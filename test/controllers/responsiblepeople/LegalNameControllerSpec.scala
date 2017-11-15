@@ -16,43 +16,28 @@
 
 package controllers.responsiblepeople
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
-import generators.ResponsiblePersonGenerator
-import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
 import models.responsiblepeople._
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
 import org.jsoup.Jsoup
-import org.scalacheck.Gen
+import org.mockito.Matchers.{eq => eqTo}
+import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
-import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 
 class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val cache = mock[DataCacheConnector]
-
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[DataCacheConnector].to(cache))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     lazy val controller = injector.instanceOf[LegalNameController]
@@ -61,25 +46,146 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
 
   "The LegalNameController" when {
     "get is called" must {
-      "prepopulate the view with data" in new TestFixture {
+      "load the page" in new TestFixture {
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last"
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+
 
         val result = controller.get(RecordId)(request)
 
-        //status(result) mustBe OK
+        status(result) must be(OK)
 
-        //val html = Jsoup.parse(contentAsString(result))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=firstName]").`val` must be("")
+        document.select("input[name=middleName]").`val` must be("")
+        document.select("input[name=lastName]").`val` must be("")
+      }
 
-        //html.select("input[type=radio][value=TestPerson]").hasAttr("checked") mustBe true
+      "prepopulate the view with data" in new TestFixture {
+
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last"
+        )
+
+        val previousPerson = PreviousName(
+          firstName = Some("firstPrevious"),
+          middleName = Some("middlePrevious"),
+          lastName = Some("lastPrevious")
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson), legalName = Some(previousPerson))
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+
+
+        val result = controller.get(RecordId)(request)
+
+        status(result) mustBe OK
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.select("input[name=firstName]").`val` must be("firstPrevious")
+        document.select("input[name=middleName]").`val` must be("middlePrevious")
+        document.select("input[name=lastName]").`val` must be("lastPrevious")
       }
 
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and" in new TestFixture {
+      "form is valid" must {
+        "go to LegalNameChangeDateController" when {
+          "edit is false" in new TestFixture {
 
-        val result = controller.post(RecordId)(request.withFormUrlEncodedBody("firstName" -> "testName"))
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true",
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last"
+            )
 
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
 
+            val result = controller.post(RecordId)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.LegalNameChangeDateController.get(RecordId).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit is true" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "true",
+              "firstName" -> "first",
+              "middleName" -> "middle",
+              "lastName" -> "last"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+
+          "edit is true and does not have previous names" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "false"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+        }
+      }
+
+      "form is invalid" must {
+        "return BAD_REQUEST" in new TestFixture {
+
+          val NameMissingInRequest = request.withFormUrlEncodedBody(
+            "hasPreviousName" -> "true"
+          )
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[PreviousName]
+
+          val result = controller.post(RecordId)(NameMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+
+      "model cannot be found with given index" must {
+        "return NOT_FOUND" in new TestFixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "hasPreviousName" -> "true",
+            "firstName" -> "first",
+            "lastName" -> "last"
+          )
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[PreviousName]
+
+          val result = controller.post(2)(requestWithParams)
+          status(result) must be(NOT_FOUND)
+        }
       }
 
     }

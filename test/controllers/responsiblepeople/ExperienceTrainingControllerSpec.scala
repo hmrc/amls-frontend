@@ -59,7 +59,7 @@ class ExperienceTrainingControllerSpec extends GenericTestHelper with MockitoSug
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
       "use correct services" in new Fixture {
         ExperienceTrainingController.authConnector must be(AMLSAuthConnector)

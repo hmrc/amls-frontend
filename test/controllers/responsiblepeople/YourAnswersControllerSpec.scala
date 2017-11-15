@@ -60,8 +60,8 @@ class YourAnswersControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "show the 'Add a responsible person' link" in new Fixture {
 
-        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1", None, None)))
-        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2", None, None)))
+        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
+        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2")))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))
@@ -78,8 +78,8 @@ class YourAnswersControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "correctly display responsible people's full names" in new Fixture {
 
-        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1", None, None)))
-        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2", None, None)))
+        val rp1 = ResponsiblePeople(Some(PersonName("firstName1", Some("middleName"), "lastName1")))
+        val rp2 = ResponsiblePeople(Some(PersonName("firstName2", None, "lastName2")))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(rp2, rp1))))

@@ -53,7 +53,7 @@ class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSu
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
 
-    val personName = PersonName("firstname", None, "lastname", None, None)
+    val personName = PersonName("firstname", None, "lastname")
 
     val passportNumber = "000000000"
   }

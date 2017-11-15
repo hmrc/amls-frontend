@@ -19,6 +19,7 @@ package controllers
 import java.net.URLEncoder
 
 import config.ApplicationConfig
+import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -48,14 +49,15 @@ import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
 import models.ReturnLocation
+import play.api.libs.json.JsResultException
 import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
 
@@ -73,6 +75,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
       override val shortLivedCache = mock[ShortLivedCache]
       override val auditConnector = mock[AuditConnector]
       override val authService = mock[AuthService]
+      override lazy val cacheConnector = mock[DataCacheConnector]
     }
 
     when {
@@ -302,6 +305,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       override val enrolmentsService = mock[AuthEnrolmentsService]
       override def auditConnector = mock[AuditConnector]
       override lazy val authService = mock[AuthService]
+      override lazy val cacheConnector = mock[DataCacheConnector]
     }
 
     when {
@@ -356,7 +360,7 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
       .thenReturn(Future.successful(Some(testData)))
   }
 
-  def buildTestCacheMap(hasChanged: Boolean, includesResponse: Boolean): CacheMap = {
+  def buildTestCacheMap(hasChanged: Boolean, includesResponse: Boolean, noTP: Boolean = false, noRP: Boolean = false): CacheMap = {
     val result = mock[CacheMap]
     val testASP = Asp(hasChanged = hasChanged)
     val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
@@ -379,13 +383,23 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
     when(result.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
     when(result.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
     when(result.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
-    when(result.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())).thenReturn(Some(testResponsiblePeople))
     when(result.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
     when(result.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
-    when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
     when(result.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
     when(result.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
     when(result.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
+
+    if (noTP) {
+      when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())) thenThrow new JsResultException(Seq.empty)
+    } else {
+      when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
+    }
+
+    if (noRP) {
+      when(result.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())) thenThrow new JsResultException(Seq.empty)
+    } else {
+      when(result.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())).thenReturn(Some(testResponsiblePeople))
+    }
 
     if (includesResponse) {
       val testResponse = SubscriptionResponse(
@@ -471,8 +485,6 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
               verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
             }
-
-
           }
 
           "there is no subscription response" should {
@@ -524,6 +536,32 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
 
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.routes.StatusController.get(true).url))
+            verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+          }
+
+          "refresh from API5 and redirect to status controller when there is no TP or RP data" in new Fixture {
+            setUpMocksForAnEnrolmentExists(controller)
+
+            val testCacheMap = buildTestCacheMap(false, false, true, true)
+
+            setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+            val fixedCacheMap = buildTestCacheMap(false, false)
+
+            when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
+
+            when {
+              controller.cacheConnector.save[TradingPremises](meq(TradingPremises.key), any())(any(), any(), any())
+            } thenReturn Future.successful(fixedCacheMap)
+
+            when {
+              controller.cacheConnector.save[ResponsiblePeople](meq(ResponsiblePeople.key), any())(any(), any(), any())
+            } thenReturn Future.successful(fixedCacheMap)
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
             verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
           }
         }

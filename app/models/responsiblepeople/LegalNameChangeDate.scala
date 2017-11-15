@@ -18,9 +18,9 @@ package models.responsiblepeople
 
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule}
+import jto.validation.{From, Rule, Write}
 import models.FormTypes._
-import org.joda.time.LocalDate
+import org.joda.time.{DateTimeFieldType, LocalDate}
 import play.api.libs.json.{Json, Writes => _}
 
 case class LegalNameChangeDate(date: LocalDate)
@@ -33,4 +33,12 @@ object LegalNameChangeDate {
     From[UrlFormEncoded] { __ =>
       (__ \ "date").read(localDateFutureRule) map LegalNameChangeDate.apply
     }
+
+  implicit def formWrites = Write[LegalNameChangeDate, UrlFormEncoded] { data =>
+    Map(
+      "date.day" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
+      "date.month" -> Seq(data.date.get(DateTimeFieldType.monthOfYear()).toString),
+      "date.year" -> Seq(data.date.get(DateTimeFieldType.year()).toString)
+    )
+  }
 }

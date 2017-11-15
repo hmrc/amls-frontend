@@ -53,7 +53,7 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
   val emptyCache = CacheMap("", Map.empty)
   val outOfBounds = 99
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
 
   "NewHomeAddressController" when {
 

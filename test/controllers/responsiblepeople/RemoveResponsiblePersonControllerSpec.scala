@@ -61,7 +61,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")))))))
 
           val result = controller.get(1, false)(request)
 
@@ -88,7 +88,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(RenewalSubmitted(None)))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -106,7 +106,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -123,7 +123,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName", None, None)), lineId = Some(4444))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -148,7 +148,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
         "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
 
           val rp = ResponsiblePeople(
-            Some(PersonName("firstName", None, "lastName", None, None))
+            Some(PersonName("firstName", None, "lastName"))
           )
 
           when(controller.statusService.getStatus(any(), any(), any()))
@@ -168,7 +168,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
         "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
 
           val rp = ResponsiblePeople(
-            Some(PersonName("firstName", None, "lastName", None, None))
+            Some(PersonName("firstName", None, "lastName"))
           )
 
           when(controller.statusService.getStatus(any(), any(), any()))
@@ -187,7 +187,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
         "respond with OK without showing endDate form when RP does have lineId" in new Fixture{
 
           val rp = ResponsiblePeople(
-            personName = Some(PersonName("firstName", None, "lastName", None, None)),
+            personName = Some(PersonName("firstName", None, "lastName")),
             lineId = Some(4444)
           )
 
@@ -502,8 +502,10 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   private val additionalPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA11AA")
   private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
   //scalastyle:off magic.number
-  val previousName = PreviousName(Some("previousFirstName"), Some("previousMiddleName"), Some("previousLastName"), Some(new LocalDate(1990, 2, 24)))
-  val personName = PersonName("firstName", Some("middleName"), "lastName", Some(previousName), Some("name"))
+  val personName = PersonName("firstName", Some("middleName"), "lastName")
+  val legalName = PreviousName(Some("firstName"), Some("middleName"), Some("lastName"))
+  val legalNameChangeDate = new LocalDate(1990, 2, 24)
+  val knownBy = KnownBy(Some("knownByName"))
   val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
   val saRegistered = SaRegisteredYes("0123456789")
   val contactDetails = ContactDetails("07000000000", "test@test.com")
@@ -517,6 +519,9 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
 
   val CompleteResponsiblePeople1 = ResponsiblePeople(
     Some(personName),
+    Some(legalName),
+    Some(legalNameChangeDate),
+    Some(knownBy),
     Some(personResidenceType),
     None,
     None,
@@ -536,6 +541,9 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   )
   val CompleteResponsiblePeople2 = ResponsiblePeople(
     Some(personName),
+    Some(legalName),
+    Some(legalNameChangeDate),
+    Some(knownBy),
     Some(personResidenceType),
     None,
     None,
@@ -555,6 +563,9 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   )
   val CompleteResponsiblePeople3 = ResponsiblePeople(
     Some(personName),
+    Some(legalName),
+    Some(legalNameChangeDate),
+    Some(knownBy),
     Some(personResidenceType),
     None,
     None,

@@ -27,16 +27,18 @@ class legal_name_change_dateSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val name = "firstName lastName"
   }
 
   "legal_name_change_date view" must {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None)
+      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.legalnamechangedate.title"))
-      heading.html must be(Messages("responsiblepeople.legalnamechangedate.heading"))
+      heading.html must be(Messages("responsiblepeople.legalnamechangedate.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "date.day") must not be empty
@@ -52,7 +54,7 @@ class legal_name_change_dateSpec extends GenericTestHelper with MustMatchers {
           (Path \ "date.year") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None)
+      def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

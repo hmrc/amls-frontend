@@ -48,13 +48,13 @@ class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar w
     )
 
     val newOfficer = ResponsiblePeople(
-      personName = Some(PersonName("New", None, "Officer", None, None)),
+      personName = Some(PersonName("New", None, "Officer")),
       positions = Some(Positions(Set(
         DesignatedMember
       ), None)))
 
     val oldOfficer = ResponsiblePeople(
-      personName = Some(PersonName("Old", None, "Officer", None, None)),
+      personName = Some(PersonName("Old", None, "Officer")),
       positions = Some(Positions(Set(
         NominatedOfficer
       ), None)))

@@ -47,6 +47,8 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
 
     val model = ResponsiblePeople(None, None)
 
+    val personName = PersonName("first name", None, "last name")
+
     when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(model))))
 
@@ -69,8 +71,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "load yourAnswers page when the status is approved" in new Fixture {
-      val personName = PersonName("first name", None, "last name", None, None)
-
       override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -88,8 +88,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "load yourAnswers page when the status is renewal submitted" in new Fixture {
-      val personName = PersonName("first name", None, "last name", None, None)
-
       override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -107,8 +105,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "load yourAnswers page when the status is approved and has no lineId" in new Fixture {
-      val personName = PersonName("first name", None, "last name", None, None)
-
       override val model = ResponsiblePeople(Some(personName), None, lineId = None)
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -126,8 +122,6 @@ class DetailedAnswersControllerSpec extends GenericTestHelper with MockitoSugar 
     }
 
     "load yourAnswers page when the status is ready for renewal" in new Fixture {
-      val personName = PersonName("first name", None, "last name", None, None)
-
       override val model = ResponsiblePeople(Some(personName), lineId = Some(121212))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

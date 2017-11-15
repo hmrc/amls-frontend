@@ -55,7 +55,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
-            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = testFitAndProper
+            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = testFitAndProper
           ))), Some(ResponsiblePeople.key))
 
           val result = controller.get(1)(request)
@@ -71,7 +71,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
-            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = Some(false)
+            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(false)
           ))), Some(ResponsiblePeople.key))
 
           val result = controller.get(1)(request)
@@ -87,7 +87,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
-            personName = Some(PersonName("firstName", None, "lastName", None, None)), hasAlreadyPassedFitAndProper = None
+            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = None
           ))), Some(ResponsiblePeople.key))
 
           val result = controller.get(1)(request)
