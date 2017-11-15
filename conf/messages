@@ -854,6 +854,12 @@ changeservices.choice.remove = Remove a service
 updateservice.removeactivities.title = What do you need to remove?
 updateservice.removeactivities.header = What do you need to remove?
 
+updateservice.removeactivitiesinformation.title = Unable to remove services
+updateservice.removeactivitiesinformation.header = Unable to remove {0}
+updateservice.removeactivitiesinformation.info.1 = As you are currently only registered for one service.
+updateservice.removeactivitiesinformation.info.2 = You will need to add a new service before you can remove the one you are currently registered for.
+updateservice.removeactivitiesinformation.info.temp = Maybe some content about de-register?
+
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
