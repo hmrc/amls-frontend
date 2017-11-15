@@ -17,8 +17,10 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
+import org.jsoup.Jsoup
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -47,10 +49,14 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
 
   "UpdateServiceDateOfChangeControllerSpec" when {
 
-    "get is called" in new Fixture {
+    "get is called" must {
+      "display date_of_change view" in new Fixture {
 
-      val result = controller.get(request)
+        val result = controller.get(request)
 
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
+      }
     }
 
     "post is called" in new Fixture {
