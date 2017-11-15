@@ -61,8 +61,8 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
     "have a list of responsible people" in new ViewFixture {
 
       val people = Seq(
-        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
+        ResponsiblePeople(PersonName("Test", None, "Person1").some),
+        ResponsiblePeople(PersonName("Test", None, "Person2").some)
       )
 
       def view = views.html.declaration.register_partners("subheading", EmptyForm, people, Seq("partner1"))
@@ -92,8 +92,8 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
     "show the correct text when there are no current partners" in new ViewFixture {
 
       val people = Seq(
-        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
+        ResponsiblePeople(PersonName("Test", None, "Person1").some),
+        ResponsiblePeople(PersonName("Test", None, "Person2").some)
       )
 
       val currentPartners = Seq.empty
@@ -106,8 +106,8 @@ class register_partnersSpec extends GenericTestHelper with MustMatchers {
     "show the correct text when there is one current partner" in new ViewFixture {
 
       val people = Seq(
-        ResponsiblePeople(PersonName("Test", None, "Person1", None, None).some),
-        ResponsiblePeople(PersonName("Test", None, "Person2", None, None).some)
+        ResponsiblePeople(PersonName("Test", None, "Person1").some),
+        ResponsiblePeople(PersonName("Test", None, "Person2").some)
       )
 
       val currentPartners = Seq("firstName lastName")

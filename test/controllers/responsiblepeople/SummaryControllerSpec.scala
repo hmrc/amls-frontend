@@ -79,16 +79,15 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "show extra content if any of the responsible people are non UK resident" in new Fixture {
 
-      val personName = Some(PersonName("firstname", None, "lastname", None, None))
+      val personName = Some(PersonName("firstname", None, "lastname"))
 
       mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
         personName,
-        Some(PersonResidenceType(
+        personResidenceType = Some(PersonResidenceType(
           NonUKResidence,
           Some(Country("United Kingdom", "GB")),
           Some(Country("France", "FR")))
-        ),
-        None
+        )
       ))), Some(ResponsiblePeople.key))
 
       val result = controller.get()(request)
@@ -128,8 +127,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Who is the business’s nominated officer?'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is pending'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
@@ -141,8 +140,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       }
       s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None,None,None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None,None,None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
@@ -157,8 +156,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Fee Guidance'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is pre amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
@@ -174,8 +173,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "redirect to 'Who is registering this business?'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
@@ -188,8 +187,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       s"'flow flag set to Some($flowFromDeclaration) and status is amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None,None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None,None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
@@ -207,8 +206,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last", None, None)), None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2", None, None)), None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
 
           mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))

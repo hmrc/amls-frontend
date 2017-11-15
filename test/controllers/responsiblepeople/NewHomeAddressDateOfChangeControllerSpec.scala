@@ -51,7 +51,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends GenericTestHelper {
   "NewHomeAddressDateOfChangeController" must {
 
     val responsiblePeople = ResponsiblePeople(personName = Some(PersonName("FirstName",
-      None, "lastName", None, None)),
+      None, "lastName")),
       positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
     "Get:" must {

@@ -18,11 +18,11 @@
 @import include._
 @import forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.legalnamechangedate.heading", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.legalnamechangedate.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -34,7 +34,6 @@
         @date(
             f = f,
             p = "date",
-            labelText = "responsiblepeople.legalnamechangedate.heading",
             example = true
         )
 

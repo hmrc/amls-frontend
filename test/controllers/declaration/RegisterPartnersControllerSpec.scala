@@ -61,8 +61,8 @@ class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar
 
     val emptyCache = CacheMap("", Map.empty)
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
-    val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1", None, Some("random"))
+    val personName = PersonName("firstName", Some("middleName"), "lastName")
+    val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(new LocalDate()))
     val rp = ResponsiblePeople (

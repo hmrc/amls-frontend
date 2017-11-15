@@ -53,12 +53,12 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
   val emptyCache = CacheMap("", Map.empty)
   val outOfBounds = 99
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
   val nino = nextNino
   val personResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("Spain", "ES")), Some(Country("Spain", "ES")))
   val updtdPersonResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("France", "FR")), Some(Country("Spain", "ES")))
   val updtdPersonResidenceTypeYes = PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
-  val responsiblePeople = ResponsiblePeople(personName, Some(personResidenceType))
+  val responsiblePeople = ResponsiblePeople(personName, personResidenceType = Some(personResidenceType))
 
   "CountryOfBirthController" when {
 

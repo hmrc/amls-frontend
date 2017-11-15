@@ -27,16 +27,18 @@ class legal_nameSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val name = "firstName lastName"
   }
 
   "legal_name view" must {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.legal_name(form2, true, 1, None)
+      def view = views.html.responsiblepeople.legal_name(form2, true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.legalName.title"))
-      heading.html must be(Messages("responsiblepeople.legalName.heading"))
+      heading.html must be(Messages("responsiblepeople.legalName.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "hasPreviousName") must not be empty
@@ -53,7 +55,7 @@ class legal_nameSpec extends GenericTestHelper with MustMatchers {
           (Path \ "lastName") -> Seq(ValidationError("fourth not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.legal_name(form2, true, 1, None)
+      def view = views.html.responsiblepeople.legal_name(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

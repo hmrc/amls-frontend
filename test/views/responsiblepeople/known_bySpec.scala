@@ -27,16 +27,18 @@ class known_bySpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val name = "firstName lastName"
   }
 
   "known_by view" must {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.known_by(form2, true, 1, None)
+      def view = views.html.responsiblepeople.known_by(form2, true, 1, None, name)
 
       doc.title must startWith(Messages("responsiblepeople.knownby.title"))
-      heading.html must be(Messages("responsiblepeople.knownby.heading"))
+      heading.html must be(Messages("responsiblepeople.knownby.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("name", "hasOtherNames") must not be empty
@@ -50,7 +52,7 @@ class known_bySpec extends GenericTestHelper with MustMatchers {
           (Path \ "otherNames") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.known_by(form2, true, 1, None)
+      def view = views.html.responsiblepeople.known_by(form2, true, 1, None, name)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")

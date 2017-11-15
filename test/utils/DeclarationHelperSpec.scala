@@ -163,19 +163,19 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   }
 
   val partnerWithName = ResponsiblePeople(
-    personName = Some(PersonName("FirstName1", None, "LastName1", None, None)),
+    personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Partner), None)),
     status = None
   )
 
   val deletedPartner = ResponsiblePeople(
-    personName = Some(PersonName("FirstName2", None, "LastName2", None, None)),
+    personName = Some(PersonName("FirstName2", None, "LastName2")),
     positions = Some(Positions(Set(Partner), None)),
     status = Some(StatusConstants.Deleted)
   )
 
   val nonPartnerWithName = ResponsiblePeople(
-    personName = Some(PersonName("FirstName1", None, "LastName1", None, None)),
+    personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Director), None)),
     status = None
   )

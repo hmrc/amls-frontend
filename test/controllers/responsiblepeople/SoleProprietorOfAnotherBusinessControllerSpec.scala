@@ -46,7 +46,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends GenericTestHelper wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
   val soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
 
   "SoleProprietorOfAnotherBusinessController" when {

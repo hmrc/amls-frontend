@@ -56,7 +56,7 @@ class AreTheyNominatedOfficerControllerSpec extends GenericTestHelper with Mocki
       lineId = Some(1),
       status = Some("")
     )
-    val personName = PersonName("firstname", None, "lastname", None, None)
+    val personName = PersonName("firstname", None, "lastname")
     val noNominatedOfficer = responsiblePerson.copy(Some(personName), positions = Some(DefaultValues.noNominatedOfficerPositions))
     val hasNominatedOfficer = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions))
     val withPartnerShip = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)))

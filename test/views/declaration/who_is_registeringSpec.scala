@@ -69,8 +69,8 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("A Person"))
 
       val people = Seq(
-        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1", None, None))),
-        ResponsiblePeople(personName = Some(PersonName("A",  None, "Name 2", None, None)))
+        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1"))),
+        ResponsiblePeople(personName = Some(PersonName("A",  None, "Name 2")))
       )
 
       def view = views.html.declaration.who_is_registering_this_registration(form2, people)
@@ -86,8 +86,8 @@ class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
       val f = Form2(WhoIsRegistering("1"))
 
       val people = Seq(
-        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1", None, None))),
-        ResponsiblePeople(personName = Some(PersonName("A",  None, "Person", None, None)))
+        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1"))),
+        ResponsiblePeople(personName = Some(PersonName("A",  None, "Person")))
       )
 
       def view = views.html.declaration.who_is_registering_this_registration(f, people)

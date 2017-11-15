@@ -43,12 +43,12 @@ class StillEmployedControllerSpec extends GenericTestHelper {
     lazy val controller = injector.instanceOf[StillEmployedController]
 
     val nominatedOfficer = ResponsiblePeople(
-      personName = Some(PersonName("firstName", None, "lastName",None, None)),
+      personName = Some(PersonName("firstName", None, "lastName")),
       positions = Some(Positions(Set(NominatedOfficer),None))
     )
 
     val otherResponsiblePerson = ResponsiblePeople(
-      personName = Some(PersonName("otherFirstName", None, "otherLastName",None, None)),
+      personName = Some(PersonName("otherFirstName", None, "otherLastName")),
       positions = Some(Positions(Set(Director),None))
     )
 
