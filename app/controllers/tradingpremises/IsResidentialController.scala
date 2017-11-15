@@ -18,43 +18,40 @@ package controllers.tradingpremises
 
 import javax.inject.{Inject, Singleton}
 
-import cats.implicits._
-import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.Country
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
-import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
-class  IsResidentialController @Inject()(override val messagesApi: MessagesApi,
-                                         val authConnector: AuthConnector,
-                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
+class  IsResidentialController @Inject()(
+                                          override val messagesApi: MessagesApi,
+                                          val authConnector: AuthConnector,
+                                          val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
 
-  def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Address]= {
+  def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Address]] = {
 
-    def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
-      businessMatching.reviewDetails.fold[Option[BCAddress]](None)(r => Some(r.businessAddress))
+    def getAddress(businessMatching: BusinessMatching): Option[Address] =
+      businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
 
     dataCacheConnector.fetchAll map { cacheO =>
-      (for {
+      for {
         cache <- cacheO
         bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
         address <- getAddress(bm)
       } yield {
         address
-      }) getOrElse Address("address", "", None, None, None, Country("United Kingdom", "UK"))
+      }
     }
   }
 
