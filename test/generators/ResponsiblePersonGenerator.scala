@@ -41,7 +41,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
   val personNameGen: Gen[PersonName] = for {
     firstName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
     lastName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
-  } yield PersonName(firstName, None, lastName, None, None)
+  } yield PersonName(firstName, None, lastName)
 
   val responsiblePersonGen: Gen[ResponsiblePeople] = for {
     personName <- personNameGen

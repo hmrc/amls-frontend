@@ -73,7 +73,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
-            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -102,7 +102,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
-            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -131,7 +131,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
-            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -160,7 +160,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
-            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -189,7 +189,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
           val responsiblePeople = ResponsiblePeople(
             addressHistory = Some(history),
-            personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+            personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -215,7 +215,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
         val responsiblePeople = ResponsiblePeople(
           addressHistory = Some(history),
-          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+          personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
           positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -242,7 +242,7 @@ class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with Mo
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
         val responsiblePeople = ResponsiblePeople(
           addressHistory = Some(history),
-          personName = Some(PersonName("firstName", Some("middleName"), "LastName", None, None)),
+          personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
           positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2017,1,1)))))
 
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

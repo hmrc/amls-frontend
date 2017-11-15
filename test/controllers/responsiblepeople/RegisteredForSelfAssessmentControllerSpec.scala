@@ -48,7 +48,7 @@ class RegisteredForSelfAssessmentControllerSpec extends GenericTestHelper with M
   }
 
   val emptyCache = CacheMap("", Map.empty)
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
 
   "RegisteredForSelfAssessmentController" when {
 

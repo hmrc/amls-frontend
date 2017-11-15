@@ -46,7 +46,7 @@ class ContactDetailsControllerSpec extends GenericTestHelper with MockitoSugar w
 
   "ContactDetailsController" when {
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
       "display the contact details page" in new Fixture {

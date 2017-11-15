@@ -58,7 +58,7 @@ class TimeAtAdditionalAddressControllerSpec extends GenericTestHelper with Mocki
 
   "TimeAtAdditionalAddressController" when {
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
 

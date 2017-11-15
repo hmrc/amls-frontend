@@ -54,7 +54,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
       "return OK" when {
 
-        val personName = PersonName("firstname", None, "lastname", None, None)
+        val personName = PersonName("firstname", None, "lastname")
         val nino = nextNino
         val residenceTypeUK = UKResidence(nino)
         val residenceTypeNonUK = NonUKResidence
@@ -390,7 +390,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             )
 
 
-            val personName = PersonName("firstname", None, "lastname", None, None)
+            val personName = PersonName("firstname", None, "lastname")
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
@@ -428,7 +428,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
           val newRequest = request.withFormUrlEncodedBody(
             "ukPassportNumber" -> "12346464688"
           )
-          val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname", None, None)))
+          val responsiblePeople = ResponsiblePeople(Some(PersonName("firstname", None, "lastname")))
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))

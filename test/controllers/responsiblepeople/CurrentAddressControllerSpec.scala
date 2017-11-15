@@ -79,7 +79,7 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
 
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
 

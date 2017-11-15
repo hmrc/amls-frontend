@@ -37,15 +37,11 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
+class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -60,12 +56,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
     val bmEmpty = Some(BusinessMatching())
 
-    when(mockCacheConnector.fetchAll(any(), any()))
-      .thenReturn(Future.successful(Some(mockCacheMap)))
-
-    when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-      .thenReturn(bm)
-
+    mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
 
   }
 
@@ -83,9 +74,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
       "return OK with change_services view - no activities" in new Fixture {
 
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(bmEmpty)
-
+        mockCacheGetEntry[BusinessMatching](Some(bmEmpty), BusinessMatching.key)
 
         val result = controller.get()(request)
 
@@ -107,13 +96,40 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
 
         "request is add with no activities " in new Fixture {
 
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(bmEmpty)
+          mockCacheGetEntry[BusinessMatching](Some(bmEmpty), BusinessMatching.key)
 
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
+        }
+
+      }
+
+      "redirect to RemoveActivitiesController" when {
+        "request is remove" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesController.get().url))
+
+        }
+      }
+
+      "redirect to RemoveActivitiesInformationController" when {
+        "there is a single service" in new Fixture{
+
+          mockCacheGetEntry[BusinessMatching](
+            Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
+            BusinessMatching.key
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesInformationController.get().url))
+
         }
       }
 
@@ -128,10 +144,10 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar{
       }
 
       "return Internal Server Error if the business matching model can't be obtained" in new Fixture {
+
         val postRequest = request.withFormUrlEncodedBody()
 
-        when(mockCacheMap.getEntry[BusinessMatching](contains(BusinessMatching.key))(any()))
-          .thenReturn(None)
+        mockCacheGetEntry[BusinessMatching](None, BusinessMatching.key)
 
         val result = controller.post()(postRequest)
 

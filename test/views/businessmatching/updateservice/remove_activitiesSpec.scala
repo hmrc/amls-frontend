@@ -16,45 +16,51 @@
 
 package views.businessmatching.updateservice
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.BusinessType
-import models.businessmatching.BusinessType.LimitedCompany
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
 import org.scalatest.MustMatchers
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.test.FakeRequest
 import utils.GenericTestHelper
 import views.Fixture
 
-class change_servicesSpec extends GenericTestHelper with MustMatchers  {
+class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
 
   trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
+
+    implicit override val request = addToken(FakeRequest())
+
   }
 
-  "change_services view" must {
-    "have correct title" in new ViewFixture {
+  "remove_activities view" must {
 
-      def view = views.html.businessmatching.updateservice.change_services(EmptyForm,Set.empty[String])
+    "display the correct headings and title" in new ViewFixture {
 
-      doc.title must startWith(Messages("changeservices.title") + " - " + Messages("summary.updateinformation"))
-      heading.html must be(Messages("changeservices.title"))
-      subHeading.html must include(Messages("summary.updateinformation"))
+      def view = views.html.businessmatching.updateservice.remove_activities(EmptyForm, Set.empty)
+
+      doc.title() must include(Messages("updateservice.removeactivities.title"))
+      heading.html() must include(Messages("updateservice.removeactivities.header"))
+      subHeading.html() must include(Messages("summary.updateservice"))
+
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "changeServices") -> Seq(ValidationError("not a message Key"))
-        ))
+      val form2: InvalidForm = InvalidForm(Map.empty, Seq(
+        (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
+      ))
 
-      def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String])
+      def view = views.html.businessmatching.updateservice.remove_activities(form2, Set.empty)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("changeServices")
+      doc.getElementById("businessActivities")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
     }
+
   }
+
+
 }

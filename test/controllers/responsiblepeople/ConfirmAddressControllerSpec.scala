@@ -52,7 +52,7 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       "ghghg"
     )
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
+    val personName = PersonName("firstName", Some("middleName"), "lastName")
 
     val rp = ResponsiblePeople (
       personName = Some(personName)

@@ -151,10 +151,10 @@ trait RegistrationProgressController extends BaseController {
 object RegistrationProgressController extends RegistrationProgressController {
   // $COVERAGE-OFF$
   override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
-  override protected[controllers] val progressService = ProgressService
   override protected[controllers] val dataCache = DataCacheConnector
   override protected[controllers] val enrolmentsService = AuthEnrolmentsService
   override protected[controllers] val statusService = StatusService
+  override protected[controllers] val progressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
   override protected[controllers] lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

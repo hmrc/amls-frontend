@@ -90,7 +90,7 @@ class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonG
       "prepopulate the view with the selected person" in new TestFixture {
 
         override lazy val responsiblePeople = Gen.listOfN(3, responsiblePersonGen).sample.get :+
-          ResponsiblePeople(Some(PersonName("Test", None, "Person", None, None)))
+          ResponsiblePeople(Some(PersonName("Test", None, "Person")))
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
 

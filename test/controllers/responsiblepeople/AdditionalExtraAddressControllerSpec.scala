@@ -62,7 +62,7 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
     } thenReturn Future.successful(Success)
   }
 
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
 
   val emptyCache = CacheMap("", Map.empty)
 

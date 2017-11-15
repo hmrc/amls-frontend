@@ -35,7 +35,6 @@ class Module extends AbstractModule {
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[connectors.AuthConnector]).toInstance(AuthConnector)
-    bind(classOf[ProgressService]).toInstance(ProgressService)
     bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
     bind(classOf[StatusService]).toInstance(StatusService)
     bind(classOf[SubmissionResponseService]).toInstance(SubmissionResponseService)

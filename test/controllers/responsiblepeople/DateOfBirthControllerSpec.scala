@@ -51,7 +51,7 @@ class DateOfBirthControllerSpec extends GenericTestHelper with MockitoSugar {
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
 
-    val personName = PersonName("firstname", None, "lastname", None, None)
+    val personName = PersonName("firstname", None, "lastname")
 
   }
 

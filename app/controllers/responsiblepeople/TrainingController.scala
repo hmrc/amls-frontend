@@ -36,9 +36,9 @@ trait TrainingController extends RepeatingSection with BaseController {
     Authorised.async {
       implicit authContext => implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)

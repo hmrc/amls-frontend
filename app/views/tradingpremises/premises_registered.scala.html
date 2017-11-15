@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], index: Int)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], index: Int, showFees: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -38,8 +38,12 @@
         }
 
     <p>@Messages("tradingpremises.have.registered.premises.text2")</p>
-    <p>@Messages("tradingpremises.have.registered.premises.text3")</p>
-
+    <p>@{if(showFees){
+        Messages("tradingpremises.have.registered.premises.text3")
+    } else {
+        Messages("tradingpremises.have.registered.premises.text3.no.fees")
+    }}
+    </p>
     @form(f, controllers.tradingpremises.routes.PremisesRegisteredController.post(index)) {
 
 
