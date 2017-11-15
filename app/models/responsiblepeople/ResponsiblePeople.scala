@@ -198,15 +198,16 @@ object ResponsiblePeople {
       if (filter(rp).equals(Nil)) {
         Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
       } else {
-        rp match {
+        filter(rp) match {
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
-          case responsiblePeople => {
-            val index = responsiblePeople.indexWhere {
-              case model if !model.isComplete => true
+          case _ => {
+            val index = rp.indexWhere {
+              case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
+
             Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
           }
         }

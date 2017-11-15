@@ -626,9 +626,9 @@ class ResponsiblePeopleWithoutHasAcceptedSpec extends PlaySpec with MockitoSugar
       initial.isComplete must be(false)
     }
 
-    "the model is has no data" in {
+    "the model has no data" in {
       val initial = ResponsiblePeople()
-      initial.isComplete must be(true)
+      initial.isComplete mustBe false
     }
 
   }
@@ -641,7 +641,7 @@ class ResponsiblePeopleWithoutHasAcceptedSpec extends PlaySpec with MockitoSugar
         when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
           .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport, ResponsiblePeople())))
 
-        ResponsiblePeople.section(mockCacheMap).status must be(models.registrationprogress.Completed)
+        ResponsiblePeople.section(mockCacheMap).status mustBe models.registrationprogress.Completed
       }
     }
   }

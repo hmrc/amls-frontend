@@ -34,6 +34,8 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import scala.concurrent.Future
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
 

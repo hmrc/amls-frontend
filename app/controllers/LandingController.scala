@@ -160,7 +160,7 @@ trait LandingController extends BaseController {
 
   }
 
-  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String)
+  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
                                                    (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
     landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber, cacheMap) map {
@@ -230,7 +230,7 @@ trait LandingController extends BaseController {
                 cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
                 case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
                 case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber)
+                case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber, Some(cacheMap))
 
               }
             } else {
@@ -254,7 +254,6 @@ trait LandingController extends BaseController {
       Future.successful(cache)
     } catch {
       case e: JsResultException =>
-        println("Exception!")
         cacheConnector.save[Seq[T]](key, Seq.empty[T])
     }
   }
