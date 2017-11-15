@@ -260,6 +260,10 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
         completeModelNonUkResidentNonUkPassport.copy(hasAccepted = true).isComplete must be(true)
       }
 
+      "the model is fully complete with no previous name added" in {
+        completeModelNonUkResidentNonUkPassportNoPreviousName.copy(hasAccepted = true).isComplete must be(true)
+      }
+
       "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
         completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
       }
@@ -784,6 +788,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
+  val completeModelNonUkResidentNonUkPassportNoPreviousName = ResponsiblePeople(
+    Some(DefaultValues.personName),
+    None,
+    None,
+    Some(DefaultValues.knownBy),
+    Some(DefaultValues.personResidenceTypeNonUk),
+    Some(DefaultValues.ukPassportNo),
+    Some(DefaultValues.nonUKPassportYes),
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
 
   val completeModelNonUkResidentNoPassport = ResponsiblePeople(
     Some(DefaultValues.personName),
