@@ -17,6 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
+import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
@@ -24,47 +25,158 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 
 class KnownByControllerSpec extends GenericTestHelper with ScalaFutures {
 
-  trait TestFixture extends AuthorisedFixture { self =>
+  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(self.authRequest)
     val RecordId = 1
 
-    val cache = mock[DataCacheConnector]
-
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[DataCacheConnector].to(cache))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     lazy val controller = injector.instanceOf[KnownByController]
 
   }
 
-  "The KnownByControllerController" when {
+  "The KnownByController" when {
     "get is called" must {
-      "prepopulate the view with data" in new TestFixture {
+      "load the page" in new TestFixture {
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last"
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
 
         val result = controller.get(RecordId)(request)
 
-        //status(result) mustBe OK
+        status(result) must be(OK)
 
-        //val html = Jsoup.parse(contentAsString(result))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[name=otherName]").`val` must be("")
 
-        //html.select("input[type=radio][value=TestPerson]").hasAttr("checked") mustBe true
+      }
+
+      "prepopulate the view with data" in new TestFixture {
+
+        val addPerson = PersonName(
+          firstName = "first",
+          middleName = Some("middle"),
+          lastName = "last"
+        )
+
+        val otherPerson = KnownBy(
+          otherNames = Some("otherName")
+        )
+
+        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson), knownBy = Some(otherPerson))
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+
+        val result = controller.get(RecordId)(request)
+
+        status(result) mustBe OK
+
+        val document = Jsoup.parse(contentAsString(result))
+
+        document.select("input[name=otherNames]").`val` must be("otherName")
       }
 
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and" in new TestFixture {
+      "form is valid" must {
+        "go to PersonResidentTypeController" when {
+          "edit is false" in new TestFixture {
 
-        val result = controller.post(RecordId)(request.withFormUrlEncodedBody("firstName" -> "testName"))
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasOtherNames" -> "true",
+              "otherNames" -> "otherName"
+            )
 
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[KnownBy]
 
+            val result = controller.post(RecordId)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.PersonResidentTypeController.get(RecordId).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit is true" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasOtherNames" -> "true",
+              "otherNames" -> "otherName"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[KnownBy]
+
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+          }
+        }
+
+        "go to DetailedAnswersController" when {
+          "edit is true and does not have other names" in new TestFixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+          "hasOtherNames" -> "false"
+          )
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[KnownBy]
+
+          val result = controller.post(RecordId, true)(requestWithParams)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+          }
+          }
+
+      }
+
+      "form is invalid" must {
+        "return BAD_REQUEST" in new TestFixture {
+
+          val NameMissingInRequest = request.withFormUrlEncodedBody(
+            "hasOtherNames" -> "true"
+          )
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[KnownBy]
+
+          val result = controller.post(RecordId)(NameMissingInRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+
+      }
+
+      "model cannot be found with given index" must {
+        "return NOT_FOUND" in new TestFixture {
+
+          val requestWithParams = request.withFormUrlEncodedBody(
+            "hasOtherNames" -> "true",
+            "otherNames" -> "otherName"
+          )
+
+          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheSave[KnownBy]
+
+          val result = controller.post(2)(requestWithParams)
+          status(result) must be(NOT_FOUND)
+        }
       }
 
     }

@@ -16,31 +16,17 @@
 
 package controllers.responsiblepeople
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
-import generators.ResponsiblePersonGenerator
-import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
 import models.responsiblepeople._
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.scalacheck.Gen
+import org.mockito.Matchers.{eq => eqTo}
+import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
-import org.scalatest.concurrent.ScalaFutures
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 
 class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
@@ -55,8 +41,6 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
       .build()
 
     lazy val controller = injector.instanceOf[LegalNameController]
-
-    val emptyCache = CacheMap("", Map.empty)
 
   }
 
@@ -146,6 +130,19 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
               "firstName" -> "first",
               "middleName" -> "middle",
               "lastName" -> "last"
+            )
+
+            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheSave[PreviousName]
+
+            val result = controller.post(RecordId, true)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+          }
+
+          "edit is true and does not have previous names" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasPreviousName" -> "false"
             )
 
             mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
