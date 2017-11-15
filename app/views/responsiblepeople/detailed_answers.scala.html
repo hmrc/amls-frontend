@@ -102,7 +102,7 @@
             editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
             dataItem = person.legalName
             ) { ln =>
-                @ln.isDefined(ln) match {
+                @ln.isDefined match {
                     case false => {<p>@Messages("lbl.no")</p>}
                     case true => {
                         <ul class="list">
@@ -128,7 +128,7 @@
             editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
             dataItem = person.knownBy
         ) { other =>
-                @other.isDefined(other) match {
+                @other.isDefined match {
                     case true => {
                     <ul class="list">
                         <li>@other.otherName</li>

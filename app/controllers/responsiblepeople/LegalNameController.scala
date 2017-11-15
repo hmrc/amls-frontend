@@ -56,7 +56,7 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
           case ValidForm(_, data) => {
             for {
               _ <- {
-                data.isDefined(data) match {
+                data.isDefined match {
                   case true => updateDataStrict[ResponsiblePeople](index) { rp =>
                     rp.legalName(data)
                   }
@@ -66,9 +66,9 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
                 }
               }
             } yield edit match {
-              case true if data.isDefined(data) => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+              case true if data.isDefined => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false if data.isDefined(data) =>
+              case false if data.isDefined =>
                 Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case _ => Redirect(routes.KnownByController.get(index, edit, flow))
             }

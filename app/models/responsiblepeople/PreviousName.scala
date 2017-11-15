@@ -30,7 +30,7 @@ case class PreviousName(
 
   val fullName = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
 
-  def isDefined(pn: PreviousName): Boolean = pn match {
+  def isDefined: Boolean = this match {
     case PreviousName(None, None, None) => false
     case _ => true
   }
@@ -71,7 +71,7 @@ object PreviousName {
 
   implicit val formWrite = Write[PreviousName, UrlFormEncoded] {
     model =>
-      model.isDefined(model) match {
+      model.isDefined match {
         case true =>
           Map(
             "hasPreviousName" -> Seq("true"),

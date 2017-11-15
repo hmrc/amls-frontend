@@ -28,7 +28,7 @@ case class KnownBy(otherNames: Option[String]) {
 
   val otherName = Seq(otherNames).flatten[String].mkString(" ")
 
-  def isDefined(kb: KnownBy): Boolean = kb match {
+  def isDefined: Boolean = this match {
     case KnownBy(None) => false
     case _ => true
   }
@@ -58,7 +58,7 @@ object KnownBy {
 
   implicit val formWrite = Write[KnownBy, UrlFormEncoded] {
     model =>
-      model.isDefined(model) match {
+      model.isDefined match {
         case true =>
           Map(
             "hasOtherNames" -> Seq("true"),
