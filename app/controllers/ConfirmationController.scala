@@ -115,14 +115,15 @@ trait ConfirmationController extends BaseController {
   }
 
   def bacsConfirmation() = Authorised.async {
-    implicit request => implicit authContext =>
-      val okResult = for {
-        refNo <- amlsRefBroker.get
-        status <- OptionT.liftF(statusService.getReadStatus(refNo))
-        name <- BusinessName.getName(status.safeId)
-      } yield Ok(views.html.confirmation.confirmation_bacs(name))
+    implicit request =>
+      implicit authContext =>
+        val okResult = for {
+          refNo <- amlsRefBroker.get
+          status <- OptionT.liftF(statusService.getReadStatus(refNo))
+          name <- BusinessName.getName(status.safeId)
+        } yield Ok(views.html.confirmation.confirmation_bacs(name))
 
-      okResult getOrElse InternalServerError("Unable to get BACS confirmation")
+        okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }
 
   def retryPayment = Authorised.async {
@@ -133,11 +134,11 @@ trait ConfirmationController extends BaseController {
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
           oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef))
           newPayment <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
-              paymentRef,
-              oldPayment.amountInPence.toDouble / 100,
-              controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
-              oldPayment.amlsRefNo,
-              oldPayment.safeId))
+            paymentRef,
+            oldPayment.amountInPence.toDouble / 100,
+            controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
+            oldPayment.amlsRefNo,
+            oldPayment.safeId))
         } yield Redirect(newPayment.links.nextUrl)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
@@ -160,7 +161,7 @@ trait ConfirmationController extends BaseController {
   }
 
   private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]])
-                                            (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+                                                (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     getFees map {
       case Some(_@(Some(payRef), total, rows, Right(Some(difference)))) if difference.value > 0 =>
         Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
@@ -179,10 +180,7 @@ trait ConfirmationController extends BaseController {
         OptionT(showRenewalConfirmation(submissionData, status))
       case _ => OptionT.liftF(submissionData map {
         case Some((Some(paymentRef), total, rows, Left(_))) => {
-          ApplicationConfig.paymentsUrlLookupToggle match {
-            case true => Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
-            case _ => Ok(confirmation(paymentRef, total, rows))
-          }
+          Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
         }
       })
     }
@@ -193,6 +191,7 @@ trait ConfirmationController extends BaseController {
 
     maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
+
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     for {
       status <- OptionT.liftF(statusService.getStatus)

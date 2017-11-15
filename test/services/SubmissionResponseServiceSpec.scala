@@ -220,8 +220,8 @@ class SubmissionResponseServiceSpec extends PlaySpec
       "not show negative fees for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
-          ResponsiblePeople(Some(PersonName("Unfit", Some("and"), "Unproper", None, None)), hasAlreadyPassedFitAndProper = Some(false)),
-          ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper", None, None)), hasAlreadyPassedFitAndProper = Some(true))
+          ResponsiblePeople(Some(PersonName("Unfit", Some("and"), "Unproper")), hasAlreadyPassedFitAndProper = Some(false)),
+          ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper")), hasAlreadyPassedFitAndProper = Some(true))
         )
 
         val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
@@ -284,8 +284,8 @@ class SubmissionResponseServiceSpec extends PlaySpec
         "they have been deleted" in new Fixture {
 
           val people = Seq(
-            ResponsiblePeople(Some(PersonName("Valid", None, "Person", None, None))),
-            ResponsiblePeople(Some(PersonName("Deleted", None, "Person", None, None)), status = Some(StatusConstants.Deleted))
+            ResponsiblePeople(Some(PersonName("Valid", None, "Person"))),
+            ResponsiblePeople(Some(PersonName("Deleted", None, "Person")), status = Some(StatusConstants.Deleted))
           )
 
           val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))

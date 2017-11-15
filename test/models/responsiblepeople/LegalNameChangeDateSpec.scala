@@ -35,11 +35,11 @@ class LegalNameChangeDateSpec extends PlaySpec with MockitoSugar {
           "date.day" -> Seq("24")
         )
 
-        val validdate = LegalNameChangeDate(
+        val validDate = LegalNameChangeDate(
           date = new LocalDate(1990, 2, 24)
         )
 
-        LegalNameChangeDate.formRule.validate(data) must equal(Valid(validdate))
+        LegalNameChangeDate.formRule.validate(data) must equal(Valid(validDate))
       }
 
     }

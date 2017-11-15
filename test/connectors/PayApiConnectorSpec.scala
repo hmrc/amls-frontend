@@ -24,19 +24,20 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import play.api.http.Status._
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience {
+class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience with OneAppPerSuite {
 
   implicit val headerCarrier = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
@@ -54,17 +55,11 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       ReturnLocation("/confirmation", "http://localhost:9222"))
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
-    val paymentsToggleValue = true
     val http = mock[WSHttp]
     val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
       override protected def environment = mock[play.api.Environment]
-
-      override def getConfBool(confKey: String, defBool: => Boolean) = confKey match {
-        case ApplicationConfig.paymentsUrlLookupToggleName => paymentsToggleValue
-        case _ => super.getConfBool(confKey, defBool)
-      }
 
       override def getConfString(confKey: String, defString: => String) = confKey match {
         case _ => super.getConfString(confKey, defString)
@@ -75,9 +70,12 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       }
     }
 
+    val auditConnector = mock[AuditConnector]
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[WSHttp].to(http))
       .bindings(bind[ServicesConfig].to(config))
+      .bindings(bind[AuditConnector].to(auditConnector))
       .build()
 
     lazy val connector = injector.instanceOf[PayApiConnector]
@@ -90,24 +88,28 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
           when {
             http.POST[CreatePaymentRequest, HttpResponse](eqTo(s"$payApiUrl/pay-api/payment"), any(), any())(any(), any(), any(), any())
           } thenReturn Future.successful(
-            HttpResponse(OK,Some(Json.toJson(validResponse)))
+            HttpResponse(OK, Some(Json.toJson(validResponse)))
           )
 
-          whenReady(connector.createPayment(validRequest)) {
-            case Some(response) => response.links.nextUrl mustBe paymentUrl
-          }
+          val result = await(connector.createPayment(validRequest))
+
+          result mustBe Some(validResponse)
+          verify(auditConnector).sendExtendedEvent(any())(any(), any())
         }
       }
 
-      "the payments feature is toggled off" must {
-        "return no result" in new TestFixture {
-          override val paymentsToggleValue = false
+      "the API returns a 400 code" must {
+        "return no result and log the failure" in new TestFixture {
+          when {
+            http.POST[CreatePaymentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+          } thenReturn Future.successful(
+            HttpResponse(BAD_REQUEST, None)
+          )
 
-          whenReady(connector.createPayment(validRequest)) { r =>
-            r must not be defined
+          val result = await(connector.createPayment(validRequest))
 
-            verify(http, never).POST(any(), any(), any())(any(), any(), any(), any())
-          }
+          result must not be defined
+          verify(auditConnector).sendExtendedEvent(any())(any(), any())
         }
       }
     }

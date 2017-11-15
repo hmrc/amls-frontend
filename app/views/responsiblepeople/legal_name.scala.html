@@ -18,11 +18,11 @@
 @import include._
 @import forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("responsiblepeople.legalName.heading", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.legalName.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
@@ -34,6 +34,7 @@
         @fieldset(
             f = f("hasPreviousName-fieldset"),
             legend = "responsiblepeople.legalName.heading",
+            legendHidden = true,
             panel=false
         ) {
             @errorGroup(
@@ -64,7 +65,7 @@
                 f = f("previous-fieldset"),
                 legend = "responsiblepeople.personName.isknownbyothernames",
                 legendHidden = true,
-                panel = false
+                panel = true
             ) {
                 @errorGroup(
                     f("previous"),

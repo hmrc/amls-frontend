@@ -90,31 +90,56 @@
         </h2>
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.previous_names"),
+            question = Messages("responsiblepeople.personName.title"),
             editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
             dataItem = person.personName
         ) { pn =>
-                @pn.previousName match {
-                case None => {<p>@Messages("lbl.no")</p>}
-                case Some(name) => {
-                <ul class="list">
-                    <li>@name.formattedPreviousName(pn)</li>
-                    <li>@Messages("responsiblepeople.detailed_answers.previous_names.since"): @name.formattedDate</li>
-                </ul>
-                }
-            }
+                <p>@pn.fullName</p>
         }
 
         @detailedAnswers(
-            question = Messages("responsiblepeople.detailed_answers.other_names"),
-            editUrl = controllers.responsiblepeople.routes.PersonNameController.get(idx, true, flow).toString(),
-            dataItem = person.personName
-        ) { pn =>
-            <p>@pn.otherNames match {
-                case None => {@Messages("lbl.no")}
-                case Some(name) => {@name}
-            }</p>
+            question = Messages("responsiblepeople.legalName.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
+            dataItem = person.legalName
+            ) { ln =>
+                @ln.isDefined match {
+                    case false => {<p>@Messages("lbl.no")</p>}
+                    case true => {
+                        <ul class="list">
+                            <li>@ln.fullName</li>
+                        </ul>
+                    }
+                }
         }
+
+        @person.legalNameChangeDate.map { legalNameChangeDate =>
+            @detailedAnswers(
+                question = Messages("responsiblepeople.legalnamechangedate.heading", personName),
+                editUrl = controllers.responsiblepeople.routes.LegalNameChangeDateController.get(idx, true, flow).toString(),
+                dataItem = person.legalNameChangeDate
+                ) { lncd =>
+                    <p>@DateHelper.formatDate(lncd)</p>
+            }
+        }
+
+
+        @detailedAnswers(
+            question = Messages("responsiblepeople.knownby.heading", personName),
+            editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
+            dataItem = person.knownBy
+        ) { other =>
+                @other.isDefined match {
+                    case true => {
+                    <ul class="list">
+                        <li>@other.otherName</li>
+                    </ul>
+                    }
+                    case false => {<p>@Messages("lbl.no")</p>}
+                }
+        }
+
+
+
 
         @detailedAnswers(
             question = Messages("responsiblepeople.detailed_answers.uk_resident", personName),

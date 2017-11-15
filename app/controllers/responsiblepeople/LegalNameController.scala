@@ -20,8 +20,13 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.{PreviousName, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.legal_name
+
+import scala.concurrent.Future
 
 @Singleton
 class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -29,12 +34,49 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(Some(personName), Some(previous), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(legal_name(Form2[PreviousName](previous), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(legal_name(EmptyForm, edit, index, flow, personName.titleName))
+          case _
+          => NotFound(notFoundView)
+        }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request => {
+        Form2[PreviousName](request.body) match {
+          case f: InvalidForm =>
+            getData[ResponsiblePeople](index) map { rp =>
+              BadRequest(views.html.responsiblepeople.legal_name(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
+          case ValidForm(_, data) => {
+            for {
+              _ <- {
+                data.isDefined match {
+                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.legalName(data)
+                  }
+                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.legalName(PreviousName(None, None, None)).copy(legalNameChangeDate = None)
+                  }
+                }
+              }
+            } yield edit match {
+              case true if data.isDefined => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              case false if data.isDefined =>
+                Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+              case _ => Redirect(routes.KnownByController.get(index, edit, flow))
+            }
+          }.recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+          }
+        }
+      }
   }
 
 }

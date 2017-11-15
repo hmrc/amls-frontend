@@ -33,12 +33,12 @@ trait NationalityController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => residencyType.nationality match {
                 case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName))
                 case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
               }
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
             case _
             => NotFound(notFoundView)

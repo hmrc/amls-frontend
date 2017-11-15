@@ -69,7 +69,7 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
     val pageTitle = Messages("responsiblepeople.additional_address.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
 
     "get is called" must {

@@ -20,8 +20,14 @@ import javax.inject.{Inject, Singleton}
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.{KnownBy, LegalNameChangeDate, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
+import views.html.responsiblepeople.known_by
+
+import scala.concurrent.Future
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
@@ -29,12 +35,46 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+        getData[ResponsiblePeople](index) map {
+          case Some(ResponsiblePeople(Some(personName), _, _, Some(otherName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(known_by(Form2[KnownBy](otherName), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          => Ok(known_by(EmptyForm, edit, index, flow, personName.titleName))
+          case _
+          => NotFound(notFoundView)
+        }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request => {
+        Form2[KnownBy](request.body) match {
+          case f: InvalidForm =>
+            getData[ResponsiblePeople](index) map { rp =>
+              BadRequest(views.html.responsiblepeople.known_by(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            }
+          case ValidForm(_, data) => {
+            for {
+              _ <- {
+                data.isDefined match {
+                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.knownBy(data)
+                  }
+                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.knownBy(KnownBy(None))
+                  }
+                }
+              }
+            } yield edit match {
+        case true => Redirect (routes.DetailedAnswersController.get (index, edit, flow) )
+        case false => Redirect (routes.PersonResidentTypeController.get (index, edit, flow) )
+        }
+        }.recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+        }
+      }
   }
+}
 
 }

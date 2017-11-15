@@ -57,7 +57,7 @@ class TrainingControllerSpec extends GenericTestHelper with MockitoSugar with Sc
     val pageTitle = Messages("responsiblepeople.training.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
 
 

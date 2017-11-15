@@ -80,7 +80,7 @@ class PositionWithinBusinessControllerSpec extends GenericTestHelper with Mockit
     val pageTitle = Messages("responsiblepeople.position_within_business.title", "firstname lastname") + " - " +
       Messages("summary.responsiblepeople") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
-    val personName = Some(PersonName("firstname", None, "lastname", None, None))
+    val personName = Some(PersonName("firstname", None, "lastname"))
 
     "get is called" must {
 

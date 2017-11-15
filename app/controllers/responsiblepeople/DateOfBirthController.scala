@@ -40,9 +40,9 @@ class DateOfBirthController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, _, _, Some(dateOfBirth), _, _, _, _,_, _, _, _, _, _, _, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,Some(dateOfBirth),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(date_of_birth(Form2[DateOfBirth](dateOfBirth), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _,_, _, _, _)) =>
+          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(date_of_birth(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }

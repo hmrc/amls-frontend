@@ -46,7 +46,7 @@ class VATRegisteredControllerSpec extends GenericTestHelper with MockitoSugar wi
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val personName = Some(PersonName("firstname", None, "lastname", None, None))
+  val personName = Some(PersonName("firstname", None, "lastname"))
 
   "RegisteredForVATController" when {
 

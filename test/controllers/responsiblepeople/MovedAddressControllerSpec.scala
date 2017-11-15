@@ -43,7 +43,7 @@ class MovedAddressControllerSpec extends GenericTestHelper with MockitoSugar {
   "MovedAddress" when {
 
 
-    val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
+    val personName = PersonName("firstName", Some("middleName"), "lastName")
     val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
     val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
     val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
@@ -88,7 +88,7 @@ class MovedAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "Load current address page successfully when no address is supplied" in new Fixture {
-        val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
+        val personName = PersonName("firstName", Some("middleName"), "lastName")
         val history = ResponsiblePersonAddressHistory(currentAddress = None)
 
         val rp = ResponsiblePeople (
@@ -158,7 +158,7 @@ class MovedAddressControllerSpec extends GenericTestHelper with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
         )
 
-        val personName = PersonName("firstName", Some("middleName"), "lastName", None, Some("name"))
+        val personName = PersonName("firstName", Some("middleName"), "lastName")
         val history = ResponsiblePersonAddressHistory(currentAddress = None)
 
         val rp = ResponsiblePeople (
