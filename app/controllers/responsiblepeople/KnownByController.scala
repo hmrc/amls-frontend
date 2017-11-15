@@ -23,6 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{KnownBy, LegalNameChangeDate, ResponsiblePeople}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.known_by
 

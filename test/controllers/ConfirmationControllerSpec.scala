@@ -61,7 +61,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
     .bindings(bind[PaymentsService].to(paymentsService))
-    .configure("microservice.services.feature-toggle.payments-url-lookup" -> true)
     .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
     .build()
 
@@ -659,121 +658,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
 
       }
-    }
-  }
-}
-
-class ConfirmationNoPaymentsSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator{
-
-  val paymentsConnector = mock[PayApiConnector]
-
-  override lazy val app: Application = new GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
-    .bindings(bindModules: _*).in(Mode.Test)
-    .bindings(bind[PayApiConnector].to(paymentsConnector))
-    .configure("microservice.services.feature-toggle.payments-url-lookup" -> false)
-    .build()
-
-  trait Fixture extends AuthorisedFixture {
-    self =>
-
-    implicit val authContext = mock[AuthContext]
-    implicit val headerCarrier = HeaderCarrier()
-
-    val baseUrl = "http://localhost"
-    val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
-
-    val controller = new ConfirmationController {
-      override protected val authConnector = self.authConnector
-      override private[controllers] val submissionResponseService = mock[SubmissionResponseService]
-      override val statusService: StatusService = mock[StatusService]
-      override val keystoreConnector = mock[KeystoreConnector]
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val amlsConnector = mock[AmlsConnector]
-      override val authEnrolmentsService = mock[AuthEnrolmentsService]
-      override val amlsRefBroker = mock[AmlsRefNumberBroker]
-      val auditConnector = mock[AuditConnector]
-    }
-
-    val response = SubscriptionResponse(
-      etmpFormBundleNumber = "",
-      amlsRefNo = amlsRegistrationNumber,
-      Some(SubscriptionFees(
-        paymentReference = paymentReferenceNumber,
-        registrationFee = 0,
-        fpFee = None,
-        fpFeeRate = None,
-        premiseFee = 0,
-        premiseFeeRate = None,
-        totalFees = 0
-      ))
-    )
-
-    protected val mockCacheMap = mock[CacheMap]
-    val paymentCookie = Cookie("test", "test-value")
-
-    reset(paymentsConnector)
-
-    when {
-      controller.submissionResponseService.getSubscription(any(), any(), any())
-    } thenReturn {
-      Future.successful((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Left(amlsRegistrationNumber)))
-    }
-
-    when {
-      controller.keystoreConnector.setConfirmationStatus(any(), any())
-    } thenReturn Future.successful()
-
-    when {
-      controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn {
-      Future.successful(Some(amlsRegistrationNumber))
-    }
-
-    when {
-      paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(None)
-
-    when {
-      controller.amlsRefBroker.get(any(), any(), any())
-    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
-
-    val defaultPaymentsReturnUrl = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber))
-
-  }
-
-  "ConfirmationController" must {
-
-    "show the old confirmation screen when the payments url lookup is toggled off" in new Fixture {
-      val companyName = "My Test Company"
-
-      val model = BusinessMatching(
-        reviewDetails = Some(ReviewDetails(companyName, None, mock[Address], ""))
-      )
-
-      val status = SubmissionReadyForReview
-
-      when {
-        controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(model))
-
-      //noinspection ScalaStyle
-      when {
-        controller.submissionResponseService.getAmendment(any(), any(), any())
-      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), Right(Some(Currency.fromInt(100))))))
-
-      when {
-        controller.statusService.getStatus(any(), any(), any())
-      } thenReturn Future.successful(status)
-
-      when {
-        controller.submissionResponseService.getSubmissionData(eqTo(status))(any(),any(),any())
-      } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency.fromInt(0), Seq(), Right(Some(Currency.fromInt(0))))))
-
-      val result = controller.get()(request)
-      val body = contentAsString(result)
-
-      Option(Jsoup.parse(body).select("div.confirmation")).isDefined mustBe true
     }
   }
 }
