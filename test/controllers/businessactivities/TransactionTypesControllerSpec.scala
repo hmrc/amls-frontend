@@ -16,26 +16,43 @@
 
 package controllers.businessactivities
 
+import generators.businessmatching.BusinessActivitiesGenerator
+import models.businessactivities.{BusinessActivities, Paper, TransactionTypes}
+import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class TransactionTypesControllerSpec extends GenericTestHelper with MustMatchers {
+class TransactionTypesControllerSpec extends GenericTestHelper
+  with MustMatchers
+  with BusinessActivitiesGenerator {
 
-  trait Fixture extends AuthorisedFixture { self =>
-
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
+    val controller = new TransactionTypesController(self.authConnector, mockCacheConnector)
 
-    val controller = new TransactionTypesController(self.authConnector)
+    mockCacheFetch(Some(BusinessActivities()))
   }
 
   "get" when {
     "called" must {
-      "return OK status" in new Fixture {
+      "return OK status with a blank form" in new Fixture {
         val result = controller.get()(request)
 
         status(result) mustBe OK
         contentAsString(result) must include(messages("businessactivities.do.keep.records"))
+      }
+
+      "return OK status with a populated form" in new Fixture {
+        val model = BusinessActivities(transactionRecordTypes = Some(TransactionTypes(Set(Paper))))
+        mockCacheFetch(Some(model))
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+
+        val html = Jsoup.parse(contentAsString(result))
+        html.select("input[type=checkbox][value=\"01\"]").first().attr("checked") mustBe "checked"
+        html.select("input[type=checkbox][value=\"02\"]").first().attr("checked") must not be "checked"
       }
     }
   }

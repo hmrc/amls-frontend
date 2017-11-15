@@ -18,18 +18,32 @@ package controllers.businessactivities
 
 import javax.inject.Inject
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2}
+import models.businessactivities.{BusinessActivities, TransactionTypes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities.transaction_types
 
 import scala.concurrent.Future
 
-class TransactionTypesController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class TransactionTypesController @Inject()
+(
+  val authConnector: AuthConnector,
+  val cacheConnector: DataCacheConnector
+) extends BaseController {
 
   def get = Authorised.async {
-    implicit auth => implicit request =>
-      Future.successful(Ok(transaction_types(EmptyForm, edit = false)))
+    implicit auth => implicit request => {
+
+      def form(ba: BusinessActivities) = ba.transactionRecordTypes.fold[Form2[TransactionTypes]](EmptyForm)(Form2(_))
+
+      for {
+        ba <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
+      } yield Ok(transaction_types(form(ba), edit = false))
+    } getOrElse InternalServerError("Cannot fetch business activities")
   }
 
   def post = Authorised.async {

@@ -34,6 +34,7 @@ case class BusinessActivities(
                                howManyEmployees: Option[HowManyEmployees] = None,
                                whoIsYourAccountant: Option[WhoIsYourAccountant] = None,
                                taxMatters: Option[TaxMatters] = None,
+                               transactionRecordTypes: Option[TransactionTypes] = None,
                                hasChanged: Boolean = false,
                                hasAccepted: Boolean = false
                              ) {
@@ -96,17 +97,17 @@ case class BusinessActivities(
       this match {
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, true) => true
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) => true
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, false) => false
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, false) => false
         case _ => false
       }
   } else {
       this match {
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _) => true
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, _) => true
         case _ => false
       }
     }
@@ -148,6 +149,7 @@ object BusinessActivities {
       __.read(Reads.optionNoError[HowManyEmployees]) and
       __.read(Reads.optionNoError[WhoIsYourAccountant]) and
       __.read(Reads.optionNoError[TaxMatters]) and
+      __.read(Reads.optionNoError[TransactionTypes]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
@@ -167,7 +169,8 @@ object BusinessActivities {
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
         Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
-        Json.toJson(model.taxMatters).asOpt[JsObject]
+        Json.toJson(model.taxMatters).asOpt[JsObject],
+        Json.toJson(model.transactionRecordTypes).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
