@@ -95,13 +95,13 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
 
     "post is called" must {
 
-      "redirect to UpdateAnyInformationController" when {
+      "redirect to UpdateServiceDateOfChangeController" when {
         "service can be removed" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("businessActivities[]" -> "03"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.UpdateAnyInformationController.get().url))
+          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get().url))
 
         }
       }
