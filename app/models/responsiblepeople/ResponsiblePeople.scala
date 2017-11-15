@@ -144,17 +144,12 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
       this match {
         case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, true, _, _, _, otherBusinessSP)
           if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
-        case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, false, _, _, _, otherBusinessSP)
-          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => false
-        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, true, _, _, _, None) => true
-        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, false, _, _, _, None) => false
         case _ => false
       }
     } else {
       this match {
         case ResponsiblePeople(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), Some(_), Some(pos), Some(_), _, Some(_), Some(_), _, _, _, _, _, _, otherBusinessSP)
           if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
-        case ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, None) => true
         case _ => false
       }
     }
@@ -203,15 +198,16 @@ object ResponsiblePeople {
       if (filter(rp).equals(Nil)) {
         Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
       } else {
-        rp match {
+        filter(rp) match {
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
-          case responsiblePeople => {
-            val index = responsiblePeople.indexWhere {
-              case model if !model.isComplete => true
+          case _ => {
+            val index = rp.indexWhere {
+              case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
+
             Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
           }
         }

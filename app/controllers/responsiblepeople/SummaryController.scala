@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
-
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import scala.concurrent.Future
 
 class SummaryController @Inject()(
@@ -59,7 +59,7 @@ class SummaryController @Inject()(
         case None => {
           (for {
             model <- OptionT(fetchModel)
-            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model map (_.copy(hasAccepted = true))))
+            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update ResponsiblePeople")
         }
       }
