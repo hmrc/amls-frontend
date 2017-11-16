@@ -105,7 +105,7 @@ object BusinessActivities {
      (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) map (BusinessActivities(_))
    }
 
-  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter(_))
+  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter _)
 
   private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
     Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))

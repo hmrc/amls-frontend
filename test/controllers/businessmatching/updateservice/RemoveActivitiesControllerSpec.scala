@@ -100,7 +100,7 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
           val result = controller.post()(request.withFormUrlEncodedBody("businessActivities[]" -> "03"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get().url))
+          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get("03").url))
 
         }
         "mutliple services are removed" in new Fixture {
@@ -117,7 +117,7 @@ class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar
           ))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get("03", "04").url))
+          redirectLocation(result) must be(Some(routes.UpdateServiceDateOfChangeController.get("03/04").url))
 
         }
       }

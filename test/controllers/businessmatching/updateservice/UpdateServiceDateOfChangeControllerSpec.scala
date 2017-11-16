@@ -52,7 +52,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     "get is called" must {
       "display date_of_change view" in new Fixture {
 
-        val result = controller.get(request)
+        val result = controller.get("")(request)
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
@@ -63,7 +63,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
 
-          val result = controller.post(request.withFormUrlEncodedBody(
+          val result = controller.post("")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
             "dateOfChange.month" -> "10",
             "dateOfChange.year" -> "2017"
@@ -77,7 +77,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       "respond with BAD_REQUEST" when {
         "request is invalid" in new Fixture {
 
-          val result = controller.post(request)
+          val result = controller.post("")(request)
 
           status(result) must be(BAD_REQUEST)
         }

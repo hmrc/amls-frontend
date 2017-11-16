@@ -60,7 +60,7 @@ class RemoveActivitiesController @Inject()(
           Form2[BusinessActivities](request.body) match {
             case ValidForm(_, data) =>
               if (data.businessActivities.size < activities.size) {
-                Redirect(UpdateServiceDateOfChangeController.get("03"))
+                Redirect(UpdateServiceDateOfChangeController.get(data.businessActivities map BusinessActivities.getValue mkString "/"))
               } else {
                 Redirect(RemoveActivitiesInformationController.get())
               }
