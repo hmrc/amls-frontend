@@ -22,14 +22,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.BusinessActivities
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Path, Rule, RuleLike}
+import models.FormTypes
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import routes._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
@@ -40,6 +43,9 @@ class RemoveActivitiesController @Inject()(
                                           val statusService: StatusService,
                                           val dataCacheConnector: DataCacheConnector
                                           ) extends BaseController {
+
+  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
+    FormTypes.businessActivityRule("error.required.bm.remove.service")
 
   def get = Authorised.async{
     implicit authContext =>
