@@ -73,7 +73,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     "post is called" must {
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
-          
+
           mockCacheSave[BusinessMatching]
 
           when {

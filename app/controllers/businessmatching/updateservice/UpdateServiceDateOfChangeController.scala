@@ -44,7 +44,7 @@ class UpdateServiceDateOfChangeController @Inject()(
     implicit authContext =>
       implicit request =>
         mapRequestToServices(services) match {
-          case Right(_) => Future.successful(Ok(view(EmptyForm)))
+          case Right(_) => Future.successful(Ok(view(EmptyForm, services)))
           case Left(result) => Future.successful(result)
         }
   }
@@ -75,13 +75,13 @@ class UpdateServiceDateOfChangeController @Inject()(
                   ).copy(hasAccepted = true)
                 ))
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
-            case f:InvalidForm => Future.successful(BadRequest(view(f)))
+            case f:InvalidForm => Future.successful(BadRequest(view(f, services)))
           }
           case Left(result) => Future.successful(result)
         }
   }
 
-  private def view(f: Form2[_])(implicit request: Request[_]) =
-    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(""))
+  private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
+    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))
 
 }
