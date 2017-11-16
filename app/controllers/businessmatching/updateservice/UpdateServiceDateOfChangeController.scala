@@ -42,21 +42,23 @@ class UpdateServiceDateOfChangeController @Inject()(
         }
   }
 
-  private def mapRequestToServices(request: String): Either[Result, Set[BusinessActivity]] = {
+  private def mapRequestToServices(services: String): Either[Result, Set[BusinessActivity]] =
     try {
-      Right((request split "/" map BusinessActivities.getBusinessActivity).toSet)
+      Right((services split "/" map BusinessActivities.getBusinessActivity).toSet)
     } catch {
       case _: MatchError => Left(BadRequest)
     }
-  }
 
   def post(services: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
-      Form2[DateOfChange](request.body) match {
-        case ValidForm(_, _) => Future.successful(Redirect(UpdateAnyInformationController.get()))
-        case f:InvalidForm => Future.successful(BadRequest(view(f)))
-      }
+        mapRequestToServices(services) match {
+          case Right(_) => Form2[DateOfChange](request.body) match {
+            case ValidForm(_, _) => Future.successful(Redirect(UpdateAnyInformationController.get()))
+            case f:InvalidForm => Future.successful(BadRequest(view(f)))
+          }
+          case Left(result) => Future.successful(result)
+        }
   }
 
   private def view(f: Form2[_])(implicit request: Request[_]) =
