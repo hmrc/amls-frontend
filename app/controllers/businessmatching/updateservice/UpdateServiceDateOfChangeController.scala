@@ -18,19 +18,26 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
+import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class UpdateServiceDateOfChangeController @Inject()(
-                                                   val authConnector: AuthConnector
+                                                   val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val businessMatchingService: BusinessMatchingService
                                                    ) extends BaseController {
 
   def get(services: String) = Authorised.async{
@@ -53,8 +60,21 @@ class UpdateServiceDateOfChangeController @Inject()(
     implicit authContext =>
       implicit request =>
         mapRequestToServices(services) match {
-          case Right(_) => Form2[DateOfChange](request.body) match {
-            case ValidForm(_, _) => Future.successful(Redirect(UpdateAnyInformationController.get()))
+          case Right(removeActivities) => Form2[DateOfChange](request.body) match {
+            case ValidForm(_, data) =>
+              (for {
+                businessMatching <- businessMatchingService.getModel
+                activities <- OptionT.fromOption[Future](businessMatching.activities)
+                _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+                  businessMatching.activities(
+                    activities.copy(
+                      businessActivities = activities.businessActivities diff removeActivities,
+                      additionalActivities = activities.additionalActivities,
+                      dateOfChange = Some(data)
+                    )
+                  ).copy(hasAccepted = true)
+                ))
+              } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f)))
           }
           case Left(result) => Future.successful(result)

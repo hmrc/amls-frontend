@@ -18,6 +18,7 @@ package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, _}
+import models.DateOfChange
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
@@ -25,7 +26,9 @@ import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
 import play.api.libs.functional.syntax._
 
-case class BusinessActivities(businessActivities: Set[BusinessActivity], additionalActivities: Option[Set[BusinessActivity]] = None)
+case class BusinessActivities(businessActivities: Set[BusinessActivity],
+                              additionalActivities: Option[Set[BusinessActivity]] = None,
+                              dateOfChange: Option[DateOfChange] = None)
 
 sealed trait BusinessActivity {
 

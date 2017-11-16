@@ -16,11 +16,17 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessActivity, EstateAgentBusinessService, HighValueDealing}
+import models.DateOfChange
+import models.businessmatching._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.{MustMatchers, PrivateMethodTester}
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -30,6 +36,9 @@ import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with PrivateMethodTester with Results{
 
@@ -64,6 +73,17 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     "post is called" must {
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
+          
+          mockCacheSave[BusinessMatching]
+
+          when {
+            controller.businessMatchingService.getModel(any(),any(),any())
+          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              EstateAgentBusinessService,
+              HighValueDealing
+            )))
+          ))
 
           val result = controller.post("03")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
@@ -130,6 +150,45 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
 
         }
       }
+    }
+
+  }
+
+  it must {
+
+    "save the DateOfChange to BusinessActivities" in new Fixture {
+
+      mockCacheSave[BusinessMatching]
+
+      when {
+        controller.businessMatchingService.getModel(any(),any(),any())
+      } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+        activities = Some(BusinessActivities(Set(
+          EstateAgentBusinessService,
+          HighValueDealing
+        )))
+      ))
+
+      val result = controller.post("04")(request.withFormUrlEncodedBody(
+        "dateOfChange.day" -> "13",
+        "dateOfChange.month" -> "10",
+        "dateOfChange.year" -> "2017"
+      ))
+
+      status(result) must be(SEE_OTHER)
+
+      verify(controller.dataCacheConnector).save(
+        eqTo(BusinessMatching.key),
+        eqTo(BusinessMatching(
+          activities = Some(BusinessActivities(
+            Set(EstateAgentBusinessService),
+            None,
+            Some(DateOfChange(new LocalDate(2017,10,13)))
+          )),
+          hasChanged = true,
+          hasAccepted = true
+        )))(any(),any(),any())
+
     }
 
   }
