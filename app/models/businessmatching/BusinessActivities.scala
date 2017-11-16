@@ -124,7 +124,7 @@ object BusinessActivities {
       }
 
     } and (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
-      case Some(a) => {
+      case Some(a) =>
         val activities = activitiesReader(a, "additionalActivities")
 
         activities.foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))) { (result, data) =>
@@ -135,8 +135,6 @@ object BusinessActivities {
             }
           }
         }
-
-      }
       case _ => None
     })((a, b) => BusinessActivities(a,b))
   }
@@ -164,6 +162,17 @@ object BusinessActivities {
       case MoneyServiceBusiness => "05"
       case TrustAndCompanyServices => "06"
       case TelephonePaymentService => "07"
+    }
+
+  def getBusinessActivity(ba:String): BusinessActivity =
+    ba match {
+      case "01" => AccountancyServices
+      case "02" => BillPaymentServices
+      case "03" => EstateAgentBusinessService
+      case "04" => HighValueDealing
+      case "05" => MoneyServiceBusiness
+      case "06" => TrustAndCompanyServices
+      case "07" => TelephonePaymentService
     }
 
 }
