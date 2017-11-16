@@ -52,10 +52,33 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     "get is called" must {
       "display date_of_change view" in new Fixture {
 
-        val result = controller.get(request)
+        val result = controller.get("01")(request)
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
+      }
+      "respond with BAD_REQUEST" when {
+        "request contains id not linked to business activities" in new Fixture {
+
+          val result = controller.get("01/123/03")(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+        "request contains invalid string in sequence" in new Fixture {
+
+          val result = controller.get("03/abc/04")(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
+        "request contains empty string" in new Fixture {
+
+          val result = controller.get("")(request)
+
+          status(result) must be(BAD_REQUEST)
+
+        }
       }
     }
 
@@ -63,7 +86,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
 
-          val result = controller.post(request.withFormUrlEncodedBody(
+          val result = controller.post("")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
             "dateOfChange.month" -> "10",
             "dateOfChange.year" -> "2017"
@@ -77,7 +100,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       "respond with BAD_REQUEST" when {
         "request is invalid" in new Fixture {
 
-          val result = controller.post(request)
+          val result = controller.post("")(request)
 
           status(result) must be(BAD_REQUEST)
         }

@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.BusinessActivities
@@ -36,7 +37,8 @@ import scala.concurrent.Future
 class RemoveActivitiesController @Inject()(
                                           val authConnector: AuthConnector,
                                           val businessMatchingService: BusinessMatchingService,
-                                          val statusService: StatusService
+                                          val statusService: StatusService,
+                                          val dataCacheConnector: DataCacheConnector
                                           ) extends BaseController {
 
   def get = Authorised.async{
@@ -58,7 +60,7 @@ class RemoveActivitiesController @Inject()(
           Form2[BusinessActivities](request.body) match {
             case ValidForm(_, data) =>
               if (data.businessActivities.size < activities.size) {
-                Redirect(UpdateServiceDateOfChangeController.get())
+                Redirect(UpdateServiceDateOfChangeController.get(data.businessActivities map BusinessActivities.getValue mkString "/"))
               } else {
                 Redirect(RemoveActivitiesInformationController.get())
               }

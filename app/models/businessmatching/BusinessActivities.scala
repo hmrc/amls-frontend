@@ -105,7 +105,7 @@ object BusinessActivities {
      (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.register.service")) map (BusinessActivities(_))
    }
 
-  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter(_))
+  implicit def formWrites(implicit w: Write[BusinessActivity, String]) = Write[BusinessActivities, UrlFormEncoded](activitiesWriter _)
 
   private def activitiesWriter(activities: BusinessActivities)(implicit w: Write[BusinessActivity, String]) =
     Map("businessActivities[]" -> activities.additionalActivities.fold(activities.businessActivities){act => act}.toSeq.map(w.writes))
@@ -124,7 +124,7 @@ object BusinessActivities {
       }
 
     } and (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
-      case Some(a) => {
+      case Some(a) =>
         val activities = activitiesReader(a, "additionalActivities")
 
         activities.foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))) { (result, data) =>
@@ -135,8 +135,6 @@ object BusinessActivities {
             }
           }
         }
-
-      }
       case _ => None
     })((a, b) => BusinessActivities(a,b))
   }
@@ -164,6 +162,17 @@ object BusinessActivities {
       case MoneyServiceBusiness => "05"
       case TrustAndCompanyServices => "06"
       case TelephonePaymentService => "07"
+    }
+
+  def getBusinessActivity(ba:String): BusinessActivity =
+    ba match {
+      case "01" => AccountancyServices
+      case "02" => BillPaymentServices
+      case "03" => EstateAgentBusinessService
+      case "04" => HighValueDealing
+      case "05" => MoneyServiceBusiness
+      case "06" => TrustAndCompanyServices
+      case "07" => TelephonePaymentService
     }
 
 }
