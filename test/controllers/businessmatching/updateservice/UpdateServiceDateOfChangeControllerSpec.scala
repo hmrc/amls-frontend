@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
-import models.businessmatching.BusinessActivity
+import models.businessmatching.{BusinessActivity, EstateAgentBusinessService, HighValueDealing}
 import org.jsoup.Jsoup
 import org.scalatest.{MustMatchers, PrivateMethodTester}
 import org.scalatest.mock.MockitoSugar
@@ -65,7 +65,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
 
-          val result = controller.post("")(request.withFormUrlEncodedBody(
+          val result = controller.post("03")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
             "dateOfChange.month" -> "10",
             "dateOfChange.year" -> "2017"
@@ -87,6 +87,20 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     }
 
     "mapRequestToServices" must {
+
+      "respond with list of services" in new Fixture {
+
+        val mapRequestToServices = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToServices)
+
+        val result = controller invokePrivate mapRequestToServices("03/04")
+
+        result must be(Right(Set(
+          EstateAgentBusinessService,
+          HighValueDealing
+        )))
+
+      }
+
       "respond with BAD_REQUEST" when {
         "request contains id not linked to business activities" in new Fixture {
 
