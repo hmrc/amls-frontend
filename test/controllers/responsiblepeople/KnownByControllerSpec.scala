@@ -74,6 +74,7 @@ class KnownByControllerSpec extends GenericTestHelper with ScalaFutures {
         )
 
         val otherPerson = KnownBy(
+          hasOtherNames = Some(true),
           otherNames = Some("otherName")
         )
 

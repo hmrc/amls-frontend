@@ -24,21 +24,19 @@ import models.FormTypes._
 import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 
-case class KnownBy(otherNames: Option[String]) {
+case class KnownBy(
+                    hasOtherNames: Option[Boolean],
+                    otherNames: Option[String]) {
 
   val otherName = Seq(otherNames).flatten[String].mkString(" ")
 
-  def isDefined: Boolean = this match {
-    case KnownBy(None) => false
-    case _ => true
-  }
 }
 
 object KnownBy {
 
   import play.api.libs.json._
 
-  implicit val formats = Json.format[KnownBy]
+  //implicit val formats = Json.format[KnownBy]
 
 
 
@@ -51,15 +49,15 @@ object KnownBy {
   implicit val formRule: Rule[UrlFormEncoded, KnownBy] =
     From[UrlFormEncoded] { __ =>
       (__ \ "hasOtherNames").read[Boolean].withMessage("error.required.rp.hasOtherNames") flatMap  {
-        case true => (__ \ "otherNames").read(otherNamesType) map { x => KnownBy(Some(x))}
-        case false => Rule.fromMapping { _ => Valid(KnownBy(None)) }
+        case true => (__ \ "otherNames").read(otherNamesType) map { x => KnownBy(Some(true), Some(x))}
+        case false => Rule.fromMapping { _ => Valid(KnownBy(Some(false), None)) }
       }
     }
 
   implicit val formWrite = Write[KnownBy, UrlFormEncoded] {
     model =>
-      model.isDefined match {
-        case true =>
+      model.hasOtherNames match {
+        case Some(true) =>
           Map(
             "hasOtherNames" -> Seq("true"),
             "otherNames" -> Seq(model.otherNames getOrElse "")
@@ -68,4 +66,36 @@ object KnownBy {
           Map("hasOtherNames" -> Seq("false"))
       }
   }
+
+  def constant[A](x: A): Reads[A] = new Reads[A] {
+    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+  }
+
+  //implicit val format = Json.format[PreviousName]
+
+  def hasOtherNameReader: Reads[Option[Boolean]] = {
+
+    (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>
+      d match {
+        case None => (__ \ "otherNames").readNullable[String] map { f =>
+
+          (d, f) match {
+            case (None, None) => Some(false)
+            case _ => Some(true)
+          }
+        }
+        case p => constant(p)
+      }
+    }
+  }
+
+  implicit val jsonReads : Reads[KnownBy] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    hasOtherNameReader and
+      (__ \ "otherNames").readNullable[String]
+  }.apply(KnownBy.apply _)
+
+  implicit val jsonWrites = Json.writes[KnownBy]
 }

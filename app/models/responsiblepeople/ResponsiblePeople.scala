@@ -145,15 +145,18 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
         case ResponsiblePeople(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
           if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
         case ResponsiblePeople(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory && !pName.isDefined => true
-        case _ => false
+          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory && pName.hasPreviousName.contains(Some(false)) => true
+        case _ => {
+          println("sSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS")
+          false
+        }
       }
     } else {
       this match {
         case ResponsiblePeople(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, _, _, _, _, otherBusinessSP)
           if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory => true
         case ResponsiblePeople(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory && !pName.isDefined => true
+          if pos.startDate.isDefined && checkVatField(otherBusinessSP) && validateAddressHistory && pName.hasPreviousName.contains(Some(false)) => true
         case _ => false
       }
     }

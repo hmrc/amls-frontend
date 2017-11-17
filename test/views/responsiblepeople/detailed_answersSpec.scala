@@ -336,6 +336,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   val nino = nextNino
 
   val previousName = PreviousName(
+    Some(true),
     Some("firstName"),
     Some("middleName"),
     Some("lastName")
