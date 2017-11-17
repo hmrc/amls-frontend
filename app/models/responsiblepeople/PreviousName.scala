@@ -85,8 +85,6 @@ object PreviousName {
     override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
-  //implicit val format = Json.format[PreviousName]
-
   def hasPreviousNameReader: Reads[Option[Boolean]] = {
 
     (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>

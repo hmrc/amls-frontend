@@ -71,8 +71,6 @@ object KnownBy {
     override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
-  //implicit val format = Json.format[PreviousName]
-
   def hasOtherNameReader: Reads[Option[Boolean]] = {
 
     (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>
