@@ -617,7 +617,7 @@ with GenericTestHelper
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
         )
 
-        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(AccountancyServices), Set(HighValueDealing, EstateAgentBusinessService))
+        val result = service.removeBusinessActivitiesFromTradingPremises(models, Set(AccountancyServices), Set(HighValueDealing, EstateAgentBusinessService))
 
         result must be(Seq(
           models.head.copy(

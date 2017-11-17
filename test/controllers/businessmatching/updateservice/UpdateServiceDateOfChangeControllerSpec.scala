@@ -19,8 +19,10 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
+import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.{MustMatchers, PrivateMethodTester}
@@ -40,7 +42,12 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with PrivateMethodTester with Results{
+class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
+  with MockitoSugar
+  with MustMatchers
+  with PrivateMethodTester
+  with Results
+  with TradingPremisesGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -73,7 +80,13 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
     "post is called" must {
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
+          
+          val tradingPremises = Seq(
+            tradingPremisesGen.sample.get,
+            tradingPremisesGen.sample.get
+          )
 
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
           mockCacheSave[BusinessMatching]
 
           when {
@@ -156,9 +169,16 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
 
   it must {
 
-    "save the DateOfChange to BusinessActivities" in new Fixture {
+    "save the DateOfChange to BusinessActivities and update Trading Premises" in new Fixture {
 
+      val tradingPremises = Seq(
+        tradingPremisesGen.sample.get,
+        tradingPremisesGen.sample.get
+      )
+
+      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
       mockCacheSave[BusinessMatching]
+      mockCacheSave[Seq[BusinessMatching]]
 
       when {
         controller.businessMatchingService.getModel(any(),any(),any())
@@ -168,6 +188,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
           HighValueDealing
         )))
       ))
+
+      when {
+        controller.businessMatchingService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
+      } thenReturn tradingPremises
 
       val result = controller.post("04")(request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "13",
@@ -188,6 +212,11 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper with Moc
           hasChanged = true,
           hasAccepted = true
         )))(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save(
+        eqTo(TradingPremises.key),
+        eqTo(tradingPremises)
+      )(any(),any(),any())
 
     }
 
