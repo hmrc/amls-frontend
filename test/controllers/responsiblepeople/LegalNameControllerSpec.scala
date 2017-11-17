@@ -78,6 +78,7 @@ class LegalNameControllerSpec extends GenericTestHelper with ScalaFutures {
         )
 
         val previousPerson = PreviousName(
+          hasPreviousName = Some(true),
           firstName = Some("firstPrevious"),
           middleName = Some("middlePrevious"),
           lastName = Some("lastPrevious")

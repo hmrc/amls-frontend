@@ -56,19 +56,19 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
           case ValidForm(_, data) => {
             for {
               _ <- {
-                data.isDefined match {
-                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                data.hasPreviousName match {
+                  case Some(true) => updateDataStrict[ResponsiblePeople](index) { rp =>
                     rp.legalName(data)
                   }
-                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
-                    rp.legalName(PreviousName(None, None, None)).copy(legalNameChangeDate = None)
+                  case Some(false) => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.legalName(PreviousName(Some(false), None, None, None)).copy(legalNameChangeDate = None)
                   }
                 }
               }
             } yield edit match {
-              case true if data.isDefined => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
+              case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false if data.isDefined =>
+              case false if data.hasPreviousName.contains(true) =>
                 Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case _ => Redirect(routes.KnownByController.get(index, edit, flow))
             }

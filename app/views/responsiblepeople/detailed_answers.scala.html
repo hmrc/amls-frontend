@@ -101,10 +101,10 @@
             question = Messages("responsiblepeople.legalName.heading", personName),
             editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
             dataItem = person.legalName
-            ) { ln =>
-                @ln.isDefined match {
-                    case false => {<p>@Messages("lbl.no")</p>}
-                    case true => {
+            ) { ln =>O
+                @ln.hasPreviousName match {
+                    case Some(false) => {<p>@Messages("lbl.no")</p>}
+                    case Some(true) => {
                         <ul class="list">
                             <li>@ln.fullName</li>
                         </ul>
@@ -128,13 +128,13 @@
             editUrl = controllers.responsiblepeople.routes.KnownByController.get(idx, true, flow).toString(),
             dataItem = person.knownBy
         ) { other =>
-                @other.isDefined match {
-                    case true => {
+                @other.hasOtherNames match {
+                    case Some(true) => {
                     <ul class="list">
                         <li>@other.otherName</li>
                     </ul>
                     }
-                    case false => {<p>@Messages("lbl.no")</p>}
+                    case Some(false) => {<p>@Messages("lbl.no")</p>}
                 }
         }
 
