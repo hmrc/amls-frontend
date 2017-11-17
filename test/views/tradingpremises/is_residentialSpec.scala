@@ -68,13 +68,25 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
       errorSummary.html() must include("not a message Key")
     }
 
-    "the have a residential address" in new ViewFixture {
+    "the have a residential address" when {
+      "first trading premises" in new ViewFixture {
 
-      def view = views.html.tradingpremises.is_residential(EmptyForm, Some(address),1, false)
+        def view = views.html.tradingpremises.is_residential(EmptyForm, Some(address),1, false)
 
 
-      doc.html() must include("Whitehill")
+        doc.html() must include("Whitehill")
 
+      }
+    }
+    "must not show the address" when {
+      "second trading premises" in new ViewFixture {
+
+        def view = views.html.tradingpremises.is_residential(EmptyForm, Some(address),2, false)
+
+
+        doc.html() must not include("Whitehill")
+
+      }
     }
 
   }

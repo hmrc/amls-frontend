@@ -49,9 +49,7 @@ class  IsResidentialController @Inject()(
         cache <- cacheO
         bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
         address <- getAddress(bm)
-      } yield {
-        address
-      }
+      } yield address
     }
   }
 
