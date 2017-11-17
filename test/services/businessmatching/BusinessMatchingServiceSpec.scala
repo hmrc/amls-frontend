@@ -19,14 +19,14 @@ package services.businessmatching
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.{DateOfChange, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.WhatDoesYourBusinessDo
+import models.{DateOfChange, ViewResponse}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
@@ -608,49 +608,38 @@ with GenericTestHelper
 
   "assignBusinessActivitiesToTradingPremises" must {
     "remove business activities from trading premises" which {
-      "also adds one remaining business activity to trading premises without business activity" in new Fixture {
+      "also adds the first of remaining business activity to those trading premises without business activity" in new Fixture {
 
         val models = Seq(
-          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen().sample.get,
-          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
         )
 
-        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(AccountancyServices))
+        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(AccountancyServices), Set(HighValueDealing, EstateAgentBusinessService))
 
         result must be(Seq(
-          models.head,
-          models(1),
+          models.head.copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(1).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
           models(2).copy(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
             hasAccepted = true,
             hasChanged = true
           ),
-          models(3)
-        ))
-
-      }
-      "also adds first of remaining business activities to trading premises without business activity" in new Fixture {
-
-        val models = Seq(
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen().sample.get,
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get
-        )
-
-        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(HighValueDealing, AccountancyServices))
-
-        result must be(Seq(
-          models.head,
-          models(1).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          models(3).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
             hasAccepted = true,
             hasChanged = true
-          ),
-          models(2),
-          models(3)
+          )
         ))
 
       }

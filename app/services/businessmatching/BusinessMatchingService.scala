@@ -128,17 +128,22 @@ class BusinessMatchingService @Inject()(
       ).copy(hasAccepted = true)
     }
 
-  def assignBusinessActivitiesToTradingPremises(tradingPremises: Seq[TradingPremises], businessActivity: Set[BusinessActivity]): Seq[TradingPremises] = {
+  def assignBusinessActivitiesToTradingPremises(
+                                                 tradingPremises: Seq[TradingPremises],
+                                                 existingActivities: Set[BusinessActivity],
+                                                 removeActivities: Set[BusinessActivity]): Seq[TradingPremises] = {
 
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp.whatDoesYourBusinessDoAtThisAddress(
         tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)){ wdybd =>
-          WhatDoesYourBusinessDo(
-            if(wdybd.activities.isEmpty){
-              Set(businessActivity.head)
-            } else {
-              wdybd.activities
-            })
+
+          WhatDoesYourBusinessDo({
+            wdybd.activities diff removeActivities match {
+              case remainingActivities if remainingActivities.nonEmpty => remainingActivities
+              case _ => Set(existingActivities.head)
+            }
+          })
+
         }
       ).copy(hasAccepted = true)
 
