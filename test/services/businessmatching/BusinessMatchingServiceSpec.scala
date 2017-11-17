@@ -557,7 +557,7 @@ with GenericTestHelper
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
           )
 
-          val result = service.patchTradingPremises(Seq(4), models, AccountancyServices, false)
+          val result = service.addBusinessActivtiesToTradingPremises(Seq(4), models, AccountancyServices, false)
 
           result.head mustBe models.head
           result(1) mustBe models(1)
@@ -576,7 +576,7 @@ with GenericTestHelper
             tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
           )
 
-          val result = service.patchTradingPremises(Seq(0,2), models, AccountancyServices, true)
+          val result = service.addBusinessActivtiesToTradingPremises(Seq(0,2), models, AccountancyServices, true)
 
           result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
           result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
@@ -595,7 +595,7 @@ with GenericTestHelper
         tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
       )
 
-      val result = service.patchTradingPremises(Seq(1), models, AccountancyServices, true)
+      val result = service.addBusinessActivtiesToTradingPremises(Seq(1), models, AccountancyServices, true)
 
       result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
       result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))

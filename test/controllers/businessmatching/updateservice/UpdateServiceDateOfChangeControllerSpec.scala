@@ -80,7 +80,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
     "post is called" must {
       "redirect to UpdateAnyInformationController" when {
         "request is valid" in new Fixture {
-          
+
           val tradingPremises = Seq(
             tradingPremisesGen.sample.get,
             tradingPremisesGen.sample.get
