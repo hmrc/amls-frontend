@@ -503,9 +503,9 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
   private val additionalAddress = ResponsiblePersonAddress(additionalPersonAddress, Some(ZeroToFiveMonths))
   //scalastyle:off magic.number
   val personName = PersonName("firstName", Some("middleName"), "lastName")
-  val legalName = PreviousName(Some("firstName"), Some("middleName"), Some("lastName"))
+  val legalName = PreviousName(Some(true), Some("firstName"), Some("middleName"), Some("lastName"))
   val legalNameChangeDate = new LocalDate(1990, 2, 24)
-  val knownBy = KnownBy(Some("knownByName"))
+  val knownBy = KnownBy(Some(true), Some("knownByName"))
   val personResidenceType = PersonResidenceType(residence, Some(residenceCountry), Some(residenceNationality))
   val saRegistered = SaRegisteredYes("0123456789")
   val contactDetails = ContactDetails("07000000000", "test@test.com")

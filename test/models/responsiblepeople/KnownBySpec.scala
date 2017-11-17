@@ -35,6 +35,7 @@ class KnownBySpec extends PlaySpec with MockitoSugar {
         )
 
         val validPerson = KnownBy(
+          hasOtherNames = Some(true),
           otherNames = Some("otherName")
         )
 

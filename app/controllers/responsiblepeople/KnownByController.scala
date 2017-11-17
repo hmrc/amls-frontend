@@ -57,12 +57,12 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
           case ValidForm(_, data) => {
             for {
               _ <- {
-                data.isDefined match {
-                  case true => updateDataStrict[ResponsiblePeople](index) { rp =>
+                data.hasOtherNames match {
+                  case Some(true) => updateDataStrict[ResponsiblePeople](index) { rp =>
                     rp.knownBy(data)
                   }
-                  case false => updateDataStrict[ResponsiblePeople](index) { rp =>
-                    rp.knownBy(KnownBy(None))
+                  case Some(false) => updateDataStrict[ResponsiblePeople](index) { rp =>
+                    rp.knownBy(KnownBy(Some(false), None))
                   }
                 }
               }

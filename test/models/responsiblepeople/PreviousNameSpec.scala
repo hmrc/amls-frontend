@@ -29,9 +29,9 @@ class PreviousNameSpec extends PlaySpec {
     "have the formattedPreviousName function correctly return the value" in {
 
       // scalastyle:off magic.number
-      val first = PreviousName(Some("oldfirst"), None, None)
-      val middle = PreviousName(None, Some("oldmiddle"), None)
-      val last = PreviousName(None, None, Some("oldlast"))
+      val first = PreviousName(Some(true), Some("oldfirst"), None, None)
+      val middle = PreviousName(Some(true), None, Some("oldmiddle"), None)
+      val last = PreviousName(Some(true), None, None, Some("oldlast"))
 
       val personName = PersonName("First", Some("Middle"), "Last")
 
@@ -49,6 +49,7 @@ class PreviousNameSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Valid(PreviousName(
+            hasPreviousName = Some(true),
             firstName = Some("oldFirst"),
             middleName = Some("oldMiddle"),
             lastName = Some("oldLast")
@@ -68,6 +69,7 @@ class PreviousNameSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Valid(PreviousName(
+            hasPreviousName = Some(true),
             firstName = Some("oldFirst"),
             middleName = None,
             lastName = None
@@ -85,6 +87,7 @@ class PreviousNameSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Valid(PreviousName(
+            hasPreviousName = Some(true),
             firstName = None,
             middleName = Some("oldMiddle"),
             lastName = None
@@ -102,6 +105,7 @@ class PreviousNameSpec extends PlaySpec {
       implicitly[Rule[UrlFormEncoded, PreviousName]].validate(data) must
         equal(
           Valid(PreviousName(
+            hasPreviousName = Some(true),
             firstName = None,
             middleName = None,
             lastName = Some("oldLast")
@@ -136,6 +140,7 @@ class PreviousNameSpec extends PlaySpec {
       )
 
       val model = PreviousName(
+        hasPreviousName = Some(true),
         firstName = Some("oldFirst"),
         middleName = Some("oldMiddle"),
         lastName = Some("oldLast")

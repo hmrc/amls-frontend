@@ -19,21 +19,18 @@ package models.responsiblepeople
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{ValidationError, _}
-import play.api.libs.json.{Json, Writes => _}
+import models.tcsp.ServicesOfAnotherTCSP
+import play.api.libs.json.{Writes => _, _}
 import utils.MappingUtils.Implicits._
 
 case class PreviousName(
+                         hasPreviousName: Option[Boolean] = None,
                          firstName: Option[String],
                          middleName: Option[String],
                          lastName: Option[String]
                        ) {
 
   val fullName = Seq(firstName, middleName, lastName).flatten[String].mkString(" ")
-
-  def isDefined: Boolean = this match {
-    case PreviousName(None, None, None) => false
-    case _ => true
-  }
 
 }
 
@@ -64,15 +61,15 @@ object PreviousName {
           (__ \ "firstName").read(optionR(genericNameRule("error.required.rp.first_name"))) ~
             (__ \ "middleName").read(optionR(genericNameRule())) ~
             (__ \ "lastName").read(optionR(genericNameRule("error.required.rp.last_name")))
-          ).tupled andThen iR).map(t => PreviousName(t._1, t._2, t._3))
-      case false => Rule.fromMapping { _ => Valid(PreviousName(None, None, None)) }
+          ).tupled andThen iR).map(t => PreviousName(Some(true), t._1, t._2, t._3))
+      case false => Rule.fromMapping { _ => Valid(PreviousName(Some(false), None, None, None)) }
     }
   }
 
   implicit val formWrite = Write[PreviousName, UrlFormEncoded] {
     model =>
-      model.isDefined match {
-        case true =>
+      model.hasPreviousName match {
+        case Some(true) =>
           Map(
             "hasPreviousName" -> Seq("true"),
             "firstName" -> Seq(model.firstName getOrElse ""),
@@ -84,5 +81,40 @@ object PreviousName {
       }
   }
 
-  implicit val format = Json.format[PreviousName]
+  def constant[A](x: A): Reads[A] = new Reads[A] {
+    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+  }
+
+  def hasPreviousNameReader: Reads[Option[Boolean]] = {
+
+    (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>
+      d match {
+        case None => (__ \ "firstName").readNullable[String] flatMap { f =>
+          (__ \ "middleName").readNullable[String] flatMap  { m =>
+            (__ \ "lastName").readNullable[String] map { l =>
+
+              (d, f, m, l) match {
+                case (None, None, None, None) => Some(false)
+                case _ => Some(true)
+              }
+            }
+          }
+        }
+
+        case p => constant(p)
+      }
+    }
+  }
+
+  implicit val jsonReads : Reads[PreviousName] = {
+    import play.api.libs.functional.syntax._
+    import play.api.libs.json._
+
+    hasPreviousNameReader and
+      (__ \ "firstName").readNullable[String] and
+      (__ \ "middleName").readNullable[String] and
+      (__ \ "lastName").readNullable[String]
+  }.apply(PreviousName.apply _)
+
+  implicit val jsonWrites = Json.writes[PreviousName]
 }
