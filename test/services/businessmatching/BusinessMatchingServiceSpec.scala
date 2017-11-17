@@ -605,4 +605,55 @@ with GenericTestHelper
 
     }
   }
+
+  "assignBusinessActivitiesToTradingPremises" must {
+    "remove business activities from trading premises" which {
+      "also adds one remaining business activity to trading premises without business activity" in new Fixture {
+
+        val models = Seq(
+          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen().sample.get,
+          tradingPremisesWithActivitiesGen(AccountancyServices).sample.get
+        )
+
+        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(AccountancyServices))
+
+        result must be(Seq(
+          models.head,
+          models(1),
+          models(2).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(3)
+        ))
+
+      }
+      "also adds first of remaining business activities to trading premises without business activity" in new Fixture {
+
+        val models = Seq(
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen().sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get
+        )
+
+        val result = service.assignBusinessActivitiesToTradingPremises(models, Set(HighValueDealing, AccountancyServices))
+
+        result must be(Seq(
+          models.head,
+          models(1).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(2),
+          models(3)
+        ))
+
+      }
+    }
+  }
 }
