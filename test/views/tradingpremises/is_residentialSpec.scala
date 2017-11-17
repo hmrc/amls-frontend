@@ -18,6 +18,8 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
+import models.Country
+import models.businesscustomer.Address
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -28,6 +30,10 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val address=Address("56 Southview Road", "Newcastle Upon Tyne", Some("Tyne and Wear"), Some ("Whitehill"), Some("NE3 6JAX"), Country(
+      "United Kingdom", "UK"
+    ))
   }
 
   "is_residentialSpec view" must {
@@ -40,7 +46,7 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.is_residential(form2, 1, false)
+      def view = views.html.tradingpremises.is_residential(form2,Some(address), 1, false)
 
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.isResidential.title"))
@@ -57,16 +63,17 @@ class is_residentialSpec extends GenericTestHelper with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.is_residential(form2, 1, true)
+      def view = views.html.tradingpremises.is_residential(form2,Some(address), 1, true)
 
       errorSummary.html() must include("not a message Key")
     }
 
     "the have a residential address" in new ViewFixture {
 
-      def view = views.html.tradingpremises.is_residential(EmptyForm, 1, false)
+      def view = views.html.tradingpremises.is_residential(EmptyForm, Some(address),1, false)
 
-      doc.html()must include("Whitehill")
+
+      doc.html() must include("Whitehill")
 
     }
 
