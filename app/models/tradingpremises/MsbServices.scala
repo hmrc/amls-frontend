@@ -16,18 +16,13 @@
 
 package models.tradingpremises
 
-import models.DateOfChange
-import jto.validation._
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.ValidationError
-import play.api.i18n.Messages
+import models.DateOfChange
+import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, TransmittingMoney => BMTransmittingMoney}
 import play.api.libs.json._
 import utils.TraversableValidators
-import play.api.Play.current
-import play.api.i18n.Messages.Implicits._
-import cats.data.Validated.{Invalid, Valid}
-import models.businessmatching.{TransmittingMoney => BMTransmittingMoney, CurrencyExchange => BMCurrencyExchange,
-ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal}
 
 sealed trait MsbService
 

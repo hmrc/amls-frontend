@@ -137,6 +137,12 @@ class BusinessMatchingService @Inject()(
           case _ => Set(existingActivities.head)
         }
       })
+    } map { tp =>
+      if(removeActivities contains MoneyServiceBusiness) {
+        tp.copy(msbServices = None)
+      } else {
+        tp
+      }
     }
 
 
