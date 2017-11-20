@@ -748,7 +748,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
     Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.noKnownBy),
+    None,
     Some(DefaultValues.personResidenceTypeUk),
     None,
     None,
@@ -1561,8 +1561,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
         "middleName" -> "oldMiddle",
         "lastName" -> "oldLast",
         "date" -> "1990-02-24"
-      ),
-      "otherNames" -> "name"
+      )
     ),
     "personResidenceType" -> Json.obj(
       "isUKResidence" -> "true",
