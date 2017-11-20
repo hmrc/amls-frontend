@@ -98,6 +98,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ########################################################################################################################
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
+error.required.bm.remove.service = Select one or more options to show what you need to remove
 error.required.bm.registration.number = Enter a valid company registration number
 error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust

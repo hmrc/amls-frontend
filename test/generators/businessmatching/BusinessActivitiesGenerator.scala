@@ -34,7 +34,7 @@ trait BusinessActivitiesGenerator extends BaseGenerator {
 
   val businessActivitiesGen: Gen[BusinessActivities] =
     businessActivitiesListGen map { a =>
-      BusinessActivities(a.toSet, None)
+      BusinessActivities(a.toSet, None, None)
     }
   
 }

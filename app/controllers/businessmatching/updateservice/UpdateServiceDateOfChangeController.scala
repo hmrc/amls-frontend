@@ -18,36 +18,70 @@ package controllers.businessmatching.updateservice
 
 import javax.inject.{Inject, Singleton}
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import play.api.mvc.Request
+import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
+import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class UpdateServiceDateOfChangeController @Inject()(
-                                                   val authConnector: AuthConnector
+                                                   val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val businessMatchingService: BusinessMatchingService
                                                    ) extends BaseController {
 
-  def get = Authorised.async{
+  def get(services: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok(view(EmptyForm)))
+        mapRequestToServices(services) match {
+          case Right(_) => Future.successful(Ok(view(EmptyForm, services)))
+          case Left(result) => Future.successful(result)
+        }
   }
 
-  def post = Authorised.async{
+  private def mapRequestToServices(services: String): Either[Result, Set[BusinessActivity]] =
+    try {
+      Right((services split "/" map BusinessActivities.getBusinessActivity).toSet)
+    } catch {
+      case _: MatchError => Left(BadRequest)
+    }
+
+  def post(services: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
-      Form2[DateOfChange](request.body) match {
-        case ValidForm(_, _) => Future.successful(Redirect(UpdateAnyInformationController.get()))
-        case f:InvalidForm => Future.successful(BadRequest(view(f)))
-      }
+        mapRequestToServices(services) match {
+          case Right(removeActivities) => Form2[DateOfChange](request.body) match {
+            case ValidForm(_, data) =>
+              (for {
+                businessMatching <- businessMatchingService.getModel
+                activities <- OptionT.fromOption[Future](businessMatching.activities)
+                _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+                  businessMatching.activities(
+                    activities.copy(
+                      businessActivities = activities.businessActivities diff removeActivities,
+                      additionalActivities = activities.additionalActivities,
+                      dateOfChange = Some(data)
+                    )
+                  ).copy(hasAccepted = true)
+                ))
+              } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
+            case f:InvalidForm => Future.successful(BadRequest(view(f, services)))
+          }
+          case Left(result) => Future.successful(result)
+        }
   }
 
-  private def view(f: Form2[_])(implicit request: Request[_]) =
-    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post())
+  private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
+    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))
 
 }

@@ -19,8 +19,10 @@ package models
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.joda.time.LocalDate
 import utils.DateHelper.localDateOrdering
+import utils.TraversableValidators.minLengthR
 
 import scala.util.matching.Regex
 
@@ -162,8 +164,7 @@ object FormTypes {
   private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
   private val yearType: Rule[String, String] = yearRequired andThen yearPattern
 
-  def localDateRuleWithPattern : Rule[UrlFormEncoded, LocalDate] = {
-      From[UrlFormEncoded] { __ =>
+  def localDateRuleWithPattern : Rule[UrlFormEncoded, LocalDate] = From[UrlFormEncoded] { __ =>
         (
           (__ \ "year").read(yearType) ~
             (__ \ "month").read(monthType) ~
@@ -172,7 +173,6 @@ object FormTypes {
           Rule[UrlFormEncoded, String](__ => Valid("INVALID DATE STRING")) andThen
           jodaLocalDateR("yyyy-MM-dd")
       }.repath(_ => Path)
-  }
 
   val localDateWrite: Write[LocalDate, UrlFormEncoded] =
     To[UrlFormEncoded] { __ =>
@@ -234,6 +234,9 @@ object FormTypes {
       (__ \ "userName").read[String]).tupled.andThen(peopleEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
+  def businessActivityRule(msg: String) = From[UrlFormEncoded] { __ =>
+    (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg)) map (BusinessActivities(_))
+  }
 
   /** Business Identifier Rules */
 
