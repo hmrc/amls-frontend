@@ -19,6 +19,8 @@ package models.businessmatching
 import org.scalatest.mock.MockitoSugar
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import models.DateOfChange
+import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.libs.json._
 import utils.GenericTestHelper
@@ -174,12 +176,31 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
 
         }
 
-        "fail when on invalid data" in {
+        "fail given invalid data" in {
           Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "additionalActivities" -> Seq("11"))) must
             be(JsError((JsPath \ "additionalActivities") -> play.api.data.validation.ValidationError("error.invalid")))
         }
       }
 
+      "dateOfChange is present" must {
+
+        "successfully valida given a date" in {
+
+          val json = Json.obj(
+            "businessActivities" -> Seq("05", "06", "07"),
+            "dateOfChange" -> "1990-02-24"
+          )
+
+          Json.fromJson[BusinessActivities](json) must
+            be(JsSuccess(BusinessActivities(
+              Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+              None,
+              Some(DateOfChange(new LocalDate(1990, 2,24)))
+            )))
+
+        }
+
+      }
     }
 
     "validate json write" when {
@@ -192,6 +213,17 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
       "additionalActivities are present" in {
         Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), Some(Set(AccountancyServices, BillPaymentServices)))) must
           be(Json.obj("businessActivities" -> Seq("04", "03"), "additionalActivities" -> Seq("01", "02")))
+      }
+
+      "dateOfChange is present" in {
+        Json.toJson(BusinessActivities(
+          Set(HighValueDealing, EstateAgentBusinessService),
+          None,
+          Some(DateOfChange(new LocalDate(1990, 2,24)))
+        )) must be(Json.obj(
+          "businessActivities" -> Seq("04", "03"),
+          "dateOfChange" -> "1990-02-24"
+        ))
       }
 
     }
