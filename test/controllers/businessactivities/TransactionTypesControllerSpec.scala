@@ -17,11 +17,14 @@
 package controllers.businessactivities
 
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities.{BusinessActivities, Paper, TransactionTypes}
+import models.businessactivities.{BusinessActivities, DigitalSpreadsheet, Paper, TransactionTypes, DigitalSoftware}
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito.{never, verify}
+import org.mockito.Matchers.{any, eq => eqTo}
 
 class TransactionTypesControllerSpec extends GenericTestHelper
   with MustMatchers
@@ -31,6 +34,7 @@ class TransactionTypesControllerSpec extends GenericTestHelper
     val request = addToken(authRequest)
     val controller = new TransactionTypesController(self.authConnector, mockCacheConnector)
 
+    mockCacheSave[BusinessActivities]
     mockCacheFetch(Some(BusinessActivities()))
   }
 
@@ -53,6 +57,46 @@ class TransactionTypesControllerSpec extends GenericTestHelper
         val html = Jsoup.parse(contentAsString(result))
         html.select("input[type=checkbox][value=\"01\"]").first().attr("checked") mustBe "checked"
         html.select("input[type=checkbox][value=\"02\"]").first().attr("checked") must not be "checked"
+      }
+    }
+  }
+
+  "post" when {
+    "called with valid data" must {
+      "save the data and redirect away" in new Fixture {
+        val form = Seq(
+          "types[]" -> "01",
+          "types[]" -> "02",
+          "types[]" -> "03",
+          "name" -> "example software"
+        )
+
+        val result = controller.post()(request.withFormUrlEncodedBody(form:_*))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.businessactivities.routes.IdentifySuspiciousActivityController.get().url)
+
+        val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
+        verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+
+        captor.getValue.transactionRecordTypes mustBe
+          Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("example software"))))
+
+        captor.getValue.hasChanged mustBe true
+        captor.getValue.hasAccepted mustBe false
+      }
+    }
+
+    "called with invalid data" must {
+      "return BAD_REQUEST and show the page again" in new Fixture {
+        val form = "types[]" -> "03"
+
+        val result = controller.post()(request.withFormUrlEncodedBody(form))
+
+        status(result) mustBe BAD_REQUEST
+        contentAsString(result) must include(messages("businessactivities.do.keep.records"))
+
+        verify(mockCacheConnector, never).save[BusinessActivities](any(), any())(any(), any(), any())
       }
     }
   }

@@ -63,6 +63,10 @@ case class BusinessActivities(
     this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p),
       hasAccepted = hasAccepted && this.transactionRecord.contains(p))
 
+  def transactionRecordTypes(types: TransactionTypes): BusinessActivities =
+    this.copy(transactionRecordTypes = Some(types), hasChanged = hasChanged || !this.transactionRecordTypes.contains(types),
+      hasAccepted = hasAccepted && this.transactionRecordTypes.contains(types))
+
   def customersOutsideUK(p: CustomersOutsideUK): BusinessActivities =
     this.copy(customersOutsideUK = Some(p), hasChanged = hasChanged || !this.customersOutsideUK.contains(p),
       hasAccepted = hasAccepted && this.customersOutsideUK.contains(p))

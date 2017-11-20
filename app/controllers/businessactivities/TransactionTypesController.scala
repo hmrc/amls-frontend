@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, TransactionTypes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities.transaction_types
@@ -47,7 +47,19 @@ class TransactionTypesController @Inject()
   }
 
   def post = Authorised.async {
-    implicit auth => implicit request => ???
+    implicit auth => implicit request => {
+      Form2[TransactionTypes](request.body) match {
+        case ValidForm(_, data) => {
+          for {
+            bm <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
+            _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](BusinessActivities.key, bm.transactionRecordTypes(data)))
+          } yield Redirect(routes.IdentifySuspiciousActivityController.get())
+        } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
+
+        case f: InvalidForm =>
+          Future.successful(BadRequest(transaction_types(f, edit = false)))
+      }
+    }
   }
 
 }
