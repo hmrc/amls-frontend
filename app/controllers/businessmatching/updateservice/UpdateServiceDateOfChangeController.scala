@@ -25,10 +25,12 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
 import services.businessmatching.BusinessMatchingService
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -38,14 +40,14 @@ class UpdateServiceDateOfChangeController @Inject()(
                                                    val authConnector: AuthConnector,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val businessMatchingService: BusinessMatchingService
-                                                   ) extends BaseController {
+                                                   ) extends BaseController with RepeatingSection {
 
   def get(services: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
         mapRequestToServices(services) match {
           case Right(_) => Future.successful(Ok(view(EmptyForm, services)))
-          case Left(result) => Future.successful(result)
+          case Left(badRequest) => Future.successful(badRequest)
         }
   }
 
@@ -74,10 +76,17 @@ class UpdateServiceDateOfChangeController @Inject()(
                     )
                   ).copy(hasAccepted = true)
                 ))
+                _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
+                  businessMatchingService.removeBusinessActivitiesFromTradingPremises(
+                    tradingPremises,
+                    activities.businessActivities diff removeActivities,
+                    removeActivities
+                  )
+                })
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, services)))
           }
-          case Left(result) => Future.successful(result)
+          case Left(badRequest) => Future.successful(badRequest)
         }
   }
 
