@@ -36,7 +36,8 @@
         @fieldset(
             f = f("transactions-fieldset"),
             legend = "businessactivities.do.keep.records.hint",
-            classes = Seq(s"$target")
+            classes = Seq(s"$target"),
+            panel = false
         ) {
             @errorGroup(
                 field = f("types")
@@ -60,7 +61,7 @@
             }
             @panel(
                 field = Some(f(s"$target")),
-                panel = false
+                panel = true
             ) {
                 @input(
                     classes = Seq("form-control-3-4 form-control-3-4"),
