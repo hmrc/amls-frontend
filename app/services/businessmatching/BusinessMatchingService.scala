@@ -133,12 +133,17 @@ class BusinessMatchingService @Inject()(
                                                  existingActivities: Set[BusinessActivity],
                                                  removeActivities: Set[BusinessActivity]): Seq[TradingPremises] =
     patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
-      wdybd.copy(
+      wdybd.copy({
+        println(">>>>>>>>>>>>>" + (wdybd.activities diff removeActivities))
+        println(">>>>>>>>>>>>>" + existingActivities.head)
         wdybd.activities diff removeActivities match {
           case remainingActivities if remainingActivities.nonEmpty => remainingActivities
-          case _ => Set(existingActivities.head)
+          case _ => {
+            println("!!!!!>>>>>>>>>>>>>" + existingActivities.head)
+            Set(existingActivities.head)
+          }
         }
-      )
+      })
     }
 
 

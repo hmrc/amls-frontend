@@ -542,7 +542,7 @@ with GenericTestHelper
     }
   }
 
-  "patchTradingPremises" must {
+  "addBusinessActivtiesToTradingPremises" must {
     "update activity of the trading premises identified by index in request data" when {
       "there is a single index" which {
         "will leave activity given remove equals false" in new Fixture {
@@ -606,7 +606,7 @@ with GenericTestHelper
     }
   }
 
-  "assignBusinessActivitiesToTradingPremises" must {
+  "removeBusinessActivitiesFromTradingPremises" must {
     "remove business activities from trading premises" which {
       "also adds the first of remaining business activity to those trading premises without business activity" in new Fixture {
 

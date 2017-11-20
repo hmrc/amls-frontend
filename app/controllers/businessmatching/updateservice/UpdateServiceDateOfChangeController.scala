@@ -79,7 +79,7 @@ class UpdateServiceDateOfChangeController @Inject()(
                 _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
                   businessMatchingService.removeBusinessActivitiesFromTradingPremises(
                     tradingPremises,
-                    activities.businessActivities,
+                    activities.businessActivities diff removeActivities,
                     removeActivities
                   )
                 })
