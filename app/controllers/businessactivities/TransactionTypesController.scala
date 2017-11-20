@@ -35,31 +35,36 @@ class TransactionTypesController @Inject()
   val cacheConnector: DataCacheConnector
 ) extends BaseController {
 
-  def get = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit auth => implicit request => {
 
       def form(ba: BusinessActivities) = ba.transactionRecordTypes.fold[Form2[TransactionTypes]](EmptyForm)(Form2(_))
 
       for {
         ba <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
-      } yield Ok(transaction_types(form(ba), edit = false))
+      } yield Ok(transaction_types(form(ba), edit))
     } getOrElse InternalServerError("Cannot fetch business activities")
   }
 
-  def post = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit auth => implicit request => {
+      lazy val redirect = Redirect(if(edit) {
+        routes.SummaryController.get()
+      } else {
+        routes.IdentifySuspiciousActivityController.get()
+      })
+
       Form2[TransactionTypes](request.body) match {
         case ValidForm(_, data) => {
           for {
             bm <- OptionT(cacheConnector.fetch[BusinessActivities](BusinessActivities.key))
             _ <- OptionT.liftF(cacheConnector.save[BusinessActivities](BusinessActivities.key, bm.transactionRecordTypes(data)))
-          } yield Redirect(routes.IdentifySuspiciousActivityController.get())
+          } yield redirect
         } getOrElse InternalServerError("Unable to update Business Activities Transaction Types")
 
         case f: InvalidForm =>
-          Future.successful(BadRequest(transaction_types(f, edit = false)))
+          Future.successful(BadRequest(transaction_types(f, edit)))
       }
     }
   }
-
 }

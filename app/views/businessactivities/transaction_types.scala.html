@@ -32,7 +32,7 @@
     title = Messages("businessactivities.do.keep.records") + " - " + Messages("summary.businessactivities"),
     heading = header
 ) {
-    @form(f, controllers.businessactivities.routes.TransactionTypesController.post()) {
+    @form(f, controllers.businessactivities.routes.TransactionTypesController.post(edit)) {
         @fieldset(
             f = f("transactions-fieldset"),
             legend = "businessactivities.do.keep.records.hint",

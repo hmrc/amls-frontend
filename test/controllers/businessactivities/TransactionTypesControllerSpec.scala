@@ -85,6 +85,15 @@ class TransactionTypesControllerSpec extends GenericTestHelper
         captor.getValue.hasChanged mustBe true
         captor.getValue.hasAccepted mustBe false
       }
+
+      "return to the summary page when in edit mode" in new Fixture {
+        val form = "types[]" -> "01"
+
+        val result = controller.post(edit = true)(request.withFormUrlEncodedBody(form))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.businessactivities.routes.SummaryController.get().url)
+      }
     }
 
     "called with invalid data" must {
