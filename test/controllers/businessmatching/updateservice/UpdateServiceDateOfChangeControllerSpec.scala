@@ -207,6 +207,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           activities = Some(BusinessActivities(
             Set(EstateAgentBusinessService),
             None,
+            Some(Set(HighValueDealing)),
             Some(DateOfChange(new LocalDate(2017,10,13)))
           )),
           hasChanged = true,

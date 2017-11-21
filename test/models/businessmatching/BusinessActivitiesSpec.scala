@@ -195,6 +195,7 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
             be(JsSuccess(BusinessActivities(
               Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
               None,
+              None,
               Some(DateOfChange(new LocalDate(1990, 2,24)))
             )))
 
@@ -218,6 +219,7 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
       "dateOfChange is present" in {
         Json.toJson(BusinessActivities(
           Set(HighValueDealing, EstateAgentBusinessService),
+          None,
           None,
           Some(DateOfChange(new LocalDate(1990, 2,24)))
         )) must be(Json.obj(

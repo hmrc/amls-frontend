@@ -103,7 +103,7 @@ class BusinessMatchingService @Inject()(
 
   private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
     variationModel.activities match {
-      case Some(BusinessActivities(existing, Some(additional), _)) => variationModel.activities(BusinessActivities(existing ++ additional, None))
+      case Some(BusinessActivities(existing, Some(additional), None, _)) => variationModel.activities(BusinessActivities(existing ++ additional, None, None))
       case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
     }
 

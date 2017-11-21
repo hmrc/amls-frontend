@@ -28,6 +28,7 @@ import play.api.libs.functional.syntax._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
+                              removeActivities: Option[Set[BusinessActivity]] = None,
                               dateOfChange: Option[DateOfChange] = None)
 
 sealed trait BusinessActivity {
@@ -136,7 +137,7 @@ object BusinessActivities {
             }
           }
         case _ => None
-    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c) => BusinessActivities(a,b,c))
+    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c) => BusinessActivities(a,b,None,c))
   }
 
   private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {

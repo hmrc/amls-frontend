@@ -72,6 +72,9 @@ class UpdateServiceDateOfChangeController @Inject()(
                     activities.copy(
                       businessActivities = activities.businessActivities diff removeActivities,
                       additionalActivities = activities.additionalActivities,
+                      removeActivities = activities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(removeActivities)){ act =>
+                        Some(act ++ removeActivities)
+                      },
                       dateOfChange = Some(data)
                     )
                   ).copy(hasAccepted = true)

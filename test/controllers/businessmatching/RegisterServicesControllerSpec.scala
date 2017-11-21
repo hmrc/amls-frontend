@@ -248,7 +248,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
             s"$act is contained in existing activities" in new Fixture {
 
               val activityData: Set[BusinessActivity] = Set(act)
-              val businessActivities = businessActivities1.copy(businessActivities = activityData, dateOfChange = None)
+              val businessActivities = businessActivities1.copy(businessActivities = activityData, removeActivities = None, dateOfChange = None)
 
               val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
