@@ -25,7 +25,7 @@ import play.api.libs.json.{Writes => _}
 import utils.MappingUtils.Implicits._
 
 case class KnownBy(
-                    hasOtherNames: Option[Boolean],
+                    hasOtherNames: Option[Boolean] = None,
                     otherNames: Option[String]) {
 
   val otherName = Seq(otherNames).flatten[String].mkString(" ")
@@ -64,31 +64,11 @@ object KnownBy {
       }
   }
 
-  def constant[A](x: A): Reads[A] = new Reads[A] {
-    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
-  }
-
-  def hasOtherNameReader: Reads[Option[Boolean]] = {
-
-    (__ \ "hasOtherNames").readNullable[Boolean] flatMap { d =>
-      d match {
-        case None => (__ \ "otherNames").readNullable[String] map { f =>
-
-          (d, f) match {
-            case (None, None) => Some(false)
-            case _ => Some(true)
-          }
-        }
-        case p => constant(p)
-      }
-    }
-  }
-
   implicit val jsonReads : Reads[KnownBy] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
-    hasOtherNameReader and
+    (__ \ "hasOtherNames").readNullable[Boolean] and
       (__ \ "otherNames").readNullable[String]
   }.apply(KnownBy.apply _)
 
