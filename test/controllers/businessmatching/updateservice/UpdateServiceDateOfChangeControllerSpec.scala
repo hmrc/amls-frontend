@@ -202,7 +202,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       status(result) must be(SEE_OTHER)
 
       verify(controller.dataCacheConnector).save(
-        eqTo(BusinessMatching.key),
+        eqTo(BusinessMatching.variationKey),
         eqTo(BusinessMatching(
           activities = Some(BusinessActivities(
             Set(EstateAgentBusinessService),

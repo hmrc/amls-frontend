@@ -182,6 +182,39 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
         }
       }
 
+      "removeActivities are present" must {
+
+        "successfully validate given an enum value" in {
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("05", "06", "07"), "removeActivities" -> Seq("01", "02"))) must
+            be(JsSuccess(
+              BusinessActivities(
+                Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService),
+                None,
+                Some(Set(AccountancyServices, BillPaymentServices))
+              )
+            ))
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01", "02", "03"), "removeActivities" -> Seq("04", "05", "06"))) must
+            be(JsSuccess(
+              BusinessActivities(
+                Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService),
+                None,
+                Some(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices))
+              )
+            ))
+
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("04"), "removeActivities" -> Seq("07"))) must
+            be(JsSuccess(BusinessActivities(Set(HighValueDealing), None, Some(Set(TelephonePaymentService)))))
+
+        }
+
+        "fail given invalid data" in {
+          Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq("01"),  "removeActivities" -> Seq("11"))) must
+            be(JsError((JsPath \ "removeActivities") -> play.api.data.validation.ValidationError("error.invalid")))
+        }
+      }
+
       "dateOfChange is present" must {
 
         "successfully valida given a date" in {
@@ -214,6 +247,11 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
       "additionalActivities are present" in {
         Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), Some(Set(AccountancyServices, BillPaymentServices)))) must
           be(Json.obj("businessActivities" -> Seq("04", "03"), "additionalActivities" -> Seq("01", "02")))
+      }
+
+      "removeActivities are present" in {
+        Json.toJson(BusinessActivities(Set(HighValueDealing, EstateAgentBusinessService), None, Some(Set(AccountancyServices, BillPaymentServices)))) must
+          be(Json.obj("businessActivities" -> Seq("04", "03"), "removeActivities" -> Seq("01", "02")))
       }
 
       "dateOfChange is present" in {

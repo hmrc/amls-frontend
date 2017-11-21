@@ -62,7 +62,10 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
-        businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+        businessActivities <- {
+          println(">>>>>>>>>>>>>>>>>>>" + OptionT.fromOption[Future](businessMatching.activities))
+          OptionT.fromOption[Future](businessMatching.activities)
+        }
         status <- OptionT.liftF(statusService.getStatus)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
@@ -80,8 +83,6 @@ trait SummaryController extends BaseController {
       case NotCompleted | SubmissionReady => false
       case _ => ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined
     }
-
-  private def updateServiceComplete(updateService: Option[UpdateService]): Boolean = updateService.fold(false)(_.isComplete)
 
 }
 

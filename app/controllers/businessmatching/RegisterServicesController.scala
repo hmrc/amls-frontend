@@ -75,20 +75,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             }
           case ValidForm(_, data) =>
             for {
-              status <- statusService.getStatus
+              isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
               _ <- isMsb(data, businessMatching.activities) match {
-                case true => {
+                case true =>
                   businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, status))
+                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission))
+                  ).value
+                case false =>
+                  businessMatchingService.updateModel(
+                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
                   ).value
                 }
-                case false => {
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
-                  ).value
-                }
-              }
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
@@ -117,11 +115,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, status: SubmissionStatus): BusinessActivities =
+  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, isPreSubmission: Boolean): BusinessActivities =
     existing.fold[BusinessActivities](added) { existing =>
-      status match {
-        case NotCompleted | SubmissionReady => added
-        case _ => BusinessActivities(existing.businessActivities, Some(added.businessActivities))
+      if(isPreSubmission){
+        added
+      } else {
+        BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
       }
     }
 
