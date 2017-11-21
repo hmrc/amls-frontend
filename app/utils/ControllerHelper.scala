@@ -16,13 +16,10 @@
 
 package utils
 
-import java.util.NoSuchElementException
-
-import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
 import models.renewal.CustomersOutsideUK
-import models.responsiblepeople.{NominatedOfficer, NonUKResidence, ResponsiblePeople}
+import models.responsiblepeople.{NonUKResidence, ResponsiblePeople}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import play.api.Play.current
 import play.api.i18n.Messages
@@ -30,11 +27,11 @@ import play.api.i18n.Messages.Implicits._
 import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 object ControllerHelper {
 

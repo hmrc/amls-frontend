@@ -38,26 +38,11 @@ class  IsResidentialController @Inject()(
                                           val authConnector: AuthConnector,
                                           val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
 
-
-  def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Address]] = {
-
-    def getAddress(businessMatching: BusinessMatching): Option[Address] =
-      businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
-
-    dataCacheConnector.fetchAll map { cacheO =>
-      for {
-        cache <- cacheO
-        bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        address <- getAddress(bm)
-      } yield address
-    }
-  }
-
   def get(index: Int, edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
         getData[TradingPremises](index) flatMap {
-          case Some(tp) => {
+          case Some(tp) =>
             val form = tp.yourTradingPremises match {
               case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
               case _ => EmptyForm
@@ -65,7 +50,6 @@ class  IsResidentialController @Inject()(
             getResidentialAddress map { address =>
               Ok(views.html.tradingpremises.is_residential(form, address, index, edit))
             }
-          }
           case None => Future.successful(NotFound(notFoundView))
         }
   }
@@ -90,4 +74,32 @@ class  IsResidentialController @Inject()(
             }
         }
   }
+
+  private def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Address]] = {
+
+    def getAddress(businessMatching: BusinessMatching): Option[Address] =
+      businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
+
+    dataCacheConnector.fetchAll map { cacheO =>
+      for {
+        cache <- cacheO
+        bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        address <- getAddress(bm)
+      } yield address
+    }
+  }
+
+  private def isFirstTradingPremises(index: Int): Boolean = {
+
+    dataCacheConnector.fetchAll map { cacheO =>
+      for {
+        cache <- cacheO
+        tp <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+      } yield {
+//        tp.filter()
+      }
+    }
+
+  }
+
 }
