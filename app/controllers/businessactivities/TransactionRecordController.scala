@@ -54,8 +54,7 @@ class TransactionRecordController @Inject()
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivity.transactionRecord(data)
-            )
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivity.transactionRecord(data))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.IdentifySuspiciousActivityController.get())

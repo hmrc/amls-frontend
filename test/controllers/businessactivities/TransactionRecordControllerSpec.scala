@@ -19,7 +19,7 @@ package controllers.businessactivities
 import connectors.DataCacheConnector
 import models.businessactivities._
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -96,6 +96,31 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get().url))
         }
+      }
+
+      "reset the transaction types if 'no' is selected" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "isRecorded" -> "false"
+        )
+
+        mockCacheFetch[BusinessActivities](Some(BusinessActivities(
+          transactionRecord = Some(true),
+          transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
+        )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.IdentifySuspiciousActivityController.get().url)
+
+        verify(mockCacheConnector).save[BusinessActivities](
+          eqTo(BusinessActivities.key),
+          eqTo(BusinessActivities(
+            transactionRecord = Some(false),
+            transactionRecordTypes = None,
+            hasChanged = true,
+            hasAccepted = false
+          )
+        ))(any(), any(), any())
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

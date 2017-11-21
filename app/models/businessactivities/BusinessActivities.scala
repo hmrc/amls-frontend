@@ -59,9 +59,13 @@ case class BusinessActivities(
     this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p),
       hasAccepted = hasAccepted && this.identifySuspiciousActivity.contains(p))
 
-  def transactionRecord(p: Boolean): BusinessActivities =
-    this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p),
-      hasAccepted = hasAccepted && this.transactionRecord.contains(p))
+  def transactionRecord(isRecorded: Boolean): BusinessActivities = {
+    val types = if (isRecorded) this.transactionRecordTypes else None
+
+    this.copy(transactionRecord = Some(isRecorded), transactionRecordTypes = types,
+      hasChanged = hasChanged || !this.transactionRecord.contains(isRecorded),
+      hasAccepted = hasAccepted && this.transactionRecord.contains(isRecorded))
+  }
 
   def transactionRecordTypes(types: TransactionTypes): BusinessActivities =
     this.copy(transactionRecordTypes = Some(types), hasChanged = hasChanged || !this.transactionRecordTypes.contains(types),
