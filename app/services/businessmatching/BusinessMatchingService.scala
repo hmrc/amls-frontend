@@ -66,21 +66,9 @@ class BusinessMatchingService @Inject()(
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
-    } yield {
-      println(">>>>>>>>>>>>>>>>" +
-        current.businessActivities +
-        ">>" + submitted.businessActivities +
-        ">>" + current.removeActivities +
-        ">>" + current.removeActivities.fold(submitted.businessActivities) { removed =>
-        submitted.businessActivities diff removed
-      }
-      )
-      (current.businessActivities, {
-        current.removeActivities.fold(submitted.businessActivities) { removed =>
-          submitted.businessActivities diff removed
-        }
-      })
-    }
+    } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
+      submitted.businessActivities diff removed
+    })
 
   private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =

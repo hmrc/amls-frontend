@@ -218,7 +218,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
             val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-            val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), true, Some(activityData1))
+            val (newActivities, existing) =
+              controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), true, Some(activityData1))
 
             activities foreach { act =>
               newActivities must contain(BusinessActivities.getValue(act))
@@ -241,7 +242,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
               val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-              val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), false, Some(activityData))
+              val (newActivities, existing) =
+                controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), false, Some(activityData))
 
               newActivities must not contain BusinessActivities.getValue(act)
               existing must be(Set(BusinessActivities.getValue(act)))

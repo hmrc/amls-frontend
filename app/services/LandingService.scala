@@ -18,7 +18,6 @@ package services
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
@@ -26,7 +25,7 @@ import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover, ExpectedBusinessTurnover}
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessMatching, BusinessActivities => BMActivities}
 import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -38,12 +37,12 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.withdrawal.WithdrawalStatus
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.Request
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 trait LandingService {
 
@@ -169,7 +168,7 @@ trait LandingService {
     _ <- cacheConnector.remove(authContext.user.oid)
     _ <- cacheConnector.save[WithdrawalStatus](WithdrawalStatus.key, withdrawalStatus getOrElse WithdrawalStatus(false))
     _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
-    _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(viewResponse.businessMatchingSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
     _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
     _ <- cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection))
     _ <- cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
@@ -184,6 +183,19 @@ trait LandingService {
     cache1 <- cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
     cache2 <- saveRenewalData(viewResponse, cache1)
   } yield cache2
+
+  def businessMatchingSection(viewResponse: BusinessMatching): BusinessMatching = {
+    viewResponse.copy(
+      activities = viewResponse.activities.fold(viewResponse.activities){ activities =>
+        Some(BMActivities(
+          activities.businessActivities,
+          activities.additionalActivities,
+          None,
+          activities.dateOfChange
+        ))
+      }, hasAccepted = true
+    )
+  }
 
   def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
     Some(viewResponse.fold(Seq.empty[ResponsiblePeople])(_.map(rp => rp.copy(hasAccepted = true))))

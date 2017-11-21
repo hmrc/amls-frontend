@@ -62,10 +62,7 @@ trait SummaryController extends BaseController {
     implicit authContext => implicit request =>
       (for {
         businessMatching <- businessMatchingService.getModel
-        businessActivities <- {
-          println(">>>>>>>>>>>>>>>>>>>" + OptionT.fromOption[Future](businessMatching.activities))
-          OptionT.fromOption[Future](businessMatching.activities)
-        }
+        businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         status <- OptionT.liftF(statusService.getStatus)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
