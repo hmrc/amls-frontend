@@ -1,0 +1,76 @@
+@*
+ * Copyright 2017 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target = @{
+    s"""${f("transactions").id}-panel"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("businessactivities.do.keep.records", "summary.businessactivities")
+}
+
+@main(
+    title = Messages("businessactivities.do.keep.records") + " - " + Messages("summary.businessactivities"),
+    heading = header
+) {
+    @form(f, controllers.businessactivities.routes.TransactionTypesController.post(edit)) {
+        @fieldset(
+            f = f("transactions-fieldset"),
+            legend = "businessactivities.do.keep.records.hint",
+            classes = Seq(s"$target"),
+            panel = false
+        ) {
+            @errorGroup(
+                field = f("types")
+            ) {
+                @checkbox(
+                    f = f("types[]"),
+                    labelText = "businessactivities.transactiontype.lbl.01",
+                    value = "01"
+                )
+                @checkbox(
+                    f = f("types[]"),
+                    labelText = "businessactivities.transactiontype.lbl.02",
+                    value = "02"
+                )
+                @checkbox(
+                    f = f("types[]"),
+                    labelText = "businessactivities.transactiontype.lbl.03",
+                    value = "03",
+                    target = s"#$target"
+                )
+            }
+            @panel(
+                field = Some(f(s"$target")),
+                panel = true
+            ) {
+                @input(
+                    classes = Seq("form-control-3-4 form-control-3-4"),
+                    field = f("name"),
+                    labelText = "businessactivities.name.software.pkg.lbl"
+                )
+            }
+        }
+
+        @submit(edit)
+    }
+}

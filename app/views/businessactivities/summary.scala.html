@@ -115,8 +115,8 @@
         editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString
     ) {
         @model.transactionRecord.map {
-            case TransactionRecordNo => { <p>@Messages("lbl.no")</p> }
-            case TransactionRecordYes(v) => {
+            case KeepTransactionRecordNo => { <p>@Messages("lbl.no")</p> }
+            case KeepTransactionRecordYes(v) => {
                 <ul class="list list-bullet">
                     @v.map { x =>
                         <li>@x match {

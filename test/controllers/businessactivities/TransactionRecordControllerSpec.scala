@@ -69,7 +69,7 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(BusinessActivities(
-            transactionRecord = Some(TransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test"))))
+            transactionRecord = Some(KeepTransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("test"))))
           ))))
 
         val result = controller.get()(request)
