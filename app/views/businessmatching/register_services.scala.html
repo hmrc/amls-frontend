@@ -18,12 +18,11 @@
 @import include._
 @import include.forms2._
 @import config.ApplicationConfig
-@import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
 
-@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], isPreSubmission: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
-@header = { @status match {
-    case SubmissionReady | NotCompleted => {
+@header = { @isPreSubmission match {
+    case true => {
         @errorSummary(f)
         @heading("businessmatching.registerservices.title", "summary.businessmatching")
     }
@@ -34,8 +33,8 @@
 }}
 
 @main(
-    title = { status match {
-        case SubmissionReady | NotCompleted => {
+    title = { isPreSubmission match {
+        case true => {
             Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching")
         }
         case _ => {
@@ -45,8 +44,8 @@
     heading = header
 ) {
 
-    @status match {
-        case SubmissionReady | NotCompleted => {}
+    @isPreSubmission match {
+        case true => {}
         case _ => {
             @panel(
                 jsHidden = false,

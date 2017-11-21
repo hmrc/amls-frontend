@@ -67,15 +67,18 @@ class UpdateServiceDateOfChangeController @Inject()(
               (for {
                 businessMatching <- businessMatchingService.getModel
                 activities <- OptionT.fromOption[Future](businessMatching.activities)
-                _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key,
+                _ <- businessMatchingService.updateModel(
                   businessMatching.activities(
                     activities.copy(
                       businessActivities = activities.businessActivities diff removeActivities,
                       additionalActivities = activities.additionalActivities,
+                      removeActivities = activities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(removeActivities)){ act =>
+                        Some(act ++ removeActivities)
+                      },
                       dateOfChange = Some(data)
                     )
                   ).copy(hasAccepted = true)
-                ))
+                )
                 _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
                   businessMatchingService.removeBusinessActivitiesFromTradingPremises(
                     tradingPremises,

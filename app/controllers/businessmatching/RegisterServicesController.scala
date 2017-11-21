@@ -39,18 +39,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        statusService.getStatus flatMap { status =>
+        statusService.isPreSubmission flatMap { isPreSubmission =>
           businessMatchingService.getModel.value map { bm =>
             (for {
               businessMatching <- bm
               businessActivities <- businessMatching.activities
             } yield {
               val form = Form2[BusinessActivities](businessActivities)
-              val (newActivities, existing) = getActivityValues(form, status, Some(businessActivities.businessActivities))
-              Ok(register_services(form, edit, newActivities, existing, status))
+              val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
+              Ok(register_services(form, edit, newActivities, existing, isPreSubmission))
             }) getOrElse {
-              val (newActivities, existing) = getActivityValues(EmptyForm, status, None)
-              Ok(register_services(EmptyForm, edit, newActivities, existing, status))
+              val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
+              Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission))
             }
           }
         }
@@ -62,33 +62,31 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         import jto.validation.forms.Rules._
         Form2[BusinessActivities](request.body) match {
           case invalidForm: InvalidForm =>
-            statusService.getStatus flatMap { status =>
+            statusService.isPreSubmission flatMap { isPreSubmission =>
               (for {
                 bm <- businessMatchingService.getModel
                 businessActivities <- OptionT.fromOption[Future](bm.activities)
               } yield {
                 businessActivities.businessActivities
               }).value map { activities =>
-                val (newActivities, existing) = getActivityValues(invalidForm, status, activities)
-                BadRequest(register_services(invalidForm, edit, newActivities, existing, status))
+                val (newActivities, existing) = getActivityValues(invalidForm, isPreSubmission, activities)
+                BadRequest(register_services(invalidForm, edit, newActivities, existing, isPreSubmission))
               }
             }
           case ValidForm(_, data) =>
             for {
-              status <- statusService.getStatus
+              isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
               _ <- isMsb(data, businessMatching.activities) match {
-                case true => {
+                case true =>
                   businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, status))
+                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission))
+                  ).value
+                case false =>
+                  businessMatchingService.updateModel(
+                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
                   ).value
                 }
-                case false => {
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, status)).copy(msbServices = None)
-                  ).value
-                }
-              }
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
@@ -96,7 +94,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def getActivityValues(f: Form2[_], status: SubmissionStatus, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
+  private def getActivityValues(f: Form2[_], isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
 
     val activities: Set[String] = Set(
       AccountancyServices,
@@ -109,19 +107,21 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     ) map BusinessActivities.getValue
 
     existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)) { ea =>
-      status match {
-        case SubmissionReady | NotCompleted => (activities, Set.empty)
-        case _ => (activities diff (ea map BusinessActivities.getValue), activities intersect (ea map BusinessActivities.getValue))
+      if(isPreSubmission) {
+        (activities, Set.empty)
+      } else {
+        (activities diff (ea map BusinessActivities.getValue), activities intersect (ea map BusinessActivities.getValue))
       }
     }
 
   }
 
-  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, status: SubmissionStatus): BusinessActivities =
+  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, isPreSubmission: Boolean): BusinessActivities =
     existing.fold[BusinessActivities](added) { existing =>
-      status match {
-        case NotCompleted | SubmissionReady => added
-        case _ => BusinessActivities(existing.businessActivities, Some(added.businessActivities))
+      if(isPreSubmission){
+        added
+      } else {
+        BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
       }
     }
 

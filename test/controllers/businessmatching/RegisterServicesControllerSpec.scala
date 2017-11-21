@@ -20,7 +20,6 @@ import cats.data.OptionT
 import cats.implicits._
 import forms.{EmptyForm, Form2}
 import models.businessmatching._
-import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -34,7 +33,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,11 +50,11 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     TelephonePaymentService
   )
 
-  trait Fixture extends AuthorisedFixture {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+
     val request = addToken(authRequest)
 
-    val statusService = mock[StatusService]
+    val statusService = mockStatusService
     val businessMatchingService = mock[BusinessMatchingService]
 
     val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
@@ -64,8 +63,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     val businessActivities1 = BusinessActivities(activityData1)
 
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
-
-    val emptyCache = CacheMap("", Map.empty)
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -77,12 +74,16 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     val controller = app.injector.instanceOf[RegisterServicesController]
 
     when {
-      controller.statusService.getStatus(any(), any(), any())
-    } thenReturn Future.successful(NotCompleted)
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
 
     when {
       controller.businessMatchingService.commitVariationData(any(),any(),any())
-    } thenReturn OptionT.some[Future, CacheMap](emptyCache)
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    when {
+      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
   }
 
@@ -134,9 +135,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
             when(controller.businessMatchingService.getModel(any(), any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
-
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -154,9 +152,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
             when(controller.businessMatchingService.getModel(any(), any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
-
-            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -177,9 +172,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
             when(controller.businessMatchingService.getModel(any(), any(), any()))
               .thenReturn(OptionT.some[Future, BusinessMatching](bm))
 
-            when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-              .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
-
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
@@ -199,9 +191,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
           when(controller.businessMatchingService.getModel(any(), any(), any()))
             .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 
-          when(controller.businessMatchingService.updateModel(any())(any(), any(), any()))
-            .thenReturn(OptionT.some[Future, CacheMap](emptyCache))
-
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
@@ -216,7 +205,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
             val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-            val (newActivities, existing) = controller invokePrivate getActivityValues(EmptyForm, NotCompleted, None)
+            val (newActivities, existing) = controller invokePrivate getActivityValues(EmptyForm, true, None)
 
             activities foreach { act =>
               newActivities must contain(BusinessActivities.getValue(act))
@@ -229,7 +218,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
             val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-            val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), NotCompleted, Some(activityData1))
+            val (newActivities, existing) =
+              controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), true, Some(activityData1))
 
             activities foreach { act =>
               newActivities must contain(BusinessActivities.getValue(act))
@@ -248,11 +238,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
             s"$act is contained in existing activities" in new Fixture {
 
               val activityData: Set[BusinessActivity] = Set(act)
-              val businessActivities = businessActivities1.copy(businessActivities = activityData, dateOfChange = None)
+              val businessActivities = businessActivities1.copy(businessActivities = activityData, removeActivities = None, dateOfChange = None)
 
               val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
-              val (newActivities, existing) = controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), SubmissionDecisionApproved, Some(activityData))
+              val (newActivities, existing) =
+                controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), false, Some(activityData))
 
               newActivities must not contain BusinessActivities.getValue(act)
               existing must be(Set(BusinessActivities.getValue(act)))
@@ -271,11 +262,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
           val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
           val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
-          val status = SubmissionDecisionApproved
 
           val updateModel = PrivateMethod[BusinessActivities]('updateModel)
 
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, false)
 
           services must be(BusinessActivities(existingServices.businessActivities, Some(addedServices.businessActivities)))
 
@@ -286,11 +276,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
           val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
           val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
-          val status = NotCompleted
 
           val updateModel = PrivateMethod[BusinessActivities]('updateModel)
 
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, status)
+          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, true)
 
           services must be(addedServices)
 
@@ -308,12 +297,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.businessMatchingService.updateModel(any())(any(), any(),any())
-        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
-
-        when {
-          controller.statusService.getStatus(any(),any(),any())
-        } thenReturn Future.successful(SubmissionDecisionApproved)
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(false)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
@@ -336,12 +321,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
 
         when {
-          controller.businessMatchingService.updateModel(any())(any(), any(),any())
-        } thenReturn OptionT.some[Future, CacheMap](emptyCache)
-
-        when {
-          controller.statusService.getStatus(any(),any(),any())
-        } thenReturn Future.successful(NotCompleted)
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(true)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),

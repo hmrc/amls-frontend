@@ -37,6 +37,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -62,6 +63,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       .build()
 
     val controller = app.injector.instanceOf[UpdateServiceDateOfChangeController]
+
+    when {
+      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
   }
 
@@ -201,12 +206,12 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save(
-        eqTo(BusinessMatching.key),
+      verify(controller.businessMatchingService).updateModel(
         eqTo(BusinessMatching(
           activities = Some(BusinessActivities(
             Set(EstateAgentBusinessService),
             None,
+            Some(Set(HighValueDealing)),
             Some(DateOfChange(new LocalDate(2017,10,13)))
           )),
           hasChanged = true,

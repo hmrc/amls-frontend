@@ -114,7 +114,7 @@ trait LandingController extends BaseController {
             }
           case (None, None) =>
             Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
-          case (_, Some(amlsReference)) =>
+          case (_, Some(_)) =>
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
@@ -139,7 +139,7 @@ trait LandingController extends BaseController {
             }
           }
       }
-    } getOrElse (Future.successful(Redirect(controllers.routes.LandingController.get())))
+    } getOrElse Future.successful(Redirect(controllers.routes.LandingController.get()))
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
@@ -216,10 +216,8 @@ trait LandingController extends BaseController {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
-        case Some(c) => {
-
+        case Some(c) =>
           val fix = for {
-            c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
             c2 <- fixEmptyRecords[ResponsiblePeople](c, ResponsiblePeople.key)
           } yield c2
 
@@ -238,8 +236,6 @@ trait LandingController extends BaseController {
               refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
             }
           }
-        }
-
         case _ => refreshAndRedirect(amlsRegistrationNumber, None)
       }
 

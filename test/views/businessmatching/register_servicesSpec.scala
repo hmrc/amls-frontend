@@ -19,12 +19,10 @@ package views.businessmatching
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{AccountancyServices, BusinessActivities}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-
 
 class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
@@ -38,7 +36,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
         val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, NotCompleted)
+        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, true)
 
         doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.title"))
@@ -49,7 +47,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
         val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, SubmissionDecisionApproved)
+        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, false)
 
         doc.title must startWith(Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.other.title"))
@@ -61,7 +59,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
     "notify of services already selected" when {
       "status is post submission" in new ViewFixture {
 
-        def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, SubmissionDecisionApproved)
+        def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, false)
 
         html must include(Messages("businessmatching.registerservices.existing"))
 
@@ -75,7 +73,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, NotCompleted)
+      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, true)
 
       errorSummary.html() must include("not a message Key")
 
