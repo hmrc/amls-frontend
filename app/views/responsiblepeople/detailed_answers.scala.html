@@ -101,7 +101,7 @@
             question = Messages("responsiblepeople.legalName.heading", personName),
             editUrl = controllers.responsiblepeople.routes.LegalNameController.get(idx, true, flow).toString(),
             dataItem = person.legalName
-            ) { ln =>O
+            ) { ln =>
                 @ln.hasPreviousName match {
                     case Some(false) => {<p>@Messages("lbl.no")</p>}
                     case Some(true) => {

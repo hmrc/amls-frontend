@@ -115,29 +115,28 @@ object BusinessActivities {
 
   implicit val jsonReads: Reads[BusinessActivities] = {
     import play.api.libs.json.Reads.StringReads
-    ((__ \ "businessActivities").read[Set[String]].flatMap[Set[BusinessActivity]]{ ba =>
-      val activities = activitiesReader(ba, "businessActivities")
-
-      activities.foldLeft[Reads[Set[BusinessActivity]]](Reads[Set[BusinessActivity]](_ => JsSuccess(Set.empty))) { (result, data) =>
-        data flatMap { r =>
-          result.map{_ + r}
-        }
-      }
-
-    } and (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
-      case Some(a) =>
-        val activities = activitiesReader(a, "additionalActivities")
-
-        activities.foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ => JsSuccess(None))) { (result, data) =>
+    (
+      (__ \ "businessActivities").read[Set[String]].flatMap[Set[BusinessActivity]]{ ba =>
+        activitiesReader(ba, "businessActivities").foldLeft[Reads[Set[BusinessActivity]]](Reads[Set[BusinessActivity]](_ =>
+          JsSuccess(Set.empty))) { (result, data) =>
           data flatMap { r =>
-            result.map {
-              case Some(n) => Some(n + r)
-              case _ => Some(Set(r))
-            }
+            result.map{_ + r}
           }
         }
-      case _ => None
-    })((a, b) => BusinessActivities(a,b))
+    } and
+      (__ \ "additionalActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
+        case Some(a) =>
+          activitiesReader(a, "additionalActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ =>
+            JsSuccess(None))) { (result, data) =>
+            data flatMap { r =>
+              result.map {
+                case Some(n) => Some(n + r)
+                case _ => Some(Set(r))
+              }
+            }
+          }
+        case _ => None
+    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c) => BusinessActivities(a,b,c))
   }
 
   private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {

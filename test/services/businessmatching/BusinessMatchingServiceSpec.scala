@@ -19,14 +19,14 @@ package services.businessmatching
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.{DateOfChange, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.WhatDoesYourBusinessDo
+import models.{DateOfChange, ViewResponse}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
@@ -542,7 +542,7 @@ with GenericTestHelper
     }
   }
 
-  "patchTradingPremises" must {
+  "addBusinessActivtiesToTradingPremises" must {
     "update activity of the trading premises identified by index in request data" when {
       "there is a single index" which {
         "will leave activity given remove equals false" in new Fixture {
@@ -557,7 +557,7 @@ with GenericTestHelper
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
           )
 
-          val result = service.patchTradingPremises(Seq(4), models, AccountancyServices, false)
+          val result = service.addBusinessActivtiesToTradingPremises(Seq(4), models, AccountancyServices, false)
 
           result.head mustBe models.head
           result(1) mustBe models(1)
@@ -576,7 +576,7 @@ with GenericTestHelper
             tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
           )
 
-          val result = service.patchTradingPremises(Seq(0,2), models, AccountancyServices, true)
+          val result = service.addBusinessActivtiesToTradingPremises(Seq(0,2), models, AccountancyServices, true)
 
           result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
           result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
@@ -595,7 +595,7 @@ with GenericTestHelper
         tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
       )
 
-      val result = service.patchTradingPremises(Seq(1), models, AccountancyServices, true)
+      val result = service.addBusinessActivtiesToTradingPremises(Seq(1), models, AccountancyServices, true)
 
       result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
       result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
@@ -603,6 +603,46 @@ with GenericTestHelper
       result.head.isComplete mustBe false
       result.head.hasChanged mustBe true
 
+    }
+  }
+
+  "removeBusinessActivitiesFromTradingPremises" must {
+    "remove business activities from trading premises" which {
+      "also adds the first of remaining business activity to those trading premises without business activity" in new Fixture {
+
+        val models = Seq(
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
+        )
+
+        val result = service.removeBusinessActivitiesFromTradingPremises(models, Set(AccountancyServices), Set(HighValueDealing, EstateAgentBusinessService))
+
+        result must be(Seq(
+          models.head.copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(1).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(2).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          ),
+          models(3).copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true
+          )
+        ))
+
+      }
     }
   }
 }

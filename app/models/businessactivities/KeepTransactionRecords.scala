@@ -26,39 +26,23 @@ import jto.validation.forms.Rules.{minLength => _, _}
 import utils.TraversableValidators.minLengthR
 import cats.data.Validated.{Invalid, Valid}
 
-sealed trait TransactionRecord
+sealed trait KeepTransactionRecords
 
-case class TransactionRecordYes(transactionType: Set[TransactionType]) extends TransactionRecord
+case class KeepTransactionRecordYes(transactionType: Set[TransactionType]) extends KeepTransactionRecords
 
-case object TransactionRecordNo extends TransactionRecord
+case object KeepTransactionRecordNo extends KeepTransactionRecords
 
-
-sealed trait TransactionType {
-  val value: String =
-    this match {
-      case Paper => "01"
-      case DigitalSpreadsheet => "02"
-      case DigitalSoftware(_) => "03"
-    }
-}
-
-case object Paper extends TransactionType
-
-case object DigitalSpreadsheet extends TransactionType
-
-case class DigitalSoftware(name: String) extends TransactionType
-
-object TransactionRecord {
+object KeepTransactionRecords {
 
   import utils.MappingUtils.Implicits._
 
   val maxSoftwareNameLength = 40
   val softwareNameType =  notEmptyStrip andThen
-                          notEmpty.withMessage("error.required.ba.software.package.name") andThen
-                          maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
-                          basicPunctuationPattern()
+    notEmpty.withMessage("error.required.ba.software.package.name") andThen
+    maxLength(maxSoftwareNameLength).withMessage("error.invalid.maxlength.40") andThen
+    basicPunctuationPattern()
 
-  implicit val formRule: Rule[UrlFormEncoded, TransactionRecord] =
+  implicit val formRule: Rule[UrlFormEncoded, KeepTransactionRecords] =
     From[UrlFormEncoded] { __ =>
       (__ \ "isRecorded").read[Boolean].withMessage("error.required.ba.select.transaction.record") flatMap {
         case true =>
@@ -81,16 +65,16 @@ object TransactionRecord {
                       _ + x
                     }
                   }
-            } map TransactionRecordYes.apply
+            } map KeepTransactionRecordYes.apply
           }
 
-        case false => Rule.fromMapping { _ => Valid(TransactionRecordNo) }
+        case false => Rule.fromMapping { _ => Valid(KeepTransactionRecordNo) }
       }
     }
 
-  implicit def formWrites = Write[TransactionRecord, UrlFormEncoded] {
-    case TransactionRecordNo => Map("isRecorded" -> "false")
-    case TransactionRecordYes(transactions) =>
+  implicit def formWrites = Write[KeepTransactionRecords, UrlFormEncoded] {
+    case KeepTransactionRecordNo => Map("isRecorded" -> "false")
+    case KeepTransactionRecordYes(transactions) =>
       Map(
         "isRecorded" -> Seq("true"),
         "transactions[]" -> (transactions map { _.value }).toSeq
@@ -102,7 +86,7 @@ object TransactionRecord {
       }
   }
 
-  implicit val jsonReads: Reads[TransactionRecord] =
+  implicit val jsonReads: Reads[KeepTransactionRecords] =
     (__ \ "isRecorded").read[Boolean] flatMap {
       case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
         x.map {
@@ -122,13 +106,13 @@ object TransactionRecord {
              }
            }
         }
-      } map TransactionRecordYes.apply
-      case false => Reads(_ => JsSuccess(TransactionRecordNo))
+      } map KeepTransactionRecordYes.apply
+      case false => Reads(_ => JsSuccess(KeepTransactionRecordNo))
     }
 
-  implicit val jsonWrite = Writes[TransactionRecord] {
-    case TransactionRecordNo => Json.obj("isRecorded" -> false)
-    case TransactionRecordYes(transactions) =>
+  implicit val jsonWrite = Writes[KeepTransactionRecords] {
+    case KeepTransactionRecordNo => Json.obj("isRecorded" -> false)
+    case KeepTransactionRecordYes(transactions) =>
       Json.obj(
         "isRecorded" -> true,
         "transactions" -> (transactions map {

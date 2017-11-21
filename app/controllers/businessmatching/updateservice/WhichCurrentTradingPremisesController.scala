@@ -79,7 +79,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def updateTradingPremises(data: TradingPremisesForm, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity, true)
+      businessMatchingService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, true)
     }
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {

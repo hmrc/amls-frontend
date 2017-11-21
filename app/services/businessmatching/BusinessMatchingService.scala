@@ -29,11 +29,9 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.RepeatingSection
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
@@ -111,19 +109,43 @@ class BusinessMatchingService @Inject()(
 
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
 
-  def patchTradingPremises(indices: Seq[Int], tradingPremises: Seq[TradingPremises], activity: BusinessActivity, remove: Boolean): Seq[TradingPremises] =
+  def addBusinessActivtiesToTradingPremises(
+                                             indices: Seq[Int],
+                                             tradingPremises: Seq[TradingPremises],
+                                             activity: BusinessActivity,
+                                             remove: Boolean): Seq[TradingPremises] =
+    patchTradingPremisesBusinessActivities(tradingPremises){ (wdybd, index) =>
+      wdybd.copy({
+        if (indices contains index) {
+          wdybd.activities + activity
+        } else if (remove) {
+          wdybd.activities - activity
+        } else {
+          wdybd.activities
+        }
+      })
+    }
+
+  def removeBusinessActivitiesFromTradingPremises(
+                                                 tradingPremises: Seq[TradingPremises],
+                                                 existingActivities: Set[BusinessActivity],
+                                                 removeActivities: Set[BusinessActivity]): Seq[TradingPremises] =
+    patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
+      wdybd.copy({
+        wdybd.activities diff removeActivities match {
+          case remainingActivities if remainingActivities.nonEmpty => remainingActivities
+          case _ => Set(existingActivities.head)
+        }
+      })
+    }
+
+
+  def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
+                                            (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] =
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp.whatDoesYourBusinessDoAtThisAddress(
-        tradingPremises(index).whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set(activity))) { wdybd =>
-          wdybd.copy({
-            if(indices contains index){
-              wdybd.activities + activity
-            } else if (remove){
-              wdybd.activities - activity
-            } else {
-              wdybd.activities
-            }
-          })
+        tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)){ wdybd =>
+          fn(wdybd, index)
         }
       ).copy(hasAccepted = true)
     }

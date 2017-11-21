@@ -36,10 +36,6 @@ object KnownBy {
 
   import play.api.libs.json._
 
-  //implicit val formats = Json.format[KnownBy]
-
-
-
   val otherNamesLength = 140
   val otherNamesType = notEmptyStrip andThen
     notEmpty.withMessage("error.required.rp.otherNames") andThen
@@ -64,6 +60,7 @@ object KnownBy {
           )
         case _ =>
           Map("hasOtherNames" -> Seq("false"))
+
       }
   }
 
@@ -73,7 +70,7 @@ object KnownBy {
 
   def hasOtherNameReader: Reads[Option[Boolean]] = {
 
-    (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>
+    (__ \ "hasOtherNames").readNullable[Boolean] flatMap { d =>
       d match {
         case None => (__ \ "otherNames").readNullable[String] map { f =>
 

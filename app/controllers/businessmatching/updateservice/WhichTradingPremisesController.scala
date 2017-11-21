@@ -109,7 +109,7 @@ class WhichTradingPremisesController @Inject()(
   private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      businessMatchingService.patchTradingPremises(data.index.toSeq, tradingPremises, activity, false)
+      businessMatchingService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, false)
     }
 
   private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
