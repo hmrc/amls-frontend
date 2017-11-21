@@ -86,6 +86,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     hasChanged = false,
     hasAccepted = true
   )
+
   val completeModelWithoutCustUK = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
@@ -117,6 +118,38 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       "types" -> Seq("01", "03"),
       "software" -> DefaultSoftwareName
     ),
+    "isOutside" -> true,
+    "countries" -> Json.arr("GB"),
+    "ncaRegistered" -> true,
+    "accountantForAMLSRegulations" -> true,
+    "hasWrittenGuidance" -> true,
+    "hasPolicy" -> true,
+    "riskassessments" -> Seq("01"),
+    "employeeCount" -> "5",
+    "employeeCountAMLSSupervision" -> "4",
+    "accountantsName" -> "Accountant's name",
+    "accountantsTradingName" -> "Accountant's trading name",
+    "accountantsAddressLine1" -> "address1",
+    "accountantsAddressLine2" -> "address2",
+    "accountantsAddressLine3" -> "address3",
+    "accountantsAddressLine4" -> "address4",
+    "accountantsAddressPostCode" -> "POSTCODE",
+    "manageYourTaxAffairs" -> false,
+    "hasWrittenGuidance" -> true,
+    "hasChanged" -> false,
+    "hasAccepted" -> true
+  )
+
+  val oldFormatJson = Json.obj(
+    "involvedInOther" -> true,
+    "details" -> DefaultInvolvedInOtherDetails,
+    "expectedBusinessTurnover" -> "01",
+    "expectedAMLSTurnover" -> "01",
+    "businessFranchise" -> true,
+    "franchiseName" -> DefaultFranchiseName,
+    "isRecorded" -> true,
+    "transactions" -> Seq("01", "03"),
+    "digitalSoftwareName" -> DefaultSoftwareName,
     "isOutside" -> true,
     "countries" -> Json.arr("GB"),
     "ncaRegistered" -> true,
@@ -188,6 +221,12 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       Json.toJson(partialModel) mustBe partialJson
     }
 
+  }
+
+  "Old format BusinessActivities json" must {
+    "deserialise correctly" in {
+      oldFormatJson.as[BusinessActivities] mustBe completeModel
+    }
   }
 
   "BusinessActivities with all values set as None" must {
