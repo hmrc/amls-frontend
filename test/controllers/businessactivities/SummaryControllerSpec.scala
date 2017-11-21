@@ -60,6 +60,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       identifySuspiciousActivity = Some(BusinessActivitiesValues.DefaultIdentifySuspiciousActivity),
       whoIsYourAccountant = Some(BusinessActivitiesValues.DefaultWhoIsYourAccountant),
       taxMatters = Some(BusinessActivitiesValues.DefaultTaxMatters),
+      transactionRecordTypes = Some(BusinessActivitiesValues.DefaultTransactionRecordTypes),
       hasChanged = false
     )
   }
@@ -211,7 +212,8 @@ object BusinessActivitiesValues {
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
   val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = KeepTransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultTransactionRecord = true
+  val DefaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)

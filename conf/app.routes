@@ -223,8 +223,8 @@ POST        /business-activities/turnover                                       
 GET         /business-activities/business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /business-activities/business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
 
-GET         /business-activities/records                                              controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
-POST        /business-activities/records                                              controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
+GET         /business-activities/records                                              @controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
+POST        /business-activities/records                                              @controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
 
 GET         /business-activities/record-transactions                                  @controllers.businessactivities.TransactionTypesController.get(edit: Boolean ?= false)
 POST        /business-activities/record-transactions                                  @controllers.businessactivities.TransactionTypesController.post(edit: Boolean ?= false)

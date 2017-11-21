@@ -25,7 +25,7 @@ case class BusinessActivities(
                                expectedBusinessTurnover: Option[ExpectedBusinessTurnover] = None,
                                expectedAMLSTurnover: Option[ExpectedAMLSTurnover] = None,
                                businessFranchise: Option[BusinessFranchise] = None,
-                               transactionRecord: Option[KeepTransactionRecords] = None,
+                               transactionRecord: Option[Boolean] = None,
                                customersOutsideUK: Option[CustomersOutsideUK] = None,
                                ncaRegistered: Option[NCARegistered] = None,
                                accountantForAMLSRegulations: Option[AccountantForAMLSRegulations] = None,
@@ -59,7 +59,7 @@ case class BusinessActivities(
     this.copy(identifySuspiciousActivity = Some(p), hasChanged = hasChanged || !this.identifySuspiciousActivity.contains(p),
       hasAccepted = hasAccepted && this.identifySuspiciousActivity.contains(p))
 
-  def transactionRecord(p: KeepTransactionRecords): BusinessActivities =
+  def transactionRecord(p: Boolean): BusinessActivities =
     this.copy(transactionRecord = Some(p), hasChanged = hasChanged || !this.transactionRecord.contains(p),
       hasAccepted = hasAccepted && this.transactionRecord.contains(p))
 
@@ -144,7 +144,7 @@ object BusinessActivities {
       __.read(Reads.optionNoError[ExpectedBusinessTurnover]) and
       __.read(Reads.optionNoError[ExpectedAMLSTurnover]) and
       __.read(Reads.optionNoError[BusinessFranchise]) and
-      __.read(Reads.optionNoError[KeepTransactionRecords]) and
+      (__ \ "isRecorded").readNullable[Boolean] and
       __.read(Reads.optionNoError[CustomersOutsideUK]) and
       __.read(Reads.optionNoError[NCARegistered]) and
       __.read(Reads.optionNoError[AccountantForAMLSRegulations]) and
@@ -153,7 +153,7 @@ object BusinessActivities {
       __.read(Reads.optionNoError[HowManyEmployees]) and
       __.read(Reads.optionNoError[WhoIsYourAccountant]) and
       __.read(Reads.optionNoError[TaxMatters]) and
-      __.read(Reads.optionNoError[TransactionTypes]) and
+      (__ \ "transactionTypes").read(Reads.optionNoError[TransactionTypes]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)
@@ -165,7 +165,8 @@ object BusinessActivities {
         Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],
         Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
         Json.toJson(model.businessFranchise).asOpt[JsObject],
-        Json.toJson(model.transactionRecord).asOpt[JsObject],
+        model.transactionRecord map { t => Json.obj("isRecorded" -> t)},
+        model.transactionRecordTypes map (t => Json.obj("transactionTypes" -> Json.toJson(t))),
         Json.toJson(model.customersOutsideUK).asOpt[JsObject],
         Json.toJson(model.ncaRegistered).asOpt[JsObject],
         Json.toJson(model.accountantForAMLSRegulations).asOpt[JsObject],
@@ -173,8 +174,7 @@ object BusinessActivities {
         Json.toJson(model.riskAssessmentPolicy).asOpt[JsObject],
         Json.toJson(model.howManyEmployees).asOpt[JsObject],
         Json.toJson(model.whoIsYourAccountant).asOpt[JsObject],
-        Json.toJson(model.taxMatters).asOpt[JsObject],
-        Json.toJson(model.transactionRecordTypes).asOpt[JsObject]
+        Json.toJson(model.taxMatters).asOpt[JsObject]
       ).flatten.fold(Json.obj()) {
         _ ++ _
       } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))

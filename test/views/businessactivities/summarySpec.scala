@@ -27,7 +27,6 @@ import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-
 class summarySpec extends GenericTestHelper
   with MustMatchers
   with HtmlAssertions
@@ -62,7 +61,8 @@ class summarySpec extends GenericTestHelper
       ("businessactivities.businessfranchise.title",checkElementTextIncludes(_, "FranchiseName")),
       ("businessactivities.employees.line1.cya",checkElementTextIncludes(_, "123")),
       ("businessactivities.employees.line2.cya",checkElementTextIncludes(_, "456")),
-      ("businessactivities.keep.customer.records.title",
+      ("businessactivities.keep.customer.records.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("businessactivities.do.keep.records",
         checkElementTextIncludes(_, "businessactivities.transactiontype.lbl.01", "businessactivities.transactiontype.lbl.02", "businessactivities.transactiontype.lbl.03", "SoftwareName")),
       ("businessactivities.identify-suspicious-activity.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.ncaRegistered.title",checkElementTextIncludes(_, "lbl.yes")),
@@ -83,7 +83,7 @@ class summarySpec extends GenericTestHelper
           Some(ExpectedBusinessTurnover.First),
           Some(ExpectedAMLSTurnover.First),
           Some(BusinessFranchiseYes("FranchiseName")),
-          Some(KeepTransactionRecordYes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName")))),
+          Some(true),
           None, // This is only present in renewal
           Some(NCARegistered(true)),
           Some(AccountantForAMLSRegulations(true)),
@@ -91,7 +91,8 @@ class summarySpec extends GenericTestHelper
           Some(RiskAssessmentPolicyYes(Set(PaperBased, Digital))),
           Some(HowManyEmployees(Some("123"), Some("456"))),
           Some(WhoIsYourAccountant("AccountantName",Some("tradingName"),UkAccountantsAddress("line1","line2",Some("line3"),Some("line4"),"AB12CD"))),
-          Some(TaxMatters(true))
+          Some(TaxMatters(true)),
+          Some(TransactionTypes(Set(Paper, DigitalSpreadsheet, DigitalSoftware("SoftwareName"))))
         ),
         None,
         true

@@ -33,7 +33,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
   val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = KeepTransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultTransactionRecord = true
+  val DefaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
@@ -53,7 +54,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val NewInvolvedInOther = InvolvedInOtherYes(NewInvolvedInOtherDetails)
   val NewBusinessTurnover = ExpectedBusinessTurnover.Second
   val NewAMLSTurnover = ExpectedAMLSTurnover.Second
-  val NewTransactionRecord = KeepTransactionRecordNo
+  val NewTransactionRecord = false
   val NewCustomersOutsideUK = CustomersOutsideUK(None)
   val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
@@ -81,6 +82,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
+    transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
     hasAccepted = true
   )
@@ -98,6 +100,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
+    transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
     hasAccepted = true
   )
@@ -110,8 +113,10 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "businessFranchise" -> true,
     "franchiseName" -> DefaultFranchiseName,
     "isRecorded" -> true,
-    "transactions" -> Seq("01", "03"),
-    "digitalSoftwareName" -> DefaultSoftwareName,
+    "transactionTypes" -> Json.obj(
+      "types" -> Seq("01", "03"),
+      "software" -> DefaultSoftwareName
+    ),
     "isOutside" -> true,
     "countries" -> Json.arr("GB"),
     "ncaRegistered" -> true,
@@ -137,12 +142,12 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
 
   "BusinessActivities Serialisation" must {
-    "Serialise as expected" in {
+    "serialise as expected" in {
       Json.toJson(completeModel) must
         be(completeJson)
     }
 
-    "Deserialise as expected" in {
+    "deserialise as expected" in {
       completeJson.as[BusinessActivities] must
         be(completeModel)
     }
@@ -179,7 +184,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       "hasAccepted" -> false
     )
 
-    "Serialise as expected" in {
+    "serialise as expected" in {
       Json.toJson(partialModel) mustBe partialJson
     }
 

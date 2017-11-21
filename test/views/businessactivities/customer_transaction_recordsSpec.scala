@@ -18,12 +18,11 @@ package views.businessactivities
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessactivities.{KeepTransactionRecordNo, KeepTransactionRecords}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-
+import utils.BooleanFormReadWrite._
 
 class customer_transaction_recordsSpec extends GenericTestHelper with MustMatchers {
 
@@ -34,7 +33,7 @@ class customer_transaction_recordsSpec extends GenericTestHelper with MustMatche
   "customer_transaction_records view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[KeepTransactionRecords] = Form2(KeepTransactionRecordNo)
+      val form2: ValidForm[Boolean] = Form2(false)(formWrites("isRecorded"))
 
       def view = views.html.businessactivities.customer_transaction_records(form2, true)
 
@@ -43,7 +42,7 @@ class customer_transaction_recordsSpec extends GenericTestHelper with MustMatche
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[KeepTransactionRecords] = Form2(KeepTransactionRecordNo)
+      val form2: ValidForm[Boolean] = Form2(false)(formWrites("isRecorded"))
 
       def view = views.html.businessactivities.customer_transaction_records(form2, true)
 
@@ -56,25 +55,15 @@ class customer_transaction_recordsSpec extends GenericTestHelper with MustMatche
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "isRecorded") -> Seq(ValidationError("not a message Key")),
-          (Path \ "transactions") -> Seq(ValidationError("second not a message Key")),
-          (Path \ "name") -> Seq(ValidationError("third not a message Key"))
+          (Path \ "isRecorded") -> Seq(ValidationError("not a message Key"))
         ))
 
       def view = views.html.businessactivities.customer_transaction_records(form2, true)
 
       errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
-      errorSummary.html() must include("third not a message Key")
 
       doc.getElementById("isRecorded")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-      doc.getElementById("transactions")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
-
-      doc.getElementById("name").parent
-        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
     }
   }

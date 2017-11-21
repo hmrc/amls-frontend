@@ -115,20 +115,28 @@
         editUrl = controllers.businessactivities.routes.TransactionRecordController.get(true).toString
     ) {
         @model.transactionRecord.map {
-            case KeepTransactionRecordNo => { <p>@Messages("lbl.no")</p> }
-            case KeepTransactionRecordYes(v) => {
-                <ul class="list list-bullet">
-                    @v.map { x =>
-                        <li>@x match {
-                            case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
-                            case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
-                            case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"): @software}
-                        }</li>
-                    }
-                </ul>
+            case false => { <p>@Messages("lbl.no")</p> }
+            case _ => { <p>@Messages("lbl.yes")</p>
             }
         }
     }
+
+    @checkYourAnswers(
+        question = Messages("businessactivities.do.keep.records"),
+        editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString
+    ) {
+        @model.transactionRecordTypes.map { t =>
+                <ul class="list list-bullet">
+                    @t.types.map { x =>
+                    <li>@x match {
+                        case Paper => {@Messages("businessactivities.transactiontype.lbl.01")}
+                        case DigitalSpreadsheet => {@Messages("businessactivities.transactiontype.lbl.02")}
+                        case DigitalSoftware(software) => {@Messages("businessactivities.transactiontype.lbl.03"): @software}
+                    }</li>
+                }
+                </ul>
+            }
+        }
 
     @checkYourAnswers(
         question = Messages("businessactivities.identify-suspicious-activity.title"),
