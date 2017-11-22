@@ -106,17 +106,12 @@ class UpdateServiceDateOfChangeController @Inject()(
   private def removeSection(services: Set[BusinessActivity])
                            (implicit hc: HeaderCarrier, ac: AuthContext) = Future.sequence(
     services map {
-      case AccountancyServices =>
-        dataCacheConnector.save[Asp](Asp.key,None) flatMap { _ =>
-          dataCacheConnector.save[Supervision](Supervision.key, None)
-        }
+      case AccountancyServices | TrustAndCompanyServices => dataCacheConnector.save[Supervision](Supervision.key, None)
+      case AccountancyServices => dataCacheConnector.save[Asp](Asp.key,None)
       case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,None)
       case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
       case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
-      case TrustAndCompanyServices =>
-        dataCacheConnector.save[Tcsp](Tcsp.key,None) flatMap { _ =>
-          dataCacheConnector.save[Supervision](Supervision.key, None)
-      }
+      case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key,None)
       case _ => Future.successful()
     }
   )

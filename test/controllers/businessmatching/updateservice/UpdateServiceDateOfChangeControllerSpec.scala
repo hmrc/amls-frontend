@@ -21,8 +21,13 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
+import models.asp.Asp
 import models.businessmatching._
 import models.hvd.Hvd
+import models.supervision.Supervision
+import models.estateagentbusiness.{EstateAgentBusiness => Eab}
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -67,6 +72,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
     when {
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
+    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    when {
+      controller.businessMatchingService.commitVariationData(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
   }
@@ -185,13 +194,20 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
       mockCacheSave[BusinessMatching]
       mockCacheSave[Seq[BusinessMatching]]
+      mockCacheSave[Asp]
+      mockCacheSave[Supervision]
+      mockCacheSave[Hvd]
+      mockCacheSave[Tcsp]
+      mockCacheSave[Eab]
+      mockCacheSave[Msb]
 
       when {
         controller.businessMatchingService.getModel(any(),any(),any())
       } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
         activities = Some(BusinessActivities(Set(
           EstateAgentBusinessService,
-          HighValueDealing
+          HighValueDealing,
+          TelephonePaymentService
         )))
       ))
 
@@ -199,7 +215,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
         controller.businessMatchingService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
       } thenReturn tradingPremises
 
-      val result = controller.post("04")(request.withFormUrlEncodedBody(
+      val result = controller.post("01/02/03/04/05/06")(request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "13",
         "dateOfChange.month" -> "10",
         "dateOfChange.year" -> "2017"
@@ -210,9 +226,16 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       verify(controller.businessMatchingService).updateModel(
         eqTo(BusinessMatching(
           activities = Some(BusinessActivities(
-            Set(EstateAgentBusinessService),
+            Set(TelephonePaymentService),
             None,
-            Some(Set(HighValueDealing)),
+            Some(Set(
+              HighValueDealing,
+              AccountancyServices,
+              EstateAgentBusinessService,
+              BillPaymentServices,
+              MoneyServiceBusiness,
+              TrustAndCompanyServices
+            )),
             Some(DateOfChange(new LocalDate(2017,10,13)))
           )),
           hasChanged = true,
@@ -228,6 +251,32 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
         eqTo(Hvd.key),
         eqTo(None)
       )(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save[Asp](
+        eqTo(Asp.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save[Supervision](
+        eqTo(Supervision.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save[Msb](
+        eqTo(Msb.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save[Tcsp](
+        eqTo(Tcsp.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(controller.dataCacheConnector).save[Eab](
+        eqTo(Eab.key),
+        eqTo(None)
+      )(any(),any(),any())
+
     }
 
   }
