@@ -55,9 +55,10 @@ class TransactionRecordController @Inject()
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivity.transactionRecord(data))
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.IdentifySuspiciousActivityController.get())
+          } yield (edit, data) match {
+            case (_, true) => Redirect(routes.TransactionTypesController.get(edit))
+            case (true, false) => Redirect(routes.SummaryController.get())
+            case (false, _) => Redirect(routes.IdentifySuspiciousActivityController.get())
           }
         }
       }

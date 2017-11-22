@@ -121,11 +121,12 @@
         }
     }
 
-    @checkYourAnswers(
-        question = Messages("businessactivities.do.keep.records"),
-        editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString
-    ) {
-        @model.transactionRecordTypes.map { t =>
+
+    @model.transactionRecordTypes.map { t =>
+        @checkYourAnswers(
+            question = Messages("businessactivities.do.keep.records"),
+            editUrl = controllers.businessactivities.routes.TransactionTypesController.get(true).toString
+        ) {
                 <ul class="list list-bullet">
                     @t.types.map { x =>
                     <li>@x match {
