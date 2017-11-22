@@ -38,6 +38,7 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
@@ -103,18 +104,32 @@ class UpdateServiceDateOfChangeController @Inject()(
         }
   }
 
-  private def removeSection(services: Set[BusinessActivity])
-                           (implicit hc: HeaderCarrier, ac: AuthContext) = Future.sequence(
-    services map {
-      case AccountancyServices | TrustAndCompanyServices => dataCacheConnector.save[Supervision](Supervision.key, None)
-      case AccountancyServices => dataCacheConnector.save[Asp](Asp.key,None)
-      case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,None)
+  private def removeSection(activities: Set[BusinessActivity])
+                           (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = Future.sequence({
+    activities filter withoutSection map {
+      case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)
+      case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, None)
       case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
       case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
-      case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key,None)
-      case _ => Future.successful()
+      case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
     }
-  )
+  } map { cache =>
+    if(removeSupervision(activities)){
+      dataCacheConnector.save[Supervision](Supervision.key, None)
+    } else {
+      cache
+    }
+  })
+
+  private def withoutSection(activity: BusinessActivity): Boolean = activity match {
+    case TelephonePaymentService | BillPaymentServices => false
+    case _ => true
+  }
+
+  private def removeSupervision(activities: Set[BusinessActivity]): Boolean =
+    activities exists { activity =>
+      (activity equals AccountancyServices) | (activity equals TrustAndCompanyServices)
+    }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
     views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))
