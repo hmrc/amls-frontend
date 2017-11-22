@@ -81,8 +81,6 @@ trait SummaryController extends BaseController {
       case _ => ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined
     }
 
-  private def updateServiceComplete(updateService: Option[UpdateService]): Boolean = updateService.fold(false)(_.isComplete)
-
 }
 
 

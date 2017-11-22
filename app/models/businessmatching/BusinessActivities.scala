@@ -28,6 +28,7 @@ import play.api.libs.functional.syntax._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
+                              removeActivities: Option[Set[BusinessActivity]] = None,
                               dateOfChange: Option[DateOfChange] = None)
 
 sealed trait BusinessActivity {
@@ -136,7 +137,19 @@ object BusinessActivities {
             }
           }
         case _ => None
-    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c) => BusinessActivities(a,b,c))
+    } and (__ \ "removeActivities").readNullable[Set[String]].flatMap[Option[Set[BusinessActivity]]] {
+        case Some(a) =>
+          activitiesReader(a, "removeActivities").foldLeft[Reads[Option[Set[BusinessActivity]]]](Reads[Option[Set[BusinessActivity]]](_ =>
+            JsSuccess(None))) { (result, data) =>
+            data flatMap { r =>
+              result.map {
+                case Some(n) => Some(n + r)
+                case _ => Some(Set(r))
+              }
+            }
+          }
+        case _ => None
+    } and (__ \ "dateOfChange").readNullable[DateOfChange])((a,b,c,d) => BusinessActivities(a,b,c,d))
   }
 
   private def activitiesReader(values: Set[String], path: String): Set[Reads[_ <: BusinessActivity]] = {

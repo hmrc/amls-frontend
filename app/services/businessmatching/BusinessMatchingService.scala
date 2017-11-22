@@ -66,7 +66,9 @@ class BusinessMatchingService @Inject()(
       submitted <- OptionT.fromOption[Future](viewResponse.businessMatchingSection.activities)
       model <- getModel
       current <- OptionT.fromOption[Future](model.activities)
-    } yield (current.businessActivities, submitted.businessActivities)
+    } yield (current.businessActivities, current.removeActivities.fold(submitted.businessActivities) { removed =>
+      submitted.businessActivities diff removed
+    })
 
   private def getActivitySet(fn: (Set[BusinessActivity], Set[BusinessActivity]) => Set[BusinessActivity])
                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
@@ -103,7 +105,8 @@ class BusinessMatchingService @Inject()(
 
   private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
     variationModel.activities match {
-      case Some(BusinessActivities(existing, Some(additional), _)) => variationModel.activities(BusinessActivities(existing ++ additional, None))
+      case Some(BusinessActivities(existing, Some(additional), removed, doc)) =>
+        variationModel.activities(BusinessActivities(existing ++ additional, None, removed, doc))
       case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
     }
 
@@ -137,6 +140,12 @@ class BusinessMatchingService @Inject()(
           case _ => Set(existingActivities.head)
         }
       })
+    } map { tp =>
+      if(removeActivities contains MoneyServiceBusiness) {
+        tp.copy(msbServices = None)
+      } else {
+        tp
+      }
     }
 
 

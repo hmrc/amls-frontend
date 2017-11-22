@@ -23,6 +23,8 @@ import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
+import models.tradingpremises.MsbServices
+import models.tradingpremises.MsbServices._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.WhatDoesYourBusinessDo
@@ -38,7 +40,7 @@ import utils.{DependencyMocks, FutureAssertions, GenericTestHelper, StatusConsta
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class BusinessMatchingServiceSpec extends PlaySpec
-with GenericTestHelper
+  with GenericTestHelper
   with MockitoSugar
   with ScalaFutures
   with FutureAssertions
@@ -613,11 +615,17 @@ with GenericTestHelper
         val models = Seq(
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
           tradingPremisesWithActivitiesGen(HighValueDealing).sample.get,
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
+          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, MoneyServiceBusiness).sample.get.copy(
+            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+          ),
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
         )
 
-        val result = service.removeBusinessActivitiesFromTradingPremises(models, Set(AccountancyServices), Set(HighValueDealing, EstateAgentBusinessService))
+        val result = service.removeBusinessActivitiesFromTradingPremises(
+          models,
+          Set(AccountancyServices),
+          Set(HighValueDealing, EstateAgentBusinessService, MoneyServiceBusiness)
+        )
 
         result must be(Seq(
           models.head.copy(
@@ -632,6 +640,7 @@ with GenericTestHelper
           ),
           models(2).copy(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
+            msbServices = None,
             hasAccepted = true,
             hasChanged = true
           ),
