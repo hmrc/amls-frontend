@@ -26,9 +26,11 @@ import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import views.html.tradingpremises.is_residential
 
 import scala.concurrent.Future
 
@@ -41,65 +43,63 @@ class  IsResidentialController @Inject()(
   def get(index: Int, edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        getData[TradingPremises](index) flatMap {
-          case Some(tp) =>
+        dataCacheConnector.fetchAll map { cacheO =>
+          (for {
+            cache <- cacheO
+            tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+            tp <- tradingPremises.lift(index)
+          } yield {
             val form = tp.yourTradingPremises match {
               case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
               case _ => EmptyForm
             }
-            getResidentialAddress map { address =>
-              Ok(views.html.tradingpremises.is_residential(form, address, index, edit))
-            }
-          case None => Future.successful(NotFound(notFoundView))
+            Ok(is_residential(form, getResidentialAddress(index, cacheO), index, edit))
+          }) getOrElse NotFound(notFoundView)
         }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[IsResidential](request.body) match {
-          case f: InvalidForm =>
-            getResidentialAddress map { address =>
-              BadRequest(views.html.tradingpremises.is_residential(f, address, index, edit))
-            }
-          case ValidForm(_, data) =>
-            for {
-              _ <- updateDataStrict[TradingPremises](index) { tp =>
-                val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(isResidential = Some(data.isResidential))))
-                tp.copy(yourTradingPremises = ytp)
-              }
-            } yield edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
-              case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
-            }
+        dataCacheConnector.fetchAll flatMap { cacheO =>
+          Form2[IsResidential](request.body) match {
+            case f: InvalidForm =>
+              Future.successful(BadRequest(is_residential(f, getResidentialAddress(index, cacheO), index, edit)))
+            case ValidForm(_, data) =>
+              (cacheO map { cache =>
+                for {
+                  _ <- updateData[TradingPremises](cache, index) { tpO =>
+                    tpO map { tp =>
+                      val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { x =>
+                        Some(x.copy(isResidential = Some(data.isResidential)))
+                      }
+                      tp.copy(yourTradingPremises = ytp)
+                    }
+                  }
+                } yield edit match {
+                  case true => Redirect(routes.SummaryController.getIndividual(index))
+                  case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
+                }
+              }) getOrElse Future.successful(InternalServerError("Cannot update Trading Premises"))
+          }
         }
   }
 
-  private def getResidentialAddress(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Address]] = {
+  private def getResidentialAddress(index: Int, cacheO: Option[CacheMap])
+                                   (implicit hc: HeaderCarrier, ac: AuthContext): Option[Address] = {
 
     def getAddress(businessMatching: BusinessMatching): Option[Address] =
       businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
 
-    dataCacheConnector.fetchAll map { cacheO =>
       for {
         cache <- cacheO
         bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        address <- getAddress(bm)
+        address <- getAddress(bm) if isFirstTradingPremises(index, cacheO)
       } yield address
-    }
   }
 
-  private def isFirstTradingPremises(index: Int): Boolean = {
-
-    dataCacheConnector.fetchAll map { cacheO =>
-      for {
-        cache <- cacheO
-        tp <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      } yield {
-//        tp.filter()
-      }
-    }
-
+  private def isFirstTradingPremises(index: Int, cacheO: Option[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Boolean = {
+     ???
   }
 
 }
