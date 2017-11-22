@@ -24,13 +24,21 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching}
+import models.asp.Asp
+import models.businessmatching._
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
 import services.businessmatching.BusinessMatchingService
 import utils.RepeatingSection
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.supervision.Supervision
+import models.tcsp.Tcsp
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -86,12 +94,32 @@ class UpdateServiceDateOfChangeController @Inject()(
                     removeActivities
                   )
                 })
+                _ <- businessMatchingService.commitVariationData
+                _ <- OptionT.liftF(removeSection(removeActivities))
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, services)))
           }
           case Left(badRequest) => Future.successful(badRequest)
         }
   }
+
+  private def removeSection(services: Set[BusinessActivity])
+                           (implicit hc: HeaderCarrier, ac: AuthContext) = Future.sequence(
+    services map {
+      case AccountancyServices =>
+        dataCacheConnector.save[Asp](Asp.key,None) flatMap { _ =>
+          dataCacheConnector.save[Supervision](Supervision.key, None)
+        }
+      case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,None)
+      case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
+      case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
+      case TrustAndCompanyServices =>
+        dataCacheConnector.save[Tcsp](Tcsp.key,None) flatMap { _ =>
+          dataCacheConnector.save[Supervision](Supervision.key, None)
+      }
+      case _ => Future.successful()
+    }
+  )
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
     views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))

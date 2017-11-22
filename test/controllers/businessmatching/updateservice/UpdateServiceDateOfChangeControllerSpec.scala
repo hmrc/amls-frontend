@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
+import models.hvd.Hvd
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -218,11 +219,15 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           hasAccepted = true
         )))(any(),any(),any())
 
-      verify(controller.dataCacheConnector).save(
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         eqTo(TradingPremises.key),
         eqTo(tradingPremises)
       )(any(),any(),any())
 
+      verify(controller.dataCacheConnector).save[Hvd](
+        eqTo(Hvd.key),
+        eqTo(None)
+      )(any(),any(),any())
     }
 
   }
