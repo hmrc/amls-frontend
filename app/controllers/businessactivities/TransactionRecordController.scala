@@ -33,6 +33,10 @@ class TransactionRecordController @Inject()
   val dataCacheConnector: DataCacheConnector
 ) extends BaseController {
 
+  val fieldName = "isRecorded"
+  implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")
+  implicit val writer = formWrites(fieldName)
+
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
@@ -40,7 +44,7 @@ class TransactionRecordController @Inject()
           val form: Form2[Boolean] = (for {
             businessActivities <- response
             transactionRecord <- businessActivities.transactionRecord
-          } yield Form2[Boolean](transactionRecord)(formWrites("isRecorded"))).getOrElse(EmptyForm)
+          } yield Form2[Boolean](transactionRecord)).getOrElse(EmptyForm)
 
           Ok(customer_transaction_records(form, edit))
       }
@@ -48,7 +52,7 @@ class TransactionRecordController @Inject()
 
   def post(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[Boolean](request.body)(formRule("isRecorded", "error.required.ba.select.transaction.record")) match {
+      Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(customer_transaction_records(f, edit)))
         case ValidForm(_, data) => {
