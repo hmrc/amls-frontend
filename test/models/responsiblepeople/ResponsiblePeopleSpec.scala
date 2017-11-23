@@ -1557,6 +1557,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "middleName" -> "middle",
       "lastName" -> "last",
       "previousName" -> Json.obj(
+        "hasPreviousName" -> true,
         "firstName" -> "oldFirst",
         "middleName" -> "oldMiddle",
         "lastName" -> "oldLast",
