@@ -16,6 +16,7 @@
 
 package controllers.tradingpremises
 
+import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -40,6 +41,9 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
       Messages("summary.tradingpremises") + " - " +
       Messages("title.amls") + " - " + Messages("title.gov")
 
+    mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(TradingPremises())), TradingPremises.key)
+    mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
+
     val controller = new IsResidentialController(messagesApi, self.authConnector, mockCacheConnector)
   }
 
@@ -47,36 +51,47 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
 
     "get is called" must {
 
-      "load is residential page with empty form" in new Fixture {
+      "load is residential page" when {
+        "with empty form" in new Fixture {
 
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel.copy(isResidential = None))))))
+          mockCacheGetEntry[Seq[TradingPremises]](
+            Some(Seq(TradingPremises(yourTradingPremises = Some(ytpModel.copy(isResidential = None))))),
+            TradingPremises.key
+          )
 
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.title mustBe pageTitle
+          val document = Jsoup.parse(contentAsString(result))
+          document.title mustBe pageTitle
+
+        }
+
+        "with pre - populated data form" in new Fixture {
+
+          mockCacheGetEntry[Seq[TradingPremises]](
+            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            TradingPremises.key
+          )
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.title mustBe pageTitle
+          document.select("input[value=true]").hasAttr("checked") must be(true)
+        }
 
       }
 
-      "respond with not found page when YourTradingPremises is None" in new Fixture {
+      "respond with not found page" when {
+        "TradingPremises is None" in new Fixture {
 
-        mockCacheFetch[Seq[TradingPremises]](None)
+          mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
 
-        val result = controller.get(1)(request)
-        status(result) must be(NOT_FOUND)
-      }
-
-      "load is residential page with pre - populated data form" in new Fixture {
-
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.title mustBe pageTitle
-        document.select("input[value=true]").hasAttr("checked") must be(true)
+          val result = controller.get(1)(request)
+          status(result) must be(NOT_FOUND)
+        }
       }
 
     }
@@ -88,7 +103,10 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
           "isResidential" -> "true"
         )
 
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
+        mockCacheGetEntry[Seq[TradingPremises]](
+          Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+          TradingPremises.key
+        )
         mockCacheSave[Seq[TradingPremises]]
 
         val result = controller.post(1)(postRequest)
@@ -107,7 +125,10 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
         val tp = TradingPremises(yourTradingPremises = ytp)
 
-        mockCacheFetch[Seq[TradingPremises]](Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
+        mockCacheGetEntry[Seq[TradingPremises]](
+          Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+          TradingPremises.key
+        )
         mockCacheSave[Seq[TradingPremises]]
 
         val result = controller.post(1, true)(postRequest)

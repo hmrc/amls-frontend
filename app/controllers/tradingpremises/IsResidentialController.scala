@@ -47,13 +47,20 @@ class  IsResidentialController @Inject()(
           (for {
             cache <- cacheO
             tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-            tp <- tradingPremises.lift(index)
+            tp <- tradingPremises.lift(index - 1)
           } yield {
+
             val form = tp.yourTradingPremises match {
               case Some(YourTradingPremises(_, _, Some(boolean), _, _)) => Form2[IsResidential](IsResidential(boolean))
               case _ => EmptyForm
             }
-            Ok(is_residential(form, getResidentialAddress(index, cacheO), index, edit))
+
+            val address = for {
+              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+              address <- getAddress(bm) if isFirstTradingPremises(tradingPremises, index)
+            } yield address
+
+            Ok(is_residential(form, address, index, edit))
           }) getOrElse NotFound(notFoundView)
         }
   }
@@ -64,7 +71,15 @@ class  IsResidentialController @Inject()(
         dataCacheConnector.fetchAll flatMap { cacheO =>
           Form2[IsResidential](request.body) match {
             case f: InvalidForm =>
-              Future.successful(BadRequest(is_residential(f, getResidentialAddress(index, cacheO), index, edit)))
+
+              val address = for {
+                cache <- cacheO
+                tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                address <- getAddress(bm) if isFirstTradingPremises(tradingPremises, index)
+              } yield address
+
+              Future.successful(BadRequest(is_residential(f, address, index, edit)))
             case ValidForm(_, data) =>
               (cacheO map { cache =>
                 for {
@@ -85,20 +100,10 @@ class  IsResidentialController @Inject()(
         }
   }
 
-  private def getResidentialAddress(index: Int, cacheO: Option[CacheMap])
-                                   (implicit hc: HeaderCarrier, ac: AuthContext): Option[Address] = {
+  def getAddress(businessMatching: BusinessMatching): Option[Address] =
+    businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
 
-    def getAddress(businessMatching: BusinessMatching): Option[Address] =
-      businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
-
-      for {
-        cache <- cacheO
-        bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        address <- getAddress(bm) if isFirstTradingPremises(index, cacheO)
-      } yield address
-  }
-
-  private def isFirstTradingPremises(index: Int, cacheO: Option[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Boolean = {
+  private def isFirstTradingPremises(tradingPremises: Seq[TradingPremises], index: Int)(implicit hc: HeaderCarrier, ac: AuthContext): Boolean = {
      ???
   }
 
