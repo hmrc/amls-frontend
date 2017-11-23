@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import models.businesscustomer.Address
 
-@(f: forms.Form2[_], index:Int, edit: Boolean)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], model: Option[Address], index:Int, edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -30,6 +31,10 @@
 ) {
 
     @form(f, controllers.tradingpremises.routes.IsResidentialController.post(index, edit)) {
+
+        @model.map { address =>
+            @registered_office_helper(address)
+        }
 
         @fieldset(
             f = f("isResidential-fieldset"),
