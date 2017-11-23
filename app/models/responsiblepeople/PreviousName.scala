@@ -81,36 +81,11 @@ object PreviousName {
       }
   }
 
-  def constant[A](x: A): Reads[A] = new Reads[A] {
-    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
-  }
-
-  def hasPreviousNameReader: Reads[Option[Boolean]] = {
-
-    (__ \ "hasPreviousName").readNullable[Boolean] flatMap { d =>
-      d match {
-        case None => (__ \ "firstName").readNullable[String] flatMap { f =>
-          (__ \ "middleName").readNullable[String] flatMap  { m =>
-            (__ \ "lastName").readNullable[String] map { l =>
-
-              (d, f, m, l) match {
-                case (None, None, None, None) => Some(false)
-                case _ => Some(true)
-              }
-            }
-          }
-        }
-
-        case p => constant(p)
-      }
-    }
-  }
-
   implicit val jsonReads : Reads[PreviousName] = {
     import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
-    hasPreviousNameReader and
+    (__ \ "hasPreviousName").readNullable[Boolean] and
       (__ \ "firstName").readNullable[String] and
       (__ \ "middleName").readNullable[String] and
       (__ \ "lastName").readNullable[String]
