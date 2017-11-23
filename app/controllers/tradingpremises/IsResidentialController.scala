@@ -25,11 +25,8 @@ import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 import views.html.tradingpremises.is_residential
 
 import scala.concurrent.Future
@@ -100,11 +97,20 @@ class  IsResidentialController @Inject()(
         }
   }
 
-  def getAddress(businessMatching: BusinessMatching): Option[Address] =
+  private def getAddress(businessMatching: BusinessMatching): Option[Address] =
     businessMatching.reviewDetails.fold[Option[Address]](None)(r => Some(r.businessAddress))
 
-  private def isFirstTradingPremises(tradingPremises: Seq[TradingPremises], index: Int)(implicit hc: HeaderCarrier, ac: AuthContext): Boolean = {
-     ???
+  private def isFirstTradingPremises(tradingPremises: Seq[TradingPremises], index: Int): Boolean = {
+
+    val tpWithoutDeleted =  tradingPremises.zipWithIndex.filterNot { case (tp, _) =>
+      tp.status.contains(StatusConstants.Deleted)
+    }
+
+    tpWithoutDeleted match {
+      case (_, i) :: _ if i equals (index - 1) => true
+      case _ => false
+    }
+
   }
 
 }

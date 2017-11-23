@@ -32,10 +32,8 @@
 
     @form(f, controllers.tradingpremises.routes.IsResidentialController.post(index, edit)) {
 
-        @if(index equals 1){
-            @model.map { address =>
-                @registered_office_helper(address)
-            }
+        @model.map { address =>
+            @registered_office_helper(address)
         }
 
         @fieldset(

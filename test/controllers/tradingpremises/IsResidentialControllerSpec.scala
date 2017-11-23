@@ -26,9 +26,9 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
-class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with PrivateMethodTester{
+class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -150,14 +150,71 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
     }
 
     "isFirstTradingPremises is called" must {
-      "return true" in new Fixture {
+      "return true" when {
+        "trading premises have been deleted" in new Fixture {
 
-        val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+          val tp = Seq(
+            TradingPremises(status = Some(StatusConstants.Deleted)),
+            TradingPremises(status = Some(StatusConstants.Deleted)),
+            TradingPremises(),
+            TradingPremises()
+          )
 
-        val result = controller invokePrivate isFirstTradingPremises(3)
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
 
-        result must be(true)
+          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
 
+          result must be(true)
+
+        }
+
+        "trading premises have not been deleted" in new Fixture {
+
+          val tp = Seq(
+            TradingPremises(),
+            TradingPremises()
+          )
+
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
+
+          result must be(true)
+
+        }
+      }
+      "return false" when {
+        "trading premises have been deleted" in new Fixture {
+
+          val tp = Seq(
+            TradingPremises(),
+            TradingPremises(status = Some(StatusConstants.Deleted)),
+            TradingPremises(),
+            TradingPremises()
+          )
+
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 3)
+
+          result must be(false)
+
+        }
+
+        "trading premises have not been deleted" in new Fixture {
+
+          val tp = Seq(
+            TradingPremises(status = Some(StatusConstants.Deleted)),
+            TradingPremises()
+          )
+
+          val isFirstTradingPremises = PrivateMethod[Boolean]('isFirstTradingPremises)
+
+          val result = controller invokePrivate isFirstTradingPremises(tp, 1)
+
+          result must be(false)
+
+        }
       }
     }
   }
