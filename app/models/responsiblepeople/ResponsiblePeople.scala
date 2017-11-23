@@ -251,7 +251,9 @@ object ResponsiblePeople {
     (__ \ "personName" \ "previousName" \ "date").readNullable[LocalDate] orElse constant(None)
 
   def oldKnownByReader: Reads[Option[KnownBy]] =
-    (__ \ "personName" \ "otherNames").readNullable[KnownBy] orElse constant(None)
+    (__ \ "personName" \ "otherNames").readNullable[String] map { maybeName =>
+      maybeName.fold[Option[KnownBy]](None)(name => Some(KnownBy(Some(true), Some(name))))
+    } orElse constant(None)
 
   implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
 
