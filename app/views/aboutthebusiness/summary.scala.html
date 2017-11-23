@@ -64,18 +64,6 @@
         }
     }
 
-    @model.corporationTaxRegistered.map { ctRegistered =>
-        @checkYourAnswers(
-            question = Messages("aboutthebusiness.registeredforcorporationtax.title"),
-            editUrl = controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get(true).toString
-        ) {
-            <p>@ctRegistered match {
-                case CorporationTaxRegisteredNo => { @Messages("lbl.no") }
-                case CorporationTaxRegisteredYes(v) => { @Messages("aboutthebusiness.registeredforcorporationtax.taxReference"): @v }
-            }</p>
-        }
-    }
-
     @model.registeredOffice.map { a =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredoffice.title"),
