@@ -19,6 +19,7 @@ package models.businessactivities
 import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import models.businessactivities.TransactionTypes._
 
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
@@ -140,34 +141,11 @@ object BusinessActivities {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+  import utils.MappingUtils.constant
 
   val key = "business-activities"
 
-  val transactionTypeReader = (__ \ "transactionTypes").read[TransactionTypes] map { t => Option(t) }
-
-  val oldTransactionTypeReader: Reads[Option[TransactionTypes]] =
-    (__ \ "isRecorded").read[Boolean] flatMap {
-      case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
-        x.map {
-          case "01" => Reads(_ => JsSuccess(Paper)) map identity[TransactionType]
-          case "02" => Reads(_ => JsSuccess(DigitalSpreadsheet)) map identity[TransactionType]
-          case "03" =>
-            (__ \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
-          case _ =>
-            Reads(_ => JsError((__ \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
-        }.foldLeft[Reads[Set[TransactionType]]](
-          Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
-        ){
-          (result, data) =>
-            data flatMap {m =>
-              result.map {n =>
-                n + m
-              }
-            }
-        }
-      } map(t => Some(TransactionTypes(t)))
-      case false => Reads(_ => JsSuccess(None))
-    }
+  val transactionTypesReader = (__ \ "transactionTypes").read[TransactionTypes] map (Option(_))
 
   implicit val reads: Reads[BusinessActivities] = (
     __.read(Reads.optionNoError[InvolvedInOther]) and
@@ -183,7 +161,7 @@ object BusinessActivities {
       __.read(Reads.optionNoError[HowManyEmployees]) and
       __.read(Reads.optionNoError[WhoIsYourAccountant]) and
       __.read(Reads.optionNoError[TaxMatters]) and
-      (transactionTypeReader orElse oldTransactionTypeReader) and
+      (transactionTypesReader orElse TransactionTypes.oldTransactionTypeReader orElse constant(None)) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
       (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessActivities.apply _)

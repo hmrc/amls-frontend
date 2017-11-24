@@ -69,6 +69,10 @@ object GenericValidators {
 
 trait MappingUtils {
 
+  import play.api.libs.json.{Reads, JsSuccess, JsError}
+
+  def constant[A](a: A): Reads[A] = Reads(_ => JsSuccess(a))
+  
   /**
     * This is an overloaded version of `writeM` from the validation library which instead of serializing
     * arrays to:

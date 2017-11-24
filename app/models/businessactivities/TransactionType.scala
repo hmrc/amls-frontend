@@ -45,6 +45,7 @@ object TransactionTypes {
 
   import jto.validation.forms.Rules._
   import utils.MappingUtils.Implicits._
+  import utils.MappingUtils.constant
 
   implicit val jsonReads = new Reads[TransactionTypes] {
     override def reads(json: JsValue) = {
@@ -64,6 +65,30 @@ object TransactionTypes {
       }
     }
   }
+
+  val oldTransactionTypeReader: Reads[Option[TransactionTypes]] =
+    (__ \ "isRecorded").read[Boolean] flatMap {
+      case true => (__ \ "transactions").read[Set[String]].flatMap {x:Set[String] =>
+        x.map {
+          case "01" => constant(Paper) map identity[TransactionType]
+          case "02" => constant(DigitalSpreadsheet) map identity[TransactionType]
+          case "03" =>
+            (__ \ "digitalSoftwareName").read[String].map (DigitalSoftware.apply  _) map identity[TransactionType]
+          case _ =>
+            Reads(_ => JsError((__ \ "transactions") -> play.api.data.validation.ValidationError("error.invalid")))
+        }.foldLeft[Reads[Set[TransactionType]]](
+          Reads[Set[TransactionType]](_ => JsSuccess(Set.empty))
+        ){
+          (result, data) =>
+            data flatMap {m =>
+              result.map {n =>
+                n + m
+              }
+            }
+        }
+      } map(t => Some(TransactionTypes(t)))
+      case false => constant(None)
+    }
 
   implicit val jsonWrites = Writes[TransactionTypes] { t =>
     Json.obj(
