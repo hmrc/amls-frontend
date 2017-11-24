@@ -46,8 +46,6 @@ trait CorporationTaxRegisteredController extends BaseController {
     implicit authContext => implicit request =>
       filterByBusinessType { cache =>
         cache.getEntry[AboutTheBusiness](AboutTheBusiness.key) match {
-          case Some(response) if response.corporationTaxRegistered.isDefined =>
-            Future.successful(Ok(corporation_tax_registered(Form2[CorporationTaxRegistered](response.corporationTaxRegistered.get), edit)))
           case _ =>
             (for {
               bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
