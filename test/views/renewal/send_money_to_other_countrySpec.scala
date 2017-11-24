@@ -70,5 +70,14 @@ class send_money_to_other_countrySpec extends GenericTestHelper with MustMatcher
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
+
+    "show the correct return progress link" in new ViewFixture {
+      val form2: ValidForm[SendMoneyToOtherCountry] = Form2(SendMoneyToOtherCountry(true))
+
+      def view = views.html.renewal.send_money_to_other_country(form2, true)
+      doc.getElementsByClass("return-link").first().text() must include(Messages("link.return.renewal.progress"))
+      doc.getElementsByClass("return-link").first().html() must include(controllers.renewal.routes.RenewalProgressController.get.url)
+    }
+
   }
 }
