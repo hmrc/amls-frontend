@@ -35,16 +35,22 @@ import scala.concurrent.Future
 
 class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with DependencyMocks {
 
-  trait Fixture extends AuthorisedFixture {
-    self =>
+  trait Fixture extends AuthorisedFixture { self =>
+
     val request = addToken(authRequest)
 
-    mockCacheFetchAll
-    mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(ReviewDetails(
+    val reviewDetails = ReviewDetails(
       "BusinessName",
       Some(LimitedCompany),
-      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
-    ))), BusinessMatching.key)
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")),
+      "ghghg",
+      Some("sdsw")
+    )
+    val businessMatching = BusinessMatching(Some(reviewDetails))
+
+    mockCacheFetchAll
+    mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
+    mockCacheSave[AboutTheBusiness]
 
     val controller = new CorporationTaxRegisteredController {
       override val dataCacheConnector = mockCacheConnector
@@ -57,24 +63,38 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
 
     "get is called" must {
 
-      "display the registered for corporation tax page with pre populated data" in new Fixture {
+      "redirect to SummaryController" when {
+        "edit is true" in new Fixture {
 
-        val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+          val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
 
-        mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+          mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
 
-        val result = controller.get()(request)
-        status(result) must be(OK)
+          val result = controller.get(true)(request)
+          status(result) must be(SEE_OTHER)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(true)
-        document.getElementById("corporationTaxReference").`val` must be("1111111111")
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+      }
+      "redirect to ConfirmRegisteredOfficeController" when {
+        "edit is false" in new Fixture {
+
+          val data = AboutTheBusiness(corporationTaxRegistered = Some(CorporationTaxRegisteredYes("1111111111")))
+
+          mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
+
+          val result = controller.get()(request)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) must be(Some(routes.ConfirmRegisteredOfficeController.get().url))
+        }
       }
 
       "display an empty form when no previous entry" in new Fixture {
 
         val data = AboutTheBusiness(corporationTaxRegistered = None)
 
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(Some(reviewDetails.copy(utr = None)))), BusinessMatching.key)
         mockCacheGetEntry[AboutTheBusiness](Some(data), AboutTheBusiness.key)
 
         val result = controller.get()(request)
@@ -121,10 +141,8 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
               "corporationTaxReference" -> "1111111111"
             )
 
-            when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
             val result = controller.post()(newRequest)
+
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
           }
@@ -138,10 +156,8 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
               "corporationTaxReference" -> "1111111111"
             )
 
-            when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
-              (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
             val result = controller.post(true)(newRequest)
+
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
           }
@@ -176,9 +192,6 @@ class CorporationTaxRegisteredControllerSpec extends GenericTestHelper with Mock
             "registeredForCorporationTax" -> "true",
             "corporationTaxReference" -> "1111111111"
           )
-
-          when(controller.dataCacheConnector.save[AboutTheBusiness](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post()(newRequest)
           status(result) must be(NOT_FOUND)

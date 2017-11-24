@@ -16,14 +16,11 @@
 
 package controllers.aboutthebusiness
 
-import cats.data.OptionT
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.AboutTheBusiness
-import models.businessactivities.ExpectedAMLSTurnover
-import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import views.html.aboutthebusiness._

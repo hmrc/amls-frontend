@@ -29,7 +29,6 @@ import forms.EmptyForm
 
 import scala.collection.JavaConversions._
 
-
 class summarySpec extends GenericTestHelper
   with MustMatchers
   with HtmlAssertions
@@ -65,7 +64,6 @@ class summarySpec extends GenericTestHelper
       ("aboutthebusiness.registeredformlr.title",checkElementTextIncludes(_, "aboutthebusiness.registeredformlr.mlrregno.lbl", "1234")),
       ("aboutthebusiness.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
       ("aboutthebusiness.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
-      ("aboutthebusiness.registeredforcorporationtax.title",checkElementTextIncludes(_, "aboutthebusiness.registeredforcorporationtax.taxReference", "3456")),
       ("aboutthebusiness.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
       ("aboutthebusiness.contactingyou.email.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.email.lbl", "test@test.com")),
       ("aboutthebusiness.contactingyou.phone.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl", "01234567890")),
@@ -95,7 +93,7 @@ class summarySpec extends GenericTestHelper
 
         val hTwo = hTwos.toList.find(e => e.text() == Messages(key))
 
-        hTwo must not be (None)
+        hTwo must not be None
         val section = hTwo.get.parents().select("section").first()
         check(section) must be(true)
       }
