@@ -78,4 +78,9 @@ trait TestOnlyController extends BaseController with Actions {
       Future.successful(Ok(views.html.confirmation.payment_failure("confirmation.payment.failed.reason.failure", 100, "X123456789")))
   }
 
+  def paymentSuccessful = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.confirmation.payment_confirmation("Company Name", "X123456789")))
+  }
+
 }

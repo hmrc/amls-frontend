@@ -1295,4 +1295,12 @@ details {
     }
 }
 
+/* print page */
+
+.print-link {
+    display: block;
+}
+
+
+
 
