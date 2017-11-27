@@ -15,11 +15,21 @@
  */
 
  @media print {
+     #proposition-links,
+     .menu,
      .service-info,
-     .content,
      .print-link,
      .get-help-form,
      .button {
          display: none !important;
-         }
+     }
+
+     .confirmation {
+        -webkit-print-color-adjust: exact;
+     }
+
+     header {
+       text-align:center;
+       margin:auto;
+     }
  }
