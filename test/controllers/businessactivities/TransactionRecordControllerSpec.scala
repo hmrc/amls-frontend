@@ -121,6 +121,21 @@ class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSuga
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TransactionTypesController.get(edit = true).url))
         }
+
+        "given valid data in edit mode, 'yes' is selected and the next question has already been asked" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "isRecorded" -> "true"
+          )
+
+          mockCacheFetch(Some(BusinessActivities(
+            transactionRecord = Some(true),
+            transactionRecordTypes = Some(TransactionTypes(Set(Paper)))
+          )))
+
+          val result = controller.post(true)(newRequest)
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.SummaryController.get.url)
+        }
       }
 
       "reset the transaction types if 'no' is selected" in new Fixture {
