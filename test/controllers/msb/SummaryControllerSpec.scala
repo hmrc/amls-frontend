@@ -18,8 +18,8 @@ package controllers.msb
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching.{MoneyServiceBusiness => BMMoneyServiceBusiness, _}
-import models.moneyservicebusiness._
+import models.businessmatching._
+import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -28,19 +28,18 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
 import services.businessmatching.ServiceFlow
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val serviceFlow = mock[ServiceFlow]
-
-    val controller = new SummaryController(mock[DataCacheConnector], mock[StatusService], self.authConnector, serviceFlow)
+    val controller = new SummaryController(mockCacheConnector, mockStatusService, self.authConnector, mockServiceFlow)
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -61,14 +60,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
     )
 
-    val mockCacheMap = mock[CacheMap]
-
     when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+      mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
     } thenReturn Future.successful(false)
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
+      mockStatusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
   }
 
@@ -88,17 +85,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         )
       )
 
-      when(controller.dataCache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(model))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      mockIsNewActivity(false)
+      mockCacheFetchAll
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheGetEntry[MoneyServiceBusiness]((Some(model)), MoneyServiceBusiness.key)
+      mockApplicationStatus(NotCompleted)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -119,14 +110,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
         )
       )
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(None)
+      mockApplicationStatus(NotCompleted)
+      mockCacheGetEntry[BusinessMatching]((Some(BusinessMatching(msbServices = msbServices))), BusinessMatching.key)
+      mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
 
       val result = controller.get()(request)
       status(result) must be(SEE_OTHER)
@@ -135,19 +121,15 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        when(controller.dataCache.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        val bm = Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+          ChequeCashingNotScrapMetal,
+          ChequeCashingScrapMetal)))))
 
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
-            ChequeCashingNotScrapMetal,
-            ChequeCashingScrapMetal))))))
-
-        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-          .thenReturn(Some(completeModel))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockIsNewActivity(false)
+        mockCacheFetchAll
+        mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
+        mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -169,19 +151,15 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        when(controller.dataCache.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        val bm = Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+          ChequeCashingNotScrapMetal,
+          ChequeCashingScrapMetal)))))
 
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
-            ChequeCashingNotScrapMetal,
-            ChequeCashingScrapMetal))))))
-
-        when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-          .thenReturn(Some(completeModel))
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(NotCompleted))
+        mockIsNewActivity(false)
+        mockCacheFetchAll
+        mockCacheGetEntry[BusinessMatching](bm, BusinessMatching.key)
+        mockCacheGetEntry[MoneyServiceBusiness](Some(completeModel), MoneyServiceBusiness.key)
+        mockApplicationStatus(NotCompleted)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -198,14 +176,9 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "redirect to RegistrationProgressController" when {
       "model has been saved with hasAccepted set to true" in new Fixture {
-
-        when {
-          controller.dataCache.fetch[MoneyServiceBusiness](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(completeModel))
-
-        when {
-          controller.dataCache.save[MoneyServiceBusiness](any(), any())(any(),any(),any())
-        } thenReturn Future.successful(mockCacheMap)
+        mockIsNewActivity(false)
+        mockCacheFetch[MoneyServiceBusiness](Some(completeModel), Some(MoneyServiceBusiness.key))
+        mockCacheSave[MoneyServiceBusiness]
 
         val result = controller.post()(request)
 
@@ -217,16 +190,11 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "redirect to NewServiceInformationController" when {
       "status is not pre-submission and activity has just been added" in new Fixture {
-        when {
-          controller.dataCache.fetch[MoneyServiceBusiness](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(completeModel))
+        mockCacheFetch[MoneyServiceBusiness](Some(completeModel))
+        mockCacheSave[MoneyServiceBusiness]
 
         when {
-          controller.dataCache.save[MoneyServiceBusiness](any(), any())(any(),any(),any())
-        } thenReturn Future.successful(mockCacheMap)
-
-        when {
-          serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+          mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
         } thenReturn Future.successful(true)
 
         when {
