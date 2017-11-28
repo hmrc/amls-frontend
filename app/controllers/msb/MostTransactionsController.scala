@@ -16,28 +16,34 @@
 
 package controllers.msb
 
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{CurrencyExchange, MsbService, BusinessMatching}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-trait MostTransactionsController extends BaseController {
-
-  def cache: DataCacheConnector
-  implicit val statusService: StatusService
+@Singleton
+class MostTransactionsController @Inject()(
+                                            val authConnector: AuthConnector = AMLSAuthConnector,
+                                            val cacheConnector: DataCacheConnector,
+                                            implicit val statusService: StatusService,
+                                            implicit val serviceFlow: ServiceFlow
+                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true => cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      ControllerHelper.allowedToEdit(MsbActivity) flatMap {
+        case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
             val form = (for {
               msb <- response
@@ -70,7 +76,7 @@ trait MostTransactionsController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(views.html.msb.most_transactions(f, edit)))
         case ValidForm(_, data) =>
-          cache.fetchAll flatMap {
+          cacheConnector.fetchAll flatMap {
             optMap =>
               val result = for {
                 cacheMap <- optMap
@@ -78,7 +84,7 @@ trait MostTransactionsController extends BaseController {
                 bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
                 services <- bm.msbServices
               } yield {
-                cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+                cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   msb.mostTransactions(data)
                 ) map {
                   _ =>
@@ -92,11 +98,4 @@ trait MostTransactionsController extends BaseController {
           }
       }
   }
-}
-
-object MostTransactionsController extends MostTransactionsController {
-  // $COVERAGE-OFF$
-  override val cache: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
 }
