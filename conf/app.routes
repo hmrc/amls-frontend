@@ -533,8 +533,8 @@ POST        /money-service-business/most-transactions                           
 GET         /money-service-business/transfers                                         controllers.msb.TransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transfers                                         controllers.msb.TransactionsInNext12MonthsController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/largest-amounts                                   controllers.msb.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
-POST        /money-service-business/largest-amounts                                   controllers.msb.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+GET         /money-service-business/largest-amounts                                   @controllers.msb.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /money-service-business/largest-amounts                                   @controllers.msb.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)

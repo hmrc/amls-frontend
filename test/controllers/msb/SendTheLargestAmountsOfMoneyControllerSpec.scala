@@ -16,64 +16,56 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.Country
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new SendTheLargestAmountsOfMoneyController {
-
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override protected def authConnector: AuthConnector = self.authConnector
-      override implicit val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new SendTheLargestAmountsOfMoneyController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService,
+      mockServiceFlow
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "SendTheLargestAmountsOfMoneyController" must {
-
     "load the 'Where to Send The Largest Amounts Of Money' page" in new Fixture  {
-
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
+      mockIsNewActivity(false)
+      mockApplicationStatus(NotCompleted)
+      mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
       status(result) must be(OK)
       val document = Jsoup.parse(contentAsString(result))
-      document.title() must be (Messages("msb.send.the.largest.amounts.of.money.title") + " - " + Messages("summary.msb") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
+      document.title() must be (Messages("msb.send.the.largest.amounts.of.money.title") +
+        " - " + Messages("summary.msb") +
+        " - " + Messages("title.amls") +
+        " - " + Messages("title.gov"))
     }
 
     "pre-populate the 'Where to Send The Largest Amounts Of Money' Page" in new Fixture  {
+      val msb = Some(MoneyServiceBusiness(
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))))
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
-
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(MoneyServiceBusiness(
-          sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))))))
+      mockIsNewActivity(false)
+      mockApplicationStatus(NotCompleted)
+      mockCacheFetch[MoneyServiceBusiness](msb, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -83,12 +75,23 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
 
     }
 
+    "continue to show the correct view" when {
+      "application is in variation mode but the service has just been added" in new Fixture {
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("msb.send.the.largest.amounts.of.money.title"))
+      }
+    }
+
 
     "redirect to Page not found" when {
       "application is in variation mode" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockIsNewActivity(false)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(NOT_FOUND)
@@ -101,11 +104,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         "country_1" -> "GS"
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+      mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -130,11 +130,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
+      mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -153,11 +150,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "UK")))
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[MoneyServiceBusiness](Some(incomingModel), Some(MoneyServiceBusiness.key))
+      mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -170,11 +164,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with 
         "country_1" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+      mockCacheSave[MoneyServiceBusiness]
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
