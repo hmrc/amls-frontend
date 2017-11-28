@@ -20,49 +20,51 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, KeepTransactionRecords}
+import models.businessactivities.{BusinessActivities}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
-
+import javax.inject.Inject
+import utils.BooleanFormReadWrite._
 import scala.concurrent.Future
 
-trait TransactionRecordController extends BaseController {
+class TransactionRecordController @Inject()
+(
+  val authConnector: AuthConnector,
   val dataCacheConnector: DataCacheConnector
+) extends BaseController {
+
+  val fieldName = "isRecorded"
+  implicit val reader = formRule(fieldName, "error.required.ba.select.transaction.record")
+  implicit val writer = formWrites(fieldName)
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
         response =>
-          val form: Form2[KeepTransactionRecords] = (for {
+          val form: Form2[Boolean] = (for {
             businessActivities <- response
             transactionRecord <- businessActivities.transactionRecord
-          } yield Form2[KeepTransactionRecords](transactionRecord)).getOrElse(EmptyForm)
+          } yield Form2[Boolean](transactionRecord)).getOrElse(EmptyForm)
+
           Ok(customer_transaction_records(form, edit))
       }
   }
 
   def post(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[KeepTransactionRecords](request.body) match {
+      Form2[Boolean](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(customer_transaction_records(f, edit)))
         case ValidForm(_, data) => {
           for {
-            businessActivity <-
-            dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-              businessActivity.transactionRecord(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.IdentifySuspiciousActivityController.get())
+            businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivity.transactionRecord(data))
+          } yield (edit, data) match {
+            case (_, true) => Redirect(routes.TransactionTypesController.get(edit))
+            case (true, false) => Redirect(routes.SummaryController.get())
+            case (false, _) => Redirect(routes.IdentifySuspiciousActivityController.get())
           }
         }
       }
   }
-}
-
-object TransactionRecordController extends TransactionRecordController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

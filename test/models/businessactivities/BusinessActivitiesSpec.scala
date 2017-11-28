@@ -33,7 +33,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val DefaultInvolvedInOtherDetails = "DEFAULT INVOLVED"
   val DefaultInvolvedInOther = InvolvedInOtherYes(DefaultInvolvedInOtherDetails)
   val DefaultBusinessFranchise = BusinessFranchiseYes(DefaultFranchiseName)
-  val DefaultTransactionRecord = KeepTransactionRecordYes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
+  val DefaultTransactionRecord = true
+  val DefaultTransactionRecordTypes = TransactionTypes(Set(Paper, DigitalSoftware(DefaultSoftwareName)))
   val DefaultCustomersOutsideUK = CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))
   val DefaultNCARegistered = NCARegistered(true)
   val DefaultAccountantForAMLSRegulations = AccountantForAMLSRegulations(true)
@@ -53,7 +54,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val NewInvolvedInOther = InvolvedInOtherYes(NewInvolvedInOtherDetails)
   val NewBusinessTurnover = ExpectedBusinessTurnover.Second
   val NewAMLSTurnover = ExpectedAMLSTurnover.Second
-  val NewTransactionRecord = KeepTransactionRecordNo
+  val NewTransactionRecord = false
   val NewCustomersOutsideUK = CustomersOutsideUK(None)
   val NewNCARegistered = NCARegistered(false)
   val NewAccountantForAMLSRegulations = AccountantForAMLSRegulations(false)
@@ -81,9 +82,11 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
+    transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
     hasAccepted = true
   )
+
   val completeModelWithoutCustUK = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
@@ -98,11 +101,46 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
     taxMatters = Some(DefaultTaxMatters),
+    transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
     hasAccepted = true
   )
 
   val completeJson = Json.obj(
+    "involvedInOther" -> true,
+    "details" -> DefaultInvolvedInOtherDetails,
+    "expectedBusinessTurnover" -> "01",
+    "expectedAMLSTurnover" -> "01",
+    "businessFranchise" -> true,
+    "franchiseName" -> DefaultFranchiseName,
+    "isRecorded" -> true,
+    "transactionTypes" -> Json.obj(
+      "types" -> Seq("01", "03"),
+      "software" -> DefaultSoftwareName
+    ),
+    "isOutside" -> true,
+    "countries" -> Json.arr("GB"),
+    "ncaRegistered" -> true,
+    "accountantForAMLSRegulations" -> true,
+    "hasWrittenGuidance" -> true,
+    "hasPolicy" -> true,
+    "riskassessments" -> Seq("01"),
+    "employeeCount" -> "5",
+    "employeeCountAMLSSupervision" -> "4",
+    "accountantsName" -> "Accountant's name",
+    "accountantsTradingName" -> "Accountant's trading name",
+    "accountantsAddressLine1" -> "address1",
+    "accountantsAddressLine2" -> "address2",
+    "accountantsAddressLine3" -> "address3",
+    "accountantsAddressLine4" -> "address4",
+    "accountantsAddressPostCode" -> "POSTCODE",
+    "manageYourTaxAffairs" -> false,
+    "hasWrittenGuidance" -> true,
+    "hasChanged" -> false,
+    "hasAccepted" -> true
+  )
+
+  val oldFormatJson = Json.obj(
     "involvedInOther" -> true,
     "details" -> DefaultInvolvedInOtherDetails,
     "expectedBusinessTurnover" -> "01",
@@ -137,12 +175,12 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   val partialModel = BusinessActivities(businessFranchise = Some(DefaultBusinessFranchise))
 
   "BusinessActivities Serialisation" must {
-    "Serialise as expected" in {
+    "serialise as expected" in {
       Json.toJson(completeModel) must
         be(completeJson)
     }
 
-    "Deserialise as expected" in {
+    "deserialise as expected" in {
       completeJson.as[BusinessActivities] must
         be(completeModel)
     }
@@ -179,10 +217,16 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       "hasAccepted" -> false
     )
 
-    "Serialise as expected" in {
+    "serialise as expected" in {
       Json.toJson(partialModel) mustBe partialJson
     }
 
+  }
+
+  "Old format BusinessActivities json" must {
+    "deserialise correctly" in {
+      oldFormatJson.as[BusinessActivities] mustBe completeModel
+    }
   }
 
   "BusinessActivities with all values set as None" must {

@@ -63,45 +63,6 @@
             }
         }
 
-        @fieldset(
-            f = f("transactions-fieldset"),
-            legend = "businessactivities.do.keep.records",
-            hint = "businessactivities.do.keep.records.hint",
-            classes = Seq(s"$target")
-        ) {
-            @errorGroup(
-                field = f("transactions")
-            ) {
-                @checkbox(
-                    f = f("transactions[]"),
-                    labelText = "businessactivities.transactiontype.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("transactions[]"),
-                    labelText = "businessactivities.transactiontype.lbl.02",
-                    value = "02"
-                )
-                @checkbox(
-                    f = f("transactions[]"),
-                    labelText = "businessactivities.transactiontype.lbl.03",
-                    value = "03",
-                    target = s"#$target"
-                )
-            }
-            @panel(
-                field = Some(f(s"$target")),
-                panel = false
-            ) {
-                @input(
-                    classes = Seq("form-control-3-4 form-control-3-4"),
-                    field = f("name"),
-                    labelText = "businessactivities.name.software.pkg.lbl"
-                )
-            }
-        }
-
-
         @submit(edit)
     }
 }
