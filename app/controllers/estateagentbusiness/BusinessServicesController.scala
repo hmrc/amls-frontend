@@ -16,22 +16,26 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.estateagentbusiness._
+import routes._
 
 import scala.concurrent.Future
 
-trait BusinessServicesController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+@Singleton
+class BusinessServicesController @Inject()(
+                                          val authConnector: AuthConnector,
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val statusService: StatusService
+                                          ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -86,11 +90,4 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
           }
       }
   }
-}
-
-object BusinessServicesController extends BusinessServicesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
 }

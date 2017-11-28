@@ -16,219 +16,221 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
-import connectors.DataCacheConnector
 import models.estateagentbusiness._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.{eq => meq, _}
-import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val controller = new BusinessServicesController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val request = addToken(authRequest)
+
+    val controller = new BusinessServicesController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService
+    )
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  "BusinessServicesController" when {
 
-  "BusinessServicesController" must {
+    "get is called" must {
 
-    "use correct services" in new Fixture {
-      BusinessServicesController.authConnector must be(AMLSAuthConnector)
-      BusinessServicesController.dataCacheConnector must be(DataCacheConnector)
-    }
+      "display Business services page" in new Fixture {
 
-    "on get display Business services page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-      val result = controller.get()(request)
-      status(result) must be(OK)
-      contentAsString(result) must include(Messages("estateagentbusiness.services.title") + " - " + Messages("summary.estateagentbusiness") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
-    }
+        mockCacheFetch[EstateAgentBusiness](None)
 
-    "submit with valid data" in new Fixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "services[0]" -> "02",
-        "services[1]" -> "08"
-      )
-      val eab = EstateAgentBusiness(Some(Services(Set(Residential))), Some(ThePropertyOmbudsman), None, None)
-
-      val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development),None)),None,None,None,true)
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eabWithoutRedress)))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
-    }
-
-    "load the page with data when the user revisits at a later time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None))))
-
-      val result = controller.get()(request)
-      status(result) must be(OK)
-
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=03]").hasAttr("checked") must be(true)
-      document.select("input[value=01]").hasAttr("checked") must be(true)
-    }
-
-    "fail submission on error" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "services" -> "0299999"
-      )
-
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include("Invalid value")
-    }
-
-    "fail submission when no check boxes were selected" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-
-      )
-
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-      val document: Document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#services]").html() must include(Messages("error.required.eab.business.services"))
-    }
-
-
-    "submit with valid data in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "services[1]" -> "02",
-        "services[0]" -> "01",
-        "services[2]" -> "03"
-      )
-      val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), None, None, None)
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
-
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eab)))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
-    }
-
-    "submit with valid data with Residential option from business services" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "services[0]" -> "01",
-        "services[1]" -> "02",
-        "services[2]" -> "03"
-      )
-
-      val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), Some(ThePropertyOmbudsman), None, None)
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionReadyForReview))
-
-      when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(eab)))
-
-      when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), meq(Some(eab)))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get().url))
-    }
-
-
-    "successfully redirect to dateOfChange page" when {
-      "user edits services option" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "services[0]" -> "01",
-          "services[1]" -> "02",
-          "services[2]" -> "07"
-        )
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
-
-        when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(
-          services = Some(Services(Set(Residential, Commercial, Auction)))))))
-
-        when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+        contentAsString(result) must include(Messages("estateagentbusiness.services.title"))
       }
+
+      "load the page with data when the user revisits at a later time" in new Fixture {
+
+        mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(Some(Services(Set(Auction, Residential))), None, None, None)))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.select("input[value=03]").hasAttr("checked") must be(true)
+        document.select("input[value=01]").hasAttr("checked") must be(true)
+      }
+
     }
 
-    "successfully redirect to dateOfChange page" when {
-      "status is ready for renewal and user edits services option" in new Fixture {
+    "post is called" when {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "services[0]" -> "01",
-          "services[1]" -> "02",
-          "services[2]" -> "07"
-        )
+      "valid data is submitted" must {
 
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(ReadyForRenewal(None)))
+        "redirect to PenalisedUnderEstateAgentsActController" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(EstateAgentBusiness(
-          services = Some(Services(Set(Residential, Commercial, Auction)))))))
+          val newRequest = request.withFormUrlEncodedBody(
+            "services[0]" -> "02",
+            "services[1]" -> "08"
+          )
+          val eab = EstateAgentBusiness(Some(Services(Set(Residential))), Some(ThePropertyOmbudsman), None, None)
 
-        when(controller.dataCacheConnector.save[EstateAgentBusiness](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+          val eabWithoutRedress = EstateAgentBusiness(Some(Services(Set(Commercial, Development), None)), None, None, None, true)
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+          mockApplicationStatus(SubmissionDecisionRejected)
+
+          mockCacheFetch[EstateAgentBusiness](Some(eab))
+          mockCacheSave[EstateAgentBusiness](eabWithoutRedress, Some(EstateAgentBusiness.key))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.PenalisedUnderEstateAgentsActController.get().url))
+        }
+
+        "redirect to ResidentialRedressSchemeController" when {
+
+            "Residential option is submitted" when {
+
+            "edit is true" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "services[1]" -> "02",
+                "services[0]" -> "01",
+                "services[2]" -> "03"
+              )
+              val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), None, None, None)
+
+              mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
+              mockCacheSave[EstateAgentBusiness](eab, Some(EstateAgentBusiness.key))
+
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+
+              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get(true).url))
+            }
+
+            "edit is false" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "services[0]" -> "01",
+                "services[1]" -> "02",
+                "services[2]" -> "03"
+              )
+
+              val eab = EstateAgentBusiness(Some(Services(Set(Auction, Commercial, Residential))), Some(ThePropertyOmbudsman), None, None)
+
+              mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheFetch[EstateAgentBusiness](Some(eab), Some(EstateAgentBusiness.key))
+              mockCacheSave[EstateAgentBusiness](eab, Some(EstateAgentBusiness.key))
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ResidentialRedressSchemeController.get().url))
+
+            }
+
+          }
+
+        }
+
+        "redirect to dateOfChange page" when {
+          "edit is true" when {
+            "status is approved" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "services[0]" -> "01",
+                "services[1]" -> "02",
+                "services[2]" -> "07"
+              )
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+
+              mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
+                services = Some(Services(Set(Residential, Commercial, Auction)))
+              )))
+              mockCacheSave[EstateAgentBusiness]
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+            }
+
+            "status is ready for renewal" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "services[0]" -> "01",
+                "services[1]" -> "02",
+                "services[2]" -> "07"
+              )
+
+              mockApplicationStatus(ReadyForRenewal(None))
+
+              mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
+                services = Some(Services(Set(Residential, Commercial, Auction)))
+              )))
+              mockCacheSave[EstateAgentBusiness]
+
+              val result = controller.post()(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+            }
+          }
+        }
+
+        "redirect to SummaryController" when {
+
+          "edit is true" when {
+
+            "status is pre-approved" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "services[1]" -> "02",
+                "services[2]" -> "07"
+              )
+
+              mockApplicationStatus(SubmissionReadyForReview)
+
+              mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
+                services = Some(Services(Set(Commercial, Auction)))
+              )))
+              mockCacheSave[EstateAgentBusiness]
+
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.SummaryController.get().url))
+
+            }
+
+          }
+
+        }
+
+      }
+
+      "invalid data is submitted" must {
+
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "services" -> "0299999"
+          )
+
+          mockCacheFetch[EstateAgentBusiness](None)
+          mockCacheSave[EstateAgentBusiness]
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+
       }
     }
   }
