@@ -16,49 +16,38 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.Country
-import models.businessmatching._
-import models.moneyservicebusiness.MoneyServiceBusiness
-import models.moneyservicebusiness._
-import models.status.{SubmissionDecisionApproved, NotCompleted}
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
+import models.moneyservicebusiness.{MoneyServiceBusiness, _}
+import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{GenericTestHelper, AuthorisedFixture}
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val cache: DataCacheConnector = mock[DataCacheConnector]
-    val cacheMap = mock[CacheMap]
-    val controller = new MostTransactionsController {
-      override val cache: DataCacheConnector = self.cache
-      override protected def authConnector: AuthConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new MostTransactionsController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService,
+      mockServiceFlow
+    )
   }
 
   "MostTransactionsController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
-
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(None))
+      mockIsNewActivity(false)
+      mockApplicationStatus(NotCompleted)
+      mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -80,11 +69,9 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         )
       )
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(NotCompleted))
-
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
-        .thenReturn(Future.successful(Some(model)))
+      mockIsNewActivity(false)
+      mockApplicationStatus(NotCompleted)
+      mockCacheFetch[MoneyServiceBusiness](Some(model), Some(MoneyServiceBusiness.key))
 
       val result = controller.get()(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -96,11 +83,22 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       document.select(".amls-error-summary").size mustEqual 0
     }
 
+    "continue to show the correct view" when {
+      "application is in variation mode but the service has just been added" in new Fixture {
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+        mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("msb.most.transactions.title"))
+      }
+    }
+
     "redirect to Page not found" when {
       "application is in variation mode" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockIsNewActivity(false)
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
         status(result) must be(NOT_FOUND)
@@ -142,17 +140,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         "mostTransactionsCountries[]" -> "GB"
       )
 
-      when(cache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      mockCacheFetchAll
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = false)(newRequest)
 
@@ -181,17 +172,11 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       val newRequest = request.withFormUrlEncodedBody(
         "mostTransactionsCountries[]" -> "GB"
       )
-      when(cache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      mockCacheFetchAll
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = false)(newRequest)
 
@@ -230,17 +215,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         "mostTransactionsCountries[]" -> "GB"
       )
 
-      when(cache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      mockCacheFetchAll
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -270,14 +248,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         "mostTransactionsCountries[0]" -> "GB"
       )
 
-      when(cache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      mockCacheFetchAll
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -307,14 +281,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
           )
         )
       )
-      when(cache.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))(any(), any(), any()))
-        .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      mockCacheFetchAll
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = true)(newRequest)
 
@@ -336,17 +306,10 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
       hasChanged = true
     )
 
-    when(cache.fetchAll(any(), any()))
-      .thenReturn(Future.successful(Some(cacheMap)))
-
-    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-      .thenReturn(None)
-
-    when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-      .thenReturn(Some(incomingModel))
-
-    when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-      (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
+    mockCacheFetchAll
+    mockCacheGetEntry[MoneyServiceBusiness](None, MoneyServiceBusiness.key)
+    mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+    mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
 
     a[Exception] must be thrownBy {
