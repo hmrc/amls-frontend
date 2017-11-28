@@ -16,25 +16,34 @@
 
 package controllers.msb
 
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.moneyservicebusiness.{SendTheLargestAmountsOfMoney, MoneyServiceBusiness}
+import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
+import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-trait SendTheLargestAmountsOfMoneyController extends BaseController {
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
+@Singleton
+class SendTheLargestAmountsOfMoneyController @Inject()(
+                                                        val authConnector: AuthConnector = AMLSAuthConnector,
+                                                        val cacheConnector: DataCacheConnector,
+                                                        implicit val statusService: StatusService,
+                                                        implicit val serviceFlow: ServiceFlow
+                                                      ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      ControllerHelper.allowedToEdit(MsbActivity) flatMap {
+        case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[SendTheLargestAmountsOfMoney] = (for {
               msb <- response
@@ -54,8 +63,8 @@ trait SendTheLargestAmountsOfMoneyController extends BaseController {
         case ValidForm(_, data) =>
           for {
             msb <-
-            dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.sendTheLargestAmountsOfMoney(data)
             )
           } yield edit match {
@@ -66,11 +75,4 @@ trait SendTheLargestAmountsOfMoneyController extends BaseController {
           }
       }
   }
-}
-
-object SendTheLargestAmountsOfMoneyController extends SendTheLargestAmountsOfMoneyController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService: StatusService = StatusService
 }
