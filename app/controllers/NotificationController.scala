@@ -16,33 +16,32 @@
 
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
-import models.notifications.StatusType.DeRegistered
-import play.api.Play
 import play.api.mvc.Request
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BusinessName, FeatureToggle}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait NotificationController extends BaseController {
-
-  protected[controllers] implicit val dataCacheConnector: DataCacheConnector
-
-  protected[controllers] def authEnrolmentsService: AuthEnrolmentsService
-
-  protected[controllers] def statusService: StatusService
-
-  protected[controllers] lazy val amlsNotificationService: NotificationService = Play.current.injector.instanceOf[NotificationService]
-
-  protected[controllers] implicit val amlsConnector: AmlsConnector
+@Singleton
+class NotificationController @Inject()(
+                                        val authEnrolmentsService: AuthEnrolmentsService,
+                                        val statusService: StatusService,
+                                        val authConnector: AuthConnector,
+                                        val amlsNotificationService: NotificationService,
+                                        implicit val amlsConnector: AmlsConnector,
+                                        implicit val dataCacheConnector: DataCacheConnector
+                                      ) extends BaseController {
 
   def getMessages = FeatureToggle(ApplicationConfig.notificationsToggle) {
     Authorised.async {
@@ -108,13 +107,4 @@ trait NotificationController extends BaseController {
       }
     }
   }
-}
-
-object NotificationController extends NotificationController {
-  // $COVERAGE-OFF$
-  override protected[controllers] val dataCacheConnector = DataCacheConnector
-  override protected[controllers] val authEnrolmentsService = AuthEnrolmentsService
-  override protected[controllers] val statusService = StatusService
-  override protected val authConnector = AMLSAuthConnector
-  override protected[controllers] lazy val amlsConnector = AmlsConnector
 }
