@@ -20,16 +20,15 @@ import javax.inject.Inject
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService
 import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.msb.summary
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
@@ -38,7 +37,7 @@ class SummaryController @Inject()
   val dataCache: DataCacheConnector,
   implicit val statusService: StatusService,
   val authConnector: AuthConnector,
-  val serviceFlow: ServiceFlow
+  implicit val serviceFlow: ServiceFlow
 ) extends BaseController {
 
   def get = Authorised.async {
@@ -50,7 +49,7 @@ class SummaryController @Inject()
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
           } yield {
-            ControllerHelper.allowedToEdit map(x => Ok(summary(msb, businessMatching.msbServices,x)))
+            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices,x)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
