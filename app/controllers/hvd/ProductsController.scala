@@ -18,13 +18,11 @@ package controllers.hvd
 
 import javax.inject.Inject
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.HighValueDealing
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

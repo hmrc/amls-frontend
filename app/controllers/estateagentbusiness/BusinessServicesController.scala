@@ -21,12 +21,13 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
-import views.html.estateagentbusiness._
-import routes._
+import views.html.estateagentbusiness.business_servicess
 
 import scala.concurrent.Future
 
@@ -34,7 +35,8 @@ import scala.concurrent.Future
 class BusinessServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           val dataCacheConnector: DataCacheConnector,
-                                          val statusService: StatusService
+                                          val statusService: StatusService,
+                                          val serviceFlow: ServiceFlow
                                           ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -81,8 +83,9 @@ class BusinessServicesController @Inject()(
             _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
               updateData(estateAgentBusiness.services(data), data))
             status <- statusService.getStatus
+            isNewActivity <- serviceFlow.isNewActivity(EAB)
           } yield {
-            if (redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
+            if (!isNewActivity & redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
               Redirect(routes.ServicesDateOfChangeController.get())
             } else {
               redirectToNextPage(edit, data)

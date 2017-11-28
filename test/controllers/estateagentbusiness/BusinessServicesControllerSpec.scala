@@ -16,6 +16,7 @@
 
 package controllers.estateagentbusiness
 
+import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected, SubmissionReadyForReview}
 import org.jsoup.Jsoup
@@ -35,8 +36,12 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
     val controller = new BusinessServicesController(
       self.authConnector,
       mockCacheConnector,
-      mockStatusService
+      mockStatusService,
+      mockServiceFlow
     )
+
+    mockIsNewActivity(false, Some(EAB))
+
   }
 
   "BusinessServicesController" when {
@@ -94,7 +99,7 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         "redirect to ResidentialRedressSchemeController" when {
 
-            "Residential option is submitted" when {
+          "Residential option is submitted" when {
 
             "edit is true" in new Fixture {
 
@@ -142,45 +147,47 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
 
         "redirect to dateOfChange page" when {
-          "edit is true" when {
-            "status is approved" in new Fixture {
+          "EstateAgentBusiness is not newly added" when {
+            "edit is true" when {
+              "status is approved" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
-                "services[0]" -> "01",
-                "services[1]" -> "02",
-                "services[2]" -> "07"
-              )
+                val newRequest = request.withFormUrlEncodedBody(
+                  "services[0]" -> "01",
+                  "services[1]" -> "02",
+                  "services[2]" -> "07"
+                )
 
-              mockApplicationStatus(SubmissionDecisionApproved)
+                mockApplicationStatus(SubmissionDecisionApproved)
 
-              mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
-                services = Some(Services(Set(Residential, Commercial, Auction)))
-              )))
-              mockCacheSave[EstateAgentBusiness]
+                mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
+                  services = Some(Services(Set(Residential, Commercial, Auction)))
+                )))
+                mockCacheSave[EstateAgentBusiness]
 
-              val result = controller.post()(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
-            }
+                val result = controller.post()(newRequest)
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+              }
 
-            "status is ready for renewal" in new Fixture {
+              "status is ready for renewal" in new Fixture {
 
-              val newRequest = request.withFormUrlEncodedBody(
-                "services[0]" -> "01",
-                "services[1]" -> "02",
-                "services[2]" -> "07"
-              )
+                val newRequest = request.withFormUrlEncodedBody(
+                  "services[0]" -> "01",
+                  "services[1]" -> "02",
+                  "services[2]" -> "07"
+                )
 
-              mockApplicationStatus(ReadyForRenewal(None))
+                mockApplicationStatus(ReadyForRenewal(None))
 
-              mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
-                services = Some(Services(Set(Residential, Commercial, Auction)))
-              )))
-              mockCacheSave[EstateAgentBusiness]
+                mockCacheFetch[EstateAgentBusiness](Some(EstateAgentBusiness(
+                  services = Some(Services(Set(Residential, Commercial, Auction)))
+                )))
+                mockCacheSave[EstateAgentBusiness]
 
-              val result = controller.post()(newRequest)
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+                val result = controller.post()(newRequest)
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.estateagentbusiness.routes.ServicesDateOfChangeController.get().url))
+              }
             }
           }
         }
@@ -188,7 +195,6 @@ class BusinessServicesControllerSpec extends GenericTestHelper with MockitoSugar
         "redirect to SummaryController" when {
 
           "edit is true" when {
-
             "status is pre-approved" in new Fixture {
 
               val newRequest = request.withFormUrlEncodedBody(
