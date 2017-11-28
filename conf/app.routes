@@ -146,8 +146,8 @@ POST        /estate-agents/penalised-body                                       
 GET         /estate-agents/penalised-act                                              controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
 POST        /estate-agents/penalised-act                                              controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 
-GET         /estate-agents/services                                                   controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
-POST        /estate-agents/services                                                   controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+GET         /estate-agents/services                                                   @controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
+POST        /estate-agents/services                                                   @controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
 
 GET         /estate-agents/date-change                                                controllers.estateagentbusiness.ServicesDateOfChangeController.get
 POST        /estate-agents/date-change                                                controllers.estateagentbusiness.ServicesDateOfChangeController.post

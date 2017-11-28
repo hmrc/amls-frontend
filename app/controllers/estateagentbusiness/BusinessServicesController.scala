@@ -16,22 +16,28 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
+import javax.inject.{Inject, Singleton}
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessmatching.{EstateAgentBusinessService => EAB}
 import models.estateagentbusiness.{EstateAgentBusiness, Residential, Services}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
-import views.html.estateagentbusiness._
+import views.html.estateagentbusiness.business_servicess
 
 import scala.concurrent.Future
 
-trait BusinessServicesController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+@Singleton
+class BusinessServicesController @Inject()(
+                                          val authConnector: AuthConnector,
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val statusService: StatusService,
+                                          val serviceFlow: ServiceFlow
+                                          ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -77,8 +83,9 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
             _ <- dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key,
               updateData(estateAgentBusiness.services(data), data))
             status <- statusService.getStatus
+            isNewActivity <- serviceFlow.isNewActivity(EAB)
           } yield {
-            if (redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
+            if (!isNewActivity & redirectToDateOfChange[Services](status, estateAgentBusiness.services, data)) {
               Redirect(routes.ServicesDateOfChangeController.get())
             } else {
               redirectToNextPage(edit, data)
@@ -86,11 +93,4 @@ trait BusinessServicesController extends BaseController with DateOfChangeHelper 
           }
       }
   }
-}
-
-object BusinessServicesController extends BusinessServicesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
 }

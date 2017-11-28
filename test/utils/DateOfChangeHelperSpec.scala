@@ -25,14 +25,12 @@ import uk.gov.hmrc.play.test.UnitSpec
 
 class DateOfChangeHelperSpec extends UnitSpec with OneAppPerSuite with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false) )
-
   "DateOfChangeHelper" should {
 
     object DateOfChangeHelperTest extends DateOfChangeHelper{
     }
 
-    val originalModel =RegisteredOfficeUK(
+    val originalModel = RegisteredOfficeUK(
       "addressLine1",
       "addressLine2",
       None,
@@ -41,35 +39,36 @@ class DateOfChangeHelperSpec extends UnitSpec with OneAppPerSuite with MockitoSu
       None
     )
 
-
     val changeModel = RegisteredOfficeUK("","",None, None, "", None)
 
-    "return false" when {
+    "return true" when {
       "a change has been made to a model" in {
-        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(false)
+        DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(true)
       }
+    }
+
+    "return false" when {
       "no change has been made to a model" in {
         DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), originalModel) should be(false)
       }
     }
 
     "return isEligibleForDateOfChange false when status is Amendment" in {
-      DateOfChangeHelperTest.isEligibleForDateOfChange(SubmissionReadyForReview) should be(false)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionReadyForReview, Some(originalModel), changeModel) should be(false)
     }
 
     "return isEligibleForDateOfChange true when status is Variation" in {
-      DateOfChangeHelperTest.isEligibleForDateOfChange(SubmissionDecisionApproved) should be(true)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](SubmissionDecisionApproved, Some(originalModel), changeModel) should be(true)
     }
 
     "return isEligibleForDateOfChange true when status is Renewal" in {
-      DateOfChangeHelperTest.isEligibleForDateOfChange(ReadyForRenewal(None)) should be(true)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](ReadyForRenewal(None), Some(originalModel), changeModel) should be(true)
     }
 
     "return isEligibleForDateOfChange true when status is Renewal Submitted" in {
-      DateOfChangeHelperTest.isEligibleForDateOfChange(RenewalSubmitted(None)) should be(true)
+      DateOfChangeHelperTest.redirectToDateOfChange[RegisteredOffice](RenewalSubmitted(None), Some(originalModel), changeModel) should be(true)
     }
+
   }
 
 }
-
-
