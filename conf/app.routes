@@ -458,8 +458,8 @@ GET         /responsible-people/your-answers                                    
 
 GET         /accountancy-service-provider/what-you-need                               controllers.asp.WhatYouNeedController.get()
 
-GET         /accountancy-service-provider/services                                    controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
-POST        /accountancy-service-provider/services                                    controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
+GET         /accountancy-service-provider/services                                    @controllers.asp.ServicesOfBusinessController.get(edit: Boolean ?= false)
+POST        /accountancy-service-provider/services                                    @controllers.asp.ServicesOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /accountancy-service-provider/agent-scheme                                controllers.asp.OtherBusinessTaxMattersController.get(edit: Boolean ?= false)
 POST        /accountancy-service-provider/agent-scheme                                controllers.asp.OtherBusinessTaxMattersController.post(edit: Boolean ?= false)

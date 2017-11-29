@@ -16,22 +16,28 @@
 
 package controllers.asp
 
-import config.AMLSAuthConnector
+import javax.inject.Inject
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.asp.{Asp, ServicesOfBusiness}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
+import models.businessmatching.AccountancyServices
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.asp._
 
 import scala.concurrent.Future
 
-trait ServicesOfBusinessController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+class ServicesOfBusinessController @Inject()
+(
+  dataCacheConnector: DataCacheConnector,
+  statusService: StatusService,
+  val authConnector: AuthConnector,
+  serviceFlow: ServiceFlow
+) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -58,8 +64,9 @@ trait ServicesOfBusinessController extends BaseController with DateOfChangeHelpe
             _ <- dataCacheConnector.save[Asp](Asp.key,
               businessServices.services(data))
             status <- statusService.getStatus
+            isNewActivity <- serviceFlow.isNewActivity(AccountancyServices)
           } yield {
-            if (redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
+            if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
               Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
             } else {
               edit match {
@@ -70,12 +77,5 @@ trait ServicesOfBusinessController extends BaseController with DateOfChangeHelpe
           }
       }
   }
-}
-
-object ServicesOfBusinessController extends ServicesOfBusinessController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
 }
 
