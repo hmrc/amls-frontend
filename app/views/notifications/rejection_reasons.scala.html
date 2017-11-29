@@ -35,7 +35,7 @@
     <h2 class="heading-medium">@Messages("notifications.reason.refusal")</h2>
     <p>@Html(msgContent)</p>
 
-    @regulations_info_for_decision()
+    @info_for_decision()
 
     <a href="@controllers.routes.NotificationController.getMessages().url" class="back-link">@Messages("button.back")</a>
 }
