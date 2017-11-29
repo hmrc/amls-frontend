@@ -43,40 +43,35 @@ class NotificationController @Inject()(
                                         implicit val dataCacheConnector: DataCacheConnector
                                       ) extends BaseController {
 
-  def getMessages = FeatureToggle(ApplicationConfig.notificationsToggle) {
-    Authorised.async {
-      implicit authContext =>
-        implicit request =>
-          statusService.getReadStatus flatMap {
-            case readStatus if readStatus.safeId.isDefined => {
-              (for {
-                businessName <- BusinessName.getName(readStatus.safeId)
-                records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
-              } yield {
-                Ok(views.html.notifications.your_messages(businessName, records))
-              }) getOrElse (throw new Exception("Cannot retrieve business name"))
-            }
-            case _ => throw new Exception("Unable to retrieve SafeID")
-          }
-    }
+  def getMessages = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        statusService.getReadStatus flatMap {
+          case readStatus if readStatus.safeId.isDefined =>
+            (for {
+              businessName <- BusinessName.getName(readStatus.safeId)
+              records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
+            } yield {
+              Ok(views.html.notifications.your_messages(businessName, records))
+            }) getOrElse (throw new Exception("Cannot retrieve business name"))
+          case _ => throw new Exception("Unable to retrieve SafeID")
+        }
   }
 
-  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = FeatureToggle(ApplicationConfig.notificationsToggle) {
-    Authorised.async {
-      implicit authContext =>
-        implicit request =>
-          statusService.getReadStatus flatMap {
-            case readStatus if readStatus.safeId.isDefined =>
-              (for {
-                safeId <- OptionT.fromOption[Future](readStatus.safeId)
-                businessName <- BusinessName.getName(readStatus.safeId)
-                details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
-                status <- OptionT.liftF(statusService.getStatus)
-              } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
-            case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
-            case _ => Future.successful(BadRequest)
-          }
-    }
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        statusService.getReadStatus flatMap {
+          case readStatus if readStatus.safeId.isDefined =>
+            (for {
+              safeId <- OptionT.fromOption[Future](readStatus.safeId)
+              businessName <- BusinessName.getName(readStatus.safeId)
+              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
+              status <- OptionT.liftF(statusService.getStatus)
+            } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
+          case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
+          case _ => Future.successful(BadRequest)
+        }
   }
 
   private def contactTypeToResponse(
@@ -97,14 +92,13 @@ class NotificationController @Inject()(
       case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRefNo, businessName, details.dateReceived))
       case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, safeId))
       case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRefNo))
-      case _ => {
+      case _ =>
         (status, contactType) match {
           case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
             Ok(views.html.notifications.message_details(details.subject, msgText, safeId.some))
           case _ =>
             Ok(views.html.notifications.message_details(details.subject, msgText, None))
         }
-      }
     }
   }
 }
