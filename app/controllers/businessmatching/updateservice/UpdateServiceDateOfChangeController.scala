@@ -32,7 +32,7 @@ import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
-import services.businessmatching.BusinessMatchingService
+import services.businessmatching.{BusinessMatchingService, TradingPremisesService}
 import utils.RepeatingSection
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.supervision.Supervision
@@ -48,7 +48,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class UpdateServiceDateOfChangeController @Inject()(
                                                    val authConnector: AuthConnector,
                                                    val dataCacheConnector: DataCacheConnector,
-                                                   val businessMatchingService: BusinessMatchingService
+                                                   val businessMatchingService: BusinessMatchingService,
+                                                   val tradingPremisesService: TradingPremisesService
                                                    ) extends BaseController with RepeatingSection {
 
   def get(services: String) = Authorised.async{
@@ -89,7 +90,7 @@ class UpdateServiceDateOfChangeController @Inject()(
                   ).copy(hasAccepted = true)
                 )
                 _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-                  businessMatchingService.removeBusinessActivitiesFromTradingPremises(
+                  tradingPremisesService.removeBusinessActivitiesFromTradingPremises(
                     tradingPremises,
                     activities.businessActivities diff removeActivities,
                     removeActivities
