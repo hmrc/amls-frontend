@@ -16,33 +16,32 @@
 
 package controllers.asp
 
-import connectors.DataCacheConnector
 import models.asp._
+import models.businessmatching.AccountancyServices
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new ServicesOfBusinessController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val controller = new ServicesOfBusinessController(
+      mockCacheConnector,
+      mockStatusService,
+      self.authConnector,
+      mockServiceFlow
+    )
+
+    mockCacheFetch[Asp](None)
+    mockCacheSave[Asp]
+    mockIsNewActivity(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -50,8 +49,7 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
   "ServicesOfBusinessController" must {
 
     "on get display Which services does your business provide page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("asp.services.title"))
@@ -64,14 +62,7 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
         "services" -> "04"
       )
 
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -79,8 +70,8 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
     }
 
     "load the page with data when the user revisits at a later time" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(Some(Asp(Some(ServicesOfBusiness(Set(BookKeeping, Accountancy))), None))))
+
+      mockCacheFetch(Some(Asp(Some(ServicesOfBusiness(Set(BookKeeping, Accountancy))), None)))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -96,12 +87,6 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
         "services" -> "0299999"
       )
 
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include("Invalid value")
@@ -112,12 +97,6 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
       val newRequest = request.withFormUrlEncodedBody(
 
       )
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -133,14 +112,7 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
         "services[2]" -> "03"
       )
 
-      when(controller.statusService.getStatus(any(), any(), any()))
-        .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-      when(controller.dataCacheConnector.fetch[Asp](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Asp](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockApplicationStatus(SubmissionDecisionRejected)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -150,12 +122,7 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
     "go to the date of change page" when {
       "the submission has been approved and registeredOffice has changed" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Asp](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[0]" -> "02",
@@ -171,12 +138,7 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
     "go to the date of change page" when {
       "status is ready for renewal and services selection has changed" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Asp](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(ReadyForRenewal(None)))
+        mockApplicationStatus(ReadyForRenewal(None))
 
         val newRequest = request.withFormUrlEncodedBody(
           "services[0]" -> "02",
@@ -186,6 +148,26 @@ class ServicesOfBusinessControllerSpec extends GenericTestHelper with MockitoSug
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.asp.routes.ServicesOfBusinessDateOfChangeController.get().url))
+      }
+    }
+
+    "Calling POST" when {
+      "the status is approved" when {
+        "the service has just been added" must {
+          "redirect to the next page in the flow" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "services[0]" -> "02",
+              "services[1]" -> "01",
+              "services[2]" -> "03")
+
+            mockApplicationStatus(SubmissionDecisionApproved)
+            mockIsNewActivity(true, Some(AccountancyServices))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.asp.routes.OtherBusinessTaxMattersController.get().url))
+          }
+        }
       }
     }
 

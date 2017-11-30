@@ -16,20 +16,15 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
+import models.businessmatching.HighValueDealing
 import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.businessmatching.HighValueDealing
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
 
