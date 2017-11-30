@@ -18,7 +18,9 @@
     attrRole: Boolean = false,
     attrHref: String,
     linkText: String,
-    visuallyhidden: String = ""
+    visuallyhidden: String = "",
+    returnLink : Boolean = false,
+    returnLocation : Option[String] = None
 )(implicit lang:Lang,  m: Messages)
 
 @*  Current use suggests we only use the one class on anchors: button;
@@ -28,4 +30,14 @@
   @if(attrRole){ class="button"}
   @if(attrRole){ role="button"}>@linkText@if(visuallyhidden){
     <span class="visuallyhidden">@visuallyhidden</span>}</a>
+
+@if(returnLink) {
+    <p class="return-link">
+        @if(returnLocation == Some("renewal")) {
+        <a href="@controllers.renewal.routes.RenewalProgressController.get().url">@Messages("link.return.renewal.progress")</a>
+        } else {
+        <a href="@controllers.routes.RegistrationProgressController.get().url">@Messages("link.return.registration.progress")</a>
+        }
+    </p>
+}
 
