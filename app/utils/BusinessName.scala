@@ -35,14 +35,11 @@ object BusinessName {
     } yield rd.businessName
 
   def getNameFromAmls(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext) =
-    OptionT.liftF(amls.registrationDetails(safeId)) map {_.companyName}
-
-  def getName(safeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) = {
-    if (ApplicationConfig.businessNameLookup) {
-      safeId.fold(getNameFromCache)(v => getNameFromAmls(v))
-    } else {
-      getNameFromCache
+    OptionT.liftF(amls.registrationDetails(safeId)) map {
+      _.companyName
     }
-  }
+
+  def getName(safeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache)(v => getNameFromAmls(v))
 
 }
