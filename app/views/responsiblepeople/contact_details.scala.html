@@ -36,7 +36,7 @@
         jsHidden = false,
         gutter = true
     ) {
-    <p>@Messages("responsiblepeople.contact_details.lbl")</p>
+    <p>@Messages("responsiblepeople.contact_details.lbl", personName)</p>
     }
 
     @form(f, controllers.responsiblepeople.routes.ContactDetailsController.post(index, edit, flow)) {
