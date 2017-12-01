@@ -60,5 +60,11 @@ class servicesSpec extends GenericTestHelper with MustMatchers  {
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
+    "hide the return to progress link"in new ViewFixture {
+      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+
+      def view = views.html.businessmatching.services(form2, true)
+      doc.body().text() must not include (Messages("link.return.registration.progress"))
+    }
   }
 }
