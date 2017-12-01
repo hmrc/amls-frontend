@@ -72,5 +72,18 @@ class contact_detailsSpec extends GenericTestHelper with MustMatchers {
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
+    "show the person name in intro text" in new ViewFixture {
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "phoneNumber") -> Seq(ValidationError("not a message Key")),
+          (Path \ "emailAddress") -> Seq(ValidationError("second not a message Key"))
+        ))
+
+
+      def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+
+      doc.body().text() must include(Messages("responsiblepeople.contact_details.lbl","firstName lastName"))
+
+    }
   }
 }
