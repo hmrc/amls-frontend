@@ -47,10 +47,11 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             } yield {
               val form = Form2[BusinessActivities](businessActivities)
               val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
-              Ok(register_services(form, edit, newActivities, existing, isPreSubmission))
+
+              Ok(register_services(form, edit, newActivities, existing, isPreSubmission, businessMatching.hasAccepted))
             }) getOrElse {
               val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
-              Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission))
+              Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission, false))
             }
           }
         }
