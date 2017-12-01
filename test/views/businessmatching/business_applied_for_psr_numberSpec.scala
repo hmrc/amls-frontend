@@ -66,5 +66,11 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
+    "hide the return to progress link"in new ViewFixture {
+      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+      def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
+      doc.body().text() must not include (Messages("link.return.registration.progress"))
+    }
   }
 }

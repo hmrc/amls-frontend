@@ -81,5 +81,10 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
+    "hide the return to progress link" in new ViewFixture {
+      def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, true)
+
+      doc.body().text() must not include (Messages("link.return.registration.progress"))
+    }
   }
 }

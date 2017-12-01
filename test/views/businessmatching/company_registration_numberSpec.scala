@@ -61,5 +61,12 @@ class company_registration_numberSpec extends GenericTestHelper with MustMatcher
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
+    "hide the return to progress link"in new ViewFixture {
+      val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
+
+      def view = views.html.businessmatching.company_registration_number(form2, true)
+      doc.body().text() must not include(Messages("link.return.registration.progress"))
+
+    }
   }
 }
