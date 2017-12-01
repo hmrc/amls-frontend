@@ -43,13 +43,13 @@ trait ServicesController extends BaseController {
     implicit authContext =>
       implicit request =>
         businessMatchingService.getModel.value map {
-          response =>
+          maybeBM =>
             val form = (for {
-              bm <- response
+              bm <- maybeBM
               services <- bm.msbServices
             } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-            Ok(views.html.businessmatching.services(form, edit))
+            Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.hasAccepted)))
         }
   }
 

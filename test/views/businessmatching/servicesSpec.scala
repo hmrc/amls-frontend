@@ -37,7 +37,7 @@ class servicesSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      def view = views.html.businessmatching.services(form2, true)
+      def view = views.html.businessmatching.services(form2, edit = true)
 
       doc.title must startWith(Messages("msb.services.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("msb.services.title"))
@@ -52,7 +52,7 @@ class servicesSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.services(form2, true)
+      def view = views.html.businessmatching.services(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -63,8 +63,8 @@ class servicesSpec extends GenericTestHelper with MustMatchers  {
     "hide the return to progress link"in new ViewFixture {
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      def view = views.html.businessmatching.services(form2, true)
-      doc.body().text() must not include (Messages("link.return.registration.progress"))
+      def view = views.html.businessmatching.services(form2, edit = true, showReturnLink = false)
+      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }
