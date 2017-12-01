@@ -21,12 +21,24 @@ import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
+import models.asp.Asp
 import models.businessactivities.BusinessActivities
+import models.asp.Asp
+import models.hvd.Hvd
+import models.supervision.Supervision
+import models.estateagentbusiness.{EstateAgentBusiness => Eab}
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.tcsp.Tcsp
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import org.mockito.Matchers.{any, eq => eqTo}
+import models.supervision.Supervision
+import models.tcsp.Tcsp
+import org.mockito.Matchers.{any, eq, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -538,6 +550,39 @@ class BusinessMatchingServiceSpec extends PlaySpec
         result must be(false)
       }
     }
+  }
+
+  "clear section" must {
+
+    "clear data of the correct model given a business activity" in new Fixture {
+
+      verify(mockCacheConnector).save[Hvd](
+        eqTo(Hvd.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(mockCacheConnector).save[Asp](
+        eqTo(Asp.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(mockCacheConnector).save[Msb](
+        eqTo(Msb.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(mockCacheConnector).save[Tcsp](
+        eqTo(Tcsp.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+      verify(mockCacheConnector).save[Eab](
+        eqTo(Eab.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+
   }
 
 }
