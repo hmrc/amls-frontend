@@ -18,17 +18,17 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import models.asp.Asp
 import models.businessmatching._
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{when, verify}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
-import services.businessmatching.{BusinessMatchingService, ServiceFlow, NextService}
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
-import models.businessmatching.updateservice.UpdateService
+import services.businessmatching.{BusinessMatchingService, NextService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -44,21 +44,29 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
 
   "GET" when {
     "called" must {
-      "return OK with the service name" in new Fixture {
-        when {
-          bmService.getAdditionalBusinessActivities(any(), any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
+      "return OK with the service name" which {
+        "clears the section data of the activity retrieved" in new Fixture {
+          when {
+            bmService.getAdditionalBusinessActivities(any(), any(), any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
 
-        when {
-          mockServiceFlow.next(any(), any(), any())
-        } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
+          when {
+            mockServiceFlow.next(any(), any(), any())
+          } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
 
-        val result = controller.get()(request)
+          when {
+            bmService.clearSection(eqTo(AccountancyServices))(any(),any())
+          } thenReturn Future.successful(mockCacheMap)
 
-        status(result) mustBe OK
+          val result = controller.get()(request)
 
-        contentAsString(result) must include(AccountancyServices.getMessage)
-        contentAsString(result) must include("/service")
+          status(result) mustBe OK
+
+          contentAsString(result) must include(AccountancyServices.getMessage)
+          contentAsString(result) must include("/service")
+
+          verify(bmService).clearSection(eqTo(AccountancyServices))(any(),any())
+        }
       }
 
       "redirect to the 'update more information' page" when {

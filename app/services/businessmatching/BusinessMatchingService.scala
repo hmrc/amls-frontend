@@ -22,9 +22,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.ViewResponse
+import models.asp.Asp
 import models.businessmatching._
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.status.{NotCompleted, SubmissionReady}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -112,51 +116,12 @@ class BusinessMatchingService @Inject()(
 
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
 
-  def addBusinessActivtiesToTradingPremises(
-                                             indices: Seq[Int],
-                                             tradingPremises: Seq[TradingPremises],
-                                             activity: BusinessActivity,
-                                             remove: Boolean): Seq[TradingPremises] =
-    patchTradingPremisesBusinessActivities(tradingPremises){ (wdybd, index) =>
-      wdybd.copy({
-        if (indices contains index) {
-          wdybd.activities + activity
-        } else if (remove) {
-          wdybd.activities - activity
-        } else {
-          wdybd.activities
-        }
-      })
-    }
-
-  def removeBusinessActivitiesFromTradingPremises(
-                                                 tradingPremises: Seq[TradingPremises],
-                                                 existingActivities: Set[BusinessActivity],
-                                                 removeActivities: Set[BusinessActivity]): Seq[TradingPremises] =
-    patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
-      wdybd.copy({
-        wdybd.activities diff removeActivities match {
-          case remainingActivities if remainingActivities.nonEmpty => remainingActivities
-          case _ => Set(existingActivities.head)
-        }
-      })
-    } map { tp =>
-      if(removeActivities contains MoneyServiceBusiness) {
-        tp.copy(msbServices = None)
-      } else {
-        tp
-      }
-    }
-
-
-  def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
-                                            (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] =
-    tradingPremises.zipWithIndex map { case (tp, index) =>
-      tp.whatDoesYourBusinessDoAtThisAddress(
-        tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)){ wdybd =>
-          fn(wdybd, index)
-        }
-      ).copy(hasAccepted = true)
-    }
+  def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
+    case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)
+    case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, None)
+    case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
+    case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
+    case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
+  }
 
 }
