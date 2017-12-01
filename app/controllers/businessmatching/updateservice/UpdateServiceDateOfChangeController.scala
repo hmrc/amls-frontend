@@ -32,11 +32,12 @@ import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
-import services.businessmatching.{BusinessMatchingService, TradingPremisesService}
+import services.businessmatching.BusinessMatchingService
 import utils.RepeatingSection
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
+import services.TradingPremisesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext

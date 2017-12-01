@@ -25,6 +25,7 @@ import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import services.TradingPremisesService
 import utils.{DependencyMocks, FutureAssertions, GenericTestHelper, StatusConstants}
 
 class TradingPremisesServiceSpec extends PlaySpec

@@ -28,8 +28,8 @@ import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
-import services.StatusService
-import services.businessmatching.{BusinessMatchingService, TradingPremisesService}
+import services.{StatusService, TradingPremisesService}
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

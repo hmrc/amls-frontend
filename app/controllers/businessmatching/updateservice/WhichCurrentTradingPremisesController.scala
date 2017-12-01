@@ -27,7 +27,8 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.TradingPremises
-import services.businessmatching.{BusinessMatchingService, TradingPremisesService}
+import services.TradingPremisesService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector

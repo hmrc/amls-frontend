@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.businessmatching
+package services
 
 import javax.inject.Singleton
 
