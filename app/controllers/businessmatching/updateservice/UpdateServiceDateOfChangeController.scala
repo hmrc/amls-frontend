@@ -106,31 +106,28 @@ class UpdateServiceDateOfChangeController @Inject()(
   }
 
   private def removeSection(activities: Set[BusinessActivity])
-                           (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = Future.sequence({
-    activities filter withoutSection map {
-      case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)
-      case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, None)
-      case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
-      case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
-      case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
-    }
-  } map { cache =>
-    if(removeSupervision(activities)){
-      dataCacheConnector.save[Supervision](Supervision.key, None)
-    } else {
-      cache
-    }
-  })
+                           (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = {
 
-  private def withoutSection(activity: BusinessActivity): Boolean = activity match {
-    case TelephonePaymentService | BillPaymentServices => false
-    case _ => true
+    def removeSupervision(activities: Set[BusinessActivity]): Boolean =
+      activities exists { activity =>
+        (activity equals AccountancyServices) | (activity equals TrustAndCompanyServices)
+      }
+
+    val withoutSection: PartialFunction[BusinessActivity, Boolean] = {
+      case TelephonePaymentService | BillPaymentServices => false
+      case _ => true
+    }
+
+    Future.sequence({
+      activities filter withoutSection map businessMatchingService.clearSection
+    } map { cache =>
+      if(removeSupervision(activities)){
+        dataCacheConnector.save[Supervision](Supervision.key, None)
+      } else {
+        cache
+      }
+    })
   }
-
-  private def removeSupervision(activities: Set[BusinessActivity]): Boolean =
-    activities exists { activity =>
-      (activity equals AccountancyServices) | (activity equals TrustAndCompanyServices)
-    }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
     views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))

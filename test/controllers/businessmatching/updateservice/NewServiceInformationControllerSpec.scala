@@ -54,6 +54,10 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
             mockServiceFlow.next(any(), any(), any())
           } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
 
+          when {
+            bmService.clearSection(eqTo(AccountancyServices))(any(),any())
+          } thenReturn Future.successful(mockCacheMap)
+
           val result = controller.get()(request)
 
           status(result) mustBe OK
@@ -61,7 +65,7 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
           contentAsString(result) must include(AccountancyServices.getMessage)
           contentAsString(result) must include("/service")
 
-          verify(controller.dataCacheConnector).save(eqTo(Asp.key), eqTo(Asp()))(any(),any(),any())
+          verify(bmService).clearSection(eqTo(AccountancyServices))(any(),any())
         }
       }
 

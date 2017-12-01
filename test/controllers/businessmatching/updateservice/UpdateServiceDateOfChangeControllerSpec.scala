@@ -117,6 +117,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
             )))
           ))
 
+          when {
+            mockBusinessMatchingService.clearSection(any())(any(),any())
+          } thenReturn Future.successful(mockCacheMap)
+
           val result = controller.post("03")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
             "dateOfChange.month" -> "10",
@@ -198,12 +202,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
       mockCacheSave[BusinessMatching]
       mockCacheSave[Seq[BusinessMatching]]
-      mockCacheSave[Asp]
       mockCacheSave[Supervision]
-      mockCacheSave[Hvd]
-      mockCacheSave[Tcsp]
-      mockCacheSave[Eab]
-      mockCacheSave[Msb]
 
       when {
         mockBusinessMatchingService.getModel(any(),any(),any())
@@ -218,6 +217,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       when {
         mockTradingPremisesService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
       } thenReturn tradingPremises
+
+      when {
+        mockBusinessMatchingService.clearSection(any())(any(),any())
+      } thenReturn Future.successful(mockCacheMap)
 
       val result = controller.post("01/02/03/04/05/06")(request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "13",
@@ -251,36 +254,20 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
         eqTo(tradingPremises)
       )(any(),any(),any())
 
-      verify(mockCacheConnector).save[Hvd](
-        eqTo(Hvd.key),
-        eqTo(None)
-      )(any(),any(),any())
-
-      verify(mockCacheConnector).save[Asp](
-        eqTo(Asp.key),
-        eqTo(None)
-      )(any(),any(),any())
-
       verify(mockCacheConnector).save[Supervision](
         eqTo(Supervision.key),
         eqTo(None)
       )(any(),any(),any())
 
-      verify(mockCacheConnector).save[Msb](
-        eqTo(Msb.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(AccountancyServices))(any(),any())
 
-      verify(mockCacheConnector).save[Tcsp](
-        eqTo(Tcsp.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(EstateAgentBusinessService))(any(),any())
 
-      verify(mockCacheConnector).save[Eab](
-        eqTo(Eab.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(HighValueDealing))(any(),any())
 
+      verify(mockBusinessMatchingService).clearSection(eqTo(MoneyServiceBusiness))(any(),any())
+
+      verify(mockBusinessMatchingService).clearSection(eqTo(TrustAndCompanyServices))(any(),any())
     }
 
   }

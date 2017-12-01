@@ -22,9 +22,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.ViewResponse
+import models.asp.Asp
 import models.businessmatching._
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.status.{NotCompleted, SubmissionReady}
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -111,5 +115,13 @@ class BusinessMatchingService @Inject()(
     }
 
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
+
+  def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
+    case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)
+    case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, None)
+    case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
+    case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
+    case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
+  }
 
 }
