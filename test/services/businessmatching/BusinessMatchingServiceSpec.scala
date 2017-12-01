@@ -21,29 +21,23 @@ import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
-import models.asp.Asp
 import models.businessactivities.BusinessActivities
 import models.asp.Asp
 import models.hvd.Hvd
-import models.supervision.Supervision
+import models.tcsp.Tcsp
 import models.estateagentbusiness.{EstateAgentBusiness => Eab}
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.tcsp.Tcsp
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
-import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.supervision.Supervision
-import models.tcsp.Tcsp
-import org.mockito.Matchers.{any, eq, eq => eqTo}
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
+import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -554,27 +548,59 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
   "clear section" must {
 
-    "clear data of the correct model given a business activity" in new Fixture {
+    "clear data of Asp given AccountancyServices" in new Fixture {
 
-      verify(mockCacheConnector).save[Hvd](
-        eqTo(Hvd.key),
-        eqTo(None)
-      )(any(),any(),any())
+      val result = service.clearSection(AccountancyServices)
+
+      await(result)
 
       verify(mockCacheConnector).save[Asp](
         eqTo(Asp.key),
         eqTo(None)
       )(any(),any(),any())
 
+    }
+    "clear data of Hvd given HighValueDealing" in new Fixture {
+
+      val result = service.clearSection(HighValueDealing)
+
+      await(result)
+
+      verify(mockCacheConnector).save[Hvd](
+        eqTo(Hvd.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+    "clear data of Msb given MoneyServiceBusiness" in new Fixture {
+
+      val result = service.clearSection(MoneyServiceBusiness)
+
+      await(result)
+
       verify(mockCacheConnector).save[Msb](
         eqTo(Msb.key),
         eqTo(None)
       )(any(),any(),any())
 
+    }
+    "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
+
+      val result = service.clearSection(TrustAndCompanyServices)
+
+      await(result)
+
       verify(mockCacheConnector).save[Tcsp](
         eqTo(Tcsp.key),
         eqTo(None)
       )(any(),any(),any())
+
+    }
+    "clear data of Eab given EstateAgentBusinessService" in new Fixture {
+
+      val result = service.clearSection(EstateAgentBusinessService)
+
+      await(result)
 
       verify(mockCacheConnector).save[Eab](
         eqTo(Eab.key),
