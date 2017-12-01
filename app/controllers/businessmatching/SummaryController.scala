@@ -52,6 +52,7 @@ trait SummaryController extends BaseController {
               ba.businessActivities ++ ba.additionalActivities.fold[Set[BusinessActivity]](Set.empty)(act => act)
             ))
           )
+
           Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
         }
 

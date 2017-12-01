@@ -38,7 +38,8 @@ trait CompanyRegistrationNumberController extends BaseController {
             businessMatching <- response
             registrationNumber <- businessMatching.companyRegistrationNumber
           } yield Form2[CompanyRegistrationNumber](registrationNumber)).getOrElse(EmptyForm)
-          Ok(company_registration_number(form, edit))
+
+          Ok(company_registration_number(form, edit, response.fold(false)(_.hasAccepted)))
       }
   }
 

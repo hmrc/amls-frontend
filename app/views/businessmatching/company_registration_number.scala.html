@@ -19,7 +19,7 @@
 @import include.forms2._
 @import models.aboutthebusiness._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -45,6 +45,6 @@
                 labelText = "businessmatching.registrationnumber.lbl"
             )
 
-        @submit(edit,returnLink = false)
+        @submit(edit, returnLink = showReturnLink)
     }
 }
