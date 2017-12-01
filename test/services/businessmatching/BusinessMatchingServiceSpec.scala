@@ -19,23 +19,25 @@ package services.businessmatching
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
+import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
 import models.businessactivities.BusinessActivities
+import models.asp.Asp
+import models.hvd.Hvd
+import models.tcsp.Tcsp
+import models.estateagentbusiness.{EstateAgentBusiness => Eab}
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
-import models.tradingpremises.MsbServices
-import models.tradingpremises.MsbServices._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.WhatDoesYourBusinessDo
-import models.{DateOfChange, ViewResponse}
-import org.joda.time.LocalDate
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import utils.{DependencyMocks, FutureAssertions, GenericTestHelper, StatusConstants}
+import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
+import play.api.test.Helpers._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -544,114 +546,69 @@ class BusinessMatchingServiceSpec extends PlaySpec
     }
   }
 
-  "addBusinessActivtiesToTradingPremises" must {
-    "update activity of the trading premises identified by index in request data" when {
-      "there is a single index" which {
-        "will leave activity given remove equals false" in new Fixture {
+  "clear section" must {
 
-          val models = Seq(
-            tradingPremisesGen.sample.get.copy(
-              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(BillPaymentServices), Some(DateOfChange(new LocalDate(2001,10,31)))))
-            ),
-            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get.copy(status = Some(StatusConstants.Deleted)),
-            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
-            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get,
-            tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
-          )
+    "clear data of Asp given AccountancyServices" in new Fixture {
 
-          val result = service.addBusinessActivtiesToTradingPremises(Seq(4), models, AccountancyServices, false)
+      val result = service.clearSection(AccountancyServices)
 
-          result.head mustBe models.head
-          result(1) mustBe models(1)
-          result(2) mustBe models(2)
-          result(3) mustBe models(3)
-          result.lift(4).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices), None))
+      await(result)
 
-        }
-      }
-      "there are multiple indices" which {
-        "will remove activity if existing in trading premises given remove equals true" in new Fixture {
-
-          val models = Seq(
-            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
-            tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get,
-            tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
-          )
-
-          val result = service.addBusinessActivtiesToTradingPremises(Seq(0,2), models, AccountancyServices, true)
-
-          result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-          result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
-          result.lift(2).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, MoneyServiceBusiness), None))
-
-          result.head.isComplete mustBe true
-          result.head.hasChanged mustBe true
-
-        }
-      }
-    }
-    "mark the trading premises as incomplete if there are no activities left" in new Fixture {
-
-      val models = Seq(
-        tradingPremisesWithActivitiesGen(AccountancyServices).sample.get,
-        tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
-      )
-
-      val result = service.addBusinessActivtiesToTradingPremises(Seq(1), models, AccountancyServices, true)
-
-      result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
-      result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
-
-      result.head.isComplete mustBe false
-      result.head.hasChanged mustBe true
+      verify(mockCacheConnector).save[Asp](
+        eqTo(Asp.key),
+        eqTo(None)
+      )(any(),any(),any())
 
     }
+    "clear data of Hvd given HighValueDealing" in new Fixture {
+
+      val result = service.clearSection(HighValueDealing)
+
+      await(result)
+
+      verify(mockCacheConnector).save[Hvd](
+        eqTo(Hvd.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+    "clear data of Msb given MoneyServiceBusiness" in new Fixture {
+
+      val result = service.clearSection(MoneyServiceBusiness)
+
+      await(result)
+
+      verify(mockCacheConnector).save[Msb](
+        eqTo(Msb.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+    "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
+
+      val result = service.clearSection(TrustAndCompanyServices)
+
+      await(result)
+
+      verify(mockCacheConnector).save[Tcsp](
+        eqTo(Tcsp.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+    "clear data of Eab given EstateAgentBusinessService" in new Fixture {
+
+      val result = service.clearSection(EstateAgentBusinessService)
+
+      await(result)
+
+      verify(mockCacheConnector).save[Eab](
+        eqTo(Eab.key),
+        eqTo(None)
+      )(any(),any(),any())
+
+    }
+
   }
 
-  "removeBusinessActivitiesFromTradingPremises" must {
-    "remove business activities from trading premises" which {
-      "also adds the first of remaining business activity to those trading premises without business activity" in new Fixture {
-
-        val models = Seq(
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
-          tradingPremisesWithActivitiesGen(HighValueDealing).sample.get,
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, MoneyServiceBusiness).sample.get.copy(
-            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
-          ),
-          tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
-        )
-
-        val result = service.removeBusinessActivitiesFromTradingPremises(
-          models,
-          Set(AccountancyServices),
-          Set(HighValueDealing, EstateAgentBusinessService, MoneyServiceBusiness)
-        )
-
-        result must be(Seq(
-          models.head.copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(1).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(2).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            msbServices = None,
-            hasAccepted = true,
-            hasChanged = true
-          ),
-          models(3).copy(
-            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices))),
-            hasAccepted = true,
-            hasChanged = true
-          )
-        ))
-
-      }
-    }
-  }
 }

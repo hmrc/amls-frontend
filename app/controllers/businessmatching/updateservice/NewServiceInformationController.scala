@@ -46,8 +46,8 @@ class NewServiceInformationController @Inject()
   def get() = Authorised.async {
     implicit authContext => implicit request => {
         for {
-          cacheMap <- OptionT(dataCacheConnector.fetchAll)
           next <- serviceFlow.next
+          _ <- OptionT.liftF(businessMatchingService.clearSection(next.activity))
         } yield Ok(new_service_information(next.activity, next.url))
       } getOrElse Redirect(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get())
   }

@@ -28,7 +28,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
-import services.StatusService
+import services.{StatusService, TradingPremisesService}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -43,7 +43,8 @@ class WhichTradingPremisesController @Inject()(
                                                 val authConnector: AuthConnector,
                                                 val dataCacheConnector: DataCacheConnector,
                                                 val statusService: StatusService,
-                                                val businessMatchingService: BusinessMatchingService
+                                                val businessMatchingService: BusinessMatchingService,
+                                                val tradingPremisesService: TradingPremisesService
                                               )() extends BaseController with RepeatingSection {
 
   def get(index: Int = 0) = Authorised.async {
@@ -109,7 +110,7 @@ class WhichTradingPremisesController @Inject()(
   private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      businessMatchingService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, false)
+      tradingPremisesService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, false)
     }
 
   private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =

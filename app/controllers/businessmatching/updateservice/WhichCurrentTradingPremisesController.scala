@@ -27,6 +27,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremisesForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.tradingpremises.TradingPremises
+import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -38,7 +39,8 @@ import scala.concurrent.Future
 
 class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthConnector,
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
+                                                      businessMatchingService: BusinessMatchingService,
+                                                      tradingPremisesService: TradingPremisesService) extends BaseController with RepeatingSection {
 
   private val failure = InternalServerError("Could not get form data")
 
@@ -79,7 +81,7 @@ class WhichCurrentTradingPremisesController @Inject()(val authConnector: AuthCon
   private def updateTradingPremises(data: TradingPremisesForm, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      businessMatchingService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, true)
+      tradingPremisesService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, true)
     }
 
   private def formData(implicit hc: HeaderCarrier, ac: AuthContext) = for {

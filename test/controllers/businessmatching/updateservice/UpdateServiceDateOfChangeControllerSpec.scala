@@ -41,7 +41,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Result, Results}
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
-import services.StatusService
+import services.{StatusService, TradingPremisesService}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -60,22 +60,26 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
     val request = addToken(authRequest)
 
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockTradingPremisesService = mock[TradingPremisesService]
+
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[BusinessMatchingService].to(mock[BusinessMatchingService]))
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[TradingPremisesService].to(mockTradingPremisesService))
       .build()
 
     val controller = app.injector.instanceOf[UpdateServiceDateOfChangeController]
 
     when {
-      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+      mockBusinessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.businessMatchingService.commitVariationData(any(),any(),any())
+      mockBusinessMatchingService.commitVariationData(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
   }
@@ -105,13 +109,17 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           mockCacheSave[BusinessMatching]
 
           when {
-            controller.businessMatchingService.getModel(any(),any(),any())
+            mockBusinessMatchingService.getModel(any(),any(),any())
           } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
             activities = Some(BusinessActivities(Set(
               EstateAgentBusinessService,
               HighValueDealing
             )))
           ))
+
+          when {
+            mockBusinessMatchingService.clearSection(any())(any(),any())
+          } thenReturn Future.successful(mockCacheMap)
 
           val result = controller.post("03")(request.withFormUrlEncodedBody(
             "dateOfChange.day" -> "13",
@@ -194,15 +202,10 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
       mockCacheSave[BusinessMatching]
       mockCacheSave[Seq[BusinessMatching]]
-      mockCacheSave[Asp]
       mockCacheSave[Supervision]
-      mockCacheSave[Hvd]
-      mockCacheSave[Tcsp]
-      mockCacheSave[Eab]
-      mockCacheSave[Msb]
 
       when {
-        controller.businessMatchingService.getModel(any(),any(),any())
+        mockBusinessMatchingService.getModel(any(),any(),any())
       } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
         activities = Some(BusinessActivities(Set(
           EstateAgentBusinessService,
@@ -212,8 +215,12 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       ))
 
       when {
-        controller.businessMatchingService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
+        mockTradingPremisesService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
       } thenReturn tradingPremises
+
+      when {
+        mockBusinessMatchingService.clearSection(any())(any(),any())
+      } thenReturn Future.successful(mockCacheMap)
 
       val result = controller.post("01/02/03/04/05/06")(request.withFormUrlEncodedBody(
         "dateOfChange.day" -> "13",
@@ -223,7 +230,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.businessMatchingService).updateModel(
+      verify(mockBusinessMatchingService).updateModel(
         eqTo(BusinessMatching(
           activities = Some(BusinessActivities(
             Set(TelephonePaymentService),
@@ -242,41 +249,25 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           hasAccepted = true
         )))(any(),any(),any())
 
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
+      verify(mockCacheConnector).save[Seq[TradingPremises]](
         eqTo(TradingPremises.key),
         eqTo(tradingPremises)
       )(any(),any(),any())
 
-      verify(controller.dataCacheConnector).save[Hvd](
-        eqTo(Hvd.key),
-        eqTo(None)
-      )(any(),any(),any())
-
-      verify(controller.dataCacheConnector).save[Asp](
-        eqTo(Asp.key),
-        eqTo(None)
-      )(any(),any(),any())
-
-      verify(controller.dataCacheConnector).save[Supervision](
+      verify(mockCacheConnector).save[Supervision](
         eqTo(Supervision.key),
         eqTo(None)
       )(any(),any(),any())
 
-      verify(controller.dataCacheConnector).save[Msb](
-        eqTo(Msb.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(AccountancyServices))(any(),any())
 
-      verify(controller.dataCacheConnector).save[Tcsp](
-        eqTo(Tcsp.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(EstateAgentBusinessService))(any(),any())
 
-      verify(controller.dataCacheConnector).save[Eab](
-        eqTo(Eab.key),
-        eqTo(None)
-      )(any(),any(),any())
+      verify(mockBusinessMatchingService).clearSection(eqTo(HighValueDealing))(any(),any())
 
+      verify(mockBusinessMatchingService).clearSection(eqTo(MoneyServiceBusiness))(any(),any())
+
+      verify(mockBusinessMatchingService).clearSection(eqTo(TrustAndCompanyServices))(any(),any())
     }
 
   }
