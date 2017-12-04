@@ -35,10 +35,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
-  override implicit lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.business-name-lookup" -> true)
-    .build()
-
   trait Fixture {
     implicit val amlsConnector = mock[AmlsConnector]
     implicit val cacheConnector = mock[DataCacheConnector]

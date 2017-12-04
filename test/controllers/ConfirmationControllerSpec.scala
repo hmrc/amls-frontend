@@ -25,10 +25,10 @@ import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments.PaymentStatuses.{Cancelled, Failed}
 import models.payments._
-import models.ReturnLocation
+import models.registrationdetails.RegistrationDetails
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
-import models.{ReadStatusResponse, SubscriptionFees, SubscriptionResponse}
+import models.{ReadStatusResponse, ReturnLocation, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.{LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -37,18 +37,17 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Cookie
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
 
@@ -61,7 +60,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
     .bindings(bind[PaymentsService].to(paymentsService))
-    .configure("microservice.services.feature-toggle.business-name-lookup" -> false)
     .build()
 
   trait Fixture extends AuthorisedFixture {
@@ -111,7 +109,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       controller.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(mock[AuditResult])
 
-
     when {
       controller.keystoreConnector.setConfirmationStatus(any(), any())
     } thenReturn Future.successful()
@@ -135,6 +132,10 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
+
+    when {
+      mockAmlsConnector.registrationDetails(any())(any(), any(), any())
+    } thenReturn Future.successful(RegistrationDetails(companyName, isIndividual = false))
 
     val paymentRef = paymentRefGen.sample.get
 
@@ -574,27 +575,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
-      }
-
-      "there is no business name" in new Fixture {
-
-        setupStatus(SubmissionReady)
-
-        when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
-        } thenReturn Future.successful(None)
-
-        when {
-          controller.dataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-        } thenReturn Future.successful(none[BusinessMatching])
-
-        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
-
-        status(result) mustBe OK
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(".confirmation p").text must startWith(Messages("confirmation.payment.reference_header", paymentReferenceNumber))
       }
 
       "the payment failed" in new Fixture {
