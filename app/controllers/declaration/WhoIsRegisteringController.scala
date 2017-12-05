@@ -51,7 +51,7 @@ trait WhoIsRegisteringController extends BaseController {
           (for {
             cache <- optionalCache
             responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield whoIsRegisteringView(Ok, EmptyForm, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted)))
+          } yield whoIsRegisteringView(Ok, EmptyForm, ResponsiblePeople.filter(responsiblePeople))
           ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
@@ -61,7 +61,7 @@ trait WhoIsRegisteringController extends BaseController {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
           dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-            case Some(data) => whoIsRegisteringView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
+            case Some(data) => whoIsRegisteringView(BadRequest, f, ResponsiblePeople.filter(data))
             case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
@@ -75,7 +75,7 @@ trait WhoIsRegisteringController extends BaseController {
                   case "-1" =>
                     redirectToAddPersonPage
                   case _ =>
-                    getAddPerson(data, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted))) map { addPerson =>
+                    getAddPerson(data, ResponsiblePeople.filter(responsiblePeople)) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     redirectToDeclarationPage
@@ -118,7 +118,12 @@ trait WhoIsRegisteringController extends BaseController {
       }.headOption
       personName <- selectedPerson.personName
     } yield {
-      AddPerson(personName.firstName, personName.middleName, personName.lastName, selectedPerson.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions))
+      AddPerson(
+        personName.firstName,
+        personName.middleName,
+        personName.lastName,
+        selectedPerson.positions.fold[Set[PositionWithinBusiness]](Set.empty)(x => x.positions)
+      )
     }
   }
 

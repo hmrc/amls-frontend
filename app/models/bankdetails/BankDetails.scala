@@ -48,23 +48,11 @@ case class BankDetails(
       hasAccepted = hasAccepted && this.bankAccount == value)
   }
 
-  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
-    this match {
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, true) => true
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, false) => false
-      case BankDetails(Some(_), Some(_), _, _, status, true) => true
-      case BankDetails(Some(_), Some(_), _, _, status, false) => false
-      case BankDetails(None, None, _, _, _, true) => true
-      case BankDetails(None, None, _, _, _, false) => false
-      case _ => false
-    }
-  } else {
-    this match {
-      case BankDetails(Some(NoBankAccountUsed), None, _, _, _, _) => true
-      case BankDetails(Some(_), Some(_), _, _, status, _) => true
-      case BankDetails(None, None, _, _, _, _) => true //This code part of fix for the issue AMLS-1549 back button issue
-      case _ => false
-    }
+  def isComplete: Boolean = this match {
+    case BankDetails(Some(NoBankAccountUsed), None, _, _, _, accepted) => accepted
+    case BankDetails(Some(_), Some(_), _, _, _, accepted) => accepted
+    case BankDetails(None, None, _, _, _, accepted) => accepted
+    case _ => false
   }
 }
 
