@@ -37,7 +37,7 @@ class company_registration_numberSpec extends GenericTestHelper with MustMatcher
 
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, true)
+      def view = views.html.businessmatching.company_registration_number(form2, edit = true)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.registrationnumber.title"))
@@ -52,7 +52,7 @@ class company_registration_numberSpec extends GenericTestHelper with MustMatcher
           (Path \ "companyRegistrationNumber") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.company_registration_number(form2, true)
+      def view = views.html.businessmatching.company_registration_number(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -61,12 +61,13 @@ class company_registration_numberSpec extends GenericTestHelper with MustMatcher
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }
-    "hide the return to progress link"in new ViewFixture {
+
+    "hide the return to progress link when requested" in new ViewFixture {
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, true)
-      doc.body().text() must not include(Messages("link.return.registration.progress"))
+      def view = views.html.businessmatching.company_registration_number(form2, edit = true, showReturnLink = false)
 
+      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }

@@ -35,39 +35,42 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
   val businessMatchingService: BusinessMatchingService
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      businessMatchingService.getModel.value map {
-        response =>
-          val form: Form2[BusinessAppliedForPSRNumber] = (for {
-            bm <- response
-            number <- bm.businessAppliedForPSRNumber
-          } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
-          Ok(business_applied_for_psr_number(form, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        businessMatchingService.preApplicationComplete flatMap { preApplicationComplete =>
+          (businessMatchingService.getModel map { bm =>
+            val form: Form2[BusinessAppliedForPSRNumber] = (for {
+              number <- bm.businessAppliedForPSRNumber
+            } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
+
+            Ok(business_applied_for_psr_number(form, edit, preApplicationComplete))
+          }) getOrElse Ok(business_applied_for_psr_number(EmptyForm, edit, preApplicationComplete))
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[BusinessAppliedForPSRNumber](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
-        case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
-          (for {
-            bm <- businessMatchingService.getModel
-            _ <- businessMatchingService.updateModel(
-              bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
-            )
-          } yield {
-            Redirect(routes.SummaryController.get())
-          }) getOrElse InternalServerError("Could not update psr number")
-        }
-        case ValidForm(_, _) => {
-          businessMatchingService.clearVariation map { _ =>
-            Redirect(routes.NoPsrController.get())
-          } getOrElse InternalServerError("Could not clear the variation data")
+    implicit authContext =>
+      implicit request => {
+        Form2[BusinessAppliedForPSRNumber](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
+          case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
+            (for {
+              bm <- businessMatchingService.getModel
+              _ <- businessMatchingService.updateModel(
+                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
+              )
+            } yield {
+              Redirect(routes.SummaryController.get())
+            }) getOrElse InternalServerError("Could not update psr number")
+          }
+          case ValidForm(_, _) => {
+            businessMatchingService.clearVariation map { _ =>
+              Redirect(routes.NoPsrController.get())
+            } getOrElse InternalServerError("Could not clear the variation data")
+          }
         }
       }
-    }
   }
 }
 

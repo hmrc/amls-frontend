@@ -56,5 +56,11 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers  {
       doc.getElementById("changeServices")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
+
+    "not show the return link when specified" in new ViewFixture {
+      def view = views.html.businessmatching.updateservice.change_services(EmptyForm,Set.empty[String])
+
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
   }
 }

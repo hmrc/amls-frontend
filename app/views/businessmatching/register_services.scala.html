@@ -19,7 +19,7 @@
 @import include.forms2._
 @import config.ApplicationConfig
 
-@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], isPreSubmission: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String], isPreSubmission: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = { @isPreSubmission match {
     case true => {
@@ -100,7 +100,7 @@
             }
         }
 
-        @submit(edit, returnLink = !isPreSubmission)
+        @submit(edit, returnLink = showReturnLink)
 
     }
 

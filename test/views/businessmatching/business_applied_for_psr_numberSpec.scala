@@ -38,7 +38,7 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
 
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
+      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
 
       doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.psr.number.title"))
@@ -54,7 +54,7 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
           (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
+      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -66,11 +66,12 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }
+
     "hide the return to progress link"in new ViewFixture {
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, true)
-      doc.body().text() must not include (Messages("link.return.registration.progress"))
+      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true, showReturnLink = false)
+      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }

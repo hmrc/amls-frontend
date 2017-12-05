@@ -31,20 +31,23 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.change_services
 import routes._
+import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
 
 class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
-                                          implicit val dataCacheConnector: DataCacheConnector
+                                          implicit val dataCacheConnector: DataCacheConnector,
+                                          val businessMatchingService: BusinessMatchingService
                                         ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-        OptionT(getActivities) map { activities =>
-          Ok(change_services(EmptyForm, activities))
-        } getOrElse InternalServerError("Unable to show the page")
+        (for {
+          activities <- OptionT(getActivities)
+          preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
+        } yield Ok(change_services(EmptyForm, activities, showReturnLink = preApplicationComplete))) getOrElse InternalServerError("Unable to show the page")
   }
 
   def post() = Authorised.async {

@@ -42,6 +42,9 @@ class BusinessMatchingService @Inject()(
                                          dataCacheConnector: DataCacheConnector
                                        ) {
 
+  def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] =
+    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)) map (_.isComplete) getOrElse false
+
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     lazy val originalModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
     lazy val variationModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.variationKey))

@@ -36,7 +36,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
         val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, true)
+        def view = views.html.businessmatching.register_services(form2, edit = true, Set("01"), Set.empty, isPreSubmission = true)
 
         doc.title must startWith(Messages("businessmatching.registerservices.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.title"))
@@ -47,7 +47,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
         val form2: ValidForm[BusinessActivities] = Form2(BusinessActivities(Set(AccountancyServices)))
 
-        def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, false)
+        def view = views.html.businessmatching.register_services(form2, edit = true, Set("01"), Set.empty, isPreSubmission = false)
 
         doc.title must startWith(Messages("businessmatching.registerservices.other.title") + " - " + Messages("summary.businessmatching"))
         heading.html must be(Messages("businessmatching.registerservices.other.title"))
@@ -59,7 +59,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
     "notify of services already selected" when {
       "status is post submission" in new ViewFixture {
 
-        def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, false)
+        def view = views.html.businessmatching.register_services(EmptyForm, edit = true, Set("01"), Set.empty, isPreSubmission = false)
 
         html must include(Messages("businessmatching.registerservices.existing"))
 
@@ -73,7 +73,7 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
           (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.register_services(form2, true, Set("01"), Set.empty, true)
+      def view = views.html.businessmatching.register_services(form2, edit = true, Set("01"), Set.empty, isPreSubmission = true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -82,9 +82,9 @@ class register_servicesSpec extends GenericTestHelper with MustMatchers  {
 
     }
     "hide the return to progress link" in new ViewFixture {
-      def view = views.html.businessmatching.register_services(EmptyForm, true, Set("01"), Set.empty, true)
+      def view = views.html.businessmatching.register_services(EmptyForm, edit = true, Set("01"), Set.empty, isPreSubmission = true, showReturnLink = false)
 
-      doc.body().text() must not include (Messages("link.return.registration.progress"))
+      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }
