@@ -17,7 +17,7 @@
 package services
 
 import connectors.DataCacheConnector
-import generators.AmlsReferenceNumberGenerator
+import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
@@ -43,12 +43,12 @@ import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-
 class SubmissionResponseServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
   with OneAppPerSuite
+  with ResponsiblePersonGenerator
   with AmlsReferenceNumberGenerator{
 
   trait Fixture {
@@ -199,7 +199,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         when {
           cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-        } thenReturn Some(Seq(ResponsiblePeople()))
+        } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
         val rows = Seq(
           BreakdownRow("confirmation.submission", 1, 100, 100)
@@ -754,7 +754,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople(), ResponsiblePeople()))
+          } thenReturn Some(Seq(responsiblePersonGen.sample.get, responsiblePersonGen.sample.get))
 
           val result = await(TestSubmissionResponseService.getSubscription)
 

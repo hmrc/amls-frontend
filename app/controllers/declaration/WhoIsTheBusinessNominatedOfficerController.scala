@@ -62,7 +62,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
             (for {
               cache <- optionalCache
               responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-            } yield businessNominatedOfficerView(Ok, EmptyForm, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted)))
+            } yield businessNominatedOfficerView(Ok, EmptyForm, ResponsiblePeople.filter(responsiblePeople))
               ) getOrElse businessNominatedOfficerView(Ok, EmptyForm, Seq.empty)
         }
   }
@@ -109,7 +109,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                      (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
     form match {
       case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-        case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
+        case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePeople.filter(data))
         case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
       }
       case ValidForm(_, data) => fn(data)
