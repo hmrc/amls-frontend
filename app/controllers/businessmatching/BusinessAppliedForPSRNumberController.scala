@@ -37,14 +37,12 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        businessMatchingService.preApplicationComplete flatMap { preApplicationComplete =>
-          (businessMatchingService.getModel map { bm =>
-            val form: Form2[BusinessAppliedForPSRNumber] = (for {
-              number <- bm.businessAppliedForPSRNumber
-            } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
-
-            Ok(business_applied_for_psr_number(form, edit, preApplicationComplete))
-          }) getOrElse Ok(business_applied_for_psr_number(EmptyForm, edit, preApplicationComplete))
+        businessMatchingService.getModel.value map { maybeBm =>
+          val form: Form2[BusinessAppliedForPSRNumber] = (for {
+            bm <- maybeBm
+            number <- bm.businessAppliedForPSRNumber
+          } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
+          Ok(business_applied_for_psr_number(form, edit, maybeBm.fold(false)(_.preAppComplete)))
         }
   }
 

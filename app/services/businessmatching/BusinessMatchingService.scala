@@ -27,7 +27,7 @@ import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.status.{NotCompleted, SubmissionReady}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,8 +42,11 @@ class BusinessMatchingService @Inject()(
                                          dataCacheConnector: DataCacheConnector
                                        ) {
 
-  def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] =
-    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)) map (_.isComplete) getOrElse false
+  def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
+    for {
+      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+    } yield bm.preAppComplete
+  } getOrElse false
 
   def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
     lazy val originalModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))

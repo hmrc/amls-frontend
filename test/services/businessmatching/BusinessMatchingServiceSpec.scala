@@ -611,4 +611,16 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
   }
 
+  "preApplicationComplete" when {
+    "called" must {
+      "return true" when {
+        "in the right status" in new Fixture {
+          val result = await(service.preApplicationComplete)
+
+          result mustBe true
+        }
+      }
+    }
+  }
+
 }

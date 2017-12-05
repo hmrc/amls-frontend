@@ -61,10 +61,6 @@ class ServicesControllerSpec extends GenericTestHelper with ScalaFutures with Mo
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
 
-    when {
-      controller.businessMatchingService.preApplicationComplete(any(), any(), any())
-    } thenReturn Future.successful(false)
-
     def setupModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn (model match {

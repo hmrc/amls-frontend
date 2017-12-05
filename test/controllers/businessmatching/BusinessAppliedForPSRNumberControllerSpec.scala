@@ -59,10 +59,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    when {
-      controller.businessMatchingService.preApplicationComplete(any(), any(), any())
-    } thenReturn Future.successful(false)
   }
 
   val emptyCache = CacheMap("", Map.empty)
