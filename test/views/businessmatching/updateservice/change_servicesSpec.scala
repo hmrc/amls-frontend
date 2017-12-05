@@ -33,13 +33,13 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers  {
   }
 
   "change_services view" must {
-    "have correct title" in new ViewFixture {
-
+    "have correct content" in new ViewFixture {
       def view = views.html.businessmatching.updateservice.change_services(EmptyForm,Set.empty[String])
 
       doc.title must startWith(Messages("changeservices.title") + " - " + Messages("summary.updateinformation"))
       heading.html must be(Messages("changeservices.title"))
       subHeading.html must include(Messages("summary.updateinformation"))
+      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -58,7 +58,7 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers  {
     }
 
     "not show the return link when specified" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.change_services(EmptyForm,Set.empty[String])
+      def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
