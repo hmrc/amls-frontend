@@ -40,17 +40,14 @@ trait ServicesController extends BaseController {
   def businessMatchingService: BusinessMatchingService
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        businessMatchingService.getModel.value map {
-          maybeBM =>
-            val form = (for {
-              bm <- maybeBM
-              services <- bm.msbServices
-            } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
-
-            Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.hasAccepted)))
-        }
+    implicit authContext => implicit request =>
+      (for {
+        preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
+        bm <- businessMatchingService.getModel
+      } yield {
+        val form = bm.msbServices.fold[Form2[MsbServices]](EmptyForm){s => Form2(s)}
+        Ok(views.html.businessmatching.services(form, edit, preApplicationComplete))
+      }) getOrElse Ok(views.html.businessmatching.services(EmptyForm, edit, showReturnLink = false))
   }
 
   def post(edit: Boolean = false) = Authorised.async {
