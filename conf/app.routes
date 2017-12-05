@@ -99,10 +99,10 @@ POST        /trading-premises/crn-name/:index                                   
 GET         /trading-premises/crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
 
-GET         /trading-premises/agent-name/:index                                       controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
-POST        /trading-premises/agent-name/:index                                       controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
-GET         /trading-premises/agent-name/date-of-change/:index                        controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
-POST        /trading-premises/agent-name/date-of-change/:index                        controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
+GET         /trading-premises/agent-name/:index                                       @controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-premises/agent-name/:index                                       @controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
+GET         /trading-premises/agent-name/date-of-change/:index                        @controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
+POST        /trading-premises/agent-name/date-of-change/:index                        @controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
 
 GET         /trading-premises/partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)

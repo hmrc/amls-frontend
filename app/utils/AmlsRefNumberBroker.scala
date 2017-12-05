@@ -16,27 +16,27 @@
 
 package utils
 
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
 import cats.implicits._
+import play.api.Play
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait AmlsRefNumberBroker {
-  private[utils] val statusService: StatusService
-  private[utils] val submissionResponseService: SubmissionResponseService
-  private[utils] val authEnrolmentsService: AuthEnrolmentsService
+@Singleton
+class AmlsRefNumberBroker @Inject()(
+                                     private[utils] val statusService: StatusService,
+                                     private[utils] val authEnrolmentsService: AuthEnrolmentsService
+                                   ) {
+
+  private[utils] val submissionResponseService: SubmissionResponseService = Play.current.injector.instanceOf[SubmissionResponseService]
 
   def get(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = (for {
     status <- OptionT.liftF(statusService.getStatus)
     (_, _, _, Left(amlsRefNo)) <- OptionT(submissionResponseService.getSubmissionData(status))
   } yield amlsRefNo) orElse OptionT(authEnrolmentsService.amlsRegistrationNumber)
-}
-
-object AmlsRefNumberBroker extends AmlsRefNumberBroker {
-  private[utils] lazy val statusService = StatusService
-  private[utils] lazy val submissionResponseService = SubmissionResponseService
-  private[utils] lazy val authEnrolmentsService = AuthEnrolmentsService
 }

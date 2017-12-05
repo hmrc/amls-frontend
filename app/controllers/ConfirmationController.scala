@@ -42,8 +42,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 trait ConfirmationController extends BaseController {
 
-  private[controllers] def submissionResponseService: SubmissionResponseService
-
   private[controllers] val keystoreConnector: KeystoreConnector
 
   private[controllers] implicit val dataCacheConnector: DataCacheConnector
@@ -52,13 +50,15 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] val authEnrolmentsService: AuthEnrolmentsService
 
+  private[controllers] val statusService: StatusService
+
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
 
   private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
 
-  private[controllers] val statusService: StatusService
+  private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[SubmissionResponseService]
 
-  private[controllers] val amlsRefBroker: AmlsRefNumberBroker
+  private[controllers] val amlsRefBroker = Play.current.injector.instanceOf[AmlsRefNumberBroker]
 
   val auditConnector: AuditConnector
 
@@ -195,7 +195,7 @@ trait ConfirmationController extends BaseController {
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     for {
       status <- OptionT.liftF(statusService.getStatus)
-      subData@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+      _@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
       amlsRefNo <- {
         e match {
           case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
@@ -213,12 +213,10 @@ trait ConfirmationController extends BaseController {
 object ConfirmationController extends ConfirmationController {
   // $COVERAGE-OFF$
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val submissionResponseService = SubmissionResponseService
   override val statusService: StatusService = StatusService
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
   override private[controllers] val authEnrolmentsService = AuthEnrolmentsService
-  override private[controllers] val amlsRefBroker = AmlsRefNumberBroker
   override val auditConnector = AMLSAuditConnector
 }

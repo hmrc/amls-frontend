@@ -16,8 +16,10 @@
 
 package services
 
-import cats.implicits._
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
+import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
@@ -27,16 +29,18 @@ import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.StatusConstants
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 sealed case class RowEntity(message: String, feePer: BigDecimal)
 
-trait SubmissionResponseService extends FeeCalculations with DataCacheService {
+@Singleton
+class SubmissionResponseService @Inject()(
+                                           val cacheConnector: DataCacheConnector
+                                         ) extends FeeCalculations with DataCacheService {
 
   type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
@@ -135,7 +139,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
       val subQuantity = subscriptionQuantity(amendmentResponse)
       val total = amendmentResponse.totalFees
       val difference = amendmentResponse.difference map Currency.fromBD
-      val filteredPremises = premises.filter(!_.status.contains(StatusConstants.Deleted))
+      val filteredPremises = TradingPremises.filter(premises)
       val rows = getBreakdownRows(amendmentResponse, filteredPremises, people, businessActivities, subQuantity)
       val paymentRef = amendmentResponse.paymentReference
       Future.successful(Some((paymentRef, Currency.fromBD(total), rows, Right(difference))))
@@ -292,11 +296,6 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
   private val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
     ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
-}
-
-object SubmissionResponseService extends SubmissionResponseService {
-  // $COVERAGE-OFF$
-  override private[services] val cacheConnector = DataCacheConnector
 }
 
 sealed trait FeeCalculations {

@@ -62,7 +62,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
           data match {
             case NewOfficer("someoneElse") =>
               Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer))))
-            case _ => {
+            case _ =>
               val result = for {
                 changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
                 _ <- OptionT.liftF(cacheConnector.save(ChangeOfficer.key, changeOfficer.copy(newOfficer = Some(data))))
@@ -71,7 +71,6 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
               }
 
               result getOrElse InternalServerError("No ChangeOfficer Role found")
-            }
           }
       }
   }

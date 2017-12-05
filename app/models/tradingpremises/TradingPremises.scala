@@ -16,7 +16,6 @@
 
 package models.tradingpremises
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -74,23 +73,12 @@ case class TradingPremises(
     this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
-  def isComplete: Boolean = if(ApplicationConfig.hasAcceptedToggle) {
-      this match {
-        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, true)
-          if w.activities.nonEmpty => true
-        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true)
-          if w.activities.nonEmpty => true
-        case tp if !tp.hasAccepted => false
-        case _ => false
-      }
-    } else {
-      this match {
-        case TradingPremises(_, Some(x), _, _, _, _, Some(w), _, _, _, _, _, _, _, _)
-          if w.activities.nonEmpty => true
-        case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, _)
-          if w.activities.nonEmpty => true
-        case _ => false
-      }
+  def isComplete: Boolean =
+    this match {
+      case TradingPremises(_, Some(_), _, _, _, _, Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
+      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
+      case tp if !tp.hasAccepted => false
+      case _ => false
     }
 
   def label: Option[String] = {
@@ -110,12 +98,12 @@ object TradingPremises {
 
   def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists { _.hasChanged }
 
+  def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
+
   def section(implicit cache: CacheMap): Section = {
 
     val messageKey = "tradingpremises"
     val notStarted = Section(messageKey, NotStarted, false, controllers.tradingpremises.routes.TradingPremisesAddController.get())
-
-    def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
 
     cache.getEntry[Seq[TradingPremises]](key).fold(notStarted) { tp =>
 
@@ -126,13 +114,12 @@ object TradingPremises {
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
-          case _ => {
+          case _ =>
             val index = tp.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }
             Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
-          }
         }
       }
 

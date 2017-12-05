@@ -16,38 +16,33 @@
 
 package controllers.tradingpremises
 
-import connectors.DataCacheConnector
+import generators.tradingpremises.TradingPremisesGenerator
 import models.TradingPremisesSection
 import models.tradingpremises.{AgentPartnership, TradingPremises}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
-import org.mockito.Matchers.{eq => meq, _}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val controller = new AgentPartnershipController(mock[DataCacheConnector], self.authConnector, messagesApi)
+    val request = addToken(authRequest)
+
+    val controller = new AgentPartnershipController(mockCacheConnector, self.authConnector, messagesApi)
+
+    mockCacheFetchAll
+    mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)
   }
 
   "AgentPartnershipController" when {
-
-    val emptyCache = CacheMap("", Map.empty)
-    val mockCacheMap = mock[CacheMap]
 
     "get is called" must {
       "display agent partnership Page" in new Fixture {
@@ -100,12 +95,6 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
             "agentPartnership" -> "text"
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
         }
@@ -116,12 +105,6 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
           val newRequest = request.withFormUrlEncodedBody(
             "agentPartnership" -> "text"
           )
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -134,12 +117,6 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
             "agentPartnership" -> "text"
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
@@ -151,34 +128,12 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
         "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentPartnership" -> "11111111111" * 40
+            "agentPartnership" -> ""
           )
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.agent.partnership"))
 
-        }
-        "given missing mandatory field" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "agentPartnership" -> " "
-          )
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.post(1)(newRequest)
-          status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.agent.partnership"))
         }
       }
       "set the hasChanged flag to true" in new Fixture {
@@ -186,9 +141,6 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
         val newRequest = request.withFormUrlEncodedBody("agentPartnership" -> "text")
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
 

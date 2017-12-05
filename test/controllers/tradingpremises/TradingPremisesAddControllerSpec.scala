@@ -27,11 +27,12 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import generators.tradingpremises.TradingPremisesGenerator
 
 import scala.concurrent.Future
 
 
-class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyChecks {
+class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyChecks with TradingPremisesGenerator{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -97,7 +98,7 @@ class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyCh
 
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(TradingPremises())))
+        .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(BusinessActivitiesModel))))

@@ -60,6 +60,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     .bindings(bindModules: _*).in(Mode.Test)
     .bindings(bind[PayApiConnector].to(paymentsConnector))
     .bindings(bind[PaymentsService].to(paymentsService))
+    .bindings(bind[SubmissionResponseService].to(mock[SubmissionResponseService]))
     .build()
 
   trait Fixture extends AuthorisedFixture {
@@ -75,7 +76,6 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     val controller = new ConfirmationController {
       override protected val authConnector = self.authConnector
-      override private[controllers] val submissionResponseService = mock[SubmissionResponseService]
       override val statusService: StatusService = mock[StatusService]
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
