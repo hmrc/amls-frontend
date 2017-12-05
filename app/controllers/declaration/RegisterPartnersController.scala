@@ -75,18 +75,16 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
   def updatePartners(eventualMaybePeoples: Option[Seq[ResponsiblePeople]],
                      data: BusinessPartners): Future[Option[Seq[ResponsiblePeople]]] = {
     eventualMaybePeoples match {
-      case Some(rpSeq) => {
-        val updatedList = rpSeq.filter(!_.status.contains(StatusConstants.Deleted)).map { responsiblePerson =>
+      case Some(rpSeq) =>
+        val updatedList = ResponsiblePeople.filter(rpSeq).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
-            case true => {
+            case true =>
               val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions + Partner, p.startDate)))
               responsiblePerson.copy(positions = position)
-            }
             case false => responsiblePerson
           }
         }
         Future.successful(Some(updatedList))
-      }
       case _ => Future.successful(eventualMaybePeoples)
     }
   }

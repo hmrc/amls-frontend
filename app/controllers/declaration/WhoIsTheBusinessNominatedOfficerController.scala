@@ -62,7 +62,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
             (for {
               cache <- optionalCache
               responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-            } yield businessNominatedOfficerView(Ok, EmptyForm, responsiblePeople.filter(!_.status.contains(StatusConstants.Deleted)))
+            } yield businessNominatedOfficerView(Ok, EmptyForm, ResponsiblePeople.filter(responsiblePeople))
               ) getOrElse businessNominatedOfficerView(Ok, EmptyForm, Seq.empty)
         }
   }
@@ -72,18 +72,16 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
   def updateNominatedOfficer(eventualMaybePeoples: Option[Seq[ResponsiblePeople]],
                              data: BusinessNominatedOfficer): Future[Option[Seq[ResponsiblePeople]]] = {
     eventualMaybePeoples match {
-      case Some(rpSeq) => {
-        val updatedList = rpSeq.filter(!_.status.contains(StatusConstants.Deleted)).map { responsiblePerson =>
+      case Some(rpSeq) =>
+        val updatedList = ResponsiblePeople.filter(rpSeq).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
-            case true => {
+            case true =>
               val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions. + (NominatedOfficer), p.startDate)))
               responsiblePerson.copy(positions = position)
-            }
             case false => responsiblePerson
           }
         }
         Future.successful(Some(updatedList))
-      }
       case _ => Future.successful(eventualMaybePeoples)
     }
   }
@@ -111,7 +109,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                      (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
     form match {
       case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-        case Some(data) => businessNominatedOfficerView(BadRequest, f, data.filter(!_.status.contains(StatusConstants.Deleted)))
+        case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePeople.filter(data))
         case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
       }
       case ValidForm(_, data) => fn(data)

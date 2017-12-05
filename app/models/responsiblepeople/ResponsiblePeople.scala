@@ -190,12 +190,12 @@ object ResponsiblePeople {
 
   implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePeople]]
 
+  def filter(rp: Seq[ResponsiblePeople]) = rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
+
   def section(implicit cache: CacheMap): Section = {
 
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
-
-    def filter(rp: Seq[ResponsiblePeople]) = rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
 
     cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) { rp =>
 
@@ -206,14 +206,12 @@ object ResponsiblePeople {
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
-          case _ => {
+          case _ =>
             val index = rp.indexWhere {
               case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
-
             Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
-          }
         }
       }
     }

@@ -290,7 +290,7 @@ trait SubmissionResponseService extends FeeCalculations with DataCacheService {
     fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
 
   private val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
-    people.filter(!_.status.contains(StatusConstants.Deleted)).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
+    ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
 }
 
