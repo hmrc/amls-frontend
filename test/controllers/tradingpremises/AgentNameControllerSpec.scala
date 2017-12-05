@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import connectors.DataCacheConnector
+import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.status.{SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -28,42 +28,39 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val controller = new AgentNameController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val request = addToken(authRequest)
 
-    when(controller.statusService.getStatus(any(),any(),any())).thenReturn(Future.successful(SubmissionDecisionRejected))
+    val controller = new AgentNameController(
+      mockCacheConnector,
+      self.authConnector,
+      mockStatusService
+    )
+
+    mockCacheFetchAll
+
+    mockApplicationStatus(SubmissionDecisionRejected)
+
+    mockCacheFetch[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), Some(TradingPremises.key))
+    mockCacheGetEntry[Seq[TradingPremises]](Some(Seq(tradingPremisesGen.sample.get)), TradingPremises.key)
+
+    mockCacheSave[Seq[TradingPremises]]
+    mockCacheSave[TradingPremises]
   }
 
   "AgentNameController" when {
 
-    val emptyCache = CacheMap("", Map.empty)
-    val mockCacheMap = mock[CacheMap]
-
     "get is called" must {
       "display agent name Page" in new Fixture {
-
-        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(TradingPremises()))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -93,6 +90,7 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
       }
       "respond with NOT_FOUND" when {
         "there is no data at all at that index" in new Fixture {
+
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
@@ -113,12 +111,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
             "agentDateOfBirth.year" -> "1956"
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
         }
@@ -134,12 +126,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
             "agentDateOfBirth.year" -> "1956"
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
@@ -154,12 +140,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
             "agentDateOfBirth.year" -> "1956"
           )
 
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
@@ -171,39 +151,14 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
         "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> "11111111111" * 40
+            "agentName" -> ""
           )
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.agent.name"))
 
         }
 
-        "given missing mandatory field" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "agentName" -> " "
-          )
-
-          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          val result = controller.post(1)(newRequest)
-          status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.required.tp.agent.name"))
-        }
       }
 
       "set the hasChanged flag to true" in new Fixture {
@@ -215,9 +170,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse, TradingPremises())))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.post(1)(newRequest)
 
@@ -240,12 +192,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = Some(1)))))
 
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-
           when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -266,12 +212,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesWithHasChangedFalse.copy(lineId = None))))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(controller.dataCacheConnector.save[TradingPremises](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
 
           when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
@@ -315,9 +255,6 @@ class AgentNameControllerSpec extends GenericTestHelper with MockitoSugar with S
 
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](meq(TradingPremises.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(premises))))
-
-          when(controller.dataCacheConnector.save[TradingPremises](meq(TradingPremises.key), any[TradingPremises])(any(), any(), any())).
-            thenReturn(Future.successful(mock[CacheMap]))
 
           val result = controller.saveDateOfChange(1)(postRequest)
 

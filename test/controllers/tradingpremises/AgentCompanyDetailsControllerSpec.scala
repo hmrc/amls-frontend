@@ -17,6 +17,7 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
+import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
 import models.tradingpremises._
 import org.joda.time.LocalDate
@@ -37,7 +38,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -113,7 +114,7 @@ class AgentCompanyDetailsControllerSpec extends GenericTestHelper with OneAppPer
             "companyRegistrationNumber" -> "12345678"
           )
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-            .thenReturn(Some(Seq(TradingPremises())))
+            .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))

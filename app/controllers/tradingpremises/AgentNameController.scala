@@ -16,7 +16,9 @@
 
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import javax.inject.{Inject, Singleton}
+
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
@@ -27,17 +29,20 @@ import org.joda.time.LocalDate
 import play.api.libs.json.Format
 import services.StatusService
 import typeclasses.MongoKey
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{ControllerHelper, DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
 
-trait AgentNameController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+@Singleton
+class AgentNameController @Inject()(
+                                     val dataCacheConnector: DataCacheConnector,
+                                     val authConnector: AuthConnector,
+                                     val statusService: StatusService
+                                   ) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -126,11 +131,4 @@ trait AgentNameController extends RepeatingSection with BaseController with Date
   private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
     ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
-}
-
-object AgentNameController extends AgentNameController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }
