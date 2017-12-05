@@ -97,7 +97,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
 
   private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePeople]]): Boolean = {
     rpSeqOption match {
-      case Some(rps) => rps.filterNot(_.status.contains(StatusConstants.Deleted)).exists {
+      case Some(rps) => ResponsiblePeople.filter(rps).exists {
         rp =>
           rp.positions match {
             case Some(position) => position.isNominatedOfficer

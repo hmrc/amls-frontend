@@ -25,6 +25,7 @@ import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.{StillEmployed, StillEmployedNo, StillEmployedYes}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import routes._
 
 import scala.concurrent.Future
 
@@ -35,7 +36,7 @@ class StillEmployedController @Inject()
     implicit authContext => implicit request =>
       (getNominatedOfficerName map (name =>
         Ok(views.html.changeofficer.still_employed(EmptyForm, name))
-        )) getOrElse InternalServerError("No responsible people found")
+        )) getOrElse Redirect(NewOfficerController.get())
   }
 
   def post = Authorised.async {
@@ -45,12 +46,11 @@ class StillEmployedController @Inject()
           (getNominatedOfficerName map (name =>
             BadRequest(views.html.changeofficer.still_employed(x, name))
             )) getOrElse InternalServerError("No responsible people found")
-        case ValidForm(_, data) => {
+        case ValidForm(_, data) =>
           data match {
-            case StillEmployedYes => Future.successful(Redirect(controllers.changeofficer.routes.RoleInBusinessController.get()))
-            case StillEmployedNo => Future.successful(Redirect(controllers.changeofficer.routes.RemoveResponsiblePersonController.get()))
+            case StillEmployedYes => Future.successful(Redirect(RoleInBusinessController.get()))
+            case StillEmployedNo => Future.successful(Redirect(RemoveResponsiblePersonController.get()))
           }
-        }
       }
   }
 }
