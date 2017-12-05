@@ -40,19 +40,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         statusService.isPreSubmission flatMap { isPreSubmission =>
-          businessMatchingService.getModel.value map { bm =>
-            (for {
-              businessMatching <- bm
-              businessActivities <- businessMatching.activities
-            } yield {
-              val form = Form2[BusinessActivities](businessActivities)
-              val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
+          (for {
+            isComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
+            businessMatching <- businessMatchingService.getModel
+            businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
+          } yield {
+            val form = Form2[BusinessActivities](businessActivities)
+            val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
 
-              Ok(register_services(form, edit, newActivities, existing, isPreSubmission, businessMatching.hasAccepted))
-            }) getOrElse {
-              val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
-              Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission, false))
-            }
+            Ok(register_services(form, edit, newActivities, existing, isPreSubmission, isComplete))
+          }) getOrElse {
+            val (newActivities, existing) = getActivityValues(EmptyForm, isPreSubmission, None)
+            Ok(register_services(EmptyForm, edit, newActivities, existing, isPreSubmission, showReturnLink = false))
           }
         }
   }
@@ -87,7 +86,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   businessMatchingService.updateModel(
                     businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
                   ).value
-                }
+              }
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
@@ -108,7 +107,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     ) map BusinessActivities.getValue
 
     existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)) { ea =>
-      if(isPreSubmission) {
+      if (isPreSubmission) {
         (activities, Set.empty)
       } else {
         (activities diff (ea map BusinessActivities.getValue), activities intersect (ea map BusinessActivities.getValue))
@@ -119,7 +118,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, isPreSubmission: Boolean): BusinessActivities =
     existing.fold[BusinessActivities](added) { existing =>
-      if(isPreSubmission){
+      if (isPreSubmission) {
         added
       } else {
         BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
