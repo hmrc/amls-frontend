@@ -133,7 +133,6 @@ class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
-          contentAsString(result) must include(Messages("error.invalid.tp.agent.partnership"))
 
         }
       }
