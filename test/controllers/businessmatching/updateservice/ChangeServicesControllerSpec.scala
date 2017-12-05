@@ -39,14 +39,18 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
     val request = addToken(authRequest)
+
+    val bmService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[BusinessMatchingService].to(bmService))
       .build()
 
     val controller = app.injector.instanceOf[ChangeServicesController]
@@ -57,6 +61,10 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
     val bmEmpty = Some(BusinessMatching())
 
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
+
+    when {
+      bmService.preApplicationComplete(any(), any(), any())
+    } thenReturn Future.successful(false)
 
   }
 
@@ -118,7 +126,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "redirect to RemoveActivitiesInformationController" when {
-        "there is a single service" in new Fixture{
+        "there is a single service" in new Fixture {
 
           mockCacheGetEntry[BusinessMatching](
             Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
