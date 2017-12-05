@@ -67,7 +67,7 @@ class StillEmployedControllerSpec extends GenericTestHelper {
         contentAsString(result) must include("firstName lastName")
       }
 
-      "respond with an internal server error" when {
+      "redirect to NewOfficerController" when {
         "no nominated officer is found" in new TestFixture {
 
           when(cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -75,7 +75,8 @@ class StillEmployedControllerSpec extends GenericTestHelper {
 
           val result = controller.get()(request)
 
-          status(result) mustBe INTERNAL_SERVER_ERROR
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) must be(Some(routes.NewOfficerController.get().url))
 
         }
       }
@@ -88,15 +89,19 @@ class StillEmployedControllerSpec extends GenericTestHelper {
       }
 
       "respond with SEE_OTHER" when {
-        "response is 'yes', and redirect to RoleInBusinessController" in new TestFixture {
-          val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
+        "request is 'yes'" which {
+          "redirects to RoleInBusinessController" in new TestFixture {
+            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "true"))
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RoleInBusinessController.get().url)
+          }
         }
-        "response is 'no', and redirect to RemoveResponsiblePerson" in new TestFixture {
-          val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "false"))
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url)
+        "request is 'no'" which {
+          "redirects to RemoveResponsiblePerson" in new TestFixture {
+            val result = controller.post()(request.withFormUrlEncodedBody("stillEmployed" -> "false"))
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url)
+          }
         }
       }
     }
