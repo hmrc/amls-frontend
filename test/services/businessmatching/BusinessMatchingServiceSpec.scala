@@ -615,6 +615,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
     "called" must {
       "return true" when {
         "in the right status" in new Fixture {
+          mockCacheFetch[BusinessMatching](Some(BusinessMatching(preAppComplete = true)))
+
           val result = await(service.preApplicationComplete)
 
           result mustBe true

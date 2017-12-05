@@ -74,7 +74,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
       "regNumber" -> "123456"
       ,
       "hasChanged" -> false,
-      "hasAccepted" -> true
+      "hasAccepted" -> true,
+      "preAppComplete" -> true
     )
 
     val businessMatching = BusinessMatching(
@@ -84,7 +85,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
       Some(typeOfBusinessModel),
       Some(companyRegistrationNumberModel),
       Some(businessAppliedForPSRNumberModel),
-      hasAccepted = true)
+      hasAccepted = true,
+      preAppComplete = true)
 
     "READ the JSON successfully and return the domain Object" in {
       Json.fromJson[BusinessMatching](jsonBusinessMatching - "hasChanged") must be(JsSuccess(businessMatching))
@@ -144,7 +146,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             None,
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete mustBe true
@@ -160,7 +163,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             None,
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete mustBe true
@@ -177,7 +181,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete mustBe true
@@ -194,7 +199,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete mustBe true
@@ -210,7 +216,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             Some(companyRegistrationNumberModel),
             Some(businessAppliedForPSRNumberModel),
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete must be(true)
@@ -226,7 +233,8 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
             Some(companyRegistrationNumberModel),
             None,
             hasChanged = false,
-            hasAccepted = true
+            hasAccepted = true,
+            preAppComplete = true
           )
 
           businessMatching.isComplete must be(true)
