@@ -49,13 +49,14 @@ class SubmissionResponseServiceSpec extends PlaySpec
   with IntegrationPatience
   with OneAppPerSuite
   with ResponsiblePersonGenerator
+  with generators.tradingpremises.TradingPremisesGenerator
   with AmlsReferenceNumberGenerator{
 
   trait Fixture {
 
-    val TestSubmissionResponseService = new SubmissionResponseService {
-      override private[services] val cacheConnector = mock[DataCacheConnector]
-    }
+    val TestSubmissionResponseService = new SubmissionResponseService (
+      mock[DataCacheConnector]
+    )
 
     val rpFee: BigDecimal = 100
     val rpFeeWithRate: BigDecimal = 130
@@ -106,11 +107,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
       premiseFeeRate = None,
       totalFees = 100,
       paymentReference = Some(""),
-      difference = Some(0),
-      addedResponsiblePeople = 0,
-      addedFullYearTradingPremises = 0,
-      halfYearlyTradingPremises = 0,
-      zeroRatedTradingPremises = 0
+      difference = Some(0)
     )
 
     val reviewDetails = mock[ReviewDetails]
@@ -140,6 +137,10 @@ class SubmissionResponseServiceSpec extends PlaySpec
     } thenReturn Some(amendmentResponse)
 
     when {
+      cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+    } thenReturn Some(Seq(tradingPremisesGen.sample.get))
+
+    when {
       TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cache))
   }
@@ -147,10 +148,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
   "SubmissionResponseService" when {
     "getAmendment is called" must {
       "submit amendment returning submission data" in new Fixture {
-
-        when {
-          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-        } thenReturn Some(Seq(TradingPremises()))
 
         when {
           cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
@@ -192,10 +189,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
         when {
           cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
         } thenReturn Some(amendmentResponseWithRate)
-
-        when {
-          cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-        } thenReturn Some(Seq(TradingPremises()))
 
         when {
           cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
@@ -255,7 +248,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         val premises = Seq(
           TradingPremises(status = Some(StatusConstants.Deleted)),
-          TradingPremises()
+          tradingPremisesGen.sample.get
         )
 
         when {
@@ -910,10 +903,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
 
           when {
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())

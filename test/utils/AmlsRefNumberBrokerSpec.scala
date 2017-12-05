@@ -18,32 +18,40 @@ package utils
 
 import generators.PaymentGenerator
 import models.confirmation.{BreakdownRow, Currency}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
+import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.{Application, Mode}
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class AmlsRefNumberBrokerSpec extends PlaySpec with MustMatchers with MockitoSugar with PaymentGenerator with ScalaFutures {
+class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustMatchers with MockitoSugar with PaymentGenerator with ScalaFutures {
+
+  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
+    .bindings(bindModules: _*).in(Mode.Test)
+    .bindings(bind[SubmissionResponseService].to(mock[SubmissionResponseService]))
+    .build()
 
   trait Fixture {
 
     implicit val hc = HeaderCarrier()
     implicit val authContext = mock[AuthContext]
 
-    val broker = new AmlsRefNumberBroker {
-      override private[utils] val submissionResponseService = mock[SubmissionResponseService]
-      override private[utils] val authEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[utils] val statusService = mock[StatusService]
-    }
+    val broker = new AmlsRefNumberBroker (
+      mock[StatusService],
+      mock[AuthEnrolmentsService]
+    )
 
   }
 

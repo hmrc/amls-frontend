@@ -42,7 +42,7 @@ object Helpers {
   }
 
   def getOfficer(people: Seq[ResponsiblePeople]): Option[(ResponsiblePeople, Int)] = {
-    ResponsiblePeople.filter(people).zipWithIndex.map {
+    ResponsiblePeople.filterWithIndex(people).map {
       case (person, index) => (person, index + 1)
     } find {
       case (person, _) => person.positions.fold(false)(_.positions contains NominatedOfficer)

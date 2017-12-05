@@ -28,9 +28,7 @@ object TPControllerHelper {
 
       val maybeTradingPremises = for {
         tp <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      } yield tp collect {
-        case t if !t.status.contains(StatusConstants.Deleted) => t
-      }
+      } yield TradingPremises.filter(tp)
 
       val isAgent = (for {
         tpList <- maybeTradingPremises

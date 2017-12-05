@@ -182,15 +182,18 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
 
 object ResponsiblePeople {
 
-  def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean = {
+  def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean =
     newModel exists {
       _.hasChanged
     }
-  }
 
   implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePeople]]
 
-  def filter(rp: Seq[ResponsiblePeople]) = rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
+  def filter(rp: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
+    rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
+
+  def filterWithIndex(rp: Seq[ResponsiblePeople]): Seq[(ResponsiblePeople, Int)] =
+    rp.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePeople())
 
   def section(implicit cache: CacheMap): Section = {
 
