@@ -34,15 +34,15 @@ object Helpers {
                                 f: cats.Monad[Future]): OptionT[Future, String] = {
     for {
       people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(people))
+      (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(ResponsiblePeople.filterWithIndex(people)))
       name <- OptionT.fromOption[Future](nominatedOfficer.personName)
     } yield {
       name.fullName
     }
   }
 
-  def getOfficer(people: Seq[ResponsiblePeople]): Option[(ResponsiblePeople, Int)] = {
-    ResponsiblePeople.filterWithIndex(people).map {
+  def getOfficer(people: Seq[(ResponsiblePeople, Int)]): Option[(ResponsiblePeople, Int)] = {
+    people.map {
       case (person, index) => (person, index + 1)
     } find {
       case (person, _) => person.positions.fold(false)(_.positions contains NominatedOfficer)
@@ -55,7 +55,7 @@ object Helpers {
                                 f: cats.Monad[Future]): OptionT[Future, (ResponsiblePeople, Int)] = {
     for {
       people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people))
+      nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people.zipWithIndex))
     } yield nominatedOfficer
   }
 

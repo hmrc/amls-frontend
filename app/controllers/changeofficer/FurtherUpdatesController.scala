@@ -50,7 +50,7 @@ class FurtherUpdatesController @Inject()(
             cache <- OptionT(dataCacheConnector.fetchAll)
             responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
-            oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople))
+            oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople.zipWithIndex))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
             (_, index) <- OptionT.fromOption[Future](ResponsiblePeople.findResponsiblePersonByName(newOfficer.name, responsiblePeople))
             _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
