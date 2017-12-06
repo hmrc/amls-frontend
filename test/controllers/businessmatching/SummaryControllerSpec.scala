@@ -26,6 +26,7 @@ import models.businessmatching._
 import models.businessmatching.updateservice._
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -137,8 +138,12 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
-        }
 
+          val captor = ArgumentCaptor.forClass(classOf[BusinessMatching])
+          verify(mockBusinessMatchingService).updateModel(captor.capture())(any(), any(), any())
+          captor.getValue.hasAccepted mustBe true
+          captor.getValue.preAppComplete mustBe true
+        }
       }
 
       "return Internal Server Error if the business matching model can't be updated" in new Fixture {

@@ -84,11 +84,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     when {
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    when {
-      controller.businessMatchingService.preApplicationComplete(any(), any(), any())
-    } thenReturn Future.successful(false)
-
   }
 
   "RegisterServicesController" when {

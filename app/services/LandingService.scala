@@ -193,7 +193,9 @@ trait LandingService {
           None,
           activities.dateOfChange
         ))
-      }, hasAccepted = true
+      },
+      hasAccepted = true,
+      preAppComplete = true
     )
   }
 

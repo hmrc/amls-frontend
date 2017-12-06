@@ -65,7 +65,7 @@ trait SummaryController extends BaseController {
         businessMatching <- businessMatchingService.getModel
         businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
         status <- OptionT.liftF(statusService.getStatus)
-        _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true))
+        _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
         if(goToUpdateServices(businessActivities.additionalActivities, status)){

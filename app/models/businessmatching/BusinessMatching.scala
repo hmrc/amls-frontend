@@ -31,7 +31,8 @@ case class BusinessMatching(
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
                              businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
                              hasChanged: Boolean = false,
-                             hasAccepted: Boolean = false
+                             hasAccepted: Boolean = false,
+                             preAppComplete: Boolean = false
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =
@@ -86,9 +87,9 @@ case class BusinessMatching(
 
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _) if !ApplicationConfig.hasAcceptedToggle
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _, true) if !ApplicationConfig.hasAcceptedToggle
         && isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true)
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, true)
         if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
       case _ => false
     }
@@ -124,9 +125,9 @@ object BusinessMatching {
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
       __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
-      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
+      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
+      (__ \ "preAppComplete").readNullable[Boolean].map(_.getOrElse(false))
     ) (BusinessMatching.apply _)
-
 
   implicit val writes: Writes[BusinessMatching] =
     Writes[BusinessMatching] {
@@ -140,7 +141,7 @@ object BusinessMatching {
           Json.toJson(model.businessAppliedForPSRNumber).asOpt[JsObject]
         ).flatten.fold(Json.obj()) {
           _ ++ _
-        } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted))
+        } + ("hasChanged" -> JsBoolean(model.hasChanged)) + ("hasAccepted" -> JsBoolean(model.hasAccepted)) + ("preAppComplete" -> JsBoolean(model.preAppComplete))
     }
 
   implicit def default(businessMatching: Option[BusinessMatching]): BusinessMatching =
