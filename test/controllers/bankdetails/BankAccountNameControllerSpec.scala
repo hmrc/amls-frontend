@@ -170,7 +170,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
         }
-        
+
       }
 
       "respond with NOT_FOUND" when {
