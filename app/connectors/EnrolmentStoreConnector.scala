@@ -21,6 +21,7 @@ import javax.inject.Inject
 import config.AppConfig
 import models.enrolment.ESEnrolment
 import models.enrolment.Formatters._
+import models.enrolment.Constants
 import okhttp3.HttpUrl
 import play.api.http.Status._
 import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
@@ -44,8 +45,6 @@ class EnrolmentStoreConnector @Inject()(http: CoreGet, appConfig: AppConfig) {
 
 object EnrolmentStoreConnector {
 
-  val serviceName = "HMRC-MLR-ORG"
-
   def enrolmentsUrl(userId: String, baseUrl: String) = {
     val parts = HttpUrl.parse(baseUrl)
 
@@ -54,7 +53,7 @@ object EnrolmentStoreConnector {
       .scheme(parts.scheme)
       .port(parts.port)
       .addPathSegments(s"users/$userId/enrolments")
-      .addQueryParameter("service", serviceName)
+      .addQueryParameter("service", Constants.serviceName)
       .addQueryParameter("type", "principal")
       .addQueryParameter("start-record", "1")
       .addQueryParameter("max-records", "1000")

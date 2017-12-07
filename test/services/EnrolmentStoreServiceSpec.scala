@@ -17,18 +17,18 @@
 package services
 
 import connectors.EnrolmentStoreConnector
+import generators.AmlsReferenceNumberGenerator
 import generators.enrolment.ESEnrolmentGenerator
-import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.enrolment.{EnrolmentEntry, EnrolmentIdentifier}
+import models.enrolment.{Constants, EnrolmentEntry, EnrolmentIdentifier}
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
-import org.mockito.Mockito.when
-import org.mockito.Matchers.{any, eq => eqTo}
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{ConfidenceLevel, CredentialStrength}
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -51,8 +51,8 @@ class EnrolmentStoreServiceSpec extends PlaySpec with MustMatchers with MockitoS
     val service = new EnrolmentStoreService(connector)
 
     val validMlrEnrolment = EnrolmentEntry(
-      "HMRC-MLR-ORG", "active", "MLR Enrolment", Seq(
-        EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)
+      Constants.serviceName, "active", "MLR Enrolment", Seq(
+        EnrolmentIdentifier(Constants.amlsRefIdentKey, amlsRegistrationNumber)
       )
     )
 

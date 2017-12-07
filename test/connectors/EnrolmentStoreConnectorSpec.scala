@@ -18,6 +18,7 @@ package connectors
 
 import config.AppConfig
 import generators.enrolment.ESEnrolmentGenerator
+import models.enrolment.Formatters._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
@@ -28,9 +29,7 @@ import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import models.enrolment.Formatters._
-import org.scalacheck.Gen
-
+import models.enrolment.Constants
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
@@ -43,9 +42,11 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
     val http = mock[CoreGet]
     val appConfig = mock[AppConfig]
     val servicesConfig = mock[ServicesConfig]
-    val userId = numSequence(10).sample.get
     val connector = new EnrolmentStoreConnector(http, appConfig)
     val baseUrl = "http://enrolment-store:3001"
+
+    //noinspection ScalaStyle
+    val userId = numSequence(10).sample.get
 
     when {
       appConfig.config
@@ -85,7 +86,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
   "EnrolmentStoreConnector" must {
     "generate the correct url" in new Fixture {
       EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl) mustBe
-        s"$baseUrl/users/$userId/enrolments?service=HMRC-MLR-ORG&type=principal&start-record=1&max-records=1000"
+        s"$baseUrl/users/$userId/enrolments?service=${Constants.serviceName}&type=principal&start-record=1&max-records=1000"
     }
   }
 

@@ -26,3 +26,8 @@ object Formatters {
   implicit val enrolmentFormat = Json.format[ESEnrolment]
 }
 
+object Constants {
+  val serviceName = "HMRC-MLR-ORG"
+  val amlsRefIdentKey = "MLRRefNumber"
+}
+

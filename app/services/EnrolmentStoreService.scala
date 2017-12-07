@@ -21,7 +21,7 @@ import javax.inject.Inject
 import connectors.EnrolmentStoreConnector
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-
+import models.enrolment.Constants
 import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreService @Inject()(connector: EnrolmentStoreConnector) {
@@ -30,8 +30,8 @@ class EnrolmentStoreService @Inject()(connector: EnrolmentStoreConnector) {
     connector.userEnrolments(authContext.user.userId) map {
       case Some(enrolment) if enrolment.totalRecords > 0 && enrolment.enrolments.nonEmpty =>
         for {
-          entry <- enrolment.enrolments.find(_.service == "HMRC-MLR-ORG")
-          ident <- entry.identifiers.find(_.key == "MLRRefNumber")
+          entry <- enrolment.enrolments.find(_.service == Constants.serviceName)
+          ident <- entry.identifiers.find(_.key == Constants.amlsRefIdentKey)
         } yield ident.value
       case _ => None
     }
