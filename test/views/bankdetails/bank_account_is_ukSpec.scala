@@ -40,7 +40,7 @@ class bank_account_is_ukSpec extends GenericTestHelper with MustMatchers {
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
 
-      doc.title() must startWith(Messages("bankdetails.accountdetails.title") + " - " + Messages("summary.bankdetails"))
+      doc.title() must startWith(Messages("bankdetails.bankaccount.accounttype.title") + " - " + Messages("summary.bankdetails"))
     }
   }
 
@@ -50,7 +50,7 @@ class bank_account_is_ukSpec extends GenericTestHelper with MustMatchers {
 
     override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
 
-    heading.html() must be(Messages("bankdetails.accountdetails.title"))
+    heading.html() must be(Messages("bankdetails.bankaccount.accounttype.title"))
   }
 
   "show errors in correct places when validation fails" in new ViewFixture {
