@@ -20,21 +20,46 @@ import javax.inject.Inject
 
 import config.AppConfig
 import models.enrolment.ESEnrolment
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
-import scala.concurrent.{ExecutionContext, Future}
-import play.api.http.Status._
 import models.enrolment.Formatters._
+import okhttp3.HttpUrl
+import play.api.http.Status._
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
+
+import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreConnector @Inject()(http: CoreGet, appConfig: AppConfig) {
 
   lazy val baseUrl = appConfig.config.baseUrl("enrolment-store")
-  val serviceName = "HMRC-MLR-ORG"
 
   def userEnrolments(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ESEnrolment]] = {
-    http.GET[HttpResponse](s"$baseUrl/users/$userId/enrolments?service=$serviceName&type=principal") map {
+    val url = EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl)
+    
+    http.GET[HttpResponse](url) map {
       case HttpResponse(OK, json, _, _) => json.asOpt[ESEnrolment]
       case HttpResponse(NO_CONTENT, _, _, _) => None
     }
   }
 
+}
+
+object EnrolmentStoreConnector {
+
+  val serviceName = "HMRC-MLR-ORG"
+
+  def enrolmentsUrl(userId: String, baseUrl: String) = {
+    val parts = HttpUrl.parse(baseUrl)
+
+    new HttpUrl.Builder()
+      .host(parts.host)
+      .scheme(parts.scheme)
+      .port(parts.port)
+      .addPathSegments(s"users/$userId/enrolments")
+      .addQueryParameter("service", serviceName)
+      .addQueryParameter("type", "principal")
+      .addQueryParameter("start-record", "1")
+      .addQueryParameter("max-records", "1000")
+      .build()
+      .url()
+      .toString
+  }
 }

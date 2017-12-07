@@ -29,6 +29,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.config.inject.ServicesConfig
 import models.enrolment.Formatters._
+import org.scalacheck.Gen
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,9 +43,9 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
     val http = mock[CoreGet]
     val appConfig = mock[AppConfig]
     val servicesConfig = mock[ServicesConfig]
-    val userId = "00000038746"
+    val userId = numSequence(10).sample.get
     val connector = new EnrolmentStoreConnector(http, appConfig)
-    val baseUrl = "/enrolment-store"
+    val baseUrl = "http://enrolment-store:3001"
 
     when {
       appConfig.config
@@ -67,7 +68,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
       val result = await(connector.userEnrolments(userId))
 
       result must contain(enrolment)
-      verify(http).GET[HttpResponse](eqTo(s"$baseUrl/users/$userId/enrolments?service=HMRC-MLR-ORG&type=principal"))(any(), any(), any())
+      verify(http).GET[HttpResponse](eqTo(EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl)))(any(), any(), any())
     }
 
     "return None if the user was not found" in new Fixture {
@@ -78,6 +79,13 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
       val result = await(connector.userEnrolments(userId))
 
       result must not be defined
+    }
+  }
+
+  "EnrolmentStoreConnector" must {
+    "generate the correct url" in new Fixture {
+      EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl) mustBe
+        s"$baseUrl/users/$userId/enrolments?service=HMRC-MLR-ORG&type=principal&start-record=1&max-records=1000"
     }
   }
 
