@@ -47,11 +47,8 @@ case class EstateAgentBusiness(
 
   def isComplete: Boolean =
     this match {
-      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, true) if !x.services.contains(Residential) && ApplicationConfig.hasAcceptedToggle => true
-      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
-      case EstateAgentBusiness(_, _, _, _, _, false) if ApplicationConfig.hasAcceptedToggle => false
-      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, _) if !x.services.contains(Residential) => true
-      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, _) => true
+      case EstateAgentBusiness(Some(x), _, Some(_), Some(_), _, accepted) if !x.services.contains(Residential) => accepted
+      case EstateAgentBusiness(Some(_), Some(_), Some(_), Some(_), _, accepted) => accepted
       case _ => false
     }
 }
