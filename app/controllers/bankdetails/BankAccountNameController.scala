@@ -16,24 +16,28 @@
 
 package controllers.bankdetails
 
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import config.AMLSAuditConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails.{BankAccount, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
-trait BankAccountController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  val auditConnector: AuditConnector
-  implicit val statusService: StatusService
+@Singleton
+class BankAccountNameController @Inject()(
+                                           val authConnector: AuthConnector,
+                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val statusService: StatusService,
+                                           val auditConnector: AuditConnector = AMLSAuditConnector) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -42,8 +46,10 @@ trait BankAccountController extends RepeatingSection with BaseController {
           bankDetails <- getData[BankDetails](index)
           allowedToEdit <- ControllerHelper.allowedToEdit(edit)
         } yield bankDetails match {
-          case Some(BankDetails(_, Some(data), _, _, _, _)) if allowedToEdit => Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
-          case Some(_) if allowedToEdit => Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
+          case Some(BankDetails(_, Some(data), _, _, _, _)) if allowedToEdit =>
+            Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
+          case Some(_) if allowedToEdit =>
+            Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
   }
@@ -84,12 +90,4 @@ trait BankAccountController extends RepeatingSection with BaseController {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
-}
-
-object BankAccountController extends BankAccountController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override implicit val statusService = StatusService
-  override val auditConnector = AMLSAuditConnector
 }
