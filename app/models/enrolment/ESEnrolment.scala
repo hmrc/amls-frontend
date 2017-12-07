@@ -22,7 +22,7 @@ case class EnrolmentEntry(service: String, state: String, friendlyName: String, 
 case class ESEnrolment(startRecord: Int, totalRecords: Int, enrolments: Seq[EnrolmentEntry])
 
 object Formatters {
-  implicit val entryReads = Json.reads[EnrolmentEntry]
-  implicit val enrolmentReads = Json.reads[ESEnrolment]
+  implicit val entryFormat = Json.format[EnrolmentEntry]
+  implicit val enrolmentFormat = Json.format[ESEnrolment]
 }
 

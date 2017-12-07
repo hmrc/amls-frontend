@@ -20,19 +20,20 @@ import javax.inject.Inject
 
 import config.AppConfig
 import models.enrolment.ESEnrolment
-import models.enrolment.Formatters._
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier}
-
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
 import scala.concurrent.{ExecutionContext, Future}
-
-trait Enrolment
+import play.api.http.Status._
+import models.enrolment.Formatters._
 
 class EnrolmentStoreConnector @Inject()(http: CoreGet, appConfig: AppConfig) {
 
   lazy val baseUrl = appConfig.config.baseUrl("enrolment-store")
 
-  def userEnrolments(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[ESEnrolment] = {
-    http.GET[ESEnrolment](s"$baseUrl/users/$userId/enrolments")
+  def userEnrolments(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ESEnrolment]] = {
+    http.GET[HttpResponse](s"$baseUrl/users/$userId/enrolments") map {
+      case HttpResponse(OK, json, _, _) => json.asOpt[ESEnrolment]
+      case HttpResponse(NO_CONTENT, _, _, _) => None
+    }
   }
 
 }

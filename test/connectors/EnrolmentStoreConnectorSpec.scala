@@ -17,21 +17,23 @@
 package connectors
 
 import config.AppConfig
-import models.enrolment.ESEnrolment
+import generators.enrolment.ESEnrolmentGenerator
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
-import org.mockito.Mockito.{verify, when}
-import org.mockito.Matchers.{any, eq => eqTo}
-import uk.gov.hmrc.play.config.inject.ServicesConfig
+import play.api.libs.json.Json
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.config.inject.ServicesConfig
+import models.enrolment.Formatters._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
+class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with ESEnrolmentGenerator {
 
   trait Fixture {
 
@@ -56,13 +58,26 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
 
   "userEnrolments" must {
     "call the enrolments store to get the user's enrolments" in new Fixture {
+      val enrolment = esEnrolmentGen.sample.get
+
       when {
-        http.GET[ESEnrolment](any())(any(), any(), any())
-      } thenReturn Future.successful(mock[ESEnrolment])
+        http.GET[HttpResponse](any())(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(OK, Some(Json.toJson(enrolment))))
 
       val result = await(connector.userEnrolments(userId))
 
-      verify(http).GET[Seq[Enrolment]](eqTo(s"$baseUrl/users/$userId/enrolments"))(any(), any(), any())
+      result must contain(enrolment)
+      verify(http).GET[HttpResponse](eqTo(s"$baseUrl/users/$userId/enrolments"))(any(), any(), any())
+    }
+
+    "return None if the user was not found" in new Fixture {
+      when {
+        http.GET[HttpResponse](any)(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+      val result = await(connector.userEnrolments(userId))
+
+      result must not be defined
     }
   }
 
