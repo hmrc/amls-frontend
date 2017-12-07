@@ -67,7 +67,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
       val result = await(connector.userEnrolments(userId))
 
       result must contain(enrolment)
-      verify(http).GET[HttpResponse](eqTo(s"$baseUrl/users/$userId/enrolments"))(any(), any(), any())
+      verify(http).GET[HttpResponse](eqTo(s"$baseUrl/users/$userId/enrolments?service=HMRC-MLR-ORG&type=principal"))(any(), any(), any())
     }
 
     "return None if the user was not found" in new Fixture {

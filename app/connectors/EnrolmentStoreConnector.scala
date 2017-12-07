@@ -28,9 +28,10 @@ import models.enrolment.Formatters._
 class EnrolmentStoreConnector @Inject()(http: CoreGet, appConfig: AppConfig) {
 
   lazy val baseUrl = appConfig.config.baseUrl("enrolment-store")
+  val serviceName = "HMRC-MLR-ORG"
 
   def userEnrolments(userId: String)(implicit hc: HeaderCarrier, ec: ExecutionContext): Future[Option[ESEnrolment]] = {
-    http.GET[HttpResponse](s"$baseUrl/users/$userId/enrolments") map {
+    http.GET[HttpResponse](s"$baseUrl/users/$userId/enrolments?service=$serviceName&type=principal") map {
       case HttpResponse(OK, json, _, _) => json.asOpt[ESEnrolment]
       case HttpResponse(NO_CONTENT, _, _, _) => None
     }
