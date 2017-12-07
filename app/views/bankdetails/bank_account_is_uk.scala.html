@@ -32,11 +32,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("bankdetails.accountdetails.title", "summary.bankdetails")
+    @heading("bankdetails.bankaccount.accounttype.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.accountdetails.title") + " - " + Messages("summary.bankdetails"),
+    title = Messages("bankdetails.bankaccount.accounttype.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
 
@@ -45,7 +45,8 @@
         @fieldset(
             f = f("isUK-fieldset"),
             legend = "bankdetails.bankaccount.accounttype",
-            panel = false
+            panel = false,
+            legendHidden = true
         ) {
             @errorGroup(
                 field = f("isUK")

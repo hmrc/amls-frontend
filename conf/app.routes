@@ -198,6 +198,9 @@ POST        /bank-details/accounts/:index                                       
 GET         /bank-details/account-name/:index                                         @controllers.bankdetails.BankAccountNameController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/account-name/:index                                         @controllers.bankdetails.BankAccountNameController.post(index:Int, edit: Boolean ?= false)
 
+GET         /bank-details/uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
+POST        /bank-details/uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
+
 GET         /bank-details/your-answers                                                controllers.bankdetails.SummaryController.get(complete: Boolean = true)
 
 GET         /bank-details/check-your-answers                                          controllers.bankdetails.SummaryController.get(complete: Boolean = false)
