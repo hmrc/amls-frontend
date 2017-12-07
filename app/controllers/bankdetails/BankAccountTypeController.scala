@@ -67,7 +67,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
             } yield {
               data match {
                 case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(false))
-                case Some(_) => Redirect(routes.BankAccountController.get(index, edit))
+                case Some(_) => Redirect(routes.BankAccountNameController.get(index, edit))
                 case _ => Redirect(routes.SummaryController.get(false))
               }
             }

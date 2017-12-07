@@ -25,30 +25,34 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import play.api.inject.bind
+import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AuthorisedFixture
-import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
+class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar {
 
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-class BankAccountControllerSpec extends GenericTestHelper with MockitoSugar {
+    val request = addToken(authRequest)
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-    val controller = new BankAccountController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override implicit val statusService = mock[StatusService]
-      override val auditConnector = mock[AuditConnector]
-    }
+    val injector = new GuiceInjectorBuilder()
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuditConnector].to(mock[AuditConnector]))
+      .build()
+
+    lazy val controller = injector.instanceOf[BankAccountNameController]
+
   }
 
   val emptyCache = CacheMap("", Map.empty)

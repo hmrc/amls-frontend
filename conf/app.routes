@@ -195,8 +195,8 @@ POST        /bank-details/account-registered/:index                             
 GET         /bank-details/accounts/:index                                             controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /bank-details/accounts/:index                                             controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
-GET         /bank-details/account-details/:index                                      controllers.bankdetails.BankAccountController.get(index:Int, edit: Boolean ?= false)
-POST        /bank-details/account-details/:index                                      controllers.bankdetails.BankAccountController.post(index:Int, edit: Boolean ?= false)
+GET         /bank-details/account-name/:index                                         @controllers.bankdetails.BankAccountNameController.get(index:Int, edit: Boolean ?= false)
+POST        /bank-details/account-name/:index                                         @controllers.bankdetails.BankAccountNameController.post(index:Int, edit: Boolean ?= false)
 
 GET         /bank-details/your-answers                                                controllers.bankdetails.SummaryController.get(complete: Boolean = true)
 
