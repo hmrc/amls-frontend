@@ -15,13 +15,11 @@ private object AppDependencies {
 
   private val frontendBootstrapVersion = "8.11.0"
   private val playPartialsVersion = "6.1.0"
-
   private val httpCachingClientVersion = "7.0.0"
   private val playWhitelistFilterVersion = "2.0.0"
-
   private val validationVersion = "2.0.1"
-
   private val flexmarkVersion = "0.19.1"
+  private val okHttpVersion = "3.9.1"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -37,8 +35,8 @@ private object AppDependencies {
     "io.github.jto" %% "validation-form"      % validationVersion excludeAll playJars,
 
     "com.vladsch.flexmark" % "flexmark-all" % flexmarkVersion,
-    "com.beachape" %% "enumeratum-play" % "1.5.10"
-
+    "com.beachape" %% "enumeratum-play" % "1.5.10",
+    "com.squareup.okhttp3" % "mockwebserver" % okHttpVersion
   )
 
   trait ScopeDependencies {
