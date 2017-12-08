@@ -152,7 +152,7 @@ object RegistrationProgressController extends RegistrationProgressController {
   // $COVERAGE-OFF$
   override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
   override protected[controllers] val dataCache = DataCacheConnector
-  override protected[controllers] val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+  override protected[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
   override protected[controllers] val statusService = StatusService
   override protected[controllers] val progressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]

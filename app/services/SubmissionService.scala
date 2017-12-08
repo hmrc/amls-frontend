@@ -213,7 +213,7 @@ object SubmissionService extends SubmissionService {
 
   override private[services] val cacheConnector = DataCacheConnector
   override private[services] val amlsConnector = AmlsConnector
-  override private[services] val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+  override private[services] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
 
   override private[services] val ggService = {
     if (ApplicationConfig.enrolmentToggle) {

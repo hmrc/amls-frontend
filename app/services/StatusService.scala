@@ -154,5 +154,5 @@ object StatusService extends StatusService {
 
   override private[services] val amlsConnector: AmlsConnector = AmlsConnector
 
-  override private[services] val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+  override private[services] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
 }
