@@ -47,9 +47,9 @@ class BankAccountNameController @Inject()(
           allowedToEdit <- ControllerHelper.allowedToEdit(edit)
         } yield bankDetails match {
           case Some(BankDetails(_, Some(data), _, _, _, _)) if allowedToEdit =>
-            Ok(views.html.bankdetails.bank_account_details(Form2[BankAccount](data), edit, index))
+            Ok(views.html.bankdetails.bank_account_name(Form2[BankAccount](data), edit, index))
           case Some(_) if allowedToEdit =>
-            Ok(views.html.bankdetails.bank_account_details(EmptyForm, edit, index))
+            Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
   }
@@ -64,7 +64,7 @@ class BankAccountNameController @Inject()(
 
         Form2[BankAccount](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_details(f, edit, index)))
+            Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
           case ValidForm(_, data) =>
             updateDataStrict[BankDetails](index) { bd =>
               bd.copy(
