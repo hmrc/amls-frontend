@@ -258,7 +258,7 @@ trait LandingController extends BaseController {
 object LandingController extends LandingController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService = LandingService
-  override private[controllers] val enrolmentsService = AuthEnrolmentsService
+  override private[controllers] val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
   override val cacheConnector = DataCacheConnector
