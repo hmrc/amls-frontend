@@ -30,13 +30,13 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AuthEnrolmentsServiceSpec extends PlaySpec
+class LegacyAuthEnrolmentServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
   with AmlsReferenceNumberGenerator {
 
-  val service = new AuthEnrolmentsService(mock[AuthConnector])
+  val service = new LegacyAuthEnrolmentService(mock[AuthConnector])
 
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
@@ -45,10 +45,11 @@ class AuthEnrolmentsServiceSpec extends PlaySpec
     List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
     List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
-  "AuthEnrolmentsService" must {
+  "LegacyAuthEnrolmentService" must {
     "return an AMLS regsitration number" in {
       when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
       when(ac.enrolmentsUri).thenReturn(Some("uri"))
+
       whenReady(service.amlsRegistrationNumber){
         number => number.get mustEqual amlsRegistrationNumber
       }

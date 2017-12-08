@@ -18,16 +18,38 @@ package services
 
 import javax.inject.Inject
 
+import connectors.AuthConnector
+import models.enrolment.Constants
+import play.api.Logger
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(legacyEnrolments: LegacyAuthEnrolmentService) {
+class LegacyAuthEnrolmentService @Inject()(val authConnector: AuthConnector) {
 
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
-    legacyEnrolments.amlsRegistrationNumber
+
+    authContext.enrolmentsUri match {
+      case Some(uri) =>
+
+        val enrolments = authConnector.enrollments(uri)
+
+        enrolments map {
+          enrolmentsList => {
+            for {
+              amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == Constants.serviceName)
+              amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == Constants.amlsRefIdentKey)
+            } yield {
+              val prefix = "[LegacyAuthEnrolmentsService][amlsRegistrationNumber]"
+              Logger.debug(s"$prefix : ${amlsIdentifier.value}")
+              amlsIdentifier.value
+            }
+          }
+        }
+      case None => Future.successful(None)
+    }
   }
 }
