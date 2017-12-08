@@ -1168,6 +1168,7 @@ bankdetails.accounttype.lbl.03 = A business account belonging to another busines
 bankdetails.accounttype.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname = Give this bank account a name
+bankdetails.bankaccount.accounttype.title = Is this a UK bank account?
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
 bankdetails.bankaccount.accounttype.uk.lbl = UK Bank Account
 bankdetails.bankaccount.accounttype.lbl = Account type

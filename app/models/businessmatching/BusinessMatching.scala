@@ -33,6 +33,7 @@ case class BusinessMatching(
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false,
                              preAppComplete: Boolean = false
+
                            ) {
 
   def activities(p: BusinessActivities): BusinessMatching =

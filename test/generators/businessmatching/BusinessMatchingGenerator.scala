@@ -23,6 +23,7 @@ import org.scalacheck.Gen
 import cats.implicits._
 import models.businesscustomer.ReviewDetails
 
+
 trait BusinessMatchingGenerator extends BaseGenerator
   with ReviewDetailsGenerator
   with BusinessActivitiesGenerator

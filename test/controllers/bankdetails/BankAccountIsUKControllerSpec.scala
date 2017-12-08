@@ -29,7 +29,6 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -38,7 +37,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
 
-class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar {
+class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -51,13 +50,13 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
       .overrides(bind[AuditConnector].to(mock[AuditConnector]))
       .build()
 
-    lazy val controller = injector.instanceOf[BankAccountNameController]
+    lazy val controller = injector.instanceOf[BankAccountIsUKController]
 
   }
 
-  val fieldElements = Array("accountName")
+  val fieldElements = Array("accountNumber", "sortCode", "IBANNumber")
 
-  "BankAccountController" when {
+  "BankAccountIsUKController" when {
     "get is called" must {
       "respond with OK" when {
         "there is no bank account detail information yet" in new Fixture {
@@ -94,7 +93,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(NOT_FOUND)
         }
@@ -111,7 +110,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
           status(result) must be(NOT_FOUND)
 
         }
-        "editing a variaton" in new Fixture {
+        "editing a variation" in new Fixture {
 
           val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
