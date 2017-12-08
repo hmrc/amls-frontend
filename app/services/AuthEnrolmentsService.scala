@@ -24,11 +24,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
+import models.enrolment.Constants
 
 class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector) {
-
-  private val amlsKey = "HMRC-MLR-ORG"
-  private val amlsNumberKey = "MLRRefNumber"
 
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
@@ -42,8 +40,8 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector) {
         enrolments map {
           enrolmentsList => {
             for {
-              amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
-              amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
+              amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == Constants.serviceName)
+              amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == Constants.amlsRefIdentKey)
             } yield {
               val prefix = "[AuthEnrolmentsService][amlsRegistrationNumber]"
               Logger.debug(s"$prefix : ${amlsIdentifier.value}")
