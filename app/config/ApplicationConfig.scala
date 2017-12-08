@@ -144,5 +144,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 class AppConfig @Inject()(
                            val config: iServicesConfig
                          ) {
-  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", false)
+  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
+
+  def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 }

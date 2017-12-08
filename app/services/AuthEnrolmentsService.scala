@@ -18,16 +18,22 @@ package services
 
 import javax.inject.Inject
 
+import config.AppConfig
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(legacyEnrolments: LegacyAuthEnrolmentService) {
+class AuthEnrolmentsService @Inject()(legacyEnrolments: LegacyAuthEnrolmentService, esEnrolments: EnrolmentStoreService, appConfig: AppConfig) {
 
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
-    legacyEnrolments.amlsRegistrationNumber
+    if (appConfig.enrolmentStoreToggle) {
+      esEnrolments.getAmlsRegistrationNumber
+    }
+    else {
+      legacyEnrolments.amlsRegistrationNumber
+    }
   }
 }
