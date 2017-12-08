@@ -61,7 +61,7 @@ trait EmployeeCountAMLSSupervisionController extends BaseController {
               businessActivities.howManyEmployees(updateData(businessActivities.howManyEmployees, data)))
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.TransactionRecordController.get())
+            case false => Redirect(routes.HowManyEmployeesController.get())
           }
       }
     }

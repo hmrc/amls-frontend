@@ -100,7 +100,7 @@ class HowManyEmployeesControllerSpec extends GenericTestHelper with MockitoSugar
 
         val result = controller.post(false)(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.EmployeeCountAMLSSupervisionController.get().url))
+        redirectLocation(result) must be(Some(routes.TransactionRecordController.get().url))
       }
 
       "redirect to the SummaryController when given valid data and edit is true" in new Fixture {

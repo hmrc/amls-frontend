@@ -94,7 +94,7 @@ class BusinessFranchiseControllerSpec extends GenericTestHelper with MockitoSuga
 
           val result = controller.post(false)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.HowManyEmployeesController.get().url))
+          redirectLocation(result) must be(Some(routes.EmployeeCountAMLSSupervisionController.get().url))
         }
 
         "edit is true and given valid data" in new Fixture {
