@@ -28,30 +28,6 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
   "Account details form" must {
     "fail to validate" when {
-      "account name is given an empty string" in {
-        val urlFormEncoded = Map(
-          "isUK" -> Seq("true"),
-          "accountNumber" -> Seq("12345678"),
-          "sortCode" -> Seq("000000")
-        )
-
-        Account.formRead.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "accountName") -> Seq(ValidationError("error.bankdetails.accountname"))
-          )))
-      }
-      "account name is given a value greater than max length" in {
-        val urlFormEncoded = Map(
-          "isUK" -> Seq("true"),
-          "accountNumber" -> Seq("12345678"),
-          "sortCode" -> Seq("000000")
-        )
-
-        Account.formRead.validate(urlFormEncoded) must
-          be(Invalid(Seq(
-            (Path \ "accountName") -> Seq(ValidationError("error.invalid.bankdetails.accountname"))
-          )))
-      }
       "no selection is made for an account type" in {
         val urlFormEncoded = Map(
           "isUK" -> Seq("")
