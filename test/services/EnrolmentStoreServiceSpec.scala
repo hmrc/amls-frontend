@@ -50,54 +50,6 @@ class EnrolmentStoreServiceSpec extends PlaySpec with MustMatchers with MockitoS
     val connector = mock[EnrolmentStoreConnector]
     val service = new EnrolmentStoreService(connector)
 
-    val validMlrEnrolment = EnrolmentEntry(
-      Constants.serviceName, "active", "MLR Enrolment", Seq(
-        EnrolmentIdentifier(Constants.amlsRefIdentKey, amlsRegistrationNumber)
-      )
-    )
-
-  }
-
-  "getAmlsRegistrationNumber" when {
-    "the user has the correct enrolment" must {
-      "parse the response from the EnrolmentStoreConnector" in new Fixture {
-        val enrolment = esEnrolmentWith(validMlrEnrolment).sample
-
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(enrolment)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result must contain(amlsRegistrationNumber)
-      }
-    }
-
-    "the user doesn't have the correct enrolment" must {
-      "return None" in new Fixture {
-        val enrolment = esEnrolmentGen.sample
-
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(enrolment)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result mustBe None
-      }
-    }
-
-    "the user doesn't have any enrolments" must {
-      "return None" in new Fixture {
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result mustBe None
-      }
-    }
   }
 
 }
