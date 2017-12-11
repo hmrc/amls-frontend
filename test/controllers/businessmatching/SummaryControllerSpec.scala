@@ -44,9 +44,10 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
     .build()
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks{
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
 
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
@@ -57,26 +58,24 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       override val businessMatchingService = mockBusinessMatchingService
     }
 
-    when {
-      controller.statusService.getStatus(any(), any(), any())
-    } thenReturn Future.successful(SubmissionReady)
+    mockApplicationStatus(SubmissionReady)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(),any(),any())
+      controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn {
-      if(model.isDefined){
-        OptionT.some[Future,BusinessMatching](model)
+      if (model.isDefined) {
+        OptionT.some[Future, BusinessMatching](model)
       } else {
         OptionT.none[Future, BusinessMatching]
       }
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+      controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
     def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(),any(),any())
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
@@ -117,6 +116,22 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
       val html = Jsoup.parse(contentAsString(result))
       html.select("a.change-answer").size mustBe 0
+    }
+
+    "show the 'Register Services' page when the user wants to change their services" in new Fixture {
+      val model = BusinessMatching(
+        activities = Some(BusinessActivities(Set(EstateAgentBusinessService)))
+      )
+
+      mockGetModel(Some(model))
+
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      val doc = Jsoup.parse(contentAsString(result))
+      val editUrl = doc.select("section.register-services a.change-answer").first().attr("href")
+
+      editUrl mustBe controllers.businessmatching.routes.RegisterServicesController.get().url
     }
   }
 
@@ -165,9 +180,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     .configure("microservice.services.feature-toggle.business-matching-variation" -> true)
     .build()
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks{
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
 
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
@@ -183,21 +199,21 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     } thenReturn Future.successful(SubmissionReady)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(),any(),any())
+      controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn {
-      if(model.isDefined){
-        OptionT.some[Future,BusinessMatching](model)
+      if (model.isDefined) {
+        OptionT.some[Future, BusinessMatching](model)
       } else {
         OptionT.none[Future, BusinessMatching]
       }
     }
 
     def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any())(any(),any(),any())
+      controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
     def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(),any(),any())
+      controller.businessMatchingService.commitVariationData(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
