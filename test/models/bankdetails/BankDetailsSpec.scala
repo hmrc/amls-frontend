@@ -18,16 +18,14 @@ package models.bankdetails
 
 import jto.validation._
 import models.CharacterSets
+import models.bankdetails.BankDetails._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import org.mockito.Matchers.{any, eq => meq}
-import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsSuccess, Json}
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{DependencyMocks, StatusConstants}
-import models.bankdetails.BankDetails._
+import play.api.libs.json.Json
 import play.api.test.FakeApplication
+import utils.{DependencyMocks, StatusConstants}
 
 class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with OneAppPerSuite with DependencyMocks {
 
@@ -40,7 +38,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
   val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false, "hasAccepted" -> false)
   val accountTypeNew = BelongsToBusiness
 
-  val bankAccount = BankAccount("My Account", UKAccount("111111", "00-00-00"))
+  val bankAccount = UKAccount("111111", "00-00-00")
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
   val bankAccountJson = Json.obj("bankAccount" -> Json.obj(
     "accountName" -> "My Account",
@@ -51,7 +49,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     "refreshedFromServer" -> false,
     "hasAccepted" -> false)
 
-  val bankAccountNew = BankAccount("My Account", UKAccount("123456", "00-00-00"))
+  val bankAccountNew = UKAccount("123456", "00-00-00")
 
   val completeModel = BankDetails(Some(accountType), Some("bankName"), Some(bankAccount), hasAccepted = true)
   val incompleteModel = BankDetails(Some(accountType), None)
@@ -85,8 +83,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
       completeJson.as[BankDetails] must be(completeModel)
     }
     "deserialise correctly when hasChanged field is missing from the Json" in {
-      (completeJson - "hasChanged").as[BankDetails] must
-        be(completeModel)
+      (completeJson - "hasChanged").as[BankDetails] must be(completeModel)
     }
   }
 
@@ -120,7 +117,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
   "isComplete" must {
     "return true when BankDetails contains complete data" in {
-      val bankAccount = BankAccount("My Account", UKAccount("123456", "00-00-00"))
+      val bankAccount = UKAccount("123456", "00-00-00")
       val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
 
       bankDetails.isComplete must be(true)
@@ -443,37 +440,6 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     "fail validation for sort code with any other pattern" in {
       Account.sortCodeType.validate("8712341241431243124124654321") must be(
         Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
-      )
-    }
-  }
-
-  "accountNameType" must {
-
-    "be mandatory" in {
-      BankAccount.accountNameType.validate("") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
-    }
-
-    "accept all characters from the allowed set" in {
-      BankAccount.accountNameType.validate(digits.mkString("")) must be(Valid(digits.mkString("")))
-      BankAccount.accountNameType.validate(alphaUpper.mkString("")) must be(Valid(alphaUpper.mkString("")))
-      BankAccount.accountNameType.validate(alphaLower.mkString("")) must be(Valid(alphaLower.mkString("")))
-      BankAccount.accountNameType.validate(extendedAlphaUpper.mkString("")) must be(Valid(extendedAlphaUpper.mkString("")))
-      BankAccount.accountNameType.validate(extendedAlphaLower.mkString("")) must be(Valid(extendedAlphaLower.mkString("")))
-      BankAccount.accountNameType.validate(symbols1.mkString("")) must be(Valid(symbols1.mkString("")))
-      BankAccount.accountNameType.validate(symbols2.mkString("")) must be(Valid(symbols2.mkString("")))
-      BankAccount.accountNameType.validate(symbols6.mkString("")) must be(Valid(symbols6.mkString("")))
-    }
-
-    "be not more than 40 characters" in {
-      BankAccount.accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
-      )
-    }
-
-    "not allow characters from other sets" in {
-      BankAccount.accountNameType.validate(symbols5.mkString("")) must be (
-        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
       )
     }
   }

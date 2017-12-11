@@ -75,7 +75,7 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
 
         "there is already bank account detail information" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
+          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -99,7 +99,7 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         }
         "editing an amendment" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
+          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -112,7 +112,7 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         }
         "editing a variation" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
+          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -131,14 +131,12 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         "given valid data in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
-
           mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
@@ -151,7 +149,6 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         "given valid data when NOT in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
@@ -161,10 +158,9 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
             .thenReturn(Future.successful(Success))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
-
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, false)(newRequest)
+          val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
@@ -176,14 +172,12 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         "given an index out of bounds in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
             "isUK" -> "false",
             "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
             "isIBAN" -> "false"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
-
           mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(50, true)(newRequest)
@@ -197,12 +191,10 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
         "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
             "isUK" -> "true"
           )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
-
           mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
@@ -215,7 +207,6 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
     "an account is created" must {
       "send an audit event" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
-          "accountName" -> "test",
           "isUK" -> "false",
           "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
           "isIBAN" -> "false"
@@ -226,8 +217,8 @@ class BankAccountIsUKControllerSpec extends GenericTestHelper with MockitoSugar 
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
           Some(PersonalAccount),
-          None,
-          Some(BankAccount("Test account", UKAccount("8934798324", "934947")))))),
+          Some("Test account"),
+          Some(UKAccount("8934798324", "934947"))))),
           Some(BankDetails.key))
 
         mockCacheSave[Seq[BankDetails]]

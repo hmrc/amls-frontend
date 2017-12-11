@@ -76,7 +76,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
         "without a name" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
+          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 

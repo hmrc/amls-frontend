@@ -401,8 +401,6 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
     }
   }
 
-
-
   "basicPunctuation140CharsPattern" must {
 
     "successfully validate a valid name" in {
@@ -487,6 +485,37 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
           Path -> Seq(ValidationError("err.text.validation"))
         )))
       }
+    }
+  }
+
+  "accountNameType" must {
+
+    "be mandatory" in {
+      FormTypes.accountNameType.validate("") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.bankdetails.accountname")))))
+    }
+
+    "accept all characters from the allowed set" in {
+      FormTypes.accountNameType.validate(digits.mkString("")) must be(Valid(digits.mkString("")))
+      FormTypes.accountNameType.validate(alphaUpper.mkString("")) must be(Valid(alphaUpper.mkString("")))
+      FormTypes.accountNameType.validate(alphaLower.mkString("")) must be(Valid(alphaLower.mkString("")))
+      FormTypes.accountNameType.validate(extendedAlphaUpper.mkString("")) must be(Valid(extendedAlphaUpper.mkString("")))
+      FormTypes.accountNameType.validate(extendedAlphaLower.mkString("")) must be(Valid(extendedAlphaLower.mkString("")))
+      FormTypes.accountNameType.validate(symbols1.mkString("")) must be(Valid(symbols1.mkString("")))
+      FormTypes.accountNameType.validate(symbols2.mkString("")) must be(Valid(symbols2.mkString("")))
+      FormTypes.accountNameType.validate(symbols6.mkString("")) must be(Valid(symbols6.mkString("")))
+    }
+
+    "be not more than 40 characters" in {
+      FormTypes.accountNameType.validate("This name is definitely longer than 10 characters." * 17) must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountname"))))
+      )
+    }
+
+    "not allow characters from other sets" in {
+      FormTypes.accountNameType.validate(symbols5.mkString("")) must be (
+        Invalid(Seq(Path -> Seq(ValidationError("err.text.validation"))))
+      )
     }
   }
 

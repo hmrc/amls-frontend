@@ -33,6 +33,8 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val toHide = 6
   }
 
   "summary view" when {
@@ -110,7 +112,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(UKAccount("1234567890", "000000"))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -147,7 +149,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(NonUKAccountNumber("56789"))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -183,7 +185,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", NonUKIBANNumber("000000000")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(NonUKIBANNumber("000000000"))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -222,14 +224,14 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
                 accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
               ) {
                 new ViewFixture {
-                  val bankAccount = BankAccount(accountName, uk)
+                  val bankAccount = uk
                   val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReadyForReview)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
-                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+                  accountNumberField.takeRight(accountNumberLength).take(toHide) must be("******")
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
                 }
               }
@@ -243,14 +245,14 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
                 accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
               ) {
                 new ViewFixture {
-                  val bankAccount = BankAccount(accountName, uk)
+                  val bankAccount = uk
                   val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionDecisionApproved)
 
                   private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
 
-                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
+                  accountNumberField.takeRight(accountNumberLength).take(toHide) must be("******")
                   accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
                 }
               }
@@ -269,7 +271,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
                 accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
               ) {
                 new ViewFixture {
-                  val bankAccount = BankAccount(accountName, uk)
+                  val bankAccount = uk
                   val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount), status = Some(StatusConstants.Updated)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionReadyForReview)
@@ -290,7 +292,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with PropertyCheck
                 accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
               ) {
                 new ViewFixture {
-                  val bankAccount = BankAccount(accountName, uk)
+                  val bankAccount = uk
                   val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount), status = Some(StatusConstants.Updated)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionDecisionApproved)

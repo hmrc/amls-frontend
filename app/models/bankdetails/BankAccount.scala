@@ -23,7 +23,6 @@ import play.api.libs.json._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 
-
 sealed trait Account
 
 object Account {
@@ -135,10 +134,7 @@ object Account {
   }
 }
 
-case class UKAccount(
-                      accountNumber: String,
-                      sortCode: String
-) extends Account {
+case class UKAccount(accountNumber: String, sortCode: String) extends Account {
   def displaySortCode: String = {
     // scalastyle:off magic.number
     val pair1 = sortCode.substring(0, 2)
@@ -148,7 +144,6 @@ case class UKAccount(
     pair1 + "-" + pair2 + "-" + pair3
   }
 }
-
 
 sealed trait NonUKAccount extends Account
 

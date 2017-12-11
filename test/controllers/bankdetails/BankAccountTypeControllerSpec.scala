@@ -195,8 +195,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
             Some(PersonalAccount),
-            None,
-            Some(BankAccount("AccountName", UKAccount("12341234", "000000")))
+            Some("AccountName"),
+            Some(UKAccount("12341234", "000000"))
           ))))
 
           mockCacheSave[Seq[BankDetails]]

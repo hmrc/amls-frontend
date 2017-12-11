@@ -85,8 +85,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = BankDetails(
         Some(PersonalAccount),
-        None,
-        Some(BankAccount("Account Name", UKAccount("12341234","000000")))
+        Some("Account Name"),
+        Some(UKAccount("12341234","000000"))
       )
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
@@ -130,8 +130,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          None,
-          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
+          Some("Account Name"),
+          Some(UKAccount("12341234","000000"))
         )
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
@@ -159,8 +159,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          None,
-          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
+          Some("Account Name"),
+          Some(UKAccount("12341234","000000"))
         )
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
@@ -188,8 +188,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          None,
-          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
+          Some("Account Name"),
+          Some(UKAccount("12341234","000000"))
         )
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
@@ -216,8 +216,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
-          None,
-          Some(BankAccount("Account Name", UKAccount("12341234","000000")))
+          Some("Account Name"),
+          Some(UKAccount("12341234","000000"))
         )
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
@@ -264,16 +264,16 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         "update the accepted flag" in new Fixture {
           val accountType1 = PersonalAccount
-          val bankAccount1 = BankAccount("My Account1", UKAccount("111111", "11-11-11"))
+          val bankAccount1 = UKAccount("111111", "11-11-11")
 
           val accountType2 = PersonalAccount
-          val bankAccount2 = BankAccount("My Account2", UKAccount("222222", "22-22-22"))
+          val bankAccount2 = UKAccount("222222", "22-22-22")
 
           val accountType3 = PersonalAccount
-          val bankAccount3 = BankAccount("My Account3", UKAccount("333333", "33-33-33"))
+          val bankAccount3 = UKAccount("333333", "33-33-33")
 
           val accountType4 = PersonalAccount
-          val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
+          val bankAccount4 = UKAccount("444444", "44-44-44")
 
           val Model1 = BankDetails(Some(accountType1), None, Some(bankAccount1))
           val Model2 = BankDetails(Some(accountType2), None, Some(bankAccount2))

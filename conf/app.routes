@@ -186,7 +186,7 @@ GET         /business-matching/no-psr                                           
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
-GET         /bank-details/add                                                         controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
+GET         /bank-details/add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
 
 GET         /bank-details/account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.get(index:Int)
 POST        /bank-details/account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.post(index:Int)
