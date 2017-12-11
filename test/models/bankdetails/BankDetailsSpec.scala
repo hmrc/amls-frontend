@@ -40,23 +40,26 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
   val bankAccount = UKAccount("111111", "00-00-00")
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
-  val bankAccountJson = Json.obj("bankAccount" -> Json.obj(
-    "accountName" -> "My Account",
-    "isUK" -> true,
-    "accountNumber" -> "111111",
-    "sortCode" -> "00-00-00"),
+  val bankAccountJson = Json.obj(
+    "bankAccount" -> Json.obj(
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "00-00-00"
+    ),
     "hasChanged" -> false,
     "refreshedFromServer" -> false,
-    "hasAccepted" -> false)
+    "hasAccepted" -> false
+  )
 
   val bankAccountNew = UKAccount("123456", "00-00-00")
 
   val completeModel = BankDetails(Some(accountType), Some("bankName"), Some(bankAccount), hasAccepted = true)
   val incompleteModel = BankDetails(Some(accountType), None)
   val completeJson = Json.obj(
-    "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"),
     "accountName" -> "bankName",
-    "bankAccount" -> Json.obj("accountName" -> "My Account",
+    "bankAccount" -> Json.obj(
       "isUK" -> true,
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
@@ -65,9 +68,10 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     "hasAccepted" -> true)
   val completeModelChanged = BankDetails(Some(accountType), Some("anotherName"), Some(bankAccount), true, hasAccepted = true)
   val completeJsonChanged = Json.obj(
-    "bankAccountType" -> Json.obj("bankAccountType" -> "01"),
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"),
     "accountName" -> "anotherName",
-    "bankAccount" -> Json.obj("accountName" -> "My Account",
+    "bankAccount" -> Json.obj(
       "isUK" -> true,
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),

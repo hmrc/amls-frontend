@@ -106,11 +106,8 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         "given valid data in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
-          )
+            "accountName" -> "test"
+           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
 
@@ -125,20 +122,17 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         "given valid data when NOT in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+            "accountName" -> "test"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, false)(newRequest)
+          val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1).url))
         }
 
       }
@@ -147,10 +141,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         "given an index out of bounds in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+            "accountName" -> "test"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
