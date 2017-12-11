@@ -217,6 +217,6 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
-  override private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+  override private[controllers] val authEnrolmentsService = AuthEnrolmentsService
   override val auditConnector = AMLSAuditConnector
 }
