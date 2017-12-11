@@ -16,39 +16,40 @@
 
 package controllers.bankdetails
 
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.bankdetails.BankDetails
-import utils.{StatusConstants, RepeatingSection}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{RepeatingSection, StatusConstants}
 
-trait RemoveBankDetailsController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class RemoveBankDetailsController @Inject()(
+                                             val authConnector: AuthConnector = AMLSAuthConnector,
+                                             val dataCacheConnector: DataCacheConnector
+                                           ) extends RepeatingSection with BaseController {
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[BankDetails](index) map {
-        case Some(BankDetails(_, Some(bankAcct), _,_,_, _)) =>
-        Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, bankAcct.accountName, complete))
-        case _ => NotFound(notFoundView)
-      }
+    implicit authContext =>
+      implicit request =>
+        getData[BankDetails](index) map {
+          case Some(BankDetails(_, _, Some(bankAcct), _, _, _, _)) =>
+            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, bankAcct.accountName, complete))
+          case _ => NotFound(notFoundView)
+        }
   }
 
   def remove(index: Int, complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      for {
-        rs <- updateDataStrict[BankDetails](index) { ba =>
-          ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-        }
-      } yield Redirect(routes.SummaryController.get(complete))
-    }
+    implicit authContext =>
+      implicit request => {
+        for {
+          _ <- updateDataStrict[BankDetails](index) { ba =>
+            ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+          }
+        } yield Redirect(routes.SummaryController.get(complete))
+      }
   }
-}
-
-object RemoveBankDetailsController extends RemoveBankDetailsController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

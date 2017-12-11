@@ -16,34 +16,28 @@
 
 package controllers.bankdetails
 
-import connectors.DataCacheConnector
 import models.bankdetails._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.collection.JavaConversions._
-import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val controller = new SummaryController(
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService
+    )
   }
 
   "Get" must {
@@ -52,12 +46,10 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = BankDetails(None, None)
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(model))))
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionReady))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get(false)(request)
+      val result = controller.get()(request)
 
       status(result) must be(OK)
       contentAsString(result) must include("Accept and complete section")
@@ -69,10 +61,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = BankDetails(None, None, hasAccepted = true)
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(model))))
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionReady))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get(true)(request)
 
@@ -82,10 +72,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(None))
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionReady))
+      mockCacheFetch[Seq[BankDetails]](None)
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -97,13 +85,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = BankDetails(
         Some(PersonalAccount),
+        None,
         Some(BankAccount("Account Name", UKAccount("12341234","000000")))
       )
 
-      when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(model))))
-      when(controller.statusService.getStatus(any(),any(),any()))
-        .thenReturn(Future.successful(SubmissionReady))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockApplicationStatus(SubmissionReady)
 
       val result = controller.get()(request)
 
@@ -129,10 +116,8 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(None,None)
 
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReady))
+        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+        mockApplicationStatus(SubmissionReady)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -145,12 +130,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
+          None,
           Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+        mockApplicationStatus(SubmissionReadyForReview)
 
         val result = controller.get()(request)
 
@@ -174,12 +159,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
+          None,
           Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
 
@@ -203,12 +188,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
+          None,
           Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionReadyForReview))
+
+        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+        mockApplicationStatus(SubmissionReadyForReview)
 
         val result = controller.get(true)(request)
 
@@ -231,12 +216,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val model = BankDetails(
           Some(PersonalAccount),
+          None,
           Some(BankAccount("Account Name", UKAccount("12341234","000000")))
         )
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(model))))
-        when(controller.statusService.getStatus(any(),any(),any()))
-          .thenReturn(Future.successful(SubmissionDecisionApproved))
+
+        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get(true)(request)
 
@@ -264,15 +249,10 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       "all questions are complete" in new Fixture {
 
-        val emptyCache = CacheMap("", Map.empty)
-
         val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
 
-        when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        when(controller.dataCache.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+        mockCacheFetch[Seq[BankDetails]](None)
+        mockCacheSave[Seq[BankDetails]]
 
         val result = controller.post()(newRequest)
 
@@ -295,34 +275,29 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
           val accountType4 = PersonalAccount
           val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
 
-          val Model1 = BankDetails(Some(accountType1), Some(bankAccount1))
-          val Model2 = BankDetails(Some(accountType2), Some(bankAccount2))
-          val Model3 = BankDetails(Some(accountType3), Some(bankAccount3))
-          val Model4 = BankDetails(Some(accountType4), Some(bankAccount4))
+          val Model1 = BankDetails(Some(accountType1), None, Some(bankAccount1))
+          val Model2 = BankDetails(Some(accountType2), None, Some(bankAccount2))
+          val Model3 = BankDetails(Some(accountType3), None, Some(bankAccount3))
+          val Model4 = BankDetails(Some(accountType4), None, Some(bankAccount4))
 
-          val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), hasAccepted = true)
-          val completeModel2 = BankDetails(Some(accountType2), Some(bankAccount2), hasAccepted = true)
-          val completeModel3 = BankDetails(Some(accountType3), Some(bankAccount3), hasAccepted = true)
-          val completeModel4 = BankDetails(Some(accountType4), Some(bankAccount4), hasAccepted = true)
+          val completeModel1 = BankDetails(Some(accountType1), None, Some(bankAccount1), hasAccepted = true)
+          val completeModel2 = BankDetails(Some(accountType2), None, Some(bankAccount2), hasAccepted = true)
+          val completeModel3 = BankDetails(Some(accountType3), None, Some(bankAccount3), hasAccepted = true)
+          val completeModel4 = BankDetails(Some(accountType4), None, Some(bankAccount4), hasAccepted = true)
 
           val bankAccounts = Seq(Model1,Model2,Model3,Model4)
 
-          val emptyCache = CacheMap("", Map.empty)
-
           val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
 
-          when(controller.dataCache.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(bankAccounts)))
-
-          when(controller.dataCache.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-          verify(controller.dataCache).save[Seq[BankDetails]](any(),
+          verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
             meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
         }
 

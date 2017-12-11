@@ -29,10 +29,7 @@ import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper
-  with MustMatchers
-  with PropertyChecks
-  with HtmlAssertions {
+class summarySpec extends GenericTestHelper with MustMatchers with PropertyChecks with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -113,7 +110,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", UKAccount("1234567890", "000000")))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -150,7 +147,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", NonUKAccountNumber("56789")))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -186,7 +183,7 @@ class summarySpec extends GenericTestHelper
       )
 
       def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some(BankAccount("Account Name", NonUKIBANNumber("000000000")))))
+        val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(BankAccount("Account Name", NonUKIBANNumber("000000000")))))
 
         views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
       }
@@ -226,7 +223,7 @@ class summarySpec extends GenericTestHelper
               ) {
                 new ViewFixture {
                   val bankAccount = BankAccount(accountName, uk)
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReadyForReview)
 
@@ -247,7 +244,7 @@ class summarySpec extends GenericTestHelper
               ) {
                 new ViewFixture {
                   val bankAccount = BankAccount(accountName, uk)
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount)))
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionDecisionApproved)
 
@@ -273,7 +270,7 @@ class summarySpec extends GenericTestHelper
               ) {
                 new ViewFixture {
                   val bankAccount = BankAccount(accountName, uk)
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount), status = Some(StatusConstants.Updated)))
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount), status = Some(StatusConstants.Updated)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionReadyForReview)
 
@@ -294,7 +291,7 @@ class summarySpec extends GenericTestHelper
               ) {
                 new ViewFixture {
                   val bankAccount = BankAccount(accountName, uk)
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(bankAccount), status = Some(StatusConstants.Updated)))
+                  val testdata = Seq(BankDetails(Some(PersonalAccount), None, Some(bankAccount), status = Some(StatusConstants.Updated)))
 
                   def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionDecisionApproved)
 

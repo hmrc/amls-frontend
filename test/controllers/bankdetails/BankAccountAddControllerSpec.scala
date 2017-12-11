@@ -45,6 +45,7 @@ class BankAccountAddControllerSpec extends GenericTestHelper
     when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(BankDetails(
         Some(PersonalAccount),
+        None,
         Some(BankAccount("AccountName", UKAccount("12341234", "121212"))))))))
     when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
       .thenReturn(Future.successful(emptyCache))

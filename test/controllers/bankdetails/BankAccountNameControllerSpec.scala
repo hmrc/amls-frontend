@@ -78,7 +78,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
           val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReady)
 
@@ -102,7 +102,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
           val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -115,7 +115,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
           val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -227,6 +227,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
         mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
           Some(PersonalAccount),
+          None,
           Some(BankAccount("Test account", UKAccount("8934798324", "934947")))))),
           Some(BankDetails.key))
 
