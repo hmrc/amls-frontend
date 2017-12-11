@@ -195,31 +195,8 @@ trait SubmissionService extends DataCacheService {
 }
 
 object SubmissionService extends SubmissionService {
-
-  // $COVERAGE-OFF$
-  object MockGGService extends GovernmentGatewayService {
-
-    import play.api.http.Status.OK
-
-    override private[services] def ggConnector: GovernmentGatewayConnector = GovernmentGatewayConnector
-
-    override def enrol
-    (mlrRefNo: String, safeId: String, postCode: String)
-    (implicit
-     hc: HeaderCarrier,
-     ec: ExecutionContext
-    ): Future[HttpResponse] = Future.successful(HttpResponse(OK))
-  }
-
   override private[services] val cacheConnector = DataCacheConnector
   override private[services] val amlsConnector = AmlsConnector
   override private[services] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-
-  override private[services] val ggService = {
-    if (ApplicationConfig.enrolmentToggle) {
-      GovernmentGatewayService
-    } else {
-      MockGGService
-    }
-  }
+  override private[services] val ggService = GovernmentGatewayService
 }
