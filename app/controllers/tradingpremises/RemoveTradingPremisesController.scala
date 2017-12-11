@@ -22,7 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
-import services.{AuthEnrolmentsService, StatusService}
+import services.StatusService
 import utils.{RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
 
@@ -33,8 +33,6 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
   val dataCacheConnector: DataCacheConnector
 
   private[controllers] def statusService: StatusService
-
-  private[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -103,6 +101,4 @@ object RemoveTradingPremisesController extends RemoveTradingPremisesController {
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override private[controllers] val statusService: StatusService = StatusService
-  override private[controllers] val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
-
 }

@@ -17,6 +17,7 @@
 package services
 
 import connectors.AuthConnector
+import generators.AmlsReferenceNumberGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -29,33 +30,28 @@ import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience{
+class AuthEnrolmentsServiceSpec extends PlaySpec
+  with MockitoSugar
+  with ScalaFutures
+  with IntegrationPatience
+  with AmlsReferenceNumberGenerator {
 
-  object AuthEnrolmentsService extends AuthEnrolmentsService {
-    override private[services] val authConnector: AuthConnector = mock[AuthConnector]
-  }
+  val service = new AuthEnrolmentsService(mock[AuthConnector])
 
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
-
-  private val amlsRegistrationNumber = "XXML00000000000"
 
   private val enrolmentsList = List[GovernmentGatewayEnrolment](GovernmentGatewayEnrolment("HMCE-VATVAR-ORG",
     List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
     List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
   "AuthEnrolmentsService" must {
-
     "return an AMLS regsitration number" in {
-
-      when(AuthEnrolmentsService.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
+      when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
       when(ac.enrolmentsUri).thenReturn(Some("uri"))
-      whenReady(AuthEnrolmentsService.amlsRegistrationNumber){
-        number => number.get mustEqual(amlsRegistrationNumber)
+      whenReady(service.amlsRegistrationNumber){
+        number => number.get mustEqual amlsRegistrationNumber
       }
-
     }
-
   }
-
 }
