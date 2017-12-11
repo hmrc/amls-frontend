@@ -18,86 +18,22 @@ package services
 
 import connectors.EnrolmentStoreConnector
 import generators.AmlsReferenceNumberGenerator
-import generators.enrolment.ESEnrolmentGenerator
-import models.enrolment.{Constants, EnrolmentEntry, EnrolmentIdentifier}
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.{ConfidenceLevel, CredentialStrength}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class EnrolmentStoreServiceSpec extends PlaySpec with MustMatchers with MockitoSugar with AmlsReferenceNumberGenerator with ESEnrolmentGenerator {
+class EnrolmentStoreServiceSpec extends PlaySpec with MustMatchers with MockitoSugar with AmlsReferenceNumberGenerator {
 
   trait Fixture {
     implicit val hc = HeaderCarrier()
-
     implicit val authContext = mock[AuthContext]
-
-    //noinspection ScalaStyle
-    val userId = numSequence(10).sample.get
-
-    when {
-      authContext.user
-    } thenReturn LoggedInUser(userId, None, None, None, CredentialStrength.Strong, ConfidenceLevel.L0, "")
 
     val connector = mock[EnrolmentStoreConnector]
     val service = new EnrolmentStoreService(connector)
 
-    val validMlrEnrolment = EnrolmentEntry(
-      Constants.serviceName, "active", "MLR Enrolment", Seq(
-        EnrolmentIdentifier(Constants.amlsRefIdentKey, amlsRegistrationNumber)
-      )
-    )
-
-  }
-
-  "getAmlsRegistrationNumber" when {
-    "the user has the correct enrolment" must {
-      "parse the response from the EnrolmentStoreConnector" in new Fixture {
-        val enrolment = esEnrolmentWith(validMlrEnrolment).sample
-
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(enrolment)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result must contain(amlsRegistrationNumber)
-      }
-    }
-
-    "the user doesn't have the correct enrolment" must {
-      "return None" in new Fixture {
-        val enrolment = esEnrolmentGen.sample
-
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(enrolment)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result mustBe None
-      }
-    }
-
-    "the user doesn't have any enrolments" must {
-      "return None" in new Fixture {
-        when {
-          connector.userEnrolments(eqTo(userId))(any(), any())
-        } thenReturn Future.successful(None)
-
-        val result = await(service.getAmlsRegistrationNumber)
-
-        result mustBe None
-      }
-    }
   }
 
 }

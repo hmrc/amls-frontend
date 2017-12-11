@@ -44,10 +44,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
     val controller = new RemoveTradingPremisesController {
       override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
       override val statusService: StatusService = mock[StatusService]
-
       override protected def authConnector: AuthConnector = self.authConnector
-
-      override val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 
@@ -232,8 +229,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(None))
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
@@ -254,8 +249,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(None))
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
@@ -277,8 +270,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("RegNo")))
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
@@ -307,8 +298,6 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
             "endDate.year" -> "2001"
           )
 
-          when(controller.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("RegNo")))
           when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(tradingPremisesList)))
           when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))

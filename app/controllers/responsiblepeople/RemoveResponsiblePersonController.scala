@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
 import models.status._
+import play.api.Play
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
@@ -33,7 +34,6 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
   val dataCacheConnector: DataCacheConnector
 
   private[controllers] def statusService: StatusService
-  private[controllers] def authEnrolmentsService: AuthEnrolmentsService
 
   private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
     status match {
@@ -108,5 +108,4 @@ object RemoveResponsiblePersonController extends RemoveResponsiblePersonControll
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override private[controllers] val statusService: StatusService = StatusService
-  override private[controllers] val authEnrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
 }

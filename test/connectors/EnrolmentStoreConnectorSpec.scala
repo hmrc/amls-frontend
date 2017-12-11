@@ -16,78 +16,36 @@
 
 package connectors
 
-import config.AppConfig
-import generators.enrolment.ESEnrolmentGenerator
-import models.enrolment.Formatters._
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import config.{AppConfig, WSHttp}
+import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import models.enrolment.Constants
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
-class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with ESEnrolmentGenerator {
+class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
 
   trait Fixture {
 
     implicit val headerCarrier = HeaderCarrier()
 
-    val http = mock[CoreGet]
+    val http = mock[WSHttp]
     val appConfig = mock[AppConfig]
     val servicesConfig = mock[ServicesConfig]
     val connector = new EnrolmentStoreConnector(http, appConfig)
-    val baseUrl = "http://enrolment-store:3001"
-
-    //noinspection ScalaStyle
-    val userId = numSequence(10).sample.get
+    val baseUrl = "http://tax-enrolments:3001"
 
     when {
       appConfig.config
     } thenReturn servicesConfig
 
     when {
-      servicesConfig.baseUrl(eqTo("enrolment-store"))
+      servicesConfig.baseUrl(eqTo("tax-enrolments"))
     } thenReturn baseUrl
 
-  }
-
-  "userEnrolments" must {
-    "call the enrolments store to get the user's enrolments" in new Fixture {
-      val enrolment = esEnrolmentGen.sample.get
-
-      when {
-        http.GET[HttpResponse](any())(any(), any(), any())
-      } thenReturn Future.successful(HttpResponse(OK, Some(Json.toJson(enrolment))))
-
-      val result = await(connector.userEnrolments(userId))
-
-      result must contain(enrolment)
-      verify(http).GET[HttpResponse](eqTo(EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl)))(any(), any(), any())
-    }
-
-    "return None if the user was not found" in new Fixture {
-      when {
-        http.GET[HttpResponse](any)(any(), any(), any())
-      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
-
-      val result = await(connector.userEnrolments(userId))
-
-      result must not be defined
-    }
-  }
-
-  "EnrolmentStoreConnector" must {
-    "generate the correct url" in new Fixture {
-      EnrolmentStoreConnector.enrolmentsUrl(userId, baseUrl) mustBe
-        s"$baseUrl/users/$userId/enrolments?service=${Constants.serviceName}&type=principal&start-record=1&max-records=1000"
-    }
   }
 
 }

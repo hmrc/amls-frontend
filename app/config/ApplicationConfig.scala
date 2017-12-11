@@ -24,8 +24,6 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 import play.api.Play.current
 
 trait ApplicationConfig {
-  def enrolmentToggle: Boolean
-
   def notificationsToggle: Boolean
 
   def amendmentsToggle: Boolean
@@ -105,11 +103,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     value
   }
 
-  override def enrolmentToggle: Boolean = {
-    val value = getConfBool("feature-toggle.gg-enrolment", false)
-    value
-  }
-
   override def release7: Boolean = {
     val value = getConfBool("feature-toggle.release7", false)
     value
@@ -144,5 +137,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 class AppConfig @Inject()(
                            val config: iServicesConfig
                          ) {
-  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", false)
+  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
+
+  def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 }

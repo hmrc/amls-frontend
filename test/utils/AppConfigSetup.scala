@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package models.enrolment
+package utils
 
-import play.api.libs.json.Json
+import config.AppConfig
+import org.scalatest.mock.MockitoSugar
+import uk.gov.hmrc.play.config.inject.ServicesConfig
+import org.mockito.Mockito.when
 
-case class EnrolmentEntry(service: String, state: String, friendlyName: String, identifiers: Seq[EnrolmentIdentifier])
-case class ESEnrolment(startRecord: Int, totalRecords: Int, enrolments: Seq[EnrolmentEntry])
+trait AppConfigSetup extends MockitoSugar {
 
-object Formatters {
-  implicit val entryFormat = Json.format[EnrolmentEntry]
-  implicit val enrolmentFormat = Json.format[ESEnrolment]
+  val appConfig = mock[AppConfig]
+  val servicesConfig = mock[ServicesConfig]
+
+  when(appConfig.config) thenReturn servicesConfig
+
 }
-
-object Constants {
-  val serviceName = "HMRC-MLR-ORG"
-  val amlsRefIdentKey = "MLRRefNumber"
-}
-

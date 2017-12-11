@@ -49,7 +49,6 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
       override val dataCacheConnector = mock[DataCacheConnector]
       override val statusService: StatusService =  mock[StatusService]
       override val authConnector = self.authConnector
-      override val authEnrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
     }
   }
 

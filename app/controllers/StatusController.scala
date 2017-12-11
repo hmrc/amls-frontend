@@ -243,7 +243,7 @@ object StatusController extends StatusController {
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val enrolmentsService: AuthEnrolmentsService = AuthEnrolmentsService
+  override private[controllers] val enrolmentsService = AuthEnrolmentsService
   override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]

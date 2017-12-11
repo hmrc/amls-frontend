@@ -40,9 +40,10 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import models.tradingpremises.TradingPremises.FilterUtils
+import play.api.Play
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 //noinspection ScalaStyle
 trait SubmissionService extends DataCacheService {
@@ -54,7 +55,6 @@ trait SubmissionService extends DataCacheService {
   private[services] def ggService: GovernmentGatewayService
 
   private[services] def authEnrolmentsService: AuthEnrolmentsService
-
 
   def subscribe
   (implicit
@@ -119,7 +119,7 @@ trait SubmissionService extends DataCacheService {
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       amendment <- amlsConnector.update(
         createSubscriptionRequest(cache),
-        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][update] - No enrolment"))
+        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment"))
       )
       _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
     } yield amendment
@@ -136,7 +136,7 @@ trait SubmissionService extends DataCacheService {
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       amendment <- amlsConnector.variation(
         createSubscriptionRequest(cache),
-        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
+        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
       )
       _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
     } yield amendment
@@ -148,7 +148,7 @@ trait SubmissionService extends DataCacheService {
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       response <- amlsConnector.renewal(
         createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
+        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
       _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
     } yield response
@@ -160,7 +160,7 @@ trait SubmissionService extends DataCacheService {
       regNo <- authEnrolmentsService.amlsRegistrationNumber
       response <- amlsConnector.renewalAmendment(
         createSubscriptionRequest(cache).withRenewalData(renewal),
-        regNo.getOrElse(throw new NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
+        regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
       )
       _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
     } yield response
@@ -195,30 +195,8 @@ trait SubmissionService extends DataCacheService {
 }
 
 object SubmissionService extends SubmissionService {
-
-  // $COVERAGE-OFF$
-  object MockGGService extends GovernmentGatewayService {
-
-    import play.api.http.Status.OK
-
-    override private[services] def ggConnector: GovernmentGatewayConnector = GovernmentGatewayConnector
-
-    override def enrol
-    (mlrRefNo: String, safeId: String, postCode: String)
-    (implicit
-     hc: HeaderCarrier,
-     ec: ExecutionContext
-    ): Future[HttpResponse] = Future.successful(HttpResponse(OK))
-  }
-
   override private[services] val cacheConnector = DataCacheConnector
   override private[services] val amlsConnector = AmlsConnector
   override private[services] val authEnrolmentsService = AuthEnrolmentsService
-  override private[services] val ggService = {
-    if (ApplicationConfig.enrolmentToggle) {
-      GovernmentGatewayService
-    } else {
-      MockGGService
-    }
-  }
+  override private[services] val ggService = GovernmentGatewayService
 }
