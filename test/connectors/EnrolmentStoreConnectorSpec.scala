@@ -17,24 +17,16 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
-import generators.enrolment.ESEnrolmentGenerator
-import models.enrolment.Formatters._
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.inject.ServicesConfig
-import models.enrolment.Constants
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with ESEnrolmentGenerator {
+class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar {
 
   trait Fixture {
 
@@ -45,9 +37,6 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
     val servicesConfig = mock[ServicesConfig]
     val connector = new EnrolmentStoreConnector(http, appConfig)
     val baseUrl = "http://tax-enrolments:3001"
-
-    //noinspection ScalaStyle
-    val userId = numSequence(10).sample.get
 
     when {
       appConfig.config

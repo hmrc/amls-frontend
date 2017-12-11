@@ -19,13 +19,6 @@ package connectors
 import javax.inject.Inject
 
 import config.{AppConfig, WSHttp}
-import models.enrolment.{Constants, ESEnrolment}
-import models.enrolment.Formatters._
-import okhttp3.HttpUrl
-import play.api.http.Status._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-
-import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig) {
 

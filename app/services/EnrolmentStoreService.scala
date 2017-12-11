@@ -19,10 +19,6 @@ package services
 import javax.inject.Inject
 
 import connectors.EnrolmentStoreConnector
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import models.enrolment.Constants
-import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreService @Inject()(connector: EnrolmentStoreConnector) {
 
