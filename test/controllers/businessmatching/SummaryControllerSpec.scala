@@ -233,6 +233,23 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     }
   }
 
+  "show the 'Change services' page when the user wants to change their services in a variation, and the feature is toggled on" in new Fixture {
+    val model = BusinessMatching(
+      activities = Some(BusinessActivities(Set(EstateAgentBusinessService)))
+    )
+
+    mockGetModel(Some(model))
+    mockApplicationStatus(SubmissionDecisionApproved)
+
+    val result = controller.get()(request)
+    status(result) must be(OK)
+
+    val doc = Jsoup.parse(contentAsString(result))
+    val editUrl = doc.select("section.register-services a.change-answer").first().attr("href")
+
+    editUrl mustBe controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
+  }
+
   "redirect to TradingPremisesController" when {
     "status is post-submission" when {
       "UpdateService is not complete" which {

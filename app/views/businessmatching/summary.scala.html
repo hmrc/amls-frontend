@@ -19,7 +19,7 @@
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 
-@(f: forms.Form2[_], model: BusinessMatching, allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
+@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", if(allowEdit) "summary.businessmatching" else "")
@@ -81,7 +81,7 @@
     @model.activities.map { activity =>
         @checkYourAnswers(
             question = Messages("businessmatching.registerservices.title"),
-            editUrl = controllers.businessmatching.routes.RegisterServicesController.get().url,
+            editUrl = changeActivitiesUrl,
             allowEdit = allowEdit,
             classes = Seq("register-services")
         ) {

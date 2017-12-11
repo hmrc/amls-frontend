@@ -36,12 +36,14 @@ class summarySpec extends GenericTestHelper
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val defaultActivitiesUrl = controllers.businessmatching.routes.RegisterServicesController.get().url
   }
 
   "businessmatching view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching())
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("title.cya"))
@@ -82,7 +84,7 @@ class summarySpec extends GenericTestHelper
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching)
+      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -97,7 +99,7 @@ class summarySpec extends GenericTestHelper
           "businessmatching.registerservices.servicename.lbl.05",
           "businessmatching.registerservices.servicename.lbl.06",
           "businessmatching.registerservices.servicename.lbl.07")),
-          controllers.businessmatching.routes.RegisterServicesController.get().url),
+          defaultActivitiesUrl),
         ("businessmatching.services.title", checkListContainsItems(_, Set(
           "businessmatching.services.list.lbl.01",
           "businessmatching.services.list.lbl.02",
@@ -148,7 +150,7 @@ class summarySpec extends GenericTestHelper
         Some(CompanyRegistrationNumberModel),
         Some(BusinessAppliedForPSRNumberModel))
 
-      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching)
+      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
 
       val sectionChecks = Table[String, Element => Boolean, String](
         ("title key", "check", "editLink"),
@@ -162,7 +164,7 @@ class summarySpec extends GenericTestHelper
           "businessmatching.registerservices.servicename.lbl.04",
           "businessmatching.registerservices.servicename.lbl.06",
           "businessmatching.registerservices.servicename.lbl.07")),
-          controllers.businessmatching.routes.RegisterServicesController.get().url
+          defaultActivitiesUrl
         )
       )
 
