@@ -758,7 +758,6 @@ confirmation.payment.bacs.header = You’ve submitted
 
 confirmation.payment.bacs.received = Your application will be reviewed when HM Revenue and Customs receives your payment. You can sign into this service at any time to see the status of your application.
 confirmation.payment.bacs.time = The review process can take up to 45 days. You'll get an email when the decision has been made.
-confirmation.payment.bacs.trade = You must not trade in activities covered by the Money Laundering Regulations until your application is approved.
 
 
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
