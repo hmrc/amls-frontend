@@ -32,6 +32,8 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
 import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.tradingpremises.TradingPremises
+
 import scala.concurrent.Future
 
 class SummaryController @Inject()(
@@ -40,6 +42,18 @@ class SummaryController @Inject()(
                                    val statusService: StatusService,
                                    config: AppConfig
                                  ) extends BaseController {
+
+  private def updateResponsiblePeople(rp: Option[Seq[ResponsiblePeople]]) : Future[Option[Seq[ResponsiblePeople]]] = {
+    rp match {
+      case Some(rpSeq) => {
+        val updatedList = rpSeq.filterEmpty.map { people =>
+          people.copy(hasAccepted = true)
+        }
+        Future.successful(Some(updatedList))
+      }
+      case _ => Future.successful(rp)
+    }
+  }
 
   def get(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
@@ -68,6 +82,9 @@ class SummaryController @Inject()(
   private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
     for {
       status <- statusService.getStatus
+      rp <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+      rpNew <- updateResponsiblePeople(rp)
+      _ <- dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, rpNew.getOrElse(Seq.empty))
       hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
     } yield Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
 
