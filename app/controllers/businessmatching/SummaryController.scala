@@ -53,7 +53,13 @@ trait SummaryController extends BaseController {
             ))
           )
 
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
+          val changeActivitiesUrl = if (isPreSubmission(status) || !ApplicationConfig.businessMatchingVariationToggle) {
+            controllers.businessmatching.routes.RegisterServicesController.get().url
+          } else {
+            controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
+          }
+
+          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
         }
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
