@@ -25,7 +25,7 @@ import utils.StatusConstants
 case class BankDetails(
                         bankAccountType: Option[BankAccountType] = None,
                         accountName: Option[String] = None,
-                        bankAccount: Option[BankAccount] = None,
+                        bankAccount: Option[Account] = None,
                         hasChanged: Boolean = false,
                         refreshedFromServer: Boolean = false,
                         status: Option[String] = None,
@@ -43,7 +43,7 @@ case class BankDetails(
     }
   }
 
-  def bankAccount(value: Option[BankAccount]): BankDetails = {
+  def bankAccount(value: Option[Account]): BankDetails = {
     this.copy(bankAccount = value, hasChanged = hasChanged || (this.bankAccount != value),
       hasAccepted = hasAccepted && this.bankAccount == value)
   }
@@ -61,7 +61,7 @@ object BankDetails {
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
 
-  implicit def maybeBankAccount(account: BankAccount): Option[BankAccount] = Some(account)
+  implicit def maybeBankAccount(account: Account): Option[Account] = Some(account)
 
   def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged || x.status.contains(StatusConstants.Deleted) }
 
@@ -104,7 +104,7 @@ object BankDetails {
   implicit val reads: Reads[BankDetails] = (
     ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
       (__ \ "accountName").readNullable[String] ~
-      ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount])) ~
+      ((__ \ "bankAccount").read[Account].map[Option[Account]](Some(_)) orElse __.read(Reads.optionNoError[Account])) ~
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "status").readNullable[String] ~

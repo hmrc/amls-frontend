@@ -65,12 +65,12 @@
 
     <ul class="list list--listing">
     @model.zipWithIndex.map { case (x, y) =>
-        @x.bankAccount.map {bankAccount =>
+        @x.bankAccount.map { bankAccount =>
             @if(!x.status.contains(StatusConstants.Deleted)) {
-                @bankAccount.account match {
+                @bankAccount match {
                     case f:UKAccount => {
                         @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
+                            question = "ACCOUNT NAME",
                             editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
                             removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
                             canEdit
@@ -91,7 +91,7 @@
                     }
                     case f:NonUKAccountNumber => {
                         @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
+                            question = "ACCOUNT NAME",
                             editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
                             removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
                             canEdit
@@ -109,7 +109,7 @@
                     }
                     case f:NonUKIBANNumber => {
                         @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
+                            question = "ACCOUNT NAME",
                             editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
                             removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
                             canEdit

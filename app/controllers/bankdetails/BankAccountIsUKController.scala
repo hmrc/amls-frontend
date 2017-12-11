@@ -24,7 +24,7 @@ import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.bankdetails.{BankAccount, BankDetails}
+import models.bankdetails.{Account, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -48,7 +48,7 @@ class BankAccountIsUKController @Inject()(
           allowedToEdit <- ControllerHelper.allowedToEdit(edit)
         } yield bankDetails match {
           case Some(BankDetails(_, _, Some(data), _, _, _, _)) if allowedToEdit =>
-            Ok(views.html.bankdetails.bank_account_is_uk(Form2[BankAccount](data), edit, index))
+            Ok(views.html.bankdetails.bank_account_is_uk(Form2[Account](data), edit, index))
           case Some(_) if allowedToEdit =>
             Ok(views.html.bankdetails.bank_account_is_uk(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
@@ -64,7 +64,7 @@ class BankAccountIsUKController @Inject()(
           result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
         } yield result
 
-        Form2[BankAccount](request.body) match {
+        Form2[Account](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.bankdetails.bank_account_is_uk(f, edit, index)))
           case ValidForm(_, data) =>
