@@ -16,37 +16,32 @@
 
 package controllers.bankdetails
 
-import connectors.DataCacheConnector
 import models.bankdetails._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{StatusConstants, AuthorisedFixture}
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
 class RemoveBankDetailsControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new RemoveBankDetailsController {
-      override val dataCacheConnector: DataCacheConnector =  mock[DataCacheConnector]
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new RemoveBankDetailsController (
+      dataCacheConnector =  mockCacheConnector,
+      authConnector = self.authConnector
+    )
   }
 
   "Get" must {
 
     "load the remove bank account page when section data is available" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
+
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
 
       val result = controller.get(1,false)(request)
 
@@ -54,8 +49,8 @@ class RemoveBankDetailsControllerSpec extends GenericTestHelper with MockitoSuga
     }
 
     "show bank account details on the remove bank account page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(BankDetails(None, Some(BankAccount("Account Name", NonUKAccountNumber("12345678"))))))))
+
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(BankAccount("Account Name", NonUKAccountNumber("12345678")))))))
 
       val result = controller.get(1,true) (request)
 
@@ -85,24 +80,24 @@ class RemoveBankDetailsControllerSpec extends GenericTestHelper with MockitoSuga
       val accountType4 = PersonalAccount
       val bankAccount4 = BankAccount("My Account4", UKAccount("444444", "44-44-44"))
 
-      val completeModel1 = BankDetails(Some(accountType1), Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
-      val completeModel2 = BankDetails(Some(accountType2), Some(bankAccount2))
-      val completeModel3 = BankDetails(Some(accountType3), Some(bankAccount3))
-      val completeModel4 = BankDetails(Some(accountType4), Some(bankAccount4))
+      val completeModel1 = BankDetails(Some(accountType1), None, Some(bankAccount1), true, false, Some(StatusConstants.Deleted))
+      val completeModel2 = BankDetails(Some(accountType2), None, Some(bankAccount2))
+      val completeModel3 = BankDetails(Some(accountType3), None, Some(bankAccount3))
+      val completeModel4 = BankDetails(Some(accountType4), None, Some(bankAccount4))
 
       val bankAccounts = Seq(completeModel1,completeModel2,completeModel3,completeModel4)
-      when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(bankAccounts)))
 
-      when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
+      mockCacheSave[Seq[BankDetails]]
 
       val result = controller.remove(1)(request)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be (Some(controllers.bankdetails.routes.SummaryController.get(false).url))
 
-      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
-        meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
+      verify(controller.dataCacheConnector).save[Seq[BankDetails]](
+        any(),
+        meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4))
+      )(any(), any(), any())
 
     }
 

@@ -16,20 +16,25 @@
 
 package controllers.bankdetails
 
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails._
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
-trait BankAccountTypeController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
+@Singleton
+class BankAccountTypeController @Inject()(
+                                           val authConnector: AuthConnector = AMLSAuthConnector,
+                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val statusService: StatusService
+                                         ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -41,7 +46,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
           count <- getData[BankDetails].map(details => details.filterNot(filter).size)
           allowedToEdit <- ControllerHelper.allowedToEdit(edit)
         } yield bankDetail match {
-          case Some(BankDetails(Some(data), _, _, _, _, _)) if allowedToEdit =>
+          case Some(BankDetails(Some(data), _, _, _, _, _, _)) if allowedToEdit =>
             Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
           case Some(_) if allowedToEdit =>
             Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
@@ -58,7 +63,7 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
             Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index, count)))
           case ValidForm(_, data) => {
             for {
-              result <- updateDataStrict[BankDetails](index) { bd =>
+              _ <- updateDataStrict[BankDetails](index) { bd =>
                 data match {
                   case Some(NoBankAccountUsed) => bd.bankAccountType(data).bankAccount(None)
                   case _ => bd.bankAccountType(data)
@@ -78,11 +83,4 @@ trait BankAccountTypeController extends RepeatingSection with BaseController {
       }
   }
 
-}
-
-object BankAccountTypeController extends BankAccountTypeController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override implicit val statusService = StatusService
 }

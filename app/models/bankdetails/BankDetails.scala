@@ -16,7 +16,6 @@
 
 package models.bankdetails
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logger
 import typeclasses.MongoKey
@@ -25,6 +24,7 @@ import utils.StatusConstants
 
 case class BankDetails(
                         bankAccountType: Option[BankAccountType] = None,
+                        accountName: Option[String] = None,
                         bankAccount: Option[BankAccount] = None,
                         hasChanged: Boolean = false,
                         refreshedFromServer: Boolean = false,
@@ -49,9 +49,9 @@ case class BankDetails(
   }
 
   def isComplete: Boolean = this match {
-    case BankDetails(Some(NoBankAccountUsed), None, _, _, _, accepted) => accepted
-    case BankDetails(Some(_), Some(_), _, _, _, accepted) => accepted
-    case BankDetails(None, None, _, _, _, accepted) => accepted
+    case BankDetails(Some(NoBankAccountUsed), Some(_), None, _, _, _, accepted) => accepted
+    case BankDetails(Some(_), Some(_), Some(_), _, _, _, accepted) => accepted
+    case BankDetails(None, _, None, _, _, _, accepted) => accepted
     case _ => false
   }
 }
@@ -103,6 +103,7 @@ object BankDetails {
 
   implicit val reads: Reads[BankDetails] = (
     ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
+      (__ \ "accountName").readNullable[String] ~
       ((__ \ "bankAccount").read[BankAccount].map[Option[BankAccount]](Some(_)) orElse __.read(Reads.optionNoError[BankAccount])) ~
       (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
       (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~

@@ -25,42 +25,45 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.matchers.Matcher
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, StatusConstants}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val controller = new BankAccountTypeController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override implicit val statusService = mock[StatusService]
-    }
+    val request = addToken(authRequest)
+
+    val injector = new GuiceInjectorBuilder()
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuditConnector].to(mock[AuditConnector]))
+      .build()
+
+    lazy val controller = injector.instanceOf[BankAccountTypeController]
+
   }
-
-  val emptyCache = CacheMap("", Map.empty)
 
   "BankAccountTypeController" when {
     "get:" must {
       "respond with OK and display the blank 'bank account type' page" when {
         "there is no bank account type information yet" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(
               BankDetails(None, None, status = Some(StatusConstants.Deleted)),
               BankDetails(Some(NoBankAccountUsed), None, status = Some(StatusConstants.Added))
-            ))))
-
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+            )))
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
 
@@ -76,12 +79,10 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         }
 
         "load bank account type UI with out the option 'user does not have bank account'" when {
-          "user alreday added an account" in new Fixture {
+          "user already added an account" in new Fixture {
 
-            when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
-            when(controller.statusService.getStatus(any(),any(),any()))
-              .thenReturn(Future.successful(SubmissionReady))
+            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
+            mockApplicationStatus(SubmissionReady)
 
             val result = controller.get(2, false)(request)
 
@@ -98,10 +99,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
 
         "there is already a bank account type" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1)(request)
           val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("checked")
@@ -114,10 +113,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
       "respond with NOT_FOUND" when {
         "there is no bank account information at all" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReady))
+          mockCacheFetch[Seq[BankDetails]](None)
+          mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
 
@@ -125,10 +122,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         }
         "editing an amendment" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
+          mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
 
@@ -136,10 +131,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         }
         "editing an variation" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount))))))
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
 
@@ -157,10 +150,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
             "bankAccountType" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, false)(newRequest)
 
@@ -169,19 +160,18 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         }
 
           "not editing and there is no bank account" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "bankAccountType" -> "04" // something weird going on here?
-          )
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+            val newRequest = request.withFormUrlEncodedBody(
+              "bankAccountType" -> "04"
+            )
 
-          val result = controller.post(1, false)(newRequest)
+            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
+            mockCacheSave[Seq[BankDetails]]
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
+            val result = controller.post(1, false)(newRequest)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {
@@ -189,10 +179,8 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
             "bankAccountType" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(Some(PersonalAccount), None)))))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
 
@@ -205,12 +193,13 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
             "bankAccountType" -> "01"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(
-              Some(PersonalAccount),
-              Some(BankAccount("AccountName", UKAccount("12341234", "000000"))))))))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
+            Some(PersonalAccount),
+            None,
+            Some(BankAccount("AccountName", UKAccount("12341234", "000000")))
+          ))))
+
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
 
@@ -219,17 +208,14 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
         }
       }
 
-
       "respond with BAD_REQUEST" when {
         "there is invalid data" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "bankAccountType" -> "10"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockCacheFetch[Seq[BankDetails]](None)
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(0, false)(newRequest)
           val document = Jsoup.parse(contentAsString(result)).select("span").html()
@@ -245,12 +231,10 @@ class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar 
             "bankAccountType" -> "04"
           )
 
-          when(controller.statusService.getStatus(any(),any(),any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
-          when(controller.dataCacheConnector.fetch[Seq[BankDetails]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(BankDetails(None, None)))))
-          when(controller.dataCacheConnector.save[Seq[BankDetails]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
+          mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(3, false)(newRequest)
 

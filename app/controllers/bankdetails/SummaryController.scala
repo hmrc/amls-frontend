@@ -16,23 +16,26 @@
 
 package controllers.bankdetails
 
-import cats.data.OptionT
-import cats.implicits._
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
-import models.bankdetails.{BankAccount, BankDetails}
+import models.bankdetails.BankDetails
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.StatusConstants
 
 import scala.concurrent.Future
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
-  val statusService: StatusService
+@Singleton
+class SummaryController @Inject()(
+                                   val dataCacheConnector: DataCacheConnector,
+                                   val authConnector: AuthConnector = AMLSAuthConnector,
+                                   val statusService: StatusService
+                                 ) extends BaseController {
 
   private def updateBankDetails(bankDetails: Option[Seq[BankDetails]]) : Future[Option[Seq[BankDetails]]] = {
     bankDetails match {
@@ -49,17 +52,16 @@ trait SummaryController extends BaseController {
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        bankDetails <- dataCache.fetch[Seq[BankDetails]](BankDetails.key)
+        bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
         status <- statusService.getStatus
       } yield bankDetails match {
-        case Some(data) => {
+        case Some(data) =>
           val canEdit = status match {
             case NotCompleted | SubmissionReady => true
             case _ => false
           }
           val bankDetails = data.filterNot(_.status.contains(StatusConstants.Deleted))
           Ok(views.html.bankdetails.summary(EmptyForm, data, complete, hasBankAccount(bankDetails), canEdit, status))
-        }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
@@ -67,9 +69,9 @@ trait SummaryController extends BaseController {
   def post = Authorised.async {
     implicit authContext => implicit request =>
       (for {
-        bd <- dataCache.fetch[Seq[BankDetails]](BankDetails.key)
+        bd <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
         bdnew <- updateBankDetails(bd)
-        _ <- dataCache.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
+        _ <- dataCacheConnector.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
       } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
@@ -78,11 +80,4 @@ trait SummaryController extends BaseController {
   private def hasBankAccount(bankDetails: Seq[BankDetails]): Boolean = {
     bankDetails.exists(_.bankAccount.isDefined)
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }
