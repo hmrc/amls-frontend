@@ -158,6 +158,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
         mockApplicationStatus(SubmissionReady)
+        mockCacheSave[Seq[ResponsiblePeople]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -171,6 +172,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
         mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheSave[Seq[ResponsiblePeople]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -187,6 +189,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
         mockApplicationStatus(SubmissionReady)
+        mockCacheSave[Seq[ResponsiblePeople]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -204,6 +207,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
         mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheSave[Seq[ResponsiblePeople]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -218,6 +222,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
         mockApplicationStatus(SubmissionReadyForReview)
+        mockCacheSave[Seq[ResponsiblePeople]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -237,6 +242,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
           mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
           mockApplicationStatus(SubmissionReady)
+          mockCacheSave[Seq[ResponsiblePeople]]
 
           val result = controller.post(Some(flowFromDeclaration))(request)
 
