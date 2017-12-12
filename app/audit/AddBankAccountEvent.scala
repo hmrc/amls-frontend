@@ -60,17 +60,17 @@ object AddBankAccountEvent {
     }
   }
 
-  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = bankDetails.bankAccount map { ba =>
-    ba.account match {
-      case account: UKAccount =>
-        BankAccountAuditDetail(ba.accountName, bankDetails.bankAccountType, isUKBankAccount = true, account.sortCode.some, account.accountNumber.some, None)
+  implicit def convert(bankDetails: BankDetails): Option[BankAccountAuditDetail] = (bankDetails.bankAccount, bankDetails.accountName) match {
+    case (Some(account: UKAccount), Some(name)) =>
+        Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = true, account.sortCode.some, account.accountNumber.some, None))
 
-      case account: NonUKIBANNumber =>
-        BankAccountAuditDetail(ba.accountName, bankDetails.bankAccountType, isUKBankAccount = false, None, None, account.IBANNumber.some)
+    case (Some(account: NonUKIBANNumber), Some(name)) =>
+      Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = false, None, None, account.IBANNumber.some))
 
-      case account: NonUKAccountNumber =>
-        BankAccountAuditDetail(ba.accountName, bankDetails.bankAccountType, isUKBankAccount = false, None, account.accountNumber.some, None)
-    }
+    case (Some(account: NonUKAccountNumber), Some(name)) =>
+      Some(BankAccountAuditDetail(name, bankDetails.bankAccountType, isUKBankAccount = false, None, account.accountNumber.some, None))
+
+    case _ => None
   }
 
   def apply(bankAccount: BankDetails)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(

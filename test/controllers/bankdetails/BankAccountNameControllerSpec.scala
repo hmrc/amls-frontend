@@ -60,7 +60,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
   "BankAccountController" when {
     "get is called" must {
       "respond with OK" when {
-        "there is no bank account detail information yet" in new Fixture {
+        "given a name" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
@@ -74,9 +74,9 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
             document.select(s"input[name=$field]").`val` must be(empty)
         }
 
-        "there is already bank account detail information" in new Fixture {
+        "without a name" in new Fixture {
 
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
+          val ukBankAccount = UKAccount("12345678", "000000")
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
 
@@ -98,32 +98,6 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
 
           status(result) must be(NOT_FOUND)
         }
-        "editing an amendment" in new Fixture {
-
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
-
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
-
-          mockApplicationStatus(SubmissionReadyForReview)
-
-          val result = controller.get(1, true)(request)
-
-          status(result) must be(NOT_FOUND)
-
-        }
-        "editing a variaton" in new Fixture {
-
-          val ukBankAccount = BankAccount("My Account", UKAccount("12345678", "000000"))
-
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          val result = controller.get(1, true)(request)
-
-          status(result) must be(NOT_FOUND)
-
-        }
       }
     }
 
@@ -132,11 +106,8 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         "given valid data in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
-          )
+            "accountName" -> "test"
+           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
 
@@ -147,28 +118,21 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
 
-          verify(controller.auditConnector, never()).sendEvent(any())(any(), any())
         }
         "given valid data when NOT in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+            "accountName" -> "test"
           )
-
-          when(controller.auditConnector.sendEvent(any())(any(), any()))
-            .thenReturn(Future.successful(Success))
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))), Some(BankDetails.key))
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, false)(newRequest)
+          val result = controller.post(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1).url))
         }
 
       }
@@ -177,10 +141,7 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         "given an index out of bounds in edit mode" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "false",
-            "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-            "isIBAN" -> "false"
+            "accountName" -> "test"
           )
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
@@ -193,17 +154,14 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
         }
       }
 
-
       "respond with BAD_REQUEST" when {
         "given invalid data" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
-            "accountName" -> "test",
-            "isUK" -> "true"
+            "accountName" -> ""
           )
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
-
           mockCacheSave[Seq[BankDetails]]
 
           val result = controller.post(1, true)(newRequest)
@@ -213,40 +171,5 @@ class BankAccountNameControllerSpec extends GenericTestHelper with MockitoSugar 
       }
     }
 
-    "an account is created" must {
-      "send an audit event" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "accountName" -> "test",
-          "isUK" -> "false",
-          "nonUKAccountNumber" -> "1234567890123456789012345678901234567890",
-          "isIBAN" -> "false"
-        )
-
-        when(controller.auditConnector.sendEvent(any())(any(), any())).
-          thenReturn(Future.successful(Success))
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(
-          Some(PersonalAccount),
-          None,
-          Some(BankAccount("Test account", UKAccount("8934798324", "934947")))))),
-          Some(BankDetails.key))
-
-        mockCacheSave[Seq[BankDetails]]
-
-        val result = controller.post(1)(newRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.BankAccountRegisteredController.get(1).url))
-
-        val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-        verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
-
-        captor.getValue match {
-          case DataEvent(_, _, _, _, detail, _) =>
-            detail("accountName") mustBe "Test account"
-        }
-
-      }
-    }
   }
 }

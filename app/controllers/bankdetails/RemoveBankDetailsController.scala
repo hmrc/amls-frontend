@@ -36,8 +36,8 @@ class RemoveBankDetailsController @Inject()(
     implicit authContext =>
       implicit request =>
         getData[BankDetails](index) map {
-          case Some(BankDetails(_, _, Some(bankAcct), _, _, _, _)) =>
-            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, bankAcct.accountName, complete))
+          case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
+            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name, complete))
           case _ => NotFound(notFoundView)
         }
   }

@@ -23,7 +23,6 @@ import play.api.libs.json._
 import jto.validation.forms.UrlFormEncoded
 import jto.validation._
 
-
 sealed trait Account
 
 object Account {
@@ -135,10 +134,7 @@ object Account {
   }
 }
 
-case class UKAccount(
-                      accountNumber: String,
-                      sortCode: String
-) extends Account {
+case class UKAccount(accountNumber: String, sortCode: String) extends Account {
   def displaySortCode: String = {
     // scalastyle:off magic.number
     val pair1 = sortCode.substring(0, 2)
@@ -149,56 +145,8 @@ case class UKAccount(
   }
 }
 
-
 sealed trait NonUKAccount extends Account
 
 case class NonUKAccountNumber(accountNumber: String) extends NonUKAccount
 
 case class NonUKIBANNumber(IBANNumber: String) extends NonUKAccount
-
-case class BankAccount(accountName: String, account: Account)
-
-object BankAccount {
-
-  import utils.MappingUtils.Implicits._
-
-  val key = "bank-account"
-  val maxAccountName = 40
-
-  val accountNameType = notEmptyStrip
-    .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
-    .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
-    .andThen(basicPunctuationPattern())
-
-  implicit val formRule: Rule[UrlFormEncoded, BankAccount] = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "accountName").read(accountNameType) ~
-      __.read[Account]
-      ).apply(BankAccount.apply _)
-  }
-
-  implicit val formWrite: Write[BankAccount, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Writes._
-    import play.api.libs.functional.syntax.unlift
-    ((__ \ "accountName").write[String] ~
-      __.write[Account]
-      ) (unlift(BankAccount.unapply))
-  }
-
-  implicit val jsonReads: Reads[BankAccount] = {
-    import play.api.libs.functional.syntax._
-    import play.api.libs.json._
-    ((__ \ "accountName").read[String] and __.read[Account]) (BankAccount.apply _)
-  }
-
-  implicit val jsonWrites: Writes[BankAccount] = {
-    import play.api.libs.functional.syntax._
-
-    (
-      (__ \ "accountName").write[String] and
-        __.write[Account]
-      ) (unlift(BankAccount.unapply))
-
-  }
-
-}

@@ -65,70 +65,73 @@
 
     <ul class="list list--listing">
     @model.zipWithIndex.map { case (x, y) =>
-        @x.bankAccount.map {bankAccount =>
-            @if(!x.status.contains(StatusConstants.Deleted)) {
-                @bankAccount.account match {
-                    case f:UKAccount => {
-                        @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
-                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
-                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
-                            canEdit
-                        ) {
-                            <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
-                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                }</li>
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
-                                <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
-                                @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
+        @x.accountName.map { accountName =>
+            @x.bankAccount.map { bankAccount =>
+                @if(!x.status.contains(StatusConstants.Deleted)) {
+                    @bankAccount match {
+                        case f:UKAccount => {
+                            @checkYourAnswersBanks(
+                                question = accountName,
+                                editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                                removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                                canEdit
+                            ) {
+                                <ul class="list">
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
+                                        case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                        case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                        case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }</li>
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.yes")</li>
+                                    <li>@Messages("bankdetails.bankaccount.sortcode"): @f.displaySortCode</li>
+                                    @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
 
 
-                            </ul>
+                                </ul>
+                            }
                         }
-                    }
-                    case f:NonUKAccountNumber => {
-                        @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
-                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
-                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
-                            canEdit
-                        ) {
-                            <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
-                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                }</li>
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
-                                <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
-                            </ul>
+                        case f:NonUKAccountNumber => {
+                            @checkYourAnswersBanks(
+                                question = accountName,
+                                editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                                removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                                canEdit
+                            ) {
+                                <ul class="list">
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
+                                        case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                        case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                        case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }</li>
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                    <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                </ul>
+                            }
                         }
-                    }
-                    case f:NonUKIBANNumber => {
-                        @checkYourAnswersBanks(
-                            question = bankAccount.accountName,
-                            editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
-                            removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
-                            canEdit
-                        ) {
-                            <ul class="list">
-                                <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
-                                    case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
-                                    case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
-                                    case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
-                                }</li>
-                                <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
-                                <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
-                            </ul>
+                        case f:NonUKIBANNumber => {
+                            @checkYourAnswersBanks(
+                                question = accountName,
+                                editUrl = controllers.bankdetails.routes.BankAccountTypeController.get(y+1, true).toString,
+                                removeUrl = controllers.bankdetails.routes.RemoveBankDetailsController.get(y+1, complete).toString,
+                                canEdit
+                            ) {
+                                <ul class="list">
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.lbl"): @x.bankAccountType.map {
+                                        case PersonalAccount => {@Messages("bankdetails.summary.accounttype.lbl.01")}
+                                        case BelongsToBusiness => {@Messages("bankdetails.summary.accounttype.lbl.02")}
+                                        case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
+                                    }</li>
+                                    <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
+                                    <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
+                                </ul>
+                            }
                         }
                     }
                 }
             }
         }
-    }
+
+        }
     </ul>
 
 

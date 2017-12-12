@@ -16,6 +16,8 @@
 
 package controllers.bankdetails
 
+import javax.inject.{Inject, Singleton}
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
@@ -23,21 +25,19 @@ import models.bankdetails.BankDetails
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
-trait BankAccountAddController extends RepeatingSection with BaseController {
+@Singleton
+class BankAccountAddController @Inject()(
+                                          val dataCacheConnector: DataCacheConnector,
+                                          val authConnector: AuthConnector = AMLSAuthConnector
+                                        ) extends RepeatingSection with BaseController {
   def get(displayGuidance : Boolean = true) = Authorised.async {
     implicit authContext => implicit request =>
       addData[BankDetails](None).map { idx =>
         if (displayGuidance) {
           Redirect(routes.WhatYouNeedController.get(idx))
         } else {
-          Redirect(routes.BankAccountTypeController.get(idx, false))
+          Redirect(routes.BankAccountTypeController.get(idx))
         }
       }
   }
-}
-
-object BankAccountAddController extends BankAccountAddController {
-  // $COVERAGE-OFF$
-  override def dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

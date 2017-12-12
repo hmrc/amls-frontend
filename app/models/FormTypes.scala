@@ -40,6 +40,7 @@ object FormTypes {
   val maxEmailLength = 100
   val minAccountantRefNoTypeLength = 11
   val maxNonUKPassportLength = 40
+  val maxAccountName = 40
 
   /** Regex **/
 
@@ -256,6 +257,12 @@ object FormTypes {
       .andThen(notEmpty.withMessage(requiredMsg))
       .andThen(commonNameRegexRule)
       .andThen(maxWithMsg(maxNameTypeLength, maxLengthMsg))
+
+  val accountNameType = notEmptyStrip
+    .andThen(notEmpty.withMessage("error.bankdetails.accountname"))
+    .andThen(maxLength(maxAccountName).withMessage("error.invalid.bankdetails.accountname"))
+    .andThen(basicPunctuationPattern())
+
 
   /** Personal Identification Rules **/
 

@@ -17,8 +17,8 @@
 package views.bankdetails
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.bankdetails.{Account, BankAccount, NonUKAccountNumber}
-import org.scalatest.{MustMatchers}
+import models.bankdetails.{Account, NonUKAccountNumber}
+import org.scalatest.MustMatchers
 import  utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
@@ -36,7 +36,6 @@ class bank_account_is_ukSpec extends GenericTestHelper with MustMatchers {
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
-
 
       override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_is_uk(form2, false, 0)
 
@@ -95,6 +94,5 @@ class bank_account_is_ukSpec extends GenericTestHelper with MustMatchers {
     doc.getElementById(IBANNumberField + "-fieldset").getElementsByClass("form-group").last().html() must include(messageKey6)
 
   }
-
 
 }

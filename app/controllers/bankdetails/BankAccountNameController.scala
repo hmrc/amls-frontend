@@ -18,17 +18,17 @@ package controllers.bankdetails
 
 import javax.inject.{Inject, Singleton}
 
-import cats.data.OptionT
-import cats.implicits._
-import config.AMLSAuditConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.bankdetails.{BankAccount, BankDetails}
+import jto.validation.forms.Rules._
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{From, Write}
+import models.FormTypes
+import models.bankdetails.BankDetails
 import services.StatusService
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection, StatusConstants}
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -36,57 +36,53 @@ import scala.concurrent.Future
 class BankAccountNameController @Inject()(
                                            val authConnector: AuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService,
-                                           val auditConnector: AuditConnector = AMLSAuditConnector) extends RepeatingSection with BaseController {
+                                           implicit val statusService: StatusService
+                                         ) extends RepeatingSection with BaseController {
+
+  implicit def write: Write[String, UrlFormEncoded] = Write{ data =>
+    Map("accountName" -> Seq(data))
+  }
+  implicit val read = From[UrlFormEncoded] { __ =>
+    (__ \ "accountName").read(FormTypes.accountNameType)
+  }
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        for {
-          bankDetails <- getData[BankDetails](index)
-          allowedToEdit <- ControllerHelper.allowedToEdit(edit)
-        } yield bankDetails match {
-          case Some(BankDetails(_, _, Some(data), _, _, _, _)) if allowedToEdit =>
-            Ok(views.html.bankdetails.bank_account_name(Form2[BankAccount](data), edit, index))
-          case Some(_) if allowedToEdit =>
+        getData[BankDetails](index) map {
+          case Some(BankDetails(_, Some(data), _, _, _, _, _)) =>
+            Ok(views.html.bankdetails.bank_account_name(Form2[String](data), edit, index))
+          case Some(_) =>
             Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
-        }
+      }
   }
 
   def post(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        lazy val sendAudit = for {
-          details <- OptionT(getData[BankDetails](index))
-          result <- OptionT.liftF(auditConnector.sendEvent(audit.AddBankAccountEvent(details)))
-        } yield result
-
-        Form2[BankAccount](request.body) match {
+        Form2[String](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
           case ValidForm(_, data) =>
             updateDataStrict[BankDetails](index) { bd =>
               bd.copy(
-                bankAccount = Some(data),
+                accountName = Some(data),
                 status = Some(if (edit) {
                   StatusConstants.Updated
                 } else {
                   StatusConstants.Added
                 })
               )
-            }.flatMap { _ =>
+            } map { _ =>
               if (edit) {
-                Future.successful(Redirect(routes.SummaryController.get(false)))
+                Redirect(routes.SummaryController.get(false))
               } else {
-                lazy val redirect = Redirect(routes.BankAccountRegisteredController.get(index))
-                (sendAudit map { _ =>
-                  redirect
-                }) getOrElse redirect
+                Redirect(routes.BankAccountIsUKController.get(index))
               }
             }
         }
-      }.recoverWith {
+      } recoverWith {
         case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
   }
