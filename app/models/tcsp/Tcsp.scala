@@ -50,6 +50,7 @@ case class Tcsp (tcspTypes: Option[TcspTypes] = None,
 object Tcsp {
 
   import play.api.libs.json._
+  import utils.MappingUtils._
 
   implicit val formatOption = Reads.optionWithNull[Tcsp]
 
@@ -73,10 +74,6 @@ object Tcsp {
   }
 
   implicit val jsonWrites = Json.writes[Tcsp]
-
-  def constant[A](x: A): Reads[A] = new Reads[A] {
-    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
-  }
 
   def doesServicesOfAnotherTCSPReader: Reads[Option[Boolean]] = {
 
