@@ -24,161 +24,132 @@ import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import utils.{DependencyMocks, StatusConstants}
 
-class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with OneAppPerSuite with DependencyMocks {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with OneAppPerSuite with DependencyMocks with BankDetailsModels {
 
   val emptyBankDetails: Option[BankDetails] = None
 
-  val accountType = PersonalAccount
   val accountTypePartialModel = BankDetails(Some(accountType), None)
-  val accountTypeJson = Json.obj("bankAccountType" -> Json.obj("bankAccountType" -> "01"), "hasChanged" -> false, "refreshedFromServer" -> false, "hasAccepted" -> false)
   val accountTypeNew = BelongsToBusiness
 
-  val bankAccount = UKAccount("111111", "00-00-00")
   val bankAccountPartialModel = BankDetails(None, None, Some(bankAccount))
-  val bankAccountJson = Json.obj(
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"
-    ),
-    "hasChanged" -> false,
-    "refreshedFromServer" -> false,
-    "hasAccepted" -> false
-  )
 
   val bankAccountNew = UKAccount("123456", "00-00-00")
 
-  val completeModel = BankDetails(Some(accountType), Some("bankName"), Some(bankAccount), hasAccepted = true)
   val incompleteModel = BankDetails(Some(accountType), None)
-  val completeJson = Json.obj(
-    "bankAccountType" -> Json.obj(
-      "bankAccountType" -> "01"),
-    "accountName" -> "bankName",
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"),
-    "hasChanged" -> false,
-    "refreshedFromServer" -> false,
-    "hasAccepted" -> true)
-  val completeModelChanged = BankDetails(Some(accountType), Some("anotherName"), Some(bankAccount), true, hasAccepted = true)
-  val completeJsonChanged = Json.obj(
-    "bankAccountType" -> Json.obj(
-      "bankAccountType" -> "01"),
-    "accountName" -> "anotherName",
-    "bankAccount" -> Json.obj(
-      "isUK" -> true,
-      "accountNumber" -> "111111",
-      "sortCode" -> "00-00-00"),
-    "hasChanged" -> true,
-    "refreshedFromServer" -> false,
-    "hasAccepted" -> true)
 
-  "BankDetails with complete model" must {
-    "Serialise as expected" in {
-      Json.toJson[BankDetails](completeModel) must be(completeJson)
-    }
-    "deserialise as expected" in {
-      completeJson.as[BankDetails] must be(completeModel)
-    }
-    "deserialise correctly when hasChanged field is missing from the Json" in {
-      (completeJson - "hasChanged").as[BankDetails] must be(completeModel)
-    }
-  }
+  "BankDetails" must {
 
-  "BankDetails with complete model which has the hasChanged flag set as true" must {
-    "Serialise as expected" in {
-      Json.toJson[BankDetails](completeModelChanged)(BankDetails.writes) must be(completeJsonChanged)
-      Json.toJson[BankDetails](completeModelChanged) must be(completeJsonChanged)
+    "serialise" when {
+      "given complete model" in {
+        Json.toJson[BankDetails](completeModel) must be(completeJson)
+      }
+      "has the hasChanged flag set as true" in {
+        Json.toJson[BankDetails](completeModelChanged)(BankDetails.writes) must be(completeJsonChanged)
+        Json.toJson[BankDetails](completeModelChanged) must be(completeJsonChanged)
+      }
+      "partially complete model" which {
+        "contains only accountType" in {
+          Json.toJson[BankDetails](accountTypePartialModel) must be(accountTypeJson)
+        }
+        "contains only bankAccount" in {
+          Json.toJson[BankDetails](bankAccountPartialModel) must be(bankAccountJson)
+        }
+      }
     }
-    "deserialise as expected" in {
-      completeJsonChanged.as[BankDetails] must be(completeModelChanged)
-    }
-  }
 
-  "Bank details with partially complete model containing only accountType" must {
-    "serialise as expected" in {
-      Json.toJson[BankDetails](accountTypePartialModel) must be(accountTypeJson)
+    "deserialise" when {
+      "given complete model" in {
+        completeJson.as[BankDetails] must be(completeModel)
+      }
+      "hasChanged field is missing from the Json" in {
+        (completeJson - "hasChanged").as[BankDetails] must be(completeModel)
+      }
+      "has the hasChanged flag set as true" in {
+        completeJsonChanged.as[BankDetails] must be(completeModelChanged)
+      }
+      "partially complete model" which {
+        "contains only accountType" in {
+          accountTypeJson.as[BankDetails] must be(accountTypePartialModel)
+        }
+        "contains only bankAccount" in {
+          bankAccountJson.as[BankDetails] must be(bankAccountPartialModel)
+        }
+      }
     }
-    "Deserialise as expected" in {
-      accountTypeJson.as[BankDetails] must be(accountTypePartialModel)
-    }
-  }
 
-  "Bank details with partially complete model containing only bankAccount" must {
-    "serialise as expected" in {
-      Json.toJson[BankDetails](bankAccountPartialModel) must be(bankAccountJson)
-    }
-    "Deserialise as expected" in {
-      bankAccountJson.as[BankDetails] must be(bankAccountPartialModel)
-    }
   }
 
   "isComplete" must {
-    "return true when BankDetails contains complete data" in {
-      val bankAccount = UKAccount("123456", "00-00-00")
-      val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
+    "return true" when {
+      "given complete model" in {
+        val bankAccount = UKAccount("123456", "00-00-00")
+        val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
 
-      bankDetails.isComplete must be(true)
+        bankDetails.isComplete must be(true)
+      }
     }
 
-    "return false when BankDetails contains incomplete data" in {
-      val bankDetails = BankDetails(Some(accountType), None)
+    "return false" when {
+      "given incomplete model" in {
+        val bankDetails = BankDetails(Some(accountType), None)
 
-      bankDetails.isComplete must be(false)
+        bankDetails.isComplete must be(false)
+      }
+
+      "given empty model" in {
+        val bankDetails = BankDetails(None, None, hasAccepted = true)
+
+        bankDetails.isComplete must be(true)
+      }
     }
 
-    "return false when BankDetails no data" in {
-      val bankDetails = BankDetails(None, None, hasAccepted = true)
-
-      bankDetails.isComplete must be(true)
-    }
   }
 
   "Section" must {
 
-    "return a NotStarted Section when there is no data at all" in {
-      val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
+    "return a NotStarted Section" when {
+      "there is no data at all" in {
+        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
 
-      mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
+        mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
 
-      BankDetails.section(mockCacheMap) must be(notStartedSection)
+        BankDetails.section(mockCacheMap) must be(notStartedSection)
+      }
     }
 
-    "return a Completed Section when model is complete and has not changed" in {
-      val complete = Seq(completeModel)
-      val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
+    "return a Completed Section" when {
+      "model is complete and has not changed" in {
+        val complete = Seq(completeModel)
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
 
-      mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
+        mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
 
-      BankDetails.section(mockCacheMap) must be(completedSection)
-    }
+        BankDetails.section(mockCacheMap) must be(completedSection)
+      }
 
-    "return a Completed Section when model is complete and has changed" in {
-      val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
+      "model is complete and has changed" in {
+        val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
 
-      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
-      mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
+        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
 
-      BankDetails.section(mockCacheMap) must be(completedSection)
-    }
+        BankDetails.section(mockCacheMap) must be(completedSection)
+      }
 
-    "return a completed Section when model is complete with No bankaccount option selected" in {
-      val noBankAccount = Seq(BankDetails(None, None, None, true, false, None, true))
-      val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+      "model is complete with No bankaccount option selected" in {
+        val noBankAccount = Seq(BankDetails(None, None, None, true, false, None, true))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
 
-      mockCacheGetEntry[Seq[BankDetails]](Some(noBankAccount), BankDetails.key)
+        mockCacheGetEntry[Seq[BankDetails]](Some(noBankAccount), BankDetails.key)
 
-      val section = BankDetails.section(mockCacheMap)
-      section.hasChanged must be(true)
-      section.status must be(Completed)
-      BankDetails.section(mockCacheMap) must be(completedSection)
+        val section = BankDetails.section(mockCacheMap)
+        section.hasChanged must be(true)
+        section.status must be(Completed)
+        BankDetails.section(mockCacheMap) must be(completedSection)
+      }
     }
 
     "return a Started Section when model is incomplete" in {
@@ -225,27 +196,11 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
         BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get(2).url)
       }
     }
-    
-    "Amendment and Variation flow" when {
-      "the section is complete with all the bank details being removed" must {
-        "successfully redirect to what you need page" in {
 
+    "Amendment and Variation flow" must {
 
-          mockCacheGetEntry(Some(Seq(
-            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true),
-            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true))),
-            BankDetails.key)
-
-          val section = BankDetails.section(mockCacheMap)
-
-          section.hasChanged must be(true)
-          section.status must be(NotStarted)
-          section.call must be(controllers.bankdetails.routes.BankAccountAddController.get(true))
-        }
-      }
-
-      "the section is complete with one of the bank details object being removed" must {
-        "successfully redirect to check your answers page" in {
+      "redirect to Check Your Answers" when {
+        "the section is complete with one of the bank details object being removed" in {
 
           mockCacheGetEntry[Seq[BankDetails]](Some(Seq(
             BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true), completeModel)),
@@ -257,10 +212,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
           section.status must be(Completed)
           section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
         }
-      }
 
-      "the section is complete with all the bank details unchanged" must {
-        "successfully redirect to check your answers page" in {
+        "the section is complete with all the bank details unchanged" in {
 
           mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModel, completeModel)), BankDetails.key)
 
@@ -270,10 +223,8 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
           section.status must be(Completed)
           section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
         }
-      }
 
-      "the section is complete with all the bank details being modified" must {
-        "successfully redirect to check your answers page" in {
+        "the section is complete with all the bank details being modified" in {
 
           mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModelChanged, completeModelChanged)), BankDetails.key)
 
@@ -282,6 +233,23 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
           section.hasChanged must be(true)
           section.status must be(Completed)
           section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+        }
+
+      }
+
+      "redirect to What You Need" when {
+        "the section is complete with all the bank details being removed" in {
+
+          mockCacheGetEntry(Some(Seq(
+            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true),
+            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true))),
+            BankDetails.key)
+
+          val section = BankDetails.section(mockCacheMap)
+
+          section.hasChanged must be(true)
+          section.status must be(NotStarted)
+          section.call must be(controllers.bankdetails.routes.BankAccountAddController.get(true))
         }
       }
 
@@ -299,7 +267,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
         }
         test must be(Some(Seq(completeModelChanged)))
       }
+
     }
+
   }
 
   "anyChanged" must {
@@ -359,93 +329,56 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     }
   }
 
-  "ibanType" must {
-    "validate IBAN supplied " in {
-      Account.ibanType.validate("IBAN_0000000000000") must be(Valid("IBAN_0000000000000"))
-    }
+}
 
-    "fail validation if IBAN is longer than the permissible length" in {
-      Account.ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
-    }
+trait BankDetailsModels {
 
-    "fail validation if IBAN contains invalid characters" in {
-      Account.ibanType.validate("ab{}kfg  ") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
-    }
+  val accountType = PersonalAccount
+  val accountTypeJson = Json.obj(
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"
+    ),
+    "hasChanged" -> false,
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> false
+  )
 
-    "fail validation if IBAN contains only whitespace" in {
-      Account.ibanType.validate("    ") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
-    }
-  }
+  val bankAccount = UKAccount("111111", "00-00-00")
+  val bankAccountJson = Json.obj(
+    "bankAccount" -> Json.obj(
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "00-00-00"
+    ),
+    "hasChanged" -> false,
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> false
+  )
 
-  "nonUKBankAccountNumberType" must {
-    "validate Non UK Account supplied " in {
-      Account.nonUKBankAccountNumberType.validate("IND00000000000000") must be(Valid("IND00000000000000"))
-    }
+  val completeModel = BankDetails(Some(accountType), Some("bankName"), Some(bankAccount), hasAccepted = true)
+  val completeJson = Json.obj(
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"),
+    "accountName" -> "bankName",
+    "bankAccount" -> Json.obj(
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "00-00-00"),
+    "hasChanged" -> false,
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
 
-    "fail validation if Non UK Account is longer than the permissible length" in {
-      Account.nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
-    }
-
-    "fail validation if Non UK Account no contains invalid characters" in {
-      Account.nonUKBankAccountNumberType.validate("ab{}kfg  ") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
-    }
-
-    "fail validation if Non UK Account no contains only whitespace" in {
-      Account.nonUKBankAccountNumberType.validate("    ") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
-    }
-  }
-
-  "ukBankAccountNumberType" must {
-
-    "validate when 8 digits are supplied " in {
-      Account.ukBankAccountNumberType.validate("00000000") must be(Valid("00000000"))
-    }
-
-    "fail validation when less than 8 characters are supplied" in {
-      Account.ukBankAccountNumberType.validate("123456") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
-    }
-
-    "fail validation when more than 8 characters are supplied" in {
-      Account.ukBankAccountNumberType.validate("1234567890") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
-    }
-  }
-
-  "sortCodeType" must {
-
-    "validate when 6 digits are supplied without - " in {
-      Account.sortCodeType.validate("000000") must be(Valid("000000"))
-    }
-
-    "fail validation when more than 6 digits are supplied without - " in {
-      Account.sortCodeType.validate("87654321") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
-    }
-
-    "fail when 8 non digits are supplied with - " in {
-      Account.sortCodeType.validate("ab-cd-ef") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
-    }
-
-    "pass validation when dashes are used to seperate number groups" in {
-      Account.sortCodeType.validate("65-43-21") must be(Valid("654321"))
-    }
-    "pass validation when spaces are used to seperate number groups" in {
-      Account.sortCodeType.validate("65 43 21") must be(Valid("654321"))
-    }
-
-    "fail validation for sort code with any other pattern" in {
-      Account.sortCodeType.validate("8712341241431243124124654321") must be(
-        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
-      )
-    }
-  }
+  val completeModelChanged = BankDetails(Some(accountType), Some("anotherName"), Some(bankAccount), true, hasAccepted = true)
+  val completeJsonChanged = Json.obj(
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"),
+    "accountName" -> "anotherName",
+    "bankAccount" -> Json.obj(
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "00-00-00"),
+    "hasChanged" -> true,
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
 
 }
