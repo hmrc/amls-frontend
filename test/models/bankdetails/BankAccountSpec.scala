@@ -23,7 +23,6 @@ import jto.validation.ValidationError
 
 import play.api.libs.json.{JsSuccess, JsPath, Json}
 
-
 class BankAccountSpec extends PlaySpec with MockitoSugar {
 
   "Account details form" must {
@@ -140,7 +139,6 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
     }
   }
 
-
   "For the Account" must {
 
     "Form Rule validation is successful for UKAccount" in {
@@ -218,7 +216,6 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
 
       Account.formWrites.writes(ukAccount) must be(urlFormEncoded)
     }
-
 
     "JSON Read is successful for UKAccount" in {
       val jsObject = Json.obj(
@@ -376,6 +373,95 @@ class BankAccountSpec extends PlaySpec with MockitoSugar {
       Account.formWrites.writes(nonUKBankAccount) must be(urlFormEncoded)
     }
 
+  }
+
+  "ibanType" must {
+    "validate IBAN supplied " in {
+      Account.ibanType.validate("IBAN_0000000000000") must be(Valid("IBAN_0000000000000"))
+    }
+
+    "fail validation if IBAN is longer than the permissible length" in {
+      Account.ibanType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+
+    "fail validation if IBAN contains invalid characters" in {
+      Account.ibanType.validate("ab{}kfg  ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+
+    "fail validation if IBAN contains only whitespace" in {
+      Account.ibanType.validate("    ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.iban")))))
+    }
+  }
+
+  "nonUKBankAccountNumberType" must {
+    "validate Non UK Account supplied " in {
+      Account.nonUKBankAccountNumberType.validate("IND00000000000000") must be(Valid("IND00000000000000"))
+    }
+
+    "fail validation if Non UK Account is longer than the permissible length" in {
+      Account.nonUKBankAccountNumberType.validate("12345678901234567890123456789012345678901234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+
+    "fail validation if Non UK Account no contains invalid characters" in {
+      Account.nonUKBankAccountNumberType.validate("ab{}kfg  ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+
+    "fail validation if Non UK Account no contains only whitespace" in {
+      Account.nonUKBankAccountNumberType.validate("    ") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.account")))))
+    }
+  }
+
+  "ukBankAccountNumberType" must {
+
+    "validate when 8 digits are supplied " in {
+      Account.ukBankAccountNumberType.validate("00000000") must be(Valid("00000000"))
+    }
+
+    "fail validation when less than 8 characters are supplied" in {
+      Account.ukBankAccountNumberType.validate("123456") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.accountnumber")))))
+    }
+
+    "fail validation when more than 8 characters are supplied" in {
+      Account.ukBankAccountNumberType.validate("1234567890") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.max.length.bankdetails.accountnumber")))))
+    }
+  }
+
+  "sortCodeType" must {
+
+    "validate when 6 digits are supplied without - " in {
+      Account.sortCodeType.validate("000000") must be(Valid("000000"))
+    }
+
+    "fail validation when more than 6 digits are supplied without - " in {
+      Account.sortCodeType.validate("87654321") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+    }
+
+    "fail when 8 non digits are supplied with - " in {
+      Account.sortCodeType.validate("ab-cd-ef") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode")))))
+    }
+
+    "pass validation when dashes are used to seperate number groups" in {
+      Account.sortCodeType.validate("65-43-21") must be(Valid("654321"))
+    }
+    "pass validation when spaces are used to seperate number groups" in {
+      Account.sortCodeType.validate("65 43 21") must be(Valid("654321"))
+    }
+
+    "fail validation for sort code with any other pattern" in {
+      Account.sortCodeType.validate("8712341241431243124124654321") must be(
+        Invalid(Seq(Path -> Seq(ValidationError("error.invalid.bankdetails.sortcode"))))
+      )
+    }
   }
 
 }
