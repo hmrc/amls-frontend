@@ -16,7 +16,6 @@
 
 package models.bankdetails
 
-import jto.validation._
 import models.CharacterSets
 import models.bankdetails.BankDetails._
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
@@ -76,6 +75,9 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
         "contains only bankAccount" in {
           bankAccountJson.as[BankDetails] must be(bankAccountPartialModel)
         }
+      }
+      "given old format" in {
+        oldCompleteJson.as[BankDetails] must be(completeModel)
       }
     }
 
@@ -378,6 +380,18 @@ trait BankDetailsModels {
       "accountNumber" -> "111111",
       "sortCode" -> "00-00-00"),
     "hasChanged" -> true,
+    "refreshedFromServer" -> false,
+    "hasAccepted" -> true)
+
+  val oldCompleteJson = Json.obj(
+    "bankAccountType" -> Json.obj(
+      "bankAccountType" -> "01"),
+    "bankAccount" -> Json.obj(
+      "accountName" -> "bankName",
+      "isUK" -> true,
+      "accountNumber" -> "111111",
+      "sortCode" -> "00-00-00"),
+    "hasChanged" -> false,
     "refreshedFromServer" -> false,
     "hasAccepted" -> true)
 
