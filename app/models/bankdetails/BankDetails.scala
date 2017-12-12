@@ -101,21 +101,32 @@ object BankDetails {
     override def apply(): String = "bank-details"
   }
 
-  implicit val reads: Reads[BankDetails] = (
-    ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
-      (__ \ "accountName").readNullable[String] ~
-      ((__ \ "bankAccount").read[Account].map[Option[Account]](Some(_)) orElse __.read(Reads.optionNoError[Account])) ~
-      (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
-      (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
-      (__ \ "status").readNullable[String] ~
-      (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
-    ) (BankDetails.apply _)
+  implicit val reads: Reads[BankDetails] = {
 
+    def constant[A](x: A): Reads[A] = new Reads[A] {
+      override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
+    }
+
+    def accountNameReader: Reads[Option[String]] = {
+      (__ \ "accountName").readNullable[String] flatMap {
+        case x@Some(_) => constant(x)
+        case _ => (__ \ "bankAccount" \ "accountName").readNullable[String] orElse constant(None)
+      }
+    }
+
+    (
+      ((__ \ "bankAccountType").readNullable[BankAccountType] orElse __.read(Reads.optionNoError[BankAccountType])) ~
+        accountNameReader ~
+        ((__ \ "bankAccount").read[Account].map[Option[Account]](Some(_)) orElse __.read(Reads.optionNoError[Account])) ~
+        (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) ~
+        (__ \ "refreshedFromServer").readNullable[Boolean].map(_.getOrElse(false)) ~
+        (__ \ "status").readNullable[String] ~
+        (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false))
+      ) (BankDetails.apply _)
+  }
 
   implicit val writes: Writes[BankDetails] = Json.writes[BankDetails]
 
   implicit def default(details: Option[BankDetails]): BankDetails =
     details.getOrElse(BankDetails())
 }
-
-
