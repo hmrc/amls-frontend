@@ -231,6 +231,7 @@ object ResponsiblePeople {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+  import utils.MappingUtils._
 
   val flowChangeOfficer = "changeofficer"
   val flowFromDeclaration = "fromDeclaration"
@@ -239,10 +240,6 @@ object ResponsiblePeople {
 
   implicit val mongoKey = new MongoKey[ResponsiblePeople] {
     override def apply(): String = key
-  }
-
-  def constant[A](x: A): Reads[A] = new Reads[A] {
-    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
   def oldPreviousNameReader: Reads[Option[PreviousName]] =

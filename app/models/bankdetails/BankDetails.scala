@@ -49,7 +49,7 @@ case class BankDetails(
   }
 
   def isComplete: Boolean = this match {
-    case BankDetails(Some(NoBankAccountUsed), Some(_), None, _, _, _, accepted) => accepted
+    case BankDetails(Some(NoBankAccountUsed), _, None, _, _, _, accepted) => accepted
     case BankDetails(Some(_), Some(_), Some(_), _, _, _, accepted) => accepted
     case BankDetails(None, _, None, _, _, _, accepted) => accepted
     case _ => false
@@ -60,6 +60,7 @@ object BankDetails {
 
   import play.api.libs.functional.syntax._
   import play.api.libs.json._
+  import utils.MappingUtils._
 
   implicit def maybeBankAccount(account: Account): Option[Account] = Some(account)
 
@@ -102,10 +103,6 @@ object BankDetails {
   }
 
   implicit val reads: Reads[BankDetails] = {
-
-    def constant[A](x: A): Reads[A] = new Reads[A] {
-      override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
-    }
 
     def accountNameReader: Reads[Option[String]] = {
       (__ \ "accountName").readNullable[String] flatMap {

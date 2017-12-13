@@ -94,6 +94,8 @@ case class Hvd (cashPayment: Option[CashPayment] = None,
 
 object Hvd {
 
+  import utils.MappingUtils._
+
   val key = "hvd"
 
   implicit val formatOption = Reads.optionWithNull[Hvd]
@@ -108,10 +110,6 @@ object Hvd {
           Section(key, Started, model.hasChanged, controllers.hvd.routes.WhatYouNeedController.get())
         }
     }
-  }
-
-  def constant[A](x: A): Reads[A] = new Reads[A] {
-    override def reads(json: JsValue): JsResult[A] = JsSuccess(x)
   }
 
   def oldReceiveCashPaymentsReader: Reads[Option[Boolean]] =
