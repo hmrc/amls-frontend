@@ -336,6 +336,27 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
     }
+    "remove RP FitAndProper" when {
+      "tcsp is removed" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+
+
+      }
+      "msb is removed" in new Fixture {
+
+      }
+    }
+    "not update RP" when {
+      "msb remains" in new Fixture {
+
+      }
+      "tcsp remains" in new Fixture {
+
+      }
+    }
   }
 
 }
