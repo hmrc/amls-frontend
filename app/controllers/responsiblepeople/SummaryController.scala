@@ -23,15 +23,18 @@ import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
-import services.StatusService
+import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
 import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremises
 
 import scala.concurrent.Future
@@ -68,7 +71,7 @@ class SummaryController @Inject()(
   def post(flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       flow match {
-        case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
+        //case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
         case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
         case None => {
           (for {
@@ -81,12 +84,19 @@ class SummaryController @Inject()(
 
   private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
     for {
-      status <- statusService.getStatus
-      rp <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-      rpNew <- updateResponsiblePeople(rp)
-      _ <- dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, rpNew.getOrElse(Seq.empty))
-      hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-    } yield Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
+      model <- OptionT(fetchModel)
+      _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
+     // hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      //businessmatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+      //reviewDetails <- businessmatching.reviewDetails
+      //businessType <- reviewDetails.businessType
+      //status <- statusService.getStatus
+    } yield true match {
+      case true if DeclarationHelper.numberOfPartners(model) < 2 =>
+        Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+      case _ =>
+        Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+    }
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
