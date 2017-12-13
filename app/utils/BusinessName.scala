@@ -16,17 +16,15 @@
 
 package utils
 
-import cats.implicits._
 import cats.data.OptionT
-import config.ApplicationConfig
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
-import models.registrationdetails.RegistrationDetails
 import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 object BusinessName {
 
