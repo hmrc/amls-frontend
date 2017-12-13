@@ -88,9 +88,9 @@ case class BusinessMatching(
 
   def isComplete: Boolean =
     this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _, true) if !ApplicationConfig.hasAcceptedToggle
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _, _) if !ApplicationConfig.hasAcceptedToggle
         && isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, true)
+      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
         if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
       case _ => false
     }
