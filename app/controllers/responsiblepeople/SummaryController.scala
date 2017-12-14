@@ -23,16 +23,20 @@ import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
+import models.businessmatching.BusinessMatching
+import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePeople
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
-import services.StatusService
+import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
 import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremises
+import play.api.mvc.Result
 
 import scala.concurrent.Future
 
@@ -80,13 +84,20 @@ class SummaryController @Inject()(
     }
 
   private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
-    for {
-      status <- statusService.getStatus
-      rp <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-      rpNew <- updateResponsiblePeople(rp)
-      _ <- dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, rpNew.getOrElse(Seq.empty))
-      hasNominatedOfficer <- ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-    } yield Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
+    (for {
+      model <- OptionT(fetchModel)
+      _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
+      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)))
+      businessmatching <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
+      businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
+      status <- OptionT.liftF(statusService.getStatus)
+    } yield businessType match {
+      case Partnership if DeclarationHelper.numberOfPartners(model) < 2 =>
+        Redirect(controllers.declaration.routes.RegisterPartnersController.get())
+      case _ =>
+        Redirect(DeclarationHelper.routeDependingOnNominatedOfficer(hasNominatedOfficer, status, config.showFeesToggle))
+    }) getOrElse InternalServerError("Cannot determine redirect")
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
