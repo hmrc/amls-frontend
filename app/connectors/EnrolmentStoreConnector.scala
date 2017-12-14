@@ -20,6 +20,7 @@ import javax.inject.Inject
 
 import config.{AppConfig, WSHttp}
 
+// $COVERAGE-OFF$
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig) {
 
   lazy val baseUrl = appConfig.config.baseUrl("tax-enrolments")
