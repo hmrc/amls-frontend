@@ -25,25 +25,58 @@ import org.scalatestplus.play.PlaySpec
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.{CoreGet, CorePost, HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http._
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import play.api.test.Helpers._
 
-class AuthConnectorSpec  extends PlaySpec with MockitoSugar with ScalaFutures {
+class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
+  trait Fixture {
+    implicit val headerCarrier = HeaderCarrier()
 
-  object TestAuthConnector extends AuthConnector {
-    override private[connectors] def authUrl: String = ""
-    override private[connectors] val http = mock[CoreGet]
+    object TestAuthConnector extends AuthConnector {
+      override private[connectors] def authUrl: String = "/auth"
+      override private[connectors] val http = mock[CoreGet]
+    }
+
+    val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three")
   }
 
   "Auth Connector" must {
-    "return list of government gateway enrolments" in {
-      implicit val headerCarrier = HeaderCarrier()
-      when(TestAuthConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(),any(), any())).thenReturn(Future.successful(Nil))
+    "return list of government gateway enrolments" in new Fixture {
+      when(TestAuthConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
 
-      whenReady(TestAuthConnector.enrollments("thing")){
+      whenReady(TestAuthConnector.enrollments("thing")) {
         results => results must equal(Nil)
       }
     }
-  }
 
+    "get the current authority" in new Fixture {
+      when {
+        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+      } thenReturn Future.successful(completeAuthorityModel)
+
+      whenReady(TestAuthConnector.getCurrentAuthority) { _ mustBe completeAuthorityModel }
+    }
+
+    "return a failed Future when the HTTP call is unauthorised" in new Fixture {
+      when {
+        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+      } thenReturn Future.failed(Upstream4xxResponse("Unauthorized", UNAUTHORIZED, UNAUTHORIZED))
+
+      intercept[Exception] {
+        await(TestAuthConnector.getCurrentAuthority)
+      }
+    }
+
+    "get the Ids" in new Fixture {
+      when {
+        TestAuthConnector.http.GET[Ids](any())(any(), any(), any())
+      } thenReturn Future.successful(mock[Ids])
+
+      whenReady(TestAuthConnector.getIds(completeAuthorityModel)) { _ =>
+        verify(TestAuthConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
+      }
+    }
+  }
 }

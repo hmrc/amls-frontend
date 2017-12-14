@@ -34,7 +34,7 @@ case class BankDetails(
 
   def bankAccountType(v: Option[BankAccountType]): BankDetails = {
     v match {
-      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isEmpty,
+      case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isDefined,
         hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
       case _ => {
         this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
