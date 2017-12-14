@@ -21,6 +21,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
+import play.api.libs.json.{JsString, JsSuccess, Json}
 
 class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
@@ -79,6 +80,46 @@ class BusinessTypeSpec extends PlaySpec with MockitoSugar {
 
       BusinessType.formW.writes(UnincorporatedBody) must
         be(Map("businessType" -> Seq("05")))
+    }
+
+
+    "the json writer" must {
+      "convert to json from model" in {
+        Json.toJson(BusinessType.SoleProprietor) must
+          be(JsString("Sole Trader"))
+
+        Json.toJson(BusinessType.LimitedCompany) must
+          be(JsString("Corporate Body"))
+
+        Json.toJson(BusinessType.Partnership) must
+          be(JsString("Partnership"))
+
+        Json.toJson(BusinessType.LPrLLP) must
+          be(JsString("LLP"))
+
+        Json.toJson(BusinessType.UnincorporatedBody) must
+          be(JsString("Unincorporated Body"))
+      }
+    }
+
+    "the json reader" must {
+      "convert from json to model" in {
+
+        Json.fromJson[BusinessType](JsString("Sole Trader")) must
+          be(JsSuccess(SoleProprietor))
+
+        Json.fromJson[BusinessType](JsString("Corporate Body")) must
+          be(JsSuccess(LimitedCompany))
+
+        Json.fromJson[BusinessType](JsString("Partnership")) must
+          be(JsSuccess(Partnership))
+
+        Json.fromJson[BusinessType](JsString("LLP")) must
+          be(JsSuccess(LPrLLP))
+
+        Json.fromJson[BusinessType](JsString("Unincorporated Body")) must
+          be(JsSuccess(UnincorporatedBody))
+      }
     }
   }
 }
