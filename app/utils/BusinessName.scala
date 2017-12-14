@@ -16,30 +16,38 @@
 
 package utils
 
-import cats.implicits._
 import cats.data.OptionT
-import config.ApplicationConfig
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 object BusinessName {
 
-  def getNameFromCache(implicit hc: HeaderCarrier, ac: AuthContext, cache: DataCacheConnector, ec: ExecutionContext) =
+  private val warn: String => Unit = msg => Logger.warn(s"[BusinessName] $msg")
+
+  def getNameFromCache(implicit hc: HeaderCarrier, ac: AuthContext, cache: DataCacheConnector, ec: ExecutionContext): OptionT[Future, String] =
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
     } yield rd.businessName
 
-  def getNameFromAmls(safeId: String)(implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext) =
-    OptionT.liftF(amls.registrationDetails(safeId)) map {
-      _.companyName
-    }
+  def getNameFromAmls(safeId: String)
+                     (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
+    OptionT(amls.registrationDetails(safeId) map { r =>
+      Option(r.companyName)
+    } recover {
+      case ex =>
+        warn(s"Call to registrationDetails failed: ${ex.getMessage}. Falling back to cache..")
+        None
+    })
+  }
 
-  def getName(safeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
-    safeId.fold(getNameFromCache)(v => getNameFromAmls(v))
-
+  def getName(safeId: Option[String])
+             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
+    safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)
 }
