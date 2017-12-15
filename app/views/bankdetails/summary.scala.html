@@ -104,7 +104,7 @@
                                         case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                     }</li>
                                     <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
-                                    <li>@Messages("bankdetails.bankaccount.accountnumber"): @f.accountNumber</li>
+                                    @accountNumber(f.accountNumber, Messages("bankdetails.bankaccount.accountnumber"), complete, status, x.status)
                                 </ul>
                             }
                         }
@@ -122,7 +122,7 @@
                                         case BelongsToOtherBusiness => {@Messages("bankdetails.summary.accounttype.lbl.03")}
                                     }</li>
                                     <li>@Messages("bankdetails.bankaccount.accounttype.uk.lbl"): @Messages("lbl.no")</li>
-                                    <li>@Messages("bankdetails.bankaccount.iban"): @f.IBANNumber</li>
+                                    @IBANNumber(f.IBANNumber, Messages("bankdetails.bankaccount.iban"), complete, status, x.status)
                                 </ul>
                             }
                         }
