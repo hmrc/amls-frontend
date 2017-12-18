@@ -380,6 +380,25 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
       "msb is removed tcsp is not selected" in new Fixture {
 
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
+
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
+          eqTo(ResponsiblePeople.key),
+          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
+        )(any(),any(),any())
+
       }
     }
     "not update RP" when {
