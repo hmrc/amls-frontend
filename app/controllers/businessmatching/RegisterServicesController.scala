@@ -148,15 +148,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def removeFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
-
+  private def removeFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[ResponsiblePeople]{ responsiblePeople: Seq[ResponsiblePeople] =>
       responsiblePeople map { rp =>
         rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
       }
     }
-
-  }
 
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))

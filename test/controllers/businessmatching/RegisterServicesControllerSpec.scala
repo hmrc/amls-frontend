@@ -394,29 +394,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
     "remove RP FitAndProper" when {
-      "tcsp is removed and msb is not selected" in new Fixture {
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, HighValueDealing)))))
-
-        when {
-          controller.statusService.isPreSubmission(any(),any(),any())
-        } thenReturn Future.successful(anyBoolean)
-
-        val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
-        ))
-
-        status(result) must be(SEE_OTHER)
-
-        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
-          eqTo(ResponsiblePeople.key),
-          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
-        )(any(),any(),any())
-
-      }
-      "msb is removed tcsp is not selected" in new Fixture {
+      "fitAndProper is not required" in new Fixture {
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
@@ -440,26 +418,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
     "not update RP" when {
-      "tcsp is removed and msb is selected in request" in new Fixture {
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
-
-        when {
-          controller.statusService.isPreSubmission(any(),any(),any())
-        } thenReturn Future.successful(anyBoolean)
-
-        val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(MoneyServiceBusiness)
-        ))
-
-        status(result) must be(SEE_OTHER)
-
-        verifyZeroInteractions(mockCacheConnector)
-
-      }
-      "msb is removed and tcsp is selected in request" in new Fixture {
+      "fitAndProper is required" in new Fixture {
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
@@ -478,7 +437,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         verifyZeroInteractions(mockCacheConnector)
 
       }
-
     }
   }
 
