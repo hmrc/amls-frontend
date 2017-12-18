@@ -144,4 +144,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
+  private def fitAndProperRequired(businessActivities: Set[BusinessActivity]): Boolean =
+    (businessActivities contains TrustAndCompanyServices) | (businessActivities contains MoneyServiceBusiness)
+
 }

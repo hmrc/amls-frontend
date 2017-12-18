@@ -304,6 +304,40 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
     }
+
+    "fitAndProperRequired" must {
+      "return true" when {
+        "tcsp is selected in request" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
+
+          result must be(true)
+
+        }
+        "msb is selected in request" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+
+          result must be(true)
+
+        }
+      }
+      "return false" when {
+        "neither msb or tcsp appear in request" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
+
+          result must be(false)
+
+        }
+      }
+    }
   }
 
   it must {
@@ -402,13 +436,23 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
     "not update RP" when {
-      "tcsp is removed and msb exists in business activities" in new Fixture {
-
-      }
-      "msb is removed and tcsp exists in business activities" in new Fixture {
-
-      }
       "tcsp is removed and msb is selected in request" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
+
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(MoneyServiceBusiness)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verifyZeroInteractions(mockCacheConnector)
 
       }
       "msb is removed and tcsp is selected in request" in new Fixture {
