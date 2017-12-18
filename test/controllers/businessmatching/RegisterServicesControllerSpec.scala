@@ -19,7 +19,9 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import forms.{EmptyForm, Form2}
+import generators.ResponsiblePersonGenerator
 import models.businessmatching._
+import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -34,11 +36,12 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import org.scalacheck.Gen
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester {
+class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester with ResponsiblePersonGenerator {
 
   val activities: Set[BusinessActivity] = Set(
     AccountancyServices,
@@ -84,6 +87,20 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     when {
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    def anyBoolean = Gen.oneOf[Boolean](true, false).sample.get
+
+    val responsiblePerson = responsiblePersonGen.sample.get
+
+    val fitAndProperResponsiblePeople = Seq(
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
+    )
+
+    when {
+      mockCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(),any(),any())
+    } thenReturn Future.successful(Some(fitAndProperResponsiblePeople))
+
   }
 
   "RegisterServicesController" when {
@@ -337,25 +354,46 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
     "remove RP FitAndProper" when {
-      "tcsp is removed" in new Fixture {
+      "tcsp is removed and msb is not selected" in new Fixture {
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching1)
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, HighValueDealing)))))
 
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
+          eqTo(ResponsiblePeople.key),
+          eqTo(Seq(responsiblePerson, responsiblePerson))
+        )(any(),any(),any())
 
       }
-      "msb is removed" in new Fixture {
+      "msb is removed tcsp is not selected" in new Fixture {
 
       }
     }
     "not update RP" when {
-      "msb remains" in new Fixture {
+      "tcsp is removed and msb exists in business activities" in new Fixture {
 
       }
-      "tcsp remains" in new Fixture {
+      "msb is removed and tcsp exists in business activities" in new Fixture {
 
       }
+      "tcsp is removed and msb is selected in request" in new Fixture {
+
+      }
+      "msb is removed and tcsp is selected in request" in new Fixture {
+
+      }
+
     }
   }
 
