@@ -82,13 +82,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             (for {
               isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
-              _ <- updateModel(businessMatching, data, isPreSubmission)
-            } yield redirectTo(data.businessActivities)) flatMap { redirectTo =>
-              if(fitAndProperRequired(data.businessActivities)){
-                Future.successful(redirectTo)
+              savedModel <- updateModel(
+                businessMatching,
+                newModel(businessMatching.activities, data, isPreSubmission),
+                isMsb(data, businessMatching.activities)
+              )
+            } yield savedModel) flatMap { savedActivities =>
+              if(fitAndProperRequired(savedActivities)){
+                Future.successful(redirectTo(data.businessActivities))
               } else {
                 removeFitAndProper map { _ =>
-                  redirectTo
+                  redirectTo(data.businessActivities)
                 }
               }
             }
@@ -123,19 +127,21 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(businessMatching: BusinessMatching,
-                          added: BusinessActivities,
-                          isPreSubmission: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
-
-    val updatedModel = businessMatching.activities.fold[BusinessActivities](added) { existing =>
-      if (isPreSubmission) {
-        added
-      } else {
-        BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
-      }
+  private def newModel(existingActivities: Option[BusinessActivities],
+                           added: BusinessActivities,
+                           isPreSubmission: Boolean) = existingActivities.fold[BusinessActivities](added) { existing =>
+    if (isPreSubmission) {
+      added
+    } else {
+      BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
     }
+  }
 
-    isMsb(added, businessMatching.activities) match {
+  private def updateModel(businessMatching: BusinessMatching,
+                          updatedModel: BusinessActivities,
+                          isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
+
+    (isMsb match {
       case true =>
         businessMatchingService.updateModel(
           businessMatching.activities(updatedModel)
@@ -144,6 +150,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         businessMatchingService.updateModel(
           businessMatching.activities(updatedModel).copy(msbServices = None)
         ).value
+    }) map { _ =>
+      updatedModel
     }
 
   }
@@ -158,7 +166,13 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
-  private def fitAndProperRequired(businessActivities: Set[BusinessActivity]): Boolean =
-    (businessActivities contains TrustAndCompanyServices) | (businessActivities contains MoneyServiceBusiness)
+  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean = {
 
+    def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+
+    (businessActivities.businessActivities, businessActivities.additionalActivities) match {
+      case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
+      case (a, _) => containsTcspOrMsb(a)
+    }
+  }
 }

@@ -276,41 +276,39 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     "fitAndProperRequired" must {
       "return true" when {
-        "pre-submission" when {
-          "tcsp is selected in request" in new Fixture {
+        "tcsp is defined in businessActivities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(TrustAndCompanyServices), None))
 
             result must be(true)
 
           }
-          "msb is selected in request" in new Fixture {
+        "msb is defined in businessActivities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(MoneyServiceBusiness), None))
 
             result must be(true)
 
           }
-        }
-        "post-submission" when {
-          "tcsp is selected in request" in new Fixture {
+        "additional activities is defined" when {
+          "tcsp is defined in additional activities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
 
             result must be(true)
 
           }
-          "msb is selected in request" in new Fixture {
+          "msb is defined in additional activities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
 
             result must be(true)
 
@@ -318,23 +316,23 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
       "return false" when {
-        "pre-submission" when {
-          "neither msb or tcsp appear in request" in new Fixture {
+        "additional activities is not defined" when {
+          "neither msb or tcsp appear businessActivities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), None))
 
             result must be(false)
 
           }
         }
-        "post-submission" when {
-          "neither msb or tcsp appear in request" in new Fixture {
+        "additional activities is defined" when {
+          "neither msb or tcsp appear businessActivities or additonal activities" in new Fixture {
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))
 
             result must be(false)
 
