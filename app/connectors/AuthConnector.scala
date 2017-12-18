@@ -42,6 +42,7 @@ case class Authority(uri: String,
   def normalisedIds: String = if (ids.startsWith("/")) ids.drop(1) else ids
 }
 
+// $COVERAGE-OFF$
 object Authority {
   implicit val format = {
     implicit val dateFormat = RestFormats.dateTimeFormats
@@ -49,6 +50,7 @@ object Authority {
     Json.format[Authority]
   }
 }
+// $COVERAGE-ON$
 
 trait AuthConnector {
 

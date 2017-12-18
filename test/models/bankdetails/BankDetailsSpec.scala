@@ -199,6 +199,14 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
       }
     }
 
+    "set hasChanged and hasAccepted when updating bankAccountType set to None" in {
+      val result = completeModel.bankAccountType(None)
+
+      result.hasAccepted mustBe false
+      result.hasChanged mustBe true
+      result.bankAccountType mustBe None
+    }
+
     "Amendment and Variation flow" must {
 
       "redirect to Check Your Answers" when {

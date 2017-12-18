@@ -20,6 +20,8 @@ import config.AMLSAuthConnector
 import generators.ResponsiblePersonGenerator
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -34,6 +36,7 @@ import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+
 import scala.concurrent.Future
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -56,7 +59,12 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
 
     val model = responsiblePersonGen.sample.get
 
+    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
     mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(model)), Some(ResponsiblePeople.key))
+
+    mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
 
   }
 
@@ -251,5 +259,51 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with Res
         }
       }
     }
+
+    "redirect to Register Partners Controller" when {
+      "there is less then 2 partners selected" in new Fixture {
+
+        val reviewDetails2 = ReviewDetails("BusinessName", Some(BusinessType.Partnership),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer, Partner), Some(new LocalDate()))
+        val positions2 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
+        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
+        val responsiblePeople = Seq(rp1, rp2)
+
+        mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails2), None)), Some(BusinessMatching.key))
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockApplicationStatus(SubmissionReady)
+        mockCacheSave[Seq[ResponsiblePeople]]
+
+        val result = controller.post(Some(flowFromDeclaration))(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.declaration.routes.RegisterPartnersController.get().url))
+
+      }
+    }
+
+    "return INTERNAL_SERVER_ERROR if reviewdetails cannot be retrieved" in new Fixture {
+
+      val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer, Partner), Some(new LocalDate()))
+      val positions2 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
+      val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
+      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
+      val responsiblePeople = Seq(rp1, rp2)
+
+      mockCacheFetch[BusinessMatching](Some(BusinessMatching(None, None)), Some(BusinessMatching.key))
+      mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+      mockApplicationStatus(SubmissionReady)
+      mockCacheSave[Seq[ResponsiblePeople]]
+
+      val result = controller.post(Some(flowFromDeclaration))(request)
+
+      status(result) must be(INTERNAL_SERVER_ERROR)
+
+    }
+
+
   }
 }

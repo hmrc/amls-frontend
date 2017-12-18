@@ -38,23 +38,25 @@
 
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @businessName.map {bn =>
-                <div class="panel-indent panel-indent--gutter panel-border-wide">
-                    <p class="heading-small">@Messages("status.business")</p><p>@bn</p>
-                    @endDate.map { date =>
-                        <p class="heading-small">@Messages("lbl.registration.status")</p>
-                        <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
-                            @if(allowDeRegister) {
-                                <a href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
-                            }
-                        </p>
-                    }
-                    @if(showChangeOfficer){
-                        @change_officer(name)
-                    }
-                    <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
-                </div>
-            }
+            <div class="panel-indent panel-indent--gutter panel-border-wide">
+                @businessName.map { bn =>
+                    <p class="heading-small">@Messages("status.business")</p> <p>@bn</p>
+                }
+
+                @endDate.map { date =>
+                    <p class="heading-small">@Messages("lbl.registration.status")</p>
+                    <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
+                        @if(allowDeRegister) {
+                            <a href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                        }
+                    </p>
+                }
+
+                @if(showChangeOfficer){
+                    @change_officer(name)
+                }
+                <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+            </div>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             @if(ApplicationConfig.notificationsToggle){
