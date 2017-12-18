@@ -58,7 +58,9 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       override val businessMatchingService = mockBusinessMatchingService
     }
 
-    mockApplicationStatus(SubmissionReady)
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -109,7 +111,10 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
       mockGetModel(Some(model))
-      mockApplicationStatus(SubmissionDecisionApproved)
+
+      when {
+        controller.statusService.isPreSubmission(any(), any(), any())
+      } thenReturn Future.successful(false)
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -195,8 +200,8 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     }
 
     when {
-      controller.statusService.getStatus(any(), any(), any())
-    } thenReturn Future.successful(SubmissionReady)
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -223,7 +228,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
       mockGetModel(Some(model))
-      mockApplicationStatus(SubmissionDecisionApproved)
+
+      when {
+        controller.statusService.isPreSubmission(any(), any(), any())
+      } thenReturn Future.successful(false)
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -239,7 +247,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     )
 
     mockGetModel(Some(model))
-    mockApplicationStatus(SubmissionDecisionApproved)
+
+    when {
+      controller.statusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(false)
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -267,7 +278,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
           mockUpdateModel
           mockCommit
           mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
-          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.statusService.isPreSubmission(any(), any(), any())
+          } thenReturn Future.successful(false)
 
           val result = controller.post()(postRequest)
 
@@ -291,7 +305,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
           mockUpdateModel
           mockCommit
           mockCacheFetch[UpdateService](None, Some(UpdateService.key))
-          mockApplicationStatus(SubmissionDecisionApproved)
+
+          when {
+            controller.statusService.isPreSubmission(any(), any(), any())
+          } thenReturn Future.successful(false)
 
           val result = controller.post()(postRequest)
 

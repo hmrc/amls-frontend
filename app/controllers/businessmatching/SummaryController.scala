@@ -40,12 +40,11 @@ trait SummaryController extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-        def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 
         val okResult = for {
           bm <- businessMatchingService.getModel
           ba <- OptionT.fromOption[Future](bm.activities)
-          status <- OptionT.liftF(statusService.getStatus)
+          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
         } yield {
           val bmWithAdditionalActivities = bm.copy(
             activities = Some(BusinessActivities(
@@ -53,13 +52,13 @@ trait SummaryController extends BaseController {
             ))
           )
 
-          val changeActivitiesUrl = if (isPreSubmission(status) || !ApplicationConfig.businessMatchingVariationToggle) {
+          val changeActivitiesUrl = if (isPreSubmission || !ApplicationConfig.businessMatchingVariationToggle) {
             controllers.businessmatching.routes.RegisterServicesController.get().url
           } else {
             controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
           }
 
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, isPreSubmission(status) || ApplicationConfig.businessMatchingVariationToggle))
+          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, isPreSubmission || ApplicationConfig.businessMatchingVariationToggle))
         }
 
         okResult getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
@@ -70,11 +69,11 @@ trait SummaryController extends BaseController {
       (for {
         businessMatching <- businessMatchingService.getModel
         businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
-        status <- OptionT.liftF(statusService.getStatus)
+        isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
         _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
-        if(goToUpdateServices(businessActivities.additionalActivities, status)){
+        if(goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)){
           Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
         } else {
           Redirect(controllers.routes.RegistrationProgressController.get())
@@ -82,11 +81,8 @@ trait SummaryController extends BaseController {
       }) getOrElse InternalServerError("Unable to update business matching")
   }
 
-  private def goToUpdateServices(additionalActivities: Option[Set[BusinessActivity]], status: SubmissionStatus): Boolean =
-    status match {
-      case NotCompleted | SubmissionReady => false
-      case _ => ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined
-    }
+  private def goToUpdateServices(additionalActivities: Option[Set[BusinessActivity]], isPreSubmission: Boolean): Boolean =
+    !isPreSubmission & (ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined)
 
 }
 
