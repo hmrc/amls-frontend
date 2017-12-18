@@ -36,10 +36,9 @@ case class BankDetails(
     v match {
       case None => this.copy(bankAccountType = None, hasChanged = hasChanged || this.bankAccountType.isDefined,
         hasAccepted = hasAccepted && this.bankAccountType.isEmpty)
-      case _ => {
+      case _ =>
         this.copy(bankAccountType = v, hasChanged = hasChanged || !this.bankAccountType.equals(v),
           hasAccepted = hasAccepted && this.bankAccountType.equals(v))
-      }
     }
   }
 

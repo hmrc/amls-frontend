@@ -108,9 +108,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def hasAlreadyPassedFitAndProper(p: Boolean): ResponsiblePeople =
-    this.copy(hasAlreadyPassedFitAndProper = Some(p), hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.contains(p),
-      hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.contains(p))
+  def hasAlreadyPassedFitAndProper(p: Option[Boolean]): ResponsiblePeople =
+    this.copy(hasAlreadyPassedFitAndProper = p, hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.equals(p),
+      hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.equals(p))
 
   def ukPassport(p: UKPassport): ResponsiblePeople =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),

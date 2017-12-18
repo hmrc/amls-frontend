@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessmatching._
@@ -72,6 +73,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
@@ -91,15 +93,15 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     def anyBoolean = Gen.oneOf[Boolean](true, false).sample.get
 
     val responsiblePerson = responsiblePersonGen.sample.get
+    val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
     val fitAndProperResponsiblePeople = Seq(
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
     )
 
-    when {
-      mockCacheConnector.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(),any(),any())
-    } thenReturn Future.successful(Some(fitAndProperResponsiblePeople))
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheSave[Seq[ResponsiblePeople]]
 
   }
 
@@ -372,7 +374,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
           eqTo(ResponsiblePeople.key),
-          eqTo(Seq(responsiblePerson, responsiblePerson))
+          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
         )(any(),any(),any())
 
       }

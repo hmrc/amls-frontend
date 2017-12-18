@@ -68,7 +68,7 @@ class FitAndProperController @Inject()(
           case ValidForm(_, data) => data match {
             case true =>
               updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-                responsiblePeople.map(_.hasAlreadyPassedFitAndProper(true).copy(hasAccepted = true))
+                responsiblePeople.map(_.hasAlreadyPassedFitAndProper(Some(true)).copy(hasAccepted = true))
               } map { _ => Redirect(NewServiceInformationController.get()) }
             case false => Future.successful(Redirect(WhichFitAndProperController.get()))
           }

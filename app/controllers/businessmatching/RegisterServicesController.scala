@@ -20,13 +20,18 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
-import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
+import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 import views.html.businessmatching._
 
 import scala.concurrent.Future
@@ -34,7 +39,8 @@ import scala.concurrent.Future
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService)() extends BaseController {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection{
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -86,6 +92,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                     businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
                   ).value
               }
+              _ <- maybeRemoveFitAndProper()
             } yield data.businessActivities.contains(MoneyServiceBusiness) match {
               case true => Redirect(routes.ServicesController.get(false))
               case false => Redirect(routes.SummaryController.get())
@@ -126,5 +133,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
+
+  private def maybeRemoveFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
+
+    updateDataStrict[ResponsiblePeople]{ responsiblePeople: Seq[ResponsiblePeople] =>
+      responsiblePeople map { rp =>
+        rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
+      }
+    }
+
+  }
 
 }
