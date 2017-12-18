@@ -274,37 +274,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
 
-    "updateModel" must {
-      "add data to the existing services" when {
-        "status is post-submission" in new Fixture {
-
-          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
-          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
-
-          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
-
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, false)
-
-          services must be(BusinessActivities(existingServices.businessActivities, Some(addedServices.businessActivities)))
-
-        }
-      }
-      "replace existing services" when {
-        "status is pre-submission" in new Fixture {
-
-          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
-          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
-
-          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
-
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, true)
-
-          services must be(addedServices)
-
-        }
-      }
-    }
-
     "fitAndProperRequired" must {
       "return true" when {
         "pre-submission" when {
@@ -491,6 +460,22 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
       "msb is removed and tcsp is selected in request" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
+
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verifyZeroInteractions(mockCacheConnector)
 
       }
 

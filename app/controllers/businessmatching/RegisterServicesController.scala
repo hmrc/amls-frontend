@@ -28,6 +28,7 @@ import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
@@ -81,16 +82,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             (for {
               isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
-              _ <- isMsb(data, businessMatching.activities) match {
-                case true =>
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission))
-                  ).value
-                case false =>
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
-                  ).value
-              }
+              _ <- updateModel(businessMatching, data, isPreSubmission)
             } yield redirectTo(data.businessActivities)) flatMap { redirectTo =>
               if(fitAndProperRequired(data.businessActivities)){
                 Future.successful(redirectTo)
@@ -131,8 +123,11 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, isPreSubmission: Boolean): BusinessActivities =
-    existing.fold[BusinessActivities](added) { existing =>
+  private def updateModel(businessMatching: BusinessMatching,
+                          added: BusinessActivities,
+                          isPreSubmission: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[CacheMap]] = {
+
+    val updatedModel = businessMatching.activities.fold[BusinessActivities](added) { existing =>
       if (isPreSubmission) {
         added
       } else {
@@ -140,8 +135,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-  private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
-    added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
+    isMsb(added, businessMatching.activities) match {
+      case true =>
+        businessMatchingService.updateModel(
+          businessMatching.activities(updatedModel)
+        ).value
+      case false =>
+        businessMatchingService.updateModel(
+          businessMatching.activities(updatedModel).copy(msbServices = None)
+        ).value
+    }
+
+  }
 
   private def removeFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
@@ -152,6 +157,9 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
 
   }
+
+  private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
+    added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
   private def fitAndProperRequired(businessActivities: Set[BusinessActivity]): Boolean =
     (businessActivities contains TrustAndCompanyServices) | (businessActivities contains MoneyServiceBusiness)
