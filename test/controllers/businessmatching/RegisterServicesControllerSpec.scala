@@ -307,34 +307,69 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     "fitAndProperRequired" must {
       "return true" when {
-        "tcsp is selected in request" in new Fixture {
+        "pre-submission" when {
+          "tcsp is selected in request" in new Fixture {
 
-          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
+            val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
 
-          result must be(true)
+            result must be(true)
 
+          }
+          "msb is selected in request" in new Fixture {
+
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+
+            result must be(true)
+
+          }
         }
-        "msb is selected in request" in new Fixture {
+        "post-submission" when {
+          "tcsp is selected in request" in new Fixture {
 
-          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+            val result = controller invokePrivate fitAndProperRequired(Set(TrustAndCompanyServices))
 
-          result must be(true)
+            result must be(true)
 
+          }
+          "msb is selected in request" in new Fixture {
+
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(Set(MoneyServiceBusiness))
+
+            result must be(true)
+
+          }
         }
       }
       "return false" when {
-        "neither msb or tcsp appear in request" in new Fixture {
+        "pre-submission" when {
+          "neither msb or tcsp appear in request" in new Fixture {
 
-          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
+            val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
 
-          result must be(false)
+            result must be(false)
 
+          }
+        }
+        "post-submission" when {
+          "neither msb or tcsp appear in request" in new Fixture {
+
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(Set(HighValueDealing))
+
+            result must be(false)
+
+          }
         }
       }
     }

@@ -28,7 +28,6 @@ import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
@@ -40,7 +39,7 @@ import scala.concurrent.Future
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection{
+                                           val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -79,7 +78,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            for {
+            (for {
               isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
               _ <- isMsb(data, businessMatching.activities) match {
@@ -92,12 +91,22 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                     businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
                   ).value
               }
-              _ <- maybeRemoveFitAndProper()
-            } yield data.businessActivities.contains(MoneyServiceBusiness) match {
-              case true => Redirect(routes.ServicesController.get(false))
-              case false => Redirect(routes.SummaryController.get())
+            } yield redirectTo(data.businessActivities)) flatMap { redirectTo =>
+              if(fitAndProperRequired(data.businessActivities)){
+                Future.successful(redirectTo)
+              } else {
+                removeFitAndProper map { _ =>
+                  redirectTo
+                }
+              }
             }
         }
+  }
+
+  private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
+    Redirect(routes.ServicesController.get())
+  } else {
+    Redirect(routes.SummaryController.get())
   }
 
   private def getActivityValues(f: Form2[_], isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
@@ -134,7 +143,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
-  private def maybeRemoveFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
+  private def removeFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] = {
 
     updateDataStrict[ResponsiblePeople]{ responsiblePeople: Seq[ResponsiblePeople] =>
       responsiblePeople map { rp =>
