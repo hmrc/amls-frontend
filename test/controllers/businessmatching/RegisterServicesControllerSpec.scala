@@ -92,7 +92,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
     def anyBoolean = Gen.oneOf[Boolean](true, false).sample.get
 
-    val responsiblePerson = responsiblePersonGen.sample.get
+    val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
     val fitAndProperResponsiblePeople = Seq(
