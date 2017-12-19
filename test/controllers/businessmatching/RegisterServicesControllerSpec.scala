@@ -471,6 +471,8 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         status(result) must be(SEE_OTHER)
 
+        verify(mockCacheConnector).fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
+
         verifyNoMoreInteractions(mockCacheConnector)
 
       }
