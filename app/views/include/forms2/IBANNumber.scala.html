@@ -23,12 +23,11 @@
     status: SubmissionStatus,
     accountStatus: Option[String]
 )(implicit lang:Lang,  m: Messages)
-
 @{accountStatus match {
     case Some(a) if a.equals(StatusConstants.Added) => <li>{label}: {value}</li>
     case _ => {
         status match {
-        case SubmissionDecisionApproved | SubmissionReadyForReview  if value.length <= 6 => {<li>{label}: <span class='visuallyhidden'>Starting with</span>{value.take(value.length-6)}<span aria-hidden='true'>******</span></li>}
+        case SubmissionDecisionApproved | SubmissionReadyForReview if value.length > 6  => {<li>{label}: <span class='visuallyhidden'>Starting with</span>{value.take(value.length-6)}<span aria-hidden='true'>******</span></li>}
         case _ => <li>{label}: {value}</li>
         }
     }
