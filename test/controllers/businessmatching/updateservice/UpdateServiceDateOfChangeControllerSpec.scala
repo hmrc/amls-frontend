@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.asp.Asp
@@ -27,6 +28,7 @@ import models.hvd.Hvd
 import models.supervision.Supervision
 import models.estateagentbusiness.{EstateAgentBusiness => Eab}
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.responsiblepeople.ResponsiblePeople
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
@@ -54,7 +56,8 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
   with MustMatchers
   with PrivateMethodTester
   with Results
-  with TradingPremisesGenerator {
+  with TradingPremisesGenerator
+  with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
@@ -81,6 +84,17 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
     when {
       mockBusinessMatchingService.commitVariationData(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
+    val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
+
+    val fitAndProperResponsiblePeople = Seq(
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
+    )
+
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheSave[Seq[ResponsiblePeople]]
 
   }
 
