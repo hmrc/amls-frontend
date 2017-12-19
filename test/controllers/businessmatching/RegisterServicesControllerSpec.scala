@@ -435,7 +435,9 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
     "set RP hasAccepted to false" when {
-      "fitAndProper is required and fitAndProper is none" in new Fixture {
+      "fitAndProper is required and fitAndProper is not defined" in new Fixture {
+
+        val responsiblePersonNotAccepted = responsiblePerson.copy(hasAccepted = false)
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
@@ -451,7 +453,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
           eqTo(ResponsiblePeople.key),
-          eqTo(Seq(responsiblePerson.copy(hasChanged = true, hasAccepted = false), responsiblePersonChanged.copy(hasChanged = true, hasAccepted = false)))
+          eqTo(Seq(responsiblePersonNotAccepted, responsiblePersonNotAccepted))
         )(any(),any(),any())
 
       }
@@ -469,7 +471,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
         status(result) must be(SEE_OTHER)
 
-        verifyZeroInteractions(mockCacheConnector)
+        verifyNoMoreInteractions(mockCacheConnector)
 
       }
     }

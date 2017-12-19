@@ -89,9 +89,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePeople] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
-                  Future.successful(redirectTo(data.businessActivities))
+                  if(promptFitAndProper(responsiblePeople)){
+                    updateResponsiblePeople(resetHasAccepted(responsiblePeople)) map { _ =>
+                      redirectTo(data.businessActivities)
+                    }
+                  } else {
+                    Future.successful(redirectTo(data.businessActivities))
+                  }
                 } else {
-                  removeFitAndProper(responsiblePeople) map { _ =>
+                  updateResponsiblePeople(removeFitAndProper(responsiblePeople)) map { _ =>
                     redirectTo(data.businessActivities)
                   }
                 }
@@ -157,12 +163,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key,
-      responsiblePeople map { rp =>
-        rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
-      })
-
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
@@ -181,4 +181,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       x & rp.hasAlreadyPassedFitAndProper.isEmpty
     }
 
+  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
+    responsiblePeople map { rp =>
+      rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
+    }
+
+  private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
+    responsiblePeople map { rp =>
+      rp.copy(hasAccepted = false)
+    }
+
+  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople)
 }
