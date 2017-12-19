@@ -26,7 +26,6 @@ import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
-import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises

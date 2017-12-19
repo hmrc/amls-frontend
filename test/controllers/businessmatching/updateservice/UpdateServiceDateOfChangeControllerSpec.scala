@@ -318,6 +318,53 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       verify(mockBusinessMatchingService).clearSection(eqTo(TrustAndCompanyServices))(any(),any())
     }
 
+    "remove fitAndProper from rp" when {
+      "fitAndProper is not required" in new Fixture {
+
+        val tradingPremises = Seq(
+          tradingPremisesGen.sample.get,
+          tradingPremisesGen.sample.get
+        )
+
+        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+        mockCacheSave[BusinessMatching]
+        mockCacheSave[Seq[BusinessMatching]]
+        mockCacheSave[Supervision]
+
+        when {
+          mockBusinessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(
+            EstateAgentBusinessService,
+            HighValueDealing,
+            TrustAndCompanyServices
+          )))
+        ))
+
+        when {
+          mockTradingPremisesService.removeBusinessActivitiesFromTradingPremises(any(),any(),any())
+        } thenReturn tradingPremises
+
+        when {
+          mockBusinessMatchingService.clearSection(any())(any(),any())
+        } thenReturn Future.successful(mockCacheMap)
+
+        val result = controller.post("06")(request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> "13",
+          "dateOfChange.month" -> "10",
+          "dateOfChange.year" -> "2017"
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
+          eqTo(ResponsiblePeople.key),
+          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
+        )(any(),any(),any())
+
+      }
+    }
+
   }
 
 }
