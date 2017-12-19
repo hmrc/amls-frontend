@@ -90,8 +90,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
-    def anyBoolean = Gen.oneOf[Boolean](true, false).sample.get
-
     val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
@@ -340,6 +338,31 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         }
       }
     }
+
+    "promptFitAndProper" must {
+      "return true" when {
+        "a responsible person has fitAndProper not defined" in new Fixture {
+
+          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
+
+          val result = controller invokePrivate promptFitAndProper(Seq(responsiblePerson, responsiblePerson))
+
+          result must be(true)
+
+        }
+      }
+      "return false" when {
+        "all responsible people have fitAndProper defined" in new Fixture {
+
+          val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
+
+          val result = controller invokePrivate promptFitAndProper(fitAndProperResponsiblePeople)
+
+          result must be(false)
+
+        }
+      }
+    }
   }
 
   it must {
@@ -398,10 +421,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
           controller.businessMatchingService.getModel(any(),any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
 
-        when {
-          controller.statusService.isPreSubmission(any(),any(),any())
-        } thenReturn Future.successful(anyBoolean)
-
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
         ))
@@ -415,16 +434,34 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
 
       }
     }
+    "set RP hasAccepted to false" when {
+      "fitAndProper is required and fitAndProper is none" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(HighValueDealing)))))
+
+        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePeople.key))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
+          eqTo(ResponsiblePeople.key),
+          eqTo(Seq(responsiblePerson.copy(hasChanged = true, hasAccepted = false), responsiblePersonChanged.copy(hasChanged = true, hasAccepted = false)))
+        )(any(),any(),any())
+
+      }
+    }
     "not update RP" when {
       "fitAndProper is required" in new Fixture {
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
-
-        when {
-          controller.statusService.isPreSubmission(any(),any(),any())
-        } thenReturn Future.successful(anyBoolean)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
