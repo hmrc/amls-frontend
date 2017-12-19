@@ -20,13 +20,17 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, _}
-import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
+import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 import views.html.businessmatching._
 
 import scala.concurrent.Future
@@ -34,7 +38,8 @@ import scala.concurrent.Future
 @Singleton
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService)() extends BaseController {
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -73,24 +78,30 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               }
             }
           case ValidForm(_, data) =>
-            for {
+            (for {
               isPreSubmission <- statusService.isPreSubmission
               businessMatching <- businessMatchingService.getModel.value
-              _ <- isMsb(data, businessMatching.activities) match {
-                case true =>
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission))
-                  ).value
-                case false =>
-                  businessMatchingService.updateModel(
-                    businessMatching.activities(updateModel(businessMatching.activities, data, isPreSubmission)).copy(msbServices = None)
-                  ).value
+              savedModel <- updateModel(
+                businessMatching,
+                newModel(businessMatching.activities, data, isPreSubmission),
+                isMsb(data, businessMatching.activities)
+              )
+            } yield savedModel) flatMap { savedActivities =>
+              if(fitAndProperRequired(savedActivities)){
+                Future.successful(redirectTo(data.businessActivities))
+              } else {
+                removeFitAndProper map { _ =>
+                  redirectTo(data.businessActivities)
+                }
               }
-            } yield data.businessActivities.contains(MoneyServiceBusiness) match {
-              case true => Redirect(routes.ServicesController.get(false))
-              case false => Redirect(routes.SummaryController.get())
             }
         }
+  }
+
+  private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
+    Redirect(routes.ServicesController.get())
+  } else {
+    Redirect(routes.SummaryController.get())
   }
 
   private def getActivityValues(f: Form2[_], isPreSubmission: Boolean, existingActivities: Option[Set[BusinessActivity]]): (Set[String], Set[String]) = {
@@ -115,16 +126,52 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def updateModel(existing: Option[BusinessActivities], added: BusinessActivities, isPreSubmission: Boolean): BusinessActivities =
-    existing.fold[BusinessActivities](added) { existing =>
-      if (isPreSubmission) {
-        added
-      } else {
-        BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
+  private def newModel(existingActivities: Option[BusinessActivities],
+                           added: BusinessActivities,
+                           isPreSubmission: Boolean) = existingActivities.fold[BusinessActivities](added) { existing =>
+    if (isPreSubmission) {
+      added
+    } else {
+      BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
+    }
+  }
+
+  private def updateModel(businessMatching: BusinessMatching,
+                          updatedModel: BusinessActivities,
+                          isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
+
+    (isMsb match {
+      case true =>
+        businessMatchingService.updateModel(
+          businessMatching.activities(updatedModel)
+        ).value
+      case false =>
+        businessMatchingService.updateModel(
+          businessMatching.activities(updatedModel).copy(msbServices = None)
+        ).value
+    }) map { _ =>
+      updatedModel
+    }
+
+  }
+
+  private def removeFitAndProper()(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    updateDataStrict[ResponsiblePeople]{ responsiblePeople: Seq[ResponsiblePeople] =>
+      responsiblePeople map { rp =>
+        rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
       }
     }
 
   private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
+  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean = {
+
+    def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+
+    (businessActivities.businessActivities, businessActivities.additionalActivities) match {
+      case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
+      case (a, _) => containsTcspOrMsb(a)
+    }
+  }
 }

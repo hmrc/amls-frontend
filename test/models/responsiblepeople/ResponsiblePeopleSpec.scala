@@ -250,7 +250,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "Merged with FitAndProper" must {
         "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
-          val result = ResponsiblePeople.default(EmptyResponsiblePeople).hasAlreadyPassedFitAndProper(true)
+          val result = ResponsiblePeople.default(EmptyResponsiblePeople).hasAlreadyPassedFitAndProper(Some(true))
           result must be(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true), hasChanged = true))
         }
       }
@@ -502,7 +502,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "hasAlreadyPassedFitAndProper value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(true)
+          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(Some(true))
           result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
@@ -510,7 +510,7 @@ class ResponsiblePeopleSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(false)
+          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(Some(false))
           result must be(completeModelNonUkResidentNonUkPassport.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
           result.hasChanged must be(true)
         }

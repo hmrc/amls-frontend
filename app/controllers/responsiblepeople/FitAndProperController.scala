@@ -61,7 +61,7 @@ class FitAndProperController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                rp.hasAlreadyPassedFitAndProper(data)
+                rp.hasAlreadyPassedFitAndProper(Some(data))
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))

@@ -18,8 +18,11 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
+import generators.ResponsiblePersonGenerator
 import models.businessmatching._
+import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -34,11 +37,12 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import org.scalacheck.Gen
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester {
+class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester with ResponsiblePersonGenerator {
 
   val activities: Set[BusinessActivity] = Set(
     AccountancyServices,
@@ -69,6 +73,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
@@ -84,6 +89,20 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
     when {
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    def anyBoolean = Gen.oneOf[Boolean](true, false).sample.get
+
+    val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
+    val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
+
+    val fitAndProperResponsiblePeople = Seq(
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
+      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
+    )
+
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheSave[Seq[ResponsiblePeople]]
+
   }
 
   "RegisterServicesController" when {
@@ -255,33 +274,69 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
       }
     }
 
-    "updateModel" must {
-      "add data to the existing services" when {
-        "status is post-submission" in new Fixture {
+    "fitAndProperRequired" must {
+      "return true" when {
+        "tcsp is defined in businessActivities" in new Fixture {
 
-          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
-          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(TrustAndCompanyServices), None))
 
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, false)
+            result must be(true)
 
-          services must be(BusinessActivities(existingServices.businessActivities, Some(addedServices.businessActivities)))
+          }
+        "msb is defined in businessActivities" in new Fixture {
 
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(MoneyServiceBusiness), None))
+
+            result must be(true)
+
+          }
+        "additional activities is defined" when {
+          "tcsp is defined in additional activities" in new Fixture {
+
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
+
+            result must be(true)
+
+          }
+          "msb is defined in additional activities" in new Fixture {
+
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
+
+            result must be(true)
+
+          }
         }
       }
-      "replace existing services" when {
-        "status is pre-submission" in new Fixture {
+      "return false" when {
+        "additional activities is not defined" when {
+          "neither msb or tcsp appear businessActivities" in new Fixture {
 
-          val existingServices = BusinessActivities(Set(HighValueDealing, AccountancyServices))
-          val addedServices = BusinessActivities(Set(MoneyServiceBusiness, TelephonePaymentService))
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val updateModel = PrivateMethod[BusinessActivities]('updateModel)
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), None))
 
-          val services = controller invokePrivate updateModel(Some(existingServices), addedServices, true)
+            result must be(false)
 
-          services must be(addedServices)
+          }
+        }
+        "additional activities is defined" when {
+          "neither msb or tcsp appear businessActivities or additonal activities" in new Fixture {
 
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))
+
+            result must be(false)
+
+          }
         }
       }
     }
@@ -333,6 +388,51 @@ class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
           BusinessActivities(Set(HighValueDealing, TelephonePaymentService))
         )))(any(),any(),any())
+
+      }
+    }
+    "remove RP FitAndProper" when {
+      "fitAndProper is not required" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
+
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
+          eqTo(ResponsiblePeople.key),
+          eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
+        )(any(),any(),any())
+
+      }
+    }
+    "not update RP" when {
+      "fitAndProper is required" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(),any(),any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
+
+        when {
+          controller.statusService.isPreSubmission(any(),any(),any())
+        } thenReturn Future.successful(anyBoolean)
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
+        ))
+
+        status(result) must be(SEE_OTHER)
+
+        verifyZeroInteractions(mockCacheConnector)
 
       }
     }

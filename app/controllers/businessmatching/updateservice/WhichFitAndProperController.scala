@@ -92,9 +92,9 @@ class WhichFitAndProperController @Inject()(
     updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
       responsiblePeople.zipWithIndex.map { case (rp, index) =>
         val updated = if (data.index contains index) {
-          rp.hasAlreadyPassedFitAndProper(true)
+          rp.hasAlreadyPassedFitAndProper(Some(true))
         } else {
-          rp.hasAlreadyPassedFitAndProper(false)
+          rp.hasAlreadyPassedFitAndProper(Some(false))
         }
         updated.copy(hasAccepted = updated.hasChanged)
       }
