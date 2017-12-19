@@ -188,6 +188,40 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       }
     }
 
+    "fitAndProperRequired" must {
+      "return true" when {
+        "tcsp is defined in businessActivities" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(TrustAndCompanyServices), None))
+
+          result must be(true)
+
+        }
+        "msb is defined in businessActivities" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(MoneyServiceBusiness), None))
+
+          result must be(true)
+
+        }
+      }
+      "return false" when {
+        "neither msb or tcsp appear businessActivities" in new Fixture {
+
+          val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), None))
+
+          result must be(false)
+
+        }
+      }
+    }
+
   }
 
   it must {

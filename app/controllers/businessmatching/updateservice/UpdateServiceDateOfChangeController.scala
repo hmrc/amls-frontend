@@ -78,11 +78,15 @@ class UpdateServiceDateOfChangeController @Inject()(
               (for {
                 businessMatching <- businessMatchingService.getModel
                 existingActivities <- OptionT.fromOption[Future](businessMatching.activities)
-                updatedBusinessActivities <- OptionT.pure[Future, BusinessActivities](updatedBusinessActivities(
-                  existingActivities,
-                  activitiesToRemove,
-                  data
-                ))
+                updatedBusinessActivities <- OptionT.pure[Future, BusinessActivities](
+                  existingActivities.copy(
+                    businessActivities = existingActivities.businessActivities diff activitiesToRemove,
+                    additionalActivities = existingActivities.additionalActivities,
+                    removeActivities = existingActivities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(activitiesToRemove)){ act =>
+                      Some(act ++ activitiesToRemove)
+                    },
+                    dateOfChange = Some(data)
+                  ))
                 _ <- businessMatchingService.updateModel(businessMatching.activities(updatedBusinessActivities).copy(hasAccepted = true))
                 _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
                   tradingPremisesService.removeBusinessActivitiesFromTradingPremises(
@@ -100,15 +104,8 @@ class UpdateServiceDateOfChangeController @Inject()(
         }
   }
 
-  private def updatedBusinessActivities(existingActivities: BusinessActivities, activitiesToRemove: Set[BusinessActivity], data: DateOfChange) =
-    existingActivities.copy(
-      businessActivities = existingActivities.businessActivities diff activitiesToRemove,
-      additionalActivities = existingActivities.additionalActivities,
-      removeActivities = existingActivities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(activitiesToRemove)){ act =>
-        Some(act ++ activitiesToRemove)
-      },
-      dateOfChange = Some(data)
-    )
+  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
+    (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
 
   private def removeSection(activities: Set[BusinessActivity])
                            (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = {
