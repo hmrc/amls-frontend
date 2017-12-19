@@ -56,55 +56,59 @@ class UpdateServiceDateOfChangeController @Inject()(
   def get(services: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        mapRequestToServices(services) match {
+        mapRequestToActivities(services) match {
           case Right(_) => Future.successful(Ok(view(EmptyForm, services)))
           case Left(badRequest) => Future.successful(badRequest)
         }
   }
 
-  private def mapRequestToServices(services: String): Either[Result, Set[BusinessActivity]] =
+  private def mapRequestToActivities(services: String): Either[Result, Set[BusinessActivity]] =
     try {
       Right((services split "/" map BusinessActivities.getBusinessActivity).toSet)
     } catch {
       case _: MatchError => Left(BadRequest)
     }
 
-  def post(services: String) = Authorised.async{
+  def post(activitiesInRequest: String) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        mapRequestToServices(services) match {
-          case Right(removeActivities) => Form2[DateOfChange](request.body) match {
+        mapRequestToActivities(activitiesInRequest) match {
+          case Right(activitiesToRemove) => Form2[DateOfChange](request.body) match {
             case ValidForm(_, data) =>
               (for {
                 businessMatching <- businessMatchingService.getModel
-                activities <- OptionT.fromOption[Future](businessMatching.activities)
-                _ <- businessMatchingService.updateModel(
-                  businessMatching.activities(
-                    activities.copy(
-                      businessActivities = activities.businessActivities diff removeActivities,
-                      additionalActivities = activities.additionalActivities,
-                      removeActivities = activities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(removeActivities)){ act =>
-                        Some(act ++ removeActivities)
-                      },
-                      dateOfChange = Some(data)
-                    )
-                  ).copy(hasAccepted = true)
-                )
+                existingActivities <- OptionT.fromOption[Future](businessMatching.activities)
+                updatedBusinessActivities <- OptionT.pure[Future, BusinessActivities](updatedBusinessActivities(
+                  existingActivities,
+                  activitiesToRemove,
+                  data
+                ))
+                _ <- businessMatchingService.updateModel(businessMatching.activities(updatedBusinessActivities).copy(hasAccepted = true))
                 _ <- OptionT.liftF(updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
                   tradingPremisesService.removeBusinessActivitiesFromTradingPremises(
                     tradingPremises,
-                    activities.businessActivities diff removeActivities,
-                    removeActivities
+                    existingActivities.businessActivities diff activitiesToRemove,
+                    activitiesToRemove
                   )
                 })
                 _ <- businessMatchingService.commitVariationData
-                _ <- OptionT.liftF(removeSection(removeActivities))
+                _ <- OptionT.liftF(removeSection(activitiesToRemove))
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
-            case f:InvalidForm => Future.successful(BadRequest(view(f, services)))
+            case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
           case Left(badRequest) => Future.successful(badRequest)
         }
   }
+
+  private def updatedBusinessActivities(existingActivities: BusinessActivities, activitiesToRemove: Set[BusinessActivity], data: DateOfChange) =
+    existingActivities.copy(
+      businessActivities = existingActivities.businessActivities diff activitiesToRemove,
+      additionalActivities = existingActivities.additionalActivities,
+      removeActivities = existingActivities.removeActivities.fold[Option[Set[BusinessActivity]]](Some(activitiesToRemove)){ act =>
+        Some(act ++ activitiesToRemove)
+      },
+      dateOfChange = Some(data)
+    )
 
   private def removeSection(activities: Set[BusinessActivity])
                            (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = {

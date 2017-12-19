@@ -142,13 +142,13 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       }
     }
 
-    "mapRequestToServices" must {
+    "mapRequestToActivities" must {
 
       "respond with list of services" in new Fixture {
 
-        val mapRequestToServices = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToServices)
+        val mapRequestToActivities = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToActivities)
 
-        val result = controller invokePrivate mapRequestToServices("03/04")
+        val result = controller invokePrivate mapRequestToActivities("03/04")
 
         result must be(Right(Set(
           EstateAgentBusinessService,
@@ -160,27 +160,27 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       "respond with BAD_REQUEST" when {
         "request contains id not linked to business activities" in new Fixture {
 
-          val mapRequestToServices = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToServices)
+          val mapRequestToActivities = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToActivities)
 
-          val result = controller invokePrivate mapRequestToServices("01/123/03")
+          val result = controller invokePrivate mapRequestToActivities("01/123/03")
 
           result must be(Left(BadRequest))
 
         }
         "request contains invalid string in sequence" in new Fixture {
 
-          val mapRequestToServices = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToServices)
+          val mapRequestToActivities = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToActivities)
 
-          val result = controller invokePrivate mapRequestToServices("03/abc/04")
+          val result = controller invokePrivate mapRequestToActivities("03/abc/04")
 
           result must be(Left(BadRequest))
 
         }
         "request contains empty string" in new Fixture {
 
-          val mapRequestToServices = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToServices)
+          val mapRequestToActivities = PrivateMethod[Either[Result, Set[BusinessActivity]]]('mapRequestToActivities)
 
-          val result = controller invokePrivate mapRequestToServices("")
+          val result = controller invokePrivate mapRequestToActivities("")
 
           result must be(Left(BadRequest))
 
