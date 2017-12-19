@@ -42,7 +42,11 @@ import org.scalacheck.Gen
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegisterServicesControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with PrivateMethodTester with ResponsiblePersonGenerator {
+class RegisterServicesControllerSpec extends GenericTestHelper
+  with MockitoSugar
+  with ScalaFutures
+  with PrivateMethodTester
+  with ResponsiblePersonGenerator {
 
   val activities: Set[BusinessActivity] = Set(
     AccountancyServices,
