@@ -74,7 +74,7 @@ trait SummaryController extends BaseController {
         _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
       } yield {
         if(goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)){
-          Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
+          Redirect(updateservice.routes.TradingPremisesController.get(0))
         } else {
           Redirect(controllers.routes.RegistrationProgressController.get())
         }

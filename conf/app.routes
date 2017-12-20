@@ -12,8 +12,8 @@ POST        /subscribe                                                          
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role
 
-GET         /registration-progress                                                    controllers.RegistrationProgressController.get()
-POST        /registration-progress                                                    controllers.RegistrationProgressController.post()
+GET         /registration-progress                                                    @controllers.RegistrationProgressController.get()
+POST        /registration-progress                                                    @controllers.RegistrationProgressController.post()
 
 GET         /application-status                                                       controllers.StatusController.get(fromDuplicateSubmission: Boolean ?= false)
 

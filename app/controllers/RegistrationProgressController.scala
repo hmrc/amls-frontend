@@ -16,18 +16,20 @@
 
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivity, BusinessMatching}
-import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import models.registrationprogress.{Completed, Section}
 import models.renewal.Renewal
 import models.status._
-import play.api.Play
 import play.api.mvc.{AnyContent, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -36,21 +38,17 @@ import views.html.registrationprogress.registration_progress
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait RegistrationProgressController extends BaseController {
-
-  protected[controllers] def progressService: ProgressService
-
-  protected[controllers] def dataCache: DataCacheConnector
-
-  protected[controllers] def enrolmentsService: AuthEnrolmentsService
-
-  protected[controllers] def statusService: StatusService
-
-  protected[controllers] def businessMatchingService: BusinessMatchingService
-
-  protected[controllers] val serviceFlow: ServiceFlow
+@Singleton
+class RegistrationProgressController @Inject()(
+                                                protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector,
+                                                protected[controllers] val dataCache: DataCacheConnector,
+                                                protected[controllers] val enrolmentsService: AuthEnrolmentsService,
+                                                protected[controllers] val statusService: StatusService,
+                                                protected[controllers] val progressService: ProgressService,
+                                                protected[controllers] val businessMatchingService: BusinessMatchingService,
+                                                protected[controllers] val serviceFlow: ServiceFlow
+                                              ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -146,15 +144,4 @@ trait RegistrationProgressController extends BaseController {
           case _ => InternalServerError("Could not get data for redirect")
         }
   }
-}
-
-object RegistrationProgressController extends RegistrationProgressController {
-  // $COVERAGE-OFF$
-  override protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector
-  override protected[controllers] val dataCache = DataCacheConnector
-  override protected[controllers] val enrolmentsService = AuthEnrolmentsService
-  override protected[controllers] val statusService = StatusService
-  override protected[controllers] val progressService = Play.current.injector.instanceOf[ProgressService]
-  override protected[controllers] val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
-  override protected[controllers] lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

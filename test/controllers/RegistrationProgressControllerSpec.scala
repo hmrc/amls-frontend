@@ -50,25 +50,25 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     val mockBusinessMatching = mock[BusinessMatching]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val controller = new RegistrationProgressController {
-      override val authConnector = self.authConnector
-      override protected[controllers] val progressService: ProgressService = mock[ProgressService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override protected[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override protected[controllers] val statusService: StatusService = mockStatusService
-      override protected[controllers] val businessMatchingService = mockBusinessMatchingService
-      override protected[controllers] val serviceFlow = mockServiceFlow
-    }
+    val controller = new RegistrationProgressController (
+      self.authConnector,
+      progressService = mock[ProgressService],
+      dataCache = mockCacheConnector,
+      enrolmentsService = mock[AuthEnrolmentsService],
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
+      serviceFlow = mockServiceFlow
+    )
 
-    when(controller.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionReady)
-    when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())) thenReturn Future.successful(None)
+    mockApplicationStatus(SubmissionReady)
+    mockCacheFetch[Renewal](None)
+
     when(mockBusinessMatching.isComplete) thenReturn true
     when(mockBusinessMatching.reviewDetails) thenReturn Some(reviewDetailsGen.sample.get)
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
@@ -92,8 +92,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
+          mockApplicationStatus(SubmissionReadyForReview)
 
           when(controller.progressService.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
@@ -114,10 +113,10 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
       "redirect to renewal registration progress" when {
         "status is ready for renewal and" must {
           "renewal data exists in save4later" in new Fixture {
-            when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
 
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(ReadyForRenewal(None)))
+            mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
+
+            mockApplicationStatus(ReadyForRenewal(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(SEE_OTHER)
@@ -126,9 +125,10 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
         }
         "status is ready for renewal submitted" must {
           "renewal data exists in save4later" in new Fixture {
-            when(controller.dataCache.fetch[Renewal](any())(any(), any(), any())).thenReturn(Future.successful(Some(Renewal(Some(InvolvedInOtherNo)))))
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(RenewalSubmitted(None)))
+
+            mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
+
+            mockApplicationStatus(RenewalSubmitted(None))
 
             val responseF = controller.get()(request)
             status(responseF) must be(SEE_OTHER)
@@ -141,8 +141,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
         "status is ready for renewal and" must {
           "redirectWithNominatedOfficer" in new Fixture {
 
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(ReadyForRenewal(None)))
+            mockApplicationStatus(ReadyForRenewal(None))
 
             when(controller.progressService.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
@@ -192,8 +191,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.statusService.getStatus(any(), any(), any()))
-                .thenReturn(Future.successful(SubmissionReadyForReview))
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.progressService.sections(mockCacheMap))
                 .thenReturn(Seq(
@@ -239,8 +237,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              when(controller.statusService.getStatus(any(), any(), any()))
-                .thenReturn(Future.successful(SubmissionReadyForReview))
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
@@ -293,8 +290,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           "application is post-submission" must {
             "show View Status button" in new Fixture {
 
-              when(controller.statusService.getStatus(any(), any(), any()))
-                .thenReturn(Future.successful(SubmissionReadyForReview))
+              mockApplicationStatus(SubmissionReadyForReview)
 
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
@@ -346,8 +342,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.statusService.getStatus(any(), any(), any()))
-              .thenReturn(Future.successful(subStatus))
+            mockApplicationStatus(subStatus)
 
             val sections = Seq(
               Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
@@ -378,8 +373,7 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
             .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-          when(controller.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionDecisionApproved))
+          mockApplicationStatus(SubmissionDecisionApproved)
 
           val sections = Seq(
             Section(BusinessMatching.messageKey, Completed, false, mock[Call]),
