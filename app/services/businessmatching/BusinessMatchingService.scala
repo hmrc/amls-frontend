@@ -114,11 +114,11 @@ class BusinessMatchingService @Inject()(
     OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
 
   private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
-    variationModel.activities match {
+    (variationModel.activities match {
       case Some(BusinessActivities(existing, Some(additional), removed, doc)) =>
         variationModel.activities(BusinessActivities(existing ++ additional, None, removed, doc))
       case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
-    }
+    }).copy(hasAccepted = true)
 
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
 

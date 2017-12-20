@@ -145,20 +145,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def updateModel(businessMatching: BusinessMatching,
-                          updatedModel: BusinessActivities,
+                          updatedBusinessActivities: BusinessActivities,
                           isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
 
-    (isMsb match {
+    val updatedBusinessMatching = isMsb match {
       case true =>
-        businessMatchingService.updateModel(
-          businessMatching.activities(updatedModel)
-        ).value
+        businessMatching.activities(updatedBusinessActivities)
       case false =>
-        businessMatchingService.updateModel(
-          businessMatching.activities(updatedModel).copy(msbServices = None)
-        ).value
-    }) map { _ =>
-      updatedModel
+        businessMatching.activities(updatedBusinessActivities).copy(msbServices = None)
+    }
+
+    businessMatchingService.updateModel(updatedBusinessMatching).value map { _ =>
+      updatedBusinessActivities
     }
 
   }

@@ -59,7 +59,7 @@ class RegistrationProgressController @Inject()(
 
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
-          case _ => {
+          case _ =>
             (for {
               status <- OptionT.liftF(statusService.getStatus)
               cacheMap <- OptionT(dataCache.fetchAll)
@@ -75,12 +75,24 @@ class RegistrationProgressController @Inject()(
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
 
                 completePreApp match {
-                  case true => Ok(registration_amendment(sectionsToDisplay, amendmentDeclarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission, Some(newSections)))
-                  case _ => Ok(registration_progress(sectionsToDisplay, declarationAvailable(sections), reviewDetails.businessAddress, activities, preSubmission))
+                  case true => Ok(registration_amendment(
+                    sectionsToDisplay,
+                    amendmentDeclarationAvailable(sections),
+                    reviewDetails.businessAddress,
+                    activities,
+                    preSubmission,
+                    Some(newSections)
+                  ))
+                  case _ => Ok(registration_progress(
+                    sectionsToDisplay,
+                    declarationAvailable(sections),
+                    reviewDetails.businessAddress,
+                    activities,
+                    preSubmission
+                  ))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
             }) getOrElse Redirect(controllers.routes.LandingController.get())
-          }
         }
   }
 
@@ -105,9 +117,12 @@ class RegistrationProgressController @Inject()(
 
   private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
 
-    sections.foldLeft((true, false)) { (acc, s) =>
-      (acc._1 && s.status == Completed,
-        acc._2 || s.hasChanged)
+    sections.foldLeft((true, false)) { (acc, section) =>
+
+      val (hasPreviousCompleted, hasPreviousChanged) = acc
+
+      (hasPreviousCompleted && section.status == Completed, hasPreviousChanged || section.hasChanged)
+
     } match {
       case (true, true) => true
       case _ => false

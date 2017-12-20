@@ -16,12 +16,10 @@
 
 package models.businessmatching
 
-import config.ApplicationConfig
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.tradingpremises.{MsbServices => TPMsbServices}
 
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
@@ -86,14 +84,12 @@ case class BusinessMatching(
     }
   }
 
-  def isComplete: Boolean =
-    this match {
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, _, _) if !ApplicationConfig.hasAcceptedToggle
-        && isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
-      case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
-        if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
-      case _ => false
-    }
+  def isComplete: Boolean = this match {
+    case BusinessMatching(Some(x), Some(activity), _, _, _, _, _, true, _)
+      if isbusinessTypeComplete(x.businessType) && msbComplete(activity) => true
+    case _ => false
+  }
+
 }
 
 object BusinessMatching {

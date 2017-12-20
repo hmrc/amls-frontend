@@ -51,12 +51,12 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val controller = new SummaryController {
-      override val dataCache = mockCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mockStatusService
-      override val businessMatchingService = mockBusinessMatchingService
-    }
+    val controller = new SummaryController (
+      dataCache = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService
+    )
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())

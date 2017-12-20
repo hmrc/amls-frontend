@@ -179,8 +179,8 @@ POST        /business-matching/services                                         
 GET         /business-matching/psr-registration                                       controllers.businessmatching.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
 POST        /business-matching/psr-registration                                       controllers.businessmatching.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
 
-GET         /business-matching/check-your-answers                                     controllers.businessmatching.SummaryController.get()
-POST        /business-matching/check-your-answers                                     controllers.businessmatching.SummaryController.post()
+GET         /business-matching/check-your-answers                                     @controllers.businessmatching.SummaryController.get()
+POST        /business-matching/check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
 GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
 
