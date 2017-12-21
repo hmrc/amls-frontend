@@ -22,28 +22,24 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.asp.Asp
 import models.businessmatching._
-import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import routes._
-import services.businessmatching.BusinessMatchingService
-import utils.RepeatingSection
-import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.supervision.Supervision
-import models.tcsp.Tcsp
 import services.TradingPremisesService
+import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 @Singleton
 class UpdateServiceDateOfChangeController @Inject()(
@@ -97,15 +93,16 @@ class UpdateServiceDateOfChangeController @Inject()(
                 })
                 _ <- businessMatchingService.commitVariationData
                 _ <- OptionT.liftF(removeSection(activitiesToRemove))
+                responsiblePeople <- OptionT.liftF(getData[ResponsiblePeople])
+                fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))
+                responsiblePeopleWithoutFitAndProper <- OptionT.pure[Future, Seq[ResponsiblePeople]](withoutFitAndProper(responsiblePeople))
+                _ <- maybeRemoveFitAndProper(responsiblePeopleWithoutFitAndProper, fitAndProperRequired)
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
           case Left(badRequest) => Future.successful(badRequest)
         }
   }
-
-  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
-    (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
 
   private def removeSection(activities: Set[BusinessActivity])
                            (implicit hc: HeaderCarrier, ac: AuthContext): Future[Set[CacheMap]] = {
@@ -130,6 +127,26 @@ class UpdateServiceDateOfChangeController @Inject()(
       }
     })
   }
+
+  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
+    (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
+
+  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[Seq[ResponsiblePeople]] = {
+    dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople) map { _ =>
+      responsiblePeople
+    }
+  }
+
+  private def withoutFitAndProper(responsiblePeople: Seq[ResponsiblePeople]) = responsiblePeople map { rp =>
+    rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
+  }
+
+  private def maybeRemoveFitAndProper(responsiblePeople: Seq[ResponsiblePeople], fitAndProperRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
+    if(fitAndProperRequired){
+      OptionT.pure[Future, Seq[ResponsiblePeople]](responsiblePeople)
+    } else {
+      OptionT.liftF(removeFitAndProper(responsiblePeople))
+    }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
     views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))

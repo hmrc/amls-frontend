@@ -186,7 +186,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
     responsiblePeople map { rp =>
-      rp.copy(hasAccepted = false)
+      rp.hasAlreadyPassedFitAndProper match {
+        case None => rp.copy(hasAccepted = false)
+        case _ => rp
+      }
     }
 
   private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
