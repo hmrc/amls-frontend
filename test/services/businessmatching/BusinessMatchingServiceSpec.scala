@@ -305,8 +305,12 @@ class BusinessMatchingServiceSpec extends PlaySpec
         mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
 
         whenReady(service.commitVariationData.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(variationModel.copy(hasChanged = true)))(any(), any(), any())
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](
+            eqTo(BusinessMatching.key), eqTo(variationModel.copy(hasAccepted = true, hasChanged = true))
+          )(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](
+            eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching())
+          )(any(), any(), any())
         }
       }
 
@@ -318,8 +322,12 @@ class BusinessMatchingServiceSpec extends PlaySpec
         mockCacheGetEntry(newModel, BusinessMatching.variationKey)
 
         whenReady(service.commitVariationData.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), eqTo(newModel.copy(hasChanged = false)))(any(), any(), any())
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](
+            eqTo(BusinessMatching.key), eqTo(newModel.copy(hasAccepted = true, hasChanged = false))
+          )(any(), any(), any())
+          verify(mockCacheConnector).save[BusinessMatching](
+            eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching())
+          )(any(), any(), any())
         }
       }
 
