@@ -42,8 +42,6 @@ trait ApplicationConfig {
 
   def showChangeOfficerLink: Boolean
 
-  def sendPostcodeKnownFact: Boolean
-
   def hasAcceptedToggle: Boolean
 
   def businessMatchingVariationToggle: Boolean
@@ -125,8 +123,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 
   override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
-
-  override def sendPostcodeKnownFact = getConfBool("feature-toggle.gg-knownfacts-postcode", false)
 
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
