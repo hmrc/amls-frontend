@@ -13,9 +13,9 @@ private object AppDependencies {
   import play.core.PlayVersion
 
 
-  private val frontendBootstrapVersion = "8.11.0"
+  private val frontendBootstrapVersion = "8.17.0"
   private val playPartialsVersion = "6.1.0"
-  private val httpCachingClientVersion = "7.0.0"
+  private val httpCachingClientVersion = "7.1.0"
   private val playWhitelistFilterVersion = "2.0.0"
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"
