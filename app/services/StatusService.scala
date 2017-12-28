@@ -49,7 +49,7 @@ trait StatusService {
 
   private def getApprovedStatus(response: ReadStatusResponse) = {
     (response.currentRegYearEndDate, response.renewalConFlag) match {
-      case (Some(endDate), false) if ApplicationConfig.renewalsToggle && LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)) =>
+      case (Some(endDate), false) if LocalDate.now().isAfter(endDate.minusDays(renewalPeriod)) =>
         ReadyForRenewal(response.currentRegYearEndDate)
       case (_, true) => RenewalSubmitted(response.currentRegYearEndDate)
       case _ => SubmissionDecisionApproved

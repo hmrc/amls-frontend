@@ -24,13 +24,12 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 import play.api.Play.current
 
 trait ApplicationConfig {
+
   def amendmentsToggle: Boolean
 
   def release7: Boolean
 
   def refreshProfileToggle: Boolean
-
-  def renewalsToggle: Boolean
 
   def allowDeRegisterToggle: Boolean
 
@@ -101,8 +100,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     val value = getConfBool("feature-toggle.release7", false)
     value
   }
-
-  override def renewalsToggle: Boolean = getConfBool("feature-toggle.renewals", false)
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
