@@ -24,8 +24,6 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 import play.api.Play.current
 
 trait ApplicationConfig {
-  def notificationsToggle: Boolean
-
   def amendmentsToggle: Boolean
 
   def release7: Boolean
@@ -41,8 +39,6 @@ trait ApplicationConfig {
   def frontendBaseUrl: String
 
   def showChangeOfficerLink: Boolean
-
-  def sendPostcodeKnownFact: Boolean
 
   def hasAcceptedToggle: Boolean
 
@@ -96,8 +92,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
 
-  override def notificationsToggle = getConfBool("feature-toggle.notifications", false)
-
   def amendmentsToggle: Boolean = {
     val value = getConfBool("feature-toggle.amendments", false)
     value
@@ -125,8 +119,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 
   override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
-
-  override def sendPostcodeKnownFact = getConfBool("feature-toggle.gg-knownfacts-postcode", false)
 
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
