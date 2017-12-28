@@ -30,21 +30,12 @@ object EnrolmentRequest {
   implicit val writes: Writes[EnrolmentRequest] =
     Writes[EnrolmentRequest] {
       request =>
-        val facts = ApplicationConfig.sendPostcodeKnownFact match {
-          case true => Seq(
+        val facts = Seq(
             request.mlrRefNo,
             "",
             "",
             request.postCode
           )
-          case _ =>
-            Seq(
-              request.mlrRefNo,
-              "",
-              "",
-              request.safeId
-            )
-        }
 
         Json.obj(
           "portalId" -> "Default",
