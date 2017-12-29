@@ -41,7 +41,7 @@ class DeregistrationReasonController @Inject()(val authConnector: AuthConnector,
                                                enrolments: AuthEnrolmentsService,
                                                statusService: StatusService) extends BaseController {
 
-  def get = FeatureToggle(ApplicationConfig.allowDeRegisterToggle) {
+  def get = {
     Authorised.async {
       implicit authContext =>
         implicit request =>

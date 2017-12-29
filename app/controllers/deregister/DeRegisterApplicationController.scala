@@ -40,7 +40,7 @@ class DeRegisterApplicationController @Inject()
   amls: AmlsConnector
 ) extends BaseController {
 
-  def get() = FeatureToggle(ApplicationConfig.allowDeRegisterToggle) {
+  def get() =  {
     Authorised.async {
       implicit authContext =>
         implicit request =>

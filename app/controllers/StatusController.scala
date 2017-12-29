@@ -163,9 +163,7 @@ trait StatusController extends BaseController {
             businessNameOption,
             endDate,
             renewalFlow = false,
-            allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
-            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-            showChangeOfficer = ApplicationConfig.showChangeOfficerLink
+            ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
           )
         }
 
@@ -196,8 +194,8 @@ trait StatusController extends BaseController {
           mlrRegNumber.getOrElse(""),
           businessNameOption,
           renewalDate,
-          ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-          ApplicationConfig.showChangeOfficerLink)
+          ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+         )
         ))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
@@ -208,16 +206,15 @@ trait StatusController extends BaseController {
                   mlrRegNumber.getOrElse(""),
                   businessNameOption,
                   renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-                  ApplicationConfig.showChangeOfficerLink)
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+                  )
                 ))
               } else {
                 Future.successful(Ok(status_renewal_incomplete(
                   mlrRegNumber.getOrElse(""),
                   businessNameOption,
                   renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-                  ApplicationConfig.showChangeOfficerLink
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
                 )))
               }
             }
@@ -226,9 +223,8 @@ trait StatusController extends BaseController {
               businessNameOption,
               renewalDate,
               true,
-              ApplicationConfig.allowDeRegisterToggle,
-              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              ApplicationConfig.showChangeOfficerLink)))
+              ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+              )))
         }
       }
     }
