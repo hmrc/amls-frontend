@@ -49,33 +49,3 @@ class EnrolmentRequestSpec extends PlaySpec with OneAppPerSuite {
   }
 
 }
-
-class EnrolmentRequestWithoutPostcodeSpec extends PlaySpec with OneAppPerSuite {
-
-  override implicit lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> false)
-    .build()
-
-  "EnrolmentRequest" must {
-
-    "serialise correctly without sending the postcode" in {
-
-      val model = EnrolmentRequest("foo", "bar", "unused")
-      val json = Json.obj(
-        "portalId" -> "Default",
-        "serviceName" -> "HMRC-MLR-ORG",
-        "friendlyName" -> "AMLS Enrolment",
-        "knownFacts" -> Seq(
-          "foo",
-          "",
-          "",
-          "bar"
-        )
-      )
-
-      Json.toJson(model) must
-        equal (json)
-    }
-  }
-
-}

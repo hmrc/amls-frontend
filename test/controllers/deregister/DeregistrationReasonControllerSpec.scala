@@ -202,30 +202,3 @@ class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPe
 
   }
 }
-
-class DeregistrationReasonControllerToggleOffSpec extends GenericTestHelper with OneAppPerSuite {
-
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture {
-    self =>
-
-    val request = addToken(authRequest)
-    val amlsConnector = mock[AmlsConnector]
-    val dataCacheConnector = mock[DataCacheConnector]
-    val authService = mock[AuthEnrolmentsService]
-    val statusService = mock[StatusService]
-
-    lazy val controller = new DeregistrationReasonController(authConnector, dataCacheConnector, amlsConnector, authService, statusService)
-  }
-
-  "The DeregistrationReasonController" when {
-    "the GET method is called" must {
-      "return 404 not found" in new TestFixture {
-        status(controller.get(request)) mustBe NOT_FOUND
-      }
-    }
-  }
-}
