@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -163,9 +163,7 @@ trait StatusController extends BaseController {
             businessNameOption,
             endDate,
             renewalFlow = false,
-            allowDeRegister = ApplicationConfig.allowDeRegisterToggle,
-            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-            showChangeOfficer = ApplicationConfig.showChangeOfficerLink
+            ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
           )
         }
 
@@ -196,8 +194,8 @@ trait StatusController extends BaseController {
           mlrRegNumber.getOrElse(""),
           businessNameOption,
           renewalDate,
-          ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-          ApplicationConfig.showChangeOfficerLink)
+          ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+         )
         ))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
@@ -208,16 +206,15 @@ trait StatusController extends BaseController {
                   mlrRegNumber.getOrElse(""),
                   businessNameOption,
                   renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-                  ApplicationConfig.showChangeOfficerLink)
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+                  )
                 ))
               } else {
                 Future.successful(Ok(status_renewal_incomplete(
                   mlrRegNumber.getOrElse(""),
                   businessNameOption,
                   renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-                  ApplicationConfig.showChangeOfficerLink
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
                 )))
               }
             }
@@ -226,9 +223,8 @@ trait StatusController extends BaseController {
               businessNameOption,
               renewalDate,
               true,
-              ApplicationConfig.allowDeRegisterToggle,
-              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              ApplicationConfig.showChangeOfficerLink)))
+              ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+              )))
         }
       }
     }

@@ -1,5 +1,5 @@
 @*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,15 +22,16 @@
     target: String = ""
 )(implicit lang:Lang,  m: Messages)
 
-<label class="block-label">
-    <input
-            id="@{f.id}-@value"
-            type="checkbox"
-            name="@{f.name}"
-            value="@value"
-            @if(f.value.contains(value)) {checked="checked"}
-            @if(target.nonEmpty) {data-toggle="@target"}
-            @if(disabled) {disabled}
-    >
-    @Messages(labelText)
+    <div class="multiple-choice">
+        <input type="checkbox"
+               id="@{f.id}-@value"
+               name="@{f.name}"
+               value="@value"
+            @if(f.value.contains(value)){ checked="checked"}
+            @if(target.nonEmpty){ data-toggle="@target"}
+            @if(disabled){ disabled}
+        />
+        <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
+
+    </div>
 </label>

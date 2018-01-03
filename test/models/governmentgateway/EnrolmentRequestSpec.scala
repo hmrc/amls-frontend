@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,36 +42,6 @@ class EnrolmentRequestSpec extends PlaySpec with OneAppPerSuite {
             "TE1 1ET"
           )
         )
-
-      Json.toJson(model) must
-        equal (json)
-    }
-  }
-
-}
-
-class EnrolmentRequestWithoutPostcodeSpec extends PlaySpec with OneAppPerSuite {
-
-  override implicit lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> false)
-    .build()
-
-  "EnrolmentRequest" must {
-
-    "serialise correctly without sending the postcode" in {
-
-      val model = EnrolmentRequest("foo", "bar", "unused")
-      val json = Json.obj(
-        "portalId" -> "Default",
-        "serviceName" -> "HMRC-MLR-ORG",
-        "friendlyName" -> "AMLS Enrolment",
-        "knownFacts" -> Seq(
-          "foo",
-          "",
-          "",
-          "bar"
-        )
-      )
 
       Json.toJson(model) must
         equal (json)

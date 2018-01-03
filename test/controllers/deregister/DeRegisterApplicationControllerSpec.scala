@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -107,30 +107,4 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
       }
     }
   }
-}
-
-class DeRegisterApplicationControllerNoToggleSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
-
-  implicit override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture { self =>
-    val request = addToken(authRequest)
-    val statusService = mock[StatusService]
-    val dataCache = mock[DataCacheConnector]
-    val enrolments = mock[AuthEnrolmentsService]
-    val amlsConnector = mock[AmlsConnector]
-    val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
-  }
-
-  "The DeRegisterApplicationController" when {
-    "the de-register feature toggle is off" must {
-      "return a 404 when GET is called" in new TestFixture {
-        val result = controller.get()(request)
-        status(result) mustBe NOT_FOUND
-      }
-    }
-  }
-
 }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2017 HM Revenue & Customs
+ * Copyright 2018 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -31,13 +31,9 @@ trait ApplicationConfig {
 
   def refreshProfileToggle: Boolean
 
-  def allowDeRegisterToggle: Boolean
-
   def returnLinkToggle: Boolean
 
   def frontendBaseUrl: String
-
-  def showChangeOfficerLink: Boolean
 
   def hasAcceptedToggle: Boolean
 
@@ -103,8 +99,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
-  override def allowDeRegisterToggle = getConfBool("feature-toggle.allow-deregister", false)
-
   override def frontendBaseUrl = {
     val secure = getConfBool("amls-frontend.public.secure", defBool = false)
     val scheme = if (secure) "https" else "http"
@@ -114,8 +108,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
-
-  override def showChangeOfficerLink = getConfBool("feature-toggle.change-officer", false)
 
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
