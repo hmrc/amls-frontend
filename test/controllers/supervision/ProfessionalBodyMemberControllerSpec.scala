@@ -16,41 +16,32 @@
 
 package controllers.supervision
 
-import connectors.DataCacheConnector
 import models.supervision._
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks {self =>
+    val request = addToken(authRequest)
 
-    val controller = new ProfessionalBodyMemberController {
+    val controller = new ProfessionalBodyMemberController (
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector
+    )
 
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    mockCacheSave[Supervision]
+
   }
-
-  val emptyCache = CacheMap("", Map.empty)
 
   "ProfessionalBodyMemberController" must {
 
     "load the page Is your business a member of a professional body?" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      mockCacheFetch[Supervision](None)
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -60,9 +51,9 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     "lod the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
 
-      when(controller.dataCacheConnector.fetch[Supervision](any())(any(), any(), any())).thenReturn(
-        Future.successful(Some(Supervision(
-          professionalBodyMember = Some(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))))))
+      mockCacheFetch[Supervision](Some(Supervision(
+        professionalBodyMember = Some(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))
+      )))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -81,11 +72,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
         "businessType[1]" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Supervision](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Supervision](None)
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
@@ -102,11 +89,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
         "specifyOtherBusiness" -> "test"
       )
 
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Supervision](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Supervision](None)
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
@@ -120,11 +103,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
         "businessType[1]" -> "02"
       )
 
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Supervision](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+      mockCacheFetch[Supervision](None)
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
@@ -133,28 +112,6 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
       document.select("a[href=#isAMember]").html() must include(Messages("error.required.supervision.business.a.member"))
     }
 
-    "on post with invalid data1" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true",
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02",
-        "businessType[2]" -> "14",
-        "specifyOtherBusiness" -> ""
-      )
-
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
-
-      when(controller.dataCacheConnector.save[Supervision](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(BAD_REQUEST)
-
-      val document = Jsoup.parse(contentAsString(result))
-      document.select("a[href=#specifyOtherBusiness]").html() must include(Messages("error.required.supervision.business.details"))
-    }
   }
 
 }
