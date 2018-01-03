@@ -16,9 +16,9 @@
 
 import javax.inject.Inject
 
-import filters.{ChangeOfficerFeatureFilter, ConfirmationFilter}
+import filters.ConfirmationFilter
 import play.api.http.DefaultHttpFilters
 
-class Filters @Inject()(confirmationFilter: ConfirmationFilter, changeOfficerFeatureFilter: ChangeOfficerFeatureFilter)
-  extends DefaultHttpFilters(confirmationFilter, changeOfficerFeatureFilter)
+class Filters @Inject()(confirmationFilter: ConfirmationFilter)
+  extends DefaultHttpFilters(confirmationFilter)
 
