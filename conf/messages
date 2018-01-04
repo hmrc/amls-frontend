@@ -1638,6 +1638,9 @@ supervision.memberofprofessionalbody.lbl.12 = International Association of Bookk
 supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
+supervision.whichprofessionalbody.title = Which professional body are you a member of?
+
+
 
 msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months
