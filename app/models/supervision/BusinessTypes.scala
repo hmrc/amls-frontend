@@ -105,14 +105,10 @@ object BusinessTypes {
 
   implicit val jsonWrites: Writes[BusinessTypes] = Writes[BusinessTypes]{ businessTypes =>
     Json.obj(
-      "businessType" -> (businessTypes.businessTypes map {
-        _.value
-      }).toSeq
+      "businessType" -> (businessTypes.businessTypes map (_.value)).toSeq
     ) ++ businessTypes.businessTypes.foldLeft[JsObject](Json.obj()) {
-      case (m, Other(name)) =>
-        m ++ Json.obj("specifyOtherBusiness" -> name)
-      case (m, _) =>
-        m
+      case (json, Other(name)) => json ++ Json.obj("specifyOtherBusiness" -> name)
+      case (json, _) => json
     }
   }
 
