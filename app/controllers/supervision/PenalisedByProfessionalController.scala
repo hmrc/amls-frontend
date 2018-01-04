@@ -16,18 +16,22 @@
 
 package controllers.supervision
 
+import javax.inject.Inject
+
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.supervision.{ProfessionalBody, Supervision}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.penalised_by_professional
 
 import scala.concurrent.Future
 
-trait PenalisedByProfessionalController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class PenalisedByProfessionalController @Inject()(
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector = AMLSAuthConnector
+                                                 ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -54,10 +58,4 @@ trait PenalisedByProfessionalController extends BaseController {
           } yield Redirect(routes.SummaryController.get())
       }
   }
-}
-
-object PenalisedByProfessionalController extends PenalisedByProfessionalController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }
