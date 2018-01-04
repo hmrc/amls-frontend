@@ -18,11 +18,9 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 
-import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address => BusinessCustomerAddress}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
@@ -30,9 +28,7 @@ import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
