@@ -51,12 +51,12 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val controller = new SummaryController {
-      override val dataCache = mockCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mockStatusService
-      override val businessMatchingService = mockBusinessMatchingService
-    }
+    val controller = new SummaryController (
+      dataCache = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService
+    )
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
@@ -82,11 +82,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
   }
 
   "Get" must {
-
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
 
     "load the summary page when section data is available" in new Fixture {
       val model = BusinessMatching(
@@ -192,12 +187,12 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val controller = new SummaryController {
-      override val dataCache = mockCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mockStatusService
-      override val businessMatchingService = mockBusinessMatchingService
-    }
+    val controller = new SummaryController (
+      dataCache = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService
+    )
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())

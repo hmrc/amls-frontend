@@ -116,8 +116,8 @@ class BusinessMatchingService @Inject()(
   private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
     variationModel.activities match {
       case Some(BusinessActivities(existing, Some(additional), removed, doc)) =>
-        variationModel.activities(BusinessActivities(existing ++ additional, None, removed, doc))
-      case _ => variationModel.copy(hasChanged = primaryModel != variationModel)
+        variationModel.activities(BusinessActivities(existing ++ additional, None, removed, doc)).copy(hasAccepted = true)
+      case _ => variationModel.copy(hasChanged = primaryModel != variationModel, hasAccepted = true)
     }
 
   def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
