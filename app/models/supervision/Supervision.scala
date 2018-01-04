@@ -16,7 +16,6 @@
 
 package models.supervision
 
-import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -24,6 +23,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Supervision(
                         anotherBody: Option[AnotherBody] = None,
                         professionalBodyMember: Option[ProfessionalBodyMember] = None,
+                        transactionType: Option[BusinessTypes] = None,
                         professionalBody: Option[ProfessionalBody] = None,
                         hasChanged: Boolean = false,
                         hasAccepted: Boolean = false) {
@@ -40,19 +40,9 @@ case class Supervision(
     this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p),
       hasAccepted = hasAccepted && this.professionalBody.contains(p))
 
-  def isComplete: Boolean = {
-    if (ApplicationConfig.hasAcceptedToggle) {
-    this match {
-      case Supervision(Some(_), Some(_), Some(_), _, true) => true
-      case Supervision(Some(_), Some(_), Some(_), _, false) => false
-      case _ => false
-    }
-  } else {
-      this match {
-        case Supervision(Some(_), Some(_), Some(_), _, _) => true
-        case _ => false
-      }
-    }
+  def isComplete: Boolean = this match {
+    case Supervision(Some(_), Some(_), _, Some(_), _, true) => true
+    case _ => false
   }
 
 }
@@ -87,6 +77,7 @@ object Supervision {
     (
       (__ \ "anotherBody").readNullable[AnotherBody] and
         (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
+        (__ \ "businessType").readNullable[BusinessTypes] and
         (__ \ "professionalBody").readNullable[ProfessionalBody] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}
