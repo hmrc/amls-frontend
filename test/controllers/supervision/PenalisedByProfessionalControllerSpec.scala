@@ -23,19 +23,18 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 
 class PenalisedByProfessionalControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController {
       override val dataCacheConnector = mock[DataCacheConnector]
@@ -48,8 +47,9 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
   "PenalisedByProfessionalController" must {
 
     "on get display the Penalised By Professional Body page" in new Fixture {
-      when(controller.dataCacheConnector.fetch[Supervision](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+
+      mockCacheFetch[Supervision](None)
+
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("supervision.penalisedbyprofessional.title"))
@@ -58,8 +58,12 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
 
   "on get display the Penalised By Professional Body page with pre populated data" in new Fixture {
 
-    when(controller.dataCacheConnector.fetch[Supervision](any())
-      (any(), any(), any())).thenReturn(Future.successful(Some(Supervision(None, None, Some(ProfessionalBodyYes("details"))))))
+    mockCacheFetch[Supervision](Some(Supervision(
+      None,
+      None,
+      None,
+      Some(ProfessionalBodyYes("details"))
+    )))
 
     val result = controller.get()(request)
     status(result) must be(OK)
@@ -74,11 +78,9 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
       "professionalBody" -> "details"
     )
 
-    when(controller.dataCacheConnector.fetch[Supervision](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+    mockCacheFetch[Supervision](None)
 
-    when(controller.dataCacheConnector.save[Supervision](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    mockCacheSave[Supervision]
 
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
@@ -102,14 +104,12 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
 
      val newRequest = request.withFormUrlEncodedBody(
        "penalised" -> "true",
-      "professionalBody" -> "details"
+       "professionalBody" -> "details"
      )
 
-     when(controller.dataCacheConnector.fetch[Supervision](any())
-       (any(), any(), any())).thenReturn(Future.successful(None))
+     mockCacheFetch[Supervision](None)
 
-     when(controller.dataCacheConnector.save[Supervision](any(), any())
-       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+     mockCacheSave[Supervision]
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
@@ -117,5 +117,3 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
    }
   }
 }
-
-

@@ -101,7 +101,36 @@ object ProfessionalBodyMember {
 
   implicit val jsonReads: Reads[ProfessionalBodyMember] = {
     (__ \ "isAMember").read[Boolean] flatMap {
-      case true => BusinessTypes.businessTypeReader map ProfessionalBodyMemberYes.apply
+      case true => (__ \ "businessType").read[Set[String]] flatMap { setOfStrings: Set[String] =>
+        (setOfStrings map {
+          case "01" => Reads(_ => JsSuccess(AccountingTechnicians)) map identity[BusinessType]
+          case "02" => Reads(_ => JsSuccess(CharteredCertifiedAccountants)) map identity[BusinessType]
+          case "03" => Reads(_ => JsSuccess(InternationalAccountants)) map identity[BusinessType]
+          case "04" => Reads(_ => JsSuccess(TaxationTechnicians)) map identity[BusinessType]
+          case "05" => Reads(_ => JsSuccess(ManagementAccountants)) map identity[BusinessType]
+          case "06" => Reads(_ => JsSuccess(InstituteOfTaxation)) map identity[BusinessType]
+          case "07" => Reads(_ => JsSuccess(Bookkeepers)) map identity[BusinessType]
+          case "08" => Reads(_ => JsSuccess(AccountantsIreland)) map identity[BusinessType]
+          case "09" => Reads(_ => JsSuccess(AccountantsScotland)) map identity[BusinessType]
+          case "10" => Reads(_ => JsSuccess(AccountantsEnglandandWales)) map identity[BusinessType]
+          case "11" => Reads(_ => JsSuccess(FinancialAccountants)) map identity[BusinessType]
+          case "12" => Reads(_ => JsSuccess(AssociationOfBookkeepers)) map identity[BusinessType]
+          case "13" => Reads(_ => JsSuccess(LawSociety)) map identity[BusinessType]
+          case "14" =>
+            (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply) map identity[BusinessType]
+          case _ =>
+            Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
+        }).foldLeft[Reads[Set[BusinessType]]](
+          Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
+        ) {
+          (start, businessTypeReader) =>
+            businessTypeReader flatMap { businessType =>
+              start map { businessTypes =>
+                businessTypes + businessType
+              }
+            }
+        }
+      } map ProfessionalBodyMemberYes.apply
       case false => Reads(_ => JsSuccess(ProfessionalBodyMemberNo))
     }
   }
