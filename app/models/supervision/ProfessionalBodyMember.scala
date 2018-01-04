@@ -32,55 +32,6 @@ case class ProfessionalBodyMemberYes(transactionType: Set[BusinessType]) extends
 
 case object ProfessionalBodyMemberNo extends ProfessionalBodyMember
 
-
-sealed trait BusinessType {
-  val value: String =
-    this match {
-      case AccountingTechnicians => "01"
-      case CharteredCertifiedAccountants => "02"
-      case InternationalAccountants => "03"
-      case TaxationTechnicians => "04"
-      case ManagementAccountants => "05"
-      case InstituteOfTaxation => "06"
-      case Bookkeepers => "07"
-      case AccountantsIreland => "08"
-      case AccountantsScotland => "09"
-      case AccountantsEnglandandWales => "10"
-      case FinancialAccountants => "11"
-      case AssociationOfBookkeepers => "12"
-      case LawSociety => "13"
-      case Other(_) => "14"
-    }
-}
-
-case object AccountingTechnicians extends BusinessType
-
-case object CharteredCertifiedAccountants extends BusinessType
-
-case object InternationalAccountants extends BusinessType
-
-case object TaxationTechnicians extends BusinessType
-
-case object ManagementAccountants extends BusinessType
-
-case object InstituteOfTaxation extends BusinessType
-
-case object Bookkeepers extends BusinessType
-
-case object AccountantsIreland extends BusinessType
-
-case object AccountantsScotland extends BusinessType
-
-case object AccountantsEnglandandWales extends BusinessType
-
-case object FinancialAccountants extends BusinessType
-
-case object AssociationOfBookkeepers extends BusinessType
-
-case object LawSociety extends BusinessType
-
-case class Other(businessDetails: String) extends BusinessType
-
 object ProfessionalBodyMember {
 
   import utils.MappingUtils.Implicits._
@@ -150,36 +101,7 @@ object ProfessionalBodyMember {
 
   implicit val jsonReads: Reads[ProfessionalBodyMember] = {
     (__ \ "isAMember").read[Boolean] flatMap {
-      case true => (__ \ "businessType").read[Set[String]].flatMap { x: Set[String] =>
-        x.map {
-          case "01" => Reads(_ => JsSuccess(AccountingTechnicians)) map identity[BusinessType]
-          case "02" => Reads(_ => JsSuccess(CharteredCertifiedAccountants)) map identity[BusinessType]
-          case "03" => Reads(_ => JsSuccess(InternationalAccountants)) map identity[BusinessType]
-          case "04" => Reads(_ => JsSuccess(TaxationTechnicians)) map identity[BusinessType]
-          case "05" => Reads(_ => JsSuccess(ManagementAccountants)) map identity[BusinessType]
-          case "06" => Reads(_ => JsSuccess(InstituteOfTaxation)) map identity[BusinessType]
-          case "07" => Reads(_ => JsSuccess(Bookkeepers)) map identity[BusinessType]
-          case "08" => Reads(_ => JsSuccess(AccountantsIreland)) map identity[BusinessType]
-          case "09" => Reads(_ => JsSuccess(AccountantsScotland)) map identity[BusinessType]
-          case "10" => Reads(_ => JsSuccess(AccountantsEnglandandWales)) map identity[BusinessType]
-          case "11" => Reads(_ => JsSuccess(FinancialAccountants)) map identity[BusinessType]
-          case "12" => Reads(_ => JsSuccess(AssociationOfBookkeepers)) map identity[BusinessType]
-          case "13" => Reads(_ => JsSuccess(LawSociety)) map identity[BusinessType]
-          case "14" =>
-            (JsPath \ "specifyOtherBusiness").read[String].map(Other.apply _) map identity[BusinessType]
-          case _ =>
-            Reads(_ => JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
-        }.foldLeft[Reads[Set[BusinessType]]](
-          Reads[Set[BusinessType]](_ => JsSuccess(Set.empty))
-        ) {
-          (result, data) =>
-            data flatMap { m =>
-              result.map { n =>
-                n + m
-              }
-            }
-        }
-      } map ProfessionalBodyMemberYes.apply
+      case true => BusinessTypes.businessTypeReader map ProfessionalBodyMemberYes.apply
       case false => Reads(_ => JsSuccess(ProfessionalBodyMemberNo))
     }
   }
