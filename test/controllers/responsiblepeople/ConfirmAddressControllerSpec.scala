@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{ReviewDetails, Address => BusinessCustomerAddress}
 import models.businessmatching.{BusinessMatching, BusinessType}
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -105,6 +106,29 @@ class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
             .thenReturn(Some(Seq(ResponsiblePeople())))
+
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(bm.copy(reviewDetails = None)))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          val result = controller.get(1)(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
+        }
+
+        "current address is defined" in new Fixture {
+
+          val mockCacheMap = mock[CacheMap]
+
+          val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
+          val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
+          val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
+          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+            .thenReturn(Some(Seq(responsiblePeople)))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(bm.copy(reviewDetails = None)))

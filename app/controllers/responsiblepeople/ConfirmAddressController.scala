@@ -18,6 +18,7 @@ package controllers.responsiblepeople
 
 import javax.inject.Inject
 
+import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -39,12 +40,6 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val authConnector: AuthConnector)
   extends RepeatingSection with BaseController {
 
-  def getAddress(businessMatching: Future[Option[BusinessMatching]]): Future[Option[BusinessCustomerAddress]] = {
-    businessMatching map {
-      case Some(bm) => bm.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
-      case _ => None
-    }
-  }
   def getAddress(businessMatching: BusinessMatching): Option[BusinessCustomerAddress] = {
       businessMatching.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
   }
@@ -74,9 +69,16 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
               rp <- getData[ResponsiblePeople](cache, index)
               bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
-              getAddress(bm) match {
-                case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
-                case _ => Redirect(routes.CurrentAddressController.get(index))
+              rp.addressHistory.isDefined match {
+                case true
+                  => Redirect(routes.CurrentAddressController.get(index))
+                case _
+                  => {
+                  getAddress(bm) match {
+                    case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
+                    case _ => Redirect(routes.CurrentAddressController.get(index))
+                  }
+                }
               }
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
