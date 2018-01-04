@@ -130,6 +130,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
         be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
       }
     }
+
     "validate form write for valid transaction record" in {
 
       val map = Map(
