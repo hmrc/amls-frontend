@@ -16,19 +16,14 @@
 
 package controllers.supervision
 
-import connectors.DataCacheConnector
 import models.supervision.{ProfessionalBodyYes, Supervision}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-
-import scala.concurrent.Future
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 
 class PenalisedByProfessionalControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
@@ -37,12 +32,13 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
     val request = addToken(authRequest)
 
     val controller = new PenalisedByProfessionalController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+      override val dataCacheConnector = mockCacheConnector
       override val authConnector = self.authConnector
     }
-  }
 
-  val emptyCache = CacheMap("", Map.empty)
+    mockCacheSave[Supervision]
+
+  }
 
   "PenalisedByProfessionalController" must {
 
@@ -80,8 +76,6 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
 
     mockCacheFetch[Supervision](None)
 
-    mockCacheSave[Supervision]
-
     val result = controller.post()(newRequest)
     status(result) must be(SEE_OTHER)
     redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
@@ -108,8 +102,6 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
      )
 
      mockCacheFetch[Supervision](None)
-
-     mockCacheSave[Supervision]
 
      val result = controller.post(true)(newRequest)
      status(result) must be(SEE_OTHER)
