@@ -40,11 +40,13 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
     "get" must {
 
-      "return OK" in new Fixture {
+      "display view" in new Fixture {
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
+
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
 
       }
     }
