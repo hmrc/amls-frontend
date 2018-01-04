@@ -494,8 +494,8 @@ GET         /supervision/what-you-need                                          
 GET         /supervision/supervised                                                   controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
 POST        /supervision/supervised                                                   controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
-GET         /supervision/professional-body                                            controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
-POST        /supervision/professional-body                                            controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
+GET         /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
+POST        /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
 
 GET         /supervision/penalised                                                    controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /supervision/penalised                                                    controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
