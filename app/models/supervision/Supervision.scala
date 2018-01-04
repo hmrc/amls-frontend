@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Supervision(
                         anotherBody: Option[AnotherBody] = None,
                         professionalBodyMember: Option[ProfessionalBodyMember] = None,
-                        transactionType: Option[BusinessTypes] = None,
+                        businessTypes: Option[BusinessTypes] = None,
                         professionalBody: Option[ProfessionalBody] = None,
                         hasChanged: Boolean = false,
                         hasAccepted: Boolean = false) {

@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import models.supervision.{AssociationOfBookkeepers, BusinessTypes, Other, Supervision}
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -40,18 +41,42 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
     "get" must {
 
-      "display view" in new Fixture {
+      "display view" when {
 
-        val result = controller.get()(request)
+        "form data exists" in new Fixture {
 
-        status(result) must be(OK)
+          mockCacheFetch[Supervision](Some(Supervision(
+            businessTypes = Some(BusinessTypes(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
+          )))
 
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
+          val result = controller.get()(request)
 
+          status(result) must be(OK)
+
+          Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.select("input[value=12]").hasAttr("checked") must be(true)
+          document.select("input[value=14]").hasAttr("checked") must be(true)
+          document.select("input[name=specifyOtherBusiness]").`val`() must be("SomethingElse")
+
+        }
+
+        "form data is empty" in new Fixture {
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.get()(request)
+
+          status(result) must be(OK)
+
+          Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
+
+        }
       }
     }
 
-    "post" must {
+    "post" when {
 
       "be called" in new Fixture {
 
