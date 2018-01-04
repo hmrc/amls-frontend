@@ -1,0 +1,74 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+
+@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+
+@target1 = @{
+    s"""${f("specifyOtherBusiness").id}-panel"""
+}
+
+@header = {
+    @errorSummary(f)
+    @heading("supervision.whichprofessionalbody.title", "summary.supervision")
+}
+
+@main(
+    title = Messages("supervision.whichprofessionalbody.title") + " - " + Messages("summary.supervision"),
+    heading = header
+) {
+
+    @form(f, controllers.supervision.routes.ProfessionalBodyMemberController.post(edit)) {
+
+        <p>@Messages("lbl.select.all")</p>
+
+        @fieldset(
+            legend = "supervision.memberofprofessionalbody.title",
+            legendHidden = true,
+            f = f("businessType"),
+            panel = false
+        ) {
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
+            @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#$target1")
+        }
+        @panel(
+            field = Some(f(s"$target1")),
+            panel = false,
+            jsHidden = true
+        ) {
+            @input(
+                field = f("specifyOtherBusiness"),
+                labelText = "lbl.pleasespecify"
+            )
+        }
+
+        @submit(edit)
+    }
+}
