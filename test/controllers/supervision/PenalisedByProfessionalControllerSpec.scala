@@ -22,7 +22,6 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 
@@ -31,10 +30,10 @@ class PenalisedByProfessionalControllerSpec extends GenericTestHelper with Mocki
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new PenalisedByProfessionalController {
-      override val dataCacheConnector = mockCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val controller = new PenalisedByProfessionalController (
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector
+    )
 
     mockCacheSave[Supervision]
 
