@@ -121,4 +121,6 @@ class AppConfig @Inject()(
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def authUrl = config.baseUrl("auth")
+
+  def enrolmentStoreUrl = config.baseUrl("tax-enrolments")
 }

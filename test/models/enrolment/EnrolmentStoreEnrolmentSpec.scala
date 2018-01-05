@@ -24,17 +24,14 @@ import play.api.libs.json.Json
 class EnrolmentStoreEnrolmentSpec extends PlaySpec with MustMatchers with BaseGenerator with AmlsReferenceNumberGenerator {
 
   trait Fixture {
-
     //noinspection ScalaStyle
     val userId = numSequence(10).sample.get
     val postCode = postcodeGen.sample.get
-    val refNumber = amlsRefNoGen.sample.get
-
   }
 
   "The model" must {
     "serialize to the correct Json" in new Fixture {
-      val model = EnrolmentStoreEnrolment(userId, refNumber, postCode)
+      val model = EnrolmentStoreEnrolment(userId, postCode)
 
       val expectedJson = Json.obj(
         "userId" -> userId,

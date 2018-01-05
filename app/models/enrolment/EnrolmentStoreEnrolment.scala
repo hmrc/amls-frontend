@@ -23,7 +23,7 @@ case class EnrolmentStoreEnrolment(userId: String, friendlyName: String, `type`:
 object EnrolmentStoreEnrolment {
   implicit val format = Json.writes[EnrolmentStoreEnrolment]
 
-  def apply(userId: String, amlsRefNumber: String, postCode: String): EnrolmentStoreEnrolment =
+  def apply(userId: String, postCode: String): EnrolmentStoreEnrolment =
     EnrolmentStoreEnrolment(userId, "AMLS Enrolment", "principal", Seq(
       EnrolmentIdentifier("Postcode", postCode)
     ))

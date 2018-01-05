@@ -18,6 +18,7 @@ package generators
 
 import org.scalacheck.Gen
 
+//noinspection ScalaStyle
 trait AmlsReferenceNumberGenerator {
 
   def amlsRefNoGen = {
