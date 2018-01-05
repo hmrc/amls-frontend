@@ -264,9 +264,7 @@ trait SupervisionValues {
       "endingReason" -> "Ending reason"
     ),
     "professionalBodyMember" -> Json.obj(
-      "isAMember" -> true,
-      "businessType" -> Json.arr("01", "02", "14"),
-      "specifyOtherBusiness" -> "test"
+      "isAMember" -> true
     ),
     "businessTypes" -> Json.obj(
       "businessType" -> Json.arr("01", "02", "14"),
