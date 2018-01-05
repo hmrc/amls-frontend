@@ -21,7 +21,6 @@ import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address => BusinessCustomerAddress}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople._
@@ -29,9 +28,7 @@ import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.confirm_address
-
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
@@ -39,12 +36,6 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          val authConnector: AuthConnector)
   extends RepeatingSection with BaseController {
 
-  def getAddress(businessMatching: Future[Option[BusinessMatching]]): Future[Option[BusinessCustomerAddress]] = {
-    businessMatching map {
-      case Some(bm) => bm.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
-      case _ => None
-    }
-  }
   def getAddress(businessMatching: BusinessMatching): Option[BusinessCustomerAddress] = {
       businessMatching.reviewDetails.fold[Option[BusinessCustomerAddress]](None)(r => Some(r.businessAddress))
   }
@@ -74,9 +65,16 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
               rp <- getData[ResponsiblePeople](cache, index)
               bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
-              getAddress(bm) match {
-                case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
-                case _ => Redirect(routes.CurrentAddressController.get(index))
+              rp.addressHistory.isDefined match {
+                case true
+                  => Redirect(routes.CurrentAddressController.get(index))
+                case _
+                  => {
+                  getAddress(bm) match {
+                    case Some(addr) => Ok(confirm_address(EmptyForm, addr, index, ControllerHelper.rpTitleName(Some(rp))))
+                    case _ => Redirect(routes.CurrentAddressController.get(index))
+                  }
+                }
               }
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
         }
