@@ -76,7 +76,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+      redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
     }
 
     "on post with valid data in edit mode" in new Fixture {
