@@ -49,7 +49,7 @@ import utils.DependencyMocks
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite
   with ResponsiblePersonGenerator
@@ -74,15 +74,16 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     val subscriptionResponse = SubscriptionResponse(
       etmpFormBundleNumber = "",
-      amlsRefNo = "amlsRef",Some(SubscriptionFees(
+      amlsRefNo = "amlsRef",
+      Some(SubscriptionFees(
         registrationFee = 0,
-      fpFee = None,
-      fpFeeRate = None,
-      premiseFee = 0,
-      premiseFeeRate = None,
-      totalFees = 0,
-      paymentReference = ""
-    )))
+        fpFee = None,
+        fpFeeRate = None,
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = ""
+      )))
 
     val amendmentResponse = AmendVariationRenewalResponse(
       processingDate = "",
@@ -156,8 +157,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         } thenReturn Future.successful(enrolmentResponse)
 
         whenReady(TestSubmissionService.subscribe) {
-          result =>
-            result must equal(subscriptionResponse)
+          _ mustBe subscriptionResponse
         }
       }
     }
@@ -287,7 +287,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true,true,Some("other")))))
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
       )
 
       val result = await(TestSubmissionService.renewalAmendment(renewal))
