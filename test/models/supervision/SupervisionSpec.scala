@@ -93,8 +93,13 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         completeModel.isComplete must be(true)
       }
 
-      "show if the model is incomplete" in {
-        partialModel.isComplete must be(false)
+      "show if the model is incomplete" when {
+        "ProfessionalBodyMember is Yes and businessTypes is not defined" in {
+          partialModelNoBusinessTypes.isComplete must be(false)
+        }
+        "multiple properties are missing" in {
+          partialModel.isComplete must be(false)
+        }
       }
     }
 
@@ -250,6 +255,13 @@ trait SupervisionValues {
     Some(DefaultValues.DefaultAnotherBody),
     Some(DefaultValues.DefaultProfessionalBodyMember),
     Some(DefaultValues.DefaultBusinessTypes),
+    Some(DefaultValues.DefaultProfessionalBody),
+    hasAccepted = true)
+
+  val partialModelNoBusinessTypes = Supervision(
+    Some(DefaultValues.DefaultAnotherBody),
+    Some(DefaultValues.DefaultProfessionalBodyMember),
+    None,
     Some(DefaultValues.DefaultProfessionalBody),
     hasAccepted = true)
 
