@@ -236,7 +236,7 @@ trait SupervisionValues {
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
     val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
-    val DefaultBusinessTypes = BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants))
+    val DefaultBusinessTypes = BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
   }
 
   object NewValues {
@@ -269,7 +269,8 @@ trait SupervisionValues {
       "specifyOtherBusiness" -> "test"
     ),
     "businessTypes" -> Json.obj(
-      "businessType" -> Json.arr("01", "02")
+      "businessType" -> Json.arr("01", "02", "14"),
+      "specifyOtherBusiness" -> "test"
     ),
     "professionalBody" -> Json.obj(
       "penalised" -> true,

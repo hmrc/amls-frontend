@@ -67,13 +67,21 @@ object Supervision {
   }
 
   import play.api.libs.json._
+  import utils.MappingUtils._
 
   val key = "supervision"
+
   implicit val formatOption = Reads.optionWithNull[Supervision]
 
   implicit val mongoKey = new MongoKey[Supervision] {
     override def apply(): String = "supervision"
   }
+
+  def businessTypesReader: Reads[Option[BusinessTypes]] =
+    (__ \ "businessTypes").readNullable[BusinessTypes] flatMap {
+      case businessTypes@Some(_) => constant(businessTypes)
+      case _ => (__ \ "professionalBodyMember").readNullable[BusinessTypes] orElse constant(None)
+    }
 
   implicit val reads: Reads[Supervision] = {
     import play.api.libs.functional.syntax._
@@ -81,7 +89,7 @@ object Supervision {
     (
       (__ \ "anotherBody").readNullable[AnotherBody] and
         (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
-        (__ \ "businessTypes").readNullable[BusinessTypes] and
+        businessTypesReader and
         (__ \ "professionalBody").readNullable[ProfessionalBody] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}
