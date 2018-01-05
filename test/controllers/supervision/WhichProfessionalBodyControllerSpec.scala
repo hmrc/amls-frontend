@@ -53,9 +53,9 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
           status(result) must be(OK)
 
-          Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
-
           val document = Jsoup.parse(contentAsString(result))
+
+          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
           document.select("input[value=12]").hasAttr("checked") must be(true)
           document.select("input[value=14]").hasAttr("checked") must be(true)
           document.select("input[name=specifyOtherBusiness]").`val`() must be("SomethingElse")
@@ -72,6 +72,12 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
           Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
 
+          val document = Jsoup.parse(contentAsString(result))
+
+          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
+
+          document.select("input[type=checkbox]").hasAttr("checked") must be(false)
+          document.select("input[name=specifyOtherBusiness]").`val`() must be(empty)
         }
       }
     }

@@ -19,7 +19,7 @@ package models.supervision
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.forms.Rules.{maxLength, notEmpty, minLength => _, _}
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Path, Rule, ValidationError}
+import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.FormTypes.{basicPunctuationPattern, notEmptyStrip}
 import play.api.libs.json.Reads.StringReads
 import play.api.libs.json._
@@ -120,6 +120,17 @@ object BusinessTypes {
             }
           }
       } map BusinessTypes.apply
+    }
+  }
+
+  implicit def formWrites = Write[BusinessTypes, UrlFormEncoded] { businessTypes =>
+    Map(
+      "businessType[]" -> (businessTypes.businessTypes map {
+        _.value
+      }).toSeq
+    ) ++ businessTypes.businessTypes.foldLeft[UrlFormEncoded](Map.empty) {
+      case (form, Other(name)) => form ++ Map("specifyOtherBusiness" -> Seq(name))
+      case (form, _) => form
     }
   }
 
