@@ -16,6 +16,7 @@
 
 package controllers.supervision
 
+import models.supervision.{AssociationOfBookkeepers, BusinessTypes, Other, Supervision}
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -40,20 +41,64 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
     "get" must {
 
-      "return OK" in new Fixture {
+      "display view" when {
 
-        val result = controller.get()(request)
+        "form data exists" in new Fixture {
 
-        status(result) must be(OK)
+          mockCacheFetch[Supervision](Some(Supervision(
+            businessTypes = Some(BusinessTypes(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
+          )))
 
+          val result = controller.get()(request)
+
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+
+          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
+          document.select("input[value=12]").hasAttr("checked") must be(true)
+          document.select("input[value=14]").hasAttr("checked") must be(true)
+          document.select("input[name=specifyOtherBusiness]").`val`() must be("SomethingElse")
+
+        }
+
+        "form data is empty" in new Fixture {
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.get()(request)
+
+          status(result) must be(OK)
+
+          Jsoup.parse(contentAsString(result)).title() must include(Messages("supervision.whichprofessionalbody.title"))
+
+          val document = Jsoup.parse(contentAsString(result))
+
+          document.title() must include(Messages("supervision.whichprofessionalbody.title"))
+
+          document.select("input[type=checkbox]").hasAttr("checked") must be(false)
+          document.select("input[name=specifyOtherBusiness]").`val`() must be(empty)
+        }
       }
     }
 
-    "post" must {
+    "post" when {
 
-      "be called" in new Fixture {
+      "valid data" must {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        "redirect to PenalisedByProfessionalController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessType[0]" -> "01",
+            "businessType[1]" -> "02"
+          )
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        }
 
       }
 

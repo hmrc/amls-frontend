@@ -21,7 +21,10 @@ import javax.inject.Inject
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2, ValidForm}
+import models.supervision.{BusinessTypes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.supervision.which_professional_body
 
 import scala.concurrent.Future
 
@@ -33,13 +36,25 @@ class WhichProfessionalBodyController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok)
+        dataCacheConnector.fetch[Supervision](Supervision.key) map { response =>
+
+          val form = (for {
+            supervision <- response
+            businessTypes <- supervision.businessTypes
+          } yield {
+            Form2[BusinessTypes](businessTypes)
+          }) getOrElse EmptyForm
+
+          Ok(which_professional_body(form, false))
+        }
   }
 
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
-      ???
+      Form2[BusinessTypes](request.body) match {
+        case ValidForm(_, data) => Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+      }
   }
 
 }

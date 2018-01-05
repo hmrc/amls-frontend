@@ -40,7 +40,6 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           ))))
 
       }
-
     }
 
     "return error" when {
@@ -110,16 +109,42 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
 
   }
 
+  "Form writers" must {
+    "write to form with businessTypes" when {
+      "without other option" in {
+
+        val map = Map(
+          "businessType[]" -> Seq("03","04", "05", "06")
+        )
+
+        val model = BusinessTypes(Set(InternationalAccountants, TaxationTechnicians, ManagementAccountants, InstituteOfTaxation))
+
+        BusinessTypes.formWrites.writes(model) must be (map)
+      }
+
+      "with Other option" in {
+
+        val map = Map(
+          "businessType[]" -> Seq("14","13"),
+          "specifyOtherBusiness" -> Seq("otherBusiness")
+        )
+
+        val model = BusinessTypes(Set(Other("otherBusiness"), LawSociety))
+        BusinessTypes.formWrites.writes(model) must be (map)
+      }
+    }
+  }
+
   "JSON validation" must {
 
-    "successfully validate given values" in {
+    "validate given values" in {
       val json =  Json.obj("businessType" -> Seq("01","02"))
 
       Json.fromJson[BusinessTypes](json) must
         be(JsSuccess(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
     }
 
-    "successfully validate given values with option Digital software" in {
+    "validate given values with option Digital software" in {
       val json =  Json.obj(
         "businessType" -> Seq("14", "12"),
         "specifyOtherBusiness" -> "test"
@@ -139,11 +164,13 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
         be(JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
-    "write valid data in using json write" in {
+  }
+
+  "JSON writers" must {
+    "write valid data" in {
       Json.toJson[BusinessTypes](BusinessTypes(Set(AccountantsScotland, Other("test657")))) must
         be (Json.obj("businessType" -> Seq("09", "14"), "specifyOtherBusiness" -> "test657"))
     }
-
   }
 
 }
