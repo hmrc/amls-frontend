@@ -17,7 +17,7 @@
 package services
 
 import connectors.AuthConnector
-import play.api.Logger
+import play.api.{Logger, Play}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -58,7 +58,7 @@ trait AuthEnrolmentsService {
 
 object AuthEnrolmentsService extends AuthEnrolmentsService {
   // $COVERAGE-OFF$
-  override private[services] val authConnector = AuthConnector
+  override private[services] lazy val authConnector = Play.current.injector.instanceOf[AuthConnector]
   // $COVERAGE-ON$
 
 }

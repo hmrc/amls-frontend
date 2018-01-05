@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.{AppConfig, WSHttp}
 import models.auth.UserDetailsResponse
 import models.enrolment.GovernmentGatewayEnrolment
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -39,51 +40,50 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     when(authContext.userDetailsUri) thenReturn Some("/user-details")
 
-    object TestAuthConnector extends AuthConnector {
-      override private[connectors] def authUrl: String = "/auth"
+    val config = mock[AppConfig]
+    when(config.authUrl) thenReturn "/auth"
 
-      override private[connectors] val http = mock[CoreGet]
-    }
+    val authConnector = new AuthConnector(mock[WSHttp], config)
 
     val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three")
   }
 
   "Auth Connector" must {
     "return list of government gateway enrolments" in new Fixture {
-      when(TestAuthConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
+      when(authConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
 
-      whenReady(TestAuthConnector.enrollments("thing")) {
+      whenReady(authConnector.enrollments("thing")) {
         results => results must equal(Nil)
       }
     }
 
     "get the current authority" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+        authConnector.http.GET[Authority](any())(any(), any(), any())
       } thenReturn Future.successful(completeAuthorityModel)
 
-      whenReady(TestAuthConnector.getCurrentAuthority) {
+      whenReady(authConnector.getCurrentAuthority) {
         _ mustBe completeAuthorityModel
       }
     }
 
     "return a failed Future when the HTTP call is unauthorised" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+        authConnector.http.GET[Authority](any())(any(), any(), any())
       } thenReturn Future.failed(Upstream4xxResponse("Unauthorized", UNAUTHORIZED, UNAUTHORIZED))
 
       intercept[Exception] {
-        await(TestAuthConnector.getCurrentAuthority)
+        await(authConnector.getCurrentAuthority)
       }
     }
 
     "get the Ids" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Ids](any())(any(), any(), any())
+        authConnector.http.GET[Ids](any())(any(), any(), any())
       } thenReturn Future.successful(mock[Ids])
 
-      whenReady(TestAuthConnector.getIds(completeAuthorityModel)) { _ =>
-        verify(TestAuthConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
+      whenReady(authConnector.getIds(completeAuthorityModel)) { _ =>
+        verify(authConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
       }
     }
   }
@@ -92,11 +92,11 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "called with a valid uri" must {
       "return the user details response data" in new Fixture {
         when {
-          TestAuthConnector.http.GET[UserDetailsResponse](any())(any(), any(), any())
+          authConnector.http.GET[UserDetailsResponse](any())(any(), any(), any())
         } thenReturn Future.successful(mock[UserDetailsResponse])
 
-        whenReady(TestAuthConnector.userDetails) { _ =>
-          verify(TestAuthConnector.http).GET[UserDetailsResponse](eqTo("/user-details"))(any(), any(), any())
+        whenReady(authConnector.userDetails) { _ =>
+          verify(authConnector.http).GET[UserDetailsResponse](eqTo("/user-details"))(any(), any(), any())
         }
       }
     }
@@ -106,7 +106,7 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         when(authContext.userDetailsUri) thenReturn None
 
         intercept[Exception] {
-          await(TestAuthConnector.userDetails)
+          await(authConnector.userDetails)
         }
       }
     }

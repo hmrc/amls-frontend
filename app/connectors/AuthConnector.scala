@@ -16,7 +16,9 @@
 
 package connectors
 
-import config.{ApplicationConfig, WSHttp}
+import javax.inject.Inject
+
+import config.{AppConfig, ApplicationConfig, WSHttp}
 import models.auth.UserDetailsResponse
 import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
@@ -53,18 +55,15 @@ object Authority {
 }
 // $COVERAGE-ON$
 
-trait AuthConnector {
+class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
 
-  private[connectors] def authUrl: String
-
-  private[connectors] val http : CoreGet
+  private lazy val authUrl = config.authUrl
 
   def enrollments(uri: String)(implicit
                                headerCarrier: HeaderCarrier,
                                ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
 
     http.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
-
   }
 
   def getCurrentAuthority(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Authority] = {
@@ -86,9 +85,3 @@ trait AuthConnector {
   }
 }
 
-object AuthConnector extends AuthConnector {
-  // $COVERAGE-OFF$
-  override private[connectors] lazy val authUrl = ApplicationConfig.authUrl
-  override private[connectors] lazy val http = WSHttp
-  // $COVERAGE-ON$
-}
