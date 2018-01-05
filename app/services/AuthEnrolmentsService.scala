@@ -16,17 +16,16 @@
 
 package services
 
+import javax.inject.Inject
+
 import connectors.AuthConnector
-import play.api.{Logger, Play}
+import play.api.Logger
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait AuthEnrolmentsService {
-
-  private[services] def authConnector: AuthConnector
-
+class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector) {
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
 
@@ -54,11 +53,4 @@ trait AuthEnrolmentsService {
       case None => Future.successful(None)
     }
   }
-}
-
-object AuthEnrolmentsService extends AuthEnrolmentsService {
-  // $COVERAGE-OFF$
-  override private[services] lazy val authConnector = Play.current.injector.instanceOf[AuthConnector]
-  // $COVERAGE-ON$
-
 }

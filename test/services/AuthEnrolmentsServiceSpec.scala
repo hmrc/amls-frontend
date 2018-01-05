@@ -31,9 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience{
 
-  object AuthEnrolmentsService extends AuthEnrolmentsService {
-    override private[services] val authConnector: AuthConnector = mock[AuthConnector]
-  }
+  val service = new AuthEnrolmentsService(mock[AuthConnector])
 
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
@@ -48,9 +46,9 @@ class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFut
 
     "return an AMLS regsitration number" in {
 
-      when(AuthEnrolmentsService.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
+      when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
       when(ac.enrolmentsUri).thenReturn(Some("uri"))
-      whenReady(AuthEnrolmentsService.amlsRegistrationNumber){
+      whenReady(service.amlsRegistrationNumber){
         number => number.get mustEqual(amlsRegistrationNumber)
       }
 
