@@ -48,4 +48,14 @@ class EnrolmentStoreConnectorSpec extends PlaySpec with MustMatchers with ScalaF
 
   }
 
+  "enrol" when {
+    "called" must {
+      "call the UserDetails service to get the group id" in new Fixture {
+
+
+
+      }
+    }
+  }
+
 }
