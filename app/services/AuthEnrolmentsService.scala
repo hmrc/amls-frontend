@@ -18,14 +18,15 @@ package services
 
 import javax.inject.Inject
 
-import connectors.AuthConnector
+import connectors.{AuthConnector, EnrolmentStoreConnector}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import play.api.Logger
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector) {
+class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enrolmentStore: EnrolmentStoreConnector) {
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
 
@@ -53,4 +54,12 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector) {
       case None => Future.successful(None)
     }
   }
+
+  def enrol(amlsRegistrationNumber: String, postcode: String)
+           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[_] = {
+    authConnector.getCurrentAuthority flatMap { authority =>
+      enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
+    }
+  }
+
 }

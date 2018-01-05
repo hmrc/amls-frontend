@@ -39,7 +39,8 @@ object Ids {
 case class Authority(uri: String,
                      accounts: Accounts,
                      userDetailsLink: String,
-                     ids: String
+                     ids: String,
+                     credId: String
                     ) {
 
   def normalisedIds: String = if (ids.startsWith("/")) ids.drop(1) else ids
