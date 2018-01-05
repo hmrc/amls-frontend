@@ -84,9 +84,21 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
     "post" when {
 
-      "be called" in new Fixture {
+      "valid data" must {
 
-        val result = controller.post()(request.withFormUrlEncodedBody())
+        "redirect to PenalisedByProfessionalController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessType[0]" -> "01",
+            "businessType[1]" -> "02"
+          )
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        }
 
       }
 

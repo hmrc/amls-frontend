@@ -21,10 +21,12 @@ import javax.inject.Inject
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, ValidForm}
 import models.supervision.{BusinessTypes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.which_professional_body
+
+import scala.concurrent.Future
 
 class WhichProfessionalBodyController @Inject()(
                                                val dataCacheConnector: DataCacheConnector,
@@ -50,7 +52,9 @@ class WhichProfessionalBodyController @Inject()(
   def post() = Authorised.async{
     implicit authContext =>
       implicit request =>
-      ???
+      Form2[BusinessTypes](request.body) match {
+        case ValidForm(_, data) => Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+      }
   }
 
 }
