@@ -45,7 +45,8 @@ case class Supervision(
       hasAccepted = hasAccepted && this.professionalBody.contains(p))
 
   def isComplete: Boolean = this match {
-    case Supervision(Some(_), Some(_), _, Some(_), _, true) => true
+    case Supervision(Some(_), Some(ProfessionalBodyMemberYes), Some(_), Some(_), _, true) => true
+    case Supervision(Some(_), Some(ProfessionalBodyMemberNo), _, Some(_), _, true) => true
     case _ => false
   }
 

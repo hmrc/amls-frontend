@@ -93,8 +93,13 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         completeModel.isComplete must be(true)
       }
 
-      "show if the model is incomplete" in {
-        partialModel.isComplete must be(false)
+      "show if the model is incomplete" when {
+        "ProfessionalBodyMember is Yes and businessTypes is not defined" in {
+          partialModelNoBusinessTypes.isComplete must be(false)
+        }
+        "multiple properties are missing" in {
+          partialModel.isComplete must be(false)
+        }
       }
     }
 
@@ -235,7 +240,7 @@ trait SupervisionValues {
 
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
-    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
+    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes
     val DefaultBusinessTypes = BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
   }
 
@@ -253,6 +258,13 @@ trait SupervisionValues {
     Some(DefaultValues.DefaultProfessionalBody),
     hasAccepted = true)
 
+  val partialModelNoBusinessTypes = Supervision(
+    Some(DefaultValues.DefaultAnotherBody),
+    Some(DefaultValues.DefaultProfessionalBodyMember),
+    None,
+    Some(DefaultValues.DefaultProfessionalBody),
+    hasAccepted = true)
+
   val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
@@ -264,9 +276,7 @@ trait SupervisionValues {
       "endingReason" -> "Ending reason"
     ),
     "professionalBodyMember" -> Json.obj(
-      "isAMember" -> true,
-      "businessType" -> Json.arr("01", "02", "14"),
-      "specifyOtherBusiness" -> "test"
+      "isAMember" -> true
     ),
     "businessTypes" -> Json.obj(
       "businessType" -> Json.arr("01", "02", "14"),

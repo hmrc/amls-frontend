@@ -69,28 +69,7 @@
     ) {
         @model.professionalBodyMember.map {
             case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
-            case ProfessionalBodyMemberYes(v) => {
-            <ul class="list list--semicolon">
-                @v.map { x=>
-                <li>@x match {
-                        case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
-                        case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
-                        case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
-                        case TaxationTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.04")}
-                        case ManagementAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.05")}
-                        case InstituteOfTaxation => {@Messages("supervision.memberofprofessionalbody.lbl.06")}
-                        case Bookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.07")}
-                        case AccountantsIreland => {@Messages("supervision.memberofprofessionalbody.lbl.08")}
-                        case AccountantsScotland => {@Messages("supervision.memberofprofessionalbody.lbl.09")}
-                        case AccountantsEnglandandWales => {@Messages("supervision.memberofprofessionalbody.lbl.10")}
-                        case FinancialAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.11")}
-                        case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
-                        case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
-                        case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
-                    }</li>
-                }
-            </ul>
-            }
+            case ProfessionalBodyMemberYes => { <p>@Messages("lbl.yes")</p> }
         }
     }
 
