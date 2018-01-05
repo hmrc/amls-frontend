@@ -33,7 +33,7 @@ class WhichProfessionalBodyController @Inject()(
                                                val authConnector: AuthConnector = AMLSAuthConnector
                                                ) extends BaseController {
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         dataCacheConnector.fetch[Supervision](Supervision.key) map { response =>
@@ -45,15 +45,20 @@ class WhichProfessionalBodyController @Inject()(
             Form2[BusinessTypes](businessTypes)
           }) getOrElse EmptyForm
 
-          Ok(which_professional_body(form, false))
+          Ok(which_professional_body(form, edit))
         }
   }
 
-  def post() = Authorised.async{
+  def post(edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
       Form2[BusinessTypes](request.body) match {
-        case ValidForm(_, data) => Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+        case ValidForm(_, data) =>
+          if(edit){
+            Future.successful(Redirect(routes.SummaryController.post()))
+          } else {
+            Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+          }
       }
   }
 
