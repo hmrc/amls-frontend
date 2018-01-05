@@ -36,6 +36,10 @@ case class Supervision(
     this.copy(professionalBodyMember = Some(p), hasChanged = hasChanged || !this.professionalBodyMember.contains(p),
       hasAccepted = hasAccepted && this.professionalBodyMember.contains(p))
 
+  def businessTypes(p: Option[BusinessTypes]): Supervision =
+    this.copy(businessTypes = p, hasChanged = hasChanged || !this.businessTypes.equals(p),
+      hasAccepted = hasAccepted && this.businessTypes.equals(p))
+
   def professionalBody(p: ProfessionalBody): Supervision =
     this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p),
       hasAccepted = hasAccepted && this.professionalBody.contains(p))
@@ -77,7 +81,7 @@ object Supervision {
     (
       (__ \ "anotherBody").readNullable[AnotherBody] and
         (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
-        (__ \ "businessType").readNullable[BusinessTypes] and
+        (__ \ "businessTypes").readNullable[BusinessTypes] and
         (__ \ "professionalBody").readNullable[ProfessionalBody] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}

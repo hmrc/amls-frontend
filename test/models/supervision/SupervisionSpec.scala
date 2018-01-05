@@ -184,6 +184,23 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
         }
       }
 
+      "businessTypes value is set" which {
+        "is the same as before" must {
+          "leave the object unchanged" in {
+            val res: Supervision = completeModel.businessTypes(Some(DefaultValues.DefaultBusinessTypes))
+            res must be(completeModel)
+            res.hasChanged must be(false)
+          }
+        }
+        "is different" must {
+          "set the hasChanged update the value" in {
+            val res = completeModel.businessTypes(Some(NewValues.NewBusinessTypes))
+            res.hasChanged must be(true)
+            res.businessTypes must be(Some(NewValues.NewBusinessTypes))
+          }
+        }
+      }
+
       "professionalBody value is set" which {
         "is the same as before" must {
           "leave the object unchanged" in {
@@ -218,18 +235,20 @@ trait SupervisionValues {
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
     val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
+    val DefaultBusinessTypes = BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants))
   }
 
   object NewValues {
     val NewAnotherBody = AnotherBodyNo
     val NewProfessionalBody = ProfessionalBodyNo
     val ProfessionalBodyMemberYes = ProfessionalBodyMemberNo
+    val NewBusinessTypes = BusinessTypes(Set(AccountantsIreland))
   }
 
   val completeModel = Supervision(
     Some(DefaultValues.DefaultAnotherBody),
     Some(DefaultValues.DefaultProfessionalBodyMember),
-    None,
+    Some(DefaultValues.DefaultBusinessTypes),
     Some(DefaultValues.DefaultProfessionalBody),
     hasAccepted = true)
 
@@ -247,6 +266,9 @@ trait SupervisionValues {
       "isAMember" -> true,
       "businessType" -> Json.arr("01", "02", "14"),
       "specifyOtherBusiness" -> "test"
+    ),
+    "businessTypes" -> Json.obj(
+      "businessType" -> Json.arr("01", "02")
     ),
     "professionalBody" -> Json.obj(
       "penalised" -> true,

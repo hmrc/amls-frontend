@@ -57,7 +57,7 @@ class WhichProfessionalBodyController @Inject()(
             if(edit){
               Future.successful(Redirect(routes.SummaryController.post()))
             } else {
-              Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+              Future.successful(Redirect(routes.PenalisedByProfessionalController.post(edit)))
             }
           case f:InvalidForm => Future.successful(BadRequest(which_professional_body(f, edit)))
         }

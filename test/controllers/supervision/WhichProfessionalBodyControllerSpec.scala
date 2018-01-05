@@ -16,9 +16,11 @@
 
 package controllers.supervision
 
-import models.supervision.{AssociationOfBookkeepers, BusinessTypes, Other, Supervision}
+import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -35,12 +37,13 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
       self.authConnector
     )
 
+    mockCacheSave[Supervision]
+
   }
 
   "WhichProfessionalBodyControllerSpec" when {
 
     "get" must {
-
       "display view" when {
 
         "form data exists" in new Fixture {
@@ -134,6 +137,26 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
     }
 
+  }
+
+  it must {
+    "save the valid data to the supervision model" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "businessType[0]" -> "01",
+        "businessType[1]" -> "02"
+      )
+
+      mockCacheFetch[Supervision](None)
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+
+      verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        businessTypes = Some(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))
+      )))(any(),any(),any())
+
+    }
   }
 
 }
