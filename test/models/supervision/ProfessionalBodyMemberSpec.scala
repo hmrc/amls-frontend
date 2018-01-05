@@ -30,27 +30,17 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
     "pass validation" when {
       "more than one check box is selected" in {
 
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("01", "02", "04","05","06","07","08","09","10","11","12","13","14"),
-          "specifyOtherBusiness" -> Seq("test")
-        )
+        val model = Map("isAMember" -> Seq("true"))
 
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Valid(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, TaxationTechnicians, ManagementAccountants,
-            InstituteOfTaxation, Bookkeepers, AccountantsIreland, AccountantsScotland, AccountantsEnglandandWales, FinancialAccountants,
-            AssociationOfBookkeepers, LawSociety, Other("test")))))
+        ProfessionalBodyMember.formRule.validate(model) must be(Valid(ProfessionalBodyMemberYes))
 
       }
 
       "'No' is selected" in {
 
-        val model = Map(
-          "isAMember" -> Seq("false")
-        )
+        val model = Map("isAMember" -> Seq("false"))
 
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Valid(ProfessionalBodyMemberNo))
+        ProfessionalBodyMember.formRule.validate(model) must be(Valid(ProfessionalBodyMemberNo))
 
       }
     }
@@ -58,47 +48,11 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
     "fail validation" when {
       "'isAMember' field field is missing" in {
 
-        val model = Map(
-          "businessType[]" -> Seq("01", "02", "03"),
-          "specifyOtherBusiness" -> Seq("")
-        )
+        val model = Map[String, Seq[String]]()
 
         ProfessionalBodyMember.formRule.validate(model) must
           be(Invalid(List((Path \ "isAMember", Seq(ValidationError("error.required.supervision.business.a.member"))))))
 
-      }
-
-      "'isAMember is set to 'true' and 'Other' is selected, but specifyOtherBusiness is an empty string" in {
-
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("01", "02", "14"),
-          "specifyOtherBusiness" -> Seq("")
-        )
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
-      }
-
-      "specifyOtherBusiness exceeds max length" in {
-
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("01", "02", "14"),
-          "specifyOtherBusiness" -> Seq("test" * 200)
-        )
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
-      }
-
-      "'isAMember is set to 'true' but businessType[] is empty" in {
-
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq(),
-          "specifyOtherBusiness" -> Seq("test")
-        )
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Invalid(List((Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
       }
 
       "given no data represented by an empty Map" in {
@@ -108,101 +62,44 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
 
       }
 
-      "given invalid businessType[] selection" in {
-
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("01", "20")
-        )
-        ProfessionalBodyMember.formRule.validate(model) must
-          be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
-
-      }
-
-      "given invalid characters in specifyOther" in {
-
-        val model = Map(
-          "isAMember" -> Seq("true"),
-          "businessType[]" -> Seq("14"),
-          "specifyOtherBusiness" -> Seq("{}{}")
-        )
-        ProfessionalBodyMember.formRule.validate(model) must
-        be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
-      }
-    }
-
-    "validate form write for valid transaction record" in {
-
-      val map = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("14","13"),
-        "specifyOtherBusiness" -> Seq("test")
-      )
-
-      val model = ProfessionalBodyMemberYes(Set(Other("test"), LawSociety))
-
-     ProfessionalBodyMember.formWrites.writes(model) must be (map)
     }
 
     "validate form write for option No" in {
 
-      val map = Map(
-        "isAMember" -> Seq("false")
-      )
-      val model = ProfessionalBodyMemberNo
-      ProfessionalBodyMember.formWrites.writes(model) must be (map)
+      val map = Map("isAMember" -> Seq("false"))
+
+      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberNo) must be (map)
     }
 
     "validate form write for option Yes" in {
 
-      val map = Map(
-        "isAMember" -> Seq("true"),
-        "businessType[]" -> Seq("03","04", "05", "06")
-      )
+      val map = Map("isAMember" -> Seq("true"))
 
-      val model = ProfessionalBodyMemberYes(Set(InternationalAccountants,
-        TaxationTechnicians, ManagementAccountants, InstituteOfTaxation))
-      ProfessionalBodyMember.formWrites.writes(model) must be (map)
+      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberYes) must be (map)
     }
 
     "form write test" in {
-      val map = Map(
-        "isAMember" -> Seq("false")
-      )
-      val model = ProfessionalBodyMemberNo
+      val map = Map("isAMember" -> Seq("false"))
 
-      ProfessionalBodyMember.formWrites.writes(model) must be(map)
+      ProfessionalBodyMember.formWrites.writes(ProfessionalBodyMemberNo) must be(map)
     }
 
     "JSON validation" must {
 
       "successfully validate given values" in {
-        val json =  Json.obj("isAMember" -> true,
-          "businessType" -> Seq("01","02"))
+        val json =  Json.obj("isAMember" -> true)
 
-        Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
+        Json.fromJson[ProfessionalBodyMember](json) must be(JsSuccess(ProfessionalBodyMemberYes, JsPath))
       }
 
       "successfully validate given values with option No" in {
         val json =  Json.obj("isAMember" -> false)
 
-        Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberNo, JsPath))
-      }
-
-      "successfully validate given values with option Digital software" in {
-        val json =  Json.obj("isAMember" -> true,
-          "businessType" -> Seq("14", "12"),
-        "specifyOtherBusiness" -> "test")
-
-        Json.fromJson[ProfessionalBodyMember](json) must
-          be(JsSuccess(ProfessionalBodyMemberYes(Set(Other("test"), AssociationOfBookkeepers)), JsPath ))
+        Json.fromJson[ProfessionalBodyMember](json) must be(JsSuccess(ProfessionalBodyMemberNo, JsPath))
       }
 
       "fail when on path is missing" in {
-        Json.fromJson[ProfessionalBodyMember](Json.obj("isAMember" -> true,
-          "transaction" -> Seq("01"))) must
+        Json.fromJson[ProfessionalBodyMember](Json.obj()) must
           be(JsError((JsPath \"businessType") -> play.api.data.validation.ValidationError("error.path.missing")))
       }
 
@@ -212,10 +109,7 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
       }
 
       "write valid data in using json write" in {
-        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberYes(Set(AccountantsScotland, Other("test657")))) must be (Json.obj("isAMember" -> true,
-        "businessType" -> Seq("09", "14"),
-          "specifyOtherBusiness" -> "test657"
-        ))
+        Json.toJson[ProfessionalBodyMember](ProfessionalBodyMemberYes) must be (Json.obj("isAMember" -> true))
       }
 
       "write valid data in using json write with Option No" in {
@@ -224,5 +118,3 @@ class ProfessionalBodyMemberSpec extends PlaySpec with MockitoSugar {
     }
   }
 }
-
-

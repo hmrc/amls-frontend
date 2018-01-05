@@ -49,27 +49,24 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     }
 
-    "lod the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
+    "load the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
 
       mockCacheFetch[Supervision](Some(Supervision(
-        professionalBodyMember = Some(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))
+        professionalBodyMember = Some(ProfessionalBodyMemberYes)
       )))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
-      document.select("input[value=02]").hasAttr("checked") must be(true)
+      document.select("input[value=true]").hasAttr("checked") must be(true)
 
     }
 
     "on post with valid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true",
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02"
+        "isAMember" -> "true"
       )
 
       mockCacheFetch[Supervision](None)
@@ -82,11 +79,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
     "on post with valid data in edit mode" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true",
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02",
-        "businessType[2]" -> "03",
-        "specifyOtherBusiness" -> "test"
+        "isAMember" -> "true"
       )
 
       mockCacheFetch[Supervision](None)
@@ -98,10 +91,7 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02"
-      )
+      val newRequest = request.withFormUrlEncodedBody()
 
       mockCacheFetch[Supervision](None)
 
