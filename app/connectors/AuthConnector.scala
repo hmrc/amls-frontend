@@ -17,6 +17,7 @@
 package connectors
 
 import config.{ApplicationConfig, WSHttp}
+import models.auth.UserDetailsResponse
 import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
 import play.api.libs.json.Json
@@ -75,6 +76,13 @@ trait AuthConnector {
 
   def getIds(authority: Authority)(implicit headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Ids] = {
     http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
+  }
+
+  def userDetails(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[UserDetailsResponse] = {
+    ac.userDetailsUri match {
+      case Some(uri) => http.GET[UserDetailsResponse](uri)
+      case _ => Future.failed(new Exception("No user details Uri available"))
+    }
   }
 }
 

@@ -16,6 +16,7 @@
 
 package connectors
 
+import models.auth.UserDetailsResponse
 import models.enrolment.GovernmentGatewayEnrolment
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -28,14 +29,19 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     implicit val headerCarrier = HeaderCarrier()
+    implicit val authContext = mock[AuthContext]
+
+    when(authContext.userDetailsUri) thenReturn Some("/user-details")
 
     object TestAuthConnector extends AuthConnector {
       override private[connectors] def authUrl: String = "/auth"
+
       override private[connectors] val http = mock[CoreGet]
     }
 
@@ -56,7 +62,9 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
         TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
       } thenReturn Future.successful(completeAuthorityModel)
 
-      whenReady(TestAuthConnector.getCurrentAuthority) { _ mustBe completeAuthorityModel }
+      whenReady(TestAuthConnector.getCurrentAuthority) {
+        _ mustBe completeAuthorityModel
+      }
     }
 
     "return a failed Future when the HTTP call is unauthorised" in new Fixture {
@@ -76,6 +84,30 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
       whenReady(TestAuthConnector.getIds(completeAuthorityModel)) { _ =>
         verify(TestAuthConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
+      }
+    }
+  }
+
+  "the userDetails method" when {
+    "called with a valid uri" must {
+      "return the user details response data" in new Fixture {
+        when {
+          TestAuthConnector.http.GET[UserDetailsResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(mock[UserDetailsResponse])
+
+        whenReady(TestAuthConnector.userDetails) { _ =>
+          verify(TestAuthConnector.http).GET[UserDetailsResponse](eqTo("/user-details"))(any(), any(), any())
+        }
+      }
+    }
+
+    "called with a missing user details uri" must {
+      "throw an exception" in new Fixture {
+        when(authContext.userDetailsUri) thenReturn None
+
+        intercept[Exception] {
+          await(TestAuthConnector.userDetails)
+        }
       }
     }
   }
