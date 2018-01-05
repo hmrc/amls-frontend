@@ -21,7 +21,7 @@ import javax.inject.Inject
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.supervision.{BusinessTypes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.which_professional_body
@@ -52,14 +52,15 @@ class WhichProfessionalBodyController @Inject()(
   def post(edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
-      Form2[BusinessTypes](request.body) match {
-        case ValidForm(_, data) =>
-          if(edit){
-            Future.successful(Redirect(routes.SummaryController.post()))
-          } else {
-            Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
-          }
-      }
+        Form2[BusinessTypes](request.body) match {
+          case ValidForm(_, data) =>
+            if(edit){
+              Future.successful(Redirect(routes.SummaryController.post()))
+            } else {
+              Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
+            }
+          case f:InvalidForm => Future.successful(BadRequest(which_professional_body(f, edit)))
+        }
   }
 
 }

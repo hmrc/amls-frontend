@@ -120,6 +120,18 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
       }
 
+      "invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody()
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+        }
+      }
+
     }
 
   }
