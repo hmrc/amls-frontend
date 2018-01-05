@@ -54,10 +54,15 @@ class WhichProfessionalBodyController @Inject()(
       implicit request =>
         Form2[BusinessTypes](request.body) match {
           case ValidForm(_, data) =>
-            if(edit){
-              Future.successful(Redirect(routes.SummaryController.post()))
-            } else {
-              Future.successful(Redirect(routes.PenalisedByProfessionalController.post(edit)))
+            for {
+              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+              _ <- dataCacheConnector.save[Supervision](Supervision.key,supervision.businessTypes(Some(data)))
+            } yield {
+              if(edit){
+                Redirect(routes.SummaryController.post())
+              } else {
+                Redirect(routes.PenalisedByProfessionalController.post(edit))
+              }
             }
           case f:InvalidForm => Future.successful(BadRequest(which_professional_body(f, edit)))
         }

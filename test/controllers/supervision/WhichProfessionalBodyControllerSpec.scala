@@ -37,6 +37,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
       self.authConnector
     )
 
+    mockCacheFetch[Supervision](Some(Supervision()))
     mockCacheSave[Supervision]
 
   }
@@ -67,8 +68,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
         "form data is empty" in new Fixture {
 
-          mockCacheFetch[Supervision](None)
-
           val result = controller.get()(request)
 
           status(result) must be(OK)
@@ -97,8 +96,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
               "businessType[1]" -> "02"
             )
 
-            mockCacheFetch[Supervision](None)
-
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
@@ -113,8 +110,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
               "businessType[1]" -> "02"
             )
 
-            mockCacheFetch[Supervision](None)
-
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.SummaryController.get().url))
@@ -127,8 +122,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
         "respond with BAD_REQUEST" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody()
-
-          mockCacheFetch[Supervision](None)
 
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -147,13 +140,12 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
         "businessType[1]" -> "02"
       )
 
-      mockCacheFetch[Supervision](None)
-
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
 
       verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
-        businessTypes = Some(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))
+        businessTypes = Some(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
+        hasChanged = true
       )))(any(),any(),any())
 
     }
