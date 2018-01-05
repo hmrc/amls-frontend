@@ -63,30 +63,49 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data" must {
+      "redirect to WhichProfessionalBodyController" when {
+        "isMember is true" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true"
-      )
+          val newRequest = request.withFormUrlEncodedBody(
+            "isAMember" -> "true"
+          )
 
-      mockCacheFetch[Supervision](None)
+          mockCacheFetch[Supervision](None)
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
-    }
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
+        }
+      }
+      "redirect to WhichProfessionalBodyController" when {
+        "isMember is false" in new Fixture {
 
-    "on post with valid data in edit mode" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "isAMember" -> "false"
+          )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true"
-      )
+          mockCacheFetch[Supervision](None)
 
-      mockCacheFetch[Supervision](None)
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        }
+      }
+      "redirect to SummaryController" when {
+        "edit is true" in new Fixture {
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          val newRequest = request.withFormUrlEncodedBody(
+            "isAMember" -> "true"
+          )
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        }
+      }
     }
 
     "on post with invalid data" in new Fixture {

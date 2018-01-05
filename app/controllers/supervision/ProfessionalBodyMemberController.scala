@@ -22,7 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.supervision.{ProfessionalBodyMember, Supervision}
+import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.member_of_professional_body
 
@@ -57,9 +57,10 @@ class ProfessionalBodyMemberController @Inject()(
             _ <- dataCacheConnector.save[Supervision](Supervision.key,
               supervision.professionalBodyMember(data)
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.WhichProfessionalBodyController.get())
+          } yield (edit, data) match {
+            case (false, ProfessionalBodyMemberYes) => Redirect(routes.WhichProfessionalBodyController.get())
+            case (false, ProfessionalBodyMemberNo) => Redirect(routes.PenalisedByProfessionalController.get())
+            case _ => Redirect(routes.SummaryController.get())
           }
         }
       }
