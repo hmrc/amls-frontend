@@ -51,7 +51,7 @@ class AuthServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with 
     def setupUserDetails(role: String) = {
       when {
         authConnector.getUserDetails[UserDetailsResponse](any())(any(), any(), any())
-      } thenReturn Future.successful(userDetailsGen.sample.get.copy(credentialRole = role))
+      } thenReturn Future.successful(userDetailsGen.sample.get.copy(credentialRole = Some(role)))
     }
   }
 

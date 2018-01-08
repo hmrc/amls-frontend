@@ -32,13 +32,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class AuthService @Inject() (authConnector: AuthConnector) {
 
-  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role).absoluteUrl, "utf-8")
+  private lazy val unauthorisedUrl = URLEncoder.encode(ReturnLocation(controllers.routes.AmlsController.unauthorised_role()).absoluteUrl, "utf-8")
   def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   def validateCredentialRole(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     authConnector.getUserDetails[UserDetailsResponse](authContext) map { result =>
       result.credentialRole match {
-        case CredentialRole.User => true
+        case Some(CredentialRole.User) => true
         case _ => false
       }
     }

@@ -51,7 +51,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
     val connector = new EnrolmentStoreConnector(http, appConfig, authConnector)
     val baseUrl = "http://tax-enrolments:3001"
-    val userDetails = UserDetailsResponse("Test User", None, "123456789", "Organisation")
+    val userDetails = UserDetailsResponse("Test User", None, "123456789", Some("Organisation"))
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
