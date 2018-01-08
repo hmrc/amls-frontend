@@ -45,7 +45,7 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
     val authConnector = new AuthConnector(mock[WSHttp], config)
 
-    val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three")
+    val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three", "12345678")
   }
 
   "Auth Connector" must {

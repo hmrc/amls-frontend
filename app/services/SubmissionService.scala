@@ -56,6 +56,10 @@ trait SubmissionService extends DataCacheService {
 
   private[services] def authEnrolmentsService: AuthEnrolmentsService
 
+  private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
+    ggService.enrol(amlsRegistrationNumber, safeId, postcode)
+
   def subscribe
   (implicit
    ec: ExecutionContext,
@@ -68,14 +72,10 @@ trait SubmissionService extends DataCacheService {
       request <- Future.successful(createSubscriptionRequest(cache))
       subscription <- amlsConnector.subscribe(request, safeId)
       _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
-      _ <- ggService.enrol(
-        safeId = safeId,
-        mlrRefNo = subscription.amlsRefNo,
-        postCode = request.aboutTheBusinessSection.fold("")(_.registeredOffice match {
-          case Some(o: RegisteredOfficeUK) => o.postCode
-          case _ => ""
-        })
-      )
+      _ <- enrol(safeId, subscription.amlsRefNo, request.aboutTheBusinessSection.fold("")(_.registeredOffice match {
+        case Some(o: RegisteredOfficeUK) => o.postCode
+        case _ => ""
+      }))
     } yield subscription
   }
 
@@ -197,6 +197,6 @@ trait SubmissionService extends DataCacheService {
 object SubmissionService extends SubmissionService {
   override private[services] val cacheConnector = DataCacheConnector
   override private[services] val amlsConnector = AmlsConnector
-  override private[services] val authEnrolmentsService = AuthEnrolmentsService
+  override private[services] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
   override private[services] val ggService = GovernmentGatewayService
 }

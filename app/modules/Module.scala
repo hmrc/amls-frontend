@@ -38,6 +38,5 @@ class Module extends AbstractModule {
     bind(classOf[StatusService]).toInstance(StatusService)
     bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
-    bind(classOf[AuthEnrolmentsService]).toInstance(AuthEnrolmentsService)
   }
 }
