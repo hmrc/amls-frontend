@@ -27,6 +27,7 @@ trait UserDetailsGenerator extends BaseGenerator {
     name <- stringOfLengthGen(10)
     group <- stringOfLengthGen(20)
     credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
-  } yield UserDetailsResponse(name, None, group, Some(credentialRole))
+    groupId <- numSequence(9)
+  } yield UserDetails(name, None, group, Some(credentialRole), Some(groupId))
 
 }

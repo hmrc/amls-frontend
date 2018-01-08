@@ -34,9 +34,13 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
 
     auth.userDetails flatMap { details =>
-      val url = s"$baseUrl/groups/${details.affinityGroup}/enrolments/${enrolKey.key}"
+      details.groupIdentifier match {
+        case Some(groupId) =>
+          val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
+          http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment)
 
-      http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment)
+        case _ => throw new Exception("Group identifier is unavailable")
+      }
     }
   }
 

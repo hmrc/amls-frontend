@@ -17,8 +17,8 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
+import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -38,6 +38,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
   with ScalaFutures
   with MockitoSugar
   with AmlsReferenceNumberGenerator
+  with UserDetailsGenerator
   with BaseGenerator {
 
   trait Fixture {
@@ -51,7 +52,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
     val connector = new EnrolmentStoreConnector(http, appConfig, authConnector)
     val baseUrl = "http://tax-enrolments:3001"
-    val userDetails = UserDetailsResponse("Test User", None, "123456789", Some("Organisation"))
+    val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
@@ -67,7 +68,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
         val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
-        val endpointUrl = s"$baseUrl/tax-enrolments/groups/${userDetails.affinityGroup}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/tax-enrolments/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
@@ -76,6 +77,18 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
         whenReady(connector.enrol(enrolKey, enrolment)) { _ =>
           verify(authConnector).userDetails(any(), any(), any())
           verify(http).POST[EnrolmentStoreEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
+        }
+      }
+
+      "throw an exception when no group identifier is available" in new Fixture {
+        val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
+
+        when {
+          authConnector.userDetails(any(), any(), any())
+        } thenReturn Future.successful(userDetails.copy(groupIdentifier = None))
+
+        intercept[Exception] {
+          await(connector.enrol(enrolKey, enrolment))
         }
       }
     }
