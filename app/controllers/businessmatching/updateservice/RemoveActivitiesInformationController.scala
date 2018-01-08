@@ -48,7 +48,7 @@ class RemoveActivitiesInformationController @Inject()(
 
     activities match {
       case Some(act) if act.size equals 1 => Messages(s"businessmatching.registerservices.servicename.lbl.${act.head}")
-      case _ => "services"
+      case _ => "all services"
     }
 
   }
