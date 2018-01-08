@@ -97,6 +97,7 @@ class UpdateServiceDateOfChangeController @Inject()(
                 fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))
                 responsiblePeopleWithoutFitAndProper <- OptionT.pure[Future, Seq[ResponsiblePeople]](withoutFitAndProper(responsiblePeople))
                 _ <- maybeRemoveFitAndProper(responsiblePeopleWithoutFitAndProper, fitAndProperRequired)
+                //_ <- maybeRemove
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
@@ -127,6 +128,8 @@ class UpdateServiceDateOfChangeController @Inject()(
       }
     })
   }
+
+  private def maybeRemove = ???
 
   private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
     (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
