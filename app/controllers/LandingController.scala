@@ -22,7 +22,7 @@ import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, Appli
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
-import models.auth.{CredentialRole, UserDetailsResponse}
+import models.auth.{CredentialRole, UserDetails}
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching

@@ -18,8 +18,13 @@ package models.auth
 
 import play.api.libs.json.Json
 
-case class UserDetailsResponse(name: String, email: Option[String], affinityGroup: String, credentialRole: Option[String])
+case class UserDetails(name: String,
+                       email: Option[String],
+                       affinityGroup: String,
+                       credentialRole: Option[String],
+                       groupIdentifier: Option[String]
+                      )
 
-object UserDetailsResponse {
-  implicit val format = Json.format[UserDetailsResponse]
+object UserDetails {
+  implicit val format = Json.format[UserDetails]
 }

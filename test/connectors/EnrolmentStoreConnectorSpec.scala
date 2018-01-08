@@ -18,7 +18,7 @@ package connectors
 
 import config.{AppConfig, WSHttp}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.auth.UserDetailsResponse
+import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}

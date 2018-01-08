@@ -20,7 +20,7 @@ import java.net.URLEncoder
 import javax.inject.Inject
 
 import config.ApplicationConfig
-import models.auth.{CredentialRole, UserDetailsResponse}
+import models.auth.{CredentialRole, UserDetails}
 import models.ReturnLocation
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -36,7 +36,7 @@ class AuthService @Inject() (authConnector: AuthConnector) {
   def signoutUrl = s"${ApplicationConfig.logoutUrl}?continue=$unauthorisedUrl"
 
   def validateCredentialRole(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
-    authConnector.getUserDetails[UserDetailsResponse](authContext) map { result =>
+    authConnector.getUserDetails[UserDetails](authContext) map { result =>
       result.credentialRole match {
         case Some(CredentialRole.User) => true
         case _ => false

@@ -19,7 +19,7 @@ package connectors
 import javax.inject.Inject
 
 import config.{AppConfig, ApplicationConfig, WSHttp}
-import models.auth.UserDetailsResponse
+import models.auth.UserDetails
 import models.enrolment.GovernmentGatewayEnrolment
 import org.apache.http.HttpStatus
 import play.api.libs.json.Json
@@ -78,9 +78,9 @@ class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
     http.GET[Ids](s"$authUrl/${authority.normalisedIds}")
   }
 
-  def userDetails(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[UserDetailsResponse] = {
+  def userDetails(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[UserDetails] = {
     ac.userDetailsUri match {
-      case Some(uri) => http.GET[UserDetailsResponse](uri)
+      case Some(uri) => http.GET[UserDetails](uri)
       case _ => Future.failed(new Exception("No user details Uri available"))
     }
   }
