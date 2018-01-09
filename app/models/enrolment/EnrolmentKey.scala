@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package models.enrolment
 
-import org.scalacheck.Gen
+sealed trait EnrolmentKey {
+  protected val serviceName: String
+  protected val identifier: String
+  protected val value: String
 
-//noinspection ScalaStyle
-trait AmlsReferenceNumberGenerator {
+  def key: String = s"$serviceName~$identifier~$value"
+}
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
-
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
+case class AmlsEnrolmentKey(amlsRefNumber: String) extends EnrolmentKey {
+  override protected val serviceName: String = "HMRC-MLR-ORG"
+  override protected val identifier: String = "MLRRefNumber"
+  override protected val value: String = amlsRefNumber
 }

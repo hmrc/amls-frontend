@@ -14,19 +14,20 @@
  * limitations under the License.
  */
 
-package generators
+package models.enrolment
 
-import org.scalacheck.Gen
+import generators.AmlsReferenceNumberGenerator
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 
-//noinspection ScalaStyle
-trait AmlsReferenceNumberGenerator {
+class EnrolmentKeySpec extends PlaySpec with MustMatchers with AmlsReferenceNumberGenerator {
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
+  "The enrolment key" must {
+    "be in the correct format" in {
+      val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
+
+      enrolKey.key mustBe s"HMRC-MLR-ORG~MLRRefNumber~$amlsRegistrationNumber"
+    }
   }
 
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
 }

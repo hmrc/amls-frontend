@@ -14,19 +14,18 @@
  * limitations under the License.
  */
 
-package generators
+package models.enrolment
 
-import org.scalacheck.Gen
+import play.api.libs.json.Json
 
-//noinspection ScalaStyle
-trait AmlsReferenceNumberGenerator {
+case class EnrolmentStoreEnrolment(userId: String, friendlyName: String, `type`: String, verifiers: Seq[EnrolmentIdentifier])
 
-  def amlsRefNoGen = {
-    for {
-      a <- Gen.listOfN(1, Gen.alphaUpperChar).map(x => x.mkString)
-      b <- Gen.listOfN(6, Gen.numChar).map(x => x.mkString)
-    } yield s"X${a}ML00000$b"
-  }
+object EnrolmentStoreEnrolment {
+  implicit val format = Json.writes[EnrolmentStoreEnrolment]
 
-  lazy val amlsRegistrationNumber = amlsRefNoGen.sample.get
+  def apply(userId: String, postCode: String): EnrolmentStoreEnrolment =
+    EnrolmentStoreEnrolment(userId, "AMLS Enrolment", "principal", Seq(
+      EnrolmentIdentifier("Postcode", postCode)
+    ))
+
 }

@@ -16,6 +16,8 @@
 
 package connectors
 
+import config.{AppConfig, WSHttp}
+import models.auth.UserDetailsResponse
 import models.enrolment.GovernmentGatewayEnrolment
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -28,54 +30,84 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import play.api.test.Helpers._
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
   trait Fixture {
     implicit val headerCarrier = HeaderCarrier()
+    implicit val authContext = mock[AuthContext]
 
-    object TestAuthConnector extends AuthConnector {
-      override private[connectors] def authUrl: String = "/auth"
-      override private[connectors] val http = mock[CoreGet]
-    }
+    when(authContext.userDetailsUri) thenReturn Some("/user-details")
 
-    val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three")
+    val config = mock[AppConfig]
+    when(config.authUrl) thenReturn "/auth"
+
+    val authConnector = new AuthConnector(mock[WSHttp], config)
+
+    val completeAuthorityModel = Authority("/", Accounts(), "/details", "/one/two/three", "12345678")
   }
 
   "Auth Connector" must {
     "return list of government gateway enrolments" in new Fixture {
-      when(TestAuthConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
+      when(authConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
 
-      whenReady(TestAuthConnector.enrollments("thing")) {
+      whenReady(authConnector.enrollments("thing")) {
         results => results must equal(Nil)
       }
     }
 
     "get the current authority" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+        authConnector.http.GET[Authority](any())(any(), any(), any())
       } thenReturn Future.successful(completeAuthorityModel)
 
-      whenReady(TestAuthConnector.getCurrentAuthority) { _ mustBe completeAuthorityModel }
+      whenReady(authConnector.getCurrentAuthority) {
+        _ mustBe completeAuthorityModel
+      }
     }
 
     "return a failed Future when the HTTP call is unauthorised" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Authority](any())(any(), any(), any())
+        authConnector.http.GET[Authority](any())(any(), any(), any())
       } thenReturn Future.failed(Upstream4xxResponse("Unauthorized", UNAUTHORIZED, UNAUTHORIZED))
 
       intercept[Exception] {
-        await(TestAuthConnector.getCurrentAuthority)
+        await(authConnector.getCurrentAuthority)
       }
     }
 
     "get the Ids" in new Fixture {
       when {
-        TestAuthConnector.http.GET[Ids](any())(any(), any(), any())
+        authConnector.http.GET[Ids](any())(any(), any(), any())
       } thenReturn Future.successful(mock[Ids])
 
-      whenReady(TestAuthConnector.getIds(completeAuthorityModel)) { _ =>
-        verify(TestAuthConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
+      whenReady(authConnector.getIds(completeAuthorityModel)) { _ =>
+        verify(authConnector.http).GET[Ids](eqTo(s"/auth/${completeAuthorityModel.normalisedIds}"))(any(), any(), any())
+      }
+    }
+  }
+
+  "the userDetails method" when {
+    "called with a valid uri" must {
+      "return the user details response data" in new Fixture {
+        when {
+          authConnector.http.GET[UserDetailsResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(mock[UserDetailsResponse])
+
+        whenReady(authConnector.userDetails) { _ =>
+          verify(authConnector.http).GET[UserDetailsResponse](eqTo("/user-details"))(any(), any(), any())
+        }
+      }
+    }
+
+    "called with a missing user details uri" must {
+      "throw an exception" in new Fixture {
+        when(authContext.userDetailsUri) thenReturn None
+
+        intercept[Exception] {
+          await(authConnector.userDetails)
+        }
       }
     }
   }
