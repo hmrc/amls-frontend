@@ -17,7 +17,7 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
-import models.auth.UserDetailsResponse
+import models.auth.UserDetails
 import models.enrolment.GovernmentGatewayEnrolment
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -92,11 +92,11 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "called with a valid uri" must {
       "return the user details response data" in new Fixture {
         when {
-          authConnector.http.GET[UserDetailsResponse](any())(any(), any(), any())
-        } thenReturn Future.successful(mock[UserDetailsResponse])
+          authConnector.http.GET[UserDetails](any())(any(), any(), any())
+        } thenReturn Future.successful(mock[UserDetails])
 
         whenReady(authConnector.userDetails) { _ =>
-          verify(authConnector.http).GET[UserDetailsResponse](eqTo("/user-details"))(any(), any(), any())
+          verify(authConnector.http).GET[UserDetails](eqTo("/user-details"))(any(), any(), any())
         }
       }
     }

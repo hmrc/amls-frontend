@@ -14,12 +14,17 @@
  * limitations under the License.
  */
 
-package services
+package models.auth
 
-import javax.inject.Inject
+import play.api.libs.json.Json
 
-import connectors.EnrolmentStoreConnector
+case class UserDetails(name: String,
+                       email: Option[String],
+                       affinityGroup: String,
+                       credentialRole: Option[String],
+                       groupIdentifier: Option[String]
+                      )
 
-class EnrolmentStoreService @Inject()(connector: EnrolmentStoreConnector) {
-
+object UserDetails {
+  implicit val format = Json.format[UserDetails]
 }

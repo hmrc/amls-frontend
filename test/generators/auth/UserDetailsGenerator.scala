@@ -17,16 +17,17 @@
 package generators.auth
 
 import generators.BaseGenerator
-import models.auth.{CredentialRole, UserDetailsResponse}
+import models.auth.{CredentialRole, UserDetails}
 import org.scalacheck.Gen
 
 //noinspection ScalaStyle
 trait UserDetailsGenerator extends BaseGenerator {
 
-  val userDetailsGen: Gen[UserDetailsResponse] = for {
+  val userDetailsGen: Gen[UserDetails] = for {
     name <- stringOfLengthGen(10)
     group <- stringOfLengthGen(20)
     credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
-  } yield UserDetailsResponse(name, None, group, credentialRole)
+    groupId <- numSequence(9)
+  } yield UserDetails(name, None, group, Some(credentialRole), Some(groupId))
 
 }
