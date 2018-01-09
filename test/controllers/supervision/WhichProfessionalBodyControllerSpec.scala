@@ -26,7 +26,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelper with MockitoSugar{
+class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelper with MockitoSugar {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 

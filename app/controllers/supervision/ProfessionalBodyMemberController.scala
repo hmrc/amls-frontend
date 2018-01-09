@@ -52,10 +52,14 @@ class ProfessionalBodyMemberController @Inject()(
           Future.successful(BadRequest(member_of_professional_body(f, edit)))
         case ValidForm(_, data) => {
           for {
-            supervision <-
-            dataCacheConnector.fetch[Supervision](Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key,
-              supervision.professionalBodyMember(data)
+            supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+            _ <- dataCacheConnector.save[Supervision](Supervision.key, {
+              data match {
+                case ProfessionalBodyMemberNo
+                  if supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) | supervision.professionalBodies.isDefined =>
+                  supervision.professionalBodyMember(data).copy(professionalBodies = None)
+                case _ => supervision.professionalBodyMember(data)
+              }}
             )
           } yield (edit, data) match {
             case (false, ProfessionalBodyMemberYes) => Redirect(routes.WhichProfessionalBodyController.get())

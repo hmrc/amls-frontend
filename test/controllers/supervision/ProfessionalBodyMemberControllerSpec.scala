@@ -19,6 +19,8 @@ package controllers.supervision
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -77,8 +79,6 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
         }
-      }
-      "redirect to WhichProfessionalBodyController" when {
         "isMember is false" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -119,6 +119,56 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#isAMember]").html() must include(Messages("error.required.supervision.business.a.member"))
+    }
+
+  }
+
+  it must {
+
+    "remove professionalBodies data" when {
+      "updated from ProfessionalBodyMemberYes to No" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isAMember" -> "false"
+        )
+
+        mockCacheFetch[Supervision](Some(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberYes),
+          professionalBodies = Some(ProfessionalBodies(
+            Set(AccountantsEnglandandWales, Other("Another professional body"))
+          ))
+        )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberNo),
+          hasChanged = true
+        )))(any(),any(),any())
+
+      }
+      "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isAMember" -> "false"
+        )
+
+        mockCacheFetch[Supervision](Some(Supervision(
+          professionalBodies = Some(ProfessionalBodies(
+            Set(AccountantsEnglandandWales, Other("Another professional body"))
+          ))
+        )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberNo),
+          hasChanged = true
+        )))(any(),any(),any())
+
+      }
     }
 
   }
