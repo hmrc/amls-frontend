@@ -73,11 +73,13 @@
         }
     }
 
-    @checkYourAnswers(
-        question = Messages("supervision.whichprofessionalbody.title"),
-        editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
-    ) {
-        @model.professionalBodies.map { businessType =>
+    @model.professionalBodies.map { businessType =>
+
+        @checkYourAnswers(
+            question = Messages("supervision.whichprofessionalbody.title"),
+            editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
+        ) {
+
             <ul class="list">
                 @businessType.businessTypes.map { x=>
                     <li>@x match {
