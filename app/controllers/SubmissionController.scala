@@ -86,7 +86,7 @@ object SubmissionController extends SubmissionController {
   override protected def authConnector: AuthConnector = AMLSAuthConnector
 
   override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
-  override private[controllers] val subscriptionService: SubmissionService = SubmissionService
+  override private[controllers] lazy val subscriptionService = Play.current.injector.instanceOf[SubmissionService]
   override private[controllers] val statusService: StatusService = StatusService
   override private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
 }

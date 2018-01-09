@@ -16,10 +16,12 @@
 
 package services
 
-import config.ApplicationConfig
-import connectors.{AmlsConnector, DataCacheConnector, GovernmentGatewayConnector}
+import javax.inject.Inject
+
+import config.AppConfig
+import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
-import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
+import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
 import models.businessactivities.BusinessActivities
@@ -31,34 +33,35 @@ import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePeople.FilterUtils
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.tradingpremises.TradingPremises.FilterUtils
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
-import models.responsiblepeople.ResponsiblePeople.FilterUtils
-import models.tradingpremises.TradingPremises.FilterUtils
-import play.api.Play
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-//noinspection ScalaStyle
-trait SubmissionService extends DataCacheService {
-
-  private[services] def cacheConnector: DataCacheConnector
-
-  private[services] def amlsConnector: AmlsConnector
-
-  private[services] def ggService: GovernmentGatewayService
-
-  private[services] def authEnrolmentsService: AuthEnrolmentsService
+class SubmissionService @Inject()
+(
+  val cacheConnector: DataCacheConnector,
+  val ggService: GovernmentGatewayService,
+  val authEnrolmentsService: AuthEnrolmentsService,
+  val amlsConnector: AmlsConnector,
+  config: AppConfig
+) extends DataCacheService {
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    ggService.enrol(amlsRegistrationNumber, safeId, postcode)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[_] =
+    if (config.enrolmentStoreToggle) {
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode)
+    } else {
+      ggService.enrol(amlsRegistrationNumber, safeId, postcode)
+    }
 
   def subscribe
   (implicit
@@ -171,32 +174,28 @@ trait SubmissionService extends DataCacheService {
       bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       rd <- bm.reviewDetails
     } yield rd.safeId) match {
-      case Some(a) =>
-        Future.successful(a)
-      case _ =>
-        // TODO: Better exception
-        Future.failed(new Exception(""))
+      case Some(a) => Future.successful(a)
+      case _ => Future.failed(new Exception("No SafeID value available"))
     }
   }
 
   def bankDetailsExceptDeleted(bankDetails: Option[Seq[BankDetails]]): Option[Seq[BankDetails]] = {
     bankDetails match {
-      case Some(bankAccts) => {
-        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty || x.bankAccountType.contains(NoBankAccountUsed))
-        bankDtls.nonEmpty match {
-          case true => Some(bankDtls)
-          case false => Some(Seq.empty)
+      case Some(bankAccts) =>
+
+        val bankDtls = bankAccts.filterNot(
+          x => x.status.contains(StatusConstants.Deleted)
+            || x.bankAccountType.isEmpty
+            || x.bankAccountType.contains(NoBankAccountUsed))
+
+        if (bankDtls.nonEmpty) {
+          Some(bankDtls)
+        } else {
+          Some(Seq.empty)
         }
-      }
+
       case _ => Some(Seq.empty)
     }
   }
 
-}
-
-object SubmissionService extends SubmissionService {
-  override private[services] val cacheConnector = DataCacheConnector
-  override private[services] val amlsConnector = AmlsConnector
-  override private[services] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override private[services] val ggService = GovernmentGatewayService
 }

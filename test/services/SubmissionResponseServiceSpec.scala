@@ -50,7 +50,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
   with OneAppPerSuite
   with ResponsiblePersonGenerator
   with generators.tradingpremises.TradingPremisesGenerator
-  with AmlsReferenceNumberGenerator{
+  with AmlsReferenceNumberGenerator {
 
   trait Fixture {
 
