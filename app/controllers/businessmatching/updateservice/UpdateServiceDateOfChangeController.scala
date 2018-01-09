@@ -98,6 +98,10 @@ class UpdateServiceDateOfChangeController @Inject()(
                 fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))
                 responsiblePeopleWithoutFitAndProper <- OptionT.pure[Future, Seq[ResponsiblePeople]](withoutFitAndProper(responsiblePeople))
                 _ <- maybeRemoveFitAndProper(responsiblePeopleWithoutFitAndProper, fitAndProperRequired)
+                businessActivities <- OptionT.liftF(dataCacheConnector.fetch[ba](ba.key))
+                accountantForAMLSRegulationsRequired <- OptionT.pure[Future, Boolean](accountantForAMLSRegulationsRequired(updatedBusinessActivities))
+                baWithoutAccountantForAMLSRegulations <- OptionT.pure[Future, ba](withoutAccountantForAMLSRegulations(businessActivities))
+                _ <- maybeRemoveAccountantForAMLSRegulations(baWithoutAccountantForAMLSRegulations, accountantForAMLSRegulationsRequired)
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
@@ -113,11 +117,6 @@ class UpdateServiceDateOfChangeController @Inject()(
         (activity equals AccountancyServices) | (activity equals TrustAndCompanyServices)
       }
 
-    def removeAccountantForAMLSRegulations(activities: Set[BusinessActivity]): Boolean =
-      activities exists { activity =>
-        (activity equals AccountancyServices)
-      }
-
     val withoutSection: PartialFunction[BusinessActivity, Boolean] = {
       case TelephonePaymentService | BillPaymentServices => false
       case _ => true
@@ -131,12 +130,6 @@ class UpdateServiceDateOfChangeController @Inject()(
       } else {
         cache
       }
-
-      if(removeAccountantForAMLSRegulations(activities)){
-        dataCacheConnector.save[ba](ba.key, updateTransmittingMoney(OptionT.liftF(dataCacheConnector.fetch[ba](ba.key))))
-      }else {
-        cache
-      }
     })
   }
 
@@ -144,21 +137,33 @@ class UpdateServiceDateOfChangeController @Inject()(
   private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
     (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
 
+  private def accountantForAMLSRegulationsRequired(businessActivities: BusinessActivities): Boolean =
+    (businessActivities.businessActivities contains AccountancyServices)
+
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[Seq[ResponsiblePeople]] = {
     dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople) map { _ =>
       responsiblePeople
     }
   }
 
-  def updateTransmittingMoney(a: ba) = {
+  private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier): Future[ba] = {
+    dataCacheConnector.save[ba](ba.key, activities) map { _ =>
+      activities.accountantForAMLSRegulations(None)
+    }
+  }
+
+  /*def updateTransmittingMoney(a: ba) = {
       a.copy(
         accountantForAMLSRegulations = None
       )
-  }
+  }*/
 
   private def withoutFitAndProper(responsiblePeople: Seq[ResponsiblePeople]) = responsiblePeople map { rp =>
     rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
   }
+
+  private def withoutAccountantForAMLSRegulations(activities: ba) = activities.accountantForAMLSRegulations(None).copy(hasAccepted = true)
+
 
   private def maybeRemoveFitAndProper(responsiblePeople: Seq[ResponsiblePeople], fitAndProperRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
     if(fitAndProperRequired){
@@ -167,11 +172,11 @@ class UpdateServiceDateOfChangeController @Inject()(
       OptionT.liftF(removeFitAndProper(responsiblePeople))
     }
 
-  private def maybeRemoveFitAndProper(responsiblePeople: Seq[ResponsiblePeople], fitAndProperRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
-    if(fitAndProperRequired){
-      OptionT.pure[Future, Seq[ResponsiblePeople]](responsiblePeople)
+  private def maybeRemoveAccountantForAMLSRegulations(activites: ba, accountantForAMLSRegulationsRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
+    if(accountantForAMLSRegulationsRequired){
+      OptionT.pure[Future, ba](activites)
     } else {
-      OptionT.liftF(removeFitAndProper(responsiblePeople))
+      OptionT.liftF(removeAccountantForAMLSRegulations(activites))
     }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
