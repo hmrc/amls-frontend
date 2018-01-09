@@ -59,12 +59,12 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
   trait Fixture extends DependencyMocks {
 
-    val TestSubmissionService = new SubmissionService {
-      override private[services] val cacheConnector = mockCacheConnector
-      override private[services] val amlsConnector = mock[AmlsConnector]
-      override private[services] val ggService = mock[GovernmentGatewayService]
-      override private[services] val authEnrolmentsService = mock[AuthEnrolmentsService]
-    }
+    val submissionService = new SubmissionService (
+      mockCacheConnector,
+      mock[GovernmentGatewayService],
+      mock[AuthEnrolmentsService],
+      mock[AmlsConnector]
+    )
 
     when {
       mockAuthContext.principal
@@ -149,14 +149,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "subscribe and enrol" in new Fixture {
 
         when {
-          TestSubmissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
         } thenReturn Future.successful(subscriptionResponse)
 
         when {
-          TestSubmissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
+          submissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
         } thenReturn Future.successful(enrolmentResponse)
 
-        whenReady(TestSubmissionService.subscribe) {
+        whenReady(submissionService.subscribe) {
           _ mustBe subscriptionResponse
         }
       }
@@ -166,14 +166,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "submit amendment" in new Fixture {
 
         when {
-          TestSubmissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.update(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
         when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-        whenReady(TestSubmissionService.update) {
+        whenReady(submissionService.update) {
           result =>
             result must equal(amendmentResponse)
         }
@@ -182,10 +182,10 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "return failed future when no enrolment" in new Fixture {
 
         when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(None))
 
-        whenReady(TestSubmissionService.update.failed) {
+        whenReady(submissionService.update.failed) {
           result =>
             result mustBe a[NoEnrolmentException]
         }
@@ -196,14 +196,14 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       "submit variation" in new Fixture {
 
         when {
-          TestSubmissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
+          submissionService.amlsConnector.variation(any(), eqTo(amlsRegistrationNumber))(any(), any(), any(), any(), any())
         } thenReturn Future.successful(amendmentResponse)
 
         when {
-          TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+          submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
         }.thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-        whenReady(TestSubmissionService.variation) {
+        whenReady(submissionService.variation) {
           result =>
             result must equal(amendmentResponse)
         }
@@ -213,11 +213,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "submit a renewal" in new Fixture {
 
       when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       when {
-        TestSubmissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+        submissionService.amlsConnector.renewal(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
       } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
@@ -234,13 +234,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, Some("other")))))
       )
 
-      val result = await(TestSubmissionService.renewal(renewal))
+      val result = await(submissionService.renewal(renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
-      verify(TestSubmissionService.amlsConnector).renewal(captor.capture(), any())(any(), any(), any())
+      verify(submissionService.amlsConnector).renewal(captor.capture(), any())(any(), any(), any())
 
       val submission = captor.getValue
 
@@ -266,11 +266,11 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "submit a renewal amendment" in new Fixture {
 
       when {
-        TestSubmissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
+        submissionService.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       when {
-        TestSubmissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
+        submissionService.amlsConnector.renewalAmendment(any(), eqTo(amlsRegistrationNumber))(any(), any(), any())
       } thenReturn Future.successful(mock[AmendVariationRenewalResponse])
 
       val renewal = Renewal(
@@ -287,13 +287,13 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
         ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("12345678963")),
         transactionsInLast12Months = Some(TransactionsInLast12Months("2500")),
         percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(courier = true, direct = true, Some("other")))))
       )
 
-      val result = await(TestSubmissionService.renewalAmendment(renewal))
+      val result = await(submissionService.renewalAmendment(renewal))
 
       val captor = ArgumentCaptor.forClass(classOf[SubscriptionRequest])
-      verify(TestSubmissionService.amlsConnector).renewalAmendment(captor.capture(), any())(any(), any(), any())
+      verify(submissionService.amlsConnector).renewalAmendment(captor.capture(), any())(any(), any(), any())
 
       val submission = captor.getValue
       // The actual values of these are tested in renewals.models.Conversions
