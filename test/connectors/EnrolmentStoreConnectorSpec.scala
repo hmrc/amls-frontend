@@ -51,7 +51,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     val authConnector = mock[AuthConnector]
 
     val connector = new EnrolmentStoreConnector(http, appConfig, authConnector)
-    val baseUrl = "http://tax-enrolments:3001"
+    val baseUrl = "http://enrolment-store:3001"
     val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
@@ -68,7 +68,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
         val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
-        val endpointUrl = s"$baseUrl/tax-enrolments/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())

@@ -113,14 +113,12 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
 }
 
-class AppConfig @Inject()(
-                           val config: iServicesConfig
-                         ) {
+class AppConfig @Inject()(val config: iServicesConfig) {
   def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
 
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def authUrl = config.baseUrl("auth")
 
-  def enrolmentStoreUrl = config.baseUrl("tax-enrolments")
+  def enrolmentStoreUrl = config.baseUrl("enrolment-store")
 }

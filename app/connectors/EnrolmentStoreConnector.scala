@@ -25,10 +25,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-// $COVERAGE-OFF$
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector) {
 
-  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/enrolment-store-proxy"
 
   def enrol(enrolKey: EnrolmentKey, enrolment: EnrolmentStoreEnrolment)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
@@ -36,7 +35,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
     auth.userDetails flatMap { details =>
       details.groupIdentifier match {
         case Some(groupId) =>
-          val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
+          val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/${enrolKey.key}"
           http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment)
 
         case _ => throw new Exception("Group identifier is unavailable")
