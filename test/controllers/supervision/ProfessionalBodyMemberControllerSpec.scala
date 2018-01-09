@@ -67,18 +67,36 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     "on post with valid data" must {
       "redirect to WhichProfessionalBodyController" when {
-        "isMember is true" in new Fixture {
+        "isMember is true" when {
+          "edit is false" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "isAMember" -> "true"
-          )
+            val newRequest = request.withFormUrlEncodedBody(
+              "isAMember" -> "true"
+            )
 
-          mockCacheFetch[Supervision](None)
+            mockCacheFetch[Supervision](None)
 
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
+          }
+          "edit is true" when {
+            "professionalBodies is not defined" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "isAMember" -> "true"
+              )
+
+              mockCacheFetch[Supervision](None)
+
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get(true).url))
+            }
+          }
         }
+      }
+      "redirect to PenalisedByProfessionalController" when {
         "isMember is false" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -93,17 +111,23 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
         }
       }
       "redirect to SummaryController" when {
-        "edit is true" in new Fixture {
+        "edit is true" when {
+          "isMember is true" when {
+            "ProfessionalBodyMemberYes is already defined" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "isAMember" -> "true"
-          )
+              val newRequest = request.withFormUrlEncodedBody(
+                "isAMember" -> "true"
+              )
 
-          mockCacheFetch[Supervision](None)
+              mockCacheFetch[Supervision](Some(Supervision(
+                professionalBodyMember = Some(ProfessionalBodyMemberYes)
+              )))
 
-          val result = controller.post(true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            }
+          }
         }
       }
     }

@@ -61,12 +61,16 @@ class ProfessionalBodyMemberController @Inject()(
                 case _ => supervision.professionalBodyMember(data)
               }}
             )
-          } yield (edit, data) match {
-            case (false, ProfessionalBodyMemberYes) => Redirect(routes.WhichProfessionalBodyController.get())
-            case (false, ProfessionalBodyMemberNo) => Redirect(routes.PenalisedByProfessionalController.get())
-            case _ => Redirect(routes.SummaryController.get())
-          }
+          } yield redirectTo(data, supervision, edit)
         }
       }
   }
+
+  def redirectTo(data: ProfessionalBodyMember, supervision: Supervision, edit: Boolean) =
+    (data, edit) match {
+      case (ProfessionalBodyMemberYes, _) if !supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) =>
+        Redirect(routes.WhichProfessionalBodyController.get(edit))
+      case (ProfessionalBodyMemberNo, false) => Redirect(routes.PenalisedByProfessionalController.get())
+      case _ => Redirect(routes.SummaryController.get())
+    }
 }
