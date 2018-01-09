@@ -18,6 +18,7 @@ package services
 
 import javax.inject.Inject
 
+import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.NoEnrolmentException
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
@@ -50,12 +51,17 @@ class SubmissionService @Inject()
   val cacheConnector: DataCacheConnector,
   val ggService: GovernmentGatewayService,
   val authEnrolmentsService: AuthEnrolmentsService,
-  val amlsConnector: AmlsConnector
+  val amlsConnector: AmlsConnector,
+  config: AppConfig
 ) extends DataCacheService {
 
   private def enrol(safeId: String, amlsRegistrationNumber: String, postcode: String)
-                   (implicit hc: HeaderCarrier, ec: ExecutionContext): Future[HttpResponse] =
-    ggService.enrol(amlsRegistrationNumber, safeId, postcode)
+                   (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[_] =
+    if (config.enrolmentStoreToggle) {
+      authEnrolmentsService.enrol(amlsRegistrationNumber, postcode)
+    } else {
+      ggService.enrol(amlsRegistrationNumber, safeId, postcode)
+    }
 
   def subscribe
   (implicit

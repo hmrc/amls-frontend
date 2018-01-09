@@ -16,6 +16,7 @@
 
 package services
 
+import config.AppConfig
 import connectors.AmlsConnector
 import exceptions.NoEnrolmentException
 import generators.ResponsiblePersonGenerator
@@ -47,6 +48,7 @@ import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import utils.DependencyMocks
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
+
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -59,16 +61,21 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
   trait Fixture extends DependencyMocks {
 
+    val config = mock[AppConfig]
+
     val submissionService = new SubmissionService (
       mockCacheConnector,
       mock[GovernmentGatewayService],
       mock[AuthEnrolmentsService],
-      mock[AmlsConnector]
+      mock[AmlsConnector],
+      config
     )
 
     when {
       mockAuthContext.principal
     } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
+
+    when(config.enrolmentStoreToggle) thenReturn false
 
     val enrolmentResponse = HttpResponse(OK)
 
