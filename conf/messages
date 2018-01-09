@@ -1639,8 +1639,6 @@ supervision.memberofprofessionalbody.lbl.14 = Other
 
 supervision.whichprofessionalbody.title = Which professional body are you a member of?
 
-
-
 msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months
 msb.whatyouneed.line_2 = how you manage transactions and money transfers
