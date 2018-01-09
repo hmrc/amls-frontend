@@ -56,7 +56,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enro
   }
 
   def enrol(amlsRegistrationNumber: String, postcode: String)
-           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[_] = {
+           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
     authConnector.getCurrentAuthority flatMap { authority =>
       enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
     }

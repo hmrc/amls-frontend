@@ -75,8 +75,6 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
       mockAuthContext.principal
     } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
-    when(config.enrolmentStoreToggle) thenReturn false
-
     val enrolmentResponse = HttpResponse(OK)
 
     val subscriptionResponse = SubscriptionResponse(
@@ -153,18 +151,41 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
   "SubmissionService" when {
 
     "subscribe is called" must {
-      "subscribe and enrol" in new Fixture {
+      "subscribe and enrol using Government Gateway" when {
+        "the enrolment-store toggle is off" in new Fixture {
 
-        when {
-          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
-        } thenReturn Future.successful(subscriptionResponse)
+          when(config.enrolmentStoreToggle) thenReturn false
 
-        when {
-          submissionService.ggService.enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
-        } thenReturn Future.successful(enrolmentResponse)
+          when {
+            submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+          } thenReturn Future.successful(subscriptionResponse)
 
-        whenReady(submissionService.subscribe) {
-          _ mustBe subscriptionResponse
+          when {
+            submissionService.ggService.enrol(any(), any(), any())(any(), any())
+          } thenReturn Future.successful(enrolmentResponse)
+
+          whenReady(submissionService.subscribe) { response =>
+            response mustBe subscriptionResponse
+            verify(submissionService.ggService).enrol(eqTo("amlsRef"), eqTo(safeId), eqTo("postcode"))(any(), any())
+          }
+        }
+      }
+
+      "subscribe and enrol using Enrolment Store" when {
+        "the enrolment-store toggle is on" in new Fixture {
+          when(config.enrolmentStoreToggle) thenReturn true
+
+          when {
+            submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+          } thenReturn Future.successful(subscriptionResponse)
+
+          when {
+            submissionService.authEnrolmentsService.enrol(any(), any())(any(), any(), any())
+          } thenReturn Future.successful(HttpResponse(OK))
+
+          whenReady(submissionService.subscribe) {
+            _ mustBe subscriptionResponse
+          }
         }
       }
     }
