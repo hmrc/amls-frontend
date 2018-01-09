@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 import utils.GenericTestHelper
 
-class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
+class ProfessionalBodiesSpec extends PlaySpec with GenericTestHelper {
 
   "Form validation" must {
 
