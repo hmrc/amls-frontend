@@ -32,7 +32,11 @@
     heading = header
 )  {
 
-    <p>@Messages("updateservice.removeactivitiesinformation.info.1")</p>
+    @if(placeholder == "all services") {
+        <p>@Messages("updateservice.removeactivitiesinformation.info.1.all")</p>
+    } else {
+        <p>@Messages("updateservice.removeactivitiesinformation.info.1")</p>
+    }
     <p>@Messages("updateservice.removeactivitiesinformation.info.2")</p>
 
     @anchor(
