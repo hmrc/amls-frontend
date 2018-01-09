@@ -256,7 +256,8 @@ trait SupervisionValues {
     Some(DefaultValues.DefaultProfessionalBodyMember),
     Some(DefaultValues.DefaultBusinessTypes),
     Some(DefaultValues.DefaultProfessionalBody),
-    hasAccepted = true)
+    hasAccepted = true
+  )
 
   val partialModelNoBusinessTypes = Supervision(
     Some(DefaultValues.DefaultAnotherBody),
