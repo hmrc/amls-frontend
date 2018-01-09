@@ -14,20 +14,17 @@
  * limitations under the License.
  */
 
-package generators.auth
+package models.auth
 
-import generators.BaseGenerator
-import models.auth.{CredentialRole, UserDetails}
-import org.scalacheck.Gen
+import play.api.libs.json.Json
 
-//noinspection ScalaStyle
-trait UserDetailsGenerator extends BaseGenerator {
+case class UserDetails(name: String,
+                       email: Option[String],
+                       affinityGroup: String,
+                       credentialRole: Option[String],
+                       groupIdentifier: Option[String]
+                      )
 
-  val userDetailsGen: Gen[UserDetails] = for {
-    name <- stringOfLengthGen(10)
-    group <- stringOfLengthGen(20)
-    credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
-    groupId <- numSequence(9)
-  } yield UserDetails(name, None, group, Some(credentialRole), Some(groupId))
-
+object UserDetails {
+  implicit val format = Json.format[UserDetails]
 }

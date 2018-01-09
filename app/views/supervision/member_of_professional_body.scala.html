@@ -60,44 +60,6 @@
             )
         }
 
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-            <p>@Messages("lbl.select.all")</p>
-
-            @fieldset(
-                legend = "supervision.memberofprofessionalbody.title",
-                legendHidden = true,
-                f = f("businessType"),
-                panel = false
-            ) {
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.01", "01")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.02", "02")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.03", "03")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.04", "04")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.05", "05")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.06", "06")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.07", "07")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.08", "08")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.09", "09")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.10", "10")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.11", "11")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.12", "12")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
-                @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#$target1")
-            }
-            @panel(
-                field = Some(f(s"$target1")),
-                panel = false,
-                jsHidden = true
-            ) {
-                @input(
-                    field = f("specifyOtherBusiness"),
-                    labelText = "lbl.pleasespecify"
-                )
-            }
-        }
-
         @submit(edit)
     }
 }

@@ -26,28 +26,26 @@ import play.api.libs.json.Json
 import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues with OneAppPerSuite{
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues with OneAppPerSuite {
 
   "Supervision" must {
 
     "have a default function that" must {
 
-      "correctly provides a default value when none is provided" in {
-        Supervision.default(None) must be(Supervision())
-      }
+      "provides a default value" when {
+        "none is provided" in {
+          Supervision.default(None) must be(Supervision())
+        }
 
-      "correctly provides a default value when existing value is provided" in {
-        Supervision.default(Some(completeModel)) must be(completeModel)
+        "existing value is provided" in {
+          Supervision.default(Some(completeModel)) must be(completeModel)
+        }
       }
 
     }
 
-    "have a mongo key that" must {
-      "be correctly set" in {
-        Supervision.mongoKey() must be("supervision")
-      }
+    "have a mongo key" in {
+      Supervision.mongoKey() must be("supervision")
     }
 
     "have a section function that" must {
@@ -91,30 +89,37 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
 
     "have an isComplete function that" must {
 
-      "correctly show if the model is complete" in {
+      "show if the model is complete" in {
         completeModel.isComplete must be(true)
       }
 
-      "correctly show if the model is incomplete" in {
-        partialModel.isComplete must be(false)
+      "show if the model is incomplete" when {
+        "ProfessionalBodyMember is Yes and businessTypes is not defined" in {
+          partialModelNoBusinessTypes.isComplete must be(false)
+        }
+        "multiple properties are missing" in {
+          partialModel.isComplete must be(false)
+        }
       }
     }
 
-    "Complete Model" when {
+    "convert between json formats" which {
+      "Serialises" in {
+        Json.toJson(completeModel) must be(completeJson)
+      }
 
-      "correctly convert between json formats" when {
-
-        "Serialise as expected" in {
-          Json.toJson(completeModel) must be(completeJson)
-        }
-
-        "Deserialise as expected" in {
+      "Deserialises" when {
+        "json is current format" in {
           (completeJson - "hasChanged").as[Supervision] must be(completeModel)
         }
+        "json is old format" in {
+          (completeJsonOldFormat - "hasChanged").as[Supervision] must be(completeModel)
+        }
       }
+
     }
 
-    "Supervision with all values set as None" must {
+    "with all values set as None" must {
       val initial: Option[Supervision] = None
 
       "return Supervision with anotherBody set and indicating changes have been made" in {
@@ -131,7 +136,8 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       }
 
     }
-    "Supervision with existing values" must {
+
+    "with existing values" must {
       val initial: Supervision = completeModel
 
       "return Supervision with anotherBody set and indicating changes have been made" in {
@@ -148,7 +154,7 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
       }
     }
 
-    "Supervision class" when {
+    "have function to provide property data" when {
       "anotherBody value is set" which {
         "is the same as before" must {
           "leave the object unchanged" in {
@@ -180,6 +186,23 @@ class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues 
             val res = completeModel.professionalBodyMember(NewValues.ProfessionalBodyMemberYes)
             res.hasChanged must be(true)
             res.professionalBodyMember must be(Some(NewValues.ProfessionalBodyMemberYes))
+          }
+        }
+      }
+
+      "businessTypes value is set" which {
+        "is the same as before" must {
+          "leave the object unchanged" in {
+            val res: Supervision = completeModel.professionalBodies(Some(DefaultValues.DefaultBusinessTypes))
+            res must be(completeModel)
+            res.hasChanged must be(false)
+          }
+        }
+        "is different" must {
+          "set the hasChanged update the value" in {
+            val res = completeModel.professionalBodies(Some(NewValues.NewBusinessTypes))
+            res.hasChanged must be(true)
+            res.professionalBodies must be(Some(NewValues.NewBusinessTypes))
           }
         }
       }
@@ -217,16 +240,26 @@ trait SupervisionValues {
 
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
-    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
+    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes
+    val DefaultBusinessTypes = ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
   }
 
   object NewValues {
     val NewAnotherBody = AnotherBodyNo
     val NewProfessionalBody = ProfessionalBodyNo
     val ProfessionalBodyMemberYes = ProfessionalBodyMemberNo
+    val NewBusinessTypes = ProfessionalBodies(Set(AccountantsIreland))
   }
 
   val completeModel = Supervision(
+    Some(DefaultValues.DefaultAnotherBody),
+    Some(DefaultValues.DefaultProfessionalBodyMember),
+    Some(DefaultValues.DefaultBusinessTypes),
+    Some(DefaultValues.DefaultProfessionalBody),
+    hasAccepted = true
+  )
+
+  val partialModelNoBusinessTypes = Supervision(
     Some(DefaultValues.DefaultAnotherBody),
     Some(DefaultValues.DefaultProfessionalBodyMember),
     None,
@@ -236,6 +269,29 @@ trait SupervisionValues {
   val partialModel = Supervision(Some(DefaultValues.DefaultAnotherBody))
 
   val completeJson = Json.obj(
+    "anotherBody" -> Json.obj(
+      "anotherBody" -> true,
+      "supervisorName" -> "Company A",
+      "startDate" -> "1993-08-25",
+      "endDate" -> "1999-08-25",
+      "endingReason" -> "Ending reason"
+    ),
+    "professionalBodyMember" -> Json.obj(
+      "isAMember" -> true
+    ),
+    "professionalBodies" -> Json.obj(
+      "businessType" -> Json.arr("01", "02", "14"),
+      "specifyOtherBusiness" -> "test"
+    ),
+    "professionalBody" -> Json.obj(
+      "penalised" -> true,
+      "professionalBody" -> "details"
+    ),
+    "hasChanged" -> false,
+    "hasAccepted" -> true
+  )
+
+  val completeJsonOldFormat = Json.obj(
     "anotherBody" -> Json.obj(
       "anotherBody" -> true,
       "supervisorName" -> "Company A",
@@ -255,4 +311,5 @@ trait SupervisionValues {
     "hasChanged" -> false,
     "hasAccepted" -> true
   )
+
 }

@@ -22,7 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.supervision.{ProfessionalBodyMember, Supervision}
+import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.member_of_professional_body
 
@@ -52,16 +52,25 @@ class ProfessionalBodyMemberController @Inject()(
           Future.successful(BadRequest(member_of_professional_body(f, edit)))
         case ValidForm(_, data) => {
           for {
-            supervision <-
-            dataCacheConnector.fetch[Supervision](Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key,
-              supervision.professionalBodyMember(data)
+            supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+            _ <- dataCacheConnector.save[Supervision](Supervision.key, {
+              data match {
+                case ProfessionalBodyMemberNo
+                  if supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) | supervision.professionalBodies.isDefined =>
+                  supervision.professionalBodyMember(data).copy(professionalBodies = None)
+                case _ => supervision.professionalBodyMember(data)
+              }}
             )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.PenalisedByProfessionalController.get())
-          }
+          } yield redirectTo(data, supervision, edit)
         }
       }
   }
+
+  def redirectTo(data: ProfessionalBodyMember, supervision: Supervision, edit: Boolean) =
+    (data, edit) match {
+      case (ProfessionalBodyMemberYes, _) if !supervision.professionalBodyMember.contains(ProfessionalBodyMemberYes) =>
+        Redirect(routes.WhichProfessionalBodyController.get(edit))
+      case (ProfessionalBodyMemberNo, false) => Redirect(routes.PenalisedByProfessionalController.get())
+      case _ => Redirect(routes.SummaryController.get())
+    }
 }

@@ -16,46 +16,67 @@
 
 package services
 
-import connectors.AuthConnector
-import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.Matchers.{eq => eqTo, _}
+import connectors.{AuthConnector, Authority, EnrolmentStoreConnector}
+import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, EnrolmentStoreEnrolment, GovernmentGatewayEnrolment}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.test.Helpers._
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
-class AuthEnrolmentsServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience{
+class AuthEnrolmentsServiceSpec extends PlaySpec
+  with MockitoSugar
+  with ScalaFutures
+  with IntegrationPatience
+  with AmlsReferenceNumberGenerator
+  with BaseGenerator {
 
-  object AuthEnrolmentsService extends AuthEnrolmentsService {
-    override private[services] val authConnector: AuthConnector = mock[AuthConnector]
+  trait Fixture {
+    val enrolmentStore = mock[EnrolmentStoreConnector]
+    val service = new AuthEnrolmentsService(mock[AuthConnector], enrolmentStore)
+
+    implicit val hc = mock[HeaderCarrier]
+    implicit val ac = mock[AuthContext]
+
+    val enrolmentsList = List[GovernmentGatewayEnrolment](GovernmentGatewayEnrolment("HMCE-VATVAR-ORG",
+      List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
+      List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
+
   }
-
-  implicit val hc = mock[HeaderCarrier]
-  implicit val ac = mock[AuthContext]
-
-  private val amlsRegistrationNumber = "XXML00000000000"
-
-  private val enrolmentsList = List[GovernmentGatewayEnrolment](GovernmentGatewayEnrolment("HMCE-VATVAR-ORG",
-    List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
-    List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
   "AuthEnrolmentsService" must {
-
-    "return an AMLS regsitration number" in {
-
-      when(AuthEnrolmentsService.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
+    "return an AMLS regsitration number" in new Fixture {
+      when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
       when(ac.enrolmentsUri).thenReturn(Some("uri"))
-      whenReady(AuthEnrolmentsService.amlsRegistrationNumber){
-        number => number.get mustEqual(amlsRegistrationNumber)
-      }
 
+      whenReady(service.amlsRegistrationNumber){
+        number => number.get mustEqual amlsRegistrationNumber
+      }
     }
 
-  }
+    "create an enrolment" in new Fixture {
+      when {
+        service.authConnector.getCurrentAuthority(any(), any())
+      } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
+      when {
+        service.enrolmentStore.enrol(any(), any())(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(OK))
+
+      val postcode = postcodeGen.sample.get
+
+      whenReady(service.enrol(amlsRegistrationNumber, postcode)) { _ =>
+        val enrolment = EnrolmentStoreEnrolment("12345678", postcode)
+        verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment))(any(), any(), any())
+      }
+    }
+  }
 }

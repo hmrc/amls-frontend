@@ -14,12 +14,20 @@
  * limitations under the License.
  */
 
-package models.auth
+package models.enrolment
 
-import play.api.libs.json.Json
+import generators.AmlsReferenceNumberGenerator
+import org.scalatest.MustMatchers
+import org.scalatestplus.play.PlaySpec
 
-case class UserDetailsResponse(name: String, email: Option[String], affinityGroup: String, credentialRole: String)
+class EnrolmentKeySpec extends PlaySpec with MustMatchers with AmlsReferenceNumberGenerator {
 
-object UserDetailsResponse {
-  implicit val format = Json.format[UserDetailsResponse]
+  "The enrolment key" must {
+    "be in the correct format" in {
+      val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
+
+      enrolKey.key mustBe s"HMRC-MLR-ORG~MLRRefNumber~$amlsRegistrationNumber"
+    }
+  }
+
 }

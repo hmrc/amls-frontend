@@ -14,20 +14,18 @@
  * limitations under the License.
  */
 
-package generators.auth
+package models.enrolment
 
-import generators.BaseGenerator
-import models.auth.{CredentialRole, UserDetails}
-import org.scalacheck.Gen
+sealed trait EnrolmentKey {
+  protected val serviceName: String
+  protected val identifier: String
+  protected val value: String
 
-//noinspection ScalaStyle
-trait UserDetailsGenerator extends BaseGenerator {
+  def key: String = s"$serviceName~$identifier~$value"
+}
 
-  val userDetailsGen: Gen[UserDetails] = for {
-    name <- stringOfLengthGen(10)
-    group <- stringOfLengthGen(20)
-    credentialRole <- Gen.oneOf(CredentialRole.User, CredentialRole.Assistant)
-    groupId <- numSequence(9)
-  } yield UserDetails(name, None, group, Some(credentialRole), Some(groupId))
-
+case class AmlsEnrolmentKey(amlsRefNumber: String) extends EnrolmentKey {
+  override protected val serviceName: String = "HMRC-MLR-ORG"
+  override protected val identifier: String = "MLRRefNumber"
+  override protected val value: String = amlsRefNumber
 }

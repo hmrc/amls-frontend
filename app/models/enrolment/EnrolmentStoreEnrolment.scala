@@ -14,12 +14,18 @@
  * limitations under the License.
  */
 
-package services
+package models.enrolment
 
-import javax.inject.Inject
+import play.api.libs.json.Json
 
-import connectors.EnrolmentStoreConnector
+case class EnrolmentStoreEnrolment(userId: String, friendlyName: String, `type`: String, verifiers: Seq[EnrolmentIdentifier])
 
-class EnrolmentStoreService @Inject()(connector: EnrolmentStoreConnector) {
+object EnrolmentStoreEnrolment {
+  implicit val format = Json.writes[EnrolmentStoreEnrolment]
+
+  def apply(userId: String, postCode: String): EnrolmentStoreEnrolment =
+    EnrolmentStoreEnrolment(userId, "AMLS Enrolment", "principal", Seq(
+      EnrolmentIdentifier("Postcode", postCode)
+    ))
 
 }

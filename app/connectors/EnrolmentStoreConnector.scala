@@ -19,10 +19,29 @@ package connectors
 import javax.inject.Inject
 
 import config.{AppConfig, WSHttp}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, EnrolmentStoreEnrolment}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+
+import scala.concurrent.{ExecutionContext, Future}
 
 // $COVERAGE-OFF$
-class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig) {
+class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector) {
 
-  lazy val baseUrl = appConfig.config.baseUrl("tax-enrolments")
+  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+
+  def enrol(enrolKey: EnrolmentKey, enrolment: EnrolmentStoreEnrolment)
+           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+
+    auth.userDetails flatMap { details =>
+      details.groupIdentifier match {
+        case Some(groupId) =>
+          val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
+          http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment)
+
+        case _ => throw new Exception("Group identifier is unavailable")
+      }
+    }
+  }
 
 }

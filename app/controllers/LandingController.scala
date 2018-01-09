@@ -22,7 +22,7 @@ import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, Appli
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
-import models.auth.{CredentialRole, UserDetailsResponse}
+import models.auth.{CredentialRole, UserDetails}
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
@@ -258,7 +258,7 @@ trait LandingController extends BaseController {
 object LandingController extends LandingController {
   // $COVERAGE-OFF$
   override private[controllers] val landingService = LandingService
-  override private[controllers] val enrolmentsService = AuthEnrolmentsService
+  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
   override protected val authConnector = AMLSAuthConnector
   override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
   override val cacheConnector = DataCacheConnector

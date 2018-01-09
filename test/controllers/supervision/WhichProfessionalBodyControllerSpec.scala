@@ -16,15 +16,17 @@
 
 package controllers.supervision
 
-import models.supervision.{AssociationOfBookkeepers, BusinessTypes, Other, Supervision}
+import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelper with MockitoSugar{
+class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelper with MockitoSugar {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 
@@ -35,18 +37,20 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
       self.authConnector
     )
 
+    mockCacheFetch[Supervision](Some(Supervision()))
+    mockCacheSave[Supervision]
+
   }
 
   "WhichProfessionalBodyControllerSpec" when {
 
     "get" must {
-
       "display view" when {
 
         "form data exists" in new Fixture {
 
           mockCacheFetch[Supervision](Some(Supervision(
-            businessTypes = Some(BusinessTypes(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
+            professionalBodies = Some(ProfessionalBodies(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
           )))
 
           val result = controller.get()(request)
@@ -63,8 +67,6 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
         }
 
         "form data is empty" in new Fixture {
-
-          mockCacheFetch[Supervision](None)
 
           val result = controller.get()(request)
 
@@ -86,24 +88,67 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
 
       "valid data" must {
 
-        "redirect to PenalisedByProfessionalController" in new Fixture {
+        "redirect to PenalisedByProfessionalController" when {
+          "not in edit mode" in new Fixture {
 
-          val newRequest = request.withFormUrlEncodedBody(
-            "businessType[0]" -> "01",
-            "businessType[1]" -> "02"
-          )
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessType[0]" -> "01",
+              "businessType[1]" -> "02"
+            )
 
-          mockCacheFetch[Supervision](None)
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+          }
+        }
 
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        "redirect to SummaryController" when {
+          "in edit mode" in new Fixture {
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "businessType[0]" -> "01",
+              "businessType[1]" -> "02"
+            )
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          }
         }
 
       }
 
+      "invalid data" must {
+        "respond with BAD_REQUEST" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody()
+
+          val result = controller.post()(newRequest)
+          status(result) must be(BAD_REQUEST)
+        }
+      }
+
     }
 
+  }
+
+  it must {
+    "save the valid data to the supervision model" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "businessType[0]" -> "01",
+        "businessType[1]" -> "02"
+      )
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+
+      verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+        professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
+        hasChanged = true
+      )))(any(),any(),any())
+
+    }
   }
 
 }

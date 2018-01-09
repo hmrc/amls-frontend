@@ -17,7 +17,7 @@
 package services
 
 import generators.auth.UserDetailsGenerator
-import models.auth.{CredentialRole, UserDetailsResponse}
+import models.auth.{CredentialRole, UserDetails}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -50,8 +50,8 @@ class AuthServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with 
 
     def setupUserDetails(role: String) = {
       when {
-        authConnector.getUserDetails[UserDetailsResponse](any())(any(), any(), any())
-      } thenReturn Future.successful(userDetailsGen.sample.get.copy(credentialRole = role))
+        authConnector.getUserDetails[UserDetails](any())(any(), any(), any())
+      } thenReturn Future.successful(userDetailsGen.sample.get.copy(credentialRole = Some(role)))
     }
   }
 

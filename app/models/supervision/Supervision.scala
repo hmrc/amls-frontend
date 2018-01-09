@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Supervision(
                         anotherBody: Option[AnotherBody] = None,
                         professionalBodyMember: Option[ProfessionalBodyMember] = None,
-                        businessTypes: Option[BusinessTypes] = None,
+                        professionalBodies: Option[ProfessionalBodies] = None,
                         professionalBody: Option[ProfessionalBody] = None,
                         hasChanged: Boolean = false,
                         hasAccepted: Boolean = false) {
@@ -36,12 +36,17 @@ case class Supervision(
     this.copy(professionalBodyMember = Some(p), hasChanged = hasChanged || !this.professionalBodyMember.contains(p),
       hasAccepted = hasAccepted && this.professionalBodyMember.contains(p))
 
+  def professionalBodies(p: Option[ProfessionalBodies]): Supervision =
+    this.copy(professionalBodies = p, hasChanged = hasChanged || !this.professionalBodies.equals(p),
+      hasAccepted = hasAccepted && this.professionalBodies.equals(p))
+
   def professionalBody(p: ProfessionalBody): Supervision =
     this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p),
       hasAccepted = hasAccepted && this.professionalBody.contains(p))
 
   def isComplete: Boolean = this match {
-    case Supervision(Some(_), Some(_), _, Some(_), _, true) => true
+    case Supervision(Some(_), Some(ProfessionalBodyMemberYes), Some(_), Some(_), _, true) => true
+    case Supervision(Some(_), Some(ProfessionalBodyMemberNo), _, Some(_), _, true) => true
     case _ => false
   }
 
@@ -63,13 +68,21 @@ object Supervision {
   }
 
   import play.api.libs.json._
+  import utils.MappingUtils._
 
   val key = "supervision"
+
   implicit val formatOption = Reads.optionWithNull[Supervision]
 
   implicit val mongoKey = new MongoKey[Supervision] {
     override def apply(): String = "supervision"
   }
+
+  def professionalBodiesReader: Reads[Option[ProfessionalBodies]] =
+    (__ \ "professionalBodies").readNullable[ProfessionalBodies] flatMap {
+      case businessTypes@Some(_) => constant(businessTypes)
+      case _ => (__ \ "professionalBodyMember").readNullable[ProfessionalBodies] orElse constant(None)
+    }
 
   implicit val reads: Reads[Supervision] = {
     import play.api.libs.functional.syntax._
@@ -77,7 +90,7 @@ object Supervision {
     (
       (__ \ "anotherBody").readNullable[AnotherBody] and
         (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
-        (__ \ "businessType").readNullable[BusinessTypes] and
+        professionalBodiesReader and
         (__ \ "professionalBody").readNullable[ProfessionalBody] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}

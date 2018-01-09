@@ -856,7 +856,8 @@ updateservice.removeactivities.header = What do you need to remove?
 
 updateservice.removeactivitiesinformation.title = Unable to remove services
 updateservice.removeactivitiesinformation.header = Unable to remove {0}
-updateservice.removeactivitiesinformation.info.1 = You need to add a new serive before you can remove the one you are currently registered for.
+updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
+updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 dateofchange.title = When did the change happen?
@@ -1638,8 +1639,6 @@ supervision.memberofprofessionalbody.lbl.13 = Law Society
 supervision.memberofprofessionalbody.lbl.14 = Other
 
 supervision.whichprofessionalbody.title = Which professional body are you a member of?
-
-
 
 msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months

@@ -19,6 +19,8 @@ package controllers.supervision
 import models.supervision._
 import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -49,59 +51,90 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
     }
 
-    "lod the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
+    "load the page Is your business a member of a professional body? with pre-populate data" in new Fixture  {
 
       mockCacheFetch[Supervision](Some(Supervision(
-        professionalBodyMember = Some(ProfessionalBodyMemberYes(Set(AccountingTechnicians, CharteredCertifiedAccountants)))
+        professionalBodyMember = Some(ProfessionalBodyMemberYes)
       )))
 
       val result = controller.get()(request)
       status(result) must be(OK)
 
       val document = Jsoup.parse(contentAsString(result))
-      document.select("input[value=01]").hasAttr("checked") must be(true)
-      document.select("input[value=02]").hasAttr("checked") must be(true)
+      document.select("input[value=true]").hasAttr("checked") must be(true)
 
     }
 
-    "on post with valid data" in new Fixture {
+    "on post with valid data" must {
+      "redirect to WhichProfessionalBodyController" when {
+        "isMember is true" when {
+          "edit is false" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true",
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02"
-      )
+            val newRequest = request.withFormUrlEncodedBody(
+              "isAMember" -> "true"
+            )
 
-      mockCacheFetch[Supervision](None)
+            mockCacheFetch[Supervision](None)
 
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
-    }
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get().url))
+          }
+          "edit is true" when {
+            "professionalBodies is not defined" in new Fixture {
 
-    "on post with valid data in edit mode" in new Fixture {
+              val newRequest = request.withFormUrlEncodedBody(
+                "isAMember" -> "true"
+              )
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "isAMember" -> "true",
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02",
-        "businessType[2]" -> "03",
-        "specifyOtherBusiness" -> "test"
-      )
+              mockCacheFetch[Supervision](None)
 
-      mockCacheFetch[Supervision](None)
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.WhichProfessionalBodyController.get(true).url))
+            }
+          }
+        }
+      }
+      "redirect to PenalisedByProfessionalController" when {
+        "isMember is false" in new Fixture {
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+          val newRequest = request.withFormUrlEncodedBody(
+            "isAMember" -> "false"
+          )
+
+          mockCacheFetch[Supervision](None)
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.PenalisedByProfessionalController.get().url))
+        }
+      }
+      "redirect to SummaryController" when {
+        "edit is true" when {
+          "isMember is true" when {
+            "ProfessionalBodyMemberYes is already defined" in new Fixture {
+
+              val newRequest = request.withFormUrlEncodedBody(
+                "isAMember" -> "true"
+              )
+
+              mockCacheFetch[Supervision](Some(Supervision(
+                professionalBodyMember = Some(ProfessionalBodyMemberYes)
+              )))
+
+              val result = controller.post(true)(newRequest)
+              status(result) must be(SEE_OTHER)
+              redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            }
+          }
+        }
+      }
     }
 
     "on post with invalid data" in new Fixture {
 
-      val newRequest = request.withFormUrlEncodedBody(
-        "businessType[0]" -> "01",
-        "businessType[1]" -> "02"
-      )
+      val newRequest = request.withFormUrlEncodedBody()
 
       mockCacheFetch[Supervision](None)
 
@@ -110,6 +143,56 @@ class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with Mockit
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("a[href=#isAMember]").html() must include(Messages("error.required.supervision.business.a.member"))
+    }
+
+  }
+
+  it must {
+
+    "remove professionalBodies data" when {
+      "updated from ProfessionalBodyMemberYes to No" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isAMember" -> "false"
+        )
+
+        mockCacheFetch[Supervision](Some(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberYes),
+          professionalBodies = Some(ProfessionalBodies(
+            Set(AccountantsEnglandandWales, Other("Another professional body"))
+          ))
+        )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberNo),
+          hasChanged = true
+        )))(any(),any(),any())
+
+      }
+      "ProfessionalBodyMemberNo and professionalBodies is defined" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "isAMember" -> "false"
+        )
+
+        mockCacheFetch[Supervision](Some(Supervision(
+          professionalBodies = Some(ProfessionalBodies(
+            Set(AccountantsEnglandandWales, Other("Another professional body"))
+          ))
+        )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
+          professionalBodyMember = Some(ProfessionalBodyMemberNo),
+          hasChanged = true
+        )))(any(),any(),any())
+
+      }
     }
 
   }

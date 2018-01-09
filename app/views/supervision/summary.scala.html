@@ -69,10 +69,20 @@
     ) {
         @model.professionalBodyMember.map {
             case ProfessionalBodyMemberNo => { <p>@Messages("lbl.no")</p> }
-            case ProfessionalBodyMemberYes(v) => {
-            <ul class="list list--semicolon">
-                @v.map { x=>
-                <li>@x match {
+            case ProfessionalBodyMemberYes => { <p>@Messages("lbl.yes")</p> }
+        }
+    }
+
+    @model.professionalBodies.map { businessType =>
+
+        @checkYourAnswers(
+            question = Messages("supervision.whichprofessionalbody.title"),
+            editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
+        ) {
+
+            <ul class="list">
+                @businessType.businessTypes.map { x=>
+                    <li>@x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
                         case CharteredCertifiedAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.02")}
                         case InternationalAccountants => {@Messages("supervision.memberofprofessionalbody.lbl.03")}
@@ -87,10 +97,10 @@
                         case AssociationOfBookkeepers => {@Messages("supervision.memberofprofessionalbody.lbl.12")}
                         case LawSociety => {@Messages("supervision.memberofprofessionalbody.lbl.13")}
                         case Other(details) => {@Messages("supervision.memberofprofessionalbody.lbl.14"): @details}
-                    }</li>
+                        }
+                    </li>
                 }
             </ul>
-            }
         }
     }
 

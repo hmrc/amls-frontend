@@ -72,8 +72,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val notificationsUrl = baseUrl("amls-notification")
   lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
 
-  lazy val authUrl = baseUrl("auth")
-
   def businessCustomerUrl = getConfigString("business-customer.url")
 
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
@@ -121,4 +119,8 @@ class AppConfig @Inject()(
   def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
 
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
+
+  def authUrl = config.baseUrl("auth")
+
+  def enrolmentStoreUrl = config.baseUrl("tax-enrolments")
 }

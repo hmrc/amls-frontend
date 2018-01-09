@@ -21,8 +21,8 @@ import javax.inject.Inject
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, ValidForm}
-import models.supervision.{BusinessTypes, Supervision}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.supervision.{ProfessionalBodies, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.which_professional_body
 
@@ -33,28 +33,39 @@ class WhichProfessionalBodyController @Inject()(
                                                val authConnector: AuthConnector = AMLSAuthConnector
                                                ) extends BaseController {
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         dataCacheConnector.fetch[Supervision](Supervision.key) map { response =>
 
           val form = (for {
             supervision <- response
-            businessTypes <- supervision.businessTypes
+            businessTypes <- supervision.professionalBodies
           } yield {
-            Form2[BusinessTypes](businessTypes)
+            Form2[ProfessionalBodies](businessTypes)
           }) getOrElse EmptyForm
 
-          Ok(which_professional_body(form, false))
+          Ok(which_professional_body(form, edit))
         }
   }
 
-  def post() = Authorised.async{
+  def post(edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
-      Form2[BusinessTypes](request.body) match {
-        case ValidForm(_, data) => Future.successful(Redirect(routes.PenalisedByProfessionalController.post(false)))
-      }
+        Form2[ProfessionalBodies](request.body) match {
+          case ValidForm(_, data) =>
+            for {
+              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+              _ <- dataCacheConnector.save[Supervision](Supervision.key,supervision.professionalBodies(Some(data)))
+            } yield {
+              if(edit){
+                Redirect(routes.SummaryController.post())
+              } else {
+                Redirect(routes.PenalisedByProfessionalController.post(edit))
+              }
+            }
+          case f:InvalidForm => Future.successful(BadRequest(which_professional_body(f, edit)))
+        }
   }
 
 }
