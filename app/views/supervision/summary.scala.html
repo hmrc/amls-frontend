@@ -77,8 +77,8 @@
         question = Messages("supervision.whichprofessionalbody.title"),
         editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
     ) {
-        @model.businessTypes.map { businessType =>
-            <ul class="list list--semicolon">
+        @model.professionalBodies.map { businessType =>
+            <ul class="list">
                 @businessType.businessTypes.map { x=>
                     <li>@x match {
                         case AccountingTechnicians => {@Messages("supervision.memberofprofessionalbody.lbl.01")}
