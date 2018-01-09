@@ -54,7 +54,7 @@ class summarySpec extends GenericTestHelper with MustMatchers with TableDrivenPr
         val testdata = Supervision(
           Some(AnotherBodyYes("Company A", new LocalDate(1993, 8, 25), new LocalDate(1999, 8, 25), "Ending reason")),
           Some(ProfessionalBodyMemberYes),
-          Some(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
+          Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("anotherProfessionalBody")))),
           Some(ProfessionalBodyYes("details")),
           hasAccepted = true
         )

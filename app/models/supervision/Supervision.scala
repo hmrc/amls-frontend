@@ -23,7 +23,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class Supervision(
                         anotherBody: Option[AnotherBody] = None,
                         professionalBodyMember: Option[ProfessionalBodyMember] = None,
-                        businessTypes: Option[BusinessTypes] = None,
+                        professionalBodies: Option[ProfessionalBodies] = None,
                         professionalBody: Option[ProfessionalBody] = None,
                         hasChanged: Boolean = false,
                         hasAccepted: Boolean = false) {
@@ -36,9 +36,9 @@ case class Supervision(
     this.copy(professionalBodyMember = Some(p), hasChanged = hasChanged || !this.professionalBodyMember.contains(p),
       hasAccepted = hasAccepted && this.professionalBodyMember.contains(p))
 
-  def businessTypes(p: Option[BusinessTypes]): Supervision =
-    this.copy(businessTypes = p, hasChanged = hasChanged || !this.businessTypes.equals(p),
-      hasAccepted = hasAccepted && this.businessTypes.equals(p))
+  def professionalBodies(p: Option[ProfessionalBodies]): Supervision =
+    this.copy(professionalBodies = p, hasChanged = hasChanged || !this.professionalBodies.equals(p),
+      hasAccepted = hasAccepted && this.professionalBodies.equals(p))
 
   def professionalBody(p: ProfessionalBody): Supervision =
     this.copy(professionalBody = Some(p), hasChanged = hasChanged || !this.professionalBody.contains(p),
@@ -78,10 +78,10 @@ object Supervision {
     override def apply(): String = "supervision"
   }
 
-  def businessTypesReader: Reads[Option[BusinessTypes]] =
-    (__ \ "businessTypes").readNullable[BusinessTypes] flatMap {
+  def professionalBodiesReader: Reads[Option[ProfessionalBodies]] =
+    (__ \ "professionalBodies").readNullable[ProfessionalBodies] flatMap {
       case businessTypes@Some(_) => constant(businessTypes)
-      case _ => (__ \ "professionalBodyMember").readNullable[BusinessTypes] orElse constant(None)
+      case _ => (__ \ "professionalBodyMember").readNullable[ProfessionalBodies] orElse constant(None)
     }
 
   implicit val reads: Reads[Supervision] = {
@@ -90,7 +90,7 @@ object Supervision {
     (
       (__ \ "anotherBody").readNullable[AnotherBody] and
         (__ \ "professionalBodyMember").readNullable[ProfessionalBodyMember] and
-        businessTypesReader and
+        professionalBodiesReader and
         (__ \ "professionalBody").readNullable[ProfessionalBody] and
         (__ \ "hasChanged").readNullable[Boolean].map {_.getOrElse(false)} and
         (__ \ "hasAccepted").readNullable[Boolean].map {_.getOrElse(false)}

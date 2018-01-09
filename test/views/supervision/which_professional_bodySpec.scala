@@ -21,7 +21,7 @@ import org.scalatest.MustMatchers
 import utils.GenericTestHelper
 import jto.validation.Path
 import jto.validation.ValidationError
-import models.supervision.BusinessTypes
+import models.supervision.ProfessionalBodies$
 import play.api.i18n.Messages
 import views.Fixture
 
