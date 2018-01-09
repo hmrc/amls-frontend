@@ -33,8 +33,8 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "specifyOtherBusiness" -> Seq("test")
         )
 
-        BusinessTypes.formRule.validate(model) must
-          be(Valid(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants, TaxationTechnicians, ManagementAccountants,
+        ProfessionalBodies.formRule.validate(model) must
+          be(Valid(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, TaxationTechnicians, ManagementAccountants,
             InstituteOfTaxation, Bookkeepers, AccountantsIreland, AccountantsScotland, AccountantsEnglandandWales, FinancialAccountants,
             AssociationOfBookkeepers, LawSociety, Other("test")
           ))))
@@ -51,7 +51,7 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "specifyOtherBusiness" -> Seq("")
         )
 
-        BusinessTypes.formRule.validate(model) must
+        ProfessionalBodies.formRule.validate(model) must
           be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.required.supervision.business.details"))))))
       }
 
@@ -62,7 +62,7 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "specifyOtherBusiness" -> Seq("test" * 200)
         )
 
-        BusinessTypes.formRule.validate(model) must
+        ProfessionalBodies.formRule.validate(model) must
           be(Invalid(List((Path \ "specifyOtherBusiness", Seq(ValidationError("error.invalid.supervision.business.details"))))))
       }
 
@@ -72,13 +72,13 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "businessType[]" -> Seq()
         )
 
-        BusinessTypes.formRule.validate(model) must
+        ProfessionalBodies.formRule.validate(model) must
           be(Invalid(List((Path \ "businessType", Seq(ValidationError("error.required.supervision.one.professional.body"))))))
       }
 
       "given no data represented by an empty Map" in {
 
-        BusinessTypes.formRule.validate(Map.empty) must
+        ProfessionalBodies.formRule.validate(Map.empty) must
           be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.required.supervision.one.professional.body")))))
 
       }
@@ -89,7 +89,7 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "businessType[]" -> Seq("01", "20")
         )
 
-        BusinessTypes.formRule.validate(model) must
+        ProfessionalBodies.formRule.validate(model) must
           be(Invalid(Seq((Path \ "businessType") -> Seq(ValidationError("error.invalid")))))
 
       }
@@ -101,7 +101,7 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "specifyOtherBusiness" -> Seq("{}{}")
         )
 
-        BusinessTypes.formRule.validate(model) must
+        ProfessionalBodies.formRule.validate(model) must
           be(Invalid(Seq((Path \ "specifyOtherBusiness", Seq(ValidationError("err.text.validation"))))))
       }
 
@@ -117,9 +117,9 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "businessType[]" -> Seq("03","04", "05", "06")
         )
 
-        val model = BusinessTypes(Set(InternationalAccountants, TaxationTechnicians, ManagementAccountants, InstituteOfTaxation))
+        val model = ProfessionalBodies(Set(InternationalAccountants, TaxationTechnicians, ManagementAccountants, InstituteOfTaxation))
 
-        BusinessTypes.formWrites.writes(model) must be (map)
+        ProfessionalBodies.formWrites.writes(model) must be (map)
       }
 
       "with Other option" in {
@@ -129,8 +129,8 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
           "specifyOtherBusiness" -> Seq("otherBusiness")
         )
 
-        val model = BusinessTypes(Set(Other("otherBusiness"), LawSociety))
-        BusinessTypes.formWrites.writes(model) must be (map)
+        val model = ProfessionalBodies(Set(Other("otherBusiness"), LawSociety))
+        ProfessionalBodies.formWrites.writes(model) must be (map)
       }
     }
   }
@@ -140,8 +140,8 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
     "validate given values" in {
       val json =  Json.obj("businessType" -> Seq("01","02"))
 
-      Json.fromJson[BusinessTypes](json) must
-        be(JsSuccess(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
+      Json.fromJson[ProfessionalBodies](json) must
+        be(JsSuccess(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants)), JsPath))
     }
 
     "validate given values with option Digital software" in {
@@ -150,17 +150,17 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
         "specifyOtherBusiness" -> "test"
       )
 
-      Json.fromJson[BusinessTypes](json) must
-        be(JsSuccess(BusinessTypes(Set(Other("test"), AssociationOfBookkeepers)), JsPath ))
+      Json.fromJson[ProfessionalBodies](json) must
+        be(JsSuccess(ProfessionalBodies(Set(Other("test"), AssociationOfBookkeepers)), JsPath ))
     }
 
     "fail when on path is missing" in {
-      Json.fromJson[BusinessTypes](Json.obj("isAMember" -> true)) must
+      Json.fromJson[ProfessionalBodies](Json.obj("isAMember" -> true)) must
         be(JsError((JsPath \"businessType") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
 
     "fail when on invalid data" in {
-      Json.fromJson[BusinessTypes](Json.obj("businessType" -> Seq("40"))) must
+      Json.fromJson[ProfessionalBodies](Json.obj("businessType" -> Seq("40"))) must
         be(JsError((JsPath \ "businessType") -> play.api.data.validation.ValidationError("error.invalid")))
     }
 
@@ -168,7 +168,7 @@ class BusinessTypesSpec extends PlaySpec with GenericTestHelper {
 
   "JSON writers" must {
     "write valid data" in {
-      Json.toJson[BusinessTypes](BusinessTypes(Set(AccountantsScotland, Other("test657")))) must
+      Json.toJson[ProfessionalBodies](ProfessionalBodies(Set(AccountantsScotland, Other("test657")))) must
         be (Json.obj("businessType" -> Seq("09", "14"), "specifyOtherBusiness" -> "test657"))
     }
   }

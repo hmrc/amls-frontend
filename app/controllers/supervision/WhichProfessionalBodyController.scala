@@ -22,7 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.supervision.{BusinessTypes, Supervision}
+import models.supervision.{ProfessionalBodies, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.which_professional_body
 
@@ -40,9 +40,9 @@ class WhichProfessionalBodyController @Inject()(
 
           val form = (for {
             supervision <- response
-            businessTypes <- supervision.businessTypes
+            businessTypes <- supervision.professionalBodies
           } yield {
-            Form2[BusinessTypes](businessTypes)
+            Form2[ProfessionalBodies](businessTypes)
           }) getOrElse EmptyForm
 
           Ok(which_professional_body(form, edit))
@@ -52,11 +52,11 @@ class WhichProfessionalBodyController @Inject()(
   def post(edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
-        Form2[BusinessTypes](request.body) match {
+        Form2[ProfessionalBodies](request.body) match {
           case ValidForm(_, data) =>
             for {
               supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-              _ <- dataCacheConnector.save[Supervision](Supervision.key,supervision.businessTypes(Some(data)))
+              _ <- dataCacheConnector.save[Supervision](Supervision.key,supervision.professionalBodies(Some(data)))
             } yield {
               if(edit){
                 Redirect(routes.SummaryController.post())

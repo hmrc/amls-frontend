@@ -50,7 +50,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
         "form data exists" in new Fixture {
 
           mockCacheFetch[Supervision](Some(Supervision(
-            businessTypes = Some(BusinessTypes(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
+            professionalBodies = Some(ProfessionalBodies(Set(AssociationOfBookkeepers, Other("SomethingElse"))))
           )))
 
           val result = controller.get()(request)
@@ -144,7 +144,7 @@ class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelpe
       status(result) must be(SEE_OTHER)
 
       verify(controller.dataCacheConnector).save[Supervision](any(),eqTo(Supervision(
-        businessTypes = Some(BusinessTypes(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
+        professionalBodies = Some(ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants))),
         hasChanged = true
       )))(any(),any(),any())
 

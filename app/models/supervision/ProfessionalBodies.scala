@@ -73,9 +73,9 @@ case object LawSociety extends BusinessType
 
 case class Other(businessDetails: String) extends BusinessType
 
-case class BusinessTypes(businessTypes: Set[BusinessType])
+case class ProfessionalBodies(businessTypes: Set[BusinessType])
 
-object BusinessTypes {
+object ProfessionalBodies {
 
   import utils.MappingUtils.Implicits._
 
@@ -88,7 +88,7 @@ object BusinessTypes {
   def stringToRule(businessType: BusinessType): Rule[UrlFormEncoded, BusinessType] =
     Rule[UrlFormEncoded, BusinessType](_ => Valid(businessType))
 
-  implicit val formRule: Rule[UrlFormEncoded, BusinessTypes] = From[UrlFormEncoded] { __ =>
+  implicit val formRule: Rule[UrlFormEncoded, ProfessionalBodies] = From[UrlFormEncoded] { __ =>
     (__ \ "businessType").read(minLengthR[Set[String]](1).withMessage("error.required.supervision.one.professional.body")) flatMap { setOfStrings =>
       setOfStrings.map {
         case "01" => stringToRule(AccountingTechnicians)
@@ -119,11 +119,11 @@ object BusinessTypes {
               businessTypes + businessType
             }
           }
-      } map BusinessTypes.apply
+      } map ProfessionalBodies.apply
     }
   }
 
-  implicit def formWrites = Write[BusinessTypes, UrlFormEncoded] { businessTypes =>
+  implicit def formWrites = Write[ProfessionalBodies, UrlFormEncoded] { businessTypes =>
     Map(
       "businessType[]" -> (businessTypes.businessTypes map {
         _.value
@@ -137,7 +137,7 @@ object BusinessTypes {
   def stringToReader(businessType: BusinessType): Reads[BusinessType] =
     Reads(_ => JsSuccess(businessType)) map identity[BusinessType]
 
-  implicit val jsonReader: Reads[BusinessTypes] = (__ \ "businessType").read[Set[String]] flatMap { setOfStrings =>
+  implicit val jsonReader: Reads[ProfessionalBodies] = (__ \ "businessType").read[Set[String]] flatMap { setOfStrings =>
     (setOfStrings map {
       case "01" => stringToReader(AccountingTechnicians)
       case "02" => stringToReader(CharteredCertifiedAccountants)
@@ -166,9 +166,9 @@ object BusinessTypes {
           }
         }
     }
-  } map BusinessTypes.apply
+  } map ProfessionalBodies.apply
 
-  implicit val jsonWrites: Writes[BusinessTypes] = Writes[BusinessTypes]{ businessTypes =>
+  implicit val jsonWrites: Writes[ProfessionalBodies] = Writes[ProfessionalBodies]{ businessTypes =>
     Json.obj(
       "businessType" -> (businessTypes.businessTypes map (_.value)).toSeq
     ) ++ businessTypes.businessTypes.foldLeft[JsObject](Json.obj()) {
