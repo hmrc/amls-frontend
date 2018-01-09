@@ -80,8 +80,8 @@ case class BusinessActivities(
     this.copy(ncaRegistered = Some(p), hasChanged = hasChanged || !this.ncaRegistered.contains(p),
       hasAccepted = hasAccepted && this.ncaRegistered.contains(p))
 
-  def accountantForAMLSRegulations(p: AccountantForAMLSRegulations): BusinessActivities =
-    this.copy(accountantForAMLSRegulations = Some(p), hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p),
+  def accountantForAMLSRegulations(p: Option[AccountantForAMLSRegulations]): BusinessActivities =
+    this.copy(accountantForAMLSRegulations = p, hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p),
       hasAccepted = hasAccepted && this.accountantForAMLSRegulations.contains(p))
 
   def riskAssessmentPolicy(p: RiskAssessmentPolicy): BusinessActivities =

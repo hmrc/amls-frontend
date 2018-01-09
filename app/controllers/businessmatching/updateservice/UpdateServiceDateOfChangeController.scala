@@ -25,6 +25,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
+import models.businessactivities.{BusinessActivities => ba}
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -97,7 +98,6 @@ class UpdateServiceDateOfChangeController @Inject()(
                 fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))
                 responsiblePeopleWithoutFitAndProper <- OptionT.pure[Future, Seq[ResponsiblePeople]](withoutFitAndProper(responsiblePeople))
                 _ <- maybeRemoveFitAndProper(responsiblePeopleWithoutFitAndProper, fitAndProperRequired)
-                //_ <- maybeRemove
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
@@ -113,6 +113,11 @@ class UpdateServiceDateOfChangeController @Inject()(
         (activity equals AccountancyServices) | (activity equals TrustAndCompanyServices)
       }
 
+    def removeAccountantForAMLSRegulations(activities: Set[BusinessActivity]): Boolean =
+      activities exists { activity =>
+        (activity equals AccountancyServices)
+      }
+
     val withoutSection: PartialFunction[BusinessActivity, Boolean] = {
       case TelephonePaymentService | BillPaymentServices => false
       case _ => true
@@ -126,10 +131,15 @@ class UpdateServiceDateOfChangeController @Inject()(
       } else {
         cache
       }
+
+      if(removeAccountantForAMLSRegulations(activities)){
+        dataCacheConnector.save[ba](ba.key, updateTransmittingMoney(OptionT.liftF(dataCacheConnector.fetch[ba](ba.key))))
+      }else {
+        cache
+      }
     })
   }
 
-  private def maybeRemove = ???
 
   private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
     (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
@@ -140,9 +150,22 @@ class UpdateServiceDateOfChangeController @Inject()(
     }
   }
 
+  def updateTransmittingMoney(a: ba) = {
+      a.copy(
+        accountantForAMLSRegulations = None
+      )
+  }
+
   private def withoutFitAndProper(responsiblePeople: Seq[ResponsiblePeople]) = responsiblePeople map { rp =>
     rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
   }
+
+  private def maybeRemoveFitAndProper(responsiblePeople: Seq[ResponsiblePeople], fitAndProperRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
+    if(fitAndProperRequired){
+      OptionT.pure[Future, Seq[ResponsiblePeople]](responsiblePeople)
+    } else {
+      OptionT.liftF(removeFitAndProper(responsiblePeople))
+    }
 
   private def maybeRemoveFitAndProper(responsiblePeople: Seq[ResponsiblePeople], fitAndProperRequired: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier) =
     if(fitAndProperRequired){
