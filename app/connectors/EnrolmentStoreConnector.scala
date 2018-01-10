@@ -20,16 +20,20 @@ import javax.inject.Inject
 
 import audit.ESEnrolEvent
 import config.{AppConfig, WSHttp}
+import exceptions.DuplicateEnrolmentException
 import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.Logger
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.http.Status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
 
   lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/enrolment-store-proxy"
+  val warn: String => Unit = msg => Logger.warn(s"[EnrolmentStoreConnector] $msg")
 
   def enrol(enrolKey: EnrolmentKey, enrolment: EnrolmentStoreEnrolment)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
@@ -38,10 +42,14 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
       details.groupIdentifier match {
         case Some(groupId) =>
           val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/${enrolKey.key}"
-          
+
           http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment) map { response =>
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
             response
+          } recoverWith {
+            case e: HttpException if e.responseCode == CONFLICT =>
+              warn(s"$CONFLICT received from enrolment-store-proxy: ${e.getMessage}")
+              throw DuplicateEnrolmentException(e.getMessage, e)
           }
 
         case _ => throw new Exception("Group identifier is unavailable")

@@ -17,6 +17,7 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
+import exceptions.DuplicateEnrolmentException
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
@@ -27,7 +28,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -65,12 +66,14 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     when {
       authConnector.userDetails(any(), any(), any())
     } thenReturn Future.successful(userDetails)
+
+    val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
+
   }
 
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
-        val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
         val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
@@ -85,13 +88,21 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
       }
 
       "throw an exception when no group identifier is available" in new Fixture {
-        val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
-
         when {
           authConnector.userDetails(any(), any(), any())
         } thenReturn Future.successful(userDetails.copy(groupIdentifier = None))
 
         intercept[Exception] {
+          await(connector.enrol(enrolKey, enrolment))
+        }
+      }
+
+      "throws a DuplicateEnrolmentException when the enrolment has already been created" in new Fixture {
+        when {
+          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+        } thenReturn Future.failed(new HttpException("This is an error", CONFLICT))
+
+        intercept[DuplicateEnrolmentException] {
           await(connector.enrol(enrolKey, enrolment))
         }
       }
