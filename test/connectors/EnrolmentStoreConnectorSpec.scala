@@ -25,9 +25,10 @@ import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +40,8 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
   with MockitoSugar
   with AmlsReferenceNumberGenerator
   with UserDetailsGenerator
-  with BaseGenerator {
+  with BaseGenerator
+  with OneAppPerSuite {
 
   trait Fixture {
 
@@ -49,8 +51,9 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     val http = mock[WSHttp]
     val appConfig = mock[AppConfig]
     val authConnector = mock[AuthConnector]
+    val auditConnector = mock[AuditConnector]
 
-    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector)
+    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector, auditConnector)
     val baseUrl = "http://enrolment-store:3001"
     val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
@@ -77,6 +80,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
         whenReady(connector.enrol(enrolKey, enrolment)) { _ =>
           verify(authConnector).userDetails(any(), any(), any())
           verify(http).POST[EnrolmentStoreEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
