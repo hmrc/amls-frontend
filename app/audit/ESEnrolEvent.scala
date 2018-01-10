@@ -18,7 +18,7 @@ package audit
 
 import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment}
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.config.AppName
@@ -39,6 +39,25 @@ object ESEnrolEvent {
         "key" -> key.key,
         "response" -> response.body,
         "status" -> response.status.toString
+      )
+    )
+}
+
+object ESEnrolFailureEvent {
+  def apply
+  (enrolment: EnrolmentStoreEnrolment, exception: Throwable, key: EnrolmentKey)
+  (implicit
+   hc: HeaderCarrier,
+   reqW: Writes[EnrolmentStoreEnrolment]
+  ): DataEvent =
+    DataEvent(
+      auditSource = AppName.appName,
+      auditType = "OutboundCall",
+      tags = hc.toAuditTags("Enrolment", "N/A"),
+      detail = hc.toAuditDetails() ++ Map(
+        "enrolment" -> Json.toJson(enrolment).toString,
+        "key" -> key.key,
+        "exception" -> exception.getMessage
       )
     )
 }

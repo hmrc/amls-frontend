@@ -18,12 +18,14 @@ package connectors
 
 import javax.inject.Inject
 
-import audit.ESEnrolEvent
+import audit.{ESEnrolEvent, ESEnrolFailureEvent}
 import config.{AppConfig, WSHttp}
-import exceptions.DuplicateEnrolmentException
-import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment}
+import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
+import models.enrolment.ErrorResponse._
+import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import play.api.Logger
-import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse}
+import play.api.libs.json.Json
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.http.Status._
@@ -34,6 +36,11 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
 
   lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/enrolment-store-proxy"
   val warn: String => Unit = msg => Logger.warn(s"[EnrolmentStoreConnector] $msg")
+
+  object ResponseCodes {
+    val duplicateEnrolment = "ERROR_INVALID_IDENTIFIERS"
+    val invalidCredentialRole = "INVALID_CREDENTIAL_ID"
+  }
 
   def enrol(enrolKey: EnrolmentKey, enrolment: EnrolmentStoreEnrolment)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
@@ -47,9 +54,22 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
             response
           } recoverWith {
-            case e: HttpException if e.responseCode == CONFLICT =>
-              warn(s"$CONFLICT received from enrolment-store-proxy: ${e.getMessage}")
-              throw DuplicateEnrolmentException(e.getMessage, e)
+            case e: Upstream4xxResponse if Json.parse(e.message).asOpt[ErrorResponse].isDefined =>
+              val error = Json.parse(e.message).as[ErrorResponse]
+              audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+              warn(error.toString)
+
+              (e.upstreamResponseCode, error.code) match {
+                case (BAD_REQUEST, ResponseCodes.duplicateEnrolment) =>
+                  throw DuplicateEnrolmentException(error.toString, e)
+                case (FORBIDDEN, ResponseCodes.invalidCredentialRole) =>
+                  throw InvalidEnrolmentCredentialsException(error.toString, e)
+              }
+
+            case e: Throwable =>
+              audit.sendEvent(ESEnrolFailureEvent(enrolment, e, enrolKey))
+              warn(e.getMessage)
+              throw e
           }
 
         case _ => throw new Exception("Group identifier is unavailable")
