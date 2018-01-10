@@ -17,17 +17,20 @@
 package connectors
 
 import config.{AppConfig, WSHttp}
+import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,7 +42,8 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
   with MockitoSugar
   with AmlsReferenceNumberGenerator
   with UserDetailsGenerator
-  with BaseGenerator {
+  with BaseGenerator
+  with OneAppPerSuite {
 
   trait Fixture {
 
@@ -49,8 +53,9 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     val http = mock[WSHttp]
     val appConfig = mock[AppConfig]
     val authConnector = mock[AuthConnector]
+    val auditConnector = mock[AuditConnector]
 
-    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector)
+    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector, auditConnector)
     val baseUrl = "http://enrolment-store:3001"
     val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
@@ -62,12 +67,16 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     when {
       authConnector.userDetails(any(), any(), any())
     } thenReturn Future.successful(userDetails)
+
+    val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
+
+    def jsonError(code: String, message: String): String = Json.toJson(ErrorResponse(code, message)).toString
+
   }
 
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
-        val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
         val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
@@ -77,17 +86,36 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
         whenReady(connector.enrol(enrolKey, enrolment)) { _ =>
           verify(authConnector).userDetails(any(), any(), any())
           verify(http).POST[EnrolmentStoreEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
 
       "throw an exception when no group identifier is available" in new Fixture {
-        val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
-
         when {
           authConnector.userDetails(any(), any(), any())
         } thenReturn Future.successful(userDetails.copy(groupIdentifier = None))
 
         intercept[Exception] {
+          await(connector.enrol(enrolKey, enrolment))
+        }
+      }
+
+      "throws a DuplicateEnrolmentException when the enrolment has already been created" in new Fixture {
+        when {
+          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
+
+        intercept[DuplicateEnrolmentException] {
+          await(connector.enrol(enrolKey, enrolment))
+        }
+      }
+
+      "throws a InvalidEnrolmentCredentialsException when the enrolment has the wrong type of role" in new Fixture {
+        when {
+          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
+
+        intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolKey, enrolment))
         }
       }
