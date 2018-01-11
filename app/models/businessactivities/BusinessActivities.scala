@@ -81,8 +81,8 @@ case class BusinessActivities(
       hasAccepted = hasAccepted && this.ncaRegistered.contains(p))
 
   def accountantForAMLSRegulations(p: Option[AccountantForAMLSRegulations]): BusinessActivities =
-    this.copy(accountantForAMLSRegulations = p, hasChanged = hasChanged || !this.accountantForAMLSRegulations.contains(p),
-      hasAccepted = hasAccepted && this.accountantForAMLSRegulations.contains(p))
+    this.copy(accountantForAMLSRegulations = p, hasChanged = hasChanged || !this.accountantForAMLSRegulations.equals(p),
+      hasAccepted = hasAccepted && this.accountantForAMLSRegulations.equals(p))
 
   def riskAssessmentPolicy(p: RiskAssessmentPolicy): BusinessActivities =
     this.copy(riskAssessmentPolicy = Some(p), hasChanged = hasChanged || !this.riskAssessmentPolicy.contains(p),
@@ -92,9 +92,9 @@ case class BusinessActivities(
     this.copy(howManyEmployees = Some(p), hasChanged = hasChanged || !this.howManyEmployees.contains(p),
       hasAccepted = hasAccepted && this.howManyEmployees.contains(p))
 
-  def whoIsYourAccountant(p: WhoIsYourAccountant): BusinessActivities =
-    this.copy(whoIsYourAccountant = Some(p), hasChanged = hasChanged || !this.whoIsYourAccountant.contains(p),
-      hasAccepted = hasAccepted && this.whoIsYourAccountant.contains(p))
+  def whoIsYourAccountant(p: Option[WhoIsYourAccountant]): BusinessActivities =
+    this.copy(whoIsYourAccountant = p, hasChanged = hasChanged || !this.whoIsYourAccountant.equals(p),
+      hasAccepted = hasAccepted && this.whoIsYourAccountant.equals(p))
 
   def taxMatters(p: TaxMatters): BusinessActivities =
     this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p),
