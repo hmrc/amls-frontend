@@ -18,7 +18,7 @@ package services
 
 import config.AppConfig
 import connectors.AmlsConnector
-import exceptions.NoEnrolmentException
+import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models._
@@ -41,6 +41,7 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.libs.json.Json
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
@@ -51,7 +52,7 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 
 class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite
   with ResponsiblePersonGenerator
@@ -188,6 +189,52 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
           }
         }
       }
+
+      "throw a DuplicateSubscriptionException when a 422 is returned from AMLS" in new Fixture {
+        when(config.enrolmentStoreToggle) thenReturn true
+
+        when {
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+        } thenReturn Future.failed(
+          Upstream4xxResponse(Json.toJson(SubscriptionErrorResponse(amlsRegistrationNumber, "An error occurred")).toString(),
+            UNPROCESSABLE_ENTITY,
+            UNPROCESSABLE_ENTITY))
+
+        intercept[DuplicateSubscriptionException] {
+          await(submissionService.subscribe)
+        }
+
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+      }
+
+      "throw the original error if 422 encountered without a json body" in new Fixture {
+        when(config.enrolmentStoreToggle) thenReturn true
+
+        when {
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY))
+
+        intercept[Upstream4xxResponse] {
+          await(submissionService.subscribe)
+        }
+
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+      }
+
+      "throw the original error if something other than a duplicate subscription is encountered" in new Fixture {
+        when(config.enrolmentStoreToggle) thenReturn true
+
+        when {
+          submissionService.amlsConnector.subscribe(any(), eqTo(safeId))(any(), any(), any(), any(), any())
+        } thenReturn Future.failed(Upstream4xxResponse("Some other kind of error occurred", BAD_REQUEST, BAD_REQUEST))
+
+        intercept[Upstream4xxResponse] {
+          await(submissionService.subscribe)
+        }
+
+        verify(submissionService.authEnrolmentsService, never).enrol(any(), any())(any(), any(), any())
+      }
+
     }
 
     "update is called" must {
