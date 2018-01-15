@@ -269,7 +269,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return BusinessActivities with accountantForAMLSRegulations set and indicate that changes have been made" in {
-      val result = initial.accountantForAMLSRegulations(NewAccountantForAMLSRegulations)
+      val result = initial.accountantForAMLSRegulations(Some(NewAccountantForAMLSRegulations))
       result must be(BusinessActivities(None, None, None, None, None, None, None, Some(NewAccountantForAMLSRegulations), hasChanged = true))
     }
 
@@ -285,7 +285,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return BusinessActivities with WhoIsYourAccountant set and indicate that changes have been made" in {
-      val result = initial.whoIsYourAccountant(NewWhoIsYourAccountant)
+      val result = initial.whoIsYourAccountant(Some(NewWhoIsYourAccountant))
       result must be(BusinessActivities(whoIsYourAccountant = Some(NewWhoIsYourAccountant), hasChanged = true))
     }
 
@@ -425,7 +425,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "accountantForAMLSRegulations value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.accountantForAMLSRegulations(DefaultAccountantForAMLSRegulations)
+          val res = completeModel.accountantForAMLSRegulations(Some(DefaultAccountantForAMLSRegulations))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -433,7 +433,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.accountantForAMLSRegulations(NewAccountantForAMLSRegulations)
+          val res = completeModel.accountantForAMLSRegulations(Some(NewAccountantForAMLSRegulations))
           res.hasChanged must be(true)
           res.accountantForAMLSRegulations must be(Some(NewAccountantForAMLSRegulations))
         }
@@ -461,7 +461,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "whoIsYourAccountant value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.whoIsYourAccountant(DefaultWhoIsYourAccountant)
+          val res = completeModel.whoIsYourAccountant(Some(DefaultWhoIsYourAccountant))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -469,7 +469,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.whoIsYourAccountant(NewWhoIsYourAccountant)
+          val res = completeModel.whoIsYourAccountant(Some(NewWhoIsYourAccountant))
           res.hasChanged must be(true)
           res.whoIsYourAccountant must be(Some(NewWhoIsYourAccountant))
         }

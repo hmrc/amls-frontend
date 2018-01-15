@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.businessactivities.BusinessActivities
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{AccountancyServices, BusinessMatching}
 import services.StatusService
 import utils.ControllerHelper
 import views.html.businessactivities.summary
@@ -45,8 +45,10 @@ trait SummaryController extends BaseController {
             cache <- optionalCache
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
+            bmActivities <- businessMatching.activities
           } yield {
-            ControllerHelper.allowedToEdit map(isEditable => Ok(summary(EmptyForm, businessActivity, businessMatching.activities, isEditable)))
+            val hideReceiveAdvice = bmActivities.businessActivities.contains(AccountancyServices)
+            ControllerHelper.allowedToEdit map(isEditable => Ok(summary(EmptyForm, businessActivity, businessMatching.activities, isEditable, hideReceiveAdvice)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
