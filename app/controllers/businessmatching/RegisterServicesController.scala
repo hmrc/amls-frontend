@@ -111,12 +111,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def accountantForAMLSRegulationsRequired(businessActivities: BusinessActivities): Boolean =
-    (businessActivities.businessActivities contains AccountancyServices)
+    businessActivities.businessActivities contains AccountancyServices
 
-  private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] = {
-    Future.successful(activities.whoIsYourAccountant(None))
-    Future.successful(activities.accountantForAMLSRegulations(None).copy(hasAccepted = true))
-  }
+  private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] =
+    Future.successful(activities.whoIsYourAccountant(None).accountantForAMLSRegulations(None).copy(hasAccepted = true))
 
   private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier) = {
     dataCacheConnector.save[ba](ba.key, activities)

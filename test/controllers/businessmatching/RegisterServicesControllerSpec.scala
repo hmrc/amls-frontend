@@ -21,7 +21,8 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
-import models.businessmatching._
+import models.businessactivities.BusinessActivities
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -37,7 +38,6 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-import org.scalacheck.Gen
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -68,7 +68,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
     val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
     val activityData2: Set[BusinessActivity] = Set(HighValueDealing, MoneyServiceBusiness)
 
-    val businessActivities1 = BusinessActivities(activityData1)
+    val businessActivities1 = BMBusinessActivities(activityData1)
 
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
@@ -104,6 +104,9 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
     mockCacheSave[Seq[ResponsiblePeople]]
+
+    mockCacheFetch[BusinessActivities](Some(BusinessActivities()), Some(BusinessActivities.key))
+    mockCacheSave[BusinessActivities]
 
   }
 
@@ -144,7 +147,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
         "redirect to SummaryController" when {
           "edit is false" in new Fixture {
 
-            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+            val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData1)
             val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -162,7 +165,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
           "edit is true" in new Fixture {
 
-            val businessActivitiesWithData = BusinessActivities(businessActivities = activityData2)
+            val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData2)
             val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -182,7 +185,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
         "redirect to ServicesController" when {
           "msb is selected" in new Fixture {
 
-            val businessActivities = BusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
+            val businessActivities = BMBusinessActivities(businessActivities = Set(HighValueDealing, MoneyServiceBusiness))
             val bm = BusinessMatching(None, Some(businessActivities))
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -202,7 +205,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
       "request data is invalid" must {
         "return BAD_REQUEST" in new Fixture {
 
-          val businessActivitiesWithData = BusinessActivities(businessActivities = activityData1)
+          val businessActivitiesWithData = BMBusinessActivities(businessActivities = activityData1)
           val businessMatchingWithData = BusinessMatching(None, Some(businessActivitiesWithData))
 
           val newRequest = request.withFormUrlEncodedBody(
@@ -228,7 +231,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
             val (newActivities, existing) = controller invokePrivate getActivityValues(EmptyForm, true, None)
 
             activities foreach { act =>
-              newActivities must contain(BusinessActivities.getValue(act))
+              newActivities must contain(BMBusinessActivities.getValue(act))
             }
 
             existing must be(empty)
@@ -239,10 +242,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper
             val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
             val (newActivities, existing) =
-              controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities1), true, Some(activityData1))
+              controller invokePrivate getActivityValues(Form2[BMBusinessActivities](businessActivities1), true, Some(activityData1))
 
             activities foreach { act =>
-              newActivities must contain(BusinessActivities.getValue(act))
+              newActivities must contain(BMBusinessActivities.getValue(act))
             }
 
             existing must be(empty)
@@ -263,10 +266,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper
               val getActivityValues = PrivateMethod[(Set[String], Set[String])]('getActivityValues)
 
               val (newActivities, existing) =
-                controller invokePrivate getActivityValues(Form2[BusinessActivities](businessActivities), false, Some(activityData))
+                controller invokePrivate getActivityValues(Form2[BMBusinessActivities](businessActivities), false, Some(activityData))
 
-              newActivities must not contain BusinessActivities.getValue(act)
-              existing must be(Set(BusinessActivities.getValue(act)))
+              newActivities must not contain BMBusinessActivities.getValue(act)
+              existing must be(Set(BMBusinessActivities.getValue(act)))
 
             }
 
@@ -282,7 +285,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(TrustAndCompanyServices), None))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(TrustAndCompanyServices), None))
 
             result must be(true)
 
@@ -291,7 +294,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(MoneyServiceBusiness), None))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(MoneyServiceBusiness), None))
 
             result must be(true)
 
@@ -301,7 +304,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
 
             result must be(true)
 
@@ -310,7 +313,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
 
             result must be(true)
 
@@ -323,7 +326,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), None))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), None))
 
             result must be(false)
 
@@ -334,7 +337,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-            val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))
 
             result must be(false)
 
@@ -382,14 +385,14 @@ class RegisterServicesControllerSpec extends GenericTestHelper
         } thenReturn Future.successful(false)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
-          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+          "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BMBusinessActivities.getValue(TelephonePaymentService)
         ))
 
         status(result) must be(SEE_OTHER)
 
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
-            BusinessActivities(activityData1, Some(Set(HighValueDealing, TelephonePaymentService)))
+          BMBusinessActivities(activityData1, Some(Set(HighValueDealing, TelephonePaymentService)))
         )))(any(),any(),any())
 
       }
@@ -406,14 +409,14 @@ class RegisterServicesControllerSpec extends GenericTestHelper
         } thenReturn Future.successful(true)
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing),
-          "businessActivities[1]" -> BusinessActivities.getValue(TelephonePaymentService)
+          "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing),
+          "businessActivities[1]" -> BMBusinessActivities.getValue(TelephonePaymentService)
         ))
 
         status(result) must be(SEE_OTHER)
 
         verify(controller.businessMatchingService).updateModel(eqTo(businessMatching1.activities(
-          BusinessActivities(Set(HighValueDealing, TelephonePaymentService))
+          BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))
         )))(any(),any(),any())
 
       }
@@ -423,10 +426,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness, HighValueDealing)))))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(HighValueDealing)
+          "businessActivities[0]" -> BMBusinessActivities.getValue(HighValueDealing)
         ))
 
         status(result) must be(SEE_OTHER)
@@ -445,12 +448,12 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(HighValueDealing)))))
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(HighValueDealing)))))
 
         mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePeople.key))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
+          "businessActivities[0]" -> BMBusinessActivities.getValue(TrustAndCompanyServices)
         ))
 
         status(result) must be(SEE_OTHER)
@@ -467,10 +470,10 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
         when {
           controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness)))))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
-          "businessActivities[0]" -> BusinessActivities.getValue(TrustAndCompanyServices)
+          "businessActivities[0]" -> BMBusinessActivities.getValue(TrustAndCompanyServices)
         ))
 
         status(result) must be(SEE_OTHER)
