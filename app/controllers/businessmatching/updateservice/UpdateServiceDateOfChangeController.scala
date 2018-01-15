@@ -138,7 +138,7 @@ class UpdateServiceDateOfChangeController @Inject()(
     (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
 
   private def accountantForAMLSRegulationsRequired(businessActivities: BusinessActivities): Boolean =
-    (businessActivities.businessActivities contains AccountancyServices)
+    businessActivities.businessActivities contains AccountancyServices
 
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[Seq[ResponsiblePeople]] = {
     dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople) map { _ =>

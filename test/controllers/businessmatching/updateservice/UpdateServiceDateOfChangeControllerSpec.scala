@@ -22,34 +22,32 @@ import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.asp.Asp
-import models.businessmatching._
-import models.hvd.Hvd
-import models.supervision.Supervision
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessactivities.BusinessActivities
 import models.estateagentbusiness.{EstateAgentBusiness => Eab}
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.responsiblepeople.ResponsiblePeople
-import models.tcsp.Tcsp
+import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.scalatest.{MustMatchers, PrivateMethodTester}
-import org.scalatest.mock.MockitoSugar
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import org.scalatest.{MustMatchers, PrivateMethodTester}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.{Result, Results}
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
-import services.{StatusService, TradingPremisesService}
 import services.businessmatching.BusinessMatchingService
+import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
   with MockitoSugar
@@ -95,6 +93,8 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
     mockCacheSave[Seq[ResponsiblePeople]]
+    mockCacheFetch[BusinessActivities](Some(BusinessActivities()), Some(BusinessActivities.key))
+    mockCacheSave[BusinessActivities]
 
   }
 
@@ -125,7 +125,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           when {
             mockBusinessMatchingService.getModel(any(),any(),any())
           } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-            activities = Some(BusinessActivities(Set(
+            activities = Some(BMBusinessActivities(Set(
               EstateAgentBusinessService,
               HighValueDealing
             )))
@@ -208,7 +208,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
           val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(TrustAndCompanyServices), None))
+          val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(TrustAndCompanyServices), None))
 
           result must be(true)
 
@@ -217,7 +217,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
           val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(MoneyServiceBusiness), None))
+          val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(MoneyServiceBusiness), None))
 
           result must be(true)
 
@@ -228,7 +228,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
           val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
-          val result = controller invokePrivate fitAndProperRequired(BusinessActivities(Set(HighValueDealing), None))
+          val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), None))
 
           result must be(false)
 
@@ -255,7 +255,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       when {
         mockBusinessMatchingService.getModel(any(),any(),any())
       } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-        activities = Some(BusinessActivities(Set(
+        activities = Some(BMBusinessActivities(Set(
           EstateAgentBusinessService,
           HighValueDealing,
           TelephonePaymentService
@@ -280,7 +280,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
 
       verify(mockBusinessMatchingService).updateModel(
         eqTo(BusinessMatching(
-          activities = Some(BusinessActivities(
+          activities = Some(BMBusinessActivities(
             Set(TelephonePaymentService),
             None,
             Some(Set(
@@ -334,7 +334,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
         when {
           mockBusinessMatchingService.getModel(any(),any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-          activities = Some(BusinessActivities(Set(
+          activities = Some(BMBusinessActivities(Set(
             EstateAgentBusinessService,
             HighValueDealing,
             TrustAndCompanyServices
