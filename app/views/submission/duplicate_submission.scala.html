@@ -1,0 +1,40 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import utils.Strings._
+@import config.{ApplicationConfig => appConfig}
+
+@(errorMessage: String)(implicit request: Request[_], m: Messages)
+
+@getHelpForm = {
+    @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
+}
+
+@header = {
+    @heading("error.submission.problem.title")
+}
+
+@main(m("error.submission.problem.title"), heading = header, showGetHelpForm = false) {
+
+    @m("error.submission.duplicate_submission.content").paragraphizeH
+
+    <div class="partial-deskpro-form" data-action-value="Submit my application" data-error-value="@errorMessage">
+        <div class="get-help-form">
+        @getHelpForm
+        </div>
+    </div>
+}

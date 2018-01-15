@@ -26,10 +26,10 @@ import play.api.Logger
 import play.api.libs.json.{JsObject, Json, Reads, Writes}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.http._
-import play.api.http.Status.OK
+import play.api.http.Status.UNPROCESSABLE_ENTITY
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost, HttpPut, HttpResponse, NotFoundException }
+import uk.gov.hmrc.http._
 
 trait AmlsConnector {
 

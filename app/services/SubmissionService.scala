@@ -46,7 +46,7 @@ import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
-
+import utils.Strings._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionService @Inject()
@@ -93,8 +93,8 @@ class SubmissionService @Inject()
         case _ => ""
       }))
     } yield subscription) recoverWith {
-      case e: Upstream4xxResponse if errorResponse(e).isDefined =>
-        Future.failed(errorResponse(e).map(r => DuplicateSubscriptionException(r.amlsRegNumber, r.message, e)).getOrElse(e))
+      case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+        Future.failed(DuplicateSubscriptionException)
     }
   }
 
