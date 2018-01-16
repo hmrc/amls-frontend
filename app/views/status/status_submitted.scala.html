@@ -47,6 +47,10 @@
                     <p class="heading-small">@Messages("status.business")</p>
                     <p>@bn</p>
                 }
+                @feeResponse.map { fees =>
+                    <p class="heading-small">@Messages("status.status"):</p>
+                    <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(fees.createdAt.toLocalDate))</p>
+                }
                 <p>
                     <a href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
                 </p>

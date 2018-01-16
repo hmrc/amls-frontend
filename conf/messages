@@ -502,6 +502,7 @@ status.title = Your registration
 status.business = Your business:
 status.referenceno = Anti-money laundering supervision registration number:
 status.incomplete = Incomplete
+status.status = Status
 status.complete = Completed
 status.notsubmitted = Not submitted
 status.submitted = Submitted

@@ -112,7 +112,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse))
 
-        val date = DateHelper.formatDate(LocalDate.now())
+        val date = DateHelper.formatDate(feeResponse.createdAt.toLocalDate)
         doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
           be(Messages("status.submittedForReview.submitteddate.text", date))
         doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
@@ -121,7 +121,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse), true, true)
 
-        val date = DateHelper.formatDate(LocalDate.now())
+        val date = DateHelper.formatDate(feeResponse.createdAt.toLocalDate)
         doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
           be(Messages("status.submittedForReview.submitteddate.text", date))
         doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.submissionreadyforreview.duplicate.link"))
