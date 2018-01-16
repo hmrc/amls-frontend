@@ -107,17 +107,6 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
-    "not show specific content when view input is none" in new ViewFixture {
-
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)
-
-      doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
-
-      doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
-      doc.getElementsContainingOwnText(Messages("status.fee.link")).isEmpty must be(true)
-      doc.getElementsByTag("details").html() must be("")
-    }
-
     "show specific content" when {
       "view input has feeData and submitted date" in new ViewFixture {
 
@@ -148,6 +137,18 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
 
         validateParagraphizedContent("status.submissionreadyforreview.bacs")
       }
+      "view input is none" in new ViewFixture {
+
+        def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)
+
+        doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
+
+        doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
+
+        doc.getElementsByTag("details").text() must include(Messages("fee.details.dup_nofees.heading"))
+
+      }
+
     }
 
   }
