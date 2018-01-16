@@ -76,7 +76,7 @@
             </ol>
         </div>
         <div class="grid-layout__column grid-layout__column--2-3">
-            @if(!fromDuplicateSubmission){
+            @if(!fromDuplicateSubmission & feeResponse.isDefined){
                 @include.status.rightpanel_submissionreadyforreview(feeResponse, showBacsContent)
             }else {
                 @include.status.rightpanel_submissionreadyforreview_dup(feeResponse)

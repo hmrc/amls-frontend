@@ -48,11 +48,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
   val cacheMap = mock[CacheMap]
 
-  override lazy val app = GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-withdrawal" -> true)
-    .configure("microservice.services.feature-toggle.change-officer" -> true)
-    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
-    .build()
+  override lazy val app = GuiceApplicationBuilder().build()
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -128,7 +124,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       "the application status is Ready For Review, and the user has elected to pay by BACS" in new Fixture {
         val paymentRef = paymentRefGen.sample.get
         val payment = paymentGen.sample.get.copy(isBacs = Some(true))
-        val feeResponse = mock[FeeResponse]
 
         when(controller.feeConnector.feeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any(), any()))
           .thenReturn(Future.successful(feeResponse))
@@ -763,63 +758,3 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     }
   }
 }
-
-class StatusControllerWithoutDeRegisterSpec extends GenericTestHelper with OneAppPerSuite {
-
-  override lazy val app = GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> false)
-    .build()
-
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
-
-    val request = addToken(authRequest)
-    val cacheMap = mock[CacheMap]
-
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-    }
-
-    val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-      Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
-
-    val statusResponse = mock[ReadStatusResponse]
-    when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
-    when(statusResponse.safeId).thenReturn(None)
-
-    when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-      .thenReturn(
-        Some(BusinessMatching(Some(reviewDetails), None)))
-
-    when(controller.landingService.cacheMap(any(), any(), any()))
-      .thenReturn(Future.successful(Some(cacheMap)))
-
-    when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-      .thenReturn(Future.successful(None))
-
-    when(controller.statusService.getDetailedStatus(any(), any(), any()))
-      .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
-
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())), Some(ResponsiblePeople.key))
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
-    mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails))), Some(BusinessMatching.key))
-  }
-
-  "The status controller" must {
-    "not show the deregister link" in new Fixture {
-      val result = controller.get()(request)
-      val doc = Jsoup.parse(contentAsString(result))
-
-      Option(doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").first()) must not be defined
-    }
-  }
-}
-
