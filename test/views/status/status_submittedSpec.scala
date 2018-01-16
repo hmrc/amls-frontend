@@ -144,7 +144,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
       "the user has elected to pay by BACS" in new ViewFixture {
         val form2 = EmptyForm
 
-        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None, showBacsContent = true)
+        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse), showBacsContent = true)
 
         validateParagraphizedContent("status.submissionreadyforreview.bacs")
       }
