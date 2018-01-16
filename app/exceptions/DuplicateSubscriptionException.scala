@@ -16,4 +16,4 @@
 
 package exceptions
 
-case object DuplicateSubscriptionException extends Throwable
+case class DuplicateSubscriptionException(message: String) extends Throwable(message)

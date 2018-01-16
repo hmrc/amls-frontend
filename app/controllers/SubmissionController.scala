@@ -63,9 +63,9 @@ trait SubmissionController extends BaseController {
         case _: DuplicateEnrolmentException =>
           Logger.info("[SubmissionController][post] handling DuplicateEnrolmentException")
           Future.successful(Ok(views.html.submission.duplicate_enrolment()))
-        case DuplicateSubscriptionException =>
+        case e: DuplicateSubscriptionException =>
           Logger.info("[SubmissionController][post] handling DuplicateSubscriptionException")
-          Future.successful(Ok(views.html.submission.duplicate_submission("")))
+          Future.successful(Ok(views.html.submission.duplicate_submission(e.message)))
         case _: InvalidEnrolmentCredentialsException =>
           Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
           Future.successful(Ok(views.html.submission.wrong_credential_type()))

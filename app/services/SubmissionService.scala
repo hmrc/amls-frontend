@@ -94,7 +94,7 @@ class SubmissionService @Inject()
       }))
     } yield subscription) recoverWith {
       case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
-        Future.failed(DuplicateSubscriptionException)
+        Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
     }
   }
 

@@ -154,7 +154,7 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures with 
 
       when {
         controller.subscriptionService.subscribe(any(), any(), any())
-      } thenReturn Future.failed(DuplicateSubscriptionException(amlsRegistrationNumber, msg, Upstream4xxResponse(msg, UNPROCESSABLE_ENTITY, UNPROCESSABLE_ENTITY)))
+      } thenReturn Future.failed(DuplicateSubscriptionException(msg))
 
       when {
         controller.statusService.getStatus(any(), any(), any())
