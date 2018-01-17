@@ -18,9 +18,10 @@ package services
 
 import javax.inject.Inject
 
+import com.fasterxml.jackson.core.JsonParseException
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
-import exceptions.NoEnrolmentException
+import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
@@ -38,12 +39,14 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
-import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRequest, SubscriptionResponse}
+import models._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
+import play.api.http.Status.UNPROCESSABLE_ENTITY
+import play.api.libs.json.Json
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
-
+import utils.Strings._
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionService @Inject()
@@ -63,13 +66,23 @@ class SubmissionService @Inject()
       ggService.enrol(amlsRegistrationNumber, safeId, postcode)
     }
 
+  private def errorResponse(response: Upstream4xxResponse): Option[SubscriptionErrorResponse] = response match {
+    case e if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+      try {
+        Json.parse(e.getMessage).asOpt[SubscriptionErrorResponse]
+      } catch {
+        case _: JsonParseException => None
+      }
+    case _ => None
+  }
+
   def subscribe
   (implicit
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
   ): Future[SubscriptionResponse] = {
-    for {
+    (for {
       cache <- getCache
       safeId <- safeId(cache)
       request <- Future.successful(createSubscriptionRequest(cache))
@@ -79,7 +92,10 @@ class SubmissionService @Inject()
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
       }))
-    } yield subscription
+    } yield subscription) recoverWith {
+      case e: Upstream4xxResponse if e.upstreamResponseCode == UNPROCESSABLE_ENTITY =>
+        Future.failed(SubscriptionErrorResponse.from(e).fold[Throwable](e)(r => DuplicateSubscriptionException(r.message)))
+    }
   }
 
   private def createSubscriptionRequest
