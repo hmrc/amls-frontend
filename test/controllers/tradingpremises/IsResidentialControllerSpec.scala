@@ -20,10 +20,11 @@ import models.businessmatching.BusinessMatching
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => meq}
+import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
@@ -45,6 +46,8 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
     mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
 
     val controller = new IsResidentialController(messagesApi, self.authConnector, mockCacheConnector)
+
+    mockCacheSave[Seq[TradingPremises]]
   }
 
   "IsResidentialController" when {
@@ -98,55 +101,60 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
 
     "post is called" must {
 
-      "redirect to next page on valid input" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
-          "isResidential" -> "true"
-        )
+      "on valid request" must {
 
-        mockCacheGetEntry[Seq[TradingPremises]](
-          Some(Seq(TradingPremises(yourTradingPremises = ytp))),
-          TradingPremises.key
-        )
-        mockCacheSave[Seq[TradingPremises]]
+        "redirect to WhatDoesYourBusinessDoController" in new Fixture {
+          val postRequest = request.withFormUrlEncodedBody(
+            "isResidential" -> "true"
+          )
 
-        val result = controller.post(1)(postRequest)
+          mockCacheGetEntry[Seq[TradingPremises]](
+            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            TradingPremises.key
+          )
 
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1, false).url))
-      }
+          val result = controller.post(1)(postRequest)
 
-      "redirect to next page on valid input in edit mode" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
-          "isResidential" -> "false"
-        )
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1).url))
+        }
 
-        val updatedYtp = Some(YourTradingPremises("foo",
-          Address("1","2",None,None,"AA1 1BB",None), Some(false), Some(new LocalDate(2010, 10, 10)), None))
-        val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
-        val tp = TradingPremises(yourTradingPremises = ytp)
+        "redirect to SummaryController in edit mode" in new Fixture {
+          val postRequest = request.withFormUrlEncodedBody(
+            "isResidential" -> "false"
+          )
 
-        mockCacheGetEntry[Seq[TradingPremises]](
-          Some(Seq(TradingPremises(yourTradingPremises = ytp))),
-          TradingPremises.key
-        )
-        mockCacheSave[Seq[TradingPremises]]
+          val updatedYtp = Some(YourTradingPremises("foo",
+            Address("1", "2", None, None, "AA1 1BB", None), Some(false), Some(new LocalDate(2010, 10, 10)), None))
+          val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
+          val tp = TradingPremises(yourTradingPremises = ytp)
 
-        val result = controller.post(1, true)(postRequest)
+          mockCacheGetEntry[Seq[TradingPremises]](
+            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            TradingPremises.key
+          )
 
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
+          val result = controller.post(1, true)(postRequest)
 
-      }
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
 
-      "respond with BAD_REQUEST for invalid form" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody(
-          "isResidential" -> ""
-        )
-
-        val result = controller.post(1)(postRequest)
-        status(result) must be(BAD_REQUEST)
+        }
 
       }
+
+      "on invalid request" must {
+        "respond with BAD_REQUEST" in new Fixture {
+          val postRequest = request.withFormUrlEncodedBody(
+            "isResidential" -> ""
+          )
+
+          val result = controller.post(1)(postRequest)
+          status(result) must be(BAD_REQUEST)
+
+        }
+      }
+
     }
 
     "isFirstTradingPremises is called" must {
@@ -218,4 +226,40 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
       }
     }
   }
+
+  it must {
+
+    "save an updated Trading Premises model" in new Fixture {
+      val postRequest = request.withFormUrlEncodedBody(
+        "isResidential" -> "true"
+      )
+
+      override val ytp = Some(YourTradingPremises(
+        "foo",
+        Address("1","2",None,None,"AA1 1BB",None),
+        Some(false),
+        Some(new LocalDate(2010, 10, 10)),
+        None
+      ))
+
+      val tradingPremises = Seq(TradingPremises(
+        yourTradingPremises = ytp,
+        hasChanged = true
+      ))
+
+      mockCacheGetEntry[Seq[TradingPremises]](
+        Some(tradingPremises),
+        TradingPremises.key
+      )
+
+      val result = controller.post(1)(postRequest)
+
+      status(result) must be(SEE_OTHER)
+
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), eqTo(tradingPremises))(any(),any(),any())
+
+    }
+
+  }
+
 }
