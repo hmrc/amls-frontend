@@ -29,13 +29,14 @@ import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
 import exceptions._
+import generators.AmlsReferenceNumberGenerator
 import views.ParagraphHelpers
 import org.jsoup._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HttpResponse, Upstream5xxResponse }
+import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 
-class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
+class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -148,7 +149,26 @@ class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures {
       validateParagraphizedContent("error.submission.duplicate_enrolment.content")
     }
 
-    "show the correct help page when an invalid enrolment credentials error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
+    "show the correct help page when a duplicate subscription error is encountered" in new Fixture with ParagraphHelpers {
+      val msg = "HMRC-MLR-ORG duplicate subscription"
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(DuplicateSubscriptionException(msg))
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe OK
+
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateParagraphizedContent("error.submission.duplicate_submission.content")
+    }
+
+    "show the correct help page when an error is encountered while trying to enrol the user" in new Fixture with ParagraphHelpers {
       val msg = "invalid credentials"
 
       when {
