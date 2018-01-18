@@ -35,8 +35,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
 
     val request = addToken(authRequest)
 
-    val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
-    val ytp = Some(ytpModel)
+    val ytp = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), Some(true), Some(new LocalDate(2010, 10, 10)), None)
 
     val pageTitle = Messages("tradingpremises.isResidential.title", "firstname lastname") + " - " +
       Messages("summary.tradingpremises") + " - " +
@@ -58,7 +57,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         "with empty form" in new Fixture {
 
           mockCacheGetEntry[Seq[TradingPremises]](
-            Some(Seq(TradingPremises(yourTradingPremises = Some(ytpModel.copy(isResidential = None))))),
+            Some(Seq(TradingPremises(yourTradingPremises = Some(ytp.copy(isResidential = None))))),
             TradingPremises.key
           )
 
@@ -73,7 +72,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         "with pre - populated data form" in new Fixture {
 
           mockCacheGetEntry[Seq[TradingPremises]](
-            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),
             TradingPremises.key
           )
 
@@ -109,7 +108,7 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
           )
 
           mockCacheGetEntry[Seq[TradingPremises]](
-            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),
             TradingPremises.key
           )
 
@@ -127,10 +126,10 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
           val updatedYtp = Some(YourTradingPremises("foo",
             Address("1", "2", None, None, "AA1 1BB", None), Some(false), Some(new LocalDate(2010, 10, 10)), None))
           val updatedTp = TradingPremises(yourTradingPremises = updatedYtp)
-          val tp = TradingPremises(yourTradingPremises = ytp)
+          val tp = TradingPremises(yourTradingPremises = Some(ytp))
 
           mockCacheGetEntry[Seq[TradingPremises]](
-            Some(Seq(TradingPremises(yourTradingPremises = ytp))),
+            Some(Seq(TradingPremises(yourTradingPremises = Some(ytp)))),
             TradingPremises.key
           )
 
@@ -234,18 +233,15 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
         "isResidential" -> "true"
       )
 
-      override val ytp = Some(YourTradingPremises(
+      override val ytp = YourTradingPremises(
         "foo",
         Address("1","2",None,None,"AA1 1BB",None),
         Some(false),
         Some(new LocalDate(2010, 10, 10)),
         None
-      ))
+      )
 
-      val tradingPremises = Seq(TradingPremises(
-        yourTradingPremises = ytp,
-        hasChanged = true
-      ))
+      val tradingPremises = Seq(TradingPremises(yourTradingPremises = Some(ytp)))
 
       mockCacheGetEntry[Seq[TradingPremises]](
         Some(tradingPremises),
@@ -256,7 +252,10 @@ class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures wi
 
       status(result) must be(SEE_OTHER)
 
-      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), eqTo(tradingPremises))(any(),any(),any())
+      verify(controller.dataCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), eqTo(Seq(TradingPremises(
+        yourTradingPremises = Some(ytp.copy(isResidential = Some(true))),
+        hasChanged = true
+      ))))(any(),any(),any())
 
     }
 
