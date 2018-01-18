@@ -263,7 +263,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.ApplicationApproval", new LocalDate(2018, 7, 31), "ABC1234")
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.ApplicationApproval",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url,
+          "ABC1234")
       }
 
       "contact type is RenewalApproval" in new Fixture {
@@ -279,7 +283,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.RenewalApproval", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.RenewalApproval",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "contact type is AutoExpiryOfRegistration" in new Fixture {
@@ -295,7 +303,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.AutoExpiryOfRegistration", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.AutoExpiryOfRegistration",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "contact type is RenewalReminder" in new Fixture {
@@ -311,7 +323,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.RenewalReminder", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.RenewalReminder",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "content message is ETMP markdown" in new Fixture {
