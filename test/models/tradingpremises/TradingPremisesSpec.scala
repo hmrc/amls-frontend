@@ -123,7 +123,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
       "given 'your trading premises' data" in {
         val tp = TradingPremises(None, None, None)
-        val newTP = tp.yourTradingPremises(ytp)
+        val newTP = tp.yourTradingPremises(Some(ytp))
         newTP must be(tp.copy(yourTradingPremises = Some(ytp), hasChanged = true))
       }
 
