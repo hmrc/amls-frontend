@@ -1940,13 +1940,13 @@ notification.static.text.ApplicationAutorejectionForFailureToPay = <p>Your appli
 <p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
 if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
 <p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from \
-<a href="{0}">your account status page</a>.</p>
+your account <a href="{0}">status page</a>.</p>
 
 notification.static.text.RegistrationVariationApproval = <p>The recent changes made to your details have been approved.</p>\
-<p>You can find details of your registration on <a href="{0}">your status page</a>.</p>
+<p>You can find details of your registration on your <a href="{0}">status page</a>.</p>
 
 notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your anti-money laundering supervision ended has been changed.</p>\
-<p>You can see the new effective date on <a href="{0}">your status page</a>.</p>
+<p>You can see the new effective date on your <a href="{0}">status page</a>.</p>
 
 notification.reminder.to.pay.ReminderToPayForVariation = <p>You need to pay {0} for the recent changes made to your details.</p>\
 <p>Your payment reference is: {1}.</p>\
@@ -1970,16 +1970,16 @@ notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay 
 
 notification.message.with.end.date.ApplicationApproval = <p>Your application to register has been approved. You’re now registered until {0}.</p>\
 <p>Your anti-money laundering registration number is: {2}.</p>\
-<p>You can find details of your registration on <a href="{1}">your status page</a>.</p>
+<p>You can find details of your registration on your <a href="{1}">status page</a>.</p>
 
 notification.message.with.end.date.RenewalApproval = <p>Your renewal has been approved. You’re now registered for supervision until {0}.</p>\
-<p>You can find details of your registration on <a href="{1}">your status page</a>.</p>
+<p>You can find details of your registration on your <a href="{1}">status page</a>.</p>
 
 notification.message.with.end.date.AutoExpiryOfRegistration = <p>Your registration to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 expired on {0}.</p>\
 <p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a> \
  if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>\
-<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from <a href="{1}">your status page</a>.</p>
+<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your <a href="{1}">status page</a>.</p>
 
 notification.message.with.end.date.RenewalReminder = <p>You need to renew your registration before {0}.</p>\
-<p>You can renew from <a href="{1}">your status page</a>.</p>\
+<p>You can renew from your <a href="{1}">status page</a>.</p>\
 <p>If you don’t renew and pay your fees before this date your registration will expire and you won’t be supervised by HM Revenue and Customs.</p>
