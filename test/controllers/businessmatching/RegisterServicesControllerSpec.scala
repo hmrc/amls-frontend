@@ -478,9 +478,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
-
-        verifyNoMoreInteractions(mockCacheConnector)
+        verify(mockCacheConnector).fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
 
       }
     }

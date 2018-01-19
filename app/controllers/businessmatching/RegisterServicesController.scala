@@ -89,7 +89,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               )
               businessActivities <- dataCacheConnector.fetch[ba](ba.key)
               baWithoutAccountantForAMLSRegulations <- withoutAccountantForAMLSRegulations(businessActivities)
-              _ <- maybeRemoveAccountantForAMLSRegulations(baWithoutAccountantForAMLSRegulations, savedModel)
+              _ <- maybeRemoveAccountantForAMLSRegulations(baWithoutAccountantForAMLSRegulations, savedModel, businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePeople] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -110,7 +110,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def accountantForAMLSRegulationsRequired(businessActivities: BusinessActivities): Boolean =
+  private def accountantForAMLSRegulationsNotRequired(businessActivities: BusinessActivities): Boolean =
     businessActivities.businessActivities contains AccountancyServices
 
   private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] =
@@ -120,12 +120,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     dataCacheConnector.save[ba](ba.key, activities)
   }
 
-  private def maybeRemoveAccountantForAMLSRegulations(activites: ba, businessActivities: BusinessActivities)
+  private def maybeRemoveAccountantForAMLSRegulations(activitesWithoutAccountantForAMLSRegulations: ba,
+                                                      businessActivities: BusinessActivities,
+                                                      activities: ba)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) =
-    if(accountantForAMLSRegulationsRequired(businessActivities)){
-      Future.successful(activites)
+    if(accountantForAMLSRegulationsNotRequired(businessActivities) && (activities == None)){
+      removeAccountantForAMLSRegulations(activitesWithoutAccountantForAMLSRegulations)
     } else {
-      removeAccountantForAMLSRegulations(activites)
+      Future.successful(activities)
     }
 
   private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
