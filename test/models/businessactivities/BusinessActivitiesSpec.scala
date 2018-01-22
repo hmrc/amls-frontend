@@ -21,6 +21,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
 import play.api.test.FakeApplication
+import models.businessmatching.{BusinessActivities => ba, _}
 
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
@@ -68,6 +69,8 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
   )
   val NewTaxMatters = TaxMatters(true)
 
+  val bmBusinessActivitiesWithoutASP = ba(Set(EstateAgentBusinessService))
+
   val completeModel = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
@@ -100,6 +103,25 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     howManyEmployees = Some(DefaultHowManyEmployees),
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = Some(DefaultWhoIsYourAccountant),
+    taxMatters = Some(DefaultTaxMatters),
+    transactionRecordTypes = Some(DefaultTransactionRecordTypes),
+    hasChanged = false,
+    hasAccepted = true
+  )
+
+  val completeModelWithoutAccountantAdvice = BusinessActivities(
+    involvedInOther = Some(DefaultInvolvedInOther),
+    expectedBusinessTurnover = Some(DefaultBusinessTurnover),
+    expectedAMLSTurnover = Some(DefaultAMLSTurnover),
+    businessFranchise = Some(DefaultBusinessFranchise),
+    transactionRecord = Some(DefaultTransactionRecord),
+    customersOutsideUK = None,
+    ncaRegistered = Some(DefaultNCARegistered),
+    accountantForAMLSRegulations = None,
+    riskAssessmentPolicy = Some(DefaultRiskAssessments),
+    howManyEmployees = Some(DefaultHowManyEmployees),
+    identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
+    whoIsYourAccountant = None,
     taxMatters = Some(DefaultTaxMatters),
     transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
@@ -197,14 +219,18 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
   "isComplete" must {
     "return false when the model is incomplete" in {
-      partialModel.isComplete must be(false)
+      partialModel.isComplete(None) must be(false)
     }
     "return true when the model is complete" in {
-      completeModel.isComplete must be(true)
+      completeModel.isComplete(None) must be(true)
     }
 
     "return true when the CustomersOutsideUK is none" in {
-      completeModelWithoutCustUK.isComplete must be(true)
+      completeModelWithoutCustUK.isComplete(None) must be(true)
+    }
+
+    "return false when the accountantForAMLSRegulations is none and BM activities does not include ASP" in {
+      completeModelWithoutAccountantAdvice.isComplete(Some(bmBusinessActivitiesWithoutASP)) must be(false)
     }
   }
 

@@ -20,6 +20,8 @@ import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.businessactivities.TransactionTypes._
+import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => ba}
+import utils.ControllerHelper
 
 case class BusinessActivities(
                                involvedInOther: Option[InvolvedInOther] = None,
@@ -101,12 +103,20 @@ case class BusinessActivities(
       hasAccepted = hasAccepted && this.taxMatters.contains(p))
 
 
-  def isComplete: Boolean = {
+  def isComplete(bmBusinessActivities : Option[ba]): Boolean = {
+
+    val containsASP = bmBusinessActivities.fold(false) { x =>
+      x.businessActivities contains AccountancyServices
+    }
+
     if (ApplicationConfig.hasAcceptedToggle) {
       this match {
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) => true
+        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP => true
+        case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
         Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, false) => false
@@ -116,7 +126,10 @@ case class BusinessActivities(
       this match {
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, _) => true
+        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _) if !containsASP => true
+        case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, _) if containsASP => true
         case _ => false
       }
     }
@@ -129,9 +142,10 @@ object BusinessActivities {
   def section(implicit cache: CacheMap): Section = {
     val messageKey = "businessactivities"
     val notStarted = Section(messageKey, NotStarted, false, controllers.businessactivities.routes.WhatYouNeedController.get())
+    val bmBusinessActivities = ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
     cache.getEntry[BusinessActivities](key).fold(notStarted) {
       model =>
-        if (model.isComplete) {
+        if (model.isComplete(bmBusinessActivities)) {
           Section(messageKey, Completed, model.hasChanged, controllers.businessactivities.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.businessactivities.routes.WhatYouNeedController.get())
