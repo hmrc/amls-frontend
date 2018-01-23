@@ -17,7 +17,7 @@
 package utils
 
 import generators.PaymentGenerator
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
@@ -65,7 +65,7 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
 
       when {
         broker.submissionResponseService.getSubmissionData(eqTo(status))(any(), any(), any())
-      } thenReturn Future.successful(Some((paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], Left(amlsRegistrationNumber))))
+      } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], Some(amlsRegistrationNumber), None)))
 
       whenReady(broker.get.value) { r => r mustBe Some(amlsRegistrationNumber) }
 
@@ -81,7 +81,7 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
 
       when {
         broker.submissionResponseService.getSubmissionData(eqTo(status))(any(), any(), any())
-      } thenReturn Future.successful(Some((paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], Right(Some(Currency.fromInt(0))))))
+      } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], None, Some(Currency.fromInt(0)))))
 
       when {
         broker.authEnrolmentsService.amlsRegistrationNumber(any(), any(), any())

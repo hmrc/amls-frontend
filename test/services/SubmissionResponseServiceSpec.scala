@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
@@ -141,6 +141,10 @@ class SubmissionResponseServiceSpec extends PlaySpec
     } thenReturn Some(Seq(tradingPremisesGen.sample.get))
 
     when {
+      cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+    } thenReturn Some(Seq(ResponsiblePeople()))
+
+    when {
       TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cache))
   }
@@ -163,7 +167,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
-        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
+        val response = Some(SubmissionData(Some(paymentRefNo), Currency.fromBD(100), rows, None, Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
@@ -202,7 +206,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
         )
 
-        val response = Some(Some(paymentRefNo), Currency.fromBD(100), rows, Right(Some(Currency.fromBD(0))))
+        val response = Some(SubmissionData(Some(paymentRefNo), Currency.fromBD(100), rows, None, Some(Currency.fromBD(0))))
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
@@ -235,7 +239,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         whenReady(TestSubmissionResponseService.getAmendment) {
           _ foreach {
-            case (_, _, rows, _) =>
+            case SubmissionData(_, _, rows, _, _) =>
               val unpaidRow = rows.filter(_.label == "confirmation.responsiblepeople.fp.passed").head
               unpaidRow.perItm.value mustBe 0
               unpaidRow.total.value mustBe 0
@@ -265,7 +269,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         whenReady(TestSubmissionResponseService.getAmendment) { result =>
           result foreach {
-            case (_, _, rows, _) =>
+            case SubmissionData(_, _, rows, _, _) =>
               rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
           }
         }
@@ -296,7 +300,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getAmendment)
 
           whenReady(TestSubmissionResponseService.getAmendment)(_ foreach {
-            case (_, _, rows, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
+            case SubmissionData(_, _, rows, _, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
           })
 
         }
@@ -318,7 +322,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some((_, _, rows, _)) => rows foreach { row =>
+            case Some(SubmissionData(_, _, rows, _, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -349,7 +353,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some((_, _, rows, _)) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -378,7 +382,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some((_, _, rows, _)) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -431,7 +435,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows, _)) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -450,7 +454,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows, _)) => rows foreach { row =>
+            case Some(SubmissionData(_, _, rows, _, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -484,7 +488,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(variationResponseWithRate)
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows, _)) =>
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFeeWithRate)
@@ -510,7 +514,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows, _)) =>
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpFee)
@@ -531,7 +535,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows, _)) =>
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpHalfFee)
@@ -552,7 +556,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows, _)) =>
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(0)
@@ -575,10 +579,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeople = 0,
-            addedFullYearTradingPremises = 0,
-            halfYearlyTradingPremises = 0,
-            zeroRatedTradingPremises = 0,
             addedResponsiblePeopleFitAndProper = 1
           )
 
@@ -593,7 +593,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows, _)) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -614,10 +614,6 @@ class SubmissionResponseServiceSpec extends PlaySpec
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeople = 0,
-            addedFullYearTradingPremises = 0,
-            halfYearlyTradingPremises = 0,
-            zeroRatedTradingPremises = 0,
             addedResponsiblePeopleFitAndProper = 1
           )
 
@@ -632,7 +628,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some((_, _, rows, _)) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -658,7 +654,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           ))
 
           whenReady(TestSubmissionResponseService.getVariation) {
-            case Some((_, _, breakdownRows, _)) =>
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFee)
@@ -714,7 +710,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, _) => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -754,7 +750,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           case class Test(str: String)
 
           result match {
-            case (_, _, rows, _) => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.head.label mustBe "confirmation.submission"
               rows.head.quantity mustBe 1
               rows.head.perItm mustBe Currency(rpFee)
@@ -796,7 +792,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, _) => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -824,7 +820,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, _) => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -851,7 +847,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
           val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case (_, _, rows, _) => rows foreach { row =>
+            case SubmissionData(_, _, rows, _, _) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -868,10 +864,10 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(0)
 
-          val data = (Some(paymentRefNo), currency, Seq(
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
             BreakdownRow("confirmation.submission", 0, 0, 0),
             BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-          ), Left(amlsRegistrationNumber))
+          ), Some(amlsRegistrationNumber), None)
 
           when {
             cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
@@ -887,7 +883,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
 
-          await(result) mustBe Some(data)
+          await(result) mustBe Some(submissionData)
 
         }
 
@@ -895,10 +891,10 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (Some(paymentRefNo), currency, Seq(
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
             BreakdownRow("confirmation.submission", 1, 100, 100),
             BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-          ), Right(Some(currency)))
+          ), None, Some(currency))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
@@ -910,7 +906,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview)
 
-          await(result) mustBe Some(data)
+          await(result) mustBe Some(submissionData)
 
         }
 
@@ -918,7 +914,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(), None, Some(currency))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
@@ -926,7 +922,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved)
 
-          await(result) mustBe Some(data)
+          await(result) mustBe Some(submissionData)
 
         }
 
@@ -934,7 +930,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val currency = Currency.fromInt(100)
 
-          val data = (Some(paymentRefNo), currency, Seq(), Right(Some(currency)))
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(), None, Some(currency))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
@@ -946,7 +942,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
           val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
 
-          await(result) mustBe Some(data)
+          await(result) mustBe Some(submissionData)
 
         }
       }

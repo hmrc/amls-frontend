@@ -28,7 +28,7 @@ import models.payments.WaysToPay._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import models.payments.CreateBacsPaymentRequest
-import models.confirmation.Currency
+import models.confirmation.{Currency, SubmissionData}
 import models.status.NotCompleted
 import utils.AmlsRefNumberBroker
 
@@ -56,9 +56,14 @@ class WaysToPayController @Inject()(
         val submissionDetails = for {
           amlsRefNo <- amlsRefBroker.get
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
-          data@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+          data@(SubmissionData(paymentReference, _, _, _, _)) <- OptionT(submissionResponseService.getSubmissionData(status))
           payRef <- OptionT.fromOption[Future](paymentReference)
-        } yield (amlsRefNo, payRef, data, detailedStatus.fold[String](throw new Exception("No safeID available"))(_.safeId.getOrElse(throw new Exception("No safeID available"))))
+        } yield (
+          amlsRefNo,
+          payRef,
+          data,
+          detailedStatus.fold[String](throw new Exception("No safeID available"))(_.safeId.getOrElse(throw new Exception("No safeID available")))
+        )
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {

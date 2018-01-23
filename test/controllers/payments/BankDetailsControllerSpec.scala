@@ -16,23 +16,20 @@
 
 package controllers.payments
 
-import connectors.PayApiConnector
-import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.confirmation.Currency
-import models.payments._
+import generators.PaymentGenerator
+import models.confirmation.{Currency, SubmissionData}
 import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito.{verify, when}
-import org.scalatest.mock.MockitoSugar
+import org.mockito.Mockito.when
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services.{StatusService, SubmissionResponseService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator{
 
@@ -65,7 +62,7 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with Pay
 
         when {
           controller.submissionResponseService.getSubmissionData(eqTo(submissionSatus))(any(),any(),any())
-        } thenReturn Future.successful(Some((Some(paymentReferenceNumber), Currency(200), Seq.empty, Right(None))))
+        } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency(200), Seq.empty, None, None)))
 
         val result = controller.get()(request)
 
