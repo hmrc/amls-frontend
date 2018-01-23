@@ -23,7 +23,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -41,8 +41,6 @@ sealed case class RowEntity(message: String, feePer: BigDecimal)
 class SubmissionResponseService @Inject()(
                                            val cacheConnector: DataCacheConnector
                                          ) extends FeeCalculations with DataCacheService {
-
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def getSubscription
   (implicit
@@ -65,7 +63,7 @@ class SubmissionResponseService @Inject()(
           val total = subscription.getTotalFees
           val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
           val amlsRefNo = subscription.amlsRefNo
-          Future.successful((paymentReference.some, Currency.fromBD(total), rows, Left(amlsRefNo)))
+          Future.successful(SubmissionData(paymentReference.some, Currency.fromBD(total), rows, Some(amlsRefNo), None))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
@@ -98,7 +96,7 @@ class SubmissionResponseService @Inject()(
           val total = variationResponse.getTotalFees
           val rows = getVariationBreakdownRows(variationResponse, businessActivities)
           val difference = variationResponse.difference map Currency.fromBD
-          Future.successful(Some((paymentReference, Currency.fromBD(total), rows, Right(difference))))
+          Future.successful(Some(SubmissionData(paymentReference, Currency.fromBD(total), rows, None, difference)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -119,7 +117,7 @@ class SubmissionResponseService @Inject()(
           val rows = getRenewalBreakdown(renewal)
           val paymentRef = renewal.paymentReference
           val difference = renewal.difference
-          Future.successful(Some((paymentRef, Currency(totalFees), rows, Right(difference map Currency.fromBD))))
+          Future.successful(Some(SubmissionData(paymentRef, Currency(totalFees), rows, None, difference map Currency.fromBD)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
@@ -142,7 +140,7 @@ class SubmissionResponseService @Inject()(
       val filteredPremises = TradingPremises.filter(premises)
       val rows = getBreakdownRows(amendmentResponse, filteredPremises, people, businessActivities, subQuantity)
       val paymentRef = amendmentResponse.paymentReference
-      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, Right(difference))))
+      Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
     }
   }
 
@@ -282,9 +280,7 @@ class SubmissionResponseService @Inject()(
         case true => getRenewal
         case false => getVariation
       }
-      case _ => getSubscription map {
-        case (payRef, total, breakdown, amlsRefNo@Left(_)) => (payRef, total, breakdown, amlsRefNo).some
-      }
+      case _ => getSubscription map (Some(_))
     }
   }
 

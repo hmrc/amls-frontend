@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
+import models.confirmation.SubmissionData
 import play.api.Play
 import services.{AuthEnrolmentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -37,6 +38,6 @@ class AmlsRefNumberBroker @Inject()(
 
   def get(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = (for {
     status <- OptionT.liftF(statusService.getStatus)
-    (_, _, _, Left(amlsRefNo)) <- OptionT(submissionResponseService.getSubmissionData(status))
+    SubmissionData(_, _, _, Some(amlsRefNo), None) <- OptionT(submissionResponseService.getSubmissionData(status))
   } yield amlsRefNo) orElse OptionT(authEnrolmentsService.amlsRegistrationNumber)
 }

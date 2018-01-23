@@ -19,7 +19,7 @@ package controllers.payments
 import audit.BacsPaymentEvent
 import connectors.PayApiConnector
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.payments._
 import models.status.SubmissionReadyForReview
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -68,11 +68,11 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper with Paym
       controller.statusService.getStatus(any(), any(), any())
     } thenReturn Future.successful(SubmissionReadyForReview)
 
-    val data = (Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Left(amlsRegistrationNumber))
+    val submissionData = SubmissionData(Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Some(amlsRegistrationNumber), None)
 
     when {
       controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
-    } thenReturn Future.successful(Some(data))
+    } thenReturn Future.successful(Some(submissionData))
 
     when {
       controller.paymentsService.amountFromSubmissionData(any())
