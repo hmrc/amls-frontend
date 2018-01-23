@@ -29,4 +29,8 @@ object Location {
     }
   }
 
+  implicit val jsonWrites = Writes[Location] { model =>
+    JsArray(Seq(JsString(model.key), JsString(model.value)))
+  }
+
 }

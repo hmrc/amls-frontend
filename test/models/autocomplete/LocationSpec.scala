@@ -19,7 +19,7 @@ package models.autocomplete
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class LocationValuesSpec extends PlaySpec {
+class LocationSpec extends PlaySpec {
 
   val exampleJson =
     """
@@ -35,11 +35,17 @@ class LocationValuesSpec extends PlaySpec {
       | ]
     """.stripMargin
 
+  val exampleModel = Seq(
+    Location("Country 1", "country:1"),
+    Location("Country 2", "country:2"))
+
   "The location list" must {
-    "deserialise properly" in {
-      Json.parse(exampleJson).as[Seq[Location]] mustBe Seq(
-        Location("Country 1", "country:1"),
-        Location("Country 2", "country:2"))
+    "deserialise correctly into the model" in {
+      Json.parse(exampleJson).as[Seq[Location]] mustBe exampleModel
+    }
+
+    "serialise into the correct Json" in {
+      Json.toJson(exampleModel) mustBe Json.parse(exampleJson)
     }
   }
 
