@@ -369,6 +369,11 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       ninoType.validate(nino) mustBe Valid(nino)
     }
 
+    "successfully validate KC prefixes" in {
+      val nino = "KC123456A"
+      ninoType.validate(nino) mustBe Valid(nino)
+    }
+
     "successfully validate nino including spaces and dashes" in {
       val testNino = nextNino
       val spacedNino = testNino.grouped(2).mkString(" ")
