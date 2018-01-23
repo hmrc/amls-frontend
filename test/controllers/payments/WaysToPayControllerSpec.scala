@@ -16,7 +16,7 @@
 
 package controllers.payments
 
-import connectors.PayApiConnector
+import connectors.{FeeConnector, PayApiConnector}
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.confirmation.{Currency, SubmissionData}
 import models.status.SubmissionReadyForReview
@@ -57,7 +57,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       paymentsService = mock[PaymentsService],
       submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      amlsRefBroker = mock[AmlsRefNumberBroker]
+      amlsRefBroker = mock[AmlsRefNumberBroker],
+      feeConnector = mock[FeeConnector]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))

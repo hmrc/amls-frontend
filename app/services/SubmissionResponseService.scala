@@ -22,13 +22,14 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, ResponseType, SubmissionResponse, SubscriptionResponse}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -272,9 +273,9 @@ class SubmissionResponseService @Inject()(
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
 
-  def getSubmissionData(status: SubmissionStatus)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+  def getSubmissionData(status: SubmissionStatus, responseType: Option[ResponseType] = None)(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
     status match {
-      case SubmissionReadyForReview => getAmendment
+      case SubmissionReadyForReview if responseType contains AmendOrVariationResponseType => getAmendment
       case SubmissionDecisionApproved => getVariation
       case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined flatMap {
         case true => getRenewal

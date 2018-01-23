@@ -20,16 +20,14 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.PayApiConnector
+import connectors.{FeeConnector, PayApiConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.payments.{UpdateBacsRequest, WaysToPay}
+import models.confirmation.SubmissionData
+import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import models.payments.WaysToPay._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.payments.CreateBacsPaymentRequest
-import models.confirmation.{Currency, SubmissionData}
-import models.status.NotCompleted
 import utils.AmlsRefNumberBroker
 
 import scala.concurrent.Future
@@ -42,7 +40,8 @@ class WaysToPayController @Inject()(
                                      val paymentsService: PaymentsService,
                                      val submissionResponseService: SubmissionResponseService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                     val amlsRefBroker: AmlsRefNumberBroker
+                                     val amlsRefBroker: AmlsRefNumberBroker,
+                                     val feeResponseService: FeeResponseService
                                    ) extends BaseController {
 
   def get() = Authorised.async {
@@ -56,18 +55,19 @@ class WaysToPayController @Inject()(
         val submissionDetails = for {
           amlsRefNo <- amlsRefBroker.get
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
-          data@(SubmissionData(paymentReference, _, _, _, _)) <- OptionT(submissionResponseService.getSubmissionData(status))
-          payRef <- OptionT.fromOption[Future](paymentReference)
+          fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo))
+          submissionData <- OptionT(submissionResponseService.getSubmissionData(status, Some(fees.responseType)))
+          payRef <- OptionT.fromOption[Future](submissionData.paymentReference)
         } yield (
           amlsRefNo,
           payRef,
-          data,
+          submissionData,
           detailedStatus.fold[String](throw new Exception("No safeID available"))(_.safeId.getOrElse(throw new Exception("No safeID available")))
         )
 
         Form2[WaysToPay](request.body) match {
           case ValidForm(_, data) => data match {
-            case Card => {
+            case Card =>
               (for {
                 (amlsRefNo, payRef, submissionData, safeId) <- submissionDetails
                 paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
@@ -77,7 +77,6 @@ class WaysToPayController @Inject()(
                   safeId
                 ))
               } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
-            }
             case Bacs =>
               val bankTypeResult = for {
                 (amlsRef, payRef, submissionData, safeId) <- submissionDetails

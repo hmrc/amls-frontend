@@ -34,11 +34,11 @@ import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost }
 
 class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
-  object FeeConnector extends FeeConnector {
-    override private[connectors] val httpPost: HttpPost = mock[HttpPost]
-    override private[connectors] val url: String = "amls/payment"
-    override private[connectors] val httpGet: HttpGet = mock[HttpGet]
-  }
+  val connector = new FeeConnector(
+    httpPost = mock[HttpPost],
+    httpGet = mock[HttpGet],
+    url = "amls/payment"
+  )
 
   val safeId = "SAFEID"
   val amlsRegistrationNumber = "AMLSREGNO"
@@ -68,10 +68,10 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "successfully receive feeResponse" in {
 
       when {
-        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
+        connector.httpGet.GET[FeeResponse](eqTo(s"${connector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
-      whenReady(FeeConnector.feeResponse(amlsRegistrationNumber)){
+      whenReady(connector.feeResponse(amlsRegistrationNumber)){
         _ mustBe feeResponse
       }
     }
