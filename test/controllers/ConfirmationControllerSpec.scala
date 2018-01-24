@@ -146,7 +146,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     val submissionData = SubmissionData(Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Some(amlsRegistrationNumber), None)
 
     when {
-      controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
+      controller.submissionResponseService.getSubmissionData(any(), any())(any(), any(), any())
     } thenReturn Future.successful(Some(submissionData))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
@@ -187,7 +187,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       setupStatus(submissionStatus)
 
       when {
-        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady),any())(any(), any(), any())
       } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(0), Seq.empty, Some(amlsRegistrationNumber), None)))
 
       val result = controller.get()(request)
@@ -204,7 +204,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       setupStatus(submissionStatus)
 
       when {
-        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady))(any(), any(), any())
+        controller.submissionResponseService.getSubmissionData(eqTo(SubmissionReady),any())(any(), any(), any())
       } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(0), Seq.empty, Some(amlsRegistrationNumber), None)))
 
       val result = controller.get()(request)
@@ -224,7 +224,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           setupStatus(submissionStatus)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(0), Seq.empty, None, Some(Currency.fromInt(0)))))
 
           val result = controller.get()(request)
@@ -241,7 +241,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           setupStatus(submissionStatus)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -257,7 +257,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           setupStatus(submissionStatus)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(None, Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -279,7 +279,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           setupStatus(submissionStatus)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some(""), Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -295,7 +295,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           setupStatus(submissionStatus)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some(""), Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -322,7 +322,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           } thenReturn Future.successful(false)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -343,7 +343,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           } thenReturn Future.successful(true)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(None, Currency.fromInt(0), Seq.empty, None, None)))
 
           val result = controller.get()(request)
@@ -363,7 +363,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           } thenReturn Future.successful(true)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None, None)))
 
           val result = controller.get()(request)
@@ -380,7 +380,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           } thenReturn Future.successful(true)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(
             Some("payeref"),
             Currency.fromInt(100),
@@ -408,7 +408,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           } thenReturn Future.successful(false)
 
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))))(any(), any(), any())
+            controller.submissionResponseService.getSubmissionData(eqTo(ReadyForRenewal(Some(new LocalDate))),any())(any(), any(), any())
           } thenReturn Future.successful(Some(SubmissionData(Some("payeref"), Currency.fromInt(100000), Seq(BreakdownRow("", 10, Currency(10), Currency(10))), None, None)))
 
           val result = controller.get()(request)
