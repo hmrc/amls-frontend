@@ -64,7 +64,7 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
       } thenReturn Future.successful(status)
 
       when {
-        broker.submissionResponseService.getSubmissionData(eqTo(status))(any(), any(), any())
+        broker.submissionResponseService.getSubmissionData(eqTo(status), any())(any(), any(), any())
       } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], Some(amlsRegistrationNumber), None)))
 
       whenReady(broker.get.value) { r => r mustBe Some(amlsRegistrationNumber) }
@@ -80,7 +80,7 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
       } thenReturn Future.successful(status)
 
       when {
-        broker.submissionResponseService.getSubmissionData(eqTo(status))(any(), any(), any())
+        broker.submissionResponseService.getSubmissionData(eqTo(status),any())(any(), any(), any())
       } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(0), Seq.empty[BreakdownRow], None, Some(Currency.fromInt(0)))))
 
       when {
@@ -88,8 +88,6 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
       } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
       whenReady(broker.get.value) { r => r mustBe Some(amlsRegistrationNumber) }
-
-
 
     }
   }
