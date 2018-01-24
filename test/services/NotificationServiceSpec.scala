@@ -125,10 +125,10 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
             """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
             """<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a>""" +
             """ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>""" +
-            """<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from """ +
+            """<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account """ +
             """<a href="""" +
             controllers.routes.StatusController.get() +
-            """">your account status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
@@ -151,9 +151,9 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         result.get.messageText.get mustBe (
           """<p>The recent changes made to your details have been approved.</p>""" +
-            """<p>You can find details of your registration on <a href="""" +
+            """<p>You can find details of your registration on your <a href="""" +
             controllers.routes.StatusController.get() +
-            """">your status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
@@ -176,9 +176,9 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         result.get.messageText.get mustBe (
           """<p>The date your anti-money laundering supervision ended has been changed.</p>""" +
-            """<p>You can see the new effective date on <a href="""" +
+            """<p>You can see the new effective date on your <a href="""" +
             controllers.routes.StatusController.get() +
-            """">your status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
