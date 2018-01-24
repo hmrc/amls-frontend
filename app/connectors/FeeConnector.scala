@@ -18,7 +18,7 @@ package connectors
 
 import javax.inject.Inject
 
-import config.ApplicationConfig
+import config.AppConfig
 import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
@@ -28,8 +28,11 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class FeeConnector @Inject()(
-                              private[connectors] val http: CoreGet
+                              private[connectors] val http: CoreGet,
+                              appConfig: AppConfig
                             ) {
+
+  val feePaymentUrl = appConfig.feePaymentUrl
 
   def feeResponse(amlsRegistrationNumber: String)(implicit
                                              headerCarrier: HeaderCarrier,
@@ -40,7 +43,7 @@ class FeeConnector @Inject()(
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
-    val getUrl = s"${ApplicationConfig.feePaymentUrl}/$accountType/$accountId/$amlsRegistrationNumber"
+    val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
     http.GET[FeeResponse](getUrl) map {

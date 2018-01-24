@@ -29,7 +29,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.audit.model.DataEvent
@@ -55,6 +55,7 @@ class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper with Paym
       statusService = mock[StatusService],
       submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
+      feeResponseService = mock[FeeResponseService],
       paymentsService = mock[PaymentsService]
     )
 

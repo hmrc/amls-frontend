@@ -26,14 +26,15 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
-import models.ReadStatusResponse
-import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, UpdateBacsRequest, WaysToPay}
-import models.ReturnLocation
+import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
+import models.payments._
 import cats.data.OptionT
 import cats.implicits._
+import models.ResponseType.SubscriptionResponseType
+import org.joda.time.DateTime
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -58,10 +59,12 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       amlsRefBroker = mock[AmlsRefNumberBroker],
-      feeConnector = mock[FeeConnector]
+      feeResponseService = mock[FeeResponseService]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
+
+    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, 0, 100, Some(paymentReferenceNumber), None, mock[DateTime])
 
     when {
       controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
@@ -70,8 +73,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     when {
       controller.amlsRefBroker.get(any(), any(), any())
     } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
-
-    val submissionData = SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), None, Some(Currency.fromInt(100)))
 
     val submissionStatus = SubmissionReadyForReview
 
@@ -97,10 +98,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
     when {
       controller.statusService.getDetailedStatus(any())(any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
-
-    when {
-      controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-    } thenReturn Future.successful(Some(submissionData))
 
   }
 
@@ -150,7 +147,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
           val body = contentAsString(result)
 
           verify(controller.paymentsService).requestPaymentsUrl(
-            eqTo(submissionData),
+            eqTo(fees),
             eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber).url),
             eqTo(amlsRegistrationNumber),
             eqTo(safeId)
@@ -173,10 +170,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
             when {
               controller.statusService.getStatus(any(), any(), any())
             } thenReturn Future.successful(submissionStatus)
-
-            when {
-              controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-            } thenReturn Future.successful(None)
 
             val result = controller.post()(postRequest)
             val body = contentAsString(result)
