@@ -16,6 +16,7 @@
 
 @import include._
 @import forms2._
+@import models.autocomplete._
 
 @(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
@@ -66,9 +67,13 @@
             field = Some(f(s"$target"))
         ) {
 
-            @country(
+            @country_autocomplete(
                 field = f("country"),
-                labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName)
+                labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
+                data = Seq(
+                    NameValuePair("Test 1", "test1"),
+                    NameValuePair("Test 2", "test2")
+                )
             )
 
         }

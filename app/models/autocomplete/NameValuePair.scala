@@ -19,18 +19,18 @@ package models.autocomplete
 import play.api.libs.json._
 import play.api.libs.json.Reads._
 
-case class Location(key: String, value: String)
+case class NameValuePair(name: String, value: String)
 
-object Location {
+object NameValuePair {
 
-  implicit val jsonReads: Reads[Location] = {
+  implicit val jsonReads: Reads[NameValuePair] = {
     __.read[Seq[String]] map {
-      case key :: value :: _ => Location(key, value)
+      case key :: value :: _ => NameValuePair(key, value)
     }
   }
 
-  implicit val jsonWrites = Writes[Location] { model =>
-    JsArray(Seq(JsString(model.key), JsString(model.value)))
+  implicit val jsonWrites = Writes[NameValuePair] { model =>
+    JsArray(Seq(JsString(model.name), JsString(model.value)))
   }
 
 }
