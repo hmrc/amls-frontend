@@ -18,6 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
+import models.ResponseType.AmendOrVariationResponseType
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency, SubmissionData}
@@ -887,27 +888,57 @@ class SubmissionResponseServiceSpec extends PlaySpec
 
         }
 
-        "Amendment/SubmissionReadyForReview" in new Fixture {
+        "Amendment/SubmissionReadyForReview" when {
 
-          val currency = Currency.fromInt(100)
+          "feeResponse contains type SubscriptionResponse" in new Fixture {
 
-          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
-            BreakdownRow("confirmation.submission", 1, 100, 100),
-            BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-          ), None, Some(currency))
+            val currency = Currency.fromInt(0)
 
-          when {
-            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+            val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
+              BreakdownRow("confirmation.submission", 0, 0, 0),
+              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+            ), Some(amlsRegistrationNumber), None)
 
-          when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            when {
+              cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+            } thenReturn Some(subscriptionResponse)
 
-          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview)
+            when {
+              cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+            } thenReturn Some(Seq(TradingPremises()))
 
-          await(result) mustBe Some(submissionData)
+            when {
+              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+            } thenReturn Some(Seq(ResponsiblePeople()))
 
+            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
+
+            await(result) mustBe Some(submissionData)
+
+          }
+
+          "feeResponse contains type AmendmentVariationResponse" in new Fixture {
+
+            val currency = Currency.fromInt(100)
+
+            val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
+              BreakdownRow("confirmation.submission", 1, 100, 100),
+              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+            ), None, Some(currency))
+
+            when {
+              cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+            } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+            when {
+              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+            } thenReturn Some(Seq(ResponsiblePeople()))
+
+            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview, Some(AmendOrVariationResponseType))
+
+            await(result) mustBe Some(submissionData)
+
+          }
         }
 
         "Variation/SubmissionDecisionApproved" in new Fixture {

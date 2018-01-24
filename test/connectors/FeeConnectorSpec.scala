@@ -17,6 +17,7 @@
 package connectors
 
 import config.AppConfig
+import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
 import org.joda.time.{DateTime, DateTimeZone}
@@ -33,7 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
+class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
   val connector = new FeeConnector(
     http = mock[HttpGet],
@@ -41,7 +42,6 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
   )
 
   val safeId = "SAFEID"
-  val amlsRegistrationNumber = "AMLSREGNO"
 
   implicit val hc = HeaderCarrier()
   implicit val ac = AuthContext(
@@ -60,10 +60,18 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     None, None)
 
   "FeeConnector" must {
-    val amlsRegistrationNumber = "XAML00000000000"
-    val feeResponse = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber
-      , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
-      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+
+    val feeResponse = FeeResponse(
+      SubscriptionResponseType,
+      amlsRegistrationNumber,
+      150.00,
+      Some(100.0),
+      300.0,
+      550.0,
+      Some("XA000000000000"),
+      None,
+      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
+    )
 
     "successfully receive feeResponse" in {
 
