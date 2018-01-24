@@ -17,4 +17,4 @@
 @(name: Option[String])(implicit request: Request[_], m:Messages)
 
 <p class="heading-small">@Messages("changeofficer.changelink.heading")</p>@name
-<p><a href="@controllers.changeofficer.routes.StillEmployedController.get.url">@Messages("changeofficer.changelink.text")</a></p>
+<p class="no-print"><a href="@controllers.changeofficer.routes.StillEmployedController.get.url">@Messages("changeofficer.changelink.text")</a></p>

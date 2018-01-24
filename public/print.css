@@ -20,8 +20,16 @@
      .service-info,
      .print-link,
      .get-help-form,
+     .messaging,
+     .no-print,
+     .declaration,
      .button {
          display: none !important;
+     }
+
+     .print-left {
+        text-align:left;
+        margin:auto;
      }
 
      .confirmation {
@@ -32,4 +40,8 @@
        text-align:center;
        margin:auto;
      }
+
+     a[href]:after {
+         content: none !important;
+       }
  }

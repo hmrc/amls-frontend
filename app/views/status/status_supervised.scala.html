@@ -28,7 +28,7 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             <header class="page-header">
                 <h1 class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
-                <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+                <p class="heading-secondary print-left"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
             </header>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
@@ -46,7 +46,7 @@
                 @endDate.map { date =>
                     <p class="heading-small">@Messages("lbl.registration.status")</p>
                     <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
-                            <a href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                            <a class="no-print" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
                     </p>
                 }
 
@@ -89,14 +89,8 @@
     </div>
 
     @if(!renewalFlow) {
-    <div class="grid-layout grid-layout--stacked">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
-            <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
-        </div>
-        <div class="grid-layout__column grid-layout__column--1-3">
-            @* empty for layout reasons *@
-        </div>
-    </div>
+        @before_you_go()
     }
+
+    <a href="javascript:window.print()" class="print-link print-hidden js-visible">Print</a>
 }
