@@ -20,26 +20,21 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.PayApiConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.payments.WaysToPay._
 import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import services._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AmlsRefNumberBroker
 
 import scala.concurrent.Future
 
 @Singleton
 class WaysToPayController @Inject()(
                                      val authConnector: AuthConnector,
-                                     val paymentsConnector: PayApiConnector,
                                      val statusService: StatusService,
                                      val paymentsService: PaymentsService,
-                                     val submissionResponseService: SubmissionResponseService,
                                      val authEnrolmentsService: AuthEnrolmentsService,
-                                     val amlsRefBroker: AmlsRefNumberBroker,
                                      val feeResponseService: FeeResponseService
                                    ) extends BaseController {
 

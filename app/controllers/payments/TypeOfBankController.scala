@@ -35,8 +35,6 @@ import scala.concurrent.Future
 class TypeOfBankController @Inject()(
                                       val authConnector: AuthConnector,
                                       val auditConnector: AuditConnector,
-                                      val statusService: StatusService,
-                                      val submissionResponseService: SubmissionResponseService,
                                       val authEnrolmentsService: AuthEnrolmentsService,
                                       val feeResponseService: FeeResponseService,
                                       val paymentsService: PaymentsService

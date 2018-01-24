@@ -53,26 +53,19 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
     val controller = new WaysToPayController(
       authConnector = self.authConnector,
-      paymentsConnector = mock[PayApiConnector],
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
-      submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      amlsRefBroker = mock[AmlsRefNumberBroker],
       feeResponseService = mock[FeeResponseService]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
-    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, 0, 100, Some(paymentReferenceNumber), None, mock[DateTime])
+    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 
     when {
       controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(OK))
-
-    when {
-      controller.amlsRefBroker.get(any(), any(), any())
-    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
 
     val submissionStatus = SubmissionReadyForReview
 
@@ -99,6 +92,10 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
       controller.statusService.getDetailedStatus(any())(any(), any(), any())
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
+    when {
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+    } thenReturn Future.successful(Some(fees))
+
   }
 
   "WaysToPayController" when {
@@ -116,7 +113,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
 
     "post is called" when {
 
-      "enum is bacs" must {
+      "bacs" must {
         "redirect to TypeOfBankController" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Bacs.entryName
@@ -133,7 +130,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTes
         }
       }
 
-      "enum is card" must {
+      "card" must {
         "go to the payments url" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
