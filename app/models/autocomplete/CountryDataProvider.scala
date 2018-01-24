@@ -16,12 +16,11 @@
 
 package models.autocomplete
 
-import java.io.InputStream
 import javax.inject.Inject
 
 import com.google.inject.ImplementedBy
 import play.api.Environment
-import play.api.libs.json.Json
+import play.api.libs.json.{JsValue, Json}
 
 import scala.io.Source
 
@@ -39,7 +38,9 @@ class GovUkCountryDataProvider @Inject()(env: Environment) extends CountryDataPr
 
   private def isEncoded(value: String): Boolean = value.indexOf(":") > -1
 
-  private def getJson: Option[InputStream] = env.resourceAsStream(resourcePath)
+  private def getJson: Option[JsValue] = env.resourceAsStream(resourcePath) map { stream =>
+    Json.parse(Source.fromInputStream(stream).mkString)
+  }
 
   /**
     * This implementation attempts to read the canonical list of countries and territories from a JSON file. In doing that,
@@ -47,8 +48,8 @@ class GovUkCountryDataProvider @Inject()(env: Environment) extends CountryDataPr
     * Furthermore, it strips out those codes that do not appear in models.countries, as otherwise the application would fail schema validation when it
     * was submitted.
     */
-  override def fetch: Option[Seq[NameValuePair]] = getJson map { stream =>
-    Json.parse(Source.fromInputStream(stream).mkString).as[Seq[NameValuePair]] map {
+  override def fetch: Option[Seq[NameValuePair]] = getJson map { j =>
+    j.as[Seq[NameValuePair]] map {
       case n@NameValuePair(_, value) if isEncoded(value) => n.copy(value = stripCode(value))
       case n => n
     } collect {
