@@ -32,12 +32,14 @@ class FeeResponseService @Inject()(
 
   def getFeeResponse(amlsReferenceNumber: String)
                     (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[FeeResponse]] = {
-    feeConnector.feeResponse(amlsReferenceNumber).map(x => x.responseType match {
-      case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0) => Some(x)
-      case SubscriptionResponseType if x.totalFees > 0 => Some(x)
-      case _ => None
+
+    feeConnector.feeResponse(amlsReferenceNumber) map ( feeResponse =>
+      feeResponse.responseType match {
+        case AmendOrVariationResponseType if feeResponse.difference.fold(false)(_ > 0) => Some(feeResponse)
+        case SubscriptionResponseType if feeResponse.totalFees > 0 => Some(feeResponse)
+        case _ => None
     })
-  }.recoverWith {
+  } recoverWith {
     case _: NotFoundException => Future.successful(None)
   }
 

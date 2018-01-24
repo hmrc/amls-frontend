@@ -20,12 +20,11 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.{FeeConnector, PayApiConnector}
+import connectors.PayApiConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.confirmation.SubmissionData
-import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import models.payments.WaysToPay._
+import models.payments.{CreateBacsPaymentRequest, WaysToPay}
 import services._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AmlsRefNumberBroker
@@ -52,42 +51,52 @@ class WaysToPayController @Inject()(
 
   def post() = Authorised.async {
     implicit authContext => implicit request =>
-        val submissionDetails = for {
-          amlsRefNo <- amlsRefBroker.get
+
+      val submissionDetails = for {
+          amlsRefNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus(amlsRefNo))
           fees <- OptionT(feeResponseService.getFeeResponse(amlsRefNo))
-          submissionData <- OptionT(submissionResponseService.getSubmissionData(status, Some(fees.responseType)))
-          payRef <- OptionT.fromOption[Future](submissionData.paymentReference)
-        } yield (
-          amlsRefNo,
-          payRef,
-          submissionData,
-          detailedStatus.fold[String](throw new Exception("No safeID available"))(_.safeId.getOrElse(throw new Exception("No safeID available")))
-        )
+          } yield (amlsRefNo, fees, detailedStatus)
 
         Form2[WaysToPay](request.body) match {
-          case ValidForm(_, data) => data match {
-            case Card =>
-              (for {
-                (amlsRefNo, payRef, submissionData, safeId) <- submissionDetails
-                paymentsRedirect <- OptionT.liftF(paymentsService.requestPaymentsUrl(
-                  submissionData,
-                  controllers.routes.ConfirmationController.paymentConfirmation(payRef).url,
-                  amlsRefNo,
-                  safeId
-                ))
-              } yield Redirect(paymentsRedirect.links.nextUrl)) getOrElse InternalServerError("Cannot retrieve payment information")
-            case Bacs =>
-              val bankTypeResult = for {
-                (amlsRef, payRef, submissionData, safeId) <- submissionDetails
-                _ <- OptionT.liftF(paymentsService.createBacsPayment(
-                  CreateBacsPaymentRequest(amlsRef, payRef, safeId,
-                    paymentsService.amountFromSubmissionData(submissionData).fold(0)(_.map(_ * 100).value.toInt))))
-              } yield Redirect(controllers.payments.routes.TypeOfBankController.get())
+          case ValidForm(_, data) =>
+            data match {
+              case Card =>
+                submissionDetails.value flatMap {
+                  case Some((amlsRefNo, fees, Some(detailedStatus)))
+                    if fees.paymentReference.isDefined & detailedStatus.safeId.isDefined =>
 
-              bankTypeResult getOrElse InternalServerError("Unable to save BACS info")
-          }
+                    paymentsService.requestPaymentsUrl(
+                      fees,
+                      controllers.routes.ConfirmationController.paymentConfirmation(fees.paymentReference.get).url,
+                      amlsRefNo,
+                      detailedStatus.safeId.get
+                    ) map { paymentsRedirect =>
+                      Redirect(paymentsRedirect.links.nextUrl)
+                    }
+
+                  case _ => Future.successful(InternalServerError("Cannot retrieve payment information"))
+                }
+              case Bacs =>
+                submissionDetails.value flatMap {
+                  case Some((amlsRefNo, fees, Some(detailedStatus)))
+                    if fees.paymentReference.isDefined & detailedStatus.safeId.isDefined =>
+
+                    paymentsService.createBacsPayment(
+                      CreateBacsPaymentRequest(
+                        amlsRefNo,
+                        fees.paymentReference.get,
+                        detailedStatus.safeId.get,
+                        paymentsService.amountFromSubmissionData(fees).fold(0)(_.map(_ * 100).value.toInt))
+                    ) map { _ =>
+                      Redirect(controllers.payments.routes.TypeOfBankController.get())
+                    }
+
+                  case _ => Future.successful(InternalServerError("Unable to save BACS info"))
+                }
+            }
           case f: InvalidForm => Future.successful(BadRequest(views.html.payments.ways_to_pay(f)))
         }
   }
+
 }
