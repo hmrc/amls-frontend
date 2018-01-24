@@ -18,7 +18,7 @@
 @import forms2._
 @import models.autocomplete._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("country").id}-fieldset"""
@@ -70,10 +70,7 @@
             @country_autocomplete(
                 field = f("country"),
                 labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
-                data = Seq(
-                    NameValuePair("Test 1", "test1"),
-                    NameValuePair("Test 2", "test2")
-                )
+                data = countryData.getOrElse(Seq.empty)
             )
 
         }

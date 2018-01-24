@@ -18,11 +18,13 @@ package models.autocomplete
 
 import javax.inject.Inject
 
+import com.google.inject.ImplementedBy
 import play.api.Environment
 import play.api.libs.json.Json
 
 import scala.io.Source
 
+@ImplementedBy(classOf[ResourceFileAutoCompleteData])
 trait AutoCompleteData {
   def fetch: Option[Seq[NameValuePair]]
 }

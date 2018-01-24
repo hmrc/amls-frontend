@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.Country
+import models.autocomplete.{AutoCompleteData, NameValuePair}
 import models.responsiblepeople.ResponsiblePeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -46,6 +47,11 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AutoCompleteData].to(new AutoCompleteData {
+        override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
+          NameValuePair("Spain", "ES")
+        ))
+      }))
       .build()
 
     val controllers = app.injector.instanceOf[CountryOfBirthController]
@@ -93,6 +99,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
         document.getElementById("countryOfBirth-false").hasAttr("checked") must be(true)
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
@@ -118,7 +125,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
             "countryOfBirth" -> "false",
             "country" -> "FR"
           )
-         when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
