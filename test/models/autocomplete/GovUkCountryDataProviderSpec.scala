@@ -25,13 +25,13 @@ import org.scalatestplus.play.PlaySpec
 import play.api.Environment
 import play.api.libs.json.Json
 
-class GovUkAutoCompleteDataSpec extends PlaySpec with MockitoSugar {
+class GovUkCountryDataProviderSpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
 
     val env = mock[Environment]
 
-    lazy val model = new GovUkAutoCompleteData(env)
+    lazy val model = new GovUkCountryDataProvider(env)
 
     def setupEnvironment(countries: Option[Seq[NameValuePair]]) = when {
       env.resourceAsStream(any())

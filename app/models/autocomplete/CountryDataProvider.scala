@@ -25,12 +25,12 @@ import play.api.libs.json.Json
 
 import scala.io.Source
 
-@ImplementedBy(classOf[GovUkAutoCompleteData])
-trait AutoCompleteData {
+@ImplementedBy(classOf[GovUkCountryDataProvider])
+trait CountryDataProvider {
   def fetch: Option[Seq[NameValuePair]]
 }
 
-class GovUkAutoCompleteData @Inject()(env: Environment) extends AutoCompleteData {
+class GovUkCountryDataProvider @Inject()(env: Environment) extends CountryDataProvider {
   lazy val countryCodes = models.countries.map(_.code.toUpperCase()).toSet
 
   private val resourcePath = "public/autocomplete/location-autocomplete-canonical-list.json"

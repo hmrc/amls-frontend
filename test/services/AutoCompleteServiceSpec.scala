@@ -16,7 +16,7 @@
 
 package services
 
-import models.autocomplete.{AutoCompleteData, NameValuePair}
+import models.autocomplete.{CountryDataProvider, NameValuePair}
 import org.mockito.Matchers.{eq => eqTo, any}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -30,14 +30,14 @@ class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {
       NameValuePair("Location 2", "location:2")
     )
 
-    val service = new AutoCompleteService(new AutoCompleteData {
+    val service = new AutoCompleteService(new CountryDataProvider {
       override def fetch: Option[Seq[NameValuePair]] = Some(locations)
     })
   }
 
   "getLocations" must {
     "return a list of locations loaded from a resource file" in new Fixture {
-      service.getLocations mustBe locations
+      service.getCountries mustBe locations
     }
   }
 

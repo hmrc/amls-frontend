@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.Country
-import models.autocomplete.{AutoCompleteData, NameValuePair}
+import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.responsiblepeople.ResponsiblePeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -47,7 +47,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[AutoCompleteData].to(new AutoCompleteData {
+      .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
         override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
           NameValuePair("Spain", "ES")
         ))

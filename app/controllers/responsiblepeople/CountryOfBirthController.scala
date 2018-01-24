@@ -56,13 +56,13 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
                   index,
                   flow,
                   personName.titleName,
-                  autoCompleteService.getLocations))
+                  autoCompleteService.getCountries))
 
               case _ =>
-                Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getLocations))
+                Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
             }
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getLocations))
+            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _ => NotFound(notFoundView)
         }
   }
@@ -81,7 +81,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
           case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getLocations))
+            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
           }
           case ValidForm(_, data) => {
             for {

@@ -18,10 +18,10 @@ package services
 
 import javax.inject.Inject
 
-import models.autocomplete.{AutoCompleteData, NameValuePair}
+import models.autocomplete.{CountryDataProvider, NameValuePair}
 
-class AutoCompleteService @Inject()(data: AutoCompleteData) {
-  lazy val getLocations: Option[Seq[NameValuePair]] = data.fetch map { s =>
+class AutoCompleteService @Inject()(data: CountryDataProvider) {
+  lazy val getCountries: Option[Seq[NameValuePair]] = data.fetch map { s =>
     s.sortWith(_.name < _.name)
   }
 }
