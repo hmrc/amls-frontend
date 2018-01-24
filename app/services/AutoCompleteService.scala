@@ -21,5 +21,7 @@ import javax.inject.Inject
 import models.autocomplete.{AutoCompleteData, NameValuePair}
 
 class AutoCompleteService @Inject()(data: AutoCompleteData) {
-  lazy val getLocations: Option[Seq[NameValuePair]] = data.fetch
+  lazy val getLocations: Option[Seq[NameValuePair]] = data.fetch map { s =>
+    s.sortWith(_.name < _.name)
+  }
 }
