@@ -14,14 +14,15 @@
  * limitations under the License.
  */
 
-package typeclasses
+package typeclasses.confirmation
 
-import models.{SubmissionResponse, SubscriptionResponse}
-import models.businessmatching.{BusinessActivities, BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
-import models.confirmation.{BreakdownRow, Currency}
+import models.SubmissionResponse
+import models.businessmatching.BusinessActivities
+import models.confirmation.BreakdownRow
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
 import services.FeeCalculations
+import ResponsePeopleRowsInstances._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations{
   def apply(
@@ -31,38 +32,6 @@ trait ConfirmationBreakdownRows[A] extends FeeCalculations{
              businessActivities: BusinessActivities,
              subQuantity: Int
            ): Seq[BreakdownRow]
-
-
-  def responsiblePeopleRows
-  (people: Seq[ResponsiblePeople],
-   subscription: SubmissionResponse,
-   activities: Set[BusinessActivity]): Seq[BreakdownRow] = {
-    if (showBreakdown(subscription.getFpFee, activities)) {
-
-      splitPeopleByFitAndProperTest(people) match {
-        case (passedFP, notFP) =>
-          Seq(
-            BreakdownRow(peopleRow(subscription).message, notFP.size, peopleRow(subscription).feePer, Currency.fromBD(subscription.getFpFee.getOrElse(0)))
-          ) ++ (if (passedFP.nonEmpty) {
-            Seq(
-              BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
-            )
-          } else {
-            Seq.empty
-          })
-      }
-    } else {
-      Seq.empty
-    }
-  }
-
-  private val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
-    fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
-
-  private val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
-    ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
-
-  private val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
 
 }
 
@@ -79,7 +48,7 @@ object BreakdownRowInstances {
                ): Seq[BreakdownRow] = {
         Seq(
           BreakdownRow(submissionRow(subscription).message, subQuantity, submissionRow(subscription).feePer, subQuantity * submissionRow(subscription).feePer)
-        ) ++ responsiblePeopleRows(people, subscription, businessActivities.businessActivities) ++ Seq(
+        ) ++ ResponsePeopleRows[SubmissionResponse](subscription, people, businessActivities.businessActivities) ++ Seq(
           BreakdownRow(premisesRow(subscription).message, premises.size, premisesRow(subscription).feePer, subscription.getPremiseFee)
         )
       }

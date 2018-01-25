@@ -33,8 +33,8 @@ import models.{AmendVariationRenewalResponse, ResponseType, SubmissionResponse, 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import typeclasses.BreakdownRowInstances._
-import typeclasses.BreakdownRows
+import typeclasses.confirmation.BreakdownRowInstances._
+import typeclasses.confirmation.BreakdownRows
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -185,29 +185,6 @@ class SubmissionResponseService @Inject()(
   (variationResponse: AmendVariationRenewalResponse,
    businessActivities: BusinessActivities): Seq[BreakdownRow] = {
     responsiblePeopleVariationRows(variationResponse, businessActivities.businessActivities) ++ tradingPremisesVariationRows(variationResponse)
-  }
-
-  private def responsiblePeopleRows
-  (people: Seq[ResponsiblePeople],
-   subscription: SubmissionResponse,
-   activities: Set[BusinessActivity]): Seq[BreakdownRow] = {
-    if (showBreakdown(subscription.getFpFee, activities)) {
-
-      splitPeopleByFitAndProperTest(people) match {
-        case (passedFP, notFP) =>
-          Seq(
-            BreakdownRow(peopleRow(subscription).message, notFP.size, peopleRow(subscription).feePer, Currency.fromBD(subscription.getFpFee.getOrElse(0)))
-          ) ++ (if (passedFP.nonEmpty) {
-            Seq(
-              BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
-            )
-          } else {
-            Seq.empty
-          })
-      }
-    } else {
-      Seq.empty
-    }
   }
 
   private def tradingPremisesVariationRows(variationRenewalResponse: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
