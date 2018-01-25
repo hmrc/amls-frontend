@@ -16,7 +16,7 @@
 
 package typeclasses.confirmation
 
-import models.SubmissionResponse
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
@@ -44,6 +44,7 @@ object ResponsePeopleRowsInstances {
   implicit val responsePeopleRowsFromSubscription: ResponsePeopleRows[SubmissionResponse] = {
     new ResponsePeopleRows[SubmissionResponse] {
       def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]) = {
+
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
             splitPeopleByFitAndProperTest(responsiblePeople) match {
@@ -61,6 +62,40 @@ object ResponsePeopleRowsInstances {
           } else {
             Seq.empty
           }
+        }
+
+      }
+    }
+  }
+
+  implicit val responsePeopleRowsFromVariation: ResponsePeopleRows[AmendVariationRenewalResponse] = {
+    new ResponsePeopleRows[AmendVariationRenewalResponse] {
+      override def apply(
+                          value: AmendVariationRenewalResponse,
+                          activities: Set[BusinessActivity],
+                          people: Option[Seq[ResponsiblePeople]]) = {
+
+        if (showBreakdown(value.getFpFee, activities)) {
+
+          val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
+
+          (if (notFP > 0) {
+            Seq(BreakdownRow(
+              peopleVariationRow(value).message,
+              notFP,
+              peopleVariationRow(value).feePer,
+              Currency.fromBD(value.getFpFee.getOrElse(0))
+            ))
+          } else {
+            Seq.empty
+          }) ++ (if (passedFP > 0) {
+            Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
+          } else {
+            Seq.empty
+          })
+
+        } else {
+          Seq.empty
         }
       }
     }
