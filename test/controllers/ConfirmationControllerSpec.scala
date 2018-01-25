@@ -39,7 +39,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import play.api.{Application, Mode}
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
@@ -80,9 +80,12 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       override val keystoreConnector = mock[KeystoreConnector]
       override val dataCacheConnector = mock[DataCacheConnector]
       override val amlsConnector = mockAmlsConnector
-      override val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override lazy val authEnrolmentsService = mock[AuthEnrolmentsService]
+      override lazy val feeResponseService = mock[FeeResponseService]
+      override lazy val authenticator = mock[AuthenticatorConnector]
       override val amlsRefBroker = mock[AmlsRefNumberBroker]
       val auditConnector = mock[AuditConnector]
+
     }
 
     val response = SubscriptionResponse(

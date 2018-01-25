@@ -88,7 +88,7 @@ class PaymentsService @Inject()(
     amlsConnector.createBacsPayment(request)
 
   def amountFromSubmissionData(fees: FeeResponse): Option[Currency] = if(fees.difference.isDefined){
-    fees.difference.map(Currency(_))
+    fees.difference
   } else {
     Some(fees.totalFees)
   }

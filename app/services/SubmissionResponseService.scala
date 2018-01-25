@@ -33,6 +33,8 @@ import models.{AmendVariationRenewalResponse, ResponseType, SubmissionResponse, 
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import typeclasses.BreakdownRowInstances._
+import typeclasses.BreakdownRows
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -176,13 +178,8 @@ class SubmissionResponseService @Inject()(
    premises: Seq[TradingPremises],
    people: Seq[ResponsiblePeople],
    businessActivities: BusinessActivities,
-   subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(
-      BreakdownRow(submissionRow(submission).message, subQuantity, submissionRow(submission).feePer, subQuantity * submissionRow(submission).feePer)
-    ) ++ responsiblePeopleRows(people, submission, businessActivities.businessActivities) ++ Seq(
-      BreakdownRow(premisesRow(submission).message, premises.size, premisesRow(submission).feePer, submission.getPremiseFee)
-    )
-  }
+   subQuantity: Int): Seq[BreakdownRow] =
+    BreakdownRows.generateBreakdownRows[SubmissionResponse](submission, premises, people, businessActivities, subQuantity)
 
   private def getVariationBreakdownRows
   (variationResponse: AmendVariationRenewalResponse,
@@ -295,7 +292,7 @@ class SubmissionResponseService @Inject()(
 
 }
 
-sealed trait FeeCalculations {
+trait FeeCalculations {
 
   def submissionRow(response: SubmissionResponse) = RowEntity("confirmation.submission", response.getRegistrationFee)
 

@@ -20,8 +20,8 @@ import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
-import models.ReadStatusResponse
+import connectors._
+import models.{FeeResponse, ReadStatusResponse}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{Currency, SubmissionData}
 import models.payments._
@@ -29,7 +29,7 @@ import models.renewal.Renewal
 import models.status._
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services.{FeeResponseService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -47,9 +47,13 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] implicit val amlsConnector: AmlsConnector
 
-  private[controllers] val authEnrolmentsService: AuthEnrolmentsService
-
   private[controllers] val statusService: StatusService
+
+  private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
+
+  private[controllers] lazy val feeResponseService  = Play.current.injector.instanceOf[FeeResponseService]
+
+  private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
 
   private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
 
@@ -64,7 +68,15 @@ trait ConfirmationController extends BaseController {
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
+
+        val feeResponse: Future[Option[FeeResponse]] = (for {
+          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+        } yield fees).value
+
         for {
+//          _ <- authenticator.refreshProfile
+//          fees <- feeResponse
           status <- statusService.getStatus
           result <- resultFromStatus(status)
           _ <- keystoreConnector.setConfirmationStatus
@@ -165,7 +177,9 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+  private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse] = None)
+                              (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+
 
     val submissionData = submissionResponseService.getSubmissionData(status)
 
@@ -202,7 +216,6 @@ trait ConfirmationController extends BaseController {
     } yield result
   }
 
-
 }
 
 object ConfirmationController extends ConfirmationController {
@@ -212,6 +225,5 @@ object ConfirmationController extends ConfirmationController {
   override private[controllers] val keystoreConnector = KeystoreConnector
   override private[controllers] val dataCacheConnector = DataCacheConnector
   override private[controllers] val amlsConnector = AmlsConnector
-  override private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
   override val auditConnector = AMLSAuditConnector
 }
