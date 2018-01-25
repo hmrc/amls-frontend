@@ -37,7 +37,7 @@ class AutoCompleteServiceSpec extends PlaySpec with MockitoSugar {
 
   "getLocations" must {
     "return a list of locations loaded from a resource file" in new Fixture {
-      service.getCountries mustBe locations
+      service.getCountries mustBe Some(locations)
     }
   }
 

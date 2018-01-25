@@ -52,7 +52,7 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "countryOfBirth") -> Seq(ValidationError("not a message Key")),
+          (Path \ "bornInUk") -> Seq(ValidationError("not a message Key")),
           (Path \ "country") -> Seq(ValidationError("second not a message Key"))
         ))
 
@@ -61,7 +61,7 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("countryOfBirth").parent()
+      doc.getElementById("bornInUk").parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
       doc.getElementById("country").parent()

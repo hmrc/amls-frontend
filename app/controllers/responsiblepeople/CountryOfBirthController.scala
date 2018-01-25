@@ -68,7 +68,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
   }
 
   private def updateCountryOfBirth(personResidenceType: Option[PersonResidenceType], data: CountryOfBirth): Option[PersonResidenceType] = {
-    val countryOfBirth = if (data.countryOfBirth) {
+    val countryOfBirth = if (data.bornInUk) {
       Some(Country("United Kingdom", "GB"))
     } else {
       data.country

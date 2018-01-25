@@ -101,7 +101,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("countryOfBirth-false").hasAttr("checked") must be(true)
+        document.getElementById("bornInUk-false").hasAttr("checked") must be(true)
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
 
@@ -113,7 +113,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("countryOfBirth-true").hasAttr("checked") must be(true)
+        document.getElementById("bornInUk-true").hasAttr("checked") must be(true)
       }
     }
 
@@ -122,7 +122,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         "all the mandatory inoput parameters are supplied" in new Fixture {
           val requestWithParams = request.withFormUrlEncodedBody(
-            "countryOfBirth" -> "false",
+            "bornInUk" -> "false",
             "country" -> "FR"
           )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
@@ -144,7 +144,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         "all the mandatory input parameters are supplied and in edit mode" in new Fixture {
           val requestWithParams = request.withFormUrlEncodedBody(
-            "countryOfBirth" -> "true"
+            "bornInUk" -> "true"
           )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -163,7 +163,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
       "respond with BAD_REQUEST" when {
 
-        "country of birth field is not supplied" in new Fixture {
+        "bornInUk field is not supplied" in new Fixture {
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 

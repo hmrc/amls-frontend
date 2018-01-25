@@ -20,7 +20,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
 import models.Country
 
-case class CountryOfBirth (countryOfBirth: Boolean, country: Option[Country])
+case class CountryOfBirth (bornInUk: Boolean, country: Option[Country])
 
 object CountryOfBirth {
 
@@ -29,19 +29,19 @@ object CountryOfBirth {
   implicit val formRule: Rule[UrlFormEncoded, CountryOfBirth] =
     From[UrlFormEncoded] { __ =>
       import jto.validation.forms.Rules._
-      (__ \ "countryOfBirth").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
-        case false => (__ \ "country").read[Country] map {c => CountryOfBirth(countryOfBirth = false, Some(c))}
-        case true => CountryOfBirth(countryOfBirth = true, None)
+      (__ \ "bornInUk").read[Boolean].withMessage("error.required.rp.select.country.of.birth") flatMap {
+        case false => (__ \ "country").read[Country] map {c => CountryOfBirth(bornInUk = false, Some(c))}
+        case true => CountryOfBirth(bornInUk = true, None)
       }
     }
 
   implicit val formWrites: Write[CountryOfBirth, UrlFormEncoded] = Write {x =>
     x.country match {
       case Some(country) =>  Map(
-        "countryOfBirth" -> Seq("false"),
+        "bornInUk" -> Seq("false"),
         "country" -> Seq(country.code)
       )
-      case None =>  Map("countryOfBirth" -> Seq("true"))
+      case None =>  Map("bornInUk" -> Seq("true"))
     }
   }
 
