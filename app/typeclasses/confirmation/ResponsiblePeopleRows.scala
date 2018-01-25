@@ -22,7 +22,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
 import services.FeeCalculations
 
-trait ResponsePeopleRows[A] extends FeeCalculations {
+trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
              value: A,
              activities: Set[BusinessActivity],
@@ -39,10 +39,10 @@ trait ResponsePeopleRows[A] extends FeeCalculations {
 
 }
 
-object ResponsePeopleRowsInstances {
+object ResponsiblePeopleRowsInstances {
 
-  implicit val responsePeopleRowsFromSubscription: ResponsePeopleRows[SubmissionResponse] = {
-    new ResponsePeopleRows[SubmissionResponse] {
+  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] = {
+    new ResponsiblePeopleRows[SubmissionResponse] {
       def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]) = {
 
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
@@ -68,8 +68,8 @@ object ResponsePeopleRowsInstances {
     }
   }
 
-  implicit val responsePeopleRowsFromVariation: ResponsePeopleRows[AmendVariationRenewalResponse] = {
-    new ResponsePeopleRows[AmendVariationRenewalResponse] {
+  implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
+    new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
@@ -102,9 +102,9 @@ object ResponsePeopleRowsInstances {
   }
 }
 
-object ResponsePeopleRows {
+object ResponsiblePeopleRows {
   def apply[A](
                 value: A,
                 activities: Set[BusinessActivity],
-                people: Option[Seq[ResponsiblePeople]])(implicit r: ResponsePeopleRows[A]): Seq[BreakdownRow] = r(value, activities, people)
+                people: Option[Seq[ResponsiblePeople]])(implicit r: ResponsiblePeopleRows[A]): Seq[BreakdownRow] = r(value, activities, people)
 }

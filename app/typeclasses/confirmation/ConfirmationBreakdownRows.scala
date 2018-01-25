@@ -22,7 +22,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
 import services.{FeeCalculations, RowEntity}
-import ResponsePeopleRowsInstances._
+import ResponsiblePeopleRowsInstances._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
@@ -87,7 +87,7 @@ object BreakdownRowInstances {
 
             Seq(
               BreakdownRow(registrationFeeRow.message, subQuantity, registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer)
-            ) ++ ResponsePeopleRows[SubmissionResponse](subscription, activities.businessActivities, people) ++ Seq(
+            ) ++ ResponsiblePeopleRows[SubmissionResponse](subscription, activities.businessActivities, people) ++ Seq(
               BreakdownRow(premisesRow(subscription).message, premises.size, premisesRow(subscription).feePer, subscription.getPremiseFee)
             )
           case _ => Seq.empty[BreakdownRow]
@@ -106,7 +106,7 @@ object BreakdownRowInstances {
 
         businessActivities match {
           case Some(activities) =>
-            ResponsePeopleRows[AmendVariationRenewalResponse](value, activities.businessActivities, None) ++ tradingPremisesVariationRows(value)
+            ResponsiblePeopleRows[AmendVariationRenewalResponse](value, activities.businessActivities, None) ++ tradingPremisesVariationRows(value)
           case _ =>
             val breakdownRows = Seq.empty
 
