@@ -250,4 +250,11 @@ $(function () {
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
   }
 
+  $('[data-gov-autocomplete]').each(function() {
+    openregisterLocationPicker({
+      selectElement: this,
+      url: '/anti-money-laundering/assets/autocomplete/location-autocomplete-graph.json'
+    })
+  })
+
 });

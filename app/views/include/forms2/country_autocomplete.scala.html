@@ -38,7 +38,7 @@
             <span class="error-notification">@field.error</span>
         }
 
-        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")">
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-gov-autocomplete="true">
             <option value=""></option>
             @data.map { kvp =>
                 <option value="@kvp.value" @if(field.value.contains(kvp.value)) {selected}>@kvp.name</option>
