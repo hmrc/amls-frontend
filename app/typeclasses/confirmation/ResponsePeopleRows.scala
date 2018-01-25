@@ -25,8 +25,8 @@ import services.FeeCalculations
 trait ResponsePeopleRows[A] extends FeeCalculations {
   def apply(
              value: A,
-             people: Seq[ResponsiblePeople],
-             activities: Set[BusinessActivity]
+             activities: Set[BusinessActivity],
+             people: Option[Seq[ResponsiblePeople]]
            ): Seq[BreakdownRow]
 
   val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
@@ -43,33 +43,33 @@ object ResponsePeopleRowsInstances {
 
   implicit val responsePeopleRowsFromSubscription: ResponsePeopleRows[SubmissionResponse] = {
     new ResponsePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, people: Seq[ResponsiblePeople], activities: Set[BusinessActivity]) = {
-        if (showBreakdown(value.getFpFee, activities)) {
-
-          splitPeopleByFitAndProperTest(people) match {
-            case (passedFP, notFP) =>
-              Seq(
-                BreakdownRow(peopleRow(value).message, notFP.size, peopleRow(value).feePer, Currency.fromBD(value.getFpFee.getOrElse(0)))
-              ) ++ (if (passedFP.nonEmpty) {
+      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]) = {
+        people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
+          if (showBreakdown(value.getFpFee, activities)) {
+            splitPeopleByFitAndProperTest(responsiblePeople) match {
+              case (passedFP, notFP) =>
                 Seq(
-                  BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
-                )
-              } else {
-                Seq.empty
-              })
+                  BreakdownRow(peopleRow(value).message, notFP.size, peopleRow(value).feePer, Currency.fromBD(value.getFpFee.getOrElse(0)))
+                ) ++ (if (passedFP.nonEmpty) {
+                  Seq(
+                    BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
+                  )
+                } else {
+                  Seq.empty
+                })
+            }
+          } else {
+            Seq.empty
           }
-        } else {
-          Seq.empty
         }
       }
     }
   }
-
 }
 
 object ResponsePeopleRows {
   def apply[A](
                 value: A,
-                people: Seq[ResponsiblePeople],
-                activities: Set[BusinessActivity])(implicit r: ResponsePeopleRows[A]): Seq[BreakdownRow] = r(value, people, activities)
+                activities: Set[BusinessActivity],
+                people: Option[Seq[ResponsiblePeople]])(implicit r: ResponsePeopleRows[A]): Seq[BreakdownRow] = r(value, activities, people)
 }

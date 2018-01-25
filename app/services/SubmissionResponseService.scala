@@ -63,7 +63,7 @@ class SubmissionResponseService @Inject()(
         } yield {
           val paymentReference = subscription.getPaymentReference
           val total = subscription.getTotalFees
-          val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, businessActivities, Some(premises), Some(people))
+          val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, Some(businessActivities), Some(premises), Some(people))
           val amlsRefNo = subscription.amlsRefNo
           Future.successful(SubmissionData(paymentReference.some, Currency.fromBD(total), rows, Some(amlsRefNo), None))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
@@ -96,7 +96,7 @@ class SubmissionResponseService @Inject()(
         } yield {
           val paymentReference = variationResponse.paymentReference
           val total = variationResponse.getTotalFees
-          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, businessActivities, None, None)
+          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, Some(businessActivities), None, None)
           val difference = variationResponse.difference map Currency.fromBD
           Future.successful(Some(SubmissionData(paymentReference, Currency.fromBD(total), rows, None, difference)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
@@ -116,7 +116,7 @@ class SubmissionResponseService @Inject()(
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
           val totalFees: BigDecimal = renewal.getTotalFees
-          val rows = getRenewalBreakdown(renewal)
+          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](renewal, None, None, None)
           val paymentRef = renewal.paymentReference
           val difference = renewal.difference
           Future.successful(Some(SubmissionData(paymentRef, Currency(totalFees), rows, None, difference map Currency.fromBD)))
@@ -136,36 +136,10 @@ class SubmissionResponseService @Inject()(
       val total = amendmentResponse.totalFees
       val difference = amendmentResponse.difference map Currency.fromBD
       val filteredPremises = TradingPremises.filter(premises)
-      val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, businessActivities, Some(filteredPremises), Some(people))
+      val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
       val paymentRef = amendmentResponse.paymentReference
       Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
     }
-  }
-
-  private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
-
-    val breakdownRows = Seq.empty
-
-    def renewalRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
-      if (count > 0) {
-        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(renewal))))
-      } else {
-        Seq.empty
-      }
-    }
-
-    def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleVariationRow(renewal), renewalPeopleFee)
-
-    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
-
-    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesVariationRow(renewal), fullPremisesFee)
-
-    def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), renewalHalfYearPremisesFee)
-
-    def tpZeroRow: Seq[BreakdownRow] = renewalRow(renewal.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
-
-    rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-
   }
 
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =

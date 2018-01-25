@@ -24,10 +24,10 @@ import models.tradingpremises.TradingPremises
 import services.{FeeCalculations, RowEntity}
 import ResponsePeopleRowsInstances._
 
-trait ConfirmationBreakdownRows[A] extends FeeCalculations{
+trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
              value: A,
-             businessActivities: BusinessActivities,
+             businessActivities: Option[BusinessActivities],
              premises: Option[Seq[TradingPremises]],
              people: Option[Seq[ResponsiblePeople]]
            ): Seq[BreakdownRow]
@@ -109,22 +109,22 @@ object BreakdownRowInstances {
     new ConfirmationBreakdownRows[SubmissionResponse] {
       def apply(
                  subscription: SubmissionResponse,
-                 businessActivities: BusinessActivities,
+                 businessActivities: Option[BusinessActivities],
                  premises: Option[Seq[TradingPremises]],
                  people: Option[Seq[ResponsiblePeople]]
                ): Seq[BreakdownRow] = {
-        people match {
-          case Some(responsiblePeople) =>
+
+        businessActivities match {
+          case Some(activities) if people.isDefined =>
 
             val subQuantity = subscriptionQuantity(subscription)
             val registrationFeeRow = submissionRow(subscription)
 
             Seq(
               BreakdownRow(registrationFeeRow.message, subQuantity, registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer)
-            ) ++ ResponsePeopleRows[SubmissionResponse](subscription, responsiblePeople, businessActivities.businessActivities) ++ Seq(
+            ) ++ ResponsePeopleRows[SubmissionResponse](subscription, activities.businessActivities, people) ++ Seq(
               BreakdownRow(premisesRow(subscription).message, premises.size, premisesRow(subscription).feePer, subscription.getPremiseFee)
             )
-
           case _ => Seq.empty[BreakdownRow]
         }
       }
@@ -132,13 +132,39 @@ object BreakdownRowInstances {
   }
 
   implicit val breakdownRowFromVariation: ConfirmationBreakdownRows[AmendVariationRenewalResponse] = {
-    new ConfirmationBreakdownRows[AmendVariationRenewalResponse]{
+    new ConfirmationBreakdownRows[AmendVariationRenewalResponse] {
       override def apply(
                           value: AmendVariationRenewalResponse,
-                          businessActivities: BusinessActivities,
+                          businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
                           people: Option[Seq[ResponsiblePeople]]) = {
-        responsiblePeopleVariationRows(value, businessActivities.businessActivities) ++ tradingPremisesVariationRows(value)
+
+        businessActivities match {
+          case Some(activities) => responsiblePeopleVariationRows(value, activities.businessActivities) ++ tradingPremisesVariationRows(value)
+          case _ =>
+            val breakdownRows = Seq.empty
+
+            def renewalRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
+              if (count > 0) {
+                breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(value))))
+              } else {
+                Seq.empty
+              }
+            }
+
+            def rpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeople, peopleVariationRow(value), renewalPeopleFee)
+
+            def fpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
+
+            def tpFullYearRow: Seq[BreakdownRow] = renewalRow(value.addedFullYearTradingPremises, premisesVariationRow(value), fullPremisesFee)
+
+            def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(value.halfYearlyTradingPremises, premisesHalfYear(value), renewalHalfYearPremisesFee)
+
+            def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
+
+            rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+        }
+
       }
     }
   }
@@ -149,7 +175,7 @@ object BreakdownRows {
 
   def generateBreakdownRows[A](
                                 value: A,
-                                businessActivities: BusinessActivities,
+                                businessActivities: Option[BusinessActivities],
                                 premises: Option[Seq[TradingPremises]],
                                 people: Option[Seq[ResponsiblePeople]]
                               )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = b(value, businessActivities, premises, people)
