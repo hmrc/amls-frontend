@@ -22,13 +22,14 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MSB}
 import models.confirmation.{Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, ResponseType, SubmissionResponse, SubscriptionResponse}
+import models._
 import typeclasses.confirmation.BreakdownRowInstances._
 import typeclasses.confirmation.BreakdownRows
 import uk.gov.hmrc.http.HeaderCarrier
@@ -139,8 +140,11 @@ class SubmissionResponseService @Inject()(
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
 
-  def getSubmissionData(status: SubmissionStatus, responseType: Option[ResponseType] = None)
+  def getSubmissionData(status: SubmissionStatus, feeResponse: Option[FeeResponse])
                        (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
+
+    val responseType = feeResponse.map(_.responseType)
+
     status match {
       case SubmissionReadyForReview if responseType contains AmendOrVariationResponseType => getAmendment
       case SubmissionDecisionApproved => getVariation

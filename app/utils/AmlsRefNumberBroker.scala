@@ -38,6 +38,6 @@ class AmlsRefNumberBroker @Inject()(
 
   def get(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) = (for {
     status <- OptionT.liftF(statusService.getStatus)
-    SubmissionData(_, _, _, Some(amlsRefNo), None) <- OptionT(submissionResponseService.getSubmissionData(status))
+    SubmissionData(_, _, _, Some(amlsRefNo), None) <- OptionT(submissionResponseService.getSubmissionData(status, None))
   } yield amlsRefNo) orElse OptionT(authEnrolmentsService.amlsRegistrationNumber)
 }

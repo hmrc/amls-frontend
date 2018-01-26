@@ -21,12 +21,13 @@ import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors._
-import models.{FeeResponse, ReadStatusResponse}
+import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.BusinessMatching
 import models.confirmation.{Currency, SubmissionData}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
+import models.{FeeResponse, ReadStatusResponse}
 import play.api.Play
 import play.api.mvc.{AnyContent, Request}
 import services.{FeeResponseService, _}
@@ -61,27 +62,18 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[SubmissionResponseService]
 
-  private[controllers] val amlsRefBroker = Play.current.injector.instanceOf[AmlsRefNumberBroker]
-
   val auditConnector: AuditConnector
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-        val feeResponse: Future[Option[FeeResponse]] = (for {
-          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
-        } yield fees).value
-
         for {
           _ <- authenticator.refreshProfile
-          fees <- feeResponse
+          fees <- retrieveFeeResponse
           status <- statusService.getStatus
           result <- resultFromStatus(status, fees)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
-
   }
 
   def paymentConfirmation(reference: String) = Authorised.async {
@@ -126,7 +118,8 @@ trait ConfirmationController extends BaseController {
     implicit request =>
       implicit authContext =>
         val okResult = for {
-          refNo <- amlsRefBroker.get
+          _ <- OptionT.liftF(authenticator.refreshProfile)
+          refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
         } yield Ok(views.html.confirmation.confirmation_bacs(name))
@@ -180,29 +173,20 @@ trait ConfirmationController extends BaseController {
   private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse] = None)
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    val submissionDataFromFees = feeResponse map { fees =>
+    val submissionData = submissionResponseService.getSubmissionData(status, feeResponse)
 
-      SubmissionData(
-        fees.paymentReference,
-        fees.totalFees,
-        Seq.empty,
-        Some(fees.amlsReferenceNumber),
-        fees.difference
-      )
-    }
-
-
-    val submissionData = submissionResponseService.getSubmissionData(status)
+    val responseType = feeResponse.map(_.responseType)
 
     val maybeResult = status match {
-      case SubmissionReadyForReview | SubmissionDecisionApproved =>
+      case SubmissionReadyForReview | SubmissionDecisionApproved if responseType contains AmendOrVariationResponseType =>
         OptionT(showAmendmentVariationConfirmation(submissionData))
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
         OptionT(showRenewalConfirmation(submissionData, status))
-      case _ => OptionT.liftF(submissionData map {
-        case Some(SubmissionData(Some(paymentRef), total, rows, Some(_), None)) =>
-          Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
-      })
+      case _ =>
+        OptionT.liftF(submissionData map {
+          case Some(SubmissionData(Some(paymentRef), total, rows, _, _)) =>
+            Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
+        })
     }
 
     lazy val noFeeResult = for {
@@ -215,7 +199,8 @@ trait ConfirmationController extends BaseController {
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     for {
       status <- OptionT.liftF(statusService.getStatus)
-      SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+      fees <- OptionT.liftF(retrieveFeeResponse)
+      SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status, fees))
       amlsRefNo <- {
         e match {
           case Some(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
@@ -226,6 +211,12 @@ trait ConfirmationController extends BaseController {
       result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(amlsRefNo, payRef, paymentStatus)))
     } yield result
   }
+
+  def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] =
+    (for {
+      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+    } yield fees).value
 
 }
 

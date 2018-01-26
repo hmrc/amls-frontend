@@ -18,7 +18,7 @@ package services
 
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
-import models.ResponseType.AmendOrVariationResponseType
+import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency, SubmissionData}
@@ -26,8 +26,8 @@ import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
-import org.joda.time.LocalDate
+import models._
+import org.joda.time.{DateTime, LocalDate}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -109,6 +109,18 @@ class SubmissionResponseServiceSpec extends PlaySpec
       totalFees = 100,
       paymentReference = Some(""),
       difference = Some(0)
+    )
+
+    def feeResponse(responseType: ResponseType) = FeeResponse(
+      responseType,
+      amlsRegistrationNumber,
+      100,
+      None,
+      0,
+      100,
+      Some(paymentRefNo),
+      None,
+      DateTime.now
     )
 
     val reviewDetails = mock[ReviewDetails]
@@ -882,7 +894,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady, None)
 
           await(result) mustBe Some(submissionData)
 
@@ -911,7 +923,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
               cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
             } thenReturn Some(Seq(ResponsiblePeople()))
 
-            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
+            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady, Some(feeResponse(SubscriptionResponseType)))
 
             await(result) mustBe Some(submissionData)
 
@@ -934,7 +946,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
               cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
             } thenReturn Some(Seq(ResponsiblePeople()))
 
-            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview, Some(AmendOrVariationResponseType))
+            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview, Some(feeResponse(AmendOrVariationResponseType)))
 
             await(result) mustBe Some(submissionData)
 
@@ -951,7 +963,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved)
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved, Some(feeResponse(AmendOrVariationResponseType)))
 
           await(result) mustBe Some(submissionData)
 
@@ -971,7 +983,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             TestSubmissionResponseService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
           } thenReturn Future.successful(Some(Renewal()))
 
-          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
+          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())), Some(feeResponse(AmendOrVariationResponseType)))
 
           await(result) mustBe Some(submissionData)
 

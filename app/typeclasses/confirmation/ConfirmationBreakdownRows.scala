@@ -16,13 +16,14 @@
 
 package typeclasses.confirmation
 
-import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import models.businessmatching.{BusinessActivities, BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
+import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.Renewal
 import models.tradingpremises.TradingPremises
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import services.{FeeCalculations, RowEntity}
-import ResponsiblePeopleRowsInstances._
+import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
