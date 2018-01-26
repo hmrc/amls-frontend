@@ -22,9 +22,8 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MSB}
-import models.confirmation.{BreakdownRow, Currency, SubmissionData}
+import models.confirmation.{Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -33,7 +32,6 @@ import models.{AmendVariationRenewalResponse, ResponseType, SubmissionResponse, 
 import typeclasses.confirmation.BreakdownRowInstances._
 import typeclasses.confirmation.BreakdownRows
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
