@@ -19,11 +19,11 @@ package typeclasses.confirmation
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import models.status.Renewal
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import services.{FeeCalculations, RowEntity}
+import services.RowEntity
 import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
+
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(

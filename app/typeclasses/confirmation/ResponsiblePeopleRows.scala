@@ -16,11 +16,10 @@
 
 package typeclasses.confirmation
 
-import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import services.FeeCalculations
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -34,8 +33,6 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
     ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
-
-  val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
 
 }
 

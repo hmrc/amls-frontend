@@ -20,16 +20,15 @@ import javax.inject.{Inject, Singleton}
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.ResponseType.AmendOrVariationResponseType
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MSB}
+import models._
+import models.businessmatching.BusinessMatching
 import models.confirmation.{Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.tradingpremises.TradingPremises
-import models._
 import typeclasses.confirmation.BreakdownRowInstances._
 import typeclasses.confirmation.BreakdownRows
 import uk.gov.hmrc.http.HeaderCarrier
@@ -42,7 +41,7 @@ sealed case class RowEntity(message: String, feePer: BigDecimal)
 @Singleton
 class SubmissionResponseService @Inject()(
                                            val cacheConnector: DataCacheConnector
-                                         ) extends FeeCalculations with DataCacheService {
+                                         ) extends DataCacheService {
 
   def getSubscription
   (implicit
@@ -155,49 +154,5 @@ class SubmissionResponseService @Inject()(
       case _ => getSubscription map (Some(_))
     }
   }
-
-}
-
-trait FeeCalculations {
-
-  def submissionRow(response: SubmissionResponse) = RowEntity("confirmation.submission", response.getRegistrationFee)
-
-  def premisesRow(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises",
-    response.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
-
-  def premisesVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises",
-    variationResponse.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
-
-  def premisesHalfYear(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises.half",
-    premisesRow(response).feePer / 2)
-
-  def renewalPremisesHalfYear(rvariationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises.half",
-    premisesVariationRow(rvariationResponse).feePer / 2)
-
-  val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
-
-  def peopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
-    response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
-
-  def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
-    variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
-
-  def renewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
-    (premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises) + renewalHalfYearPremisesFee(renewal)
-
-  def fullPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
-    premisesVariationRow(renewal).feePer * renewal.addedFullYearTradingPremises
-
-  def renewalHalfYearPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
-    renewalPremisesHalfYear(renewal).feePer * renewal.halfYearlyTradingPremises
-
-  def renewalPeopleFee(renewal: AmendVariationRenewalResponse): BigDecimal =
-    peopleVariationRow(renewal).feePer * renewal.addedResponsiblePeople
-
-  def renewalFitAndProperDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
-
-  def renewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
-
-  val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
 
 }
