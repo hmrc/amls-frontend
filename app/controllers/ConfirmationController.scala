@@ -75,10 +75,10 @@ trait ConfirmationController extends BaseController {
         } yield fees).value
 
         for {
-//          _ <- authenticator.refreshProfile
-//          fees <- feeResponse
+          _ <- authenticator.refreshProfile
+          fees <- feeResponse
           status <- statusService.getStatus
-          result <- resultFromStatus(status)
+          result <- resultFromStatus(status, fees)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
 
@@ -179,6 +179,17 @@ trait ConfirmationController extends BaseController {
 
   private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse] = None)
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
+
+    val submissionDataFromFees = feeResponse map { fees =>
+
+      SubmissionData(
+        fees.paymentReference,
+        fees.totalFees,
+        Seq.empty,
+        Some(fees.amlsReferenceNumber),
+        fees.difference
+      )
+    }
 
 
     val submissionData = submissionResponseService.getSubmissionData(status)
