@@ -34,7 +34,7 @@ import services.{FeeResponseService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsRefNumberBroker, BusinessName}
+import utils.BusinessName
 import views.html.confirmation._
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -96,8 +96,8 @@ trait ConfirmationController extends BaseController {
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus) match {
-          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
-            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
+          case (_, status@(PaymentStatuses.Failed | PaymentStatuses.Cancelled)) =>
+            Ok(payment_failure(msgFromPaymentStatus(status), Currency(payment.amountInPence.toDouble / 100), reference))
 
           case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
