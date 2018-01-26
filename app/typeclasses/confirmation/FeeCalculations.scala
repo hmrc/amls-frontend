@@ -17,8 +17,8 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
+import models.confirmation.RowEntity
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import services.RowEntity
 
 trait FeeCalculations {
 

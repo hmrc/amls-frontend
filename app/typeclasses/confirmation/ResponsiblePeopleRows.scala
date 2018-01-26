@@ -40,7 +40,7 @@ object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] = {
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]) = {
+      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
 
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
@@ -70,7 +70,7 @@ object ResponsiblePeopleRowsInstances {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
-                          people: Option[Seq[ResponsiblePeople]]) = {
+                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
 
         if (showBreakdown(value.getFpFee, activities)) {
 

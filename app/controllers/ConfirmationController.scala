@@ -145,11 +145,11 @@ trait ConfirmationController extends BaseController {
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }
 
-  private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
+  private def showRenewalConfirmation(fees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
-      getFees map {
+      fees map {
         case Some(SubmissionData(Some(payRef), total, rows, _, _)) if total.value > 0 => {
           isRenewalDefined match {
             case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
@@ -161,16 +161,16 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]])
+  private def showAmendmentVariationConfirmation(fees: Future[Option[SubmissionData]])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    getFees map {
+    fees map {
       case Some(SubmissionData(Some(payRef), total, rows, None, Some(difference))) if difference.value > 0 =>
         Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse] = None)
+  private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse])
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     val submissionData = submissionResponseService.getSubmissionData(status, feeResponse)

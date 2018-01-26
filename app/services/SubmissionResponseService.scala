@@ -36,8 +36,6 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-sealed case class RowEntity(message: String, feePer: BigDecimal)
-
 @Singleton
 class SubmissionResponseService @Inject()(
                                            val cacheConnector: DataCacheConnector

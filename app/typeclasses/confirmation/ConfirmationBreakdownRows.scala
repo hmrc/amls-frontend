@@ -17,13 +17,11 @@
 package typeclasses.confirmation
 
 import models.businessmatching.BusinessActivities
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import services.RowEntity
 import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
-
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
@@ -103,7 +101,7 @@ object BreakdownRowInstances {
                           value: AmendVariationRenewalResponse,
                           businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
-                          people: Option[Seq[ResponsiblePeople]]) = {
+                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
 
         businessActivities match {
           case Some(activities) =>
