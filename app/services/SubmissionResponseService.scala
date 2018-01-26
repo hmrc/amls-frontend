@@ -75,8 +75,22 @@ class SubmissionResponseService @Inject()(
    hc: HeaderCarrier,
    ac: AuthContext
   ): Future[Option[SubmissionData]] = {
-    cacheConnector.fetchAll flatMap {
-      getDataForAmendment(_) getOrElse OptionT.liftF(getSubscription).value
+    cacheConnector.fetchAll flatMap { option =>
+      (for {
+        cache <- option
+        amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+        premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+        people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        businessActivities <- businessMatching.activities
+      } yield {
+        val total = amendmentResponse.totalFees
+        val difference = amendmentResponse.difference map Currency.fromBD
+        val filteredPremises = TradingPremises.filter(premises)
+        val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
+        val paymentRef = amendmentResponse.paymentReference
+        Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
+      }) getOrElse OptionT.liftF(getSubscription).value
     }
   }
 
@@ -121,24 +135,6 @@ class SubmissionResponseService @Inject()(
           val difference = renewal.difference
           Future.successful(Some(SubmissionData(paymentRef, Currency(totalFees), rows, None, difference map Currency.fromBD)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
-    }
-  }
-
-  private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
-    for {
-      cache <- option
-      amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-      premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-      businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      businessActivities <- businessMatching.activities
-    } yield {
-      val total = amendmentResponse.totalFees
-      val difference = amendmentResponse.difference map Currency.fromBD
-      val filteredPremises = TradingPremises.filter(premises)
-      val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
-      val paymentRef = amendmentResponse.paymentReference
-      Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
     }
   }
 
