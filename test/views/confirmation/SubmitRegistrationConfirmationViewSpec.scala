@@ -58,7 +58,7 @@ class SubmitRegistrationConfirmationViewSpec extends GenericTestHelper with Must
     }
 
     "show the correct reference" in new ViewFixture {
-      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe "ref number"
+      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe paymentReferenceNumber
     }
 
     "continue button has the right text" in new ViewFixture {
