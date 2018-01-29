@@ -16,10 +16,12 @@
 
 package controllers
 
+import javax.inject.{Inject, Singleton}
+
 import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import config.AMLSAuthConnector
 import connectors._
 import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.BusinessMatching
@@ -28,7 +30,6 @@ import models.payments._
 import models.renewal.Renewal
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
-import play.api.Play
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{FeeResponseService, _}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -36,33 +37,26 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.BusinessName
 import views.html.confirmation._
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-trait ConfirmationController extends BaseController {
-
-  private[controllers] val keystoreConnector: KeystoreConnector
-
-  private[controllers] implicit val dataCacheConnector: DataCacheConnector
-
-  private[controllers] implicit val amlsConnector: AmlsConnector
-
-  private[controllers] val statusService: StatusService
-
-  private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-
-  private[controllers] lazy val feeResponseService = Play.current.injector.instanceOf[FeeResponseService]
-
-  private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-
-  private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
-
-  private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
-
-  private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[ConfirmationService]
-
-  val auditConnector: AuditConnector
+@Singleton
+class ConfirmationController @Inject()(
+                                        val authConnector: AuthConnector = AMLSAuthConnector,
+                                        private[controllers] val keystoreConnector: KeystoreConnector,
+                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
+                                        private[controllers] implicit val amlsConnector: AmlsConnector,
+                                        private[controllers] val statusService: StatusService,
+                                        private[controllers] val authenticator: AuthenticatorConnector,
+                                        private[controllers] val feeResponseService: FeeResponseService,
+                                        private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
+                                        private[controllers] val paymentsConnector: PayApiConnector,
+                                        private[controllers] val paymentsService: PaymentsService,
+                                        private[controllers] val confirmationService: ConfirmationService,
+                                        private[controllers] val auditConnector: AuditConnector
+                                      ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -147,7 +141,7 @@ trait ConfirmationController extends BaseController {
   private def showRenewalConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
+    confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
         case Some(rows) if fees.totalFees > 0 => {
           isRenewalDefined match {
@@ -175,7 +169,7 @@ trait ConfirmationController extends BaseController {
     OptionT.liftF(retrieveFeeResponse) flatMap {
       case Some(fees) if fees.paymentReference.isDefined =>
 
-        val breakdownRows = submissionResponseService.getBreakdownRows(status, fees)
+        val breakdownRows = confirmationService.getBreakdownRows(status, fees)
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
@@ -211,14 +205,4 @@ trait ConfirmationController extends BaseController {
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
     } yield fees).value
 
-}
-
-object ConfirmationController extends ConfirmationController {
-  // $COVERAGE-OFF$
-  override protected val authConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
-  override private[controllers] val keystoreConnector = KeystoreConnector
-  override private[controllers] val dataCacheConnector = DataCacheConnector
-  override private[controllers] val amlsConnector = AmlsConnector
-  override val auditConnector = AMLSAuditConnector
 }

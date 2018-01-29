@@ -71,18 +71,20 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     val baseUrl = "http://localhost"
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
-    val controller = new ConfirmationController {
-      override protected val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-      override val keystoreConnector = mock[KeystoreConnector]
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val amlsConnector = mockAmlsConnector
-      override lazy val authEnrolmentsService = mock[AuthEnrolmentsService]
-      override lazy val feeResponseService = mock[FeeResponseService]
-      override lazy val authenticator = mock[AuthenticatorConnector]
-      val auditConnector = mock[AuditConnector]
-
-    }
+    val controller = new ConfirmationController(
+      keystoreConnector = mock[KeystoreConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      dataCacheConnector = mock[DataCacheConnector],
+      amlsConnector = mockAmlsConnector,
+      authEnrolmentsService = mock[AuthEnrolmentsService],
+      feeResponseService = mock[FeeResponseService],
+      authenticator = mock[AuthenticatorConnector],
+      paymentsConnector = paymentsConnector,
+      confirmationService = mock[ConfirmationService],
+      paymentsService = paymentsService,
+      auditConnector = mock[AuditConnector]
+    )
 
     val response = SubscriptionResponse(
       etmpFormBundleNumber = "",
@@ -159,7 +161,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     val breakdownRows = Seq.empty[BreakdownRow]
 
     when {
-      controller.submissionResponseService.getBreakdownRows(any(), any())(any(), any(), any())
+      controller.confirmationService.getBreakdownRows(any(), any())(any(), any(), any())
     } thenReturn Future.successful(Some(breakdownRows))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
@@ -200,7 +202,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       setupStatus(submissionStatus)
 
       when {
-        controller.submissionResponseService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
+        controller.confirmationService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
       } thenReturn Future.successful(Some(Seq.empty))
 
       val result = controller.get()(request)
@@ -218,7 +220,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       setupStatus(submissionStatus)
 
       when {
-        controller.submissionResponseService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
+        controller.confirmationService.getBreakdownRows(eqTo(SubmissionReady), any())(any(), any(), any())
       } thenReturn Future.successful(Some(Seq.empty))
 
       val result = controller.get()(request)
@@ -238,7 +240,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         } thenReturn Future.successful(None)
 
         when {
-          controller.submissionResponseService.getBreakdownRows(eqTo(SubmissionReadyForReview), any())(any(), any(), any())
+          controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), any())(any(), any(), any())
         } thenReturn Future.successful(Some(Seq.empty))
 
         val result = controller.get()(request)
@@ -258,7 +260,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         } thenReturn Future.successful(Some(feeResponse(SubscriptionResponseType).copy(paymentReference = None)))
 
         when {
-          controller.submissionResponseService.getBreakdownRows(eqTo(SubmissionDecisionApproved), any())(any(), any(), any())
+          controller.confirmationService.getBreakdownRows(eqTo(SubmissionDecisionApproved), any())(any(), any(), any())
         } thenReturn Future.successful(Some(Seq.empty))
 
         val result = controller.get()(request)
