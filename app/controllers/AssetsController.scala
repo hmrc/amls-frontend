@@ -26,7 +26,13 @@ import play.api.mvc.{Action, Result}
 class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: CanonicalGraphTransformer) extends AssetsBuilder(errorHandler) {
 
   lazy val countriesJson = transformer
-    .transform(models.countries.map(_.code).toSet)
+    .transform(models.countries.map(_.code).toSet ++ Set(
+      "ENG",
+      "GBN",
+      "NIR",
+      "SCT",
+      "WLS"
+    ))
 
   def countries = Action {
     implicit request => {
