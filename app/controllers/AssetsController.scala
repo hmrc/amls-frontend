@@ -24,11 +24,13 @@ import play.api.mvc.{Action, Result}
 
 @Singleton
 class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: CanonicalGraphTransformer) extends AssetsBuilder(errorHandler) {
+
+  lazy val countriesJson = transformer
+    .transform(models.countries.map(_.code).toSet)
+
   def countries = Action {
     implicit request => {
-      transformer
-        .transform(models.countries.map(_.code).toSet)
-        .fold[Result](InternalServerError) { j =>
+      countriesJson.fold[Result](InternalServerError) { j =>
         Ok(j.toString()).as("application/json")
       }
     }
