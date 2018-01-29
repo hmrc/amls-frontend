@@ -894,7 +894,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady, None)
+          val result = TestSubmissionResponseService.getBreakdownRows(SubmissionReady, None)
 
           await(result) mustBe Some(submissionData)
 
@@ -923,7 +923,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
               cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
             } thenReturn Some(Seq(ResponsiblePeople()))
 
-            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady, Some(feeResponse(SubscriptionResponseType)))
+            val result = TestSubmissionResponseService.getBreakdownRows(SubmissionReady, Some(feeResponse(SubscriptionResponseType)))
 
             await(result) mustBe Some(submissionData)
 
@@ -946,7 +946,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
               cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
             } thenReturn Some(Seq(ResponsiblePeople()))
 
-            val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview, Some(feeResponse(AmendOrVariationResponseType)))
+            val result = TestSubmissionResponseService.getBreakdownRows(SubmissionReadyForReview, Some(feeResponse(AmendOrVariationResponseType)))
 
             await(result) mustBe Some(submissionData)
 
@@ -963,7 +963,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved, Some(feeResponse(AmendOrVariationResponseType)))
+          val result = TestSubmissionResponseService.getBreakdownRows(SubmissionDecisionApproved, Some(feeResponse(AmendOrVariationResponseType)))
 
           await(result) mustBe Some(submissionData)
 
@@ -983,7 +983,7 @@ class SubmissionResponseServiceSpec extends PlaySpec
             TestSubmissionResponseService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
           } thenReturn Future.successful(Some(Renewal()))
 
-          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())), Some(feeResponse(AmendOrVariationResponseType)))
+          val result = TestSubmissionResponseService.getBreakdownRows(ReadyForRenewal(Some(LocalDate.now())), Some(feeResponse(AmendOrVariationResponseType)))
 
           await(result) mustBe Some(submissionData)
 

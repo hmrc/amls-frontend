@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import models.ResponseType.AmendOrVariationResponseType
 import models._
 import models.businessmatching.BusinessMatching
-import models.confirmation.{Currency, SubmissionData}
+import models.confirmation.{BreakdownRow, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -46,7 +46,7 @@ class SubmissionResponseService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[SubmissionData] =
+  ): Future[Seq[BreakdownRow]] =
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -57,11 +57,7 @@ class SubmissionResponseService @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          val paymentReference = subscription.getPaymentReference
-          val total = subscription.getTotalFees
-          val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, Some(businessActivities), Some(premises), Some(people))
-          val amlsRefNo = subscription.amlsRefNo
-          Future.successful(SubmissionData(paymentReference.some, Currency.fromBD(total), rows, Some(amlsRefNo), None))
+          Future.successful(BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, Some(businessActivities), Some(premises), Some(people)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
@@ -70,7 +66,7 @@ class SubmissionResponseService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[SubmissionData]] = {
+  ): Future[Option[Seq[BreakdownRow]]] = {
     cacheConnector.fetchAll flatMap { option =>
       (for {
         cache <- option
@@ -80,12 +76,10 @@ class SubmissionResponseService @Inject()(
         businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
         businessActivities <- businessMatching.activities
       } yield {
-        val total = amendmentResponse.totalFees
-        val difference = amendmentResponse.difference map Currency.fromBD
         val filteredPremises = TradingPremises.filter(premises)
-        val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
-        val paymentRef = amendmentResponse.paymentReference
-        Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
+        Future.successful(Some(
+          BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
+        ))
       }) getOrElse OptionT.liftF(getSubscription).value
     }
   }
@@ -95,7 +89,7 @@ class SubmissionResponseService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[SubmissionData]] = {
+  ): Future[Option[Seq[BreakdownRow]]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
@@ -104,11 +98,9 @@ class SubmissionResponseService @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          val paymentReference = variationResponse.paymentReference
-          val total = variationResponse.getTotalFees
-          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, Some(businessActivities), None, None)
-          val difference = variationResponse.difference map Currency.fromBD
-          Future.successful(Some(SubmissionData(paymentReference, Currency.fromBD(total), rows, None, difference)))
+          Future.successful(Some(
+            BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, Some(businessActivities), None, None)
+          ))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -118,18 +110,16 @@ class SubmissionResponseService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Option[SubmissionData]] = {
+  ): Future[Option[Seq[BreakdownRow]]] = {
     cacheConnector.fetchAll flatMap {
       option =>
         (for {
           cache <- option
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
-          val totalFees: BigDecimal = renewal.getTotalFees
-          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](renewal, None, None, None)
-          val paymentRef = renewal.paymentReference
-          val difference = renewal.difference
-          Future.successful(Some(SubmissionData(paymentRef, Currency(totalFees), rows, None, difference map Currency.fromBD)))
+          Future.successful(Some(
+            BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](renewal, None, None, None)
+          ))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
@@ -137,13 +127,10 @@ class SubmissionResponseService @Inject()(
   def isRenewalDefined(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] =
     cacheConnector.fetch[Renewal](Renewal.key).map(_.isDefined)
 
-  def getSubmissionData(status: SubmissionStatus, feeResponse: Option[FeeResponse])
-                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[SubmissionData]] = {
-
-    val responseType = feeResponse.map(_.responseType)
-
+  def getBreakdownRows(status: SubmissionStatus, feeResponse: FeeResponse)
+                      (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
     status match {
-      case SubmissionReadyForReview if responseType contains AmendOrVariationResponseType => getAmendment
+      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment
       case SubmissionDecisionApproved => getVariation
       case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined flatMap {
         case true => getRenewal
@@ -151,6 +138,5 @@ class SubmissionResponseService @Inject()(
       }
       case _ => getSubscription map (Some(_))
     }
-  }
 
 }

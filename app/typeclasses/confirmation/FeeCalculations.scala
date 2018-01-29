@@ -33,8 +33,8 @@ trait FeeCalculations {
   def premisesHalfYear(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises.half",
     premisesRow(response).feePer / 2)
 
-  def renewalPremisesHalfYear(rvariationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises.half",
-    premisesVariationRow(rvariationResponse).feePer / 2)
+  def renewalPremisesHalfYear(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises.half",
+    premisesVariationRow(variationResponse).feePer / 2)
 
   val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
 
