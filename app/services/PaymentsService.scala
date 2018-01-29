@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, PayApiConnector}
 import models.{FeeResponse, ReturnLocation}
-import models.confirmation.{BreakdownRow, Currency, SubmissionData}
+import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import play.api.Logger
 import play.api.http.Status._

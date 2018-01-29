@@ -23,7 +23,7 @@ import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors._
 import models.ResponseType.AmendOrVariationResponseType
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency, SubmissionData}
+import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
