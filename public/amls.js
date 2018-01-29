@@ -253,7 +253,7 @@ $(function () {
   $('[data-gov-autocomplete]').each(function() {
     openregisterLocationPicker({
       selectElement: this,
-      url: '/anti-money-laundering/assets/autocomplete/location-autocomplete-graph.json'
+      url: '/anti-money-laundering/assets/countries'
     })
   })
 
