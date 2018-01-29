@@ -21,7 +21,7 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
 import org.mockito.Mockito.when
 
-class CanonicalGraphTransformerSpec extends PlaySpec with MockitoSugar {
+class LocationGraphTransformerSpec extends PlaySpec with MockitoSugar {
 
   val json =
     """
@@ -96,10 +96,10 @@ class CanonicalGraphTransformerSpec extends PlaySpec with MockitoSugar {
   "Prune unsupported country codes from the Json" when {
     "the Json is read and transformed" in {
       val whitelist = Set("AD", "AE")
-      val loader = mock[CanonicalGraphJsonLoader]
+      val loader = mock[LocationGraphJsonLoader]
       when(loader.load) thenReturn Json.parse(json).asOpt[JsObject]
 
-      val transformer = new CanonicalGraphTransformer(loader)
+      val transformer = new LocationGraphTransformer(loader)
       val result = transformer.transform(whitelist)
 
       (result.get \ "territory:AE-AZ").toOption mustBe None

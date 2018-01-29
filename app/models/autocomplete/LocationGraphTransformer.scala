@@ -21,8 +21,9 @@ import javax.inject.{Inject, Singleton}
 import play.api.Environment
 import play.api.libs.json._
 
+// $COVERAGE-OFF$
 @Singleton
-class CanonicalGraphJsonLoader @Inject()(env: Environment) {
+class LocationGraphJsonLoader @Inject()(env: Environment) {
   private val fileName = "public/autocomplete/location-autocomplete-graph.json"
 
   def load = env.resourceAsStream(fileName) flatMap { stream =>
@@ -30,9 +31,10 @@ class CanonicalGraphJsonLoader @Inject()(env: Environment) {
     Json.parse(contents).asOpt[JsObject]
   }
 }
+// $COVERAGE-ON$
 
 @Singleton
-class CanonicalGraphTransformer @Inject()(jsonLoader: CanonicalGraphJsonLoader) {
+class LocationGraphTransformer @Inject()(jsonLoader: LocationGraphJsonLoader) {
 
   def transform(whitelist: Set[String]): Option[JsObject] = {
     val filtered = jsonLoader.load.map {

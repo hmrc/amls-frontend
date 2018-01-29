@@ -17,13 +17,13 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
-import models.autocomplete.CanonicalGraphTransformer
+import models.autocomplete.LocationGraphTransformer
 import play.api.Environment
 import play.api.http.HttpErrorHandler
 import play.api.mvc.{Action, Result}
 
 @Singleton
-class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: CanonicalGraphTransformer) extends AssetsBuilder(errorHandler) {
+class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: LocationGraphTransformer) extends AssetsBuilder(errorHandler) {
 
   lazy val countriesJson = transformer
     .transform(models.countries.map(_.code).toSet ++ Set(

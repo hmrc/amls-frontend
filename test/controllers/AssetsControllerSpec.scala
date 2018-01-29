@@ -16,7 +16,7 @@
 
 package controllers
 
-import models.autocomplete.CanonicalGraphTransformer
+import models.autocomplete.LocationGraphTransformer
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
@@ -31,7 +31,7 @@ class AssetsControllerSpec extends PlaySpec with MockitoSugar {
 
   trait Fixture {
     val environment = mock[Environment]
-    val transformer = mock[CanonicalGraphTransformer]
+    val transformer = mock[LocationGraphTransformer]
 
     val controller = new AssetsController(mock[HttpErrorHandler], environment, transformer)
   }
