@@ -16,13 +16,14 @@
 
 package views.confirmation
 
+import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers {
+class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers with PaymentGenerator{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -30,7 +31,7 @@ class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers {
     val continueHref = "http://google.co.uk"
 
     override def view = views.html.confirmation.confirm_renewal(
-      "ref number",
+      Some(paymentReferenceNumber),
       Currency(100),
       Seq.empty,
       Some(Currency(150)),

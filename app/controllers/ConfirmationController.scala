@@ -52,7 +52,7 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
 
-  private[controllers] lazy val feeResponseService  = Play.current.injector.instanceOf[FeeResponseService]
+  private[controllers] lazy val feeResponseService = Play.current.injector.instanceOf[FeeResponseService]
 
   private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
 
@@ -60,7 +60,7 @@ trait ConfirmationController extends BaseController {
 
   private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
 
-  private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[SubmissionResponseService]
+  private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[ConfirmationService]
 
   val auditConnector: AuditConnector
 
@@ -69,9 +69,8 @@ trait ConfirmationController extends BaseController {
       implicit request =>
         for {
           _ <- authenticator.refreshProfile
-          fees <- retrieveFeeResponse
           status <- statusService.getStatus
-          result <- resultFromStatus(status, fees)
+          result <- resultFromStatus(status)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
   }
@@ -170,14 +169,15 @@ trait ConfirmationController extends BaseController {
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus, feeResponse: Option[FeeResponse])
+  private def resultFromStatus(status: SubmissionStatus)
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
-    OptionT.fromOption[Future](feeResponse) flatMap { fees =>
-      
+    OptionT.liftF(retrieveFeeResponse) flatMap {
+      case Some(fees) if fees.paymentReference.isDefined =>
+
         val breakdownRows = submissionResponseService.getBreakdownRows(status, fees)
 
-        val maybeResult = status match {
+        status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
             OptionT(showAmendmentVariationConfirmation(fees, breakdownRows))
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
@@ -189,11 +189,9 @@ trait ConfirmationController extends BaseController {
             })
         }
 
-        lazy val noFeeResult = for {
-          bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-        } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
-
-        maybeResult orElse noFeeResult
+      case _ => for {
+        bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
 
     } getOrElse InternalServerError("Could not determine a response")
 

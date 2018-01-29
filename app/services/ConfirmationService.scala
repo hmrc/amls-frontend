@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import models.ResponseType.AmendOrVariationResponseType
 import models._
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, SubmissionData}
+import models.confirmation.BreakdownRow
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -37,9 +37,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class SubmissionResponseService @Inject()(
-                                           val cacheConnector: DataCacheConnector
-                                         ) extends DataCacheService {
+class ConfirmationService @Inject()(
+                                     val cacheConnector: DataCacheConnector
+                                   ) extends DataCacheService {
 
   def getSubscription
   (implicit

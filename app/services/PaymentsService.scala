@@ -37,7 +37,7 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 class PaymentsService @Inject()(
                                  val amlsConnector: AmlsConnector,
                                  val paymentsConnector: PayApiConnector,
-                                 val submissionResponseService: SubmissionResponseService,
+                                 val submissionResponseService: ConfirmationService,
                                  val statusService: StatusService
                                ) {
 
