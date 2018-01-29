@@ -1,5 +1,6 @@
 # microservice specific routes
 
+GET         /assets/countries                                                         @controllers.AssetsController.countries()
 GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
 
 GET         /                                                                         controllers.LandingController.start(allowRedirect: Boolean ?= true)

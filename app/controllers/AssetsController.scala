@@ -16,11 +16,21 @@
 
 package controllers
 
-
 import com.google.inject.{Inject, Singleton}
+import models.autocomplete.CanonicalGraphTransformer
+import play.api.Environment
 import play.api.http.HttpErrorHandler
-
-//object AssetsController extends AssetsBuilder
+import play.api.mvc.{Action, Result}
 
 @Singleton
-class AssetsController @Inject() (errorHandler: HttpErrorHandler) extends AssetsBuilder(errorHandler)
+class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environment, transformer: CanonicalGraphTransformer) extends AssetsBuilder(errorHandler) {
+  def countries = Action {
+    implicit request => {
+      transformer
+        .transform(models.countries.map(_.code).toSet)
+        .fold[Result](InternalServerError) { j =>
+        Ok(j.toString()).as("application/json")
+      }
+    }
+  }
+}

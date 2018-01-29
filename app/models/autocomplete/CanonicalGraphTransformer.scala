@@ -16,10 +16,12 @@
 
 package models.autocomplete
 
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
+
 import play.api.Environment
 import play.api.libs.json._
 
+@Singleton
 class CanonicalGraphJsonLoader @Inject()(env: Environment) {
   private val fileName = "public/autocomplete/location-autocomplete-graph.json"
 
@@ -29,6 +31,7 @@ class CanonicalGraphJsonLoader @Inject()(env: Environment) {
   }
 }
 
+@Singleton
 class CanonicalGraphTransformer @Inject()(jsonLoader: CanonicalGraphJsonLoader) {
 
   def transform(whitelist: Set[String]): Option[JsObject] = {
