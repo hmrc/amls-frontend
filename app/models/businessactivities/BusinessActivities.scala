@@ -116,7 +116,7 @@ case class BusinessActivities(
         Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP => true
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
         Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, false) => false
@@ -129,7 +129,7 @@ case class BusinessActivities(
         Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _) if !containsASP => true
         case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, _) if containsASP => true
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, _) if containsASP => true
         case _ => false
       }
     }
