@@ -23,6 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.Country
 import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePeople}
+import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.country_of_birth
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 
 @Singleton
 class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
-                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with BaseController {
 
   private def getCountryOfBirth(countryOfBirth: Country): CountryOfBirth = {
      if(countryOfBirth.code != "GB") {
@@ -47,18 +49,26 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             personResidenceType.countryOfBirth match {
-              case Some(country) => Ok (country_of_birth (Form2[CountryOfBirth] (getCountryOfBirth(country)),
-                edit, index, flow, personName.titleName))
-              case _ => Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
+              case Some(country) =>
+                Ok(country_of_birth(
+                  Form2[CountryOfBirth](getCountryOfBirth(country)),
+                  edit,
+                  index,
+                  flow,
+                  personName.titleName,
+                  autoCompleteService.getCountries))
+
+              case _ =>
+                Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
             }
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName))
+            Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _ => NotFound(notFoundView)
         }
   }
 
   private def updateCountryOfBirth(personResidenceType: Option[PersonResidenceType], data: CountryOfBirth): Option[PersonResidenceType] = {
-    val countryOfBirth = if (data.countryOfBirth) {
+    val countryOfBirth = if (data.bornInUk) {
       Some(Country("United Kingdom", "GB"))
     } else {
       data.country
@@ -71,7 +81,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
           case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+            BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
           }
           case ValidForm(_, data) => {
             for {
