@@ -1,5 +1,6 @@
 # microservice specific routes
 
+GET         /assets/countries                                                         @controllers.AssetsController.countries()
 GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
 
 GET         /                                                                         controllers.LandingController.start(allowRedirect: Boolean ?= true)
@@ -90,7 +91,6 @@ POST        /trading-premises/trading-start-date/:index                         
 GET         /trading-premises/is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-premises/is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
 
-
 GET         /trading-premises/premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
 POST        /trading-premises/premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
@@ -119,7 +119,6 @@ POST        /trading-premises/agent/:index                                      
 
 GET         /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
 POST        /trading-premises/check-your-answers                                      controllers.tradingpremises.SummaryController.post()
-
 
 GET         /trading-premises/your-answers                                            controllers.tradingpremises.SummaryController.answers()
 GET         /trading-premises/trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)

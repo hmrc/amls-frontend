@@ -21,6 +21,7 @@ import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
+import models.confirmation.SubmissionData
 import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -39,7 +40,7 @@ class BankDetailsController @Inject()(
       implicit request =>
         (for {
           status <- OptionT.liftF(statusService.getStatus)
-          (payRef, fee, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          SubmissionData(payRef, fee, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
           paymentReference <- OptionT.fromOption[Future](payRef)
         } yield {
           Ok(views.html.payments.bank_details(isUK, fee, paymentReference))

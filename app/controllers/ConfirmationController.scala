@@ -19,26 +19,25 @@ package controllers
 import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
+import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{Currency, SubmissionData}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
-import models.ReadStatusResponse
+import play.api.Play
 import play.api.mvc.{AnyContent, Request}
-import play.api.{Logger, Play}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsRefNumberBroker, BusinessName}
 import views.html.confirmation._
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
-import scala.util.Right
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
 
 trait ConfirmationController extends BaseController {
 
@@ -61,9 +60,6 @@ trait ConfirmationController extends BaseController {
   private[controllers] val amlsRefBroker = Play.current.injector.instanceOf[AmlsRefNumberBroker]
 
   val auditConnector: AuditConnector
-
-
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -149,7 +145,7 @@ trait ConfirmationController extends BaseController {
 
     submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
       getFees map {
-        case Some((Some(payRef), total, rows, _)) if total.value > 0 => {
+        case Some(SubmissionData(Some(payRef), total, rows, _, _)) if total.value > 0 => {
           isRenewalDefined match {
             case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
             case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
@@ -163,7 +159,7 @@ trait ConfirmationController extends BaseController {
   private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     getFees map {
-      case Some(_@(Some(payRef), total, rows, Right(Some(difference)))) if difference.value > 0 =>
+      case Some(SubmissionData(Some(payRef), total, rows, None, Some(difference))) if difference.value > 0 =>
         Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
@@ -179,9 +175,8 @@ trait ConfirmationController extends BaseController {
       case ReadyForRenewal(_) | RenewalSubmitted(_) =>
         OptionT(showRenewalConfirmation(submissionData, status))
       case _ => OptionT.liftF(submissionData map {
-        case Some((Some(paymentRef), total, rows, Left(_))) => {
+        case Some(SubmissionData(Some(paymentRef), total, rows, Some(_), None)) =>
           Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
-        }
       })
     }
 
@@ -195,10 +190,10 @@ trait ConfirmationController extends BaseController {
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     for {
       status <- OptionT.liftF(statusService.getStatus)
-      _@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+      SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status))
       amlsRefNo <- {
         e match {
-          case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+          case Some(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
           case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
         }
       }

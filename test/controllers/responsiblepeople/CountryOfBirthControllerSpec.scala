@@ -19,6 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.Country
+import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.responsiblepeople.ResponsiblePeople._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -46,6 +47,11 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
+        override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
+          NameValuePair("Spain", "ES")
+        ))
+      }))
       .build()
 
     val controllers = app.injector.instanceOf[CountryOfBirthController]
@@ -93,8 +99,9 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
+
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("countryOfBirth-false").hasAttr("checked") must be(true)
+        document.getElementById("bornInUk-false").hasAttr("checked") must be(true)
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
 
@@ -106,7 +113,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
         val result = controllers.get(RecordId)(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("countryOfBirth-true").hasAttr("checked") must be(true)
+        document.getElementById("bornInUk-true").hasAttr("checked") must be(true)
       }
     }
 
@@ -115,10 +122,10 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         "all the mandatory inoput parameters are supplied" in new Fixture {
           val requestWithParams = request.withFormUrlEncodedBody(
-            "countryOfBirth" -> "false",
+            "bornInUk" -> "false",
             "country" -> "FR"
           )
-         when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
@@ -137,7 +144,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
         "all the mandatory input parameters are supplied and in edit mode" in new Fixture {
           val requestWithParams = request.withFormUrlEncodedBody(
-            "countryOfBirth" -> "true"
+            "bornInUk" -> "true"
           )
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -156,7 +163,7 @@ class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar w
 
       "respond with BAD_REQUEST" when {
 
-        "country of birth field is not supplied" in new Fixture {
+        "bornInUk field is not supplied" in new Fixture {
           when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 

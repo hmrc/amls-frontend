@@ -125,10 +125,10 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
             """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
             """<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a>""" +
             """ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>""" +
-            """<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from """ +
+            """<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account """ +
             """<a href="""" +
             controllers.routes.StatusController.get() +
-            """">your account status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
@@ -151,9 +151,9 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         result.get.messageText.get mustBe (
           """<p>The recent changes made to your details have been approved.</p>""" +
-            """<p>You can find details of your registration on <a href="""" +
+            """<p>You can find details of your registration on your <a href="""" +
             controllers.routes.StatusController.get() +
-            """">your status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
@@ -176,9 +176,9 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         result.get.messageText.get mustBe (
           """<p>The date your anti-money laundering supervision ended has been changed.</p>""" +
-            """<p>You can see the new effective date on <a href="""" +
+            """<p>You can see the new effective date on your <a href="""" +
             controllers.routes.StatusController.get() +
-            """">your status page</a>.</p>"""
+            """">status page</a>.</p>"""
           )
       }
 
@@ -263,7 +263,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.ApplicationApproval", new LocalDate(2018, 7, 31), "ABC1234")
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.ApplicationApproval",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url,
+          "ABC1234")
       }
 
       "contact type is RenewalApproval" in new Fixture {
@@ -279,7 +283,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.RenewalApproval", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.RenewalApproval",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "contact type is AutoExpiryOfRegistration" in new Fixture {
@@ -295,7 +303,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.AutoExpiryOfRegistration", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.AutoExpiryOfRegistration",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "contact type is RenewalReminder" in new Fixture {
@@ -311,7 +323,11 @@ class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
 
         val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
 
-        result.get.messageText.get mustBe Messages("notification.message.with.end.date.RenewalReminder", new LocalDate(2018, 7, 31))
+        result.get.messageText.get mustBe Messages(
+          "notification.message.with.end.date.RenewalReminder",
+          new LocalDate(2018, 7, 31),
+          controllers.routes.StatusController.get().url
+        )
       }
 
       "content message is ETMP markdown" in new Fixture {

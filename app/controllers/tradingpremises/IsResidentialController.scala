@@ -68,7 +68,6 @@ class  IsResidentialController @Inject()(
         dataCacheConnector.fetchAll flatMap { cacheO =>
           Form2[IsResidential](request.body) match {
             case f: InvalidForm =>
-
               val address = for {
                 cache <- cacheO
                 tradingPremises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
@@ -82,10 +81,10 @@ class  IsResidentialController @Inject()(
                 for {
                   _ <- updateData[TradingPremises](cache, index) { tpO =>
                     tpO map { tp =>
-                      val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { x =>
-                        Some(x.copy(isResidential = Some(data.isResidential)))
+                      val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { yourTradingPremises =>
+                        Some(yourTradingPremises.copy(isResidential = Some(data.isResidential)))
                       }
-                      tp.copy(yourTradingPremises = ytp)
+                      tp.yourTradingPremises(ytp)
                     }
                   }
                 } yield edit match {

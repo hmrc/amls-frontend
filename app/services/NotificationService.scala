@@ -117,7 +117,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
         } yield {
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.message.with.end.date.$contactType",
-            details.endDate
+            details.endDate,
+            controllers.routes.StatusController.get().url,
+            ""
           )))
         }
       }
@@ -137,6 +139,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           notificationDetails.copy(messageText = Some(messagesApi(
             s"notification.message.with.end.date.$contactType",
             details.endDate,
+            controllers.routes.StatusController.get().url,
             details.referenceNumber.getOrElse("")
           )))
         }

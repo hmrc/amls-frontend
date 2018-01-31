@@ -36,12 +36,14 @@
 @styles = {
     <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
     <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
-<link href="@routes.AssetsController.at("print.css")" rel="stylesheet"/>
+    <link href="@routes.AssetsController.at("print.css")" rel="stylesheet"/>
+    <link href="@routes.AssetsController.at("autocomplete/location-autocomplete.min.css")" rel="stylesheet" />
     @linkElement
 }
 
 @scripts = {
     <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
+    <script src="@routes.AssetsController.at("autocomplete/location-autocomplete.min.js")"></script>
     <script src="@routes.AssetsController.at("amls.js")"></script>
     <script src="@routes.AssetsController.at("timeout-dialog.js")"></script>
     @scriptElem

@@ -25,6 +25,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
+import models.businessactivities.{BusinessActivities => ba}
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -97,6 +98,10 @@ class UpdateServiceDateOfChangeController @Inject()(
                 fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))
                 responsiblePeopleWithoutFitAndProper <- OptionT.pure[Future, Seq[ResponsiblePeople]](withoutFitAndProper(responsiblePeople))
                 _ <- maybeRemoveFitAndProper(responsiblePeopleWithoutFitAndProper, fitAndProperRequired)
+                businessActivities <- OptionT.liftF(dataCacheConnector.fetch[ba](ba.key))
+                accountantForAMLSRegulationsRequired <- OptionT.pure[Future, Boolean](accountantForAMLSRegulationsRequired(updatedBusinessActivities))
+                baWithAccountantForAMLSRegulations <- OptionT.pure[Future, ba](withAccountantForAMLSRegulations(businessActivities))
+                _ <- maybeRemoveAccountantForAMLSRegulations(baWithAccountantForAMLSRegulations, accountantForAMLSRegulationsRequired)
               } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
@@ -128,8 +133,12 @@ class UpdateServiceDateOfChangeController @Inject()(
     })
   }
 
+
   private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean =
     (businessActivities.businessActivities contains MoneyServiceBusiness) | (businessActivities.businessActivities contains TrustAndCompanyServices)
+
+  private def accountantForAMLSRegulationsRequired(businessActivities: BusinessActivities): Boolean =
+    businessActivities.businessActivities contains AccountancyServices
 
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[Seq[ResponsiblePeople]] = {
     dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople) map { _ =>
@@ -146,6 +155,22 @@ class UpdateServiceDateOfChangeController @Inject()(
       OptionT.pure[Future, Seq[ResponsiblePeople]](responsiblePeople)
     } else {
       OptionT.liftF(removeFitAndProper(responsiblePeople))
+    }
+
+  private def withAccountantForAMLSRegulations(activities: ba) = activities.copy(hasAccepted = false)
+
+  private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier): Future[ba] = {
+    dataCacheConnector.save[ba](ba.key, activities) map { _ =>
+      activities.accountantForAMLSRegulations(None)
+    }
+  }
+
+  private def maybeRemoveAccountantForAMLSRegulations(activites: ba, accountantForAMLSRegulationsRequired: Boolean)
+                                                     (implicit ac: AuthContext, hc: HeaderCarrier) =
+    if(accountantForAMLSRegulationsRequired){
+      OptionT.pure[Future, ba](activites)
+    } else {
+      OptionT.liftF(removeAccountantForAMLSRegulations(activites))
     }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =

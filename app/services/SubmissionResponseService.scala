@@ -22,8 +22,8 @@ import cats.data.OptionT
 import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
-import models.confirmation.{BreakdownRow, Currency}
+import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MSB}
+import models.confirmation.{Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -32,6 +32,8 @@ import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionRe
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import typeclasses.confirmation.BreakdownRowInstances._
+import typeclasses.confirmation.BreakdownRows
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -41,8 +43,6 @@ sealed case class RowEntity(message: String, feePer: BigDecimal)
 class SubmissionResponseService @Inject()(
                                            val cacheConnector: DataCacheConnector
                                          ) extends FeeCalculations with DataCacheService {
-
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def getSubscription
   (implicit
@@ -60,12 +60,11 @@ class SubmissionResponseService @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          val subQuantity = subscriptionQuantity(subscription)
           val paymentReference = subscription.getPaymentReference
           val total = subscription.getTotalFees
-          val rows = getBreakdownRows(subscription, premises, people, businessActivities, subQuantity)
+          val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, Some(businessActivities), Some(premises), Some(people))
           val amlsRefNo = subscription.amlsRefNo
-          Future.successful((paymentReference.some, Currency.fromBD(total), rows, Left(amlsRefNo)))
+          Future.successful(SubmissionData(paymentReference.some, Currency.fromBD(total), rows, Some(amlsRefNo), None))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
 
@@ -96,9 +95,9 @@ class SubmissionResponseService @Inject()(
         } yield {
           val paymentReference = variationResponse.paymentReference
           val total = variationResponse.getTotalFees
-          val rows = getVariationBreakdownRows(variationResponse, businessActivities)
+          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, Some(businessActivities), None, None)
           val difference = variationResponse.difference map Currency.fromBD
-          Future.successful(Some((paymentReference, Currency.fromBD(total), rows, Right(difference))))
+          Future.successful(Some(SubmissionData(paymentReference, Currency.fromBD(total), rows, None, difference)))
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -116,16 +115,13 @@ class SubmissionResponseService @Inject()(
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
           val totalFees: BigDecimal = renewal.getTotalFees
-          val rows = getRenewalBreakdown(renewal)
+          val rows = BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](renewal, None, None, None)
           val paymentRef = renewal.paymentReference
           val difference = renewal.difference
-          Future.successful(Some((paymentRef, Currency(totalFees), rows, Right(difference map Currency.fromBD))))
+          Future.successful(Some(SubmissionData(paymentRef, Currency(totalFees), rows, None, difference map Currency.fromBD)))
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }
-
-  private def subscriptionQuantity(subscription: SubmissionResponse): Int =
-    if (subscription.getRegistrationFee == 0) 0 else 1
 
   private def getDataForAmendment(option: Option[CacheMap])(implicit authContent: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
     for {
@@ -136,138 +132,12 @@ class SubmissionResponseService @Inject()(
       businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       businessActivities <- businessMatching.activities
     } yield {
-      val subQuantity = subscriptionQuantity(amendmentResponse)
       val total = amendmentResponse.totalFees
       val difference = amendmentResponse.difference map Currency.fromBD
       val filteredPremises = TradingPremises.filter(premises)
-      val rows = getBreakdownRows(amendmentResponse, filteredPremises, people, businessActivities, subQuantity)
+      val rows = BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
       val paymentRef = amendmentResponse.paymentReference
-      Future.successful(Some((paymentRef, Currency.fromBD(total), rows, Right(difference))))
-    }
-  }
-
-  private def getRenewalBreakdown(renewal: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
-
-    val breakdownRows = Seq.empty
-
-    def renewalRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
-      if (count > 0) {
-        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(renewal))))
-      } else {
-        Seq.empty
-      }
-    }
-
-    def rpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeople, peopleVariationRow(renewal), renewalPeopleFee)
-
-    def fpRow: Seq[BreakdownRow] = renewalRow(renewal.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
-
-    def tpFullYearRow: Seq[BreakdownRow] = renewalRow(renewal.addedFullYearTradingPremises, premisesVariationRow(renewal), fullPremisesFee)
-
-    def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(renewal.halfYearlyTradingPremises, premisesHalfYear(renewal), renewalHalfYearPremisesFee)
-
-    def tpZeroRow: Seq[BreakdownRow] = renewalRow(renewal.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
-
-    rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-
-  }
-
-  private def getBreakdownRows
-  (submission: SubmissionResponse,
-   premises: Seq[TradingPremises],
-   people: Seq[ResponsiblePeople],
-   businessActivities: BusinessActivities,
-   subQuantity: Int): Seq[BreakdownRow] = {
-    Seq(
-      BreakdownRow(submissionRow(submission).message, subQuantity, submissionRow(submission).feePer, subQuantity * submissionRow(submission).feePer)
-    ) ++ responsiblePeopleRows(people, submission, businessActivities.businessActivities) ++ Seq(
-      BreakdownRow(premisesRow(submission).message, premises.size, premisesRow(submission).feePer, submission.getPremiseFee)
-    )
-  }
-
-  private def getVariationBreakdownRows
-  (variationResponse: AmendVariationRenewalResponse,
-   businessActivities: BusinessActivities): Seq[BreakdownRow] = {
-    responsiblePeopleVariationRows(variationResponse, businessActivities.businessActivities) ++ tradingPremisesVariationRows(variationResponse)
-  }
-
-  private def responsiblePeopleRows
-  (people: Seq[ResponsiblePeople],
-   subscription: SubmissionResponse,
-   activities: Set[BusinessActivity]): Seq[BreakdownRow] = {
-    if (showBreakdown(subscription.getFpFee, activities)) {
-
-      splitPeopleByFitAndProperTest(people) match {
-        case (passedFP, notFP) =>
-          Seq(
-            BreakdownRow(peopleRow(subscription).message, notFP.size, peopleRow(subscription).feePer, Currency.fromBD(subscription.getFpFee.getOrElse(0)))
-          ) ++ (if (passedFP.nonEmpty) {
-            Seq(
-              BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
-            )
-          } else {
-            Seq.empty
-          })
-      }
-    } else {
-      Seq.empty
-    }
-  }
-
-  private def tradingPremisesVariationRows(variationRenewalResponse: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
-    val breakdownRows = Seq.empty
-
-    def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
-      if (count > 0) {
-        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variationRenewalResponse))))
-      } else {
-        Seq.empty
-      }
-    }
-
-    def tpFullYearRow: Seq[BreakdownRow] = variationRow(
-      variationRenewalResponse.addedFullYearTradingPremises,
-      premisesVariationRow(variationRenewalResponse),
-      fullPremisesFee
-    )
-
-    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
-      variationRenewalResponse.halfYearlyTradingPremises,
-      premisesHalfYear(variationRenewalResponse),
-      renewalHalfYearPremisesFee
-    )
-
-    def tpZeroRow: Seq[BreakdownRow] = variationRow(
-      variationRenewalResponse.zeroRatedTradingPremises,
-      PremisesZero,
-      renewalZeroPremisesFee
-    )
-
-    tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-  }
-
-  private def responsiblePeopleVariationRows
-  (variationResponse: AmendVariationRenewalResponse,
-   activities: Set[BusinessActivity]): Seq[BreakdownRow] = {
-
-    if (showBreakdown(variationResponse.getFpFee, activities)) {
-
-      val (passedFP, notFP) = (variationResponse.addedResponsiblePeopleFitAndProper, variationResponse.addedResponsiblePeople)
-
-      (if (notFP > 0) {
-        Seq(
-          BreakdownRow(peopleVariationRow(variationResponse).message, notFP, peopleVariationRow(variationResponse).feePer, Currency.fromBD(variationResponse.getFpFee.getOrElse(0)))
-        )
-      } else {
-        Seq.empty
-      }) ++ (if (passedFP > 0) {
-        Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
-      } else {
-        Seq.empty
-      })
-
-    } else {
-      Seq.empty
+      Future.successful(Some(SubmissionData(paymentRef, Currency.fromBD(total), rows, None, difference)))
     }
   }
 
@@ -282,23 +152,13 @@ class SubmissionResponseService @Inject()(
         case true => getRenewal
         case false => getVariation
       }
-      case _ => getSubscription map {
-        case (payRef, total, breakdown, amlsRefNo@Left(_)) => (payRef, total, breakdown, amlsRefNo).some
-      }
+      case _ => getSubscription map (Some(_))
     }
   }
 
-  private val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
-
-  private val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
-    fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
-
-  private val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
-    ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
-
 }
 
-sealed trait FeeCalculations {
+trait FeeCalculations {
 
   def submissionRow(response: SubmissionResponse) = RowEntity("confirmation.submission", response.getRegistrationFee)
 

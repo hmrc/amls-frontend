@@ -23,6 +23,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.confirmation.SubmissionData
 import models.payments.TypeOfBank
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -65,10 +66,10 @@ class TypeOfBankController @Inject()(
   private def doAudit(ukBank: Boolean)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     (for {
       status <- OptionT.liftF(statusService.getStatus)
-      subData@(paymentReference, _, _, e) <- OptionT(submissionResponseService.getSubmissionData(status))
+      subData@SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status))
       amlsRefNo <- {
         e match {
-          case Left(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+          case Some(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
           case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
         }
       }

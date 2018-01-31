@@ -57,9 +57,9 @@ case class TradingPremises(
     this.copy(agentPartnership = Some(p), hasChanged = hasChanged || !this.agentPartnership.contains(p),
       hasAccepted = hasAccepted && this.agentPartnership.contains(p))
 
-  def yourTradingPremises(p: YourTradingPremises): TradingPremises =
-    this.copy(yourTradingPremises = Some(p), hasChanged = hasChanged || !this.yourTradingPremises.contains(p),
-      hasAccepted = hasAccepted && this.yourTradingPremises.contains(p))
+  def yourTradingPremises(p: Option[YourTradingPremises]): TradingPremises =
+    this.copy(yourTradingPremises = p, hasChanged = hasChanged || !this.yourTradingPremises.equals(p),
+      hasAccepted = hasAccepted && this.yourTradingPremises.equals(p))
 
   def whatDoesYourBusinessDoAtThisAddress(p: WhatDoesYourBusinessDo): TradingPremises =
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),

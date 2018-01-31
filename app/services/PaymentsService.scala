@@ -22,7 +22,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, PayApiConnector}
 import models.ReturnLocation
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.payments._
 import play.api.Logger
 import play.api.http.Status._
@@ -31,7 +31,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 
 class PaymentsService @Inject()(
@@ -40,7 +40,6 @@ class PaymentsService @Inject()(
                                  val submissionResponseService: SubmissionResponseService,
                                  val statusService: StatusService
                                ) {
-  type SubmissionData = (Option[String], Currency, Seq[BreakdownRow], Either[String, Option[Currency]])
 
   def requestPaymentsUrl(data: SubmissionData, returnUrl: String, amlsRefNo: String, safeId: String)
                         (implicit hc: HeaderCarrier,
@@ -48,8 +47,8 @@ class PaymentsService @Inject()(
                          authContext: AuthContext,
                          request: Request[_]): Future[CreatePaymentResponse] =
     data match {
-      case (Some(ref), _, _, Right(Some(difference))) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo, safeId)
-      case (Some(ref), total, _, _) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo, safeId)
+      case SubmissionData(Some(ref), _, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo, safeId)
+      case SubmissionData(Some(ref), total, _, _, _) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo, safeId)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 
@@ -87,8 +86,8 @@ class PaymentsService @Inject()(
     amlsConnector.createBacsPayment(request)
 
   def amountFromSubmissionData(submissionData: SubmissionData): Option[Currency] = submissionData match {
-    case (_, _, _, Right(Some(x))) => Some(x)
-    case (_, total, _, _) => Some(total)
+    case SubmissionData(_, _, _, _, difference@Some(_)) => difference
+    case SubmissionData(_, total, _, _, _) => Some(total)
     case _ => None
   }
 

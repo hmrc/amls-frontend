@@ -32,6 +32,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching._
+import models.businessactivities.{BusinessActivities => ba}
 
 import scala.concurrent.Future
 
@@ -86,6 +87,9 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 newModel(businessMatching.activities, data, isPreSubmission),
                 isMsb(data, businessMatching.activities)
               )
+              businessActivities <- dataCacheConnector.fetch[ba](ba.key)
+              baWithoutAccountantForAMLSRegulations <- withoutAccountantForAMLSRegulations(businessActivities)
+              _ <- maybeRemoveAccountantForAMLSRegulations(baWithoutAccountantForAMLSRegulations, savedModel, businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePeople] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -105,6 +109,26 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             }
         }
   }
+
+  private def accountantForAMLSRegulationsNotRequired(businessActivities: BusinessActivities): Boolean =
+    businessActivities.businessActivities contains AccountancyServices
+
+  private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] =
+    Future.successful(activities.whoIsYourAccountant(None).accountantForAMLSRegulations(None).copy(hasAccepted = true))
+
+  private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    dataCacheConnector.save[ba](ba.key, activities)
+  }
+
+  private def maybeRemoveAccountantForAMLSRegulations(activitiesWithoutAccountantForAMLSRegulations: ba,
+                                                      businessActivities: BusinessActivities,
+                                                      activities: ba)
+                                                     (implicit ac: AuthContext, hc: HeaderCarrier) =
+    if(accountantForAMLSRegulationsNotRequired(businessActivities) && (activities == None)){
+      removeAccountantForAMLSRegulations(activitiesWithoutAccountantForAMLSRegulations)
+    } else {
+      Future.successful(activities)
+    }
 
   private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
     Redirect(routes.ServicesController.get())

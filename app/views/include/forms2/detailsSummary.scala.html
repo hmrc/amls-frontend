@@ -22,7 +22,7 @@
 )(content: Html)(implicit lang:Lang,  m: Messages)
 
 @* http://hmrc.github.io/assets-frontend/section-details.html *@
-<div class="form-group">
+<div class="form-group no-print">
     <details role="group">
         <summary class="@summaryClasses.mkString(" ")">@summary</summary>
         <div@if(detailsInner) { class="details__inner"}>
