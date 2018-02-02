@@ -25,7 +25,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.businessmatching.updateservice.{TradingPremisesActivities => TradingPremises$}
+import models.businessmatching.updateservice.TradingPremisesActivities
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
 import services.{StatusService, TradingPremisesService}
@@ -80,15 +80,9 @@ class WhichTradingPremisesController @Inject()(
             businessMatchingService.getAdditionalBusinessActivities.value flatMap {
               case Some(additionalActivities) =>
                 val activity = additionalActivities.toList(index)
-                Form2[TradingPremises$](request.body) match {
+                Form2[TradingPremisesActivities](request.body) match {
                   case ValidForm(_, data) =>
-                    updateTradingPremises(data, activity) map { _ =>
-                      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
-                        Redirect(TradingPremisesController.get(index + 1))
-                      } else {
-                        Redirect(CurrentTradingPremisesController.get(0))
-                      }
-                    }
+                    redirectTo(index, additionalActivities, activity, data)
                   case f: InvalidForm =>
                     tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
@@ -107,7 +101,22 @@ class WhichTradingPremisesController @Inject()(
       }
   }
 
-  private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
+  private def redirectTo(index: Int, additionalActivities: Set[BusinessActivity], activity: BusinessActivity, data: TradingPremisesActivities)
+                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
+    updateTradingPremises(data, activity) flatMap { _ =>
+      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
+        Future.successful(Redirect(TradingPremisesController.get(index + 1)))
+      } else {
+        businessMatchingService.fitAndProperRequired.value map {
+          case Some(true) => Redirect(FitAndProperController.get())
+          case Some(false) => Redirect(NewServiceInformationController.get())
+          case _ => InternalServerError("Cannot retrieve activities")
+        }
+      }
+    }
+  }
+
+  private def updateTradingPremises(data: TradingPremisesActivities, activity: BusinessActivity)
                                    (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
       tradingPremisesService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, false)

@@ -192,25 +192,75 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
 
         }
       }
-      "redirect to CurrentTradingPremises" when {
-        "trading premises are selected and there is an activity through which to iterate" in new Fixture {
+
+      "progress to the 'New Service Information' page" when {
+        "fit and proper is not required" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
           mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
 
+
           when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
           } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "tradingPremises[]" -> "1"
-          ))
+          when {
+            controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+          } thenReturn OptionT.some[Future, Boolean](false)
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.CurrentTradingPremisesController.get(0).url))
+          val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
 
         }
       }
+
+      "progress to the 'fit and proper' page" when {
+        "fit and proper requirement is introduced" in new Fixture {
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+
+          when {
+            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
+
+          when {
+            controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+          } thenReturn OptionT.some[Future, Boolean](true)
+
+          val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
+
+        }
+      }
+
+
+
+
+//      "redirect to CurrentTradingPremises" when {
+//        "trading premises are selected and there is an activity through which to iterate" in new Fixture {
+//
+//          mockApplicationStatus(SubmissionDecisionApproved)
+//          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+//
+//          when {
+//            controller.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+//          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+//
+//          val result = controller.post()(request.withFormUrlEncodedBody(
+//            "tradingPremises[]" -> "1"
+//          ))
+//
+//          status(result) must be(SEE_OTHER)
+//          redirectLocation(result) must be(Some(routes.CurrentTradingPremisesController.get(0).url))
+//
+//        }
+//      }
     }
 
     "on invalid request" must {
