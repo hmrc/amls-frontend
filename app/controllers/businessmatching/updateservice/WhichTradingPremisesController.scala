@@ -82,13 +82,7 @@ class WhichTradingPremisesController @Inject()(
                 val activity = additionalActivities.toList(index)
                 Form2[TradingPremises$](request.body) match {
                   case ValidForm(_, data) =>
-                    updateTradingPremises(data, activity) map { _ =>
-                      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
-                        Redirect(TradingPremisesController.get(index + 1))
-                      } else {
-                        Redirect(CurrentTradingPremisesController.get(0))
-                      }
-                    }
+                    redirectTo(index, additionalActivities, activity, data)
                   case f: InvalidForm =>
                     tradingPremises map { tp =>
                       BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
@@ -105,6 +99,16 @@ class WhichTradingPremisesController @Inject()(
       } recoverWith {
         case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
       }
+  }
+
+  private def redirectTo(index: Int, additionalActivities: Set[BusinessActivity], activity: BusinessActivity, data: TradingPremises$)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    updateTradingPremises(data, activity) map { _ =>
+      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
+        Redirect(TradingPremisesController.get(index + 1))
+      } else {
+        Redirect(CurrentTradingPremisesController.get(0))
+      }
+    }
   }
 
   private def updateTradingPremises(data: TradingPremises$, activity: BusinessActivity)
