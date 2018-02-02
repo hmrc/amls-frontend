@@ -16,8 +16,9 @@
 
 package controllers.businessmatching.updateservice
 
-import javax.inject.{Inject, Singleton}
+import java.lang.ProcessBuilder.Redirect
 
+import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -33,6 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import routes._
 
 import scala.concurrent.Future
+import cats.implicits._
 
 @Singleton
 class TradingPremisesController @Inject()(
@@ -55,7 +57,7 @@ class TradingPremisesController @Inject()(
       implicit request =>
         additionalActivityForTradingPremises(index){ (activities: Set[BusinessActivity], activity: BusinessActivity) =>
           Form2[AreNewActivitiesAtTradingPremises](request.body) match {
-            case ValidForm(_, data) => Future.successful(redirectTo(data, activities, index))
+            case ValidForm(_, data) => redirectTo(data, activities, index)
             case f: InvalidForm => Future.successful(
               BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
             )
@@ -63,13 +65,16 @@ class TradingPremisesController @Inject()(
         }
   }
 
-  private def redirectTo(data: AreNewActivitiesAtTradingPremises, additionalActivities: Set[BusinessActivity], index: Int) = data match {
-    case NewActivitiesAtTradingPremisesYes(_) => Redirect(WhichTradingPremisesController.get(index))
+  private def redirectTo(data: AreNewActivitiesAtTradingPremises, additionalActivities: Set[BusinessActivity], index: Int)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Result] = data match {
+    case NewActivitiesAtTradingPremisesYes(_) => Future.successful(Redirect(WhichTradingPremisesController.get(index)))
     case NewActivitiesAtTradingPremisesNo =>
       if (activitiesToIterate(index, additionalActivities)) {
-        Redirect(TradingPremisesController.get(index + 1))
+        Future.successful(Redirect(TradingPremisesController.get(index + 1)))
       } else {
-        Redirect(CurrentTradingPremisesController.get(0))
+        (businessMatchingService.fitAndProperRequired map {
+          case true => Redirect(FitAndProperController.get())
+          case false => Redirect(NewServiceInformationController.get())
+        }) getOrElse InternalServerError("Cannot retrieve activities")
       }
   }
 
@@ -85,7 +90,8 @@ class TradingPremisesController @Inject()(
           case Some(additionalActivities) =>
             val activity = additionalActivities.toList(index)
             fn(additionalActivities, activity)
-          case None => Future.successful(InternalServerError("Cannot retrieve activities"))
+          case None =>
+            Future.successful(InternalServerError("Cannot retrieve activities"))
         }
     } recoverWith {
       case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))

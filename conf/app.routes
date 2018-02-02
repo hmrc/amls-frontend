@@ -316,11 +316,11 @@ POST        /update-service/trading-premises/:index                             
 GET         /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.get(index: Int)
 POST        /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.WhichTradingPremisesController.post(index: Int)
 
-#GET         /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.get(index: Int)
-#POST        /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post(index: Int)
+GET         /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.get(index: Int)
+POST        /update-service/current-trading-premises/:index                           @controllers.businessmatching.updateservice.CurrentTradingPremisesController.post(index: Int)
 
-#GET         /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get(index: Int)
-#POST        /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post(index: Int)
+GET         /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.get(index: Int)
+POST        /update-service/which-current-trading-premises/:index                     @controllers.businessmatching.updateservice.WhichCurrentTradingPremisesController.post(index: Int)
 
 GET         /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.get()
 POST        /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.FitAndProperController.post()
