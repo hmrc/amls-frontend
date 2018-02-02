@@ -193,10 +193,12 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
         }
       }
 
-      "progress to the 'registration progress' page" when {
+      "progress to the 'New Service Information' page" when {
         "fit and proper is not required" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
 
           when {
             controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
@@ -206,7 +208,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
             controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
           } thenReturn OptionT.some[Future, Boolean](false)
 
-          val result = controller.post(1)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
+          val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
@@ -218,6 +220,8 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
         "fit and proper requirement is introduced" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
 
           when {
             controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
@@ -227,7 +231,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
             controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
           } thenReturn OptionT.some[Future, Boolean](true)
 
-          val result = controller.post(1)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
+          val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
 
           status(result) mustBe SEE_OTHER
           redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
