@@ -128,7 +128,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
     "post is called" must {
 
-      "on valid request" must {
+      "with a valid request" must {
         "redirect to WhichTradingPremises" when {
           "request equals Yes" in new Fixture {
 
@@ -148,22 +148,33 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
           }
         }
-        "redirect to CurrentTradingPremises" when {
-          "request equals No" when {
-            "there are no more activities through which to iterate" in new Fixture {
-
-              mockApplicationStatus(SubmissionDecisionApproved)
+        "and request equals No" when {
+          "progress to the 'registration progress' page" when {
+            "fit and proper is not required" in new Fixture {
 
               when {
-                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+              } thenReturn OptionT.some[Future, Boolean](false)
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
-                "tradingPremisesNewActivities" -> "false"
-              ))
+              val result = controller.post(1)(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.CurrentTradingPremisesController.get(0).url))
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
+
+            }
+          }
+
+          "progress to the 'fit and proper' page" when {
+            "fit and proper requirement is introduced" in new Fixture {
+
+              when {
+                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+              } thenReturn OptionT.some[Future, Boolean](true)
+
+              val result = controller.post(1)(request.withFormUrlEncodedBody("submittedActivities" -> "true"))
+
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
 
             }
           }
