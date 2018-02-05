@@ -20,11 +20,9 @@ import cats.implicits._
 import models.confirmation.Currency
 import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 import models.notifications.StatusType.DeRegistered
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
+import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
-
-import scala.util.matching.Regex
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],

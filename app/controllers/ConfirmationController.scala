@@ -73,7 +73,7 @@ class ConfirmationController @Inject()(
     implicit authContext =>
       implicit request =>
 
-        def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
+        def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
           maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
 
         val msgFromPaymentStatus = Map[PaymentStatus, String](
@@ -83,7 +83,7 @@ class ConfirmationController @Inject()(
 
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
-          businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
+          businessName <- companyName(detailedStatus) orElse OptionT.some("")
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
