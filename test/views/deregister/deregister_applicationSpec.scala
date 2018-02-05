@@ -31,7 +31,7 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers wit
     val businessName = "Test Business"
     val currentRegYearEndDate = LocalDate.now()
 
-    def view = views.html.deregister.deregister_application(businessName, currentRegYearEndDate, amlsRegistrationNumber)
+    def view = views.html.deregister.deregister_application(businessName, Set.empty, amlsRegistrationNumber, true)
   }
 
   "deregister_application view" must {

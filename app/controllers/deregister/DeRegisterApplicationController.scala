@@ -19,17 +19,16 @@ package controllers.deregister
 import javax.inject.Inject
 
 import cats.data.OptionT
-import cats.implicits._
-import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.FeatureToggle
 import views.html.deregister.deregister_application
 
 import scala.concurrent.Future
+import cats.implicits._
+import config.ApplicationConfig
 
 class DeRegisterApplicationController @Inject()
 (
@@ -40,18 +39,21 @@ class DeRegisterApplicationController @Inject()
   amls: AmlsConnector
 ) extends BaseController {
 
-  def get() =  {
+  def get() = {
     Authorised.async {
       implicit authContext =>
         implicit request =>
           (for {
-            readStatus <- OptionT.liftF(statusService.getReadStatus)
             bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
             details <- OptionT.fromOption[Future](bm.reviewDetails)
-            currentRegYearEndDate <- OptionT.fromOption[Future](readStatus.currentRegYearEndDate)
             amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+            ba <- OptionT.fromOption[Future](bm.activities)
           } yield {
-            Ok(deregister_application(details.businessName, currentRegYearEndDate, amlsRegNumber))
+            val activities = ba.businessActivities map {
+              _.getMessage
+            }
+
+            Ok(deregister_application(details.businessName, activities, amlsRegNumber, ApplicationConfig.businessMatchingVariationToggle))
           }) getOrElse InternalServerError("Could not show the de-register page")
     }
   }

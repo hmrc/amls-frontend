@@ -578,13 +578,16 @@ status.withdraw.button-text = Withdraw application
 status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
   I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
 
-status.deregister.title = De-register business
+status.deregister.title = De-register your business
 status.deregister.link-text = de-register business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
-status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
-  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
-  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
+status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
+  We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
+  You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
+status.deregister.services = Registered services:
+status.deregister.button.change = Change
+status.deregister.regnumber = Registration number:
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
