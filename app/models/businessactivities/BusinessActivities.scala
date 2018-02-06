@@ -100,8 +100,7 @@ case class BusinessActivities(
 
   def taxMatters(p: Option[TaxMatters]): BusinessActivities =
     this.copy(taxMatters = p, hasChanged = hasChanged || !this.taxMatters.equals(p),
-      hasAccepted = hasAccepted && this.taxMatters.contains(p))
-
+      hasAccepted = hasAccepted && this.taxMatters.equals(p))
 
   def isComplete(businessMatchingActivities: Option[BusinessMatchingActivities]): Boolean = {
 
@@ -110,7 +109,7 @@ case class BusinessActivities(
     this match {
       case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP => true
+        Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) if !containsASP => true
       case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
         Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
