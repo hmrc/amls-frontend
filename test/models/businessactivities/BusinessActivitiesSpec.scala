@@ -316,7 +316,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return BusinessActivities with TaxMatters set and indicate that changes have been made" in {
-      val result = initial.taxMatters(NewTaxMatters)
+      val result = initial.taxMatters(Some(NewTaxMatters))
       result must be(BusinessActivities(taxMatters = Some(NewTaxMatters), hasChanged = true))
     }
   }
@@ -504,7 +504,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "taxMatters value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.taxMatters(DefaultTaxMatters)
+          val res = completeModel.taxMatters(Some(DefaultTaxMatters))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
@@ -512,7 +512,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.taxMatters(NewTaxMatters)
+          val res = completeModel.taxMatters(Some(NewTaxMatters))
           res.hasChanged must be(true)
           res.taxMatters must be(Some(NewTaxMatters))
         }

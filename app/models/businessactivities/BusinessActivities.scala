@@ -98,8 +98,8 @@ case class BusinessActivities(
     this.copy(whoIsYourAccountant = p, hasChanged = hasChanged || !this.whoIsYourAccountant.equals(p),
       hasAccepted = hasAccepted && this.whoIsYourAccountant.equals(p))
 
-  def taxMatters(p: TaxMatters): BusinessActivities =
-    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p),
+  def taxMatters(p: Option[TaxMatters]): BusinessActivities =
+    this.copy(taxMatters = p, hasChanged = hasChanged || !this.taxMatters.equals(p),
       hasAccepted = hasAccepted && this.taxMatters.contains(p))
 
 

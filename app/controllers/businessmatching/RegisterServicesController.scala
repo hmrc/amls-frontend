@@ -114,7 +114,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     businessActivities.businessActivities contains AccountancyServices
 
   private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] =
-    Future.successful(activities.whoIsYourAccountant(None).accountantForAMLSRegulations(None).copy(hasAccepted = true))
+    Future.successful(activities.whoIsYourAccountant(None).accountantForAMLSRegulations(None).taxMatters(None).copy(hasAccepted = true))
 
   private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier) = {
     dataCacheConnector.save[ba](ba.key, activities)
@@ -124,7 +124,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                                       businessActivities: BusinessActivities,
                                                       activities: ba)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) =
-    if(accountantForAMLSRegulationsNotRequired(businessActivities) && (activities == None)){
+    if(accountantForAMLSRegulationsNotRequired(businessActivities)){
       removeAccountantForAMLSRegulations(activitiesWithoutAccountantForAMLSRegulations)
     } else {
       Future.successful(activities)
