@@ -20,7 +20,7 @@
 @import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[BMBusinessActivities], isEditable:Boolean, hideReceiveAdvice:Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], model: BusinessActivities, bmBusinessActivities:Option[BMBusinessActivities], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.businessactivities")
@@ -187,55 +187,53 @@
         }
     }
 
-    @if(!hideReceiveAdvice) {
-        @model.accountantForAMLSRegulations.map { x =>
-            @checkYourAnswers(
-                question = Messages("businessactivities.accountantForAMLSRegulations.title"),
-                editUrl = controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).toString
-            ) {
-                <p>@x.accountantForAMLSRegulations match {
-                    case true =>  { @Messages("lbl.yes") }
-                    case false =>  { @Messages("lbl.no") }
-                }</p>
-            }
+    @model.accountantForAMLSRegulations.map { x =>
+        @checkYourAnswers(
+            question = Messages("businessactivities.accountantForAMLSRegulations.title"),
+            editUrl = controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get(true).toString
+        ) {
+            <p>@x.accountantForAMLSRegulations match {
+                case true =>  { @Messages("lbl.yes") }
+                case false =>  { @Messages("lbl.no") }
+            }</p>
         }
+    }
 
-        @model.accountantForAMLSRegulations.map { x =>
-            @x.accountantForAMLSRegulations match {
-                case true => {
-                    @checkYourAnswers(
-                        question = Messages("businessactivities.whoisyouraccountant.title"),
-                        editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
-                    ) {
-                        @model.whoIsYourAccountant.map { accountant =>
-                            <ul class="list">
-                                @if(!accountant.accountantsName.isEmpty) {
-                                    <li>@accountant.accountantsName</li>
-                                }
-                                @if(!accountant.accountantsTradingName.isEmpty) {
-                                    <li>@accountant.accountantsTradingName</li>
-                                }
-                                <li>@accountant.address.toLines.map { line =>
-                                    @line<br />
-                                }</li>
-                            </ul>
-                        }
-                    }
-
-                    @model.taxMatters.map { x =>
-                        @checkYourAnswers(
-                            question = Messages("businessactivities.tax.matters.title"),
-                            editUrl = controllers.businessactivities.routes.TaxMattersController.get(true).toString
-                        ) {
-                            <p>@x.manageYourTaxAffairs match {
-                                case true =>  { @Messages("lbl.yes") }
-                                case false =>  { @Messages("lbl.no") }
-                            }</p>
-                        }
+    @model.accountantForAMLSRegulations.map { x =>
+        @x.accountantForAMLSRegulations match {
+            case true => {
+                @checkYourAnswers(
+                    question = Messages("businessactivities.whoisyouraccountant.title"),
+                    editUrl = controllers.businessactivities.routes.WhoIsYourAccountantController.get(true).toString
+                ) {
+                    @model.whoIsYourAccountant.map { accountant =>
+                        <ul class="list">
+                            @if(!accountant.accountantsName.isEmpty) {
+                                <li>@accountant.accountantsName</li>
+                            }
+                            @if(!accountant.accountantsTradingName.isEmpty) {
+                                <li>@accountant.accountantsTradingName</li>
+                            }
+                            <li>@accountant.address.toLines.map { line =>
+                                @line<br />
+                            }</li>
+                        </ul>
                     }
                 }
-                case false =>{}
+
+                @model.taxMatters.map { x =>
+                    @checkYourAnswers(
+                        question = Messages("businessactivities.tax.matters.title"),
+                        editUrl = controllers.businessactivities.routes.TaxMattersController.get(true).toString
+                    ) {
+                        <p>@x.manageYourTaxAffairs match {
+                            case true =>  { @Messages("lbl.yes") }
+                            case false =>  { @Messages("lbl.no") }
+                        }</p>
+                    }
+                }
             }
+            case false =>{}
         }
     }
 
