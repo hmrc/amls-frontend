@@ -588,6 +588,7 @@ status.deregister.body-content = De-register your business if you no longer want
 status.deregister.services = Registered services:
 status.deregister.button.change = Change
 status.deregister.regnumber = Registration number:
+status.deregister.visuallyhidden.change = Change your registered services
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
