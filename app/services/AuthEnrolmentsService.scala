@@ -36,7 +36,6 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enro
 
     authContext.enrolmentsUri match {
       case Some(uri) =>
-
         val enrolments = authConnector.enrollments(uri)
 
         enrolments map {

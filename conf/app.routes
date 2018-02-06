@@ -278,7 +278,7 @@ POST        /submit-application/type-of-bank                                    
 GET         /submit-application/bank-details/                                         @controllers.payments.BankDetailsController.get(isUK: Boolean = true)
 GET         /submit-application/bank-details-non-uk/                                  @controllers.payments.BankDetailsController.get(isUK: Boolean = false)
 
-GET         /submit-application/confirm-bacs/                                         controllers.ConfirmationController.bacsConfirmation()
+GET         /submit-application/confirm-bacs/                                         @controllers.ConfirmationController.bacsConfirmation()
 
 GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
 POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
@@ -334,9 +334,9 @@ GET         /declaration/register-responsible-person                            
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
 GET         /update-information/declaration                                           controllers.declaration.DeclarationController.getWithAmendment()
 
-GET         /confirmation                                                             controllers.ConfirmationController.get()
-GET         /confirmation/payment-complete                                            controllers.ConfirmationController.paymentConfirmation(reference: String)
-POST        /confirmation/payment/retry                                               controllers.ConfirmationController.retryPayment()
+GET         /confirmation                                                             @controllers.ConfirmationController.get()
+GET         /confirmation/payment-complete                                            @controllers.ConfirmationController.paymentConfirmation(reference: String)
+POST        /confirmation/payment/retry                                               @controllers.ConfirmationController.retryPayment()
 
 GET         /responsible-people/add                                                   controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
 
