@@ -255,6 +255,15 @@ $(function () {
       selectElement: this,
       url: '/anti-money-laundering/assets/countries'
     })
+
+      $('#country').blur(function() {
+        console.log(this.value)
+      }).keydown(function(e) {
+        if (e.keyCode === 13 && $(this).val() === '') {
+          e.preventDefault()
+            $('#country-select').val('')
+        }
+      })
   })
 
   $(".autocomplete__input").addClass("form-control");
