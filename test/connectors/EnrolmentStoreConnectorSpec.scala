@@ -155,7 +155,6 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES7 API endpoint" in new Fixture {
 
-
         val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/${enrolKey.key}"
 
         when {
