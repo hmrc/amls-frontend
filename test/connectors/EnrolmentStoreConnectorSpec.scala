@@ -32,6 +32,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -117,6 +118,34 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
         intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolKey, enrolment))
+        }
+      }
+    }
+  }
+
+  "deEnrol" when {
+    "called" must {
+      "call the ES12 API endpoint" in new Fixture {
+
+        val authority = mock[Authority]
+        val userId = "userId"
+
+        when(authority.credId).thenReturn(userId)
+
+        when {
+          authConnector.getCurrentAuthority(any(), any())
+        } thenReturn Future.successful(authority)
+
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/users/$userId/enrolments/${enrolKey.key}"
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+        whenReady(connector.deEnrol(amlsRegistrationNumber)) { _ =>
+          verify(authConnector).getCurrentAuthority(any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
     }

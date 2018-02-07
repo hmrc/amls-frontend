@@ -43,6 +43,26 @@ object ESEnrolEvent {
     )
 }
 
+object ESDeEnrolEvent {
+  def apply
+  (response: HttpResponse, enrolmentKey: String)
+  (implicit
+   hc: HeaderCarrier
+  ): DataEvent =
+    DataEvent(
+      auditSource = AppName.appName,
+      auditType = "OutboundCall",
+      tags = hc.toAuditTags("DeEnrolment", "N/A"),
+      detail = hc.toAuditDetails() ++ Map(
+        "enrolment" -> enrolmentKey,
+        "response" -> response.body,
+        "status" -> response.status.toString
+      )
+    )
+}
+
+
+
 object ESEnrolFailureEvent {
   def apply
   (enrolment: EnrolmentStoreEnrolment, exception: Throwable, key: EnrolmentKey)
