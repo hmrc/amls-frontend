@@ -17,8 +17,7 @@
 package connectors
 
 import javax.inject.Inject
-
-import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent}
+import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.enrolment.ErrorResponse._
@@ -86,6 +85,18 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
         audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
         response
       }
+    }
+  }
+
+  def removeKnownFacts(registrationNumber: String)
+                      (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+
+    val enrolKey = AmlsEnrolmentKey(registrationNumber).key
+    val url =s"$baseUrl/enrolment-store/enrolments/$enrolKey"
+
+    http.DELETE(url) map { response =>
+      audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))
+      response
     }
   }
 

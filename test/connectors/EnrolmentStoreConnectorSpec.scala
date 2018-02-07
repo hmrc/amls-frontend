@@ -151,4 +151,23 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     }
   }
 
+  "removeKnownFacts" when {
+    "called" must {
+      "call the ES7 API endpoint" in new Fixture {
+
+
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/${enrolKey.key}"
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+        whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
+        }
+      }
+    }
+  }
+
 }

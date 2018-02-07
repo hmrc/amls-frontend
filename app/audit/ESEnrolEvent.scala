@@ -61,6 +61,23 @@ object ESDeEnrolEvent {
     )
 }
 
+object ESRemoveKnownFactsEvent {
+  def apply
+  (response: HttpResponse, enrolmentKey: String)
+  (implicit
+   hc: HeaderCarrier
+  ): DataEvent =
+    DataEvent(
+      auditSource = AppName.appName,
+      auditType = "OutboundCall",
+      tags = hc.toAuditTags("RemoveKnownFacts", "N/A"),
+      detail = hc.toAuditDetails() ++ Map(
+        "enrolment" -> enrolmentKey,
+        "response" -> response.body,
+        "status" -> response.status.toString
+      )
+    )
+}
 
 
 object ESEnrolFailureEvent {
