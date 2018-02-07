@@ -27,6 +27,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enrolmentStore: EnrolmentStoreConnector) {
+
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
 
@@ -59,6 +60,14 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enro
     authConnector.getCurrentAuthority flatMap { authority =>
       enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
     }
+  }
+
+  def deEnrol(amlsRegistrationNumber: String)
+             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Boolean] = {
+    for {
+      _ <- enrolmentStore.removeKnownFacts(amlsRegistrationNumber)
+      _ <- enrolmentStore.deEnrol(amlsRegistrationNumber)
+    } yield true
   }
 
 }
