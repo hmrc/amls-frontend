@@ -256,12 +256,12 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
-      $('#country').blur(function() {
-        console.log(this.value)
+      var selectFieldName = $(this).attr('id');
+      var nonSelectFieldName = selectFieldName.replace('-select','');
+      $('#' + nonSelectFieldName).blur(function() {
       }).keydown(function(e) {
         if (e.keyCode === 13 && $(this).val() === '') {
-          e.preventDefault()
-            $('#country-select').val('')
+            $('#' + selectFieldName).val('')
         }
       })
   })
