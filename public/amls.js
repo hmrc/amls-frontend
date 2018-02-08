@@ -256,15 +256,21 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
-      var selectFieldName = $(this).attr('id');
-      var nonSelectFieldName = selectFieldName.replace('-select','');
-      $('#' + nonSelectFieldName).blur(function() {
-      }).keydown(function(e) {
-        if (e.keyCode === 13 && $(this).val() === '') {
-            $('#' + selectFieldName).val('')
-        }
-      })
+  var selectFieldName = $(this).attr('id');
+  var nonSelectFieldName = selectFieldName.replace('-select','');
+  $('#' + nonSelectFieldName).keydown(function(e) {
+    if (e.keyCode === 13 && $(this).val() === '') {
+        $('#' + selectFieldName).val('')
+    }
   })
+
+  $("button[name='submit']").click(function(){
+    if($('#' + nonSelectFieldName).val() === '')
+      $('#' + selectFieldName).val('');
+  })
+
+  })
+
 
   $(".autocomplete__input").addClass("form-control");
 
