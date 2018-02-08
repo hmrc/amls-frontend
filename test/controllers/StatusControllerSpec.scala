@@ -53,6 +53,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
+
     val controller = new StatusController {
       override private[controllers] val landingService: LandingService = mock[LandingService]
       override val authConnector = self.authConnector
@@ -101,6 +102,18 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
   "StatusController" should {
+    "respond with SEE_OTHER and redirect to the landing page" when {
+      "status is rejected and the new submission button is selected" in new Fixture {
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
+        val result = controller.newSubmission()(request)
+        status(result) must be(SEE_OTHER)
+        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
+      }
+    }
 
     "respond with OK and show business name on the status page" in new Fixture {
       when {

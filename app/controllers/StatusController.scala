@@ -21,6 +21,7 @@ import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
@@ -31,7 +32,7 @@ import play.api.mvc.{AnyContent, Request, Result}
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{BusinessName, ControllerHelper}
+import utils.{AckRefGenerator, BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -89,6 +90,17 @@ trait StatusController extends BaseController {
     (mlrRegNumber, submissionStatus) match {
       case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber)
       case _ => Future.successful(None)
+    }
+  }
+
+
+  def newSubmission = Authorised.async {
+    implicit authContext => implicit request => {
+      enrolmentsService.amlsRegistrationNumber map {registrationString =>
+        enrolmentsService.deEnrol(registrationString.getOrElse(""))
+        dataCache.remove(authContext.user.oid)
+      }
+      Future.successful(Redirect(controllers.routes.LandingController.start(true)))
     }
   }
 
