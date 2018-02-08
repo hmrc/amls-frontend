@@ -107,9 +107,14 @@ case class BusinessActivities(
     val containsASP = businessMatchingActivities.fold(false) { _.businessActivities contains AccountancyServices }
 
     this match {
-      case BusinessActivities(
+      case ba@BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) if !containsASP => true
+        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
+        (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
+          case (Some(AccountantForAMLSRegulations(true)), Some(_), Some(_)) => true
+          case (Some(AccountantForAMLSRegulations(false)), _, _) => true
+          case _ => false
+        }
       case BusinessActivities(
         Some(_), _, Some(_), Some(_), Some(_), _,
         Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true

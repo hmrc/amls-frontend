@@ -237,6 +237,26 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "return true when the regulation questions have no answers and BM activities does include ASP" in {
       completeModelWithoutAccountantAdvice.isComplete(Some(ba(Set(AccountancyServices)))) must be(true)
     }
+
+    "return false if only partial regulation questions have been answered" in {
+      val model = completeModelWithoutAccountantAdvice.copy(
+        accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+        whoIsYourAccountant = None,
+        taxMatters = None
+      )
+
+      model.isComplete(Some(ba(Set(HighValueDealing)))) must be(false)
+    }
+
+    "return true if partial regulation questions were answered, but accountantForAMLSRegulations is false" in {
+      val model = completeModelWithoutAccountantAdvice.copy(
+        accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(false)),
+        whoIsYourAccountant = None,
+        taxMatters = None
+      )
+
+      model.isComplete(Some(ba(Set(HighValueDealing)))) must be(true)
+    }
   }
 
   "Partially complete BusinessActivities" must {
