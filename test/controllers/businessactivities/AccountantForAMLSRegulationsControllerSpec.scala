@@ -17,12 +17,13 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
+import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
+import org.mockito.ArgumentCaptor
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -173,6 +174,36 @@ class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with 
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("err.summary"))
 
+        }
+      }
+
+      "remove the answers to dependant questions" when {
+        "user selected 'no'" in new Fixture {
+          val newRequest = request.withFormUrlEncodedBody(
+            "accountantForAMLSRegulations" -> "false"
+          )
+
+          val model = BusinessActivities(
+            accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+            whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
+            taxMatters = Some(TaxMatters(true))
+          )
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(model)))
+
+          when(controller.dataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(true)(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
+          verify(controller.dataCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+
+          captor.getValue.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(false))
+          captor.getValue.whoIsYourAccountant must not be defined
+          captor.getValue.taxMatters must not be defined
         }
       }
     }
