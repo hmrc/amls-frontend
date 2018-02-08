@@ -1301,6 +1301,9 @@ details {
     display: block;
 }
 
-
+/* autocomplete */
+input.autocomplete__input {
+  width: 50%;
+}
 
 
