@@ -16,4 +16,10 @@
 
 package models.confirmation
 
-case class BreakdownRow(label: String, quantity: Int, perItm: Currency, total: Currency)
+case class SubmissionData(
+                           paymentReference: Option[String],
+                           total: Currency,
+                           breakdownRow: Seq[BreakdownRow],
+                           amlsRefNumber: Option[String],
+                           difference: Option[Currency]
+                         )

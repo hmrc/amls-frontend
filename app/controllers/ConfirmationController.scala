@@ -16,57 +16,60 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
-import connectors._
-import models.ResponseType.AmendOrVariationResponseType
+import config.{AMLSAuditConnector, AMLSAuthConnector}
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
+import models.ReadStatusResponse
 import models.businessmatching.BusinessMatching
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{Currency, SubmissionData}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
-import models.{FeeResponse, ReadStatusResponse}
-import play.api.mvc.{AnyContent, Request, Result}
-import services.{FeeResponseService, _}
+import play.api.Play
+import play.api.mvc.{AnyContent, Request}
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.BusinessName
+import utils.{AmlsRefNumberBroker, BusinessName}
 import views.html.confirmation._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-@Singleton
-class ConfirmationController @Inject()(
-                                        val authConnector: AuthConnector = AMLSAuthConnector,
-                                        private[controllers] val keystoreConnector: KeystoreConnector,
-                                        private[controllers] implicit val dataCacheConnector: DataCacheConnector,
-                                        private[controllers] implicit val amlsConnector: AmlsConnector,
-                                        private[controllers] val statusService: StatusService,
-                                        private[controllers] val authenticator: AuthenticatorConnector,
-                                        private[controllers] val feeResponseService: FeeResponseService,
-                                        private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
-                                        private[controllers] val paymentsConnector: PayApiConnector,
-                                        private[controllers] val paymentsService: PaymentsService,
-                                        private[controllers] val confirmationService: ConfirmationService,
-                                        private[controllers] val auditConnector: AuditConnector
-                                      ) extends BaseController {
+trait ConfirmationController extends BaseController {
+
+  private[controllers] val keystoreConnector: KeystoreConnector
+
+  private[controllers] implicit val dataCacheConnector: DataCacheConnector
+
+  private[controllers] implicit val amlsConnector: AmlsConnector
+
+  private[controllers] val authEnrolmentsService: AuthEnrolmentsService
+
+  private[controllers] val statusService: StatusService
+
+  private[controllers] lazy val paymentsConnector = Play.current.injector.instanceOf[PayApiConnector]
+
+  private[controllers] lazy val paymentsService = Play.current.injector.instanceOf[PaymentsService]
+
+  private[controllers] lazy val submissionResponseService = Play.current.injector.instanceOf[SubmissionResponseService]
+
+  private[controllers] val amlsRefBroker = Play.current.injector.instanceOf[AmlsRefNumberBroker]
+
+  val auditConnector: AuditConnector
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         for {
-          _ <- authenticator.refreshProfile
           status <- statusService.getStatus
           result <- resultFromStatus(status)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
+
   }
 
   def paymentConfirmation(reference: String) = Authorised.async {
@@ -89,8 +92,8 @@ class ConfirmationController @Inject()(
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus) match {
-          case (_, status@(PaymentStatuses.Failed | PaymentStatuses.Cancelled)) =>
-            Ok(payment_failure(msgFromPaymentStatus(status), Currency(payment.amountInPence.toDouble / 100), reference))
+          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
+            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
 
           case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
@@ -111,8 +114,7 @@ class ConfirmationController @Inject()(
     implicit request =>
       implicit authContext =>
         val okResult = for {
-          _ <- OptionT.liftF(authenticator.refreshProfile)
-          refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+          refNo <- amlsRefBroker.get
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
         } yield Ok(views.html.confirmation.confirmation_bacs(name))
@@ -138,15 +140,15 @@ class ConfirmationController @Inject()(
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }
 
-  private def showRenewalConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]], status: SubmissionStatus)
+  private def showRenewalConfirmation(getFees: Future[Option[SubmissionData]], status: SubmissionStatus)
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
-      breakdownRows map {
-        case Some(rows) if fees.totalFees > 0 => {
+    submissionResponseService.isRenewalDefined flatMap { isRenewalDefined =>
+      getFees map {
+        case Some(SubmissionData(Some(payRef), total, rows, _, _)) if total.value > 0 => {
           isRenewalDefined match {
-            case true => Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
-            case false => Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+            case true => Ok(confirm_renewal(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
+            case false => Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
           }
         }
         case _ => None
@@ -154,55 +156,62 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]])
+  private def showAmendmentVariationConfirmation(getFees: Future[Option[SubmissionData]])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    breakdownRows map {
-      case Some(rows) =>
-        Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+    getFees map {
+      case Some(SubmissionData(Some(payRef), total, rows, None, Some(difference))) if difference.value > 0 =>
+        Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus)
-                              (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
+  private def resultFromStatus(status: SubmissionStatus)(implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
-    OptionT.liftF(retrieveFeeResponse) flatMap {
-      case Some(fees) if fees.paymentReference.isDefined =>
+    val submissionData = submissionResponseService.getSubmissionData(status)
 
-        val breakdownRows = confirmationService.getBreakdownRows(status, fees)
+    val maybeResult = status match {
+      case SubmissionReadyForReview | SubmissionDecisionApproved =>
+        OptionT(showAmendmentVariationConfirmation(submissionData))
+      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
+        OptionT(showRenewalConfirmation(submissionData, status))
+      case _ => OptionT.liftF(submissionData map {
+        case Some(SubmissionData(Some(paymentRef), total, rows, Some(_), None)) =>
+          Ok(confirmation_new(paymentRef, total, rows, controllers.payments.routes.WaysToPayController.get().url))
+      })
+    }
 
-        status match {
-          case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
-            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows))
-          case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-            OptionT(showRenewalConfirmation(fees, breakdownRows, status))
-          case _ =>
-            OptionT.liftF(breakdownRows map {
-              case Some(rows) =>
-                Ok(confirmation_new(fees.paymentReference, fees.totalFees, rows, controllers.payments.routes.WaysToPayController.get().url))
-            })
-        }
+    lazy val noFeeResult = for {
+      bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+    } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
 
-      case _ => for {
-        bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-      } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
-
-    } getOrElse InternalServerError("Could not determine a response")
-
+    maybeResult orElse noFeeResult getOrElse InternalServerError("Could not determine a response")
   }
 
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     for {
-      fees <- OptionT(retrieveFeeResponse)
-      payRef <- OptionT.fromOption[Future](fees.paymentReference)
-      result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(fees.amlsReferenceNumber, payRef, paymentStatus)))
+      status <- OptionT.liftF(statusService.getStatus)
+      SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+      amlsRefNo <- {
+        e match {
+          case Some(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+          case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
+        }
+      }
+      payRef <- OptionT.fromOption[Future](paymentReference)
+      result <- OptionT.liftF(auditConnector.sendEvent(PaymentConfirmationEvent(amlsRefNo, payRef, paymentStatus)))
     } yield result
   }
 
-  private def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] =
-    (for {
-      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
-    } yield fees).value
 
+}
+
+object ConfirmationController extends ConfirmationController {
+  // $COVERAGE-OFF$
+  override protected val authConnector = AMLSAuthConnector
+  override val statusService: StatusService = StatusService
+  override private[controllers] val keystoreConnector = KeystoreConnector
+  override private[controllers] val dataCacheConnector = DataCacheConnector
+  override private[controllers] val amlsConnector = AmlsConnector
+  override private[controllers] lazy val authEnrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+  override val auditConnector = AMLSAuditConnector
 }

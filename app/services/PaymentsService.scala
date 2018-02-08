@@ -21,8 +21,8 @@ import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, PayApiConnector}
-import models.{FeeResponse, ReturnLocation}
-import models.confirmation.{BreakdownRow, Currency}
+import models.ReturnLocation
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.payments._
 import play.api.Logger
 import play.api.http.Status._
@@ -37,20 +37,18 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 class PaymentsService @Inject()(
                                  val amlsConnector: AmlsConnector,
                                  val paymentsConnector: PayApiConnector,
-                                 val submissionResponseService: ConfirmationService,
+                                 val submissionResponseService: SubmissionResponseService,
                                  val statusService: StatusService
                                ) {
 
-  def requestPaymentsUrl(fees: FeeResponse, returnUrl: String, amlsRefNo: String, safeId: String)
+  def requestPaymentsUrl(data: SubmissionData, returnUrl: String, amlsRefNo: String, safeId: String)
                         (implicit hc: HeaderCarrier,
                          ec: ExecutionContext,
                          authContext: AuthContext,
                          request: Request[_]): Future[CreatePaymentResponse] =
-    fees match {
-      case f:FeeResponse if f.difference.isDefined & f.paymentReference.isDefined =>
-        paymentsUrlOrDefault(f.paymentReference.get, f.difference.get.toDouble, returnUrl, amlsRefNo, safeId)
-      case f:FeeResponse if f.paymentReference.isDefined =>
-        paymentsUrlOrDefault(f.paymentReference.get, f.totalFees.toDouble, returnUrl, amlsRefNo, safeId)
+    data match {
+      case SubmissionData(Some(ref), _, _, _, Some(difference)) => paymentsUrlOrDefault(ref, difference, returnUrl, amlsRefNo, safeId)
+      case SubmissionData(Some(ref), total, _, _, _) => paymentsUrlOrDefault(ref, total, returnUrl, amlsRefNo, safeId)
       case _ => Future.successful(CreatePaymentResponse.default)
     }
 
@@ -87,10 +85,10 @@ class PaymentsService @Inject()(
                        (implicit ec: ExecutionContext, hc: HeaderCarrier, ac: AuthContext): Future[Payment] =
     amlsConnector.createBacsPayment(request)
 
-  def amountFromSubmissionData(fees: FeeResponse): Option[Currency] = if(fees.difference.isDefined){
-    fees.difference
-  } else {
-    Some(fees.totalFees)
+  def amountFromSubmissionData(submissionData: SubmissionData): Option[Currency] = submissionData match {
+    case SubmissionData(_, _, _, _, difference@Some(_)) => difference
+    case SubmissionData(_, total, _, _, _) => Some(total)
+    case _ => None
   }
 
   private def savePaymentBeforeResponse(response: CreatePaymentResponse, amlsRefNo: String, safeId: String)

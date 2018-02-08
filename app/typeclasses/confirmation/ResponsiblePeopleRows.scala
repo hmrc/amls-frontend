@@ -16,10 +16,11 @@
 
 package typeclasses.confirmation
 
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
-import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import services.FeeCalculations
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -34,13 +35,15 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
     ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
+  val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
+
 }
 
 object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] = {
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]) = {
 
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
@@ -70,7 +73,7 @@ object ResponsiblePeopleRowsInstances {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
-                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+                          people: Option[Seq[ResponsiblePeople]]) = {
 
         if (showBreakdown(value.getFpFee, activities)) {
 
