@@ -262,6 +262,11 @@ $(function () {
     if (e.keyCode === 13 && $(this).val() === '') {
         $('#' + selectFieldName).val('')
     }
+  }).keyup(function() {
+      var menu = $('.autocomplete__menu')
+      if (menu.text() === 'No results found') {
+        $('#' + selectFieldName).val('')
+      }
   })
 
   $("button[name='submit']").click(function(){
@@ -270,5 +275,5 @@ $(function () {
   })
 
   })
-    
+
 });
