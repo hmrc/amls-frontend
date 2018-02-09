@@ -270,8 +270,5 @@ $(function () {
   })
 
   })
-
-
-  $(".autocomplete__input").addClass("form-control");
-
+    
 });
