@@ -1303,7 +1303,11 @@ details {
 
 /* autocomplete */
 input.autocomplete__input {
-  width: 50%;
+  width: 75%;
+}
+
+li.autocomplete__option {
+  margin: 0;
 }
 
 

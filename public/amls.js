@@ -252,27 +252,41 @@ $(function () {
 
   $('[data-gov-autocomplete]').each(function() {
     openregisterLocationPicker({
+        defaultValue: '',
       selectElement: this,
       url: '/anti-money-laundering/assets/countries'
     })
 
-  var selectFieldName = $(this).attr('id');
-  var nonSelectFieldName = selectFieldName.replace('-select','');
-  $('#' + nonSelectFieldName).keydown(function(e) {
-    if (e.keyCode === 13 && $(this).val() === '') {
-        $('#' + selectFieldName).val('')
-    }
-  }).keyup(function() {
-      var menu = $('.autocomplete__menu')
-      if (menu.text() === 'No results found') {
-        $('#' + selectFieldName).val('')
-      }
-  })
 
-  $("button[name='submit']").click(function(){
-    if($('#' + nonSelectFieldName).val() === '')
-      $('#' + selectFieldName).val('');
-  })
+
+    var selectFieldName = $(this).attr('id');
+    var nonSelectFieldName = selectFieldName.replace('-select','');
+    $('#' + nonSelectFieldName).keydown(function(e) {
+      if (e.keyCode === 13 && $(this).val() === '') {
+          $('#' + selectFieldName).val('')
+      }
+    }).keyup(function() {
+        var menu = $('.autocomplete__menu')
+        if (menu.text() === 'No results found') {
+          $('#' + selectFieldName).val('')
+        }
+    });
+
+    $('body')
+        .on('mouseup', ".autocomplete__option > strong", function(e){
+          e.preventDefault();
+          $(this).parent().trigger('click')
+      }).on('click', '.autocomplete__option', function(evt) {
+        evt.preventDefault()
+        var e = jQuery.Event('keydown');
+        e.keyCode = 13;
+        $(this).closest('.autocomplete__wrapper').trigger(e);
+      })
+
+    $("button[name='submit']").click(function(){
+      if($('#' + nonSelectFieldName).val() === '')
+        $('#' + selectFieldName).val('');
+    })
 
   })
 
