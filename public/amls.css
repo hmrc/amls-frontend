@@ -1302,8 +1302,8 @@ details {
 }
 
 /* autocomplete */
-input.autocomplete__input {
-  width: 75%;
+div.autocomplete__wrapper {
+  width: 75%!important;
 }
 
 li.autocomplete__option {
