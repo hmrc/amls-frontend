@@ -17,12 +17,11 @@
 package connectors
 
 import javax.inject.Inject
-
-import audit.{ESEnrolEvent, ESEnrolFailureEvent}
+import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFactsEvent}
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.enrolment.ErrorResponse._
-import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
@@ -74,6 +73,30 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
 
         case _ => throw new Exception("Group identifier is unavailable")
       }
+    }
+  }
+
+  def deEnrol(registrationNumber: String)
+             (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+    val enrolKey = AmlsEnrolmentKey(registrationNumber).key
+    auth.getCurrentAuthority flatMap { authority =>
+      val url = s"$baseUrl/enrolment-store/users/${authority.credId}/enrolments/$enrolKey"
+      http.DELETE(url) map { response =>
+        audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
+        response
+      }
+    }
+  }
+
+  def removeKnownFacts(registrationNumber: String)
+                      (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
+
+    val enrolKey = AmlsEnrolmentKey(registrationNumber).key
+    val url = s"$baseUrl/enrolment-store/enrolments/$enrolKey"
+
+    http.DELETE(url) map { response =>
+      audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))
+      response
     }
   }
 
