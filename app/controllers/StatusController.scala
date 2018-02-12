@@ -107,15 +107,14 @@ trait StatusController extends BaseController {
   def newSubmission = Authorised.async {
     implicit authContext =>
       implicit request => {
-        enrolmentsService.amlsRegistrationNumber flatMap { registrationString =>
-          enrolmentsService.deEnrol(registrationString.getOrElse("")) flatMap { _ =>
-            authenticator.refreshProfile flatMap { _ =>
-              dataCache.remove(authContext.user.oid) map { _ =>
-                Redirect(controllers.routes.LandingController.start(true))
-              }
-            }
-          }
-        }
+        val redirect = for {
+          amlsRegNumber <- OptionT(enrolmentsService.amlsRegistrationNumber)
+          _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber))
+          _ <- OptionT.liftF(authenticator.refreshProfile)
+          _ <- OptionT.liftF(dataCache.remove(authContext.user.oid))
+        } yield Redirect(controllers.routes.LandingController.start(true))
+
+        redirect getOrElse InternalServerError("New submission failed")
       }
   }
 
@@ -264,7 +263,7 @@ object StatusController extends StatusController {
   override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
   override protected[controllers] val dataCache = DataCacheConnector
-  override private[controllers] val amlsConnector = AmlsConnector
+  override protected[controllers] val amlsConnector = AmlsConnector
   // $COVERAGE-ON$
 
 }

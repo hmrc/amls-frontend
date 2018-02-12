@@ -115,6 +115,9 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         when(controller.dataCache.remove(any())(any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
         val result = controller.newSubmission()(request)
         status(result) must be(SEE_OTHER)
         verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())

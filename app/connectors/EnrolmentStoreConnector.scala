@@ -92,7 +92,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    val url =s"$baseUrl/enrolment-store/enrolments/$enrolKey"
+    val url = s"$baseUrl/enrolment-store/enrolments/$enrolKey"
 
     http.DELETE(url) map { response =>
       audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))

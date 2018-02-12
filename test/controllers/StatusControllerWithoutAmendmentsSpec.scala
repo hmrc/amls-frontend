@@ -16,7 +16,7 @@
 
 package controllers
 
-import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePeople
@@ -51,6 +51,7 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
       override private[controllers] val amlsConnector = mock[AmlsConnector]
+      override protected[controllers] val authenticator = mock[AuthenticatorConnector]
     }
 
     mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
