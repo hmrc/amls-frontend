@@ -578,7 +578,7 @@ status.withdraw.button-text = Withdraw application
 status.withdraw.body-content = Withdraw your application if you no longer want to apply for anti-money laundering supervision from HM Revenue and Customs (HMRC).\n\
   We will delete any information you have provided. We won’t refund any fees you have paid.\n\
   To make a change to your application, you can update or view your information.\n\
-  If you withdraw your application and aren't supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
+  If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
 status.deregister.title = De-register business
 status.deregister.link-text = de-register business
 status.deregister.end-date.text = Currently registered to {0}
