@@ -1,7 +1,5 @@
 /* eslint-env jquery */
 
-require('jquery')
-
 Date.now = Date.now || function () { return +new Date() }
 
 function secondsToTime (secs) {
@@ -21,7 +19,7 @@ function secondsToTime (secs) {
     return obj
 }
 
-module.exports = function (options) {
+    $.timeoutDialog = function (options) {
     var settings = {
         timeout: 900,
         countdown: 120,
