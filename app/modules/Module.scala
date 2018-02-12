@@ -20,7 +20,7 @@ import com.google.inject.AbstractModule
 import config.{AMLSAuditConnector, WSHttp}
 import connectors._
 import services._
-import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
+import uk.gov.hmrc.http.HttpPost
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 class Module extends AbstractModule {
@@ -38,8 +38,5 @@ class Module extends AbstractModule {
     bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
-    bind(classOf[CorePost]).toInstance(WSHttp)
-    bind(classOf[CoreGet]).toInstance(WSHttp)
-
   }
 }

@@ -16,14 +16,13 @@
 
 package views.confirmation
 
-import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers with PaymentGenerator{
+class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -31,7 +30,7 @@ class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers wi
     val continueHref = "http://google.co.uk"
 
     override def view = views.html.confirmation.confirm_renewal(
-      Some(paymentReferenceNumber),
+      "ref number",
       Currency(100),
       Seq.empty,
       Some(Currency(150)),
@@ -62,7 +61,7 @@ class RenewalConfirmationViewSpec extends GenericTestHelper with MustMatchers wi
     }
 
     "show the correct reference" in new ViewFixture {
-      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe paymentReferenceNumber
+      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe "ref number"
     }
 
     "continue button has the right text" in new ViewFixture {

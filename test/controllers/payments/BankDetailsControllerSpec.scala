@@ -17,16 +17,14 @@
 package controllers.payments
 
 import generators.PaymentGenerator
-import models.FeeResponse
-import models.ResponseType.SubscriptionResponseType
+import models.confirmation.{Currency, SubmissionData}
 import models.status.SubmissionReadyForReview
-import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, FeeResponseService}
+import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, GenericTestHelper}
@@ -45,8 +43,8 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with Pay
 
     val controller = new BankDetailsController(
       authConnector = self.authConnector,
-      authEnrolmentsService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService]
+      statusService = mock[StatusService],
+      submissionResponseService = mock[SubmissionResponseService]
     )
 
   }
@@ -59,15 +57,12 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with Pay
         val submissionSatus = SubmissionReadyForReview
 
         when {
-          controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
-        } thenReturn Future.successful(Some(amlsRegistrationNumber))
+          controller.statusService.getStatus(any(),any(),any())
+        } thenReturn Future.successful(submissionSatus)
 
         when {
-          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
-        } thenReturn Future.successful(Some(FeeResponse(
-          SubscriptionResponseType,
-          amlsRegistrationNumber, 100, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
-        )
+          controller.submissionResponseService.getSubmissionData(eqTo(submissionSatus))(any(),any(),any())
+        } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency(200), Seq.empty, None, None)))
 
         val result = controller.get()(request)
 

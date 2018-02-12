@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class AmendVariationRenewalResponse(
                                     processingDate: String,

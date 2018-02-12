@@ -38,6 +38,7 @@ trait AccountantForAMLSRegulationsController extends BaseController {
             businessActivities <- response
             accountant <- businessActivities.accountantForAMLSRegulations
           } yield Form2[AccountantForAMLSRegulations](accountant)).getOrElse(EmptyForm)
+
           Ok(accountant_for_amls_regulations(form, edit))
       }
   }
@@ -50,15 +51,19 @@ trait AccountantForAMLSRegulationsController extends BaseController {
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
-            _ <- dataCacheConnector.save[BusinessActivities](
-              BusinessActivities.key,
-              businessActivities.accountantForAMLSRegulations(Some(data))
-            )
+            _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, updateModel(businessActivities, Some(data)))
           } yield (edit, data.accountantForAMLSRegulations) match {
             case (false, true) | (true, true) => Redirect(routes.WhoIsYourAccountantController.get())
             case _ => Redirect(routes.SummaryController.get())
           }
       }
+    }
+  }
+
+  private def updateModel(ba: BusinessActivities, data: Option[AccountantForAMLSRegulations]): BusinessActivities = {
+    data match {
+      case d@Some(AccountantForAMLSRegulations(true)) => ba.accountantForAMLSRegulations(d)
+      case d@Some(AccountantForAMLSRegulations(false)) => ba.accountantForAMLSRegulations(d).whoIsYourAccountant(None).taxMatters(None)
     }
   }
 }

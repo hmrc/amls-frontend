@@ -45,7 +45,7 @@ trait StatusController extends BaseController {
 
   private[controllers] def enrolmentsService: AuthEnrolmentsService
 
-  private[controllers] def feeResponseService: FeeResponseService
+  private[controllers] def feeConnector: FeeConnector
 
   private[controllers] def renewalService: RenewalService
 
@@ -90,7 +90,15 @@ trait StatusController extends BaseController {
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                                                        headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
     (mlrRegNumber, submissionStatus) match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber)
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
+        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
+          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0) => Some(x)
+          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
+          case _ => None
+        })
+      }.recoverWith {
+        case _: NotFoundException => Future.successful(None)
+      }
       case _ => Future.successful(None)
     }
   }
@@ -250,13 +258,13 @@ object StatusController extends StatusController {
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
   override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val amlsConnector = AmlsConnector
-  override protected[controllers] val dataCache = DataCacheConnector
   override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override private[controllers] val feeResponseService: FeeResponseService = Play.current.injector.instanceOf[FeeResponseService]
+  override private[controllers] val feeConnector: FeeConnector = FeeConnector
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
+  override protected[controllers] val dataCache = DataCacheConnector
+  override private[controllers] val amlsConnector = AmlsConnector
   // $COVERAGE-ON$
 
 }

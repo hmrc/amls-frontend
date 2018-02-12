@@ -31,7 +31,10 @@ class AssetsController @Inject()(errorHandler: HttpErrorHandler, env: Environmen
       "GBN",
       "NIR",
       "SCT",
-      "WLS"
+      "WLS",
+      "Deutschland",
+      "UK",
+      "U.K"
     ))
 
   def countries = Action {

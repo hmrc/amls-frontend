@@ -52,7 +52,7 @@ trait TaxMattersController extends BaseController {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
             _ <- dataCacheConnector.save[BusinessActivities](
               BusinessActivities.key,
-              businessActivities.taxMatters(data)
+              businessActivities.taxMatters(Some(data))
             )
           } yield Redirect(routes.SummaryController.get())
       }

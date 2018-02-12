@@ -21,10 +21,11 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
-import models.businessactivities.BusinessActivities
+import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -217,6 +218,37 @@ class RegisterServicesControllerSpec extends GenericTestHelper
           val result = controller.post()(newRequest)
           status(result) must be(BAD_REQUEST)
 
+        }
+      }
+
+      "remove the accountancy advisor questions from Business Matching" when {
+        "Accountancy Services is added" in new Fixture {
+          val businessActivities = BusinessActivities(
+            accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+            whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
+            taxMatters = Some(TaxMatters(true))
+          )
+
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))))
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "04")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          mockCacheFetch(Some(businessActivities), Some(BusinessActivities.key))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          val captor = ArgumentCaptor.forClass(classOf[BusinessActivities])
+          verify(controller.dataCacheConnector).save(eqTo(BusinessActivities.key), captor.capture())(any(), any(), any())
+
+          captor.getValue.accountantForAMLSRegulations mustBe None
+          captor.getValue.whoIsYourAccountant mustBe None
+          captor.getValue.taxMatters mustBe None
         }
       }
     }

@@ -16,12 +16,13 @@
 
 package typeclasses.confirmation
 
-import models.businessmatching.BusinessActivities
-import models.confirmation.{BreakdownRow, Currency, RowEntity}
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import models.businessmatching.{BusinessActivities, BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
+import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
+import services.{FeeCalculations, RowEntity}
+import ResponsiblePeopleRowsInstances._
 
 trait ConfirmationBreakdownRows[A] extends FeeCalculations {
   def apply(
@@ -31,6 +32,40 @@ trait ConfirmationBreakdownRows[A] extends FeeCalculations {
              people: Option[Seq[ResponsiblePeople]]
            ): Seq[BreakdownRow]
 
+  def subscriptionQuantity(subscription: SubmissionResponse): Int =
+    if (subscription.getRegistrationFee == 0) 0 else 1
+
+  def tradingPremisesVariationRows(variationRenewalResponse: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
+    val breakdownRows = Seq.empty
+
+    def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
+      if (count > 0) {
+        breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variationRenewalResponse))))
+      } else {
+        Seq.empty
+      }
+    }
+
+    def tpFullYearRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.addedFullYearTradingPremises,
+      premisesVariationRow(variationRenewalResponse),
+      fullPremisesFee
+    )
+
+    def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.halfYearlyTradingPremises,
+      premisesHalfYear(variationRenewalResponse),
+      renewalHalfYearPremisesFee
+    )
+
+    def tpZeroRow: Seq[BreakdownRow] = variationRow(
+      variationRenewalResponse.zeroRatedTradingPremises,
+      PremisesZero,
+      renewalZeroPremisesFee
+    )
+
+    tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+  }
 }
 
 object BreakdownRowInstances {
@@ -58,10 +93,6 @@ object BreakdownRowInstances {
           case _ => Seq.empty[BreakdownRow]
         }
       }
-
-      def subscriptionQuantity(subscription: SubmissionResponse): Int =
-        if (subscription.getRegistrationFee == 0) 0 else 1
-
     }
   }
 
@@ -71,7 +102,7 @@ object BreakdownRowInstances {
                           value: AmendVariationRenewalResponse,
                           businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
-                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+                          people: Option[Seq[ResponsiblePeople]]) = {
 
         businessActivities match {
           case Some(activities) =>
@@ -101,39 +132,6 @@ object BreakdownRowInstances {
         }
 
       }
-
-      def tradingPremisesVariationRows(variationRenewalResponse: AmendVariationRenewalResponse): Seq[BreakdownRow] = {
-        val breakdownRows = Seq.empty
-
-        def variationRow(count: Int, rowEntity: RowEntity, total: AmendVariationRenewalResponse => BigDecimal): Seq[BreakdownRow] = {
-          if (count > 0) {
-            breakdownRows ++ Seq(BreakdownRow(rowEntity.message, count, rowEntity.feePer, Currency(total(variationRenewalResponse))))
-          } else {
-            Seq.empty
-          }
-        }
-
-        def tpFullYearRow: Seq[BreakdownRow] = variationRow(
-          variationRenewalResponse.addedFullYearTradingPremises,
-          premisesVariationRow(variationRenewalResponse),
-          fullPremisesFee
-        )
-
-        def tpHalfYearRow: Seq[BreakdownRow] = variationRow(
-          variationRenewalResponse.halfYearlyTradingPremises,
-          premisesHalfYear(variationRenewalResponse),
-          renewalHalfYearPremisesFee
-        )
-
-        def tpZeroRow: Seq[BreakdownRow] = variationRow(
-          variationRenewalResponse.zeroRatedTradingPremises,
-          PremisesZero,
-          renewalZeroPremisesFee
-        )
-
-        tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-      }
-
     }
   }
 

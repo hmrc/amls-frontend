@@ -18,7 +18,6 @@ package config
 
 import javax.inject.Inject
 
-import config.ApplicationConfig.baseUrl
 import play.api.{Logger, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
@@ -68,6 +67,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
 
+  lazy val feePaymentUrl = s"$amlsUrl/amls/payment"
+
   lazy val notificationsUrl = baseUrl("amls-notification")
   lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
 
@@ -113,9 +114,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 }
 
 class AppConfig @Inject()(val config: iServicesConfig) {
-
-  def amlsUrl = baseUrl("amls")
-
   def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
 
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
@@ -123,7 +121,4 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def authUrl = config.baseUrl("auth")
 
   def enrolmentStoreUrl = config.baseUrl("enrolment-store-proxy")
-
-  def feePaymentUrl = s"$amlsUrl/amls/payment"
-
 }

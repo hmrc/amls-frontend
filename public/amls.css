@@ -1301,6 +1301,13 @@ details {
     display: block;
 }
 
+/* autocomplete */
+div.autocomplete__wrapper {
+  width: 75%!important;
+}
 
+li.autocomplete__option {
+  margin: 0;
+}
 
 

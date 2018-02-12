@@ -23,20 +23,23 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.confirmation.SubmissionData
 import models.payments.TypeOfBank
-import services._
-import uk.gov.hmrc.http.HeaderCarrier
+import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
 class TypeOfBankController @Inject()(
                                       val authConnector: AuthConnector,
                                       val auditConnector: AuditConnector,
+                                      val statusService: StatusService,
+                                      val submissionResponseService: SubmissionResponseService,
                                       val authEnrolmentsService: AuthEnrolmentsService,
-                                      val feeResponseService: FeeResponseService,
                                       val paymentsService: PaymentsService
                                     ) extends BaseController {
 
@@ -62,11 +65,17 @@ class TypeOfBankController @Inject()(
 
   private def doAudit(ukBank: Boolean)(implicit hc: HeaderCarrier, ac: AuthContext) = {
     (for {
-      amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
-      fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
-      payRef <- OptionT.fromOption[Future](fees.paymentReference)
-      amount <- OptionT.fromOption[Future](paymentsService.amountFromSubmissionData(fees))
-      result <- OptionT.liftF(auditConnector.sendEvent(BacsPaymentEvent(ukBank, amlsRegistrationNumber, payRef, amount)))
+      status <- OptionT.liftF(statusService.getStatus)
+      subData@SubmissionData(paymentReference, _, _, e, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+      amlsRefNo <- {
+        e match {
+          case Some(amlsRefNo) => OptionT.pure[Future, String](amlsRefNo)
+          case _ => OptionT(authEnrolmentsService.amlsRegistrationNumber)
+        }
+      }
+      payRef <- OptionT.fromOption[Future](paymentReference)
+      amount <- OptionT.fromOption[Future](paymentsService.amountFromSubmissionData(subData))
+      result <- OptionT.liftF(auditConnector.sendEvent(BacsPaymentEvent(ukBank, amlsRefNo, payRef, amount)))
     } yield result).value
   }
 

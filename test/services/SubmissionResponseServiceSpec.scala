@@ -18,16 +18,15 @@ package services
 
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
-import models.confirmation.{BreakdownRow, Currency}
+import models.confirmation.{BreakdownRow, Currency, SubmissionData}
 import models.renewal.Renewal
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
-import org.joda.time.{DateTime, LocalDate}
+import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -35,7 +34,6 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
@@ -43,8 +41,9 @@ import utils.StatusConstants
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
+import uk.gov.hmrc.http.HeaderCarrier
 
-class ConfirmationServiceSpec extends PlaySpec
+class SubmissionResponseServiceSpec extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
@@ -55,7 +54,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
   trait Fixture {
 
-    val TestConfirmationService = new ConfirmationService (
+    val TestSubmissionResponseService = new SubmissionResponseService (
       mock[DataCacheConnector]
     )
 
@@ -111,18 +110,6 @@ class ConfirmationServiceSpec extends PlaySpec
       difference = Some(0)
     )
 
-    def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      0,
-      100,
-      Some(paymentRefNo),
-      None,
-      DateTime.now
-    )
-
     val reviewDetails = mock[ReviewDetails]
     val activities = mock[BusinessActivities]
     val businessMatching = mock[BusinessMatching]
@@ -158,7 +145,7 @@ class ConfirmationServiceSpec extends PlaySpec
     } thenReturn Some(Seq(ResponsiblePeople()))
 
     when {
-      TestConfirmationService.cacheConnector.fetchAll(any(), any())
+      TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cache))
   }
 
@@ -171,7 +158,7 @@ class ConfirmationServiceSpec extends PlaySpec
         } thenReturn Some(Seq(ResponsiblePeople()))
 
         when {
-          TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
         } thenReturn Future.successful(CacheMap("", Map.empty))
 
         val rows = Seq(
@@ -180,9 +167,9 @@ class ConfirmationServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
-        val response = Some(rows)
+        val response = Some(SubmissionData(Some(paymentRefNo), Currency.fromBD(100), rows, None, Some(Currency.fromBD(0))))
 
-        whenReady(TestConfirmationService.getAmendment) {
+        whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
             result must equal(response)
         }
@@ -219,9 +206,9 @@ class ConfirmationServiceSpec extends PlaySpec
           BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
         )
 
-        val response = Some(rows)
+        val response = Some(SubmissionData(Some(paymentRefNo), Currency.fromBD(100), rows, None, Some(Currency.fromBD(0))))
 
-        whenReady(TestConfirmationService.getAmendment) {
+        whenReady(TestSubmissionResponseService.getAmendment) {
           result =>
             result must equal(response)
         }
@@ -248,11 +235,11 @@ class ConfirmationServiceSpec extends PlaySpec
           cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
         } thenReturn Some(people)
 
-        val result = await(TestConfirmationService.getAmendment)
+        val result = await(TestSubmissionResponseService.getAmendment)
 
-        whenReady(TestConfirmationService.getAmendment) {
+        whenReady(TestSubmissionResponseService.getAmendment) {
           _ foreach {
-            case rows =>
+            case SubmissionData(_, _, rows, _, _) =>
               val unpaidRow = rows.filter(_.label == "confirmation.responsiblepeople.fp.passed").head
               unpaidRow.perItm.value mustBe 0
               unpaidRow.total.value mustBe 0
@@ -278,11 +265,11 @@ class ConfirmationServiceSpec extends PlaySpec
 
         when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(Seq(ResponsiblePeople()))
 
-        val result = await(TestConfirmationService.getAmendment)
+        val result = await(TestSubmissionResponseService.getAmendment)
 
-        whenReady(TestConfirmationService.getAmendment) { result =>
+        whenReady(TestSubmissionResponseService.getAmendment) { result =>
           result foreach {
-            case rows =>
+            case SubmissionData(_, _, rows, _, _) =>
               rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
           }
         }
@@ -310,10 +297,10 @@ class ConfirmationServiceSpec extends PlaySpec
 
           when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
 
-          val result = await(TestConfirmationService.getAmendment)
+          val result = await(TestSubmissionResponseService.getAmendment)
 
-          whenReady(TestConfirmationService.getAmendment)(_ foreach {
-            case rows => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
+          whenReady(TestSubmissionResponseService.getAmendment)(_ foreach {
+            case SubmissionData(_, _, rows, _, _) => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
           })
 
         }
@@ -332,10 +319,10 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          val result = await(TestConfirmationService.getAmendment)
+          val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some(rows) => rows foreach { row =>
+            case Some(SubmissionData(_, _, rows, _, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -363,10 +350,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
-          val result = await(TestConfirmationService.getAmendment)
+          val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some(rows) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -392,10 +379,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
 
-          val result = await(TestConfirmationService.getAmendment)
+          val result = await(TestSubmissionResponseService.getAmendment)
 
           result match {
-            case Some(rows) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -421,7 +408,7 @@ class ConfirmationServiceSpec extends PlaySpec
           cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
         } thenReturn Some(Seq(ResponsiblePeople()))
 
-        val result = await(TestConfirmationService.getAmendment)
+        val result = await(TestSubmissionResponseService.getAmendment)
 
         result mustBe defined
 
@@ -435,7 +422,7 @@ class ConfirmationServiceSpec extends PlaySpec
         "there is a Responsible People fee to pay" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.fetchAll(any(), any())
+            TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
           } thenReturn Future.successful(Some(cache))
 
           when {
@@ -445,10 +432,10 @@ class ConfirmationServiceSpec extends PlaySpec
             addedResponsiblePeople = 1
           ))
 
-          val result = await(TestConfirmationService.getVariation)
+          val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some(rows) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -464,10 +451,10 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(fpFee = None))
 
-          val result = await(TestConfirmationService.getVariation)
+          val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some(rows) => rows foreach { row =>
+            case Some(SubmissionData(_, _, rows, _, _)) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -493,15 +480,15 @@ class ConfirmationServiceSpec extends PlaySpec
           )
 
           when {
-            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponseWithRate)
 
-          whenReady(TestConfirmationService.getVariation) {
-            case Some(breakdownRows) =>
+          whenReady(TestSubmissionResponseService.getVariation) {
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFeeWithRate)
@@ -519,15 +506,15 @@ class ConfirmationServiceSpec extends PlaySpec
         "a Trading Premises has been added with a full year fee" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
 
-          whenReady(TestConfirmationService.getVariation) {
-            case Some(breakdownRows) =>
+          whenReady(TestSubmissionResponseService.getVariation) {
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpFee)
@@ -540,15 +527,15 @@ class ConfirmationServiceSpec extends PlaySpec
         "a Trading Premises has been added with a half year fee" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
 
-          whenReady(TestConfirmationService.getVariation) {
-            case Some(breakdownRows) =>
+          whenReady(TestSubmissionResponseService.getVariation) {
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(tpHalfFee)
@@ -561,15 +548,15 @@ class ConfirmationServiceSpec extends PlaySpec
         "a Trading Premises has been added with a zero fee" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
 
-          whenReady(TestConfirmationService.getVariation) {
-            case Some(breakdownRows) =>
+          whenReady(TestSubmissionResponseService.getVariation) {
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(0)
@@ -603,10 +590,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
-          val result = await(TestConfirmationService.getVariation)
+          val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some(rows) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -638,10 +625,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
 
-          val result = await(TestConfirmationService.getVariation)
+          val result = await(TestSubmissionResponseService.getVariation)
 
           result match {
-            case Some(rows) => {
+            case Some(SubmissionData(_, _, rows, _, _)) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
@@ -652,7 +639,7 @@ class ConfirmationServiceSpec extends PlaySpec
         "each of the categorised fees are in the response" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+            TestSubmissionResponseService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
           } thenReturn Future.successful(CacheMap("", Map.empty))
 
           when {
@@ -666,8 +653,8 @@ class ConfirmationServiceSpec extends PlaySpec
             zeroRatedTradingPremises = 1
           ))
 
-          whenReady(TestConfirmationService.getVariation) {
-            case Some(breakdownRows) =>
+          whenReady(TestSubmissionResponseService.getVariation) {
+            case Some(SubmissionData(_, _, breakdownRows, _, _)) =>
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFee)
@@ -705,7 +692,7 @@ class ConfirmationServiceSpec extends PlaySpec
         "there is a Responsible People fee to pay" in new Fixture {
 
           when {
-            TestConfirmationService.cacheConnector.fetchAll(any(), any())
+            TestSubmissionResponseService.cacheConnector.fetchAll(any(), any())
           } thenReturn Future.successful(Some(cache))
 
           when {
@@ -720,10 +707,10 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          val result = await(TestConfirmationService.getSubscription)
+          val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case rows => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -758,12 +745,12 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(responsiblePersonGen.sample.get, responsiblePersonGen.sample.get))
 
-          val result = await(TestConfirmationService.getSubscription)
+          val result = await(TestSubmissionResponseService.getSubscription)
 
           case class Test(str: String)
 
           result match {
-            case rows => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.head.label mustBe "confirmation.submission"
               rows.head.quantity mustBe 1
               rows.head.perItm mustBe Currency(rpFee)
@@ -802,10 +789,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
-          val result = await(TestConfirmationService.getSubscription)
+          val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case rows => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -830,10 +817,10 @@ class ConfirmationServiceSpec extends PlaySpec
             activities.businessActivities
           } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
 
-          val result = await(TestConfirmationService.getSubscription)
+          val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case rows => {
+            case SubmissionData(_, _, rows, _, _) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
@@ -857,10 +844,10 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
           } thenReturn Some(Seq(ResponsiblePeople()))
 
-          val result = await(TestConfirmationService.getSubscription)
+          val result = await(TestSubmissionResponseService.getSubscription)
 
           result match {
-            case rows => rows foreach { row =>
+            case SubmissionData(_, _, rows, _, _) => rows foreach { row =>
               row.label must not equal "confirmation.responsiblepeople"
               row.label must not equal "confirmation.responsiblepeople.fp.passed"
             }
@@ -873,73 +860,67 @@ class ConfirmationServiceSpec extends PlaySpec
 
       "return submission data" when {
 
-        "Amendment/SubmissionReadyForReview" when {
+        "Submission/SubmissionReady" in new Fixture {
 
-          "feeResponse contains type SubscriptionResponse" in new Fixture {
+          val currency = Currency.fromInt(0)
 
-            val submissionData = Seq(
-              BreakdownRow("confirmation.submission", 0, 0, 0),
-              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-            )
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
+            BreakdownRow("confirmation.submission", 0, 0, 0),
+            BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+          ), Some(amlsRegistrationNumber), None)
 
-            when {
-              cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
-            } thenReturn Some(subscriptionResponse)
+          when {
+            cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
+          } thenReturn Some(subscriptionResponse)
 
-            when {
-              cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-            } thenReturn Some(Seq(TradingPremises()))
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
 
-            when {
-              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-            } thenReturn Some(Seq(ResponsiblePeople()))
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
 
-            val result = TestConfirmationService.getBreakdownRows(
-              SubmissionReady,
-              feeResponse(SubscriptionResponseType)
-            )
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReady)
 
-            await(result) mustBe Some(submissionData)
+          await(result) mustBe Some(submissionData)
 
-          }
-
-          "feeResponse contains type AmendmentVariationResponse" in new Fixture {
-
-            val submissionData = Seq(
-              BreakdownRow("confirmation.submission", 1, 100, 100),
-              BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
-            )
-
-            when {
-              cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-            } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
-
-            when {
-              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-            } thenReturn Some(Seq(ResponsiblePeople()))
-
-            val result = TestConfirmationService.getBreakdownRows(
-              SubmissionReadyForReview,
-              feeResponse(AmendOrVariationResponseType)
-            )
-
-            await(result) mustBe Some(submissionData)
-
-          }
         }
 
-        "Variation/SubmissionDecisionApproved" in new Fixture {
+        "Amendment/SubmissionReadyForReview" in new Fixture {
 
-          val submissionData = Seq()
+          val currency = Currency.fromInt(100)
+
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(
+            BreakdownRow("confirmation.submission", 1, 100, 100),
+            BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
+          ), None, Some(currency))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-          val result = TestConfirmationService.getBreakdownRows(
-            SubmissionDecisionApproved,
-            feeResponse(AmendOrVariationResponseType)
-          )
+          when {
+            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          } thenReturn Some(Seq(ResponsiblePeople()))
+
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionReadyForReview)
+
+          await(result) mustBe Some(submissionData)
+
+        }
+
+        "Variation/SubmissionDecisionApproved" in new Fixture {
+
+          val currency = Currency.fromInt(100)
+
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(), None, Some(currency))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
+
+          val result = TestSubmissionResponseService.getSubmissionData(SubmissionDecisionApproved)
 
           await(result) mustBe Some(submissionData)
 
@@ -947,20 +928,19 @@ class ConfirmationServiceSpec extends PlaySpec
 
         "Renewal/ReadyForRenewal" in new Fixture {
 
-          val submissionData = Seq()
+          val currency = Currency.fromInt(100)
+
+          val submissionData = SubmissionData(Some(paymentRefNo), currency, Seq(), None, Some(currency))
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
           when {
-            TestConfirmationService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+            TestSubmissionResponseService.cacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
           } thenReturn Future.successful(Some(Renewal()))
 
-          val result = TestConfirmationService.getBreakdownRows(
-            ReadyForRenewal(Some(LocalDate.now())),
-            feeResponse(AmendOrVariationResponseType)
-          )
+          val result = TestSubmissionResponseService.getSubmissionData(ReadyForRenewal(Some(LocalDate.now())))
 
           await(result) mustBe Some(submissionData)
 

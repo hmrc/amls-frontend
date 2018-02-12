@@ -16,32 +16,32 @@
 
 package connectors
 
-import config.AppConfig
-import generators.AmlsReferenceNumberGenerator
 import models.ResponseType.SubscriptionResponseType
 import models._
-import org.joda.time.{DateTime, DateTimeZone}
+import org.joda.time.{DateTimeZone, DateTime}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import uk.gov.hmrc.domain.{CtUtr, SaUtr, Org}
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.domain.Org
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import uk.gov.hmrc.play.frontend.auth.connectors.domain._
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost }
 
-class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
+class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
-  val connector = new FeeConnector(
-    http = mock[HttpGet],
-    appConfig = mock[AppConfig]
-  )
+  object FeeConnector extends FeeConnector {
+    override private[connectors] val httpPost: HttpPost = mock[HttpPost]
+    override private[connectors] val url: String = "amls/payment"
+    override private[connectors] val httpGet: HttpGet = mock[HttpGet]
+  }
 
   val safeId = "SAFEID"
+  val amlsRegistrationNumber = "AMLSREGNO"
 
   implicit val hc = HeaderCarrier()
   implicit val ac = AuthContext(
@@ -60,30 +60,18 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
     None, None)
 
   "FeeConnector" must {
-
-    val feeResponse = FeeResponse(
-      SubscriptionResponseType,
-      amlsRegistrationNumber,
-      150.00,
-      Some(100.0),
-      300.0,
-      550.0,
-      Some("XA000000000000"),
-      None,
-      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)
-    )
+    val amlsRegistrationNumber = "XAML00000000000"
+    val feeResponse = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber
+      , 150.00, Some(100.0), 300.0, 550.0, Some("XA000000000000"), None,
+      new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
 
     "successfully receive feeResponse" in {
 
       when {
-        connector.feePaymentUrl
-      } thenReturn "/amls/feePaymentUrl"
-
-      when {
-        connector.http.GET[FeeResponse](eqTo(s"${connector.feePaymentUrl}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
+        FeeConnector.httpGet.GET[FeeResponse](eqTo(s"${FeeConnector.url}/org/TestOrgRef/$amlsRegistrationNumber"))(any(),any(), any())
       } thenReturn Future.successful(feeResponse)
 
-      whenReady(connector.feeResponse(amlsRegistrationNumber)){
+      whenReady(FeeConnector.feeResponse(amlsRegistrationNumber)){
         _ mustBe feeResponse
       }
     }

@@ -28,8 +28,6 @@ object Currency {
 
   implicit def fromBD(value: BigDecimal): Currency = Currency(value)
 
-  implicit def fromBDO(value: Option[BigDecimal]): Option[Currency] = value.map(Currency(_))
-
   implicit def fromInt(value: Int): Currency = Currency(value)
 
   implicit def currencyToDouble(c: Currency): Double = c.value.toDouble
