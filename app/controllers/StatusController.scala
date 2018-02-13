@@ -185,7 +185,7 @@ trait StatusController extends BaseController {
           )
         }
 
-      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterToggle))
       case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionWithdrawn, _) => Ok(status_withdrawn(businessNameOption))
