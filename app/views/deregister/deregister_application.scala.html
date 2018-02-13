@@ -21,7 +21,7 @@
 @import forms2._
 @import forms.EmptyForm
 
-@(businessName: String, currentRegYearEndDate: LocalDate, regNumber: String)(implicit request: Request[_], messages: Messages)
+@(businessName: String, activities: Set[String], regNumber: String, businessMatchingVariationToggle: Boolean)(implicit request: Request[_], messages: Messages)
 
 @header = {
     @heading("status.deregister.title", "summary.status")
@@ -30,14 +30,22 @@
 
 @main(title = messages("status.deregister.title"), heading = header) {
 
-    <div class="panel-indent panel-indent--gutter panel-border-wide">
-        <p class="heading-small">@Messages("status.business")</p>
-        <p>@businessName</p>
-        <p class="heading-small">@Messages("lbl.registration.status")</p>
-        <p>@Messages("status.deregister.end-date.text", DateHelper.formatDate(currentRegYearEndDate))</p>
-        <p class="heading-small">@messages("status.referenceno")</p>
+    <h2 class="heading-large">@businessName</h2>
+
+    <div class="grid-layout__column grid-layout__column--2-3">
+        <p class="heading-small">@messages("status.deregister.regnumber")</p>
         <p>@regNumber</p>
+        <p class="heading-small">@Messages("status.deregister.services")</p>
+        <ul class="list">@for(activity <- activities) {
+                <li>@activity</li>
+            }
+        </ul>
+
+        @if(businessMatchingVariationToggle){
+        <p><a href="@controllers.businessmatching.routes.SummaryController.get()">@Messages("status.deregister.button.change")<span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a></p>
+        }
     </div>
+
 
     @messages("status.deregister.body-content").paragraphizeH
 
