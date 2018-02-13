@@ -541,7 +541,7 @@ status.submissiondecisionapproved.description2 = Your business is now registered
 status.submissiondecision.not.supervised.heading = Not supervised
 status.submissiondecisionrejected.title = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
-status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionrejected.description2 = Your business is not registered for anti-money laundering supervision with HM Revenue and Customs(HMRC). Your business must not carry out activities which are covered by Money Laundering Regulations.
 status.submissiondecisionrevoked.title = Application revoked
 status.submissiondecisionrevoked.description = Your application has been revoked.
 status.submissiondecisionrevoked.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
@@ -579,13 +579,17 @@ status.withdraw.body-content = Withdraw your application if you no longer want t
   We will delete any information you have provided. We won’t refund any fees you have paid.\n\
   To make a change to your application, you can update or view your information.\n\
   If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
-status.deregister.title = De-register business
+status.deregister.title = De-register your business
 status.deregister.link-text = de-register business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
-status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
-  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
-  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
+status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
+  We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
+  You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
+status.deregister.services = Registered services:
+status.deregister.button.change = Change
+status.deregister.regnumber = Registration number:
+status.deregister.visuallyhidden.change = Change your registered services
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application

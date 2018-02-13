@@ -47,12 +47,13 @@ class status_rejectedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description")).text must be(
         Messages("status.submissiondecisionrejected.description"))
-      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrejected.description2")).text must be(
-        Messages("status.submissiondecisionrejected.description2"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
 
+      doc.getElementById("rejected.p2").html() must be(Messages("status.submissiondecisionrejected.description2"))
+      doc.getElementById("new.application.button").html() must be (Messages("status.submissiondecisionrejected.btn"))
+      doc.getElementsByTag("form").attr("action") must be("/anti-money-laundering/application-status/new-submission")
     }
 
   }

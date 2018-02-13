@@ -17,7 +17,7 @@
 package controllers
 
 import cats.implicits._
-import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
@@ -35,10 +35,12 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services._
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
@@ -53,6 +55,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
+
     val controller = new StatusController {
       override private[controllers] val landingService: LandingService = mock[LandingService]
       override val authConnector = self.authConnector
@@ -63,6 +66,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       override private[controllers] val renewalService: RenewalService = mock[RenewalService]
       override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
       override private[controllers] val amlsConnector = mock[AmlsConnector]
+      override protected[controllers] val authenticator: AuthenticatorConnector = mock[AuthenticatorConnector]
     }
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
@@ -94,6 +98,32 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
   "StatusController" should {
+    "respond with SEE_OTHER and redirect to the landing page" when {
+      "status is rejected and the new submission button is selected" in new Fixture {
+
+        val httpResponse = mock[HttpResponse]
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionRejected))
+
+        when(controller.enrolmentsService.deEnrol(any())(any(),any(),any()))
+          .thenReturn(Future.successful(true))
+
+        when(controller.authenticator.refreshProfile(any(),any()))
+          .thenReturn(Future.successful(HttpResponse(OK)))
+
+        when(controller.dataCache.remove(any())(any()))
+          .thenReturn(Future.successful(HttpResponse(OK)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+        val result = controller.newSubmission()(request)
+        status(result) must be(SEE_OTHER)
+        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
+      }
+    }
 
     "respond with OK and show business name on the status page" in new Fixture {
       when {
