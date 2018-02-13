@@ -42,7 +42,19 @@
 @scripts = {
     <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
     <script src="@routes.AssetsController.at("amls.js")"></script>
+    <script src="@routes.AssetsController.at("timeout-dialog.js")"></script>
     @scriptElem
+    <script>
+    @if(userLoggedIn) {
+        $.timeoutDialog({timeout: @config.ApplicationConfig.timeout,
+                         countdown: @config.ApplicationConfig.timeoutCountdown,
+                         keep_alive_url: '@controllers.routes.AmlsController.keep_alive',
+                         logout_url: '@config.ApplicationConfig.logoutUrl',
+                         logout_redirect_url: '@config.ApplicationConfig.logoutUrl',
+                         restart_on_yes: true, background_no_scroll: true});
+       var dialogOpen;
+    }
+  </script>
 }
 
 @head = {

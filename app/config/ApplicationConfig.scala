@@ -21,7 +21,7 @@ import javax.inject.Inject
 import play.api.{Logger, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
-import play.api.Play.current
+import play.api.Play.{configuration, current}
 
 trait ApplicationConfig {
 
@@ -44,12 +44,10 @@ trait ApplicationConfig {
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
-
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
 
   lazy val contactHost = baseUrl("contact-frontend")
   lazy val authHost = baseUrl("auth")
-
   lazy val assetsPrefix = getConfigString(s"assets.url") + getConfigString(s"assets.version")
 
   lazy val analyticsToken = Some(getConfigString(s"analytics.token"))
@@ -66,20 +64,20 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
-
   lazy val feePaymentUrl = s"$amlsUrl/amls/payment"
-
   lazy val notificationsUrl = baseUrl("amls-notification")
   lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
+  lazy val paymentsUrl = getConfigString("paymentsUrl")
+
+  lazy val timeout = getInt("timeout.seconds")
+  lazy val timeoutCountdown = getInt("timeout.countdown")
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
-
   lazy val ggUrl = baseUrl("government-gateway")
-  lazy val enrolUrl = s"$ggUrl/enrol"
 
-  lazy val paymentsUrl = getConfigString("paymentsUrl")
+  lazy val enrolUrl = s"$ggUrl/enrol"
 
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
