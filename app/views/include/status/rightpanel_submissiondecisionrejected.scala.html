@@ -17,14 +17,16 @@
 @import include.forms2._
 @import forms.EmptyForm
 
-@()(implicit request: Request[_],m:Messages)
+@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
 <p>@Messages("status.submissiondecisionrejected.description")</p>
 <p id="rejected.p2">@Messages("status.submissiondecisionrejected.description2")</p>
 
-@form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
+@if(showReregisterButton) {
+    @form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
 
-     @submit(
-        buttonMessageKey = Some("status.submissiondecisionrejected.btn"),
-        returnLink = false,
-        buttonId = Some("new.application.button"))
+        @submit(
+            buttonMessageKey = Some("status.submissiondecisionrejected.btn"),
+            returnLink = false,
+            buttonId = Some("new.application.button"))
+    }
 }

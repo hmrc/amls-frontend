@@ -56,5 +56,11 @@ class status_rejectedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByTag("form").attr("action") must be("/anti-money-laundering/application-status/new-submission")
     }
 
+    "hide the 'new submission' form when specified" in new ViewFixture {
+      def view =  views.html.status.status_rejected("XAML00000000000", Some("business Name"), showReregisterButton = false)
+
+      Option(doc.getElementById("new.application.button")) must not be defined
+    }
+
   }
 }
