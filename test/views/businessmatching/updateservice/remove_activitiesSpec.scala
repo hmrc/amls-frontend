@@ -39,9 +39,9 @@ class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with Mus
 
       def view = views.html.businessmatching.updateservice.remove_activities(EmptyForm, Set.empty)
 
-      doc.title() must include(Messages("updateservice.removeactivities.title"))
-      heading.html() must include(Messages("updateservice.removeactivities.header"))
-      subHeading.html() must include(Messages("summary.updateservice"))
+      doc.title must include(Messages("updateservice.removeactivities.title"))
+      heading.html must include(Messages("updateservice.removeactivities.header"))
+      subHeading.html must include(Messages("summary.updateservice"))
 
     }
 
@@ -53,14 +53,11 @@ class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with Mus
 
       def view = views.html.businessmatching.updateservice.remove_activities(form2, Set.empty)
 
-      errorSummary.html() must include("not a message Key")
+      errorSummary.html must include("not a message Key")
 
       doc.getElementById("businessActivities")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+        .getElementsByClass("error-notification").first.html must include("not a message Key")
 
     }
-
   }
-
-
 }
