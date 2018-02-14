@@ -222,7 +222,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
       }
 
       "remove the accountancy advisor questions from Business Activities" when {
-        "Accountancy Services is added and pre-application is complete" in new Fixture {
+        "Accountancy Services is added and pre-application is complete and BusinessActivities section is started" in new Fixture {
           val businessActivities = BusinessActivities(
             accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
             whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
@@ -253,7 +253,7 @@ class RegisterServicesControllerSpec extends GenericTestHelper
       }
 
       "NOT attempt to remove the accountancy advisor questions from Business Activities" when {
-        "Accountancy Services is added and preapplication is not complete" in new Fixture {
+        "Accountancy Services is added and BusinessActivities section is not started" in new Fixture {
 
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = false)
 
