@@ -120,7 +120,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       activities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
       strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
     } yield {
-      if(bmActivities.businessActivities contains AccountancyServices){
+      if((bmActivities.businessActivities contains AccountancyServices) && activities.isDefined){
         dataCacheConnector.save[BusinessActivities](BusinessActivities.key, strippedActivities)
       } else {
         Future.successful(activities)

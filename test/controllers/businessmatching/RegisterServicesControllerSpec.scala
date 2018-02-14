@@ -221,15 +221,15 @@ class RegisterServicesControllerSpec extends GenericTestHelper
         }
       }
 
-      "remove the accountancy advisor questions from Business Matching" when {
-        "Accountancy Services is added" in new Fixture {
+      "remove the accountancy advisor questions from Business Activities" when {
+        "Accountancy Services is added and pre-application is complete and BusinessActivities section is started" in new Fixture {
           val businessActivities = BusinessActivities(
             accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
             whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
             taxMatters = Some(TaxMatters(true))
           )
 
-          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))))
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
 
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "01",
@@ -249,6 +249,29 @@ class RegisterServicesControllerSpec extends GenericTestHelper
           captor.getValue.accountantForAMLSRegulations mustBe None
           captor.getValue.whoIsYourAccountant mustBe None
           captor.getValue.taxMatters mustBe None
+        }
+      }
+
+      "NOT attempt to remove the accountancy advisor questions from Business Activities" when {
+        "Accountancy Services is added and BusinessActivities section is not started" in new Fixture {
+
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = false)
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "04")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any()))
+            .thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          mockCacheFetch[BusinessActivities](None, Some(BusinessActivities.key))
+
+          val result = controller.post()(newRequest)
+          status(result) must be(SEE_OTHER)
+
+          verify(controller.dataCacheConnector, times(0))
+            .save(eqTo(BusinessActivities.key), any())(any(), any(), any())
+
         }
       }
     }
