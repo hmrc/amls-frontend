@@ -145,7 +145,7 @@ $(function () {
 
       if ($target.attr('data-toggle-new')) {
         if ($inputs.filter(pred).length || $self.prop('checked') === true) {
-          $target.show();
+          $target.removeClass('js-hidden');
         }
       } else {
         if ($inputs.filter(pred).length === 0) {
@@ -154,7 +154,7 @@ $(function () {
             'aria-expanded': 'false'
           });
           if ($self.prop('checked') === false) {
-            $target.hide().attr('aria-hidden', 'true');
+            $target.addClass('js-hidden').attr('aria-hidden', 'true');
           }
         }
       }
@@ -164,13 +164,13 @@ $(function () {
         $inputs.filter('input, select, textarea').val('');
         $inputs.filter('option').prop('selected', false);
         $self.attr('aria-expanded', 'false');
-        $target.hide().attr('aria-hidden', 'true');
+        $target.addClass('js-hidden').attr('aria-hidden', 'true');
       }
 
       $self.change(function () {
         if ($self.prop('checked') === true) {
           $self.attr('aria-expanded', 'true');
-          $target.show().attr('aria-hidden', 'false');
+          $target.removeClass('js-hidden').attr('aria-hidden', 'false');
         } else {
           hide();
         }
@@ -183,7 +183,7 @@ $(function () {
       }
 
       if ($self.prop('checked') === true) {
-        $target.show();
+        $target.removeClass('js-hidden');
       }
     });
   }());
