@@ -38,7 +38,8 @@ class ways_to_paySpec extends GenericTestHelper {
       doc.title must startWith(Messages("payments.waystopay.title"))
       heading.html must be(Messages("payments.waystopay.header"))
       subHeading.html must include(Messages("submit.registration"))
-
+      doc.html must include(Messages("payments.waystopay.info"))
+      doc.html must include(Messages("payments.waystopay.info2"))
     }
 
     "show errors in the correct locations" in new ViewFixture {

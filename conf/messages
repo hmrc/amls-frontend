@@ -783,6 +783,7 @@ payments.waystopay.title = How do you want to pay your fee?
 payments.waystopay.header = How do you want to pay your fee?
 
 payments.waystopay.info = If paying by Bacs (Bankers Automated Clearing System), check your bank’s transaction limits and processing times.
+payments.waystopay.info2 = You can’t pay by personal credit card. There’s a fee if you pay by corporate credit card.
 payments.waystopay.lead.time = Payments usually take 3 working days.
 
 payments.waystopay.card = Debit or credit card
