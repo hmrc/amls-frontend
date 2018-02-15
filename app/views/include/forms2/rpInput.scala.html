@@ -42,7 +42,7 @@
 )(implicit m: Messages)
 
 
-<div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ amls-js-hidden}"@if(data){ data-reveal="@data"}>
+<div class="form-group@if(field.hasErrors){ form-field--error}@if(parentDateAttr){ form-group-@parentDateAttr} @if(panel){ panel-indent}@if(jsHidden){ js-hidden}"@if(data){ data-reveal="@data"}>
     <label class="form-label@if(bold){-bold}" for="@field.id">
         @if(labelText.nonEmpty) {
             @if(labelHidden) {<span class="visuallyhidden">}
