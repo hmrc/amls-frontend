@@ -27,16 +27,16 @@
     field: Option[forms.Field] = None
 )(content: Html)(implicit lang: Lang, m: Messages)
 
-@classDefs = {classes ++ defineClass(panel "panel-indent"), (wide, "panel-border-wide"), (gutter, "panel-indent--gutter"), (field.get.hasErrors, "form-field--error"), (jsHidden, "amls-js-hidden"))}
+@classDefs = {classes ++ defineClass(panel "panel-indent"), (wide, "panel-border-wide"), (gutter, "panel-indent--gutter"), (field.get.hasErrors, "form-field--error"), (jsHidden, "js-hidden"))}
 
 @if(field.isDefined) {
     <div @if(field.get.id.nonEmpty){ id="@field.get.id"}
-        class="@if(panel){ panel-indent}@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(field.get.hasErrors){ form-field--error}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+        class="@if(panel){ panel-indent}@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(field.get.hasErrors){ form-field--error}@if(jsHidden){ js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
     @if(field.get.hasErrors) {
         <span class="error-notification">@field.get.error</span>
     }
 } else {
-    <div class="@if(panel){ panel-indent }@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(jsHidden){ amls-js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
+    <div class="@if(panel){ panel-indent }@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(jsHidden){ js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
 }
     @content
 </div>
