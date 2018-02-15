@@ -959,9 +959,9 @@ fieldset .panel-indent {
   width: 220px;
 }
 
-.js *[data-toggle-new] {
+/*.js *[data-toggle-new] {
   display: none;
-}
+}*/
 
 fieldset.panel-indent {
   box-sizing: border-box;
