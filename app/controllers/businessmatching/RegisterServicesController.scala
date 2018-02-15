@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessActivities, _}
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching._
-import models.businessactivities.{BusinessActivities => ba}
+import models.businessactivities.BusinessActivities
 
 import scala.concurrent.Future
 
@@ -50,7 +50,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
             businessMatching <- businessMatchingService.getModel
             businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
           } yield {
-            val form = Form2[BusinessActivities](businessActivities)
+            val form = Form2[BusinessMatchingActivities](businessActivities)
             val (newActivities, existing) = getActivityValues(form, isPreSubmission, Some(businessActivities.businessActivities))
 
             Ok(register_services(form, edit, newActivities, existing, isPreSubmission, businessMatching.preAppComplete))
@@ -65,7 +65,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         import jto.validation.forms.Rules._
-        Form2[BusinessActivities](request.body) match {
+        Form2[BusinessMatchingActivities](request.body) match {
           case invalidForm: InvalidForm =>
             statusService.isPreSubmission flatMap { isPreSubmission =>
               (for {
@@ -87,9 +87,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 newModel(businessMatching.activities, data, isPreSubmission),
                 isMsb(data, businessMatching.activities)
               )
-              businessActivities <- dataCacheConnector.fetch[ba](ba.key)
-              baWithoutAccountantForAMLSRegulations <- withoutAccountantForAMLSRegulations(businessActivities)
-              _ <- maybeRemoveAccountantForAMLSRegulations(baWithoutAccountantForAMLSRegulations, savedModel, businessActivities)
+              _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePeople] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -110,24 +108,23 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def accountantForAMLSRegulationsNotRequired(businessActivities: BusinessActivities): Boolean =
-    businessActivities.businessActivities contains AccountancyServices
+  private def withoutAccountantForAMLSRegulations(activities: BusinessActivities): BusinessActivities =
+    activities.whoIsYourAccountant(None)
+      .accountantForAMLSRegulations(None)
+      .taxMatters(None)
+      .copy(hasAccepted = true)
 
-  private def withoutAccountantForAMLSRegulations(activities: ba) : Future[ba] =
-    Future.successful(activities.whoIsYourAccountant(None).accountantForAMLSRegulations(None).copy(hasAccepted = true))
-
-  private def removeAccountantForAMLSRegulations(activities: ba)(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    dataCacheConnector.save[ba](ba.key, activities)
-  }
-
-  private def maybeRemoveAccountantForAMLSRegulations(activitiesWithoutAccountantForAMLSRegulations: ba,
-                                                      businessActivities: BusinessActivities,
-                                                      activities: ba)
+  private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) =
-    if(accountantForAMLSRegulationsNotRequired(businessActivities) && (activities == None)){
-      removeAccountantForAMLSRegulations(activitiesWithoutAccountantForAMLSRegulations)
-    } else {
-      Future.successful(activities)
+    for {
+      activities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+      strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
+    } yield {
+      if((bmActivities.businessActivities contains AccountancyServices) && activities.isDefined){
+        dataCacheConnector.save[BusinessActivities](BusinessActivities.key, strippedActivities)
+      } else {
+        Future.successful(activities)
+      }
     }
 
   private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
@@ -146,31 +143,31 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       MoneyServiceBusiness,
       TrustAndCompanyServices,
       TelephonePaymentService
-    ) map BusinessActivities.getValue
+    ) map BusinessMatchingActivities.getValue
 
     existingActivities.fold[(Set[String], Set[String])]((activities, Set.empty)) { ea =>
       if (isPreSubmission) {
         (activities, Set.empty)
       } else {
-        (activities diff (ea map BusinessActivities.getValue), activities intersect (ea map BusinessActivities.getValue))
+        (activities diff (ea map BusinessMatchingActivities.getValue), activities intersect (ea map BusinessMatchingActivities.getValue))
       }
     }
 
   }
 
-  private def newModel(existingActivities: Option[BusinessActivities],
-                           added: BusinessActivities,
-                           isPreSubmission: Boolean) = existingActivities.fold[BusinessActivities](added) { existing =>
+  private def newModel(existingActivities: Option[BusinessMatchingActivities],
+                           added: BusinessMatchingActivities,
+                           isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
     if (isPreSubmission) {
       added
     } else {
-      BusinessActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
+      BusinessMatchingActivities(existing.businessActivities, Some(added.businessActivities), existing.removeActivities, existing.dateOfChange)
     }
   }
 
   private def updateModel(businessMatching: BusinessMatching,
-                          updatedBusinessActivities: BusinessActivities,
-                          isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
+                          updatedBusinessActivities: BusinessMatchingActivities,
+                          isMsb: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessMatchingActivities] = {
 
     val updatedBusinessMatching = isMsb match {
       case true =>
@@ -185,10 +182,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def isMsb(added: BusinessActivities, existing: Option[BusinessActivities]): Boolean =
+  private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
-  private def fitAndProperRequired(businessActivities: BusinessActivities): Boolean = {
+  private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
 
     def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 

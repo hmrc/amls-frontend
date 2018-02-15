@@ -21,9 +21,7 @@ import play.api.mvc._
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
-
-trait AmlsController extends Actions with BaseController{
+trait AmlsController extends Actions {
 
   val unauthorised = Action {
     implicit request =>
@@ -33,12 +31,6 @@ trait AmlsController extends Actions with BaseController{
   val unauthorised_role = Action {
     implicit request =>
       Unauthorized(views.html.unauthorised_role())
-  }
-
-  val keep_alive = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Future.successful(Ok("OK"))
   }
 }
 

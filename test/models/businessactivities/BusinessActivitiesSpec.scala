@@ -122,7 +122,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     howManyEmployees = Some(DefaultHowManyEmployees),
     identifySuspiciousActivity = Some(DefaultIdentifySuspiciousActivity),
     whoIsYourAccountant = None,
-    taxMatters = Some(DefaultTaxMatters),
+    taxMatters = None,
     transactionRecordTypes = Some(DefaultTransactionRecordTypes),
     hasChanged = false,
     hasAccepted = true
@@ -221,6 +221,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "return false when the model is incomplete" in {
       partialModel.isComplete(None) must be(false)
     }
+
     "return true when the model is complete" in {
       completeModel.isComplete(None) must be(true)
     }
@@ -229,8 +230,32 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       completeModelWithoutCustUK.isComplete(None) must be(true)
     }
 
-    "return false when the accountantForAMLSRegulations is none and BM activities does not include ASP" in {
+    "return false when the regulation questions have no answers and BM activities does not include ASP" in {
       completeModelWithoutAccountantAdvice.isComplete(Some(bmBusinessActivitiesWithoutASP)) must be(false)
+    }
+
+    "return true when the regulation questions have no answers and BM activities does include ASP" in {
+      completeModelWithoutAccountantAdvice.isComplete(Some(ba(Set(AccountancyServices)))) must be(true)
+    }
+
+    "return false if only partial regulation questions have been answered" in {
+      val model = completeModelWithoutAccountantAdvice.copy(
+        accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+        whoIsYourAccountant = None,
+        taxMatters = None
+      )
+
+      model.isComplete(Some(ba(Set(HighValueDealing)))) must be(false)
+    }
+
+    "return true if partial regulation questions were answered, but accountantForAMLSRegulations is false" in {
+      val model = completeModelWithoutAccountantAdvice.copy(
+        accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(false)),
+        whoIsYourAccountant = None,
+        taxMatters = None
+      )
+
+      model.isComplete(Some(ba(Set(HighValueDealing)))) must be(true)
     }
   }
 
@@ -316,7 +341,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     }
 
     "return BusinessActivities with TaxMatters set and indicate that changes have been made" in {
-      val result = initial.taxMatters(NewTaxMatters)
+      val result = initial.taxMatters(Some(NewTaxMatters))
       result must be(BusinessActivities(taxMatters = Some(NewTaxMatters), hasChanged = true))
     }
   }
@@ -332,7 +357,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.involvedInOther(InvolvedInOtherNo)
           res.hasChanged must be(true)
           res.involvedInOther must be(Some(InvolvedInOtherNo))
@@ -350,7 +375,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.expectedBusinessTurnover(NewBusinessTurnover)
           res.hasChanged must be(true)
           res.expectedBusinessTurnover must be(Some(NewBusinessTurnover))
@@ -368,7 +393,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.expectedAMLSTurnover(NewAMLSTurnover)
           res.hasChanged must be(true)
           res.expectedAMLSTurnover must be(Some(NewAMLSTurnover))
@@ -386,7 +411,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.businessFranchise(NewBusinessFranchise)
           res.hasChanged must be(true)
           res.businessFranchise must be(Some(NewBusinessFranchise))
@@ -404,7 +429,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.transactionRecord(NewTransactionRecord)
           res.hasChanged must be(true)
           res.transactionRecord must be(Some(NewTransactionRecord))
@@ -422,7 +447,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.customersOutsideUK(NewCustomersOutsideUK)
           res.hasChanged must be(true)
           res.customersOutsideUK must be(Some(NewCustomersOutsideUK))
@@ -440,7 +465,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.ncaRegistered(NewNCARegistered)
           res.hasChanged must be(true)
           res.ncaRegistered must be(Some(NewNCARegistered))
@@ -458,7 +483,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.accountantForAMLSRegulations(Some(NewAccountantForAMLSRegulations))
           res.hasChanged must be(true)
           res.accountantForAMLSRegulations must be(Some(NewAccountantForAMLSRegulations))
@@ -476,7 +501,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.riskAssessmentPolicy(NewRiskAssessment)
           res.hasChanged must be(true)
           res.riskAssessmentPolicy must be(Some(NewRiskAssessment))
@@ -494,7 +519,7 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
+        "set the hasChanged & previouslyRegistered Properties" in {
           val res = completeModel.whoIsYourAccountant(Some(NewWhoIsYourAccountant))
           res.hasChanged must be(true)
           res.whoIsYourAccountant must be(Some(NewWhoIsYourAccountant))
@@ -504,15 +529,15 @@ class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSu
     "taxMatters value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val res = completeModel.taxMatters(DefaultTaxMatters)
+          val res = completeModel.taxMatters(Some(DefaultTaxMatters))
           res must be(completeModel)
           res.hasChanged must be(false)
         }
       }
 
       "is different" must {
-        "set the hasChanged & previouslyRegisterd Properties" in {
-          val res = completeModel.taxMatters(NewTaxMatters)
+        "set the hasChanged & previouslyRegistered Properties" in {
+          val res = completeModel.taxMatters(Some(NewTaxMatters))
           res.hasChanged must be(true)
           res.taxMatters must be(Some(NewTaxMatters))
         }

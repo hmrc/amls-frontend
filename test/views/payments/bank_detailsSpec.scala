@@ -36,7 +36,6 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
       doc.title must startWith(Messages("payments.bankdetails.title"))
       heading.html must be(Messages("payments.bankdetails.header"))
       subHeading.html must include(Messages("submit.registration"))
-
     }
 
     "display non uk details" when {
@@ -49,8 +48,8 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.value")) must not be empty
+        doc.getElementById("bank-details-print").html() mustBe "Print"
       }
-
     }
 
     "display uk details" when {
@@ -63,11 +62,8 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.value")) must not be empty
-
+        doc.getElementById("bank-details-print").html() mustBe "Print"
       }
-
     }
-
   }
-
 }

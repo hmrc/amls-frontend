@@ -541,7 +541,7 @@ status.submissiondecisionapproved.description2 = Your business is now registered
 status.submissiondecision.not.supervised.heading = Not supervised
 status.submissiondecisionrejected.title = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
-status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionrejected.description2 = Your business is not registered for anti-money laundering supervision with HM Revenue and Customs(HMRC). Your business must not carry out activities which are covered by Money Laundering Regulations.
 status.submissiondecisionrevoked.title = Application revoked
 status.submissiondecisionrevoked.description = Your application has been revoked.
 status.submissiondecisionrevoked.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
@@ -572,19 +572,24 @@ status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
 status.withdraw.link-text = withdraw application
-status.withdraw.title = Withdraw application
+status.withdraw.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
-status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
-  I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
-
-status.deregister.title = De-register business
+status.withdraw.body-content = Withdraw your application if you no longer want to apply for anti-money laundering supervision from HM Revenue and Customs (HMRC).\n\
+  We will delete any information you have provided. We won’t refund any fees you have paid.\n\
+  To make a change to your application, you can update or view your information.\n\
+  If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
+status.deregister.title = De-register your business
 status.deregister.link-text = de-register business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
-status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
-  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
-  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
+status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
+  We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
+  You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
+status.deregister.services = Registered services:
+status.deregister.button.change = Change
+status.deregister.regnumber = Registration number:
+status.deregister.visuallyhidden.change = Change your registered services
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
@@ -778,6 +783,7 @@ payments.waystopay.title = How do you want to pay your fee?
 payments.waystopay.header = How do you want to pay your fee?
 
 payments.waystopay.info = If paying by Bacs (Bankers Automated Clearing System), check your bank’s transaction limits and processing times.
+payments.waystopay.info2 = You can’t pay by personal credit card. There’s a fee if you pay by corporate credit card.
 payments.waystopay.lead.time = Payments usually take 3 working days.
 
 payments.waystopay.card = Debit or credit card

@@ -333,7 +333,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
         mockCacheFetch[UpdateService](Some(UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(1))),
-          Some(SubmittedActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(1)))
         )), Some(UpdateService.key))
 
