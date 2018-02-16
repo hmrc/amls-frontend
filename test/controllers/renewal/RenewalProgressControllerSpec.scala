@@ -97,7 +97,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
   "The Renewal Progress Controller" must {
 
-    "load the page" in new Fixture {
+    "load the pagewhen status is ReadyForRenewal" in new Fixture {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
@@ -135,7 +135,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
       val html = Jsoup.parse(contentAsString(result))
 
-      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
+      html.select(".page-header").text() must include(Messages("amendment.title"))
 
     }
 

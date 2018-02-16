@@ -71,7 +71,7 @@ class RegistrationProgressController @Inject()(
                 val newSections = progressService.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
                 val sections = progressService.sections(cacheMap)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
-                val preSubmission = Set(NotCompleted, SubmissionReady).contains(status)
+                val canEditPreapplication = Set(NotCompleted, SubmissionReady).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
 
                 completePreApp match {
@@ -80,7 +80,7 @@ class RegistrationProgressController @Inject()(
                     amendmentDeclarationAvailable(sections),
                     reviewDetails.businessAddress,
                     activities,
-                    preSubmission,
+                    canEditPreapplication,
                     Some(newSections)
                   ))
                   case _ => Ok(registration_progress(
@@ -88,7 +88,7 @@ class RegistrationProgressController @Inject()(
                     declarationAvailable(sections),
                     reviewDetails.businessAddress,
                     activities,
-                    preSubmission
+                    canEditPreapplication
                   ))
                 }
               } getOrElse InternalServerError("Unable to retrieve the business details")
