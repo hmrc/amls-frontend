@@ -12,6 +12,7 @@ POST        /subscribe                                                          
 
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role
+GET         /keep-alive                                                               controllers.AmlsController.keep_alive
 
 GET         /registration-progress                                                    @controllers.RegistrationProgressController.get()
 POST        /registration-progress                                                    @controllers.RegistrationProgressController.post()

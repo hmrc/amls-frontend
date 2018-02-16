@@ -29,7 +29,7 @@
 )(implicit lang:Lang,  m: Messages)
 
 <div class="form-group @if(field.hasErrors) {form-field--error} @if(panel) {panel-indent}">
-    <label for="@field.id" class="@if(jsHidden){amls-js-hidden}">
+    <label for="@field.id" class="@if(jsHidden){js-hidden}">
         @if(labelText.nonEmpty) {
             <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
         }

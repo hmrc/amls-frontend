@@ -38,7 +38,8 @@ s"""${f("utrNumber").id}-fieldset"""
             f = f("saRegistered-fieldset"),
             legend = "responsiblepeople.registeredforselfassessment.title",
             panel=false,
-            legendHidden = true
+            legendHidden = true,
+            classes = Seq("inline")
         ) {
             @errorGroupWithPlaceholder(
                 field = f("saRegistered"),
