@@ -133,7 +133,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper with BusinessMatch
 
     }
 
-    "load the page when status is renewal submitted" in new Fixture {
+    "redirect to the registration progress controller when status is renewal submitted" in new Fixture {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
@@ -146,11 +146,9 @@ class RenewalProgressControllerSpec extends GenericTestHelper with BusinessMatch
 
       val result = controller.get()(request)
 
-      status(result) mustBe OK
+      status(result) mustBe SEE_OTHER
 
-      val html = Jsoup.parse(contentAsString(result))
-
-      html.select(".page-header").text() must include(Messages("amendment.title"))
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
     }
 

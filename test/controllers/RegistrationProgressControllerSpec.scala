@@ -110,9 +110,8 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
         }
       }
 
-      "redirect to renewal registration progress" when {
-        "status is ready for renewal and" must {
-          "renewal data exists in save4later" in new Fixture {
+      "status is ReadyForRenewal and renewal data exists in save4later" must {
+        "redirect to renewal registration progress" in new Fixture {
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
@@ -123,19 +122,31 @@ class RegistrationProgressControllerSpec extends GenericTestHelper
             redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
           }
         }
-        "status is ready for renewal submitted" must {
-          "renewal data exists in save4later" in new Fixture {
+        "status is renewal submitted and renewal data exists in save4later" must {
+          "show the registration amendment page" in new Fixture {
+            when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+              .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+            when(controller.progressService.sections(mockCacheMap))
+              .thenReturn(Seq(
+                Section("TESTSECTION1", Completed, false, mock[Call]),
+                Section("TESTSECTION2", Completed, true, mock[Call])
+              ))
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
 
             mockApplicationStatus(RenewalSubmitted(None))
 
             val responseF = controller.get()(request)
-            status(responseF) must be(SEE_OTHER)
-            redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
+            status(responseF) must be(OK)
+            val pageTitle = Messages("amendment.title") + " - " +
+              Messages("title.yapp") + " - " +
+              Messages("title.amls") + " - " + Messages("title.gov")
+
+            Jsoup.parse(contentAsString(responseF)).title mustBe pageTitle
           }
         }
-      }
+
 
       "redirect to registration progress" when {
         "status is ready for renewal and" must {

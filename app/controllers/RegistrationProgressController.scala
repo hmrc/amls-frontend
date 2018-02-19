@@ -100,7 +100,7 @@ class RegistrationProgressController @Inject()(
                               authContext: AuthContext,
                               request: Request[AnyContent]): Future[Boolean] = {
     statusService.getStatus flatMap {
-      case ReadyForRenewal(_) | RenewalSubmitted(_) =>
+      case ReadyForRenewal(_) =>
         dataCache.fetch[Renewal](Renewal.key) map {
           case Some(_) => true
           case None => false

@@ -68,29 +68,7 @@ class RenewalProgressController @Inject()
               Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
             }
           }
-          case (r:RenewalSubmitted, _) => {
-
-            for {
-              renewalSection <- OptionT.liftF(renewals.getSection)
-              cache <- OptionT(dataCacheConnector.fetchAll)
-              businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-              newActivities <- businessMatchingService.getAdditionalBusinessActivities orElse OptionT.some(Set.empty[BusinessActivity])
-              reviewDetails <- OptionT.fromOption[Future](businessMatching.reviewDetails)
-            } yield {
-              val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
-              val canSubmit = renewals.canSubmit(renewalSection, variationSections)
-              val newSections = progressService.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cache).toSeq
-              val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
-
-              Ok(registration_amendment(variationSections,
-                canSubmit,
-                reviewDetails.businessAddress,
-                activities,
-                false,
-                Some(newSections)
-              ))
-            }
-          }
+          case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))
         }
         result.flatMap(_.getOrElse(InternalServerError("Cannot get business matching or renewal date")))
   }
