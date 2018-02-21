@@ -22,7 +22,7 @@
     legendHidden: Boolean = false
 )(implicit lang:Lang,  m: Messages)
 
-<legend class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">
-    @Messages(legend)
+<legend>
+    <span  class="form-label@if(bold){-bold}@if(legendHidden){ visuallyhidden}">@Messages(legend)</span>
+    @if(hint.nonEmpty) {<span class="form-hint">@Messages(hint)</span>}
 </legend>
-@if(hint.nonEmpty) {<span class="form-hint">@Messages(hint)</span>}
