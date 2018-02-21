@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors._
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
+import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency, SubmissionData}
@@ -148,6 +149,13 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
     when {
       controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
     } thenReturn Future.successful(Some(submissionData))
+
+    val aboutTheBusiness = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredNo))
+    when {
+      controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+    } thenReturn Future.successful(Some(aboutTheBusiness))
+
+
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
@@ -470,6 +478,31 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
         doc.select(".confirmation").text must include(companyName)
+      }
+
+      "the application status is 'new submission' and has been previously registered" in new Fixture {
+
+        setupStatus(SubmissionReady)
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+
+        val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+
+        when {
+          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+        } thenReturn Future.successful(Some(aboutTheBusinessYes))
+
+        val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
+
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
       }
 
       "the application status is 'pending'" in new Fixture {

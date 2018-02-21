@@ -22,6 +22,7 @@ import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
 import models.ReadStatusResponse
+import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{Currency, SubmissionData}
 import models.payments._
@@ -90,6 +91,7 @@ trait ConfirmationController extends BaseController {
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
+          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus) match {
           case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
@@ -103,6 +105,11 @@ trait ConfirmationController extends BaseController {
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
           }
+
+          case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
+            case PreviouslyRegisteredYes(_) => true
+            case _ => false
+          } =>  Ok(payment_confirmation_transitional_renewal(businessName, reference))
 
           case _ => Ok(payment_confirmation(businessName, reference))
         }
