@@ -30,6 +30,14 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
+        <p>@Messages("payments.bankdetails.hint")</p>
+    }
+
     <div class="form-group">
         <div class="grid-layout grid-border">
             <div class="grid-layout__column grid-layout__column--1-2">
@@ -88,14 +96,6 @@
             </div>
         </div>
     </div>
-
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ){
-        <p>@Messages("payments.bankdetails.warning")</p>
-    }
 
     <a id="bank-details-print" href="javascript:window.print()" class="print-link print-hidden js-visible">Print</a>
 

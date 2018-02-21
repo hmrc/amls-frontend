@@ -36,6 +36,7 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
       doc.title must startWith(Messages("payments.bankdetails.title"))
       heading.html must be(Messages("payments.bankdetails.header"))
       subHeading.html must include(Messages("submit.registration"))
+      doc.getElementsContainingOwnText(Messages("payments.bankdetails.hint")) must not be empty
     }
 
     "display non uk details" when {

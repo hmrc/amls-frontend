@@ -796,8 +796,9 @@ payments.typeofbank.header = Will you be paying from a UK bank account?
 
 payments.typeofbank.error = Select yes if you will be paying from a UK bank account
 
-payments.bankdetails.title = Payment Details
-payments.bankdetails.header = Payment Details
+payments.bankdetails.title = Bacs payment Details
+payments.bankdetails.header = Bacs payment Details
+payments.bankdetails.hint = You’ll need these details to pay your fee by Bacs. Your payment may be delayed if you use the wrong reference.
 payments.bankdetails.bics.name = Bank identifier code (BIC)
 payments.bankdetails.bics.value = BARCGB22
 payments.bankdetails.iban.name = Account number (IBAN)
@@ -810,7 +811,6 @@ payments.bankdetails.sortcode.name = Sort code
 payments.bankdetails.sortcode.value = 20 11 47
 payments.bankdetails.fee.name = Fee
 payments.bankdetails.reference.name = Reference
-payments.bankdetails.warning = Your payment may be delayed if you use the wrong reference.
 
 
 ############################### Individual pages ###############################
