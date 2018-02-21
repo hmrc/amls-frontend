@@ -769,6 +769,9 @@ confirmation.payment.bacs.header = You’ve submitted
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
+confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information. You can continue to trade whilst your renewal is being reviewed.
+confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you and email when the decision has been made. You’ll need to sign in to see the decision.
+
 confirmation.payment.failed.title = Something went wrong with your payment
 confirmation.payment.failed.header = Something went wrong with your payment
 confirmation.payment.failed.reason.failure = Your payment failed
