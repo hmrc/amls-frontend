@@ -21,8 +21,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{Nationality, ResponsiblePeople}
+import services.AutoCompleteService
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
+import models.autocomplete.{CountryDataProvider, GovUkCountryDataProvider, NameValuePair}
+import play.api.Play
 
 import scala.concurrent.Future
 
@@ -30,16 +33,18 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
+  val autoCompleteService: AutoCompleteService
+
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => residencyType.nationality match {
-                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName))
-                case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
+                case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+                case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
               }
             case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName))
+            => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
           }
@@ -52,7 +57,7 @@ trait NationalityController extends RepeatingSection with BaseController {
           Form2[Nationality](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map {rp =>
-                BadRequest(nationality(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                BadRequest(nationality(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               for {
@@ -74,7 +79,7 @@ trait NationalityController extends RepeatingSection with BaseController {
 object NationalityController extends NationalityController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
-
+  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
   override def dataCacheConnector = DataCacheConnector
 }
 
