@@ -45,8 +45,19 @@ class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
       doc.select(".confirmation p").text must include("businessName")
     }
 
-    "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=${controllers.routes.LandingController.get()}").text mustBe Messages("confirmation.payment.continue_button.text")
+    "contain the correct content" in new ViewFixture {
+      doc.html() must include(Messages("confirmation.payment.info.hmrc_review"))
+      doc.html() must include(Messages("confirmation.payment.info.hmrc_review2"))
+    }
+
+    "have a footer with the correct information" in new ViewFixture {
+      doc.html() must include(Messages("confirmation.payment.info.heading.keep_up_to_date"))
+      doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date"))
+      doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item1"))
+      doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item2"))
+      doc.html() must include(Messages("confirmation.payment.info.keep_up_to_date.item3"))
+      doc.getElementsByClass("print-link").first().text() mustBe "Print"
+      doc.getElementsByClass("button").first().text() mustBe Messages("confirmation.payment.continue_button.text")
     }
 
   }
