@@ -28,7 +28,7 @@ import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople
-import views.html.responsiblepeople.new_home_address
+
 
 import scala.concurrent.Future
 
