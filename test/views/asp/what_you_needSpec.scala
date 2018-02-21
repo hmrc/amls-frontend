@@ -46,7 +46,6 @@ class what_you_needSpec extends GenericTestHelper with MustMatchers {
 
       html must include(Messages("asp.whatyouneed.line_1"))
       html must include(Messages("asp.whatyouneed.line_2"))
-      html must include(Messages("asp.whatyouneed.line_3"))
     }
   }
 }
