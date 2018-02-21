@@ -24,7 +24,6 @@ import models.responsiblepeople.{Nationality, ResponsiblePeople}
 import services.AutoCompleteService
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
-import models.autocomplete.{CountryDataProvider, GovUkCountryDataProvider, NameValuePair}
 import play.api.Play
 
 import scala.concurrent.Future
