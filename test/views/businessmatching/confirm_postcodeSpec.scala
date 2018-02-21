@@ -55,7 +55,7 @@ class confirm_postcodeSpec extends GenericTestHelper with MustMatchers  {
       doc.getElementById("postCode").parent.getElementsByClass("error-notification").first() match {
         case e =>
           e.html() must include("not a message key")
-          e.attr("data-journey") mustBe "error-field:user input:postCode"
+          e.attr("data-journey") mustBe "error - field:user input:postCode"
       }
     }
   }
