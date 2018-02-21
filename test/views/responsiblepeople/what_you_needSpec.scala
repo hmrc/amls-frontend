@@ -47,13 +47,14 @@ class what_you_needSpec extends GenericTestHelper with MustMatchers {
 
       html must include(Messages("responsiblepeople.whatyouneed.requiredinfo"))
 
-      html must include(Messages("responsiblepeople.whatyouneed.possiblerequiredinfo"))
-
       html must include(Messages("responsiblepeople.whatyouneed.line_1"))
       html must include(Messages("responsiblepeople.whatyouneed.line_2"))
       html must include(Messages("responsiblepeople.whatyouneed.line_3"))
       html must include(Messages("responsiblepeople.whatyouneed.line_4"))
       html must include(Messages("responsiblepeople.whatyouneed.line_5"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_6"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_7"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_8"))
     }
   }
 }
