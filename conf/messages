@@ -1370,6 +1370,7 @@ responsiblepeople.legalName.title = Has this person ever legally changed their n
 responsiblepeople.legalName.heading = Has {0} ever legally changed their name?
 responsiblepeople.legalnamechangedate.title = When did this person's name change?
 responsiblepeople.legalnamechangedate.heading = When did {0}'s name change?
+responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll.
 responsiblepeople.knownby.title = Is this person known by any other names?
 responsiblepeople.knownby.heading = Is {0} known by any other names?
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
