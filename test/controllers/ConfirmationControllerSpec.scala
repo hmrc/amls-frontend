@@ -671,6 +671,28 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         Jsoup.parse(contentAsString(result)).select("h1.heading-large").text must include(Messages("confirmation.payment.bacs.header"))
 
       }
+
+      "bacs confirmation is requested and is a transitional renewal" in new Fixture {
+
+        val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
+
+        when {
+          controller.statusService.getReadStatus(any())(any(),any(),any())
+        } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
+
+        when {
+          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+        } thenReturn Future.successful(Some(aboutTheBusinessYes))
+
+        val result = controller.bacsConfirmation()(request)
+
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
+      }
     }
   }
 }

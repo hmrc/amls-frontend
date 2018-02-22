@@ -124,7 +124,14 @@ trait ConfirmationController extends BaseController {
           refNo <- amlsRefBroker.get
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
-        } yield Ok(views.html.confirmation.confirmation_bacs(name))
+          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
+          } yield() match {
+          case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
+            case PreviouslyRegisteredYes(_) => true
+            case _ => false
+          } =>  Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))
+          case _ => Ok(views.html.confirmation.confirmation_bacs(name))
+        }
 
         okResult getOrElse InternalServerError("Unable to get BACS confirmation")
   }
