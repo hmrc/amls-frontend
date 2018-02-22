@@ -21,17 +21,17 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
+class BacsConfirmationTransitionalRenewalViewSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = views.html.confirmation.confirmation_bacs(
+    override def view = views.html.confirmation.confirmation_bacs_transitional_renewal(
       "businessName"
     )
   }
 
-  "The bacs confirmation view" must {
+  "The bacs transitional renewal confirmation view" must {
 
     "show the correct title" in new ViewFixture {
       doc.title must startWith(Messages("confirmation.payment.bacs.title"))
@@ -46,8 +46,8 @@ class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the correct content" in new ViewFixture {
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review"))
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review2"))
+      doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
+      doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
     }
 
     "have a footer with the correct information" in new ViewFixture {

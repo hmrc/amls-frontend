@@ -21,33 +21,44 @@ import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
+class PaymentConfirmedTransitionalRenewalViewSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    override def view = views.html.confirmation.confirmation_bacs(
-      "businessName"
-    )
+    val businessName = "Test Business Ltd"
+    val paymentReference = "XMHSG000000000"
+
+    override def view = views.html.confirmation.payment_confirmation_transitional_renewal(businessName, paymentReference)
+
   }
 
-  "The bacs confirmation view" must {
+  "The payment confirmation view" must {
 
     "show the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("confirmation.payment.bacs.title"))
+
+      doc.title must startWith(Messages("confirmation.payment.title"))
+
     }
 
-    "show the correct header" in new ViewFixture {
-      doc.select(".heading-large").text must include(Messages("confirmation.payment.bacs.header"))
+    "show the correct heading" in new ViewFixture {
+
+      heading.text must be(Messages("confirmation.payment.lede"))
+
     }
 
-    "show the correct secondary header" in new ViewFixture {
-      doc.select(".confirmation p").text must include("businessName")
+    "show the company name and reference in the heading" in new ViewFixture {
+
+      val headingContainer = doc.select(".confirmation")
+
+      headingContainer.text must include(businessName)
+      headingContainer.text must include(Messages("confirmation.payment.reference_header", paymentReference))
+
     }
 
     "contain the correct content" in new ViewFixture {
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review"))
-      doc.html() must include(Messages("confirmation.payment.info.hmrc_review2"))
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review"))
+        doc.html() must include(Messages("confirmation.payment.info.transitional.renewal.hmrc_review2"))
     }
 
     "have a footer with the correct information" in new ViewFixture {
@@ -59,6 +70,7 @@ class BacsConfirmationViewSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("print-link").first().text() mustBe "Print"
       doc.getElementsByClass("button").first().text() mustBe Messages("confirmation.payment.continue_button.text")
     }
+
 
   }
 
