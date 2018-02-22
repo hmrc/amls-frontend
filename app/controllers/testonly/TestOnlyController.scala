@@ -87,4 +87,17 @@ trait TestOnlyController extends BaseController with Actions {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.confirmation.payment_confirmation_transitional_renewal("Company Name", "X123456789")))
   }
+
+  def ConfirmationBacs = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.confirmation.confirmation_bacs("Company Name")))
+  }
+
+  def ConfirmationBacsTransitionalRenewal = Authorised.async {
+    implicit authContext => implicit request =>
+      Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
+  }
+
+
+
 }
