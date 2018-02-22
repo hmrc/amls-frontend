@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
+import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -29,13 +30,17 @@ class new_home_addressSpec extends GenericTestHelper with MustMatchers {
     implicit val requestWithToken = addToken(request)
 
     val name = "firstName lastName"
+
+    val countries = Some(Seq(
+      NameValuePair("Country 1", "country:1")
+    ))
   }
 
   "new_home_address view" must {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.new_home_address(form2, 1, name)
+      def view = views.html.responsiblepeople.new_home_address(form2, 1, name, countries)
 
       doc.title must be(Messages("responsiblepeople.new.home.title") +
         " - " + Messages("summary.responsiblepeople") +
@@ -74,7 +79,7 @@ class new_home_addressSpec extends GenericTestHelper with MustMatchers {
           (Path \ "country") -> Seq(ValidationError("not a message Key 11"))
         ))
 
-      def view = views.html.responsiblepeople.new_home_address(form2, 1, name)
+      def view = views.html.responsiblepeople.new_home_address(form2, 1, name, countries)
 
       errorSummary.html() must include("not a message Key 1")
       errorSummary.html() must include("not a message Key 2")
