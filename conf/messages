@@ -477,6 +477,7 @@ lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 link.return.registration.progress = Return to application progress
 link.return.renewal.progress = Return to renewal progress
 link.renewal.progress.change.answers = Change your answers
+link.print = Print
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
