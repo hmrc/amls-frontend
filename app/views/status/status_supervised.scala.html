@@ -93,5 +93,7 @@
         @before_you_go()
     }
 
-    <a href="javascript:window.print()" class="print-link print-hidden js-visible">Print</a>
+    @printLink(linkId="status-supervised-submitted-print",
+               gaTag=Some("status-supervised-submitted:click:print")
+    )
 }

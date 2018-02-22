@@ -29,6 +29,9 @@
     <li>@messages("confirmation.payment.info.keep_up_to_date.item3")</li>
 </ul>
 
-<a href="javascript:window.print()" class="print-link print-hidden js-visible">Print</a>
+@printLink(linkId="confirmation-print",
+           gaTag=Some("confirmation:click:print")
+          )
+
 
 <a class="button" href="@controllers.routes.LandingController.get()" role="button">@Messages("confirmation.payment.continue_button.text")</a>
