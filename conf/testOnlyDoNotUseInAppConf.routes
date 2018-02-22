@@ -19,8 +19,8 @@ GET        /anti-money-laundering/test-only/payment/confirmation                
 GET        /anti-money-laundering/test-only/payment/confirmation/tr              controllers.testonly.TestOnlyController.paymentSuccessfulTransitionalRenewal
 GET        /anti-money-laundering/test-only/payment/:ref                         controllers.testonly.TestOnlyController.getPayment(ref)
 GET        /anti-money-laundering/test-only/companyname                          controllers.testonly.TestOnlyController.companyName
-GET        /anti-money-laundering/test-only/payment/bacs/nontr                   controllers.testonly.TestOnlyController.ConfirmationBacs
-GET        /anti-money-laundering/test-only/payment/bacs/tr                      controllers.testonly.TestOnlyController.ConfirmationBacsTransitionalRenewal
+GET        /anti-money-laundering/test-only/payment/bacs/nontr                   controllers.testonly.TestOnlyController.confirmationBacs
+GET        /anti-money-laundering/test-only/payment/bacs/tr                      controllers.testonly.TestOnlyController.confirmationBacsTransitionalRenewal
 
 
 # Add all the application routes to the prod.routes file
