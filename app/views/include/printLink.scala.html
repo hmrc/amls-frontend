@@ -18,9 +18,10 @@
  linkMessageKey: String = "link.print",
  gaTag: Option[String] = None
  )(implicit lang:Lang,  m: Messages)
-
-@if(gaTag.isDefined) {
-    <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible" data-journey-click="@gaTag.get">@Messages(linkMessageKey)</a>
-} else {
-    <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible">@Messages(linkMessageKey)</a>
-}
+ <p>
+  @if(gaTag.isDefined) {
+      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible" data-journey-click="@gaTag.get">@Messages(linkMessageKey)</a>
+  } else {
+      <a id="@linkId" href="javascript:window.print()" class="print-link print-hidden js-visible">@Messages(linkMessageKey)</a>
+  }
+ </p>
