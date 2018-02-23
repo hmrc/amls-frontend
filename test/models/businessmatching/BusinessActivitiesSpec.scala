@@ -29,7 +29,7 @@ import utils.GenericTestHelper
 class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
   import jto.validation.forms.Rules._
 
-  "BusinessActivitiesSpec" must {
+  "The BusinessActivities model" must {
     "successfully validate" when {
       "a few check boxes are selected" in {
         val model1 = Map("businessActivities[]" -> Seq("03", "01", "02"))
@@ -271,6 +271,30 @@ class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
     "throw error for invalid data" in {
       Json.fromJson[BusinessActivities](Json.obj("businessActivities" -> Seq(JsString("20")))) must
         be(JsError(JsPath \ "businessActivities", play.api.data.validation.ValidationError("error.invalid")))
+    }
+  }
+
+  "The hasBusinessOrAdditionalActivity method" must {
+    "return true" when {
+      "only businessActivities contains the activity" in {
+        val model = BusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))
+
+        model.hasBusinessOrAdditionalActivity(AccountancyServices) mustBe true
+      }
+
+      "only additionalActivities contains the activity" in {
+        val model = BusinessActivities(Set(AccountancyServices), Some(Set(HighValueDealing)))
+
+        model.hasBusinessOrAdditionalActivity(HighValueDealing) mustBe true
+      }
+    }
+
+    "return false" when {
+      "neither businessActivities or additionalActivities contains the activity" in {
+        val model = BusinessActivities(Set(AccountancyServices), Some(Set(MoneyServiceBusiness)))
+
+        model.hasBusinessOrAdditionalActivity(HighValueDealing) mustBe false
+      }
     }
   }
 }
