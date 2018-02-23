@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import models.autocomplete._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("other").id}-fieldset"""
@@ -64,9 +65,10 @@
             jsHidden = true,
             id = target
         ) {
-            @country(
+            @country_autocomplete(
                 field = f("otherCountry"),
-                labelText = "responsiblepeople.nationality.selection.other.name"
+                labelText = "responsiblepeople.nationality.selection.other.name",
+                data = countryData.getOrElse(Seq.empty)
             )
         }
 
