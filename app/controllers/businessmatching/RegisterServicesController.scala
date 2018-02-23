@@ -115,17 +115,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .copy(hasAccepted = true)
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
-                                                     (implicit ac: AuthContext, hc: HeaderCarrier) =
+                                                     (implicit ac: AuthContext, hc: HeaderCarrier) = {
     for {
       activities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
       strippedActivities <- Future.successful(withoutAccountantForAMLSRegulations(activities))
     } yield {
-      if((bmActivities.businessActivities contains AccountancyServices) && activities.isDefined){
+      if (bmActivities.hasBusinessOrAdditionalActivity(AccountancyServices) && activities.isDefined) {
         dataCacheConnector.save[BusinessActivities](BusinessActivities.key, strippedActivities)
       } else {
         Future.successful(activities)
       }
     }
+  }
 
   private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
     Redirect(routes.ServicesController.get())

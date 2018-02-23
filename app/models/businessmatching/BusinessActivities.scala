@@ -29,7 +29,13 @@ import play.api.libs.functional.syntax._
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
                               additionalActivities: Option[Set[BusinessActivity]] = None,
                               removeActivities: Option[Set[BusinessActivity]] = None,
-                              dateOfChange: Option[DateOfChange] = None)
+                              dateOfChange: Option[DateOfChange] = None) {
+
+  def hasBusinessOrAdditionalActivity(activity: BusinessActivity) = {
+    businessActivities.union(additionalActivities.getOrElse(Set.empty)) contains activity
+  }
+
+}
 
 sealed trait BusinessActivity {
 
