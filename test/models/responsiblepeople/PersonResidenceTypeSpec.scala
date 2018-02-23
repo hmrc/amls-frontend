@@ -23,6 +23,7 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
 import play.api.libs.json.{JsSuccess, Json}
+import uk.gov.hmrc.domain.Nino
 
 class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
 
@@ -42,7 +43,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Valid(PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))))
+          be(Valid(PersonResidenceType(UKResidence(Nino(nino)), Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))))
       }
 
       "validate non uk model" in {
@@ -95,7 +96,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
           )
 
           PersonResidenceType.formRule.validate(ukModel) must
-            be(Valid(PersonResidenceType(UKResidence(nino), None, Some(Country("United Kingdom", "GB")))))
+            be(Valid(PersonResidenceType(UKResidence(Nino(nino)), None, Some(Country("United Kingdom", "GB")))))
         }
 
         "UK" when {
@@ -172,16 +173,16 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
         )
 
         PersonResidenceType.formRule.validate(ukModel) must
-          be(Valid(PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), None)))
+          be(Valid(PersonResidenceType(UKResidence(Nino(nino)), Some(Country("United Kingdom", "GB")), None)))
       }
 
       "write correct UKResidence model" in {
 
-        val data = PersonResidenceType(UKResidence("12346464646"), Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))
+        val data = PersonResidenceType(UKResidence(Nino("AA346464A")), Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.formWrites.writes(data) mustBe Map(
           "isUKResidence" -> Seq("true"),
-          "nino" -> Seq("12346464646"),
+          "nino" -> Seq("AA346464A"),
           "countryOfBirth" -> Seq("GB"),
           "nationality" -> Seq("GB")
         )
@@ -224,7 +225,7 @@ class PersonResidenceTypeSpec extends PlaySpec with NinoUtil {
       }
 
       "read uk residence type model" in {
-        val ukModel = PersonResidenceType(UKResidence("123464646"),
+        val ukModel = PersonResidenceType(UKResidence(Nino("AA346464A")),
           Some(Country("United Kingdom", "GB")), Some(Country("United Kingdom", "GB")))
 
         PersonResidenceType.jsonRead.reads(PersonResidenceType.jsonWrite.writes(ukModel)) must

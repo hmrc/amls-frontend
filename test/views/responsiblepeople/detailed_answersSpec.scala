@@ -26,6 +26,7 @@ import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import play.api.i18n.Messages
+import uk.gov.hmrc.domain.Nino
 import utils.GenericTestHelper
 import views.{Fixture, HtmlAssertions}
 
@@ -349,7 +350,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   )
 
   val residenceType = PersonResidenceType(
-    UKResidence(nino),
+    UKResidence(Nino(nino)),
     Some(Country("Uganda", "UG")),
     Some(Country("United Kingdom", "GB"))
   )
