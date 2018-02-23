@@ -466,7 +466,7 @@ services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers
 services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 hint.8.digits = It’s either 8 numbers, or a mix of 15 letters and numbers.
-hint.9.digits = For example: 123456789
+hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
