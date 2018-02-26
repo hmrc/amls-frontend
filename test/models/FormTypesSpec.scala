@@ -21,7 +21,6 @@ import org.scalatestplus.play.PlaySpec
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Invalid, Path, Valid}
 import jto.validation.ValidationError
-import uk.gov.hmrc.domain.Nino
 
 class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
@@ -357,29 +356,29 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
       val nino = nextNino
 
       ninoType.validate(nino) must
-        be(Valid(Nino(nino)))
+        be(Valid(nino))
     }
 
     "successfully validate disregarding case" in {
       val nino = nextNino
-      ninoType.validate(nino.toLowerCase) mustBe Valid(Nino(nino))
+      ninoType.validate(nino.toLowerCase) mustBe Valid(nino)
     }
 
     "successfully validate Isle of Man code" in {
       val nino = "MN123456A"
-      ninoType.validate(nino) mustBe Valid(Nino(nino))
+      ninoType.validate(nino) mustBe Valid(nino)
     }
 
-    "successfully validate valid prefixes" in {
+    "successfully validate KC prefixes" in {
       val nino = "KC123456A"
-      ninoType.validate(nino) mustBe Valid(Nino(nino))
+      ninoType.validate(nino) mustBe Valid(nino)
     }
 
     "successfully validate nino including spaces and dashes" in {
       val testNino = nextNino
       val spacedNino = testNino.grouped(2).mkString(" ")
       val withDashes = spacedNino.substring(0, 8) + "-" + spacedNino.substring(8, spacedNino.length) // ## ## ##- ## #
-      ninoType.validate(withDashes) mustBe Valid(Nino(testNino))
+      ninoType.validate(withDashes) mustBe Valid(testNino)
     }
 
     "fail to validate an empty string" in {

@@ -22,11 +22,10 @@ import org.joda.time.{DateTimeFieldType, LocalDate}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.{Reads, Writes}
-import uk.gov.hmrc.domain.Nino
 
 sealed trait Residency
 
-case class UKResidence(nino: Nino) extends Residency
+case class UKResidence(nino: String) extends Residency
 
 case object NonUKResidence extends Residency
 
@@ -37,7 +36,7 @@ object Residency {
   implicit val formRule: Rule[UrlFormEncoded, Residency] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     (__ \ "isUKResidence").read[Boolean].withMessage("error.required.rp.is.uk.resident") flatMap {
-      case true => (__ \ "nino").read(ninoType).map(UKResidence.apply(_))
+      case true => (__ \ "nino").read(ninoType).map(UKResidence.apply)
       case false => Rule.fromMapping { _ => Valid(NonUKResidence) }
     }
   }
@@ -45,7 +44,7 @@ object Residency {
   implicit def formWrites: Write[Residency, UrlFormEncoded] = Write {
     case UKResidence(nino) => Map(
       "isUKResidence" -> Seq("true"),
-      "nino" -> Seq(nino.toString)
+      "nino" -> Seq(nino)
     )
     case NonUKResidence => Map(
       "isUKResidence" -> Seq("false")
@@ -56,7 +55,7 @@ object Residency {
     import play.api.libs.json._
     import play.api.libs.json.Reads._
     import play.api.libs.functional.syntax._
-    (__ \ "nino").read[Nino] map UKResidence.apply map identity[Residency] orElse Reads(_ => JsSuccess(NonUKResidence))
+    (__ \ "nino").read[String] map UKResidence.apply map identity[Residency] orElse Reads(_ => JsSuccess(NonUKResidence))
   }
 
   implicit val jsonWrites: Writes[Residency] = {

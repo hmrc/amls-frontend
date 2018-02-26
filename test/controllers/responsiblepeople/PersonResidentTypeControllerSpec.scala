@@ -30,7 +30,6 @@ import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
-import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
@@ -57,7 +56,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
 
         val personName = PersonName("firstname", None, "lastname")
         val nino = nextNino
-        val residenceTypeUK = UKResidence(Nino(nino))
+        val residenceTypeUK = UKResidence(nino)
         val residenceTypeNonUK = NonUKResidence
 
         "without pre-populated data" in new Fixture {
@@ -153,7 +152,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             val responsiblePeople = ResponsiblePeople(
               personResidenceType = Some(
                 PersonResidenceType(
-                  UKResidence(Nino(nextNino)),
+                  UKResidence(nextNino),
                   Some(Country("UK", "UK")),
                   None
                 )
@@ -219,7 +218,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               val responsiblePeople = ResponsiblePeople(
                 personResidenceType = Some(
                   PersonResidenceType(
-                    UKResidence(Nino(nextNino)),
+                    UKResidence(nextNino),
                     Some(Country("UK", "UK")),
                     None
                   )
@@ -313,7 +312,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case UKResidence(n) => Some(n)
               case _ => None
             }
-          } yield nino.toString) foreach {
+          } yield nino) foreach {
             _ mustBe testNino
           }
 
@@ -358,7 +357,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
               case UKResidence(n) => Some(n)
               case _ => None
             }
-          } yield nino.toString) foreach {
+          } yield nino) foreach {
             _ mustBe testNino
           }
 
@@ -411,7 +410,7 @@ class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSug
             verify(controller.dataCacheConnector)
               .save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople.copy(
               personResidenceType = Some(PersonResidenceType(
-                UKResidence(Nino(nino)),
+                UKResidence(nino),
                 Some(Country(countryCode, countryCode)),
                 Some(Country(countryCode, countryCode))
               )),
