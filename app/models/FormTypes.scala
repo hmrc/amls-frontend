@@ -23,7 +23,7 @@ import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.joda.time.LocalDate
 import utils.DateHelper.localDateOrdering
 import utils.TraversableValidators.minLengthR
-
+import uk.gov.hmrc.domain.Nino
 import scala.util.matching.Regex
 
 object FormTypes {
@@ -264,9 +264,6 @@ object FormTypes {
 
 
   /** Personal Identification Rules **/
-
-  import uk.gov.hmrc.domain.Nino
-
   private val ninoRequired = required("error.required.nino")
   private val ninoTransforms = removeSpacesRule andThen removeDashRule andThen transformUppercase
 
