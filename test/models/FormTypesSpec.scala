@@ -405,6 +405,24 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
           Path -> Seq(ValidationError("error.invalid.nino"))
         )))
     }
+
+    "fail to validate invalid prefixes" in {
+      Seq(
+        "AD", "DA",
+        "AF", "FA",
+        "AI", "IA",
+        "AQ", "QA",
+        "AU", "UA",
+        "AV", "VA",
+        "AO",
+        "BG", "GB",
+        "NK", "KN",
+        "TN", "NT",
+        "ZZ"
+      ) foreach { prefix =>
+        ninoType.validate(s"${prefix}123456A") mustBe Invalid(Seq(Path -> Seq(ValidationError("error.invalid.nino"))))
+      }
+    }
   }
 
   "basicPunctuation140CharsPattern" must {
