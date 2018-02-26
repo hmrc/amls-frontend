@@ -30,6 +30,7 @@ import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.domain.Nino
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -97,7 +98,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
 
     "load nationality page when nationality is none" in new Fixture {
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePeople(personName, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
@@ -193,7 +194,7 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
         "otherCountry" -> "GB"
       )
 
-      val pResidenceType = PersonResidenceType(UKResidence(nextNino), Some(Country("United Kingdom", "GB")), None)
+      val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
       val responsiblePeople = ResponsiblePeople(None, personResidenceType = Some(pResidenceType))
 
       when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))

@@ -27,6 +27,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.FakeApplication
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
@@ -613,7 +614,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
   object DefaultValues {
 
     val residenceNonUk = NonUKResidence
-    val residenceUk = UKResidence("AA111111A")
+    val residenceUk = UKResidence(Nino("AA111111A"))
     val residenceCountry = Country("United Kingdom", "GB")
     val residenceNationality = Country("United Kingdom", "GB")
     val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
@@ -649,7 +650,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     private val residenceMonth = 2
     private val residenceDay = 24
     private val residenceDate = new LocalDate(residenceYear, residenceMonth, residenceDay)
-    private val residence = UKResidence(nino)
+    private val residence = UKResidence(Nino(nino))
     private val residenceCountry = Country("United Kingdom", "GB")
     private val residenceNationality = Country("United Kingdom", "GB")
     private val newPersonAddress = PersonAddressNonUK("Line 1", "Line 2", None, None, Country("Spain", "ES"))

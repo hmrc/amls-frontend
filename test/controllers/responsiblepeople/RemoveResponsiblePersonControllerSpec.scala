@@ -34,6 +34,7 @@ import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status, _}
 import services.{AuthEnrolmentsService, StatusService}
+import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
 
@@ -493,7 +494,7 @@ class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
     }
   }
 
-  private val residence = UKResidence(nextNino)
+  private val residence = UKResidence(Nino(nextNino))
   private val residenceCountry = Country("United Kingdom", "GB")
   private val residenceNationality = Country("United Kingdom", "GB")
   private val currentPersonAddress = PersonAddressUK("Line 1", "Line 2", None, None, "AA111AA")
