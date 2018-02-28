@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
@@ -35,7 +34,6 @@ import scala.collection.JavaConversions._
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -57,19 +55,11 @@ class AdditionalExtraAddressControllerSpec extends GenericTestHelper with Mockit
       override val dataCacheConnector = mockDataCacheConnector
       override val auditConnector = mock[AuditConnector]
       override val authConnector = self.authConnector
-      override val autoCompleteService = mock[AutoCompleteService]
     }
 
     when {
       additionalExtraAddressController.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
-
-    when {
-      additionalExtraAddressController.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("Country 1", "country:1"),
-      NameValuePair("Country 2", "country:2")
-    ))
   }
 
   val personName = Some(PersonName("firstname", None, "lastname"))

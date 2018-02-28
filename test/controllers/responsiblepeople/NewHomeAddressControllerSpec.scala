@@ -17,7 +17,6 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.autocomplete.{CountryDataProvider, NameValuePair}
 import models.{Country, DateOfChange}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
@@ -47,11 +46,6 @@ class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[CountryDataProvider].to(new CountryDataProvider {
-        override def fetch: Option[Seq[NameValuePair]] = Some(Seq(
-          NameValuePair("Spain", "ES")
-        ))
-      }))
       .build()
 
     val controllers = app.injector.instanceOf[NewHomeAddressController]

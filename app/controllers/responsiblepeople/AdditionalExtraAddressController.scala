@@ -25,9 +25,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import play.api.Play
 import play.api.mvc.{AnyContent, Request}
-import services.AutoCompleteService
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -40,10 +38,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 trait AdditionalExtraAddressController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
-
   val auditConnector: AuditConnector
-
-  val autoCompleteService: AutoCompleteService
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
@@ -51,9 +46,9 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     implicit authContext => implicit request =>
       getData[ResponsiblePeople](index) map {
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(additionalExtraAddress))),_,_,_,_,_,_,_,_,_,_,_, _)) =>
-          Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
         case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
+          Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
   }
@@ -63,7 +58,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
       (Form2[ResponsiblePersonAddress](request.body) match {
         case f: InvalidForm =>
           getData[ResponsiblePeople](index) map { rp =>
-            BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+            BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) => {
           getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
@@ -132,5 +127,4 @@ object AdditionalExtraAddressController extends AdditionalExtraAddressController
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector: DataCacheConnector = DataCacheConnector
   override lazy val auditConnector = AMLSAuditConnector
-  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
 }

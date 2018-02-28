@@ -18,7 +18,6 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -45,15 +44,8 @@ class NationalityControllerSpec extends GenericTestHelper with MockitoSugar with
     val controller = new NationalityController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
-      override val autoCompleteService = mock[AutoCompleteService]
     }
 
-    when {
-      controller.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("Country 1", "country:1"),
-      NameValuePair("Country 2", "country:2")
-    ))
   }
 
   val emptyCache = CacheMap("", Map.empty)

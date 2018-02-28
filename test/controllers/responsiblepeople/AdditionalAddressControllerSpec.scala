@@ -19,7 +19,6 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePeople._
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
@@ -35,7 +34,6 @@ import org.scalatest.mock.MockitoSugar
 import utils.GenericTestHelper
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
@@ -56,19 +54,11 @@ class AdditionalAddressControllerSpec extends GenericTestHelper with MockitoSuga
       override val dataCacheConnector = mockDataCacheConnector
       override val authConnector = self.authConnector
       override lazy val auditConnector = mock[AuditConnector]
-      override val autoCompleteService = mock[AutoCompleteService]
     }
 
     when {
       additionalAddressController.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
-
-    when {
-      additionalAddressController.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Spain", "ES")
-    ))
   }
 
   val emptyCache = CacheMap("", Map.empty)
