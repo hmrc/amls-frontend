@@ -17,9 +17,8 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
-@import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -89,10 +88,9 @@
                     @input(f("addressLineNonUK2"), labelText = "lbl.address.line2", labelHidden = true)
                     @input(f("addressLineNonUK3"), labelText = "lbl.address.line3", labelHidden = true)
                     @input(f("addressLineNonUK4"), labelText = "lbl.address.line4", labelHidden = true)
-                    @country_autocomplete(
+                    @country(
                         field = f("country"),
-                        labelText = "responsiblepeople.additional_extra_address.country",
-                        data = countryData.getOrElse(Seq.empty)
+                        labelText = "responsiblepeople.additional_extra_address.country"
                     )
                 }
             </div>

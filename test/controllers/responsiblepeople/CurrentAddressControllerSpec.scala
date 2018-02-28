@@ -36,14 +36,13 @@ import play.api.test.FakeApplication
 
 import scala.collection.JavaConversions._
 import play.api.test.Helpers._
-import services.{AutoCompleteService, StatusService}
+import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import utils.AuthorisedFixture
 import audit.AddressConversions._
-import models.autocomplete.NameValuePair
 import uk.gov.hmrc.play.audit.AuditExtensions._
 
 import scala.concurrent.Future
@@ -63,21 +62,12 @@ class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
       override val auditConnector = mock[AuditConnector]
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
-      override val autoCompleteService = mock[AutoCompleteService]
     }
 
     when {
       currentAddressController.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
-
-    when {
-      currentAddressController.autoCompleteService.getCountries
-    } thenReturn Some(Seq(
-      NameValuePair("United Kingdom", "UK"),
-      NameValuePair("Spain", "ES")
-    ))
   }
-
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
