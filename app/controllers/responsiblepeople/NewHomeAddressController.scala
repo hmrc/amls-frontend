@@ -16,24 +16,26 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.DateOfChange
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.{LocalDate, Months}
+import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
-import views.html.responsiblepeople.new_home_address
+import views.html.responsiblepeople
+
 
 import scala.concurrent.Future
 
 @Singleton
 class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
-                                         val dataCacheConnector: DataCacheConnector) extends RepeatingSection with BaseController {
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val autoCompleteService: AutoCompleteService) extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = NewHomeAddress(PersonAddressUK("", "", None, None, ""))
 
@@ -42,9 +44,34 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
         implicit request =>
           getData[ResponsiblePeople](index) map {
             case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-            => Ok(new_home_address(Form2(DefaultAddressHistory), index, personName.titleName))
+            => Ok(responsiblepeople.new_home_address(Form2(DefaultAddressHistory), index, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
+          }
+    }
+
+  def post(index: Int) =
+    Authorised.async {
+      implicit authContext =>
+        implicit request =>
+          (Form2[NewHomeAddress](request.body) match {
+            case f: InvalidForm =>
+              getData[ResponsiblePeople](index) map { rp =>
+                BadRequest(responsiblepeople.new_home_address(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
+              }
+            case ValidForm(_, data) => {
+              for {
+                moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
+                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
+                }
+                _ <- dataCacheConnector.save[NewHomeDateOfChange](NewHomeDateOfChange.key, NewHomeDateOfChange(None))
+              } yield {
+                Redirect(routes.DetailedAnswersController.get(index))
+              }
+            }
+          }).recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
     }
 
@@ -84,29 +111,4 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
       additionalAddress,
       extraAdditionalAddress)
   }
-
-  def post(index: Int) =
-    Authorised.async {
-      implicit authContext =>
-        implicit request =>
-          (Form2[NewHomeAddress](request.body) match {
-            case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map { rp =>
-                BadRequest(new_home_address(f, index, ControllerHelper.rpTitleName(rp)))
-              }
-            case ValidForm(_, data) => {
-              for {
-                moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
-                  rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
-                }
-                _ <- dataCacheConnector.save[NewHomeDateOfChange](NewHomeDateOfChange.key, NewHomeDateOfChange(None))
-              } yield {
-                Redirect(routes.DetailedAnswersController.get(index))
-              }
-            }
-          }).recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
-    }
 }
