@@ -270,7 +270,7 @@ $(function () {
         if (menu.text() === 'No results found') {
           $('#' + selectFieldName).val('')
         }
-    });
+    }).attr('name', nonSelectFieldName + '-autocomp');
 
     $('body')
         .on('mouseup', ".autocomplete__option > strong", function(e){
