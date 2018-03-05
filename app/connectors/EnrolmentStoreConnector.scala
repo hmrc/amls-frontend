@@ -79,11 +79,18 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
   def deEnrol(registrationNumber: String)
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    auth.getCurrentAuthority flatMap { authority =>
-      val url = s"$baseUrl/enrolment-store/users/${authority.credId}/enrolments/$enrolKey"
-      http.DELETE(url) map { response =>
-        audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
-        response
+
+    auth.userDetails flatMap { details =>
+      details.groupIdentifier match {
+        case Some(groupId) =>
+          val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/$enrolKey"
+
+          http.DELETE(url) map { response =>
+            audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
+            response
+          }
+
+        case _ => ???
       }
     }
   }
