@@ -22,6 +22,7 @@ import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
+import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -139,6 +140,18 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
           verify(authConnector).userDetails(any(), any(), any())
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
+        }
+      }
+
+      "throw an exception when there is no group identifier" in new Fixture {
+        val details = userDetailsGen.sample.get.copy(groupIdentifier = None)
+
+        when(authConnector.userDetails(any(), any(), any())).thenReturn(Future.successful(details))
+
+        intercept[Exception] {
+          await(connector.deEnrol(amlsRegistrationNumber))
+        } match {
+          case ex => ex.getMessage mustBe "Group identifier is unavailable"
         }
       }
     }

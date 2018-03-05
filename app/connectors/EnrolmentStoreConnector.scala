@@ -90,7 +90,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
             response
           }
 
-        case _ => ???
+        case _ => throw new Exception("Group identifier is unavailable")
       }
     }
   }
