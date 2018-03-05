@@ -56,6 +56,9 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
 
       doc.getElementsMatchingOwnText(Messages("status.incomplete.description")).text must be(Messages("status.incomplete.description"))
+
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
     }
 
     "do not show business name when 'business name' is empty" in new ViewFixture {
@@ -63,7 +66,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
       def view = views.html.status.status_incomplete("XAML00000000000", None)
 
       doc.getElementsContainingOwnText(Messages("status.business")).isEmpty must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).isEmpty must be(true)
+
     }
   }
 }
