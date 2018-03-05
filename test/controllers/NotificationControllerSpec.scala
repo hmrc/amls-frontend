@@ -16,15 +16,17 @@
 
 package controllers
 
+import cats.implicits._
+import cats.data.OptionT
 import connectors.{AmlsConnector, DataCacheConnector}
 import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType}
+import models.businessmatching.{BusinessMatching, BusinessType, EstateAgentBusinessService, HighValueDealing}
 import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import models.registrationdetails.RegistrationDetails
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionDecisionRejected, SubmissionReadyForReview, SubmissionStatus}
 import models.{Country, ReadStatusResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.mockito.Matchers._
@@ -36,11 +38,13 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class NotificationControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
@@ -52,6 +56,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     val registrationDate = LocalDateTime.now()
     val statusResponse = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = Some("X123456789123"))
+    val statusResponseBad = ReadStatusResponse(registrationDate, "", None, None, None, None, renewalConFlag = false, safeId = None)
 
     val testNotifications = NotificationRow(
       status = None,
@@ -87,6 +92,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
     val mockAuthEnrolmentsService = mock[AuthEnrolmentsService]
     val mockAmlsConnector = mock[AmlsConnector]
     val mockNotificationService = mock[NotificationService]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -97,6 +103,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -121,11 +128,20 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     mockCacheFetch[BusinessMatching](Some(testBusinessMatch))
 
+    when(mockStatusService.getReadStatus(any())(any(), any(), any()))
+      .thenReturn(Future.successful(statusResponse))
+
     when(mockStatusService.getReadStatus(any(), any(), any()))
       .thenReturn(Future.successful(statusResponse))
 
+    when(mockStatusService.getStatus(any())(any(), any(), any()))
+      .thenReturn(Future.successful(SubmissionDecisionRejected))
+
     when(mockAuthEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
       .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+    when (mockBusinessMatchingService.getModel(any(),any(),any()))
+      .thenReturn(OptionT.some[Future, BusinessMatching](testBusinessMatch))
 
     when {
       mockAmlsConnector.registrationDetails(any())(any(), any(), any())
@@ -134,7 +150,7 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
   "getMessages" must {
 
-    "respond with OK and show the your_messages page when there is valid data" in new Fixture {
+    "respond with OK and show the your_messages page when there is a valid safeId" in new Fixture {
 
       when(mockNotificationService.getNotifications(any())(any(), any()))
         .thenReturn(Future.successful(testList))
@@ -142,6 +158,70 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
       val result = controller.getMessages()(request)
 
       status(result) mustBe OK
+    }
+
+    "respond with OK and show the your_messages page when there is an invalid safeId and businessMatching is used (AuthEnrolmentsService returns value)" in new Fixture {
+
+      when(mockNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      when(mockStatusService.getReadStatus(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponseBad))
+
+      val result = controller.getMessages()(request)
+
+      status(result) mustBe OK
+    }
+
+    "respond with an error message when a valid safeId cannot be found  (AuthEnrolmentsService returns value)" in new Fixture {
+
+      when(mockNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      when (mockBusinessMatchingService.getModel(any(),any(),any()))
+        .thenReturn(OptionT.some[Future, BusinessMatching](None))
+
+      when(mockStatusService.getReadStatus(any())(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponseBad))
+
+      intercept[Exception]{
+        await(controller.getMessages()(request))
+      }.getMessage must be("Unable to retrieve SafeID")
+    }
+
+    "respond with OK and show the your_messages page when there is an invalid safeId and businessMatching is used (AuthEnrolmentsService doesn't return value)" in new Fixture {
+
+      when(mockNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      when(mockStatusService.getReadStatus(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponseBad))
+
+      when(mockAuthEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      val result = controller.getMessages()(request)
+
+      status(result) mustBe OK
+    }
+
+    "respond with an error message when a valid safeId cannot be found (AuthEnrolmentsService doesn't return value)" in new Fixture {
+
+      when(mockNotificationService.getNotifications(any())(any(), any()))
+        .thenReturn(Future.successful(testList))
+
+      when (mockBusinessMatchingService.getModel(any(),any(),any()))
+        .thenReturn(OptionT.some[Future, BusinessMatching](None))
+
+      when(mockAuthEnrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+        .thenReturn(Future.successful(None))
+
+      when(mockStatusService.getReadStatus(any(), any(), any()))
+        .thenReturn(Future.successful(statusResponseBad))
+
+      intercept[Exception]{
+        await(controller.getMessages()(request))
+      }.getMessage must be("Unable to retrieve SafeID from reviewDetails")
     }
 
   }
@@ -369,9 +449,9 @@ class NotificationControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     "throw Exception" when {
 
-      "safeId is not present in status response" in new Fixture {
+      "safeId is not present in status response or BusinessMatching" in new Fixture {
 
-        when(mockStatusService.getReadStatus(any(), any(), any()))
+        when(mockStatusService.getReadStatus(any())(any(), any(), any()))
           .thenReturn(Future.successful(statusResponse.copy(safeId = None)))
 
         intercept[Exception]{
