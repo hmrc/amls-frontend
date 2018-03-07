@@ -28,7 +28,7 @@
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <header class="page-header">
-                <h1 class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
+                <h1 id="supervised-status-header" class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
                 <p class="heading-secondary print-left"><span class="visuallyhidden">
                     This section is: </span>@Messages("summary.status")</p>
             </header>
@@ -53,14 +53,13 @@
             }
 
             <p class="heading-small">@Messages("status.deregister.services")</p>
-            <ul class="list">@for(activity <- activities) {
+            <ul class="list activities-list">@for(activity <- activities) {
                 <li>@activity</li>
             }
             </ul>
             @if(businessMatchingVariationToggle) {
                 <p><a id="changeRegisteredServices" href="@controllers.businessmatching.routes.SummaryController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a></p>
             }
-
 
             <div class="panel-indent panel-indent--gutter panel-border-wide">
                 <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>

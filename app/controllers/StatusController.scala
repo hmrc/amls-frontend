@@ -138,7 +138,7 @@ trait StatusController extends BaseController {
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
         Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople)
+        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities)
       case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
     }
   }
@@ -212,9 +212,12 @@ trait StatusController extends BaseController {
   private def getRenewalFlowPage(mlrRegNumber: Option[String],
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                  businessNameOption: Option[String],
-                                 responsiblePeople: Option[Seq[ResponsiblePeople]])
+                                 responsiblePeople: Option[Seq[ResponsiblePeople]],
+                                 maybeActivities: Option[BusinessActivities])
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
+
+    val activities = maybeActivities.map(_.businessActivities.map(_.getMessage)) getOrElse Set.empty
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
@@ -252,7 +255,7 @@ trait StatusController extends BaseController {
               renewalDate,
               true,
               ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              Set.empty,
+              activities,
               ApplicationConfig.businessMatchingVariationToggle
             )))
         }

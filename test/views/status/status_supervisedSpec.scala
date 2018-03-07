@@ -95,6 +95,12 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
       Messages("status.submissiondecisionsupervised.enddate.text", renewalDate)
 
+      for (activity <- activities) {
+        doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
+      }
+
+      doc.getElementById("changeRegisteredServices").attr("href") must be(controllers.businessmatching.routes.SummaryController.get().url)
+
       doc.getElementsMatchingOwnText(Messages("status.readyforrenewal.warning")).text must be
       Messages("status.readyforrenewal.warning", renewalDate)
     }
