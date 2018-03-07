@@ -64,6 +64,10 @@ ul.list.activities-list, ul.list.activities-list li {
   margin-bottom: 0.75em;
 }
 
+#supervised-panel {
+  margin-top: 30px;
+}
+
 
 
 /* -- application progress page -- */
@@ -1240,9 +1244,9 @@ details {
   padding-top: 30px;
 }
 
-/*.panel-indent--gutter {
+.panel-indent--gutter {
   margin-top: 0;
-}*/
+}
 
 /* Registration amendment */
 .registration-amendment .grid-layout.submit-application {
