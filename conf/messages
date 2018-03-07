@@ -438,6 +438,7 @@ lbl.none.of.the.above = None of the above
 lbl.give.details = Please give details
 
 lbl.registration.status = Registration status:
+lbl.registration.status.short = Status:
 
 legend.address = Address
 lbl.address.line1 = Address
@@ -505,6 +506,7 @@ start.utr.line1 = If we can’t find your business automatically, we’ll ask fo
 status.title = Your registration
 status.business = Your business:
 status.referenceno = Anti-money laundering supervision registration number:
+status.referenceno.short = Registration number:
 status.incomplete = Incomplete
 status.status = Status
 status.complete = Completed
@@ -581,7 +583,7 @@ status.withdraw.body-content = Withdraw your application if you no longer want t
   To make a change to your application, you can update or view your information.\n\
   If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
 status.deregister.title = De-register your business
-status.deregister.link-text = de-register business
+status.deregister.link-text = De-register your business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
 status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
@@ -1798,7 +1800,7 @@ changeofficer.removeresponsibleperson.lbl = When did {0} stop being your nominat
 
 
 changeofficer.changelink.heading = Nominated Officer:
-changeofficer.changelink.text = change
+changeofficer.changelink.text = Change
 
 changeofficer.furtherupdates.title = Do you need to make other updates to your information?
 changeofficer.furtherupdates.heading = Do you need to make other updates to your information?
