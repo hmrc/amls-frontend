@@ -55,9 +55,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit"))
 
-      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.success.description")).text must be(
-        Messages("status.submissiondecisionsupervised.success.description"))
-
+      html must include (Messages("status.submissiondecisionsupervised.success.description"))
       doc.getElementsByClass("messaging").size() mustBe 1
 
       val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
