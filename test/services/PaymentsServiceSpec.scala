@@ -46,7 +46,7 @@ class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures w
     val testPaymentService = new PaymentsService(
       mock[AmlsConnector],
       mock[PayApiConnector],
-      mock[SubmissionResponseService],
+      mock[ConfirmationService],
       mock[StatusService]
     )
 

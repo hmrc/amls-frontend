@@ -19,9 +19,7 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
+import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
@@ -30,9 +28,9 @@ import org.joda.time.LocalDate
 import play.api.Play
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AckRefGenerator, BusinessName, ControllerHelper}
+import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -45,7 +43,7 @@ trait StatusController extends BaseController {
 
   private[controllers] def enrolmentsService: AuthEnrolmentsService
 
-  private[controllers] def feeConnector: FeeConnector
+  private[controllers] def feeResponseService: FeeResponseService
 
   private[controllers] def renewalService: RenewalService
 
@@ -90,15 +88,7 @@ trait StatusController extends BaseController {
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                                                        headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
     (mlrRegNumber, submissionStatus) match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
-        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0) => Some(x)
-          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
-          case _ => None
-        })
-      }.recoverWith {
-        case _: NotFoundException => Future.successful(None)
-      }
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber)
       case _ => Future.successful(None)
     }
   }
@@ -257,13 +247,13 @@ object StatusController extends StatusController {
   override private[controllers] val landingService: LandingService = LandingService
   override private[controllers] val statusService: StatusService = StatusService
   override protected val authConnector = AMLSAuthConnector
+  override private[controllers] val amlsConnector = AmlsConnector
+  override protected[controllers] val dataCache = DataCacheConnector
   override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override private[controllers] val feeConnector: FeeConnector = FeeConnector
+  override private[controllers] val feeResponseService: FeeResponseService = Play.current.injector.instanceOf[FeeResponseService]
   override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
   override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-  override protected[controllers] val dataCache = DataCacheConnector
-  override protected[controllers] val amlsConnector = AmlsConnector
   // $COVERAGE-ON$
 
 }
