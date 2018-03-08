@@ -48,11 +48,11 @@
             @endDate.map { date =>
                 <p class="heading-small">@Messages("lbl.registration.status.short")</p>
                 <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date)) <br/>
-                    <a class="no-print" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                    <a class="no-print" id="deregister-link" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
                 </p>
             }
 
-            <p class="heading-small">@Messages("status.deregister.services")</p>
+            <p id="deregister-services-list" class="heading-small">@Messages("status.deregister.services")</p>
             <ul class="list activities-list">@for(activity <- activities) {
                 <li>@activity</li>
             }
@@ -64,7 +64,7 @@
             <div id="supervised-panel" class="panel-indent panel-indent--gutter panel-border-wide">
                 <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
                 <ul>
-                    <li><a href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a></li>
+                    <li><a id="status-amendment-edit" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a></li>
                 </ul>
             </div>
 
@@ -89,7 +89,7 @@
                     <strong class="bold-small">@Messages("status.readyforrenewal.warning", DateHelper.formatDate(date))</strong>
                 </div>
                 <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
-                <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
+                <a id="status-renewal-button" class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
             }
         } else {
             <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
