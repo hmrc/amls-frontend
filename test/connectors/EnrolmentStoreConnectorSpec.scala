@@ -16,10 +16,13 @@
 
 package connectors
 
+import java.util.UUID
+
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
+import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -125,27 +128,30 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
   "deEnrol" when {
     "called" must {
-      "call the ES12 API endpoint" in new Fixture {
-
+      "call the ES9 API endpoint" in new Fixture {
         val authority = mock[Authority]
-        val userId = "userId"
-
-        when(authority.credId).thenReturn(userId)
-
-        when {
-          authConnector.getCurrentAuthority(any(), any())
-        } thenReturn Future.successful(authority)
-
-        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/users/$userId/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())
         } thenReturn Future.successful(HttpResponse(NO_CONTENT))
 
         whenReady(connector.deEnrol(amlsRegistrationNumber)) { _ =>
-          verify(authConnector).getCurrentAuthority(any(), any())
+          verify(authConnector).userDetails(any(), any(), any())
           verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
+        }
+      }
+
+      "throw an exception when there is no group identifier" in new Fixture {
+        val details = userDetailsGen.sample.get.copy(groupIdentifier = None)
+
+        when(authConnector.userDetails(any(), any(), any())).thenReturn(Future.successful(details))
+
+        intercept[Exception] {
+          await(connector.deEnrol(amlsRegistrationNumber))
+        } match {
+          case ex => ex.getMessage mustBe "Group identifier is unavailable"
         }
       }
     }

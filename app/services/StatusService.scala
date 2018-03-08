@@ -99,6 +99,10 @@ trait StatusService {
     }
   }
 
+  def getStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
+        etmpStatus(mlrRegNumber)(hc, authContext, ec)
+  }
+
   def getDetailedStatus(mlrRegNumber: String)
                        (implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext) = etmpStatusInformation(mlrRegNumber)
 

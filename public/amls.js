@@ -1,4 +1,11 @@
 /*global $*/
+
+/**
+ * PLEASE NOTE
+ * If this file is to be modified, please update the version number in the reference to amls.js in main.scala.html and main2.scala.html.
+ * This is so that the file can be re-downloaded by clients.
+ */
+
 // TODO: Tidy up
 $(function () {
   // avoids double panel-indented sections
