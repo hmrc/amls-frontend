@@ -16,7 +16,9 @@
 
 package controllers.renewal
 
+import cats.data.OptionT
 import connectors.DataCacheConnector
+import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
 import models.registrationprogress._
@@ -35,11 +37,14 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, GenericTestHelper}
+import cats.implicits._
+import services.businessmatching.BusinessMatchingService
+import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class RenewalProgressControllerSpec extends GenericTestHelper {
+class RenewalProgressControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -52,6 +57,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
     val progressService = mock[ProgressService]
     val renewalService = mock[RenewalService]
     val statusService = mock[StatusService]
+    val businessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -60,6 +66,7 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       .bindings(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[StatusService].to(statusService))
+      .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .build()
 
     val controller = app.injector.instanceOf[RenewalProgressController]
@@ -82,28 +89,36 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       renewalService.getSection(any(), any(), any())
     } thenReturn Future.successful(renewalSection)
 
-    val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val bm = Some(businessMatchingGen.sample.get.copy(activities = Some(businessActivitiesModel)))
 
-    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-      .thenReturn(bm)
+    when {
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn bm
 
     val renewalDate = LocalDate.now().plusDays(15)
 
     val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
       Some(renewalDate), false)
 
+    when(businessMatchingService.getAdditionalBusinessActivities(any(), any(), any()))
+      .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
+
+    when {
+      progressService.sectionsFromBusinessActivities(any(), any())(any())
+    } thenReturn Set(defaultSection)
+
   }
 
   "The Renewal Progress Controller" must {
 
-    "load the page" in new Fixture {
+    "load the page when status is ReadyForRenewal" in new Fixture {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
-      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
@@ -118,34 +133,32 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
 
     }
 
-    "load the page when status is renewal submitted" in new Fixture {
+    "redirect to the registration progress controller when status is renewal submitted" in new Fixture {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
-      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+      val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
 
       val result = controller.get()(request)
 
-      status(result) mustBe OK
+      status(result) mustBe SEE_OTHER
 
-      val html = Jsoup.parse(contentAsString(result))
-
-      html.select(".page-header").text() must include(Messages("renewal.progress.title"))
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
     }
 
-    "load the page when status is renewal submitted and one of the section is modified" in new Fixture  {
+    "load the page when status is ReadyForRenewal and one of the section is modified" in new Fixture  {
 
       when(statusService.getDetailedStatus(any(), any(), any()))
-        .thenReturn(Future.successful((RenewalSubmitted(Some(renewalDate)), Some(readStatusResponse))))
+        .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
       val BusinessActivitiesModelWithoutTCSPOrMSB = BusinessActivities(Set(TelephonePaymentService))
-      val bmWithoutTCSPOrMSB = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+      val bmWithoutTCSPOrMSB = Some(bm.get.copy(activities = Some(businessActivitiesModel)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(bmWithoutTCSPOrMSB)
@@ -186,8 +199,8 @@ class RenewalProgressControllerSpec extends GenericTestHelper {
       element.text must include("A new section")
       element.size mustBe 1
     }
-    
-    "display the renewal page with an empty sequence when no sections are returned" in new Fixture {
+
+    "respond with InternalServerError when no sections are returned" in new Fixture {
       when(statusService.getDetailedStatus(any(), any(), any()))
         .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 

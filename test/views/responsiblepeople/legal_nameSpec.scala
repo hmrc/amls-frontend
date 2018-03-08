@@ -40,6 +40,7 @@ class legal_nameSpec extends GenericTestHelper with MustMatchers {
       doc.title must startWith(Messages("responsiblepeople.legalName.title"))
       heading.html must be(Messages("responsiblepeople.legalName.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))
+      doc.html must include(Messages("responsiblepeople.legalnamechangedate.hint"))
 
       doc.getElementsByAttributeValue("name", "hasPreviousName") must not be empty
       doc.getElementsByAttributeValue("name", "firstName") must not be empty

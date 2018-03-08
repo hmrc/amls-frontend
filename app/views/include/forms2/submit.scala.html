@@ -20,10 +20,11 @@
  edit: Boolean = false,
  buttonMessageKey : Option[String] = None,
  returnLink : Boolean = true,
- returnLocation : Option[String] = None
+ returnLocation : Option[String] = None,
+ buttonId : Option[String] = None
  )(implicit lang:Lang,  m: Messages)
 <div class="form-group-footer">
-    <button type="submit" name="submit" class="button" >
+    <button type="submit" name="submit" class="button" id="@buttonId.getOrElse("")">
         @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))
     </button>
     @if(ApplicationConfig.returnLinkToggle) {

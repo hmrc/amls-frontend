@@ -14,6 +14,19 @@
  * limitations under the License.
  *@
 
-@()(implicit request: Request[_],m:Messages)
+@import include.forms2._
+@import forms.EmptyForm
+
+@(showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
 <p>@Messages("status.submissiondecisionrejected.description")</p>
-<p>@Messages("status.submissiondecisionrejected.description2")</p>
+<p id="rejected.p2">@Messages("status.submissiondecisionrejected.description2")</p>
+
+@if(showReregisterButton) {
+    @form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
+
+        @submit(
+            buttonMessageKey = Some("status.submissiondecisionrejected.btn"),
+            returnLink = false,
+            buttonId = Some("new.application.button"))
+    }
+}

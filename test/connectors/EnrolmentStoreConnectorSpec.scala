@@ -16,10 +16,13 @@
 
 package connectors
 
+import java.util.UUID
+
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
+import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -32,6 +35,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -117,6 +121,55 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
         intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolKey, enrolment))
+        }
+      }
+    }
+  }
+
+  "deEnrol" when {
+    "called" must {
+      "call the ES9 API endpoint" in new Fixture {
+        val authority = mock[Authority]
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+        whenReady(connector.deEnrol(amlsRegistrationNumber)) { _ =>
+          verify(authConnector).userDetails(any(), any(), any())
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
+        }
+      }
+
+      "throw an exception when there is no group identifier" in new Fixture {
+        val details = userDetailsGen.sample.get.copy(groupIdentifier = None)
+
+        when(authConnector.userDetails(any(), any(), any())).thenReturn(Future.successful(details))
+
+        intercept[Exception] {
+          await(connector.deEnrol(amlsRegistrationNumber))
+        } match {
+          case ex => ex.getMessage mustBe "Group identifier is unavailable"
+        }
+      }
+    }
+  }
+
+  "removeKnownFacts" when {
+    "called" must {
+      "call the ES7 API endpoint" in new Fixture {
+
+        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/${enrolKey.key}"
+
+        when {
+          http.DELETE[HttpResponse](any())(any(), any(), any())
+        } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+        whenReady(connector.removeKnownFacts(amlsRegistrationNumber)) { _ =>
+          verify(http).DELETE[HttpResponse](eqTo(endpointUrl))(any(), any(), any())
+          verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
     }

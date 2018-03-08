@@ -128,7 +128,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
     "post is called" must {
 
-      "on valid request" must {
+      "with a valid request" must {
         "redirect to WhichTradingPremises" when {
           "request equals Yes" in new Fixture {
 
@@ -148,9 +148,9 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
           }
         }
-        "redirect to CurrentTradingPremises" when {
-          "request equals No" when {
-            "there are no more activities through which to iterate" in new Fixture {
+        "when request equals No" when {
+          "progress to the 'new service information' page" when {
+            "fit and proper is not required" in new Fixture {
 
               mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -158,12 +158,35 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
                 controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
               } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
-                "tradingPremisesNewActivities" -> "false"
-              ))
+              when {
+                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+              } thenReturn OptionT.some[Future, Boolean](false)
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.CurrentTradingPremisesController.get(0).url))
+              val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremisesNewActivities" -> "false"))
+
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
+
+            }
+          }
+
+          "progress to the 'fit and proper' page" when {
+            "fit and proper requirement is introduced" in new Fixture {
+
+              mockApplicationStatus(SubmissionDecisionApproved)
+
+              when {
+                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
+              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
+
+              when {
+                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
+              } thenReturn OptionT.some[Future, Boolean](true)
+
+              val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremisesNewActivities" -> "false"))
+
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
 
             }
           }

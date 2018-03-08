@@ -18,6 +18,7 @@ package views.responsiblepeople
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
+import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -28,6 +29,10 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val locations = Some(Seq(
+      NameValuePair("Country 1", "country:1")
+    ))
   }
 
   "country_of_birth view" must {
@@ -35,7 +40,7 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
 
       val form2 =  EmptyForm
 
-      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, None, "Person Name")
+      def view = views.html.responsiblepeople.country_of_birth(form2, edit = true, 1, None, "Person Name", locations)
 
       doc.title must startWith(Messages("responsiblepeople.country.of.birth.title"))
       heading.html must be(Messages("responsiblepeople.country.of.birth.heading", "Person Name"))
@@ -47,16 +52,16 @@ class country_of_birthSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "countryOfBirth") -> Seq(ValidationError("not a message Key")),
+          (Path \ "bornInUk") -> Seq(ValidationError("not a message Key")),
           (Path \ "country") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.country_of_birth(form2, true, 1, None, "Person Name")
+      def view = views.html.responsiblepeople.country_of_birth(form2, edit = true, 1, None, "Person Name", locations)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("countryOfBirth").parent()
+      doc.getElementById("bornInUk").parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
       doc.getElementById("country").parent()

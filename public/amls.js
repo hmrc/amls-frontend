@@ -1,4 +1,11 @@
 /*global $*/
+
+/**
+ * PLEASE NOTE
+ * If this file is to be modified, please update the version number in the reference to amls.js in main.scala.html and main2.scala.html.
+ * This is so that the file can be re-downloaded by clients.
+ */
+
 // TODO: Tidy up
 $(function () {
   // avoids double panel-indented sections
@@ -145,7 +152,7 @@ $(function () {
 
       if ($target.attr('data-toggle-new')) {
         if ($inputs.filter(pred).length || $self.prop('checked') === true) {
-          $target.show();
+          $target.removeClass('js-hidden');
         }
       } else {
         if ($inputs.filter(pred).length === 0) {
@@ -154,7 +161,7 @@ $(function () {
             'aria-expanded': 'false'
           });
           if ($self.prop('checked') === false) {
-            $target.hide().attr('aria-hidden', 'true');
+            $target.addClass('js-hidden').attr('aria-hidden', 'true');
           }
         }
       }
@@ -164,13 +171,13 @@ $(function () {
         $inputs.filter('input, select, textarea').val('');
         $inputs.filter('option').prop('selected', false);
         $self.attr('aria-expanded', 'false');
-        $target.hide().attr('aria-hidden', 'true');
+        $target.addClass('js-hidden').attr('aria-hidden', 'true');
       }
 
       $self.change(function () {
         if ($self.prop('checked') === true) {
           $self.attr('aria-expanded', 'true');
-          $target.show().attr('aria-hidden', 'false');
+          $target.removeClass('js-hidden').attr('aria-hidden', 'false');
         } else {
           hide();
         }
@@ -183,7 +190,7 @@ $(function () {
       }
 
       if ($self.prop('checked') === true) {
-        $target.show();
+        $target.removeClass('js-hidden');
       }
     });
   }());
@@ -249,5 +256,45 @@ $(function () {
 
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
   }
+
+  $('[data-gov-autocomplete]').each(function() {
+    openregisterLocationPicker({
+        defaultValue: '',
+      selectElement: this,
+      url: '/anti-money-laundering/assets/countries'
+    })
+
+
+
+    var selectFieldName = $(this).attr('id');
+    var nonSelectFieldName = selectFieldName.replace('-select','');
+    $('#' + nonSelectFieldName).keydown(function(e) {
+      if (e.keyCode === 13 && $(this).val() === '') {
+          $('#' + selectFieldName).val('')
+      }
+    }).keyup(function() {
+        var menu = $('.autocomplete__menu')
+        if (menu.text() === 'No results found') {
+          $('#' + selectFieldName).val('')
+        }
+    }).attr('name', nonSelectFieldName + '-autocomp');
+
+    $('body')
+        .on('mouseup', ".autocomplete__option > strong", function(e){
+          e.preventDefault();
+          $(this).parent().trigger('click')
+      }).on('click', '.autocomplete__option', function(evt) {
+        evt.preventDefault()
+        var e = jQuery.Event('keydown');
+        e.keyCode = 13;
+        $(this).closest('.autocomplete__wrapper').trigger(e);
+      })
+
+    $("button[name='submit']").click(function(){
+      if($('#' + nonSelectFieldName).val() === '')
+        $('#' + selectFieldName).val('');
+    })
+
+  })
 
 });

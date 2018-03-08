@@ -53,7 +53,7 @@ class AuthEnrolmentsServiceSpec extends PlaySpec
   }
 
   "AuthEnrolmentsService" must {
-    "return an AMLS regsitration number" in new Fixture {
+    "return an AMLS registration number" in new Fixture {
       when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
       when(ac.enrolmentsUri).thenReturn(Some("uri"))
 
@@ -76,6 +76,23 @@ class AuthEnrolmentsServiceSpec extends PlaySpec
       whenReady(service.enrol(amlsRegistrationNumber, postcode)) { _ =>
         val enrolment = EnrolmentStoreEnrolment("12345678", postcode)
         verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment))(any(), any(), any())
+      }
+    }
+
+    "de-enrol the user and return true" in new Fixture {
+
+      when {
+        enrolmentStore.deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+      when {
+        enrolmentStore.removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
+      } thenReturn Future.successful(HttpResponse(NO_CONTENT))
+
+      whenReady(service.deEnrol(amlsRegistrationNumber)) { result =>
+        result mustBe true
+        verify(enrolmentStore).removeKnownFacts(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        verify(enrolmentStore).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
       }
     }
   }

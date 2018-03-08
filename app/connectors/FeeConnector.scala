@@ -16,23 +16,25 @@
 
 package connectors
 
-import javax.inject.Inject
-
-import config.AppConfig
+import config.{ApplicationConfig, WSHttp}
 import models._
 import play.api.Logger
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http._
+import uk.gov.hmrc.domain.{CtUtr, Org, SaUtr}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.domain._
+import uk.gov.hmrc.play.http._
 
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpGet, HttpPost }
 
-class FeeConnector @Inject()(
-                              private[connectors] val http: CoreGet,
-                              appConfig: AppConfig
-                            ) {
+trait FeeConnector {
 
-  val feePaymentUrl = appConfig.feePaymentUrl
+  private[connectors] def httpPost: HttpPost
+
+  private[connectors] def httpGet: HttpGet
+
+  private[connectors] def url: String
 
   def feeResponse(amlsRegistrationNumber: String)(implicit
                                              headerCarrier: HeaderCarrier,
@@ -43,13 +45,20 @@ class FeeConnector @Inject()(
 
     val (accountType, accountId) = ConnectorHelper.accountTypeAndId
 
-    val getUrl = s"$feePaymentUrl/$accountType/$accountId/$amlsRegistrationNumber"
+    val getUrl = s"$url/$accountType/$accountId/$amlsRegistrationNumber"
     val prefix = "[FeeConnector]"
     Logger.debug(s"$prefix - Request : $amlsRegistrationNumber")
-    http.GET[FeeResponse](getUrl) map {
+    httpGet.GET[FeeResponse](getUrl) map {
       response =>
         Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
   }
+}
+
+object FeeConnector extends FeeConnector {
+  // $COVERAGE-OFF$
+  override private[connectors] val httpPost = WSHttp
+  override private[connectors] val httpGet = WSHttp
+  override private[connectors] val url = ApplicationConfig.feePaymentUrl
 }

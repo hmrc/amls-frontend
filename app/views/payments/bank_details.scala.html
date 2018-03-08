@@ -30,6 +30,14 @@
     heading = header
 ) {
 
+    @panel(
+        wide = true,
+        jsHidden = false,
+        gutter = true
+    ) {
+        <p>@Messages("payments.bankdetails.hint")</p>
+    }
+
     <div class="form-group">
         <div class="grid-layout grid-border">
             <div class="grid-layout__column grid-layout__column--1-2">
@@ -89,13 +97,9 @@
         </div>
     </div>
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ){
-        <p>@Messages("payments.bankdetails.warning")</p>
-    }
+    @printLink(linkId="bank-details-print",
+    gaTag=Some("bank-details:click:print")
+    )
 
     <p><a class="button" href="@controllers.routes.ConfirmationController.bacsConfirmation()">@Messages("button.continue")</a></p>
 

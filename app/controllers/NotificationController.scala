@@ -16,19 +16,20 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.{AmlsConnector, DataCacheConnector}
+import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
-import play.api.mvc.Request
+import play.api.mvc.{Request, Result}
+import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{BusinessName, FeatureToggle}
+import utils.BusinessName
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -37,6 +38,7 @@ import scala.concurrent.Future
 class NotificationController @Inject()(
                                         val authEnrolmentsService: AuthEnrolmentsService,
                                         val statusService: StatusService,
+                                        val businessMatchingService: BusinessMatchingService,
                                         val authConnector: AuthConnector,
                                         val amlsNotificationService: NotificationService,
                                         implicit val amlsConnector: AmlsConnector,
@@ -46,28 +48,41 @@ class NotificationController @Inject()(
   def getMessages = Authorised.async {
     implicit authContext =>
       implicit request =>
-        statusService.getReadStatus flatMap {
-          case readStatus if readStatus.safeId.isDefined =>
-            (for {
-              businessName <- BusinessName.getName(readStatus.safeId)
-              records <- OptionT.liftF(amlsNotificationService.getNotifications(readStatus.safeId.get))
-            } yield {
-              Ok(views.html.notifications.your_messages(businessName, records))
-            }) getOrElse (throw new Exception("Cannot retrieve business name"))
-          case _ => throw new Exception("Unable to retrieve SafeID")
+        authEnrolmentsService.amlsRegistrationNumber flatMap {
+          case Some(mlrRegNumber) => {
+              statusService.getReadStatus(mlrRegNumber) flatMap {
+                case readStatus if readStatus.safeId.isDefined => generateNotificationView(readStatus.safeId.get)
+                case _ => throw new Exception("Unable to retrieve SafeID")
+              }
+            }
+          case _ => {
+              businessMatchingService.getModel.value flatMap {
+                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(model.reviewDetails.get.safeId)
+                case _ => throw new Exception("Unable to retrieve SafeID from reviewDetails")
+              }
+            }
         }
+  }
+
+  private def generateNotificationView(safeId: String)(implicit hc: HeaderCarrier, authContext: AuthContext, request: Request[_]): Future[Result] = {
+    (for {
+      businessName <- BusinessName.getName(Some(safeId))
+      records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId))
+    } yield {
+      Ok(views.html.notifications.your_messages(businessName, records))
+    }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
   def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        statusService.getReadStatus flatMap {
+        statusService.getReadStatus(amlsRegNo) flatMap {
           case readStatus if readStatus.safeId.isDefined =>
             (for {
               safeId <- OptionT.fromOption[Future](readStatus.safeId)
               businessName <- BusinessName.getName(readStatus.safeId)
               details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
-              status <- OptionT.liftF(statusService.getStatus)
+              status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
             } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
           case _ => Future.successful(BadRequest)

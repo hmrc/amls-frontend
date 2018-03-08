@@ -19,6 +19,7 @@ dist
 *.iws
 .ensime_cache
 ensime-langserver.log
+.ensime
 pc.stdout.log
 .DS_Store
 .jvmopts

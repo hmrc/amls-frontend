@@ -22,13 +22,18 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
+import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
+import views.html.registrationamendment.registration_amendment
 import views.html.renewal.renewal_progress
+
+import scala.concurrent.Future
+
 
 @Singleton
 class RenewalProgressController @Inject()
@@ -38,31 +43,36 @@ class RenewalProgressController @Inject()
   val progressService: ProgressService,
   val messages: MessagesApi,
   val renewals: RenewalService,
-  val statusService :StatusService
+  val businessMatchingService: BusinessMatchingService,
+  val statusService: StatusService
 ) extends BaseController {
 
-  def get() = Authorised.async {
+  def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-        renewals.getSection flatMap { renewalSection =>
-          val block = for {
-            cache <- OptionT(dataCacheConnector.fetchAll)
-            statusInfo <- OptionT.liftF(statusService.getDetailedStatus)
-          } yield {
-            val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
-            val businessMatching = cache.getEntry[BusinessMatching](BusinessMatching.key)
-            val msbOrTcspExists = ControllerHelper.isMSBSelected(businessMatching) || ControllerHelper.isTCSPSelected(businessMatching)
-            val canSubmit = renewals.canSubmit(renewalSection, variationSections)
+        val statusInfo = statusService.getDetailedStatus
 
-            statusInfo match {
-              case (r:ReadyForRenewal, _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
-              case (r:RenewalSubmitted, _) => Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
-              case _ => throw new Exception("Cannot get renewal date")
+        val result = statusInfo map {
+          case (r: ReadyForRenewal, _) => {
+            for {
+              renewalSection <- OptionT.liftF(renewals.getSection)
+              cache <- OptionT(dataCacheConnector.fetchAll)
+              businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+            } yield {
+
+              val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
+              val canSubmit = renewals.canSubmit(renewalSection, variationSections)
+              val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
+                ControllerHelper.isTCSPSelected(Some(businessMatching))
+
+              Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
             }
           }
-          block getOrElse InternalServerError("Cannot get business matching or renewal date")
+          case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))
         }
+        result.flatMap(_.getOrElse(InternalServerError("Cannot get business matching or renewal date")))
   }
+
 
   def post() = Authorised.async {
     implicit authContext =>

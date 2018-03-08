@@ -45,17 +45,18 @@ class confirm_postcodeSpec extends GenericTestHelper with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "postCode") -> Seq(ValidationError("not a message Key"))
+          (Path \ "postCode") -> Seq(ValidationError("not a message key"))
         ))
 
       def view = views.html.businessmatching.confirm_postcode(form2)
 
-      errorSummary.html() must include("not a message Key")
+      errorSummary.html() must include("not a message key")
 
-      doc.getElementById("postCode")
-        .parent
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
+      doc.getElementById("postCode").parent.getElementsByClass("error-notification").first() match {
+        case e =>
+          e.html() must include("not a message key")
+          e.attr("data-journey") mustBe "error - field:user input:postCode"
+      }
     }
   }
 }

@@ -20,7 +20,7 @@ import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.businessactivities.TransactionTypes._
-import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => ba}
+import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
 import utils.ControllerHelper
 
 case class BusinessActivities(
@@ -98,43 +98,29 @@ case class BusinessActivities(
     this.copy(whoIsYourAccountant = p, hasChanged = hasChanged || !this.whoIsYourAccountant.equals(p),
       hasAccepted = hasAccepted && this.whoIsYourAccountant.equals(p))
 
-  def taxMatters(p: TaxMatters): BusinessActivities =
-    this.copy(taxMatters = Some(p), hasChanged = hasChanged || !this.taxMatters.contains(p),
-      hasAccepted = hasAccepted && this.taxMatters.contains(p))
+  def taxMatters(p: Option[TaxMatters]): BusinessActivities =
+    this.copy(taxMatters = p, hasChanged = hasChanged || !this.taxMatters.equals(p),
+      hasAccepted = hasAccepted && this.taxMatters.equals(p))
 
+  def isComplete(businessMatchingActivities: Option[BusinessMatchingActivities]): Boolean = {
 
-  def isComplete(bmBusinessActivities : Option[ba]): Boolean = {
+    val containsASP = businessMatchingActivities.fold(false) { _.businessActivities contains AccountancyServices }
 
-    val containsASP = bmBusinessActivities.fold(false) { x =>
-      x.businessActivities contains AccountancyServices
+    this match {
+      case ba@BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
+        (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
+          case (Some(AccountantForAMLSRegulations(true)), Some(_), Some(_)) => true
+          case (Some(AccountantForAMLSRegulations(false)), _, _) => true
+          case _ => false
+        }
+      case BusinessActivities(
+        Some(_), _, Some(_), Some(_), Some(_), _,
+        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
+      case _ => false
     }
-
-    if (ApplicationConfig.hasAcceptedToggle) {
-      this match {
-        case BusinessActivities(
-        Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP => true
-        case BusinessActivities(
-        Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
-        case BusinessActivities(
-        Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, false) => false
-        case _ => false
-      }
-  } else {
-      this match {
-        case BusinessActivities(
-        Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _) if !containsASP => true
-        case BusinessActivities(
-        Some(_), _, Some(_), Some(_), Some(_), _,
-        Some(_), None, Some(_), Some(_), Some(_), _, _, _, _, _) if containsASP => true
-        case _ => false
-      }
-    }
-
-    }
+  }
 }
 
 object BusinessActivities {
@@ -187,7 +173,7 @@ object BusinessActivities {
         Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],
         Json.toJson(model.expectedAMLSTurnover).asOpt[JsObject],
         Json.toJson(model.businessFranchise).asOpt[JsObject],
-        model.transactionRecord map { t => Json.obj("isRecorded" -> t)},
+        model.transactionRecord map { t => Json.obj("isRecorded" -> t) },
         model.transactionRecordTypes map (t => Json.obj("transactionTypes" -> Json.toJson(t))),
         Json.toJson(model.customersOutsideUK).asOpt[JsObject],
         Json.toJson(model.ncaRegistered).asOpt[JsObject],

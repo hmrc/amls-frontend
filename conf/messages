@@ -192,7 +192,7 @@ error.required.tp.select.business.structure = Select one option to show your age
 error.required.tp.agent.premises = Select yes if you’re registering an agent’s premises
 error.required.tp.agent.registered.company.name = Enter your agent’s registered company name
 error.invalid.tp.agent.registered.company.name = You can’t enter more than 140 characters
-error.required.tp.agent.name = Enter your agent’s name
+error.required.tp.agent.name = Enter your agent’s full name
 error.invalid.tp.agent.name = You can’t enter more than 140 characters
 error.required.tp.agent.partnership = Enter your agent’s partners
 error.invalid.tp.agent.partnership = You can’t enter more than 140 characters
@@ -466,7 +466,7 @@ services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers
 services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 hint.8.digits = It’s either 8 numbers, or a mix of 15 letters and numbers.
-hint.9.digits = For example: 123456789
+hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
 hint.255.chars = Enter 255 characters or less.
 
@@ -477,6 +477,7 @@ lbl.hint.vat = It's 9 numbers with no letters, punctuation or other characters.
 link.return.registration.progress = Return to application progress
 link.return.renewal.progress = Return to renewal progress
 link.renewal.progress.change.answers = Change your answers
+link.print = Print
 
 ############################### Login Page ###############################
 amls.Login.title = AMLS
@@ -541,7 +542,7 @@ status.submissiondecisionapproved.description2 = Your business is now registered
 status.submissiondecision.not.supervised.heading = Not supervised
 status.submissiondecisionrejected.title = Application rejected
 status.submissiondecisionrejected.description = Your application has been rejected.
-status.submissiondecisionrejected.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
+status.submissiondecisionrejected.description2 = Your business is not registered for anti-money laundering supervision with HM Revenue and Customs(HMRC). Your business must not carry out activities which are covered by Money Laundering Regulations.
 status.submissiondecisionrevoked.title = Application revoked
 status.submissiondecisionrevoked.description = Your application has been revoked.
 status.submissiondecisionrevoked.description2 = Your business is not registered with HM Revenue and Customs for anti-money laundering supervision.
@@ -572,19 +573,24 @@ status.renewalnotsubmitted.description = Renewal not submitted
 status.renewalnotsubmitted.description2 = You’ve completed all sections of the renewal form, but you haven’t submitted it or paid the fee.
 status.renewalnotsubmitted.description3 = Your renewal application won’t be reviewed until the fee has been paid. Your supervision will expire on {0} unless you renew before then.
 status.withdraw.link-text = withdraw application
-status.withdraw.title = Withdraw application
+status.withdraw.title = Withdraw your application
 status.withdraw.registration-date.label = Registration submitted {0}
 status.withdraw.button-text = Withdraw application
-status.withdraw.body-content = I want to withdraw my application for anti-money laundering supervision with HM Revenue and Customs.\n\
-  I understand that all the information I have submitted will be deleted, and any fees I have paid will not be refunded.
-
-status.deregister.title = De-register business
+status.withdraw.body-content = Withdraw your application if you no longer want to apply for anti-money laundering supervision from HM Revenue and Customs (HMRC).\n\
+  We will delete any information you have provided. We won’t refund any fees you have paid.\n\
+  To make a change to your application, you can update or view your information.\n\
+  If you withdraw your application and aren’t supervised by another body, you must not carry out activities covered by the Money Laundering Regulations.
+status.deregister.title = De-register your business
 status.deregister.link-text = de-register business
 status.deregister.end-date.text = Currently registered to {0}
 status.deregister.button-text = De-register
-status.deregister.body-content = Your business is currently registered for anti-money laundering supervision with HM Revenue and Customs.\n\
-  De-register your business if you want to remove it from this supervision. Any fees you have paid for anti-money laundering supervision registration will not be refunded.\n\
-  If you de-register, your business must not carry out activities which are covered by Money Laundering Regulations.
+status.deregister.body-content = De-register your business if you no longer want to be supervised by HM Revenue and Customs (HMRC).\n\
+  We’ll delete any information you have provided. We won’t refund any fees you have paid.\n\
+  You mustn’t carry out activities covered by the Money Laundering Regulations if you aren’t supervised.
+status.deregister.services = Registered services:
+status.deregister.button.change = Change
+status.deregister.regnumber = Registration number:
+status.deregister.visuallyhidden.change = Change your registered services
 
 status.amendment.edit = update or view your information
 status.submissiondecisionrejected.btn = Submit new application
@@ -744,9 +750,10 @@ confirmation.renewal.summary = This shows your total renewal fees for each item.
 confirmation.payment.title = You’ve submitted
 confirmation.payment.lede = You’ve submitted
 confirmation.payment.reference_header = Payment reference: {0}
-confirmation.payment.info.hmrc_review = Your application will be reviewed by HM Revenue and Customs. You can sign into this service at any time to see the status of your application.
+confirmation.payment.info.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take up to 45 days to review your application or request further information.
+confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you and email when the decision has been made. You’ll need to sign in to see the decision.
 confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
-confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details. For example, you’ll need to update if:
+confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
 confirmation.payment.info.keep_up_to_date.item2 = you start trading from a new premises
 confirmation.payment.info.keep_up_to_date.item3 = your main contact number changes
@@ -760,12 +767,11 @@ confirmation.payment.amendvariation.info.keep_up_to_date = If any of your inform
 confirmation.payment.bacs.title = You have submitted the application
 confirmation.payment.bacs.header = You’ve submitted
 
-confirmation.payment.bacs.received = Your application will be reviewed when HM Revenue and Customs receives your payment. You can sign into this service at any time to see the status of your application.
-confirmation.payment.bacs.time = The review process can take up to 45 days. You'll get an email when the decision has been made.
-
-
 confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
+
+confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information. You can continue to trade whilst your renewal is being reviewed.
+confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you and email when the decision has been made. You’ll need to sign in to see the decision.
 
 confirmation.payment.failed.title = Something went wrong with your payment
 confirmation.payment.failed.header = Something went wrong with your payment
@@ -778,6 +784,7 @@ payments.waystopay.title = How do you want to pay your fee?
 payments.waystopay.header = How do you want to pay your fee?
 
 payments.waystopay.info = If paying by Bacs (Bankers Automated Clearing System), check your bank’s transaction limits and processing times.
+payments.waystopay.info2 = You can’t pay by personal credit card. There’s a fee if you pay by corporate credit card.
 payments.waystopay.lead.time = Payments usually take 3 working days.
 
 payments.waystopay.card = Debit or credit card
@@ -790,8 +797,9 @@ payments.typeofbank.header = Will you be paying from a UK bank account?
 
 payments.typeofbank.error = Select yes if you will be paying from a UK bank account
 
-payments.bankdetails.title = Payment Details
-payments.bankdetails.header = Payment Details
+payments.bankdetails.title = Bacs payment details
+payments.bankdetails.header = Bacs payment details
+payments.bankdetails.hint = You’ll need these details to pay your fee by Bacs. Your payment may be delayed if you use the wrong reference.
 payments.bankdetails.bics.name = Bank identifier code (BIC)
 payments.bankdetails.bics.value = BARCGB22
 payments.bankdetails.iban.name = Account number (IBAN)
@@ -804,7 +812,6 @@ payments.bankdetails.sortcode.name = Sort code
 payments.bankdetails.sortcode.value = 20 11 47
 payments.bankdetails.fee.name = Fee
 payments.bankdetails.reference.name = Reference
-payments.bankdetails.warning = Your payment may be delayed if you use the wrong reference.
 
 
 ############################### Individual pages ###############################
@@ -1010,7 +1017,7 @@ tradingpremises.summary.services = Services at this address
 tradingpremises.summary.no.trading.premises = You currently have no trading premises registered
 tradingpremises.agentcompanyname.title = What’s your agent’s registered company name?
 tradingpremises.agentcompanyname.lbl.hint = It must be identical to the registered name on the incorporation certificate.
-tradingpremises.agentname.name.lbl.hint = What’s your agent’s name?
+tradingpremises.agentname.name.lbl.hint = What’s your agent’s full name?
 tradingpremises.agentname.title = Your agent’s details
 tradingpremises.agentname.name.dateOfBirth.lbl = What’s your agent’s date of birth?
 tradingpremises.agentname.name.dateOfBirth.hint = For example, 31 03 1980
@@ -1342,13 +1349,15 @@ fee.guidance.intro = When you submit your application you’ll need to pay an ap
 fee.guidance.notice = This guide to your fees is based on the information you’ve given in your application.
 fee.guidance.edit-application.text = Edit your application
 
-responsiblepeople.whatyouneed.requiredinfo = You’ll be asked for a number of personal details for each person. It may be helpful to have the person with you when completing the section.
-responsiblepeople.whatyouneed.possiblerequiredinfo = You’ll be asked for things like:
-responsiblepeople.whatyouneed.line_1 = their name and date of birth
-responsiblepeople.whatyouneed.line_2 = their home address, phone number and email address
-responsiblepeople.whatyouneed.line_3 = their National Insurance number
-responsiblepeople.whatyouneed.line_4 = details of their personal business interests
-responsiblepeople.whatyouneed.line_5 = details of their relevant experience and training
+responsiblepeople.whatyouneed.requiredinfo = For each responsible person, you’ll be asked for things like their:
+responsiblepeople.whatyouneed.line_1 = name and any previous or alternative names, including the date of any legal change
+responsiblepeople.whatyouneed.line_2 = date of birth, country of birth and nationality
+responsiblepeople.whatyouneed.line_3 = National Insurance number and passport number
+responsiblepeople.whatyouneed.line_4 = home addresses for the last 3 years
+responsiblepeople.whatyouneed.line_5 = phone number and email
+responsiblepeople.whatyouneed.line_6 = position in the business and start date
+responsiblepeople.whatyouneed.line_7 = experience and training in anti-money laundering and counter-terrorism funding
+responsiblepeople.whatyouneed.line_8 = Self Assessment UTR and VAT number, if they are the sole proprietor of another business
 responsiblepeople.personName.title = What’s the name of this responsible person?
 responsiblepeople.personName.firstname = First name
 responsiblepeople.personName.middlename = Middle name, if applicable
@@ -1364,6 +1373,7 @@ responsiblepeople.legalName.title = Has this person ever legally changed their n
 responsiblepeople.legalName.heading = Has {0} ever legally changed their name?
 responsiblepeople.legalnamechangedate.title = When did this person's name change?
 responsiblepeople.legalnamechangedate.heading = When did {0}'s name change?
+responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll.
 responsiblepeople.knownby.title = Is this person known by any other names?
 responsiblepeople.knownby.heading = Is {0} known by any other names?
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
@@ -1589,7 +1599,6 @@ tcsp.anothertcspsupervision.header = Is that Trust or Company Service Provider r
 asp.whatyouneed.subheading = In this section, you’ll be asked for things like:
 asp.whatyouneed.line_1 = what services you provide
 asp.whatyouneed.line_2 = if you’re registered with HMRC to handle other businesses’ tax matters
-asp.whatyouneed.line_3 = your HMRC Agent Registration Number, if you have one
 asp.other.business.tax.matters.title = Are you registered with HMRC to handle other businesses’ tax matters?
 asp.other.business.tax.matters.agentrefno.lbl = HMRC Agent Registration Number
 asp.other.business.tax.matters.lbl = This refers to the HMRC Agent Registration Scheme.

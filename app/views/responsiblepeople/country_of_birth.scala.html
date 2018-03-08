@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import models.autocomplete._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("country").id}-fieldset"""
@@ -39,21 +40,22 @@
             f = f("countryOfBirth-fieldset"),
             legend = "responsiblepeople.country.of.birth.title",
             legendHidden = true,
-            panel = false
+            panel = false,
+            classes = Seq("inline")
         ) {
             @errorGroupWithPlaceholder(
-                field = f("countryOfBirth"),
+                field = f("bornInUk"),
                 placeholder = personName
             ) {
                 @radio(
-                    f = f("countryOfBirth"),
+                    f = f("bornInUk"),
                     labelText = "lbl.yes",
                     value = "true",
                     inline = true
 
                 )
                 @radio(
-                    f = f("countryOfBirth"),
+                    f = f("bornInUk"),
                     labelText = "lbl.no",
                     value = "false",
                     inline = true,
@@ -66,9 +68,10 @@
             field = Some(f(s"$target"))
         ) {
 
-            @country(
+            @country_autocomplete(
                 field = f("country"),
-                labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName)
+                labelText = Messages("responsiblepeople.country.of.birth.txt.lbl", personName),
+                data = countryData.getOrElse(Seq.empty)
             )
 
         }

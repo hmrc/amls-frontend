@@ -25,14 +25,12 @@ class UpdateServiceSpec extends GenericTestHelper{
   val json = Json.obj(
     "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo),
     "tradingPremisesNewActivities" -> Json.toJson(TradingPremisesActivities(Set(4,5))),
-    "areSubmittedActivitiesAtTradingPremises" -> Json.toJson(SubmittedActivitiesAtTradingPremisesYes),
     "tradingPremisesSubmittedActivities" -> Json.toJson(TradingPremisesActivities(Set(2)))
   )
 
   val model = UpdateService(
     Some(NewActivitiesAtTradingPremisesNo),
     Some(TradingPremisesActivities(Set(4, 5))),
-    Some(SubmittedActivitiesAtTradingPremisesYes),
     Some(TradingPremisesActivities(Set(2))
     ))
 
@@ -55,7 +53,6 @@ class UpdateServiceSpec extends GenericTestHelper{
         UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(4,5))),
-          Some(SubmittedActivitiesAtTradingPremisesYes),
           Some(TradingPremisesActivities(Set(2)))
         ).isComplete must be(true)
       }
@@ -64,18 +61,7 @@ class UpdateServiceSpec extends GenericTestHelper{
           UpdateService(
             Some(NewActivitiesAtTradingPremisesNo),
             None,
-            Some(SubmittedActivitiesAtTradingPremisesYes),
             Some(TradingPremisesActivities(Set(2)))
-          ).isComplete must be(true)
-        }
-      }
-      "tradingPremisesSubmittedActivities is SubmittedActivitiesAtTradingPremisesYes" when {
-        "areSubmittedActivitiesAtTradingPremises is not defined" in {
-          UpdateService(
-            Some(NewActivitiesAtTradingPremisesNo),
-            None,
-            Some(SubmittedActivitiesAtTradingPremisesYes),
-            None
           ).isComplete must be(true)
         }
       }
@@ -86,7 +72,6 @@ class UpdateServiceSpec extends GenericTestHelper{
         UpdateService(
           None,
           Some(TradingPremisesActivities(Set(4,5))),
-          Some(SubmittedActivitiesAtTradingPremisesYes),
           Some(TradingPremisesActivities(Set(2)))
         ).isComplete must be(false)
       }
@@ -95,7 +80,6 @@ class UpdateServiceSpec extends GenericTestHelper{
           UpdateService(
             Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
             None,
-            Some(SubmittedActivitiesAtTradingPremisesYes),
             Some(TradingPremisesActivities(Set(2)))
           ).isComplete must be(false)
         }
@@ -105,24 +89,14 @@ class UpdateServiceSpec extends GenericTestHelper{
           UpdateService(
             Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
             Some(TradingPremisesActivities(Set(4,5))),
-            Some(SubmittedActivitiesAtTradingPremisesNo),
             None
           ).isComplete must be(false)
         }
-      }
-      "areSubmittedActivitiesAtTradingPremises is not defined" in {
-        UpdateService(
-          Some(NewActivitiesAtTradingPremisesNo),
-          Some(TradingPremisesActivities(Set(4,5))),
-          None,
-          Some(TradingPremisesActivities(Set(2)))
-        ).isComplete must be(false)
       }
       "tradingPremisesSubmittedActivities is not defined" in {
         UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(4,5))),
-          Some(SubmittedActivitiesAtTradingPremisesNo),
           None
         ).isComplete must be(false)
       }

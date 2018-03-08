@@ -1,0 +1,48 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.{Field, Form2}
+@import models.autocomplete.NameValuePair
+
+@(
+    field: Field,
+    labelText: String = "",
+    hintText: String = "",
+    bold: Boolean = false,
+    classes: Seq[String] = Seq.empty,
+    data: Seq[NameValuePair] = Seq.empty
+)(implicit lang:Lang,  m: Messages)
+
+<div class="form-group form-field-group @if(field.hasErrors) {form-field--error}">
+    <label for="@field.id">
+        @if(labelText.nonEmpty) {
+            <span class="form-label@if(bold){-bold}">@Messages(labelText)</span>
+        }
+        @if(hintText.nonEmpty) {
+            <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
+        }
+        @if(field.hasErrors) {
+            <span class="error-notification">@field.error</span>
+        }
+
+        <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-gov-autocomplete="true">
+            <option value=""></option>
+            @data.map { kvp =>
+                <option value="@kvp.value" @if(field.value.contains(kvp.value)) {selected}>@kvp.name</option>
+            }
+        </select>
+    </label>
+</div>

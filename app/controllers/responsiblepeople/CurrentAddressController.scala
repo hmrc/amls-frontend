@@ -24,12 +24,13 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import play.api.mvc.{AnyContent, Request}
-import services.StatusService
+import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.current_address
 import audit.AddressConversions._
+import play.api.Play
 
 import scala.concurrent.Future
 
@@ -37,7 +38,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
 
   def dataCacheConnector: DataCacheConnector
   val auditConnector: AuditConnector
-
+  val autoCompleteService: AutoCompleteService
   val statusService: StatusService
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
@@ -48,9 +49,9 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         getData[ResponsiblePeople](index) map {
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,
           Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
-          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName))
+          => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
+          => Ok(current_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _
           => NotFound(notFoundView)
         }
@@ -63,7 +64,7 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
           (Form2[ResponsiblePersonCurrentAddress](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePeople](index) map { rp =>
-                BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
+                BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
@@ -126,4 +127,6 @@ object CurrentAddressController extends CurrentAddressController {
 
   override def dataCacheConnector = DataCacheConnector
   override lazy val auditConnector = AMLSAuditConnector
+  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
+
 }
