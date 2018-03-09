@@ -96,7 +96,7 @@ trait ConfirmationController extends BaseController {
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus, isPreviousPageSuccessful) match {
-          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled, false) =>
+          case s@(_, _, false) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
 
           case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _, true) =>
