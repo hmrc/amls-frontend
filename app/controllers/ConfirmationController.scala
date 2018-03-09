@@ -85,8 +85,7 @@ trait ConfirmationController extends BaseController {
           PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
         )
 
-        val isPreviousPageSuccessful = request.headers.get("referer").getOrElse("").contains("successful")
-
+        val isPreviousPageSuccessful = request.queryString.contains("paymentStatus")
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
           businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
