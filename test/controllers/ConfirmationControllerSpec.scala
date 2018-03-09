@@ -609,7 +609,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         doc.select(".confirmation").text must include(companyName)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
-//TODO:
+
       "the payment failed" in new Fixture {
 
         setupStatus(SubmissionReadyForReview)
@@ -625,7 +625,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val result = controller.paymentConfirmation(payment.reference)(request)
+        val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl+"?paymentStatus=Failed")
+        val result = controller.paymentConfirmation(payment.reference)(failedRequest)
 
         status(result) mustBe OK
 
@@ -633,7 +634,7 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
-//TODO:
+
       "the payment was cancelled" in new Fixture {
 
         setupStatus(SubmissionReadyForReview)
@@ -649,7 +650,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val result = controller.paymentConfirmation(payment.reference)(request)
+        val cancelledRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl+"?paymentStatus=Cancelled")
+        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
 

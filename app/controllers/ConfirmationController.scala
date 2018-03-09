@@ -85,7 +85,7 @@ trait ConfirmationController extends BaseController {
           PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
         )
 
-        val isPreviousPageSuccessful = request.queryString.contains("paymentStatus")
+        val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
           businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
@@ -94,7 +94,7 @@ trait ConfirmationController extends BaseController {
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
-        } yield (status, paymentStatus.currentStatus, isPreviousPageSuccessful) match {
+        } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
           case s@(_, _, false) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
 
