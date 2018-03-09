@@ -53,7 +53,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
 
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.hassomethingchanged"))
-      doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit"))
+      doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit.uppercase.start"))
 
       html must include (Messages("status.submissiondecisionsupervised.success.description"))
       doc.getElementsByClass("messaging").size() mustBe 1
