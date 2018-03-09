@@ -29,7 +29,7 @@ import models.payments._
 import models.renewal.Renewal
 import models.status._
 import play.api.Play
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, Request, Headers}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -85,6 +85,8 @@ trait ConfirmationController extends BaseController {
           PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
         )
 
+        val isPreviousPageSuccessful = request.headers.get("referer").getOrElse("").contains("successful")
+
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
           businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
@@ -93,14 +95,14 @@ trait ConfirmationController extends BaseController {
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
-        } yield (status, paymentStatus.currentStatus) match {
-          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
+        } yield (status, paymentStatus.currentStatus, isPreviousPageSuccessful) match {
+          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled, false) =>
             Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
 
-          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _, true) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
 
-          case (ReadyForRenewal(_), _) => if (renewalData.isDefined) {
+          case (ReadyForRenewal(_), _, true) => if (renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
