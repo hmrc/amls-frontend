@@ -3,10 +3,10 @@
 GET         /assets/countries                                                         @controllers.AssetsController.countries()
 GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
 
-GET         /                                                                         controllers.LandingController.start(allowRedirect: Boolean ?= true)
-GET         /start/bta                                                                controllers.LandingController.start(allowRedirect: Boolean ?= false)
+GET         /                                                                         @controllers.LandingController.start(allowRedirect: Boolean ?= true)
+GET         /start/bta                                                                @controllers.LandingController.start(allowRedirect: Boolean ?= false)
 
-GET         /start                                                                    controllers.LandingController.get()
+GET         /start                                                                    @controllers.LandingController.get()
 
 POST        /subscribe                                                                @controllers.SubmissionController.post()
 
