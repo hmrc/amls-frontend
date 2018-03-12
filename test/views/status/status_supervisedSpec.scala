@@ -17,6 +17,7 @@
 package views.status
 
 import forms.EmptyForm
+import models.businessmatching.{AccountancyServices, BusinessActivities, MoneyServiceBusiness}
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -25,18 +26,22 @@ import views.Fixture
 
 class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
+  val activities = Set {
+    "Money Service Business activities"
+  }
+
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
   "status_supervised view" must {
-    val pageTitleSuffix = " - Your registration - " +Messages("title.amls") + " - " + Messages("title.gov")
+    val pageTitleSuffix = " - Your registration - " + Messages("title.amls") + " - " + Messages("title.gov")
 
     "have correct title, heading and sub heading" in new ViewFixture {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -45,14 +50,12 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
 
-      doc.getElementsByClass("statusblock").html() must include(Messages("status.hassomethingchanged"))
-      doc.getElementsByClass("statusblock").html() must include(Messages("status.amendment.edit"))
+      doc.getElementsByClass("panel-indent").html() must include(Messages("status.hassomethingchanged"))
+      doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit.uppercase.start"))
 
-      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.success.description")).text must be(
-        Messages("status.submissiondecisionsupervised.success.description"))
-
+      html must include (Messages("status.submissiondecisionsupervised.success.description"))
       doc.getElementsByClass("messaging").size() mustBe 1
 
       val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
@@ -63,27 +66,50 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
 
       html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
+
+      html must include("Registered services:")
+
+      for (activity <- activities) {
+        doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
+      }
+
+      doc.getElementById("change-registered-services").attr("href") must be(controllers.businessmatching.routes.SummaryController.get().url)
+
     }
 
+    "not contain the business activities change link if businessMatchingVariationToggle is false" in new ViewFixture {
+
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, false)
+      doc.html mustNot include(controllers.businessmatching.routes.SummaryController.get().url)
+
+    }
+
+
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, None)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, None, activities, true)
 
       val renewalDate = LocalDate.now().plusDays(15)
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
       Messages("status.submissiondecisionsupervised.enddate.text", renewalDate)
 
+      for (activity <- activities) {
+        doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
+      }
+
+      doc.getElementById("change-registered-services").attr("href") must be(controllers.businessmatching.routes.SummaryController.get().url)
+
       doc.getElementsMatchingOwnText(Messages("status.readyforrenewal.warning")).text must be
       Messages("status.readyforrenewal.warning", renewalDate)
     }
 
     "contains expected survey link for supervised status" in new ViewFixture {
-      def view =  views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
-        be(Messages("survey.satisfaction.please") +" "+ Messages("survey.satisfaction.answer")+ " "+Messages("survey.satisfaction.helpus"))
+        be(Messages("survey.satisfaction.please") + " " + Messages("survey.satisfaction.answer") + " " + Messages("survey.satisfaction.helpus"))
 
-     doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.answer")).attr("href") must be("/anti-money-laundering/satisfaction-survey")
     }
 
