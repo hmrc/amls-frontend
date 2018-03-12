@@ -41,18 +41,18 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-      override protected[controllers] val authenticator = mock[AuthenticatorConnector]
-    }
+    val controller = new StatusController (
+      mock[LandingService],
+      mock[StatusService],
+      mock[AuthEnrolmentsService],
+      mock[FeeConnector],
+      mock[RenewalService],
+      mock[ProgressService],
+      mock[AmlsConnector],
+      mockCacheConnector,
+      mock[AuthenticatorConnector],
+      self.authConnector
+    )
 
     mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())), Some(ResponsiblePeople.key))

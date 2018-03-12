@@ -17,6 +17,7 @@
 package controllers
 
 import cats.implicits._
+import config.AMLSAuthConnector
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
@@ -42,6 +43,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -53,21 +55,20 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   override lazy val app = GuiceApplicationBuilder().build()
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
-    val request = addToken(authRequest)
+    self => val request = addToken(authRequest)
 
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-      override protected[controllers] val authenticator: AuthenticatorConnector = mock[AuthenticatorConnector]
-    }
+    val controller = new StatusController (
+       mock[LandingService],
+       mock[StatusService],
+       mock[AuthEnrolmentsService],
+       mock[FeeConnector],
+       mock[RenewalService],
+       mock[ProgressService],
+       mock[AmlsConnector],
+       mockCacheConnector,
+       mock[AuthenticatorConnector],
+       self.authConnector
+    )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
     val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
@@ -804,18 +805,18 @@ class StatusControllerWithoutReregisterSpec extends GenericTestHelper with Mocki
     self =>
     val request = addToken(authRequest)
 
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-      override protected[controllers] val authenticator: AuthenticatorConnector = mock[AuthenticatorConnector]
-    }
+    val controller = new StatusController (
+      mock[LandingService],
+      mock[StatusService],
+      mock[AuthEnrolmentsService],
+      mock[FeeConnector],
+      mock[RenewalService],
+      mock[ProgressService],
+      mock[AmlsConnector],
+      mockCacheConnector,
+      mock[AuthenticatorConnector],
+      self.authConnector
+    )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
     val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))

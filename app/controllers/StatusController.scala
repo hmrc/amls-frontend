@@ -19,43 +19,54 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
+import connectors._
+import javax.inject.{Inject, Singleton}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
-import models.deregister.{DeRegisterSubscriptionRequest, DeregistrationReason}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
-import play.api.Play
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AckRefGenerator, BusinessName, ControllerHelper}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StatusController extends BaseController {
 
-  private[controllers] def landingService: LandingService
+//object StatusController extends StatusController {
+//  // $COVERAGE-OFF$
+//  override private[controllers] val landingService: LandingService = LandingService
+//  override private[controllers] val statusService: StatusService = StatusService
+//  override protected val authConnector = AMLSAuthConnector
+//  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
+//  override private[controllers] val feeConnector: FeeConnector = FeeConnector
+//  override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
+//  override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
+//  override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
+//  override protected[controllers] val dataCache = DataCacheConnector
+//  override protected[controllers] val amlsConnector = AmlsConnector
+//  // $COVERAGE-ON$
+//
+//}
 
-  private[controllers] def statusService: StatusService
 
-  private[controllers] def enrolmentsService: AuthEnrolmentsService
-
-  private[controllers] def feeConnector: FeeConnector
-
-  private[controllers] def renewalService: RenewalService
-
-  private[controllers] def progressService: ProgressService
-
-  private[controllers] def amlsConnector: AmlsConnector
-
-  protected[controllers] def dataCache: DataCacheConnector
-
-  protected[controllers] def authenticator: AuthenticatorConnector
+@Singleton
+class StatusController @Inject()(val landingService: LandingService,
+                                  val statusService: StatusService,
+                                  val enrolmentsService: AuthEnrolmentsService,
+                                  val feeConnector: FeeConnector,
+                                  val renewalService: RenewalService,
+                                  val progressService: ProgressService,
+                                  val amlsConnector: AmlsConnector,
+                                  val dataCache: DataCacheConnector,
+                                  val authenticator: AuthenticatorConnector,
+                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                 ) extends BaseController {
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -250,22 +261,6 @@ trait StatusController extends BaseController {
 
   private def getBusinessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
     BusinessName.getName(maybeSafeId)(hc, ac, ec, dataCache, amlsConnector)
-}
-
-object StatusController extends StatusController {
-  // $COVERAGE-OFF$
-  override private[controllers] val landingService: LandingService = LandingService
-  override private[controllers] val statusService: StatusService = StatusService
-  override protected val authConnector = AMLSAuthConnector
-  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override private[controllers] val feeConnector: FeeConnector = FeeConnector
-  override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
-  override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
-  override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-  override protected[controllers] val dataCache = DataCacheConnector
-  override protected[controllers] val amlsConnector = AmlsConnector
-  // $COVERAGE-ON$
-
 }
 
 
