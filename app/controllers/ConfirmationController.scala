@@ -73,6 +73,7 @@ trait ConfirmationController extends BaseController {
 
   }
 
+  //noinspection ScalaStyle
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -80,12 +81,15 @@ trait ConfirmationController extends BaseController {
         def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
           maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
 
-        val msgFromPaymentStatus = Map[PaymentStatus, String](
-          PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
-          PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
+        val msgFromPaymentStatus = Map[String, String](
+          "Failed" -> "confirmation.payment.failed.reason.failure",
+          "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
         )
 
+        val paymentStatusFromQueryString = request.queryString.get("paymentStatus").map(_.head)
+
         val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
+
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
           businessName <- companyNameT(detailedStatus) orElse OptionT.some("")
@@ -95,8 +99,10 @@ trait ConfirmationController extends BaseController {
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
-          case s@(_, _, false) =>
-            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
+          case (_, currentPaymentStatus, false) =>
+            Ok(payment_failure(
+              msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(currentPaymentStatus.toString)),
+              Currency(payment.amountInPence.toDouble / 100), reference))
 
           case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _, true) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
