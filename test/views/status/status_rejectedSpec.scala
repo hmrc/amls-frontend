@@ -49,11 +49,11 @@ class status_rejectedSpec extends GenericTestHelper with MustMatchers {
         Messages("status.submissiondecisionrejected.description"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
       doc.getElementById("rejected.p2").html() must be(Messages("status.submissiondecisionrejected.description2"))
       doc.getElementById("new.application.button").html() must be (Messages("status.submissiondecisionrejected.btn"))
-      doc.getElementsByTag("form").attr("action") must be("/anti-money-laundering/application-status/new-submission")
+      doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
     }
 
     "hide the 'new submission' form when specified" in new ViewFixture {

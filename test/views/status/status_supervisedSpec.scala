@@ -60,7 +60,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       Messages("status.submissiondecisionsupervised.enddate.text", date)
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
       html must include(controllers.changeofficer.routes.StillEmployedController.get.url)
     }

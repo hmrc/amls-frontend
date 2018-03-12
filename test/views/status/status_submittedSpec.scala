@@ -87,7 +87,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
         Messages("status.submissionreadyforreview.description2"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
 
     "contain 'update/amend information' content and link" in new ViewFixture {
