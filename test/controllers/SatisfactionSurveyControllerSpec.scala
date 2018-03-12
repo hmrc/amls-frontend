@@ -37,10 +37,10 @@ class SatisfactionSurveyControllerSpec extends GenericTestHelper with MockitoSug
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SatisfactionSurveyController {
-      override val authConnector = self.authConnector
-      override val auditConnector = mock[AuditConnector]
-    }
+    val controller = new SatisfactionSurveyController (
+      mock[AuditConnector],
+      self.authConnector
+    )
 
     def model: Option[BusinessActivities] = None
 

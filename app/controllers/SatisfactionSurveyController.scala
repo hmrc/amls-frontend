@@ -22,11 +22,14 @@ import models.SatisfactionSurvey
 import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import audit.SurveyEvent
+import javax.inject.{Inject, Singleton}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
 import scala.concurrent.Future
 
-trait SatisfactionSurveyController extends BaseController {
-
-  val auditConnector: AuditConnector
+@Singleton
+class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
+                                             val authConnector: AuthConnector = AMLSAuthConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -49,8 +52,8 @@ trait SatisfactionSurveyController extends BaseController {
   }
 }
 
-object SatisfactionSurveyController extends SatisfactionSurveyController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val auditConnector = AMLSAuditConnector
-}
+//object SatisfactionSurveyController extends SatisfactionSurveyController {
+//  // $COVERAGE-OFF$
+//  override val authConnector = AMLSAuthConnector
+//  override val auditConnector = AMLSAuditConnector
+//}

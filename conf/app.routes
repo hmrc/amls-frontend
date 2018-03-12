@@ -35,8 +35,8 @@ POST        /your-registration/de-register-application                          
 GET         /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.get()
 POST        /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.post()
 
-GET         /satisfaction-survey                                                      controllers.SatisfactionSurveyController.get()
-POST        /satisfaction-survey                                                      controllers.SatisfactionSurveyController.post()
+GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
+POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
 GET         /about-the-business/contacting-you                                        controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                                        controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
