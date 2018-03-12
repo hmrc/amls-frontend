@@ -8,7 +8,7 @@ GET         /start/bta                                                          
 
 GET         /start                                                                    controllers.LandingController.get()
 
-POST        /subscribe                                                                controllers.SubmissionController.post()
+POST        /subscribe                                                                @controllers.SubmissionController.post()
 
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role

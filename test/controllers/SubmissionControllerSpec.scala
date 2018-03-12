@@ -17,41 +17,36 @@
 package controllers
 
 import connectors.AuthenticatorConnector
+import exceptions._
+import generators.AmlsReferenceNumberGenerator
 import models.renewal.Renewal
 import models.status._
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
 import org.joda.time.LocalDate
+import org.jsoup._
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import uk.gov.hmrc.http.{HttpResponse, Upstream5xxResponse}
 import utils.{AuthorisedFixture, GenericTestHelper}
-import exceptions._
-import generators.AmlsReferenceNumberGenerator
 import views.ParagraphHelpers
-import org.jsoup._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
 
 class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture {
-    self =>
-    val request = addToken(authRequest)
+    self => val request = addToken(authRequest)
 
-    val controller = new SubmissionController {
-      override private[controllers] val subscriptionService: SubmissionService = mock[SubmissionService]
-
-      override protected def authConnector: AuthConnector = self.authConnector
-
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val renewalService = mock[RenewalService]
-      override private[controllers] val authenticator = mock[AuthenticatorConnector]
-    }
-
+    val controller = new SubmissionController (
+      mock[SubmissionService],
+      mock[StatusService],
+      mock[RenewalService],
+      mock[AuthenticatorConnector],
+      self.authConnector
+    )
   }
 
   val response = SubscriptionResponse(

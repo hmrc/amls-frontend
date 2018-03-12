@@ -37,24 +37,6 @@ import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
-//object StatusController extends StatusController {
-//  // $COVERAGE-OFF$
-//  override private[controllers] val landingService: LandingService = LandingService
-//  override private[controllers] val statusService: StatusService = StatusService
-//  override protected val authConnector = AMLSAuthConnector
-//  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-//  override private[controllers] val feeConnector: FeeConnector = FeeConnector
-//  override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
-//  override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
-//  override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-//  override protected[controllers] val dataCache = DataCacheConnector
-//  override protected[controllers] val amlsConnector = AmlsConnector
-//  // $COVERAGE-ON$
-//
-//}
-
-
 @Singleton
 class StatusController @Inject()(val landingService: LandingService,
                                   val statusService: StatusService,
