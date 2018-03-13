@@ -58,7 +58,7 @@ class status_incompleteSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("status.incomplete.description")).text must be(Messages("status.incomplete.description"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
 
     "do not show business name when 'business name' is empty" in new ViewFixture {

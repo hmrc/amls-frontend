@@ -21,15 +21,16 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String] )(implicit request: Request[_],m:Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String], businessMatchingVariationToggle: Boolean)(implicit request: Request[_], m: Messages)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <header class="page-header">
-                <h1 class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
-                <p class="heading-secondary print-left"><span class="visuallyhidden">This section is: </span>@Messages("summary.status")</p>
+                <h1 id="supervised-status-header" class="heading-xlarge">@Messages("status.submissiondecisionsupervised.heading")</h1>
+                <p class="heading-secondary print-left"><span class="visuallyhidden">
+                    This section is: </span>@Messages("summary.status")</p>
             </header>
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
@@ -39,50 +40,60 @@
 
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
-            <div class="panel-indent panel-indent--gutter panel-border-wide">
-                @businessName.map { bn =>
-                    <p class="heading-small">@Messages("status.business")</p> <p>@bn</p>
-                }
+            @businessName.map { bn =>
+                <h2 class="heading-large">@bn</h2>
+            }
+                <!--            <div class="panel-indent panel-indent--gutter panel-border-wide">-->
 
-                @endDate.map { date =>
-                    <p class="heading-small">@Messages("lbl.registration.status")</p>
-                    <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date))<br/>
-                            <a class="no-print" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
-                    </p>
-                }
+            @endDate.map { date =>
+                <p class="heading-small">@Messages("lbl.registration.status.short")</p>
+                <p>@Messages("status.submissiondecisionsupervised.enddate.text", DateHelper.formatDate(date)) <br/>
+                    <a class="no-print" id="deregister-link" href="@controllers.deregister.routes.DeRegisterApplicationController.get()">@m("status.deregister.link-text")</a>
+                </p>
+            }
 
-                @change_officer(name)
-                <p class="heading-small">@Messages("status.referenceno")</p><p>@regNo</p>
+            <p id="deregister-services-list" class="heading-small">@Messages("status.deregister.services")</p>
+            <ul class="list activities-list">@for(activity <- activities) {
+                <li>@activity</li>
+            }
+            </ul>
+            @if(businessMatchingVariationToggle) {
+                <a id="change-registered-services" href="@controllers.businessmatching.routes.SummaryController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
+            }
+
+            <div id="supervised-panel" class="panel-indent panel-indent--gutter panel-border-wide">
+                <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
+                <ul>
+                    <li><a id="status-amendment-edit" href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit.uppercase.start")</a></li>
+                </ul>
             </div>
+
+                <!--</div>-->
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             <div class="govuk-box-highlight messaging">
-                <!-- <i class="icon icon-information"></i>  -->
+                    <!-- <i class="icon icon-information"></i>  -->
                 <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
             </div>
-            <div class="grid-row statusblock declaration">
-                <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
-                <ul>
-                    <li><a href="@controllers.routes.RegistrationProgressController.get()">@Messages("status.amendment.edit")</a></li>
-                </ul>
-            </div>
+            <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no">@regNo</p>
+            <p>@change_officer(name)</p>
         </div>
     </div>
 
     <div class="grid-layout grid-layout--stacked">
         <div class="grid-layout__column grid-layout__column--2-3">
-            @if(renewalFlow) {
-                @endDate.map {date =>
-                    <div class="notice spacelarge">
-                        <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
-                        <strong class="bold-small">@Messages("status.readyforrenewal.warning",DateHelper.formatDate(date))</strong>
-                    </div>
-                    <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
-                    <a class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
-                }
-            } else {
-              <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
+        @if(renewalFlow) {
+            @endDate.map { date =>
+                <div class="notice spacelarge">
+                    <i class="icon icon-important"><span class="visuallyhidden">Warning</span></i>
+                    <strong class="bold-small">@Messages("status.readyforrenewal.warning", DateHelper.formatDate(date))</strong>
+                </div>
+                <p>@Messages("status.submissiondecisionsupervised.renewal.advice.text")</p>
+                <a id="status-renewal-button" class = "button" href = "@controllers.renewal.routes.WhatYouNeedController.get()">@Messages("status.submissiondecisionsupervised.renewal.btn")</a>
             }
+        } else {
+            <p>@Messages("status.submissiondecisionsupervised.success.description")</p>
+        }
         </div>
         <div class="grid-layout__column grid-layout__column--1-3">
             @* empty for layout reasons *@
@@ -93,7 +104,7 @@
         @before_you_go()
     }
 
-    @printLink(linkId="status-supervised-submitted-print",
-               gaTag=Some("status-supervised-submitted:click:print")
+    @printLink(linkId = "status-supervised-submitted-print",
+        gaTag = Some("status-supervised-submitted:click:print")
     )
 }
