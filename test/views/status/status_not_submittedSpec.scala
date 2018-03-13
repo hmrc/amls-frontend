@@ -66,6 +66,8 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("status.submissionready.description")).text() must be(Messages("status.submissionready.description"))
 
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
 
     "contains expected content 'update/amend information'" in new ViewFixture {
@@ -76,9 +78,6 @@ class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("statusblock").first().html() must include(Messages("status.submissionready.changelink1"))
 
       doc.html() must not include Messages("survey.satisfaction.beforeyougo")
-
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(false)
-
     }
 
     "do not show business name when 'business name' is empty" in new ViewFixture {
