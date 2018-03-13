@@ -54,6 +54,21 @@ a.block-link {
   }
 }
 
+/* -- Supervised status page -- */
+
+ul.list.activities-list, ul.list.activities-list li {
+  margin-bottom: 0;
+}
+
+#supervised-status-header {
+  margin-bottom: 0.75em;
+}
+
+#supervised-panel {
+  margin-top: 30px;
+}
+
+
 
 /* -- application progress page -- */
 
