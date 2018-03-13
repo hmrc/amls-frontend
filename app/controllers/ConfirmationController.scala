@@ -29,7 +29,7 @@ import models.payments._
 import models.renewal.Renewal
 import models.status._
 import play.api.Play
-import play.api.mvc.{AnyContent, Request}
+import play.api.mvc.{AnyContent, Request, Headers}
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -80,10 +80,14 @@ trait ConfirmationController extends BaseController {
         def companyNameT(maybeStatus: Option[ReadStatusResponse]) =
           maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
 
-        val msgFromPaymentStatus = Map[PaymentStatus, String](
-          PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
-          PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
+        val msgFromPaymentStatus = Map[String, String](
+          "Failed" -> "confirmation.payment.failed.reason.failure",
+          "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
         )
+
+        val paymentStatusFromQueryString = request.queryString.get("paymentStatus").map(_.head)
+
+        val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
 
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
@@ -93,14 +97,16 @@ trait ConfirmationController extends BaseController {
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
-        } yield (status, paymentStatus.currentStatus) match {
-          case s@(_, PaymentStatuses.Failed | PaymentStatuses.Cancelled) =>
-            Ok(payment_failure(msgFromPaymentStatus(s._2), Currency(payment.amountInPence.toDouble / 100), reference))
+        } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
+          case (_, currentPaymentStatus, false) =>
+            Ok(payment_failure(
+              msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(currentPaymentStatus.toString)),
+              Currency(payment.amountInPence.toDouble / 100), reference))
 
-          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _, true) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
 
-          case (ReadyForRenewal(_), _) => if (renewalData.isDefined) {
+          case (ReadyForRenewal(_), _, true) => if (renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
