@@ -3,12 +3,12 @@
 GET         /assets/countries                                                         @controllers.AssetsController.countries()
 GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
 
-GET         /                                                                         controllers.LandingController.start(allowRedirect: Boolean ?= true)
-GET         /start/bta                                                                controllers.LandingController.start(allowRedirect: Boolean ?= false)
+GET         /                                                                         @controllers.LandingController.start(allowRedirect: Boolean ?= true)
+GET         /start/bta                                                                @controllers.LandingController.start(allowRedirect: Boolean ?= false)
 
-GET         /start                                                                    controllers.LandingController.get()
+GET         /start                                                                    @controllers.LandingController.get()
 
-POST        /subscribe                                                                controllers.SubmissionController.post()
+POST        /subscribe                                                                @controllers.SubmissionController.post()
 
 GET         /unauthorised                                                             controllers.AmlsController.unauthorised
 GET         /unauthorised-role                                                        controllers.AmlsController.unauthorised_role
@@ -17,8 +17,8 @@ GET         /keep-alive                                                         
 GET         /registration-progress                                                    @controllers.RegistrationProgressController.get()
 POST        /registration-progress                                                    @controllers.RegistrationProgressController.post()
 
-GET         /application-status                                                       controllers.StatusController.get(fromDuplicateSubmission: Boolean ?= false)
-POST        /application-status/new-submission                                        controllers.StatusController.newSubmission()
+GET         /application-status                                                       @controllers.StatusController.get(fromDuplicateSubmission: Boolean ?= false)
+POST        /application-status/new-submission                                        @controllers.StatusController.newSubmission()
 
 GET         /your-registration/your-messages/:id/:contactType/:amlsRegNo              @controllers.NotificationController.messageDetails(id : String, contactType:models.notifications.ContactType, amlsRegNo: String)
 GET         /your-registration/your-messages                                          @controllers.NotificationController.getMessages()
@@ -35,8 +35,8 @@ POST        /your-registration/de-register-application                          
 GET         /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.get()
 POST        /your-registration/de-register-application-reason                         @controllers.deregister.DeregistrationReasonController.post()
 
-GET         /satisfaction-survey                                                      controllers.SatisfactionSurveyController.get()
-POST        /satisfaction-survey                                                      controllers.SatisfactionSurveyController.post()
+GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
+POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
 GET         /about-the-business/contacting-you                                        controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /about-the-business/contacting-you                                        controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)

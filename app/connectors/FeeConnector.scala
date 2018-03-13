@@ -60,5 +60,5 @@ object FeeConnector extends FeeConnector {
   // $COVERAGE-OFF$
   override private[connectors] val httpPost = WSHttp
   override private[connectors] val httpGet = WSHttp
-  override private[connectors] val url = ApplicationConfig.feePaymentUrl
+  override private[connectors] lazy val url = ApplicationConfig.feePaymentUrl
 }

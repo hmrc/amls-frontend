@@ -17,6 +17,7 @@
 package controllers
 
 import cats.implicits._
+import config.AMLSAuthConnector
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
@@ -42,6 +43,7 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
@@ -53,21 +55,20 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   override lazy val app = GuiceApplicationBuilder().build()
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
-    val request = addToken(authRequest)
+    self => val request = addToken(authRequest)
 
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-      override protected[controllers] val authenticator: AuthenticatorConnector = mock[AuthenticatorConnector]
-    }
+    val controller = new StatusController (
+       mock[LandingService],
+       mock[StatusService],
+       mock[AuthEnrolmentsService],
+       mock[FeeConnector],
+       mock[RenewalService],
+       mock[ProgressService],
+       mock[AmlsConnector],
+       mockCacheConnector,
+       mock[AuthenticatorConnector],
+       self.authConnector
+    )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
     val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
@@ -249,37 +250,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
           contentAsString(result) must include(Messages("status.submissionreadyforreview.heading"))
         }
-
-        "show the withdrawal link" when {
-          "the status is 'ready for review'" in new Fixture {
-            val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
-              Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
-
-            val statusResponse = mock[ReadStatusResponse]
-            when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
-            when(statusResponse.safeId).thenReturn(None)
-
-            when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-              .thenReturn(
-                Some(BusinessMatching(Some(reviewDetails), None)))
-
-            when(controller.landingService.cacheMap(any(), any(), any()))
-              .thenReturn(Future.successful(Some(cacheMap)))
-
-            when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-              .thenReturn(Future.successful(None))
-
-            when(controller.statusService.getDetailedStatus(any(), any(), any()))
-              .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
-
-            val result = controller.get()(request)
-            val doc = Jsoup.parse(contentAsString(result))
-
-            doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
-          }
-        }
       }
-
 
       "application status is SubmissionDecisionApproved" in new Fixture {
 
@@ -309,11 +280,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
         val result = controller.get()(request)
         status(result) must be(OK)
-
-        val doc = Jsoup.parse(contentAsString(result))
-
-        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
         contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
         contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
@@ -410,67 +376,66 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
       }
 
-      "application status is SubmissionWithdrawn" when {
-        "there is no WithdrawalStatus data" in new Fixture {
+      "application status is SubmissionWithdrawn" in new Fixture {
 
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-          when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("amlsRegNo")))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
 
-          when(authConnector.currentAuthority(any(), any()))
-            .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((SubmissionWithdrawn, None)))
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionWithdrawn, None)))
 
-          when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-            .thenReturn(Future.successful(feeResponse))
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
 
-          val result = controller.get()(request)
-          status(result) must be(OK)
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-        }
-
-        "there is WithdrawalStatus data" in new Fixture {
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
-
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-          when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
-
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("amlsRegNo")))
-
-          when(authConnector.currentAuthority(any(), any()))
-            .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((SubmissionDecisionApproved, None)))
-
-          when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-            .thenReturn(Future.successful(feeResponse))
-
-          mockCacheFetch[WithdrawalStatus](Some(WithdrawalStatus(withdrawn = true)), Some(WithdrawalStatus.key))(controller.dataCache)
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-
-          contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-          contentAsString(result) must include(Messages("status.submissiondecisionwithdrawn.status"))
-        }
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
       }
+
+      "application status is not SubmissionWithdrawn, but has WithdrawalStatus data" in new Fixture {
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, None)))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        mockCacheFetch[WithdrawalStatus](Some(WithdrawalStatus(withdrawn = true)), Some(WithdrawalStatus.key))(controller.dataCache)
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+        contentAsString(result) must include(Messages("status.submissiondecisionwithdrawn.status"))
+      }
+
       "application status is DeRegistered" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
@@ -535,162 +500,294 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
 
       }
 
-      "application status is ReadyForRenewal" when {
+      "application status is ReadyForRenewal, and the renewal has not been started" in new Fixture {
 
-        "the renewal has not been started" in new Fixture {
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
-          when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
 
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("amlsRegNo")))
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-          when(authConnector.currentAuthority(any(), any()))
-            .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+        val renewalDate = LocalDate.now().plusDays(15)
 
-          val renewalDate = LocalDate.now().plusDays(15)
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
-          val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-            Some(renewalDate), false)
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
 
-          when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-            .thenReturn(Future.successful(feeResponse))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(None))
 
-          when(controller.renewalService.getRenewal(any(), any(), any()))
-            .thenReturn(Future.successful(None))
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-          val result = controller.get()(request)
-          status(result) must be(OK)
-          val doc = Jsoup.parse(contentAsString(result))
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
 
-          doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+      }
 
-          contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+      "application status is ReadyForRenewal, and the renewal has been started but is incomplete" in new Fixture {
 
-        }
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-        "the renewal has been started but is incomplete" in new Fixture {
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
 
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
 
-          when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("amlsRegNo")))
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(false))
 
-          when(authConnector.currentAuthority(any(), any()))
-            .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+        val renewalDate = LocalDate.now().plusDays(15)
 
-          when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
-            .thenReturn(Future.successful(false))
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
-          val renewalDate = LocalDate.now().plusDays(15)
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-          val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-            Some(renewalDate), false)
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
 
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Renewal())))
 
-          when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-            .thenReturn(Future.successful(feeResponse))
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-          when(controller.renewalService.getRenewal(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Renewal())))
+        contentAsString(result) must include(Messages("status.renewalincomplete.description"))
 
-          val result = controller.get()(request)
-          status(result) must be(OK)
+      }
 
-          contentAsString(result) must include(Messages("status.renewalincomplete.description"))
+      "application status is ReadyForRenewal, and the renewal is complete but not submitted" in new Fixture {
 
-        }
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-        "the renewal is complete but not submitted" in new Fixture {
+        when(cacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              MoneyServiceBusiness,
+              HighValueDealing
+            ))),
+            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
+          )))
 
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
 
-          when(cacheMap.getEntry[BusinessMatching](any())(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(
-                MoneyServiceBusiness,
-                HighValueDealing
-              ))),
-              msbServices = Some(MsbServices(Set(CurrencyExchange))),
-              reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
-            )))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
 
-          when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+        val dataCache = mock[DataCacheConnector]
 
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(Some("amlsRegNo")))
+        when(dataCache.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
 
-          val dataCache = mock[DataCacheConnector]
+        when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
 
-          when(dataCache.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
 
-          when(controller.renewalService.isRenewalComplete(any())(any(), any(), any()))
-            .thenReturn(Future.successful(true))
+        val renewalDate = LocalDate.now().plusDays(15)
 
-          when(authConnector.currentAuthority(any(), any()))
-            .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
 
-          val renewalDate = LocalDate.now().plusDays(15)
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
 
-          val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
-            Some(renewalDate), false)
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
 
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+        private val completeRenewal = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          Some(TotalThroughput("01")),
+          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          Some(TransactionsInLast12Months("1500")),
+          Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactionsInLast12Months("123")),
+          hasChanged = true
+        )
 
-          when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-            .thenReturn(Future.successful(feeResponse))
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(Some(completeRenewal)))
 
-          private val completeRenewal = Renewal(
-            Some(InvolvedInOtherYes("test")),
-            Some(BusinessTurnover.First),
-            Some(AMLSTurnover.First),
-            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-            Some(PercentageOfCashPaymentOver15000.First),
-            Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-            Some(TotalThroughput("01")),
-            Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-            Some(TransactionsInLast12Months("1500")),
-            Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-            Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-            Some(CETransactionsInLast12Months("123")),
-            hasChanged = true
-          )
+        val result = controller.get()(request)
+        status(result) must be(OK)
 
-          when(controller.renewalService.getRenewal(any(), any(), any()))
-            .thenReturn(Future.successful(Some(completeRenewal)))
+        val html = contentAsString(result)
+        html must include(Messages("status.renewalnotsubmitted.description"))
 
-          val result = controller.get()(request)
-          status(result) must be(OK)
+        val doc = Jsoup.parse(html)
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
-          val html = contentAsString(result)
-          html must include(Messages("status.renewalnotsubmitted.description"))
+      }
+    }
 
-          val doc = Jsoup.parse(html)
-          doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+    "show the withdrawal link" when {
+      "the status is 'ready for review'" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
-        }
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.processingDate).thenReturn(LocalDateTime.now)
+        when(statusResponse.safeId).thenReturn(None)
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(
+            Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionReadyForReview, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.withdrawal.routes.WithdrawApplicationController.get().url}]").text mustBe Messages("status.withdraw.link-text")
+      }
+    }
+
+    "show the deregister link" when {
+      "the status is 'approved'" in new Fixture {
+        val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
+          Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
+
+        val statusResponse = mock[ReadStatusResponse]
+        when(statusResponse.currentRegYearEndDate).thenReturn(LocalDate.now.some)
+        when(statusResponse.safeId).thenReturn(None)
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(
+            Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful(SubmissionDecisionApproved, statusResponse.some))
+
+        val result = controller.get()(request)
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.select(s"a[href=${controllers.deregister.routes.DeRegisterApplicationController.get().url}]").text mustBe Messages("status.deregister.link-text")
+      }
+    }
+
+    "show the change officer link" when {
+      "application status is SubmissionDecisionApproved" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(LocalDate.now.plusDays(30)), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((SubmissionDecisionApproved, Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.heading"))
+        contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+        val doc = Jsoup.parse(contentAsString(result))
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
+      }
+
+      "application status is ReadyForRenewal" in new Fixture {
+
+        when(controller.landingService.cacheMap(any(), any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some("amlsRegNo")))
+
+        when(authConnector.currentAuthority(any(), any()))
+          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
+
+        val renewalDate = LocalDate.now().plusDays(15)
+
+        val readStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Approved", None, None, None,
+          Some(renewalDate), false)
+
+        when(controller.statusService.getDetailedStatus(any(), any(), any()))
+          .thenReturn(Future.successful((ReadyForRenewal(Some(renewalDate)), Some(readStatusResponse))))
+
+        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
+          .thenReturn(Future.successful(feeResponse))
+
+        when(controller.renewalService.getRenewal(any(), any(), any()))
+          .thenReturn(Future.successful(None))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
+
+        val doc = Jsoup.parse(contentAsString(result))
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
       }
     }
   }
@@ -708,18 +805,18 @@ class StatusControllerWithoutReregisterSpec extends GenericTestHelper with Mocki
     self =>
     val request = addToken(authRequest)
 
-    val controller = new StatusController {
-      override private[controllers] val landingService: LandingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override private[controllers] val enrolmentsService: AuthEnrolmentsService = mock[AuthEnrolmentsService]
-      override private[controllers] val statusService: StatusService = mock[StatusService]
-      override private[controllers] val progressService: ProgressService = mock[ProgressService]
-      override private[controllers] val feeConnector: FeeConnector = mock[FeeConnector]
-      override private[controllers] val renewalService: RenewalService = mock[RenewalService]
-      override protected[controllers] val dataCache: DataCacheConnector = mockCacheConnector
-      override private[controllers] val amlsConnector = mock[AmlsConnector]
-      override protected[controllers] val authenticator: AuthenticatorConnector = mock[AuthenticatorConnector]
-    }
+    val controller = new StatusController (
+      mock[LandingService],
+      mock[StatusService],
+      mock[AuthEnrolmentsService],
+      mock[FeeConnector],
+      mock[RenewalService],
+      mock[ProgressService],
+      mock[AmlsConnector],
+      mockCacheConnector,
+      mock[AuthenticatorConnector],
+      self.authConnector
+    )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
     val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))

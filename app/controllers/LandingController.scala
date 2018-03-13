@@ -18,11 +18,11 @@ package controllers
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{AMLSAuditConnector, AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{ AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import connectors.DataCacheConnector
+import javax.inject.{Inject, Singleton}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
-import models.auth.{CredentialRole, UserDetails}
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
@@ -35,9 +35,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
-import play.api.libs.json.JsResultException
-import play.api.{Logger, Play}
-import play.api.mvc.{Action, Call, DiscardingCookie, Request, Result}
+import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -46,20 +44,18 @@ import services.AuthService
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait LandingController extends BaseController {
-
-  private[controllers] def landingService: LandingService
-
-  private[controllers] def enrolmentsService: AuthEnrolmentsService
-
-  private[controllers] def auditConnector: AuditConnector
-
-  private[controllers] def authService: AuthService
+@Singleton
+class LandingController @Inject()(val landingService: LandingService,
+                                  val enrolmentsService: AuthEnrolmentsService,
+                                  val auditConnector: AuditConnector,
+                                  val authService: AuthService,
+                                  val cacheConnector: DataCacheConnector,
+                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
-
-  private[controllers] val cacheConnector: DataCacheConnector
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -253,17 +249,4 @@ trait LandingController extends BaseController {
         cacheConnector.save[Seq[T]](key, Seq.empty[T])
     }
   }
-}
-
-object LandingController extends LandingController {
-  // $COVERAGE-OFF$
-  override private[controllers] val landingService = LandingService
-  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override protected val authConnector = AMLSAuthConnector
-  override val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
-  override val cacheConnector = DataCacheConnector
-
-  override private[controllers] def auditConnector = AMLSAuditConnector
-
-  override private[controllers] lazy val authService = Play.current.injector.instanceOf[AuthService]
 }

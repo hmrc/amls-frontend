@@ -754,7 +754,7 @@ confirmation.payment.title = You’ve submitted
 confirmation.payment.lede = You’ve submitted
 confirmation.payment.reference_header = Payment reference: {0}
 confirmation.payment.info.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take up to 45 days to review your application or request further information.
-confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you and email when the decision has been made. You’ll need to sign in to see the decision.
+confirmation.payment.info.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you an email when the decision has been made. You’ll need to sign in to see the decision.
 confirmation.payment.info.heading.keep_up_to_date = Keep your information up to date
 confirmation.payment.info.keep_up_to_date = If any of your information changes you’ll need to sign in to update your details within 30 days of the change. For example, you’ll need to update if:
 confirmation.payment.info.keep_up_to_date.item1 = a responsible person leaves your business
@@ -774,7 +774,7 @@ confirmation.payment.renewal.lede = You’ve submitted your renewal and paid
 confirmation.payment.renewal.title = You have submitted your renewal and paid
 
 confirmation.payment.info.transitional.renewal.hmrc_review = HM Revenue and Customs (HMRC) will review your application when we receive your payment. It can take more than 45 days to review your application or request further information. You can continue to trade whilst your renewal is being reviewed.
-confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you and email when the decision has been made. You’ll need to sign in to see the decision.
+confirmation.payment.info.transitional.renewal.hmrc_review2 = You can sign into this service at any time to see the status of your application. We’ll send you an email when the decision has been made. You’ll need to sign in to see the decision.
 
 confirmation.payment.failed.title = Something went wrong with your payment
 confirmation.payment.failed.header = Something went wrong with your payment

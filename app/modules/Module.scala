@@ -38,5 +38,7 @@ class Module extends AbstractModule {
     bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
+    bind(classOf[FeeConnector]).toInstance(FeeConnector)
+    bind(classOf[LandingService]).toInstance(LandingService)
   }
 }
