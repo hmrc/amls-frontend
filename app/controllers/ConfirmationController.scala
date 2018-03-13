@@ -73,7 +73,6 @@ trait ConfirmationController extends BaseController {
 
   }
 
-  //noinspection ScalaStyle
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
