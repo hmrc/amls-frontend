@@ -594,7 +594,7 @@ status.deregister.button.change = Change
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
-status.newsubmission.btn = Submit new application
+status.newsubmission.btn = Start a new application
 status.amendment.edit = update or view your information
 status.amendment.edit.uppercase.start = Update or view your information
 status.fee.link = If you haven’t paid the fee
