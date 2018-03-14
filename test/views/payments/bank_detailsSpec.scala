@@ -43,15 +43,13 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
 
       "non UK" in new Fixture {
 
-        def view = views.html.payments.bank_details(false, 100, paymentReferenceNumber)
+        def view = views.html.payments.bank_details(false, 0, paymentReferenceNumber)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.bics.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.iban.value")) must not be empty
         doc.getElementById("bank-details-print").html() mustBe "Print"
-        doc.getElementById("fee-to-pay").html() mustBe "£100.00"
-
       }
     }
 
@@ -59,14 +57,13 @@ class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
 
       "uk" in new Fixture {
 
-        def view = views.html.payments.bank_details(true, 100, paymentReferenceNumber)
+        def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber)
 
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.sortcode.value")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.name")) must not be empty
         doc.getElementsContainingOwnText(Messages("payments.bankdetails.accountnumber.value")) must not be empty
         doc.getElementById("bank-details-print").html() mustBe "Print"
-        doc.getElementById("fee-to-pay").html() mustBe "£100.00"
       }
     }
   }

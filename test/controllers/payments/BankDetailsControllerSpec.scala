@@ -62,7 +62,7 @@ class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with Pay
 
         when {
           controller.submissionResponseService.getSubmissionData(eqTo(submissionSatus))(any(),any(),any())
-        } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency(200), Seq.empty, None, Some(Currency(100)))))
+        } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency(200), Seq.empty, None, None)))
 
         val result = controller.get()(request)
 
