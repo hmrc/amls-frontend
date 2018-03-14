@@ -198,7 +198,7 @@ class StatusController @Inject()(val landingService: LandingService,
           date <- info.deRegistrationDate
         } yield date
 
-        Ok(status_deregistered(businessNameOption, deregistrationDate))
+        Ok(status_deregistered(businessNameOption, deregistrationDate, ApplicationConfig.allowReregisterToggle))
     }
   }
 

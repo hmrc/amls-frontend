@@ -124,6 +124,30 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
+      "status is deregistered and the new submission button is selected" in new Fixture {
+
+        val httpResponse = mock[HttpResponse]
+
+        when(controller.statusService.getStatus(any(), any(), any()))
+          .thenReturn(Future.successful(DeRegistered))
+
+        when(controller.enrolmentsService.deEnrol(any())(any(), any(), any()))
+          .thenReturn(Future.successful(true))
+
+        when(controller.authenticator.refreshProfile(any(), any()))
+          .thenReturn(Future.successful(HttpResponse(OK)))
+
+        when(controller.dataCache.remove(any())(any()))
+          .thenReturn(Future.successful(HttpResponse(OK)))
+
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
+          .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
+
+        val result = controller.newSubmission()(request)
+        status(result) must be(SEE_OTHER)
+        verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
+      }
     }
 
     "respond with OK and show business name on the status page" in new Fixture {
