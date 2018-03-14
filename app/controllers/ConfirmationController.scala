@@ -180,7 +180,7 @@ trait ConfirmationController extends BaseController {
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     getFees map {
       case Some(SubmissionData(Some(payRef), total, rows, None, Some(difference))) if difference.value > 0 =>
-        Ok(confirm_amendvariation(payRef, total, rows, total.some, controllers.payments.routes.WaysToPayController.get().url)).some
+        Ok(confirm_amendvariation(payRef, total, rows, Some(difference), controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
   }
