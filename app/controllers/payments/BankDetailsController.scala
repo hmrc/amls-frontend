@@ -40,10 +40,10 @@ class BankDetailsController @Inject()(
       implicit request =>
         (for {
           status <- OptionT.liftF(statusService.getStatus)
-          SubmissionData(payRef, fee, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          SubmissionData(payRef, _, _, _, difference) <- OptionT(submissionResponseService.getSubmissionData(status))
           paymentReference <- OptionT.fromOption[Future](payRef)
         } yield {
-          Ok(views.html.payments.bank_details(isUK, fee, paymentReference))
+          Ok(views.html.payments.bank_details(isUK, difference.getOrElse(0), paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 
