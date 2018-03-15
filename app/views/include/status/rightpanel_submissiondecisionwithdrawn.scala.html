@@ -14,6 +14,18 @@
  * limitations under the License.
  *@
 
+@import include.forms2._
+@import forms.EmptyForm
+
 @()(implicit request: Request[_], messages: Messages)
 <p>@messages("status.submissiondecisionwithdrawn.description")</p>
 <p>@messages("status.submissiondecisionwithdrawn.description2")</p>
+
+@form(EmptyForm, controllers.routes.StatusController.newSubmission()) {
+
+     @submit(
+        buttonMessageKey = Some("status.newsubmission.btn"),
+        returnLink = false,
+        buttonId = Some("new.application.button")
+     )
+}
