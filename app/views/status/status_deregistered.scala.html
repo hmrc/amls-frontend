@@ -20,7 +20,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(businessName: Option[String], deregistrationDate: Option[LocalDate])(implicit request: Request[_],m:Messages)
+@(businessName: Option[String], deregistrationDate: Option[LocalDate], showReregisterButton: Boolean = true)(implicit request: Request[_],m:Messages)
 
 @main2(title = s"${Messages("status.submissionderegistered.title")} - Your registration", showURRBanner = true) {
 
@@ -59,7 +59,7 @@
 
  <div class="grid-layout grid-layout--stacked">
   <div class="grid-layout__column grid-layout__column--2-3">
-  @include.status.rightpanel_submissionderegistered(deregistrationDate)
+  @include.status.rightpanel_submissionderegistered(deregistrationDate, showReregisterButton = showReregisterButton)
   </div>
   <div class="grid-layout__column grid-layout__column--1-3">
    @* empty for layout reasons *@

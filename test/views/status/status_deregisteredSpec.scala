@@ -29,13 +29,13 @@ class status_deregisteredSpec extends GenericTestHelper with MustMatchers {
     implicit val requestWithToken = addToken(request)
 
     val deregistrationDate = LocalDate.now
-    def view = views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate))
   }
 
   "status_revoked view" must {
     val pageTitleSuffix = s" - Your registration - ${Messages("title.amls")} - ${Messages("title.gov")}"
 
     "have correct title, heading and sub heading and static content" in new ViewFixture {
+      def view = views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate))
 
       val form2 = EmptyForm
 
@@ -45,6 +45,7 @@ class status_deregisteredSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contain the expected content elements" in new ViewFixture {
+      def view = views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate))
 
       Seq(
         Messages("status.submissionderegistered.status", DateHelper.formatDate(deregistrationDate)),
@@ -55,7 +56,14 @@ class status_deregisteredSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
+      doc.getElementById("new.application.button").html() must be (Messages("status.newsubmission.btn"))
+      doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
     }
 
+    "hide the 'new submission' form when specified" in new ViewFixture {
+      def view =  views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate), showReregisterButton = false)
+
+      Option(doc.getElementById("new.application.button")) must not be defined
+    }
   }
 }

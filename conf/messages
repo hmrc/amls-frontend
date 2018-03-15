@@ -594,9 +594,9 @@ status.deregister.button.change = Change
 status.deregister.regnumber = Registration number:
 status.deregister.visuallyhidden.change = Change your registered services
 
+status.newsubmission.btn = Start a new application
 status.amendment.edit = update or view your information
 status.amendment.edit.uppercase.start = Update or view your information
-status.submissiondecisionrejected.btn = Submit new application
 status.fee.link = If you haven’t paid the fee
 status.readyforrenewal.warning = Your supervision will expire on {0} unless you renew.
 status.submittedForReview.submitteddate.text = Application submitted {0}
