@@ -29,7 +29,6 @@ class status_deregisteredSpec extends GenericTestHelper with MustMatchers {
     implicit val requestWithToken = addToken(request)
 
     val deregistrationDate = LocalDate.now
-//    def view = views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate))
   }
 
   "status_revoked view" must {
