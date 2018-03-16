@@ -17,11 +17,11 @@
 package controllers.payments
 
 import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
-import models.confirmation.SubmissionData
+import models.confirmation.{Currency, SubmissionData}
+import models.status.SubmissionReady
 import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -40,10 +40,12 @@ class BankDetailsController @Inject()(
       implicit request =>
         (for {
           status <- OptionT.liftF(statusService.getStatus)
-          SubmissionData(payRef, fee, _, _, _) <- OptionT(submissionResponseService.getSubmissionData(status))
+          SubmissionData(payRef, fees, _, _, difference) <- OptionT(submissionResponseService.getSubmissionData(status))
           paymentReference <- OptionT.fromOption[Future](payRef)
         } yield {
-          Ok(views.html.payments.bank_details(isUK, fee, paymentReference))
+          val amount = if (status == SubmissionReady) fees else difference.getOrElse(Currency(0))
+
+          Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 
