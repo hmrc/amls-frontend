@@ -23,7 +23,7 @@
 
 @if(field.hasErrors) {
     <div id="@field.id" class="clear @classes.mkString(" ") form-field--error">
-        <span class="error-notification">@field.error</span>
+        <span class="error-notification" data-journey="error - field:user input:@field.id">@field.error</span>
         @content
     </div>
 } else {
