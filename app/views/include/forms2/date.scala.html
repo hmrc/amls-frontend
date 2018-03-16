@@ -42,7 +42,7 @@
     }
     @if(field.hasErrors) {
         <div class="form-field--error">
-            <span class="error-notification">@field.error</span>
+            <span class="error-notification" data-journey="error - field:user input:@field.id">@field.error</span>
     }
     @input(
         labelText = "lbl.day",
