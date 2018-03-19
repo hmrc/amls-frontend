@@ -52,7 +52,8 @@ class status_expiredSpec extends GenericTestHelper with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
-
+      doc.getElementById("new.application.button").html() must be (Messages("status.newsubmission.btn"))
+      doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
     }
 
   }
