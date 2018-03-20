@@ -24,7 +24,7 @@
 
 @if(field.hasErrors) {
     <div id="@field.id" class="display-block @classes.mkString(" ") form-field--error">
-        <span class="error-notification">@Messages(field.rpError, placeholder)</span>
+        <span class="error-notification" data-journey="error - field:user input:@field.id">@Messages(field.rpError, placeholder)</span>
         @content
     </div>
 } else {
