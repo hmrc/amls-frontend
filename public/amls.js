@@ -94,11 +94,15 @@ $(function () {
        $("#full-width-banner").removeClass("full-width-banner--show");
    });
 
-  $('select[data-auto-complete]').auto();
+   var myNav = navigator.userAgent.toLowerCase();
+   if(myNav.indexOf('msie 8') == -1)
+   {
+      $('select[data-auto-complete]').auto();
 
-  $('*[data-add-btn]').click(function () {
-    $('select[data-auto-complete]').combobox();
-  });
+      $('*[data-add-btn]').click(function () {
+          $('select[data-auto-complete]').combobox();
+      });
+   }
 
   (function () {
     $.widget('custom.addOne', {
