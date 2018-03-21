@@ -17,7 +17,6 @@
 package views.status
 
 import forms.EmptyForm
-import models.businessmatching.{AccountancyServices, BusinessActivities, MoneyServiceBusiness}
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -56,7 +55,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit.uppercase.start"))
 
       html must include (Messages("status.submissiondecisionsupervised.success.description"))
-      doc.getElementsByClass("messaging").size() mustBe 1
+      doc.getElementsByClass("messaging").size() mustBe 2 // 1 for desktop, 1 for mobile
 
       val date = DateHelper.formatDate(LocalDate.now().plusDays(30))
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionsupervised.enddate.text")).text must be
