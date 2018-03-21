@@ -16,12 +16,13 @@
 
 package controllers.payments
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
-import services.{AuthEnrolmentsService, FeeResponseService}
+import javax.inject.Inject
+import models.confirmation.Currency
+import models.status.SubmissionReady
+import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +31,8 @@ import scala.concurrent.Future
 class BankDetailsController @Inject()(
                                       val authConnector: AuthConnector,
                                       val authEnrolmentsService: AuthEnrolmentsService,
-                                      val feeResponseService: FeeResponseService
+                                      val feeResponseService: FeeResponseService,
+                                      val statusService: StatusService
                                     ) extends BaseController{
 
 
@@ -38,11 +40,13 @@ class BankDetailsController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
+          status <- OptionT.liftF(statusService.getStatus)
           amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
           paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
-          Ok(views.html.payments.bank_details(isUK, fees.totalFees, paymentReference))
+          val amount = if (status == SubmissionReady) Currency(fees.totalFees) else fees.difference.map(Currency(_)).getOrElse(Currency(0))
+          Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
 

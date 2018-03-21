@@ -19,41 +19,37 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector}
+import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
 import models.withdrawal.WithdrawalStatus
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
-import play.api.Play
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BusinessName, ControllerHelper}
 import views.html.status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StatusController extends BaseController {
-
-  private[controllers] def landingService: LandingService
-
-  private[controllers] def statusService: StatusService
-
-  private[controllers] def enrolmentsService: AuthEnrolmentsService
-
-  private[controllers] def feeResponseService: FeeResponseService
-
-  private[controllers] def renewalService: RenewalService
-
-  private[controllers] def progressService: ProgressService
-
-  private[controllers] def amlsConnector: AmlsConnector
-
-  protected[controllers] def dataCache: DataCacheConnector
-
-  protected[controllers] def authenticator: AuthenticatorConnector
+@Singleton
+class StatusController @Inject()(val landingService: LandingService,
+                                  val statusService: StatusService,
+                                  val enrolmentsService: AuthEnrolmentsService,
+                                  val feeConnector: FeeConnector,
+                                  val renewalService: RenewalService,
+                                  val progressService: ProgressService,
+                                  val amlsConnector: AmlsConnector,
+                                  val dataCache: DataCacheConnector,
+                                  val authenticator: AuthenticatorConnector,
+                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                 val feeResponseService: FeeResponseService
+                                 ) extends BaseController {
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -66,8 +62,10 @@ trait StatusController extends BaseController {
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
           withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
           responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          bm <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
+          maybeActivities <- Future(bm.activities)
           page <- if (withdrawalStatus.contains(WithdrawalStatus(true))) {
-            Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), maybeBusinessName, responsiblePeople))
+            Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), maybeBusinessName, responsiblePeople, maybeActivities))
           } else {
             getPageBasedOnStatus(
               mlrRegNumber,
@@ -75,7 +73,8 @@ trait StatusController extends BaseController {
               maybeBusinessName,
               feeResponse,
               fromDuplicateSubmission,
-              responsiblePeople
+              responsiblePeople,
+              maybeActivities
             )
           }
         } yield page
@@ -113,7 +112,8 @@ trait StatusController extends BaseController {
                                    businessNameOption: Option[String],
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
-                                   responsiblePeople: Option[Seq[ResponsiblePeople]])
+                                   responsiblePeople: Option[Seq[ResponsiblePeople]],
+                                   activities: Option[BusinessActivities])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
@@ -121,9 +121,9 @@ trait StatusController extends BaseController {
       case (SubmissionDecisionApproved, _) | (SubmissionDecisionRejected, _) |
            (SubmissionDecisionRevoked, _) | (SubmissionDecisionExpired, _) |
            (SubmissionWithdrawn, _) | (DeRegistered, _) =>
-        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople))
+        Future.successful(getDecisionPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities))
       case (ReadyForRenewal(_), _) | (RenewalSubmitted(_), _) =>
-        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople)
+        getRenewalFlowPage(mlrRegNumber, statusInfo, businessNameOption, responsiblePeople, activities)
       case (_, _) => Future.successful(Ok(status_incomplete(mlrRegNumber.getOrElse(""), businessNameOption)))
     }
   }
@@ -159,10 +159,12 @@ trait StatusController extends BaseController {
   private def getDecisionPage(mlrRegNumber: Option[String],
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
-                              responsiblePeople: Option[Seq[ResponsiblePeople]])(implicit request: Request[AnyContent]) = {
+                              responsiblePeople: Option[Seq[ResponsiblePeople]],
+                              maybeActivities: Option[BusinessActivities])(implicit request: Request[AnyContent]) = {
     statusInfo match {
-      case (SubmissionDecisionApproved, statusDtls) =>
+      case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
+        val activities = maybeActivities.map(_.businessActivities.map(_.getMessage)) getOrElse Set.empty
 
         Ok {
           //noinspection ScalaStyle
@@ -171,9 +173,12 @@ trait StatusController extends BaseController {
             businessNameOption,
             endDate,
             renewalFlow = false,
-            ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+            ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+            activities,
+            ApplicationConfig.businessMatchingVariationToggle
           )
         }
+      }
 
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterToggle))
       case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
@@ -185,16 +190,19 @@ trait StatusController extends BaseController {
           date <- info.deRegistrationDate
         } yield date
 
-        Ok(status_deregistered(businessNameOption, deregistrationDate))
+        Ok(status_deregistered(businessNameOption, deregistrationDate, ApplicationConfig.allowReregisterToggle))
     }
   }
 
   private def getRenewalFlowPage(mlrRegNumber: Option[String],
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                  businessNameOption: Option[String],
-                                 responsiblePeople: Option[Seq[ResponsiblePeople]])
+                                 responsiblePeople: Option[Seq[ResponsiblePeople]],
+                                 maybeActivities: Option[BusinessActivities])
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
+
+    val activities = maybeActivities.map(_.businessActivities.map(_.getMessage)) getOrElse Set.empty
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>
@@ -231,7 +239,9 @@ trait StatusController extends BaseController {
               businessNameOption,
               renewalDate,
               true,
-              ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
+              ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
+              activities,
+              ApplicationConfig.businessMatchingVariationToggle
             )))
         }
       }
@@ -240,22 +250,6 @@ trait StatusController extends BaseController {
 
   private def getBusinessName(maybeSafeId: Option[String])(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
     BusinessName.getName(maybeSafeId)(hc, ac, ec, dataCache, amlsConnector)
-}
-
-object StatusController extends StatusController {
-  // $COVERAGE-OFF$
-  override private[controllers] val landingService: LandingService = LandingService
-  override private[controllers] val statusService: StatusService = StatusService
-  override protected val authConnector = AMLSAuthConnector
-  override private[controllers] val amlsConnector = AmlsConnector
-  override protected[controllers] val dataCache = DataCacheConnector
-  override private[controllers] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
-  override private[controllers] val feeResponseService: FeeResponseService = Play.current.injector.instanceOf[FeeResponseService]
-  override private[controllers] val renewalService: RenewalService = Play.current.injector.instanceOf[RenewalService]
-  override private[controllers] val progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
-  override protected[controllers] val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-  // $COVERAGE-ON$
-
 }
 
 

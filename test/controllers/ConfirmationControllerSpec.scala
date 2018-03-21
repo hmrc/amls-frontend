@@ -481,7 +481,8 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val result = controller.paymentConfirmation(payment.reference)(request)
+        val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
+        val result = controller.paymentConfirmation(payment.reference)(failedRequest)
 
         status(result) mustBe OK
 
@@ -505,7 +506,36 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
           mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
-        val result = controller.paymentConfirmation(payment.reference)(request)
+        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
+
+        status(result) mustBe OK
+
+        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
+        contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
+      }
+
+      "payment data says 'Created' but querystring says 'Cancelled'" in new Fixture {
+        setupStatus(SubmissionReadyForReview)
+
+        when {
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+        } thenReturn Future.successful(None)
+
+        val payment = paymentGen.sample.get.copy(status = Created)
+        val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
+
+        when {
+          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+        } thenReturn Future.successful(paymentStatus)
+
+        when {
+          mockAmlsConnector.getPaymentByAmlsReference(any())(any(), any(), any())
+        } thenReturn Future.successful(Some(payment))
+
+        val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
+        val result = controller.paymentConfirmation(payment.reference)(cancelledRequest)
 
         status(result) mustBe OK
 

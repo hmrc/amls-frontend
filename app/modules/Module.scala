@@ -22,6 +22,7 @@ import connectors._
 import services._
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 
 class Module extends AbstractModule {
 
@@ -40,6 +41,6 @@ class Module extends AbstractModule {
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
     bind(classOf[CorePost]).toInstance(WSHttp)
     bind(classOf[CoreGet]).toInstance(WSHttp)
-
+    bind(classOf[LandingService]).toInstance(LandingService)
   }
 }

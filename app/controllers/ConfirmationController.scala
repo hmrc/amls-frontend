@@ -16,17 +16,13 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import audit.PaymentConfirmationEvent
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
-import connectors._
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector, _}
+import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
-import config.{AMLSAuditConnector, AMLSAuthConnector}
-import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiConnector}
-import models.ReadStatusResponse
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredYes}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
@@ -35,13 +31,13 @@ import models.renewal.Renewal
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import play.api.mvc.{AnyContent, Request, Result}
-import services.{FeeResponseService, _}
+import services.{AuthEnrolmentsService, FeeResponseService, PaymentsService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BusinessName
 import views.html.confirmation._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -80,10 +76,14 @@ class ConfirmationController @Inject()(
         def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
           maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getName(r.safeId) }
 
-        val msgFromPaymentStatus = Map[PaymentStatus, String](
-          PaymentStatuses.Failed -> "confirmation.payment.failed.reason.failure",
-          PaymentStatuses.Cancelled -> "confirmation.payment.failed.reason.cancelled"
+        val msgFromPaymentStatus = Map[String, String](
+          "Failed" -> "confirmation.payment.failed.reason.failure",
+          "Cancelled" -> "confirmation.payment.failed.reason.cancelled"
         )
+
+        val paymentStatusFromQueryString = request.queryString.get("paymentStatus").map(_.head)
+
+        val isPaymentSuccessful = !request.queryString.contains("paymentStatus")
 
         val result = for {
           (status, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
@@ -93,14 +93,16 @@ class ConfirmationController @Inject()(
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
           _ <- doAudit(paymentStatus.currentStatus)
-        } yield (status, paymentStatus.currentStatus) match {
-          case (_, status@(PaymentStatuses.Failed | PaymentStatuses.Cancelled)) =>
-            Ok(payment_failure(msgFromPaymentStatus(status), Currency(payment.amountInPence.toDouble / 100), reference))
+        } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
+          case (_, currentPaymentStatus, false) =>
+            Ok(payment_failure(
+              msgFromPaymentStatus(paymentStatusFromQueryString.getOrElse(currentPaymentStatus.toString)),
+              Currency(payment.amountInPence.toDouble / 100), reference))
 
-          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _) =>
+          case (SubmissionReadyForReview | SubmissionDecisionApproved | RenewalSubmitted(_), _, true) =>
             Ok(payment_confirmation_amendvariation(businessName, reference))
 
-          case (ReadyForRenewal(_), _) => if (renewalData.isDefined) {
+          case (ReadyForRenewal(_), _, true) => if (renewalData.isDefined) {
             Ok(payment_confirmation_renewal(businessName, reference))
           } else {
             Ok(payment_confirmation_amendvariation(businessName, reference))
@@ -160,12 +162,12 @@ class ConfirmationController @Inject()(
 
     confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
-        case Some(rows) if fees.totalFees > 0 => {
-          isRenewalDefined match {
-            case true => Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
-            case false => Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+        case Some(rows) if fees.totalFees > 0 =>
+          if (isRenewalDefined) {
+            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+          } else {
+            Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
           }
-        }
         case _ => None
       }
     }

@@ -87,7 +87,7 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
         Messages("status.submissionreadyforreview.description2"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
-      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") must be("/anti-money-laundering/your-registration/your-messages")
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
 
     "contain 'update/amend information' content and link" in new ViewFixture {
@@ -125,10 +125,8 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
         doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
           be(Messages("status.submittedForReview.submitteddate.text", date))
         doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.submissionreadyforreview.duplicate.link"))
-        doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.duplicate.description")).text() must
-          be(Messages("status.submissionreadyforreview.duplicate.description"))
-        doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.duplicate.description2")).text() must
-          be(Messages("status.submissionreadyforreview.duplicate.description2"))
+        doc.getElementsMatchingOwnText(Messages("fee.details.dup.heading")).text() must
+          be(Messages("fee.details.dup.heading"))
       }
       "the user has elected to pay by BACS" in new ViewFixture {
         val form2 = EmptyForm
@@ -146,7 +144,8 @@ class status_submittedSpec extends GenericTestHelper with MustMatchers with Amls
         doc.getElementsContainingOwnText(Messages("status.submittedForReview.submitteddate.text")).isEmpty must be(true)
 
         doc.getElementsByTag("details").text() must include(Messages("fee.details.dup_nofees.heading"))
-
+        doc.html must include(Messages("status.fee.link"))
+        doc.html must include(Messages("fee.details.dup_nofees.heading"))
       }
 
     }

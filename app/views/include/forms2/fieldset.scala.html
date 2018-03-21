@@ -33,7 +33,7 @@
 
         @include.forms2.legend(legend, jsHidden, bold, hint, legendHidden)
         @if(f.hasErrors) {
-            <span class="error-notification">@f.error</span>
+            <span class="error-notification" data-journey="error - field:user input:@f.id">@f.error</span>
         }
         @content
 </fieldset>

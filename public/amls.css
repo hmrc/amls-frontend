@@ -54,6 +54,21 @@ a.block-link {
   }
 }
 
+/* -- Supervised status page -- */
+
+ul.list.activities-list, ul.list.activities-list li {
+  margin-bottom: 0;
+}
+
+#supervised-status-header {
+  margin-bottom: 0.75em;
+}
+
+#supervised-panel {
+  margin-top: 30px;
+}
+
+
 
 /* -- application progress page -- */
 
@@ -318,6 +333,9 @@ a.progress-step,
   .progress-step--status-time .heading-medium {
     font-size: 18px;
   }
+  .hide-if-mobile {
+    display: none;
+  }
 }
 
 @media screen and (min-width: 641px) and (max-width: 767px) {
@@ -325,8 +343,21 @@ a.progress-step,
     background-position: 90% 90%;
     background-size: 25%;
   }
+  .hide-if-desktop {
+    display: none;
+  }
 }
 
+@media screen and (min-width: 767px) {
+  .hide-if-desktop {
+    display: none;
+  }
+}
+
+div.hide-if-desktop > .messaging {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
 
 /* -- TODO: fix this – IE10+ needs a chevron kick
 @media all and

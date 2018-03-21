@@ -19,28 +19,26 @@ package controllers
 import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
-import models.{SubmissionResponse, SubscriptionResponse}
+import javax.inject.{Inject, Singleton}
 import models.status._
-import org.jsoup.HttpStatusException
-import play.api.{Logger, Play}
+import models.{SubmissionResponse, SubscriptionResponse}
+import play.api.Logger
 import services.{RenewalService, StatusService, SubmissionService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait SubmissionController extends BaseController {
-
-  private[controllers] def subscriptionService: SubmissionService
-
-  private[controllers] def statusService: StatusService
-
-  private[controllers] def renewalService: RenewalService
-
-  private[controllers] def authenticator: AuthenticatorConnector
+@Singleton
+class SubmissionController @Inject()(
+                                     val subscriptionService: SubmissionService,
+                                     val statusService: StatusService,
+                                     val renewalService: RenewalService,
+                                     val authenticator: AuthenticatorConnector,
+                                     val authConnector: AuthConnector = AMLSAuthConnector
+                                    ) extends BaseController {
 
   private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     renewalService.getRenewal flatMap {
@@ -84,12 +82,12 @@ trait SubmissionController extends BaseController {
   }
 }
 
-object SubmissionController extends SubmissionController {
-  // $COVERAGE-OFF$
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-
-  override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
-  override private[controllers] lazy val subscriptionService = Play.current.injector.instanceOf[SubmissionService]
-  override private[controllers] val statusService: StatusService = StatusService
-  override private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
-}
+//object SubmissionController extends SubmissionController {
+//  // $COVERAGE-OFF$
+//  override protected def authConnector: AuthConnector = AMLSAuthConnector
+//
+//  override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
+//  override private[controllers] lazy val subscriptionService = Play.current.injector.instanceOf[SubmissionService]
+//  override private[controllers] val statusService: StatusService = StatusService
+//  override private[controllers] lazy val authenticator = Play.current.injector.instanceOf[AuthenticatorConnector]
+//}

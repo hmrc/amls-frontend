@@ -18,7 +18,7 @@ package controllers
 
 import java.net.URLEncoder
 
-import config.ApplicationConfig
+import config.{AmlsShortLivedCache, ApplicationConfig}
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -68,14 +68,15 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
 
     val request = addToken(authRequest)
 
-    val controller = new LandingController {
-      override val enrolmentsService = mock[AuthEnrolmentsService]
-      override val landingService = mock[LandingService]
-      override val authConnector = self.authConnector
+    val controller = new LandingController(
+      enrolmentsService = mock[AuthEnrolmentsService],
+      landingService = mock[LandingService],
+      authConnector = self.authConnector,
+      auditConnector = mock[AuditConnector],
+      authService = mock[AuthService],
+      cacheConnector = mock[DataCacheConnector]
+    ){
       override val shortLivedCache = mock[ShortLivedCache]
-      override val auditConnector = mock[AuditConnector]
-      override val authService = mock[AuthService]
-      override lazy val cacheConnector = mock[DataCacheConnector]
     }
 
     when {
@@ -299,13 +300,15 @@ class LandingControllerWithAmendmentsSpec extends GenericTestHelper with Mockito
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
-    val controller = new LandingController {
-      override val landingService = mock[LandingService]
-      override val authConnector = self.authConnector
-      override val enrolmentsService = mock[AuthEnrolmentsService]
-      override def auditConnector = mock[AuditConnector]
-      override lazy val authService = mock[AuthService]
-      override lazy val cacheConnector = mock[DataCacheConnector]
+    val controller = new LandingController(
+      enrolmentsService = mock[AuthEnrolmentsService],
+      landingService = mock[LandingService],
+      authConnector = self.authConnector,
+      auditConnector = mock[AuditConnector],
+      authService = mock[AuthService],
+      cacheConnector = mock[DataCacheConnector]
+    ){
+      override val shortLivedCache = mock[ShortLivedCache]
     }
 
     when {
