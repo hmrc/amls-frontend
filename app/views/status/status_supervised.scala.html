@@ -50,7 +50,7 @@
                     <!-- <i class="icon icon-information"></i>  -->
                     <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
                 </div>
-                <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no">@regNo</p>
+                <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no-mobile">@regNo</p>
             </div>
             @endDate.map { date =>
                 <p class="heading-small">@Messages("lbl.registration.status.short")</p>
@@ -59,7 +59,7 @@
                 </p>
             }
             <div class="hide-if-desktop">
-                <p>@change_officer(name)</p>
+                <p>@change_officer(name, Some("change-officer-change-link-mobile"))</p>
             </div>
 
             <p id="deregister-services-list" class="heading-small">@Messages("status.deregister.services")</p>
