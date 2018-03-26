@@ -359,6 +359,11 @@ div.hide-if-desktop > .messaging {
   margin-bottom: 20px;
 }
 
+.lte-ie8 .hide-if-desktop {
+    display:none;
+}
+
+
 /* -- TODO: fix this – IE10+ needs a chevron kick
 @media all and
   (-ms-high-contrast: none) and (max-width: 640px),
