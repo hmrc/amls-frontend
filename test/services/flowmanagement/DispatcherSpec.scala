@@ -16,10 +16,7 @@
 
 package services.flowmanagement
 
-import models.businessmatching.{BusinessActivities, HighValueDealing}
-import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, ChangeServices, ChangeServicesAdd, NewActivitiesAtTradingPremisesYes}
 import org.scalatestplus.play.PlaySpec
-import play.api.mvc.Results.Redirect
 
 class DispatcherSpec extends PlaySpec {
 
@@ -28,34 +25,5 @@ class DispatcherSpec extends PlaySpec {
 
   }
 
-  "getRoute" must {
-    "return the services view page" when {
-      "given the 'what do you want to do' model and 'add' has been selected" in new Fixture {
-        val model = ChangeServicesAdd
-        val result = dispatcher.getRoute(model, VariationAddServiceRouting)
-
-        result mustBe Redirect(controllers.businessmatching.updateservice.routes.ChangeServicesController.get())
-
-      }
-    }
-
-    "return the 'trading premises' view page" when {
-      "given the 'which services' model" in new Fixture {
-        val model = BusinessActivities(Set(HighValueDealing))
-        val result = dispatcher.getRoute(model, VariationAddServiceRouting)
-
-        result mustBe Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
-      }
-    }
-
-    "return the 'which trading premises' view page" when {
-      "given the 'trading premises yes' model" in new Fixture {
-        val model = NewActivitiesAtTradingPremisesYes(HighValueDealing)
-        val result = dispatcher.getRoute(model, VariationAddServiceFlow)
-
-        result mustBe Redirect(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get(0))
-      }
-    }
-  }
 
 }

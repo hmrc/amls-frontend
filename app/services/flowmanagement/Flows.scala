@@ -16,12 +16,7 @@
 
 package services.flowmanagement
 
-import play.api.mvc.Result
-import services.flowmanagement.routings.{VariationAddServiceRouting, VariationRemoveServiceRouting}
+sealed trait Flow
 
-class Dispatcher() {
-  def getRoute[T, F <: Flow](model: T, flow: F): Result = flow match {
-    case VariationAddServiceFlow => VariationAddServiceRouting.getRoute(model)
-    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(model)
-  }
-}
+case object VariationAddServiceFlow extends Flow
+case object VariationRemoveServiceFlow extends Flow

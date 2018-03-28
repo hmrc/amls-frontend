@@ -14,14 +14,19 @@
  * limitations under the License.
  */
 
-package services.flowmanagement
+package services.flowmanagement.routings
 
+import controllers.businessmatching.updateservice.routes
+import models.businessmatching.updateservice.{ChangeServicesRemove}
 import play.api.mvc.Result
-import services.flowmanagement.routings.{VariationAddServiceRouting, VariationRemoveServiceRouting}
+import play.api.mvc.Results.Redirect
 
-class Dispatcher() {
-  def getRoute[T, F <: Flow](model: T, flow: F): Result = flow match {
-    case VariationAddServiceFlow => VariationAddServiceRouting.getRoute(model)
-    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(model)
+object VariationRemoveServiceRouting {
+
+  implicit def getRoute[T](model: T): Result = model match {
+
+    //placeholder - doesn't actually go to the correct page
+    case ChangeServicesRemove => Redirect(routes.ChangeServicesController.get())
+
   }
 }
