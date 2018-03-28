@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import models.status.SubmissionDecisionApproved
+import models.status._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
@@ -31,10 +31,10 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusSe
 
       statusService.getStatus map { status =>
         val nextPageUrl = status match {
-          case SubmissionDecisionApproved =>
-            routes.BusinessFranchiseController.get().url
-          case _ =>
+          case NotCompleted | SubmissionReady | SubmissionReadyForReview =>
             routes.InvolvedInOtherController.get().url
+          case _ =>
+            routes.BusinessFranchiseController.get().url
         }
 
         Ok(what_you_need(nextPageUrl))

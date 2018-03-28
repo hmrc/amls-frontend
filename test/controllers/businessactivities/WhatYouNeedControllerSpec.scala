@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -48,6 +48,28 @@ class WhatYouNeeControllerSpec extends GenericTestHelper with MockitoSugar with 
 
         "performing a variation" in new Fixture {
           mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+        }
+
+        "in a renewal pending status" in new Fixture {
+          mockApplicationStatus(ReadyForRenewal(None))
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+        }
+
+        "in a renewal submitted status" in new Fixture {
+          mockApplicationStatus(RenewalSubmitted(None))
 
           val result = controller.get(request)
           status(result) must be(OK)
