@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@(nextPageUrl: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.businessactivities")
@@ -37,11 +37,12 @@
     </ul>
 
     @anchor(
-        attrHref = controllers.businessactivities.routes.InvolvedInOtherController.get().toString,
+        attrHref = nextPageUrl,
         attrRole = true,
         linkText = Messages("button.continue"),
         visuallyhidden = Messages("summary.businessactivities"),
-        returnLink = true
+        returnLink = true,
+        id = Some("next-page")
     )
 
 }
