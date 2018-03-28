@@ -16,21 +16,28 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import controllers.BaseController
+import javax.inject.{Inject, Singleton}
+import models.status.SubmissionDecisionApproved
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
-import scala.concurrent.Future
-
-trait WhatYouNeedController extends BaseController {
+@Singleton
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(what_you_need()))
-  }
-}
 
-object WhatYouNeedController extends WhatYouNeedController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
+      statusService.getStatus map { status =>
+        val nextPageUrl = status match {
+          case SubmissionDecisionApproved =>
+            routes.BusinessFranchiseController.get().url
+          case _ =>
+            routes.InvolvedInOtherController.get().url
+        }
+
+        Ok(what_you_need(nextPageUrl))
+      }
+  }
 }
