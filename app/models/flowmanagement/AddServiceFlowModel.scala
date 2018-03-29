@@ -14,27 +14,28 @@
  * limitations under the License.
  */
 
-package models.businessmatching.updateservice
+package models.flowmanagement
 
 import models.businessmatching.BusinessActivities
+import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, TradingPremisesActivities}
 import play.api.libs.json.Json
 
-case class AddServiceFlowModel (
+case class AddServiceFlowModel(
                                  businessActivities: Option[BusinessActivities] = None,
                                  areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
                                  tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
                                  tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
-                                ) {
+                                )  extends FlowModel {
 
     def isComplete: Boolean = this match {
-      case UpdateService(Some(_), Some(_), Some(_), false) => true
-      case UpdateService(Some(NewActivitiesAtTradingPremisesNo), _, Some(_), false) => true
+      case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_)) => true
+      case AddServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_)) => true
       case _ => false
     }
 
   }
 
-  object UpdateService{
+  object AddServiceFlowModel{
 
     val key = "updateservice"
 

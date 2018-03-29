@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package services.flowmanagement
+package models.flowmanagement
 
-import models.flowmanagement.{AddServiceFlowModel, AddServiceFlowPageId, FlowModel, PageId}
-import play.api.mvc.Result
-import play.libs.F
-import services.flowmanagement.routings.{VariationAddServiceRouting, VariationRemoveServiceRouting}
+trait FlowModel {
 
-class Dispatcher() {
-  def getRoute[P <: PageId, T <: FlowModel, F <: Flow](pageId: P, model: T, flow: F): Result = flow match {
-    case VariationAddServiceFlow => VariationAddServiceRouting.getRoute(pageId, model.asInstanceOf[AddServiceFlowModel])
-    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(model)
-  }
 }

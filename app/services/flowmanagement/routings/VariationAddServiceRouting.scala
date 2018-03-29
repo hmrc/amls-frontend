@@ -17,27 +17,46 @@
 package services.flowmanagement.routings
 
 import controllers.businessmatching.updateservice.routes
-import models.businessmatching.BusinessActivities
-import models.businessmatching.updateservice.{ChangeServicesAdd, NewActivitiesAtTradingPremisesNo, NewActivitiesAtTradingPremisesYes, TradingPremisesActivities}
+import models.businessmatching._
+import models.businessmatching.updateservice._
+import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 
+
 object VariationAddServiceRouting {
 
-  implicit def getRoute[T](model: T): Result = model match {
-    case ChangeServicesAdd => Redirect(routes.ChangeServicesController.get())
+   def getRoute(pageId: PageId, model: AddServiceFlowModel): Result = pageId match {
+    case WhatDoYouWantToDoPageId => Redirect(routes.ChangeServicesController.get())
 
-    case _: BusinessActivities =>
+    case BusinessActivitiesSelectionPageId =>
       Redirect(routes.TradingPremisesController.get(0))
 
-    case _: NewActivitiesAtTradingPremisesYes =>
-      Redirect(routes.WhichTradingPremisesController.get(0))
+    case TradingPremisesDecisionPageId => {
+      model.areNewActivitiesAtTradingPremises match {
+        case Some(NewActivitiesAtTradingPremisesYes(_)) =>
+          Redirect(routes.WhichTradingPremisesController.get(0))
+        case _ =>
+          Redirect(routes.UpdateServicesSummaryController.get())
+      }
+    }
 
-    case tradingPremisesList : TradingPremisesActivities => {
-      
+    case TradingPremisesSelectionPageId => {
       Redirect(routes.UpdateServicesSummaryController.get())
     }
-    case NewActivitiesAtTradingPremisesNo =>
-      Redirect(routes.UpdateServicesSummaryController.get())
+
+    case AddServiceSummaryPageId =>
+      val informationRequired: Boolean = model.businessActivities exists { activities =>
+        activities.businessActivities.intersect(Set(HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, EstateAgentBusinessService, AccountancyServices)).nonEmpty
+      }
+
+      if (informationRequired) {
+        Redirect(routes.NewServiceInformationController.get())
+      } else {
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+
+    case NewServiceInformationPageId =>
+      Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }

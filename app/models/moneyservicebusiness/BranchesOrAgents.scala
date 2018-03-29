@@ -44,10 +44,10 @@ sealed trait BranchesOrAgents0 {
       import utils.MappingUtils.Implicits.RichRule
       import TraversableValidators._
 
-       implicit val emptyToNone: String => Option[String] = {
-          case "" => None
-          case s => Some(s)
-       }
+      implicit val emptyToNone: String => Option[String] = {
+        case "" => None
+        case s => Some(s)
+      }
 
       val boolR =
         bR andThen {
