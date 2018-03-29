@@ -17,16 +17,16 @@
 package services.flowmanagement.routings
 
 import controllers.businessmatching.updateservice.routes
-import models.businessmatching.updateservice.{ChangeServicesRemove}
+import models.flowmanagement.{RemoveServiceFlowPageId, UpdateServiceFlowModel, WhatServiceToRemovePageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 
 object VariationRemoveServiceRouting {
 
-  implicit def getRoute[T](model: T): Result = model match {
+  def getRoute(pageId: RemoveServiceFlowPageId, model: UpdateServiceFlowModel): Result = pageId match {
 
     //placeholder - doesn't actually go to the correct page
-    case ChangeServicesRemove => Redirect(routes.ChangeServicesController.get())
+    case WhatServiceToRemovePageId => Redirect(routes.ChangeServicesController.get())
 
   }
 }

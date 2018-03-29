@@ -26,7 +26,7 @@ import play.api.mvc.Results.Redirect
 
 object VariationAddServiceRouting {
 
-   def getRoute(pageId: PageId, model: AddServiceFlowModel): Result = pageId match {
+   def getRoute(pageId: AddServiceFlowPageId, model: UpdateServiceFlowModel): Result = pageId match {
     case WhatDoYouWantToDoPageId => Redirect(routes.ChangeServicesController.get())
 
     case BusinessActivitiesSelectionPageId =>

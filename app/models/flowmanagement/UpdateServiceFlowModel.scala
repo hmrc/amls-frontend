@@ -20,7 +20,7 @@ import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, TradingPremisesActivities}
 import play.api.libs.json.Json
 
-case class AddServiceFlowModel(
+case class UpdateServiceFlowModel(
                                  businessActivities: Option[BusinessActivities] = None,
                                  areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
                                  tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
@@ -28,17 +28,17 @@ case class AddServiceFlowModel(
                                 )  extends FlowModel {
 
     def isComplete: Boolean = this match {
-      case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_)) => true
-      case AddServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_)) => true
+      case UpdateServiceFlowModel(Some(_), Some(_), Some(_), Some(_)) => true
+      case UpdateServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_)) => true
       case _ => false
     }
 
   }
 
-  object AddServiceFlowModel{
+  object UpdateServiceFlowModel{
 
     val key = "updateservice"
 
-    implicit val addServiceFlowModelformat = Json.format[AddServiceFlowModel]
+    implicit val updateServiceFlowModelformat = Json.format[UpdateServiceFlowModel]
 
   }

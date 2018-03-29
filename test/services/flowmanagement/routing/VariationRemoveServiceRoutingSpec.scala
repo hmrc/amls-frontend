@@ -16,10 +16,11 @@
 
 package services.flowmanagement.routing
 
-import models.businessmatching.updateservice.ChangeServicesRemove
+import models.businessmatching.{BusinessActivities, HighValueDealing}
+import models.flowmanagement.{UpdateServiceFlowModel, WhatServiceToRemovePageId}
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
-import services.flowmanagement.routings.{VariationRemoveServiceRouting}
+import services.flowmanagement.routings.VariationRemoveServiceRouting
 
 
 class VariationRemoveServiceRoutingSpec extends PlaySpec {
@@ -31,7 +32,9 @@ class VariationRemoveServiceRoutingSpec extends PlaySpec {
   "getRoute" must {
     "return the services view page 'PLACEHOLDER -- NOT THE CORRECT PAGE -- JUST FOR DEMO'" when {
       "given the 'ChangeServicesRemove' model " in new Fixture {
-        val result = routingFile.getRoute(ChangeServicesRemove)
+        val model = UpdateServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))))
+        val result = routingFile.getRoute(WhatServiceToRemovePageId, model)
+
 
         result mustBe Redirect(controllers.businessmatching.updateservice.routes.ChangeServicesController.get())
       }

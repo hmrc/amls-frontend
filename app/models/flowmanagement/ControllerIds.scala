@@ -27,7 +27,9 @@ case object TradingPremisesSelectionPageId extends AddServiceFlowPageId
 case object AddServiceSummaryPageId extends AddServiceFlowPageId
 case object NewServiceInformationPageId extends AddServiceFlowPageId
 
+
 sealed trait RemoveServiceFlowPageId extends PageId
+
 case object WhatServiceToRemovePageId extends RemoveServiceFlowPageId
 case object WhatDateRemovedPageId extends RemoveServiceFlowPageId
 case object NeedToUpdatePageId extends RemoveServiceFlowPageId

@@ -16,14 +16,13 @@
 
 package services.flowmanagement
 
-import models.flowmanagement.{AddServiceFlowModel, AddServiceFlowPageId, FlowModel, PageId}
+import models.flowmanagement._
 import play.api.mvc.Result
-import play.libs.F
 import services.flowmanagement.routings.{VariationAddServiceRouting, VariationRemoveServiceRouting}
 
 class Dispatcher() {
   def getRoute[P <: PageId, T <: FlowModel, F <: Flow](pageId: P, model: T, flow: F): Result = flow match {
-    case VariationAddServiceFlow => VariationAddServiceRouting.getRoute(pageId, model.asInstanceOf[AddServiceFlowModel])
-    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(model)
+    case VariationAddServiceFlow => VariationAddServiceRouting.getRoute(pageId.asInstanceOf[AddServiceFlowPageId], model.asInstanceOf[UpdateServiceFlowModel])
+    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(pageId.asInstanceOf[RemoveServiceFlowPageId], model.asInstanceOf[UpdateServiceFlowModel])
   }
 }
