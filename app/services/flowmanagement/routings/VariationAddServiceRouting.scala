@@ -18,7 +18,7 @@ package services.flowmanagement.routings
 
 import controllers.businessmatching.updateservice.routes
 import models.businessmatching.BusinessActivities
-import models.businessmatching.updateservice.{ChangeServicesAdd, NewActivitiesAtTradingPremisesYes, NewActivitiesAtTradingPremisesNo}
+import models.businessmatching.updateservice.{ChangeServicesAdd, NewActivitiesAtTradingPremisesNo, NewActivitiesAtTradingPremisesYes, TradingPremisesActivities}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 
@@ -33,7 +33,11 @@ object VariationAddServiceRouting {
     case _: NewActivitiesAtTradingPremisesYes =>
       Redirect(routes.WhichTradingPremisesController.get(0))
 
-    case _: NewActivitiesAtTradingPremisesNo =>
-      Redirect(routes..get(0))
+    case tradingPremisesList : TradingPremisesActivities => {
+      
+      Redirect(routes.UpdateServicesSummaryController.get())
+    }
+    case NewActivitiesAtTradingPremisesNo =>
+      Redirect(routes.UpdateServicesSummaryController.get())
   }
 }
