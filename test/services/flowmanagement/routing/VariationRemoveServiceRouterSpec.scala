@@ -14,12 +14,15 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package services.flowmanagement.routing
 
-import models.flowmanagement.{FlowModel, PageId}
-import play.api.mvc.Result
-import play.libs.F
-import services.flowmanagement.Flow
+import models.flowmanagement.RemoveServiceFlowModel
+import org.scalatestplus.play.PlaySpec
+import services.flowmanagement.Router
+import services.flowmanagement.routings.VariationRemoveServiceRouter._
 
-
-
+class VariationRemoveServiceRouterSpec extends PlaySpec {
+  trait Fixture {
+    val routingFile = implicitly[Router[RemoveServiceFlowModel]]
+  }
+}

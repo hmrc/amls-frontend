@@ -16,7 +16,9 @@
 
 package services.flowmanagement
 
-sealed trait Flow
+import models.flowmanagement.PageId
+import play.api.mvc.Result
 
-case object VariationAddServiceFlow extends Flow
-case object VariationRemoveServiceFlow extends Flow
+trait Router[A] {
+  def getRoute(pageId: PageId, model: A): Result
+}

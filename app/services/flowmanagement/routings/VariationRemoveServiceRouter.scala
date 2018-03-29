@@ -14,20 +14,15 @@
  * limitations under the License.
  */
 
-import models.flowmanagement.{PageId, UpdateServiceFlowModel}
+package services.flowmanagement.routings
+
+import models.flowmanagement.{PageId, RemoveServiceFlowModel}
 import play.api.mvc.Result
+import services.flowmanagement.Router
 
-trait Route[A] {
-  def go(a: A, pageId: PageId): Result
-}
+object VariationRemoveServiceRouter {
 
-object Route {
-
-  implicit val stringRoute: Route[UpdateServiceFlowModel] =
-    new Route[UpdateServiceFlowModel] {
-      override def go(a: UpdateServiceFlowModel): Result =
-        ???
-    }
-
-  implicitly[Route[UpdateServiceFlowModel]].go(???)
+  implicit val router = new Router[RemoveServiceFlowModel] {
+    override def getRoute(pageId: PageId, model: RemoveServiceFlowModel): Result = ???
+  }
 }

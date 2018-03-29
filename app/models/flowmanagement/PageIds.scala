@@ -14,19 +14,19 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package models.flowmanagement
 
-import controllers.businessmatching.updateservice.routes
-import models.flowmanagement.{RemoveServiceFlowPageId, UpdateServiceFlowModel, WhatServiceToRemovePageId}
-import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
+sealed trait PageId
 
-object VariationRemoveServiceRouting {
+// Add service flow
+case object WhatDoYouWantToDoPageId extends PageId
+case object BusinessActivitiesSelectionPageId extends PageId
+case object TradingPremisesDecisionPageId extends PageId
+case object TradingPremisesSelectionPageId extends PageId
+case object AddServiceSummaryPageId extends PageId
+case object NewServiceInformationPageId extends PageId
 
-  def getRoute(pageId: RemoveServiceFlowPageId, model: UpdateServiceFlowModel): Result = pageId match {
-
-    //placeholder - doesn't actually go to the correct page
-    case WhatServiceToRemovePageId => Redirect(routes.ChangeServicesController.get())
-
-  }
-}
+// Remove service flow
+case object WhatServiceToRemovePageId extends PageId
+case object WhatDateRemovedPageId extends PageId
+case object NeedToUpdatePageId extends PageId

@@ -21,22 +21,20 @@ import models.businessmatching.{BillPaymentServices, BusinessActivities, HighVal
 import models.flowmanagement._
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
-import services.flowmanagement.routings.VariationAddServiceRouting
+import services.flowmanagement._
+import services.flowmanagement.routings.VariationAddServiceRouter._
 
-
-class VariationAddServiceRoutingSpec extends PlaySpec {
+class VariationAddServiceRouterSpec extends PlaySpec {
 
   trait Fixture {
-
-    val routingFile = VariationAddServiceRouting
-
+    val routingFile = implicitly[Router[AddServiceFlowModel]]
   }
 
   "getRoute" must {
 
     "return the 'trading premises' page" when {
       "given the 'BusinessActivities' model contains a single activity" in new Fixture {
-        val model = UpdateServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))))
+        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))))
         val result = routingFile.getRoute(BusinessActivitiesSelectionPageId, model)
 
         result mustBe Redirect(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0))
@@ -45,7 +43,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'Check your answers' page" when {
       "given the activity is not done at any trading premises" in new Fixture {
-        val model = UpdateServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesNo))
+        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesNo))
         val result = routingFile.getRoute(TradingPremisesDecisionPageId, model)
 
         result mustBe Redirect(controllers.businessmatching.updateservice.routes.UpdateServicesSummaryController.get())
@@ -54,7 +52,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'which trading premises' page" when {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
-        val model = UpdateServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
         val result = routingFile.getRoute(TradingPremisesDecisionPageId, model)
 
         result mustBe Redirect(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get(0))
@@ -63,7 +61,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'Check your answers' page" when {
       "given a set of trading premises has been chosen" in new Fixture {
-        val model = UpdateServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))),
+        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))),
           Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
           Some(TradingPremisesActivities(Set(0,1,2)))
         )
@@ -76,7 +74,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'new service information' page" when {
       "we're on the summary page and a business activity has been chosen which requires more questions" in new Fixture {
-        val model = UpdateServiceFlowModel(
+        val model = AddServiceFlowModel(
           Some(BusinessActivities(Set(HighValueDealing))),
           Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
 
@@ -88,7 +86,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'registration progress' page" when {
       "we're on the summary page and 'Bill Payments' has been chosen as the activity to add" in new Fixture {
-        val model = UpdateServiceFlowModel(
+        val model = AddServiceFlowModel(
           Some(BusinessActivities(Set(BillPaymentServices))),
           Some(NewActivitiesAtTradingPremisesYes(BillPaymentServices)))
 
@@ -101,7 +99,7 @@ class VariationAddServiceRoutingSpec extends PlaySpec {
 
     "return the 'registration progress' page" when {
       "we're on the 'new service information' page" in new Fixture {
-        val model = UpdateServiceFlowModel(
+        val model = AddServiceFlowModel(
           Some(BusinessActivities(Set(HighValueDealing))),
           Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
 

@@ -14,16 +14,8 @@
  * limitations under the License.
  */
 
-package services.flowmanagement
+package models.flowmanagement
 
-import org.scalatestplus.play.PlaySpec
+case class RemoveServiceFlowModel(dummy: Int)
 
-class DispatcherSpec extends PlaySpec {
-
-  trait Fixture {
-    val dispatcher = new Dispatcher()
-
-  }
-
-
-}
+object RemoveServiceFlowModel
