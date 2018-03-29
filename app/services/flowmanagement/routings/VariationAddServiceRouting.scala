@@ -22,11 +22,18 @@ import models.businessmatching.updateservice._
 import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
+import play.libs.F
 
+import scala.concurrent.java8.FuturesConvertersImpl.P
 
-object VariationAddServiceRouting {
+trait RoutingInterface {
+  def getRoute[P <: PageId, T <: FlowModel](pageId: P, model: T): Result
+}
 
-   def getRoute(pageId: AddServiceFlowPageId, model: UpdateServiceFlowModel): Result = pageId match {
+object VariationAddServiceRouting extends RoutingInterface {
+
+  //override def getRoute[P <: AddServiceFlowPageId, +T <: FlowModel](pageId: P, model: T): Result = pageId match {
+    def getRoute[T](pageId: PageId , model: T): Result = pageId match {
     case WhatDoYouWantToDoPageId => Redirect(routes.ChangeServicesController.get())
 
     case BusinessActivitiesSelectionPageId =>
@@ -59,4 +66,6 @@ object VariationAddServiceRouting {
     case NewServiceInformationPageId =>
       Redirect(controllers.routes.RegistrationProgressController.get())
   }
+
+  //override def getRoute[P <: PageId, T <: FlowModel, F <: Flow](pageId: P, model: T, flow: F): Result = ???
 }

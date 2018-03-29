@@ -14,15 +14,8 @@
  * limitations under the License.
  */
 
-package services.flowmanagement
-
-import models.flowmanagement._
+import models.flowmanagement.{PageId, UpdateServiceFlowModel}
 import play.api.mvc.Result
-import play.libs.F
-import services.flowmanagement.routings.{VariationAddServiceRouting, VariationRemoveServiceRouting}
-
-import scala.concurrent.java8.FuturesConvertersImpl.P
-import scala.reflect.internal.annotations
 
 trait Route[A] {
   def go(a: A, pageId: PageId): Result
@@ -35,12 +28,6 @@ object Route {
       override def go(a: UpdateServiceFlowModel): Result =
         ???
     }
-}
 
-
-class Dispatcher() {
-  def getRoute[T](pageId: PageId, model: T, flow: Flow)(implicit route: Route[T]): Result = flow match {
-    case VariationAddServiceFlow => route.go(model, pageId)//VariationAddServiceRouting.getRoute(pageId, model)
-    case VariationRemoveServiceFlow => VariationRemoveServiceRouting.getRoute(pageId.asInstanceOf[RemoveServiceFlowPageId], model.asInstanceOf[UpdateServiceFlowModel])
-  }
+  implicitly[Route[UpdateServiceFlowModel]].go(???)
 }
