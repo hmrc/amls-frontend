@@ -16,15 +16,15 @@
 
 package models.flowmanagement
 
-import models.businessmatching.BusinessActivities
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, TradingPremisesActivities}
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
-                                 businessActivities: Option[BusinessActivities] = None,
-                                 areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
-                                 tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
-                                 tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
+                                businessActivities: Option[BusinessActivities] = None,
+                                areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
+                                tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
+                                tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
                                 ) {
 
     def isComplete: Boolean = this match {
@@ -37,7 +37,7 @@ case class AddServiceFlowModel(
 
   object AddServiceFlowModel{
 
-    val key = "updateservice"
+    val key = "add-service-flow"
 
     implicit val addServiceFlowModelFormat = Json.format[AddServiceFlowModel]
 

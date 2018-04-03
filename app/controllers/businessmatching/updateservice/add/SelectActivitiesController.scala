@@ -20,64 +20,41 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.Form2
 import javax.inject.{Inject, Singleton}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, Rule, RuleLike}
-import models.FormTypes
-import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.businessmatching.BusinessActivity._
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
+import models.flowmanagement.AddServiceFlowModel
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
+import utils.RepeatingSection
+import views.html.businessmatching.updateservice.select_activities
 
 @Singleton
-class SelectActivitiesController @Inject()(
-                                            val authConnector: AuthConnector,
-                                            val businessMatchingService: BusinessMatchingService,
-                                            val statusService: StatusService,
-                                            val dataCacheConnector: DataCacheConnector
-                                          ) extends BaseController {
+class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
+                                           val statusService: StatusService,
+                                           val dataCacheConnector: DataCacheConnector,
+                                           val businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
-    FormTypes.businessActivityRule("error.required.bm.remove.service")
-
-  def get = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        statusService.isPreSubmission flatMap {
-          case false => OptionT(getActivities) map { activities =>
-            Ok(views.html.businessmatching.updateservice.remove_activities(EmptyForm, activities))
-          } getOrElse InternalServerError("Could not retrieve activities")
-          case true => Future.successful(NotFound(notFoundView))
-        }
+        (for {
+          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
+          existing <- businessMatchingService.getSubmittedBusinessActivities
+        } yield {
+          val form = Form2(model.businessActivities.getOrElse(BusinessMatchingActivities(Set.empty)))
+          val existingActivityNames = existing map {_.getMessage}
+          val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
+
+          Ok(select_activities(form, edit, activityValues, existingActivityNames, false))
+        }) getOrElse InternalServerError("Failed to get activities")
   }
 
-  def post = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
-      implicit request =>
-        import jto.validation.forms.Rules._
-        OptionT(getActivities) map { activities =>
-          Form2[BusinessActivities](request.body) match {
-            case ValidForm(_, data) =>
-              if (data.businessActivities.size < activities.size) {
-                Redirect(controllers.businessmatching.updateservice.remove.routes.UpdateServiceDateOfChangeController.get(data.businessActivities map BusinessActivities.getValue mkString "/"))
-              } else {
-                Redirect(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get())
-              }
-            case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.remove_activities(f, activities))
-          }
-        } getOrElse InternalServerError("Could not retrieve activities")
-  }
-
-  private def getActivities(implicit hc: HeaderCarrier, ac: AuthContext) = businessMatchingService.getModel.value map { bm =>
-    for {
-      businessMatching <- bm
-      businessActivities <- businessMatching.activities
-    } yield businessActivities.businessActivities map BusinessActivities.getValue
+      implicit request => ???
   }
 
 }

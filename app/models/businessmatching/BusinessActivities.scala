@@ -110,6 +110,16 @@ object BusinessActivities {
 
   import utils.MappingUtils.Implicits._
 
+  val all: Set[BusinessActivity] = Set(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  )
+
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     FormTypes.businessActivityRule("error.required.bm.register.service")
 
