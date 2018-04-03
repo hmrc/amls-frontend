@@ -20,16 +20,20 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.Form2
+import forms.{Form2, InvalidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.AddServiceFlowModel
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.select_activities
+
+import scala.concurrent.ExecutionContext
 
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
@@ -42,19 +46,38 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
-          existing <- businessMatchingService.getSubmittedBusinessActivities
+          (names, values) <- getFormData
         } yield {
           val form = Form2(model.businessActivities.getOrElse(BusinessMatchingActivities(Set.empty)))
-          val existingActivityNames = existing map {_.getMessage}
-          val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
 
-          Ok(select_activities(form, edit, activityValues, existingActivityNames, false))
+          Ok(select_activities(form, edit, values, names, false))
         }) getOrElse InternalServerError("Failed to get activities")
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+        import jto.validation.forms.Rules._
+
+        Form2[BusinessMatchingActivities](request.body) match {
+          case f: InvalidForm => getFormData map {
+            case (names, values) =>
+              BadRequest(select_activities(f, edit, values, names, false))
+          } getOrElse InternalServerError("Could not get form data")
+        }
+  }
+
+  private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
+    existing <- businessMatchingService.getSubmittedBusinessActivities
+  } yield {
+
+    val existingActivityNames = existing map {
+      _.getMessage
+    }
+
+    val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
+
+    (existingActivityNames, activityValues)
   }
 
 }

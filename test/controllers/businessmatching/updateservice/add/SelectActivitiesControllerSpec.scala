@@ -56,4 +56,17 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     }
   }
 
+  "post" must {
+    "return a bad request when no data has been posted" in new Fixture {
+
+      when {
+        controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+
+      val result = controller.post()(request.withFormUrlEncodedBody())
+
+      status(result) mustBe BAD_REQUEST
+    }
+  }
+
 }
