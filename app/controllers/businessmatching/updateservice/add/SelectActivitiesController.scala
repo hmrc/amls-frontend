@@ -20,13 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{Form2, InvalidForm}
+import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity._
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.routings.VariationAddServiceRouter.router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -64,20 +65,25 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
             case (names, values) =>
               BadRequest(select_activities(f, edit, values, names, false))
           } getOrElse InternalServerError("Could not get form data")
+
+          case ValidForm(_, data) => {
+            dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key) flatMap { modelFromStore =>
+              val model = modelFromStore.getOrElse(AddServiceFlowModel()).copy(businessActivities = Some(data))
+              dataCacheConnector.save(AddServiceFlowModel.key, model) flatMap { _ =>
+                router.getRoute(SelectActivitiesPageId, model)
+              }
+            }
+          }
         }
   }
 
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
     existing <- businessMatchingService.getSubmittedBusinessActivities
-  } yield {
+    } yield {
+      val existingActivityNames = existing map { _.getMessage }
+      val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
 
-    val existingActivityNames = existing map {
-      _.getMessage
+      (existingActivityNames, activityValues)
     }
-
-    val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
-
-    (existingActivityNames, activityValues)
-  }
 
 }
