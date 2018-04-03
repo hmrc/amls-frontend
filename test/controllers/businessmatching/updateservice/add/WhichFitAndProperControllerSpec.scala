@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.add.WhichFitAndProperController
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
@@ -127,7 +128,7 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
           val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+          redirectLocation(result) must be(Some(add.routes.NewServiceInformationController.get().url))
 
         }
 

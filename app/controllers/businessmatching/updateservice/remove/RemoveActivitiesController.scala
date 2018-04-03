@@ -14,16 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
-
-import javax.inject.{Inject, Singleton}
+package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Path, Rule, RuleLike}
 import models.FormTypes
@@ -66,9 +64,9 @@ class RemoveActivitiesController @Inject()(
           Form2[BusinessActivities](request.body) match {
             case ValidForm(_, data) =>
               if (data.businessActivities.size < activities.size) {
-                Redirect(UpdateServiceDateOfChangeController.get(data.businessActivities map BusinessActivities.getValue mkString "/"))
+                Redirect(controllers.businessmatching.updateservice.remove.routes.UpdateServiceDateOfChangeController.get(data.businessActivities map BusinessActivities.getValue mkString "/"))
               } else {
-                Redirect(RemoveActivitiesInformationController.get())
+                Redirect(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get())
               }
             case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.remove_activities(f, activities))
           }

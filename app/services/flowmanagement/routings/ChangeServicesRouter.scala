@@ -16,15 +16,21 @@
 
 package services.flowmanagement.routings
 
-import models.flowmanagement.{PageId, RemoveServiceFlowModel}
+import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
+import models.flowmanagement.PageId
 import play.api.mvc.Result
 import services.flowmanagement.Router
+import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
 
-object VariationRemoveServiceRouter {
+object ChangeServicesRouter {
 
-  implicit val router = new Router[RemoveServiceFlowModel] {
-    override def getRoute(pageId: PageId, model: RemoveServiceFlowModel): Future[Result] = ???
+  implicit val router = new Router[ChangeServices] {
+    override def getRoute(pageId: PageId, model: ChangeServices): Future[Result] = model match {
+      case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get()))
+      case ChangeServicesRemove => ???
+    }
   }
+
 }

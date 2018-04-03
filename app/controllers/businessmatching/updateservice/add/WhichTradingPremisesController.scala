@@ -14,22 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
-
-import javax.inject.{Inject, Singleton}
+package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.routes._
+import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessActivities, BusinessActivity}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.TradingPremisesActivities
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
 import models.tradingpremises.TradingPremises
-import services.{StatusService, TradingPremisesService}
 import services.businessmatching.BusinessMatchingService
+import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -108,8 +107,8 @@ class WhichTradingPremisesController @Inject()(
         Future.successful(Redirect(TradingPremisesController.get(index + 1)))
       } else {
         businessMatchingService.fitAndProperRequired.value map {
-          case Some(true) => Redirect(FitAndProperController.get())
-          case Some(false) => Redirect(NewServiceInformationController.get())
+          case Some(true) => Redirect(controllers.businessmatching.updateservice.add.routes.FitAndProperController.get())
+          case Some(false) => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
           case _ => InternalServerError("Cannot retrieve activities")
         }
       }

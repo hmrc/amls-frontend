@@ -19,6 +19,8 @@ package services.flowmanagement
 import models.flowmanagement.PageId
 import play.api.mvc.Result
 
+import scala.concurrent.Future
+
 trait Router[A] {
-  def getRoute(pageId: PageId, model: A): Result
+  def getRoute(pageId: PageId, model: A): Future[Result]
 }

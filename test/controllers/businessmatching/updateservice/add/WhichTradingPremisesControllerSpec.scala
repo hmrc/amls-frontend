@@ -19,9 +19,10 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.add.WhichTradingPremisesController
 import models.DateOfChange
 import models.businessmatching._
-import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, TradingPremisesActivities, UpdateService}
+import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, UpdateService}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
 import org.joda.time.LocalDate
@@ -188,7 +189,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           ))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(1).url))
 
         }
       }
@@ -211,7 +212,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
+          redirectLocation(result) mustBe Some(add.routes.NewServiceInformationController.get().url)
 
         }
       }
@@ -234,7 +235,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremises[]" -> "0"))
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
+          redirectLocation(result) mustBe Some(add.routes.FitAndProperController.get().url)
 
         }
       }

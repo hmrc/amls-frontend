@@ -16,30 +16,28 @@
 
 package controllers.businessmatching.updateservice
 
-import javax.inject.Inject
-
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
+import models.businessmatching.updateservice.ChangeServices
+import models.flowmanagement.WhatDoYouWantToDoPageId
+import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.change_services
-import routes._
-import services.businessmatching.BusinessMatchingService
-
-import scala.concurrent.Future
 
 class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
                                           val businessMatchingService: BusinessMatchingService
-                                        ) extends BaseController with RepeatingSection {
+                                        )(implicit router: Router[ChangeServices]) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {
     implicit authContext =>
@@ -58,18 +56,23 @@ class ChangeServicesController @Inject()(
             OptionT(getActivities) map { activities =>
               BadRequest(change_services(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
-          case ValidForm(_, data) => data match {
-            case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
-            case ChangeServicesRemove => {
-              OptionT(getActivities) map { activities =>
-                if (activities.size < 2) {
-                  Redirect(RemoveActivitiesInformationController.get())
-                } else {
-                  Redirect(RemoveActivitiesController.get())
-                }
-              } getOrElse InternalServerError("Unable to show the page")
-            }
-          }
+          case ValidForm(_, data) =>
+                router.getRoute(WhatDoYouWantToDoPageId, data)
+
+            //case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
+//            case ChangeServicesAdd => {
+//            }
+//
+//            case ChangeServicesRemove => {
+//              OptionT(getActivities) map { activities =>
+//                if (activities.size < 2) {
+//                  Redirect(RemoveActivitiesInformationController.get())
+//                } else {
+//                  Redirect(RemoveActivitiesController.get())
+//                }
+//              } getOrElse InternalServerError("Unable to show the page")
+//            }
+
         }
       }
   }
@@ -82,6 +85,10 @@ class ChangeServicesController @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
         } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
     }
+  }
+
+  private def getMyActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext): Option[BusinessActivities]= {
+    ???
   }
 
 }

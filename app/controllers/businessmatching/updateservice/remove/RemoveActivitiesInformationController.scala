@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
-
-import javax.inject.{Inject, Singleton}
+package controllers.businessmatching.updateservice.remove
 
 import controllers.BaseController
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivities
 import play.api.i18n.Messages
 import services.businessmatching.BusinessMatchingService

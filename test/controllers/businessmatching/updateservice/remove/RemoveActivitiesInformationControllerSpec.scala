@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessMatching
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
@@ -33,8 +33,8 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RemoveActivitiesInformationControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers with BusinessMatchingGenerator {
 

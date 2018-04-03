@@ -282,7 +282,7 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0).url)
         }
       }
       "UpdateService is not defined" which {
@@ -309,7 +309,7 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0).url)
         }
       }
     }

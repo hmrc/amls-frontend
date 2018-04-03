@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar

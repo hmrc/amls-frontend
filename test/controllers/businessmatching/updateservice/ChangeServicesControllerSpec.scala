@@ -120,7 +120,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.get().url))
 
         }
       }
@@ -136,7 +136,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesInformationController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get().url))
 
         }
       }

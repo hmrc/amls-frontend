@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
-
-import javax.inject.{Inject, Singleton}
+package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.routes._
+import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import controllers.businessmatching.updateservice.remove.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.DateOfChange
 import models.businessactivities.{BusinessActivities => ba}
 import models.businessmatching._
@@ -102,7 +102,7 @@ class UpdateServiceDateOfChangeController @Inject()(
                 accountantForAMLSRegulationsRequired <- OptionT.pure[Future, Boolean](accountantForAMLSRegulationsRequired(updatedBusinessActivities))
                 baWithAccountantForAMLSRegulations <- OptionT.pure[Future, ba](withAccountantForAMLSRegulations(businessActivities))
                 _ <- maybeRemoveAccountantForAMLSRegulations(baWithAccountantForAMLSRegulations, accountantForAMLSRegulationsRequired)
-              } yield Redirect(UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
+              } yield Redirect(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get())) getOrElse InternalServerError("Cannot remove business activities")
             case f:InvalidForm => Future.successful(BadRequest(view(f, activitiesInRequest)))
           }
           case Left(badRequest) => Future.successful(badRequest)
@@ -174,6 +174,6 @@ class UpdateServiceDateOfChangeController @Inject()(
     }
 
   private def view(f: Form2[_], services: String)(implicit request: Request[_]) =
-    views.html.date_of_change(f, "summary.updateservice", UpdateServiceDateOfChangeController.post(services))
+    views.html.date_of_change(f, "summary.updateservice", controllers.businessmatching.updateservice.remove.routes.UpdateServiceDateOfChangeController.post(services))
 
 }

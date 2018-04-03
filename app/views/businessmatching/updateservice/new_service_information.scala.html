@@ -39,7 +39,7 @@
 
     <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
 
-    @form(EmptyForm, controllers.businessmatching.updateservice.routes.NewServiceInformationController.post()) {
+    @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.post()) {
         <input type="hidden" name="redirectUrl" value="@flowUrl">
         @submit(false, Some("Continue"), false)
     }

@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.add
 
-import java.lang.ProcessBuilder.Redirect
-
-import javax.inject.{Inject, Singleton}
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.status.{NotCompleted, SubmissionReady}
@@ -31,10 +31,8 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import routes._
 
 import scala.concurrent.Future
-import cats.implicits._
 
 @Singleton
 class TradingPremisesController @Inject()(
@@ -66,14 +64,17 @@ class TradingPremisesController @Inject()(
   }
 
   private def redirectTo(data: AreNewActivitiesAtTradingPremises, additionalActivities: Set[BusinessActivity], index: Int)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Result] = data match {
+
+
+
     case NewActivitiesAtTradingPremisesYes(_) => Future.successful(Redirect(WhichTradingPremisesController.get(index)))
     case NewActivitiesAtTradingPremisesNo =>
       if (activitiesToIterate(index, additionalActivities)) {
         Future.successful(Redirect(TradingPremisesController.get(index + 1)))
       } else {
         (businessMatchingService.fitAndProperRequired map {
-          case true => Redirect(FitAndProperController.get())
-          case false => Redirect(NewServiceInformationController.get())
+          case true => Redirect(controllers.businessmatching.updateservice.add.routes.FitAndProperController.get())
+          case false => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
         }) getOrElse InternalServerError("Cannot retrieve activities")
       }
   }

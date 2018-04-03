@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import models.asp.Asp
 import models.businessmatching._
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}

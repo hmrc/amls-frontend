@@ -22,7 +22,10 @@ import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import controllers.businessmatching.updateservice.routes
+import controllers.businessmatching.updateservice.add.{ routes => addRoutes }
 import services.flowmanagement.Router
+
+import scala.concurrent.Future
 
 object VariationAddServiceRouter {
 
@@ -33,24 +36,24 @@ object VariationAddServiceRouter {
     EstateAgentBusinessService,
     AccountancyServices)
 
-  implicit val route = new Router[AddServiceFlowModel] {
-    override def getRoute(pageId: PageId, model: AddServiceFlowModel): Result = pageId match {
+  implicit val router = new Router[AddServiceFlowModel] {
+    override def getRoute(pageId: PageId, model: AddServiceFlowModel): Future[Result] = pageId match {
 
-      case WhatDoYouWantToDoPageId => Redirect(routes.ChangeServicesController.get())
+      case WhatDoYouWantToDoPageId => Future.successful(Redirect(routes.ChangeServicesController.get()))
 
       case BusinessActivitiesSelectionPageId =>
-        Redirect(routes.TradingPremisesController.get(0))
+        Future.successful(Redirect(addRoutes.TradingPremisesController.get(0)))
 
       case TradingPremisesDecisionPageId =>
         model.areNewActivitiesAtTradingPremises match {
           case Some(NewActivitiesAtTradingPremisesYes(_)) =>
-            Redirect(routes.WhichTradingPremisesController.get(0))
+            Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(0)))
           case _ =>
-            Redirect(routes.UpdateServicesSummaryController.get())
+            Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
       case TradingPremisesSelectionPageId =>
-        Redirect(routes.UpdateServicesSummaryController.get())
+        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
       case AddServiceSummaryPageId =>
         val informationRequired: Boolean = model.businessActivities exists { activities =>
@@ -58,13 +61,13 @@ object VariationAddServiceRouter {
         }
 
         if (informationRequired) {
-          Redirect(routes.NewServiceInformationController.get())
+          Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
         } else {
-          Redirect(controllers.routes.RegistrationProgressController.get())
+          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
         }
 
       case NewServiceInformationPageId =>
-        Redirect(controllers.routes.RegistrationProgressController.get())
+        Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
     }
   }
 }

@@ -39,6 +39,6 @@ case class AddServiceFlowModel(
 
     val key = "updateservice"
 
-    implicit val updateServiceFlowModelformat = Json.format[AddServiceFlowModel]
+    implicit val addServiceFlowModelFormat = Json.format[AddServiceFlowModel]
 
   }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
@@ -22,10 +22,8 @@ import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.businessactivities.BusinessActivities
-import models.estateagentbusiness.{EstateAgentBusiness => Eab}
-import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
@@ -142,7 +140,7 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
           ))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.UpdateAnyInformationController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url))
 
         }
       }

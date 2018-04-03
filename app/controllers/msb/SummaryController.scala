@@ -63,7 +63,7 @@ class SummaryController @Inject()
         preSubmission <- OptionT.liftF(statusService.isPreSubmission)
         isNewActivity <- OptionT.liftF(serviceFlow.inNewServiceFlow(models.businessmatching.MoneyServiceBusiness))
       } yield (preSubmission, isNewActivity) match {
-        case (false, true) => Redirect(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get())
+        case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
   }

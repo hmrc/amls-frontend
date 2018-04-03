@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
@@ -23,7 +23,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.UpdateService
 import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -31,13 +31,13 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -144,7 +144,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             ))
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.WhichTradingPremisesController.get(0).url))
+            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0).url))
 
           }
         }
