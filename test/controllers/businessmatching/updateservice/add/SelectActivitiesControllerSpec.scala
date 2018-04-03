@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.implicits._
 import cats.data.OptionT
-import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing}
+import models.businessmatching.{BillPaymentServices, BusinessActivities, BusinessActivity, HighValueDealing}
 import models.flowmanagement.AddServiceFlowModel
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -66,6 +66,17 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
       val result = controller.post()(request.withFormUrlEncodedBody())
 
       status(result) mustBe BAD_REQUEST
+    }
+
+    "return the next page in the flow when valid data has been posted" in new Fixture {
+      mockCacheFetch(Some(AddServiceFlowModel()))
+      mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing)))), Some(AddServiceFlowModel.key))
+
+      val result = controller.post()(request.withFormUrlEncodedBody(
+        "businessActivities[]" -> "04"
+      ))
+
+      status(result) mustBe SEE_OTHER
     }
   }
 
