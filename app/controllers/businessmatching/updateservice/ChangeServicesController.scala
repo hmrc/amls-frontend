@@ -24,9 +24,9 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.updateservice.ChangeServices
-import models.flowmanagement.WhatDoYouWantToDoPageId
+import models.flowmanagement.ChangeServicesPageId
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
+import services.flowmanagement.routings.ChangeServicesRouter.router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,7 +37,8 @@ class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
                                           val businessMatchingService: BusinessMatchingService
-                                        )(implicit router: Router[ChangeServices]) extends BaseController with RepeatingSection {
+                                        ) extends BaseController with RepeatingSection {
+
 
   def get = Authorised.async {
     implicit authContext =>
@@ -57,11 +58,9 @@ class ChangeServicesController @Inject()(
               BadRequest(change_services(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
-                router.getRoute(WhatDoYouWantToDoPageId, data)
+                router.getRoute(ChangeServicesPageId, data)
 
-            //case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
-//            case ChangeServicesAdd => {
-//            }
+//            case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
 //
 //            case ChangeServicesRemove => {
 //              OptionT(getActivities) map { activities =>
@@ -86,9 +85,4 @@ class ChangeServicesController @Inject()(
         } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
     }
   }
-
-  private def getMyActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext): Option[BusinessActivities]= {
-    ???
-  }
-
 }

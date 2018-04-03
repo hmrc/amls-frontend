@@ -19,11 +19,11 @@ package models.flowmanagement
 sealed trait PageId
 
 // Add service flow
-case object WhatDoYouWantToDoPageId extends PageId
-case object BusinessActivitiesSelectionPageId extends PageId
-case object TradingPremisesDecisionPageId extends PageId
-case object TradingPremisesSelectionPageId extends PageId
-case object AddServiceSummaryPageId extends PageId
+case object ChangeServicesPageId extends PageId
+case object SelectActivitiesPageId extends PageId
+case object TradingPremisesPageId extends PageId
+case object WhichTradingPremisesPageId extends PageId
+case object UpdateServiceSummaryPageId extends PageId
 case object NewServiceInformationPageId extends PageId
 
 // Remove service flow

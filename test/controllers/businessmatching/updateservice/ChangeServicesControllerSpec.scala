@@ -93,13 +93,13 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
     }
 
     "post is called" must {
-      "redirect to WhichFitAndProperController" when {
+      "redirect to RegisterServicesController" when {
         "request is add" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get().url))
         }
 
         "request is add with no activities " in new Fixture {
@@ -109,37 +109,37 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get().url))
         }
 
       }
 
-      "redirect to RemoveActivitiesController" when {
-        "request is remove" in new Fixture {
+//      "redirect to RemoveActivitiesController" when {
+//        "request is remove" in new Fixture {
+//
+//          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+//
+//          status(result) must be(SEE_OTHER)
+//          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.get().url))
+//
+//        }
+//      }
 
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.get().url))
-
-        }
-      }
-
-      "redirect to RemoveActivitiesInformationController" when {
-        "there is a single service" in new Fixture {
-
-          mockCacheGetEntry[BusinessMatching](
-            Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
-            BusinessMatching.key
-          )
-
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get().url))
-
-        }
-      }
+//      "redirect to RemoveActivitiesInformationController" when {
+//        "there is a single service" in new Fixture {
+//
+//          mockCacheGetEntry[BusinessMatching](
+//            Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
+//            BusinessMatching.key
+//          )
+//
+//          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+//
+//          status(result) must be(SEE_OTHER)
+//          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get().url))
+//
+//        }
+//      }
 
       "return BAD_REQUEST" when {
         "request is invalid" in new Fixture {

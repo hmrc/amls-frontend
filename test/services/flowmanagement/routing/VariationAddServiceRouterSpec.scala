@@ -37,7 +37,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     "return the 'trading premises' page" when {
       "given the 'BusinessActivities' model contains a single activity" in new Fixture {
         val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))))
-        val result = await(routingFile.getRoute(BusinessActivitiesSelectionPageId, model))
+        val result = await(routingFile.getRoute(SelectActivitiesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0))
       }
@@ -46,7 +46,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     "return the 'Check your answers' page" when {
       "given the activity is not done at any trading premises" in new Fixture {
         val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesNo))
-        val result = await(routingFile.getRoute(TradingPremisesDecisionPageId, model))
+        val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
       }
@@ -55,7 +55,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     "return the 'which trading premises' page" when {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
         val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
-        val result = await(routingFile.getRoute(TradingPremisesDecisionPageId, model))
+        val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0))
       }
@@ -68,7 +68,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           Some(TradingPremisesActivities(Set(0,1,2)))
         )
 
-        val result = await(routingFile.getRoute(TradingPremisesSelectionPageId, model))
+        val result = await(routingFile.getRoute(WhichTradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
       }
@@ -80,7 +80,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           Some(BusinessActivities(Set(HighValueDealing))),
           Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
 
-        val result = await(routingFile.getRoute(AddServiceSummaryPageId, model))
+        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
       }
@@ -92,7 +92,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           Some(BusinessActivities(Set(BillPaymentServices))),
           Some(NewActivitiesAtTradingPremisesYes(BillPaymentServices)))
 
-        val result = await(routingFile.getRoute(AddServiceSummaryPageId, model))
+        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
 
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }

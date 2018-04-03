@@ -17,7 +17,7 @@
 package services.flowmanagement.routing
 
 import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
-import models.flowmanagement.WhatDoYouWantToDoPageId
+import models.flowmanagement.ChangeServicesPageId
 import org.scalatestplus.play.PlaySpec
 import services.flowmanagement.Router
 import services.flowmanagement.routings._
@@ -35,7 +35,7 @@ class ChangeServicesRouterSpec extends PlaySpec {
     "return the 'service selection' page" when {
       "given the 'register a service' model" in new Fixture {
 
-        val result = router.getRoute(WhatDoYouWantToDoPageId, ChangeServicesAdd)
+        val result = router.getRoute(ChangeServicesPageId, ChangeServicesAdd)
 
         redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get().url)
 
