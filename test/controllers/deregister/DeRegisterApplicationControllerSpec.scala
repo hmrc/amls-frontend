@@ -96,7 +96,7 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
 
       "show the business activities" in new TestFixture {
         val result = controller.get()(request)
-        contentAsString(result) must include("Accountancy services")
+        contentAsString(result) must include("Accountancy service provider")
       }
 
       "contain a link to change the business activities" in new TestFixture {

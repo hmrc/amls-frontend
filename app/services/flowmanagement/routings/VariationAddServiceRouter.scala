@@ -58,7 +58,10 @@ object VariationAddServiceRouter {
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
         }
         case Some(false) => {
-          val informationRequired = model.activity.isDefined
+          val informationRequired = model.activity.exists {
+            case BillPaymentServices | TelephonePaymentService => false
+            case _ => true
+          }
 
           if (informationRequired) {
             Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))

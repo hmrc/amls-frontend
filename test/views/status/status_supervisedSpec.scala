@@ -72,7 +72,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
         doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
       }
 
-      doc.getElementById("change-registered-services").attr("href") must be(controllers.businessmatching.routes.SummaryController.get().url)
+      doc.getElementById("change-registered-services").attr("href") must be(controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url)
 
     }
 
@@ -96,7 +96,8 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
         doc.getElementsByClass("list").html() must include("<li>" + activity + "</li>")
       }
 
-      doc.getElementById("change-registered-services").attr("href") must be(controllers.businessmatching.routes.SummaryController.get().url)
+      doc.getElementById("change-registered-services").attr("href") mustBe
+        controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
 
       doc.getElementsMatchingOwnText(Messages("status.readyforrenewal.warning")).text must be
       Messages("status.readyforrenewal.warning", renewalDate)
