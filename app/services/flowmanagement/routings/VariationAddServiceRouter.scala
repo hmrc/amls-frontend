@@ -56,7 +56,8 @@ object VariationAddServiceRouter {
       case AddMoreAcivitiesPageId => model.addMoreActivities match {
         case Some(true) => {
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-        } else {
+        }
+        case Some(false) => {
           val informationRequired = model.activity.isDefined
 
           if (informationRequired) {
