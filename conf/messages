@@ -1148,6 +1148,8 @@ businessmatching.cannotchangeservices.button.text = Return to update information
 
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
+businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
+
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
