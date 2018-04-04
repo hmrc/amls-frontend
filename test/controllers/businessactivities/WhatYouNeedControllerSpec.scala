@@ -16,41 +16,71 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
-import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class WhatYouNeeControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
-    val controller = new WhatYouNeedController {
-      override val authConnector = self.authConnector
-    }
+    val request = addToken(authRequest)
+    val controller = new WhatYouNeedController(self.authConnector, mockStatusService)
   }
+
   "WhatYouNeedController" must {
-
-      "use correct services" in new Fixture {
-        WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-      }
-
     "get" must {
+      "load the page with the correct 'next page' link" when {
+        "creating a new submission" in new Fixture {
+          mockApplicationStatus(SubmissionReadyForReview)
 
-      "load the page" in new Fixture {
-        val result = controller.get(request)
-        status(result) must be(OK)
+          val result = controller.get(request)
+          status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.businessactivities") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+          val doc = Jsoup.parse(contentAsString(result))
 
-        contentAsString(result) must include(pageTitle)
+          doc.getElementById("next-page").attr("href") mustBe routes.InvolvedInOtherController.get().url
+        }
+
+        "performing a variation" in new Fixture {
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+        }
+
+        "in a renewal pending status" in new Fixture {
+          mockApplicationStatus(ReadyForRenewal(None))
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+        }
+
+        "in a renewal submitted status" in new Fixture {
+          mockApplicationStatus(RenewalSubmitted(None))
+
+          val result = controller.get(request)
+          status(result) must be(OK)
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+        }
+
       }
+
     }
   }
 }

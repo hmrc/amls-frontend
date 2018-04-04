@@ -83,7 +83,8 @@
             question = Messages("businessmatching.registerservices.title"),
             editUrl = changeActivitiesUrl,
             allowEdit = allowEdit,
-            classes = Seq("register-services")
+            classes = Seq("register-services"),
+            idTag = "edit-business-activities"
         ) {
             <ul class="list list--comma">
                 @activity.businessActivities.map { line =>
@@ -105,7 +106,8 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
-                    allowEdit = allowEdit
+                    allowEdit = allowEdit,
+                    idTag="edit-msb-services"
                 ) {
                     <ul class="list list--comma">
                     @services.msbServices.map { svc =>
