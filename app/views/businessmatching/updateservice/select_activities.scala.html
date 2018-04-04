@@ -23,11 +23,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.registerservices.other.title", "summary.updateinformation")
+    @heading("businessmatching.updateservice.selectactivities.title", "summary.updateinformation")
 }
 
 @main(
-    title = Messages("businessmatching.registerservices.title") + " - " + Messages("summary.updateinformation"),
+    title = Messages("businessmatching.updateservice.selectactivities.title") + " - " + Messages("summary.updateinformation"),
     heading = header
 ) {
 
@@ -39,7 +39,9 @@
         <p>@Messages("businessmatching.registerservices.existing")</p>
         <p>@existing.mkString(", ")</p>
     }
-    
+
+    <p>@Messages("businessmatching.updateservice.selectactivities.hint")</p>
+
     @form(f, controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.post()) {
 
         <div class="form-group">
