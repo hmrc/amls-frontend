@@ -104,7 +104,7 @@ class WhichTradingPremisesController @Inject()(
                         (implicit ac: AuthContext, hc: HeaderCarrier) = {
     updateTradingPremises(data, activity) flatMap { _ =>
       if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
-        Future.successful(Redirect(TradingPremisesController.get(index + 1)))
+        Future.successful(Redirect(TradingPremisesController.get()))
       } else {
         businessMatchingService.fitAndProperRequired.value map {
           case Some(true) => Redirect(controllers.businessmatching.updateservice.add.routes.FitAndProperController.get())

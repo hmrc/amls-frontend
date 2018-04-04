@@ -18,7 +18,7 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], activity: String, index: Int)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], activity: String)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
@@ -33,7 +33,7 @@
     heading = header
 )  {
 
-    @form(f, controllers.businessmatching.updateservice.add.routes.TradingPremisesController.post(index)) {
+    @form(f, controllers.businessmatching.updateservice.add.routes.TradingPremisesController.post()) {
 
         @fieldset(
             f = f("tradingPremisesNewActivities-fieldset"),
@@ -66,6 +66,5 @@
 
         @submit(returnLink = false)
 
-}
-
+    }
 }

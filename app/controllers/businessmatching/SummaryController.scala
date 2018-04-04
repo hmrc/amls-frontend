@@ -77,7 +77,7 @@ class SummaryController @Inject()(
           _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
         } yield {
           if (goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)) {
-            Redirect(updateservice.add.routes.TradingPremisesController.get(0))
+            Redirect(updateservice.add.routes.TradingPremisesController.get())
           } else {
             Redirect(controllers.routes.RegistrationProgressController.get())
           }

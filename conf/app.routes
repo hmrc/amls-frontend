@@ -319,8 +319,8 @@ POST        /update-information/further-updates                                 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
 
-GET         /update-service/trading-premises/:index                                   @controllers.businessmatching.updateservice.add.TradingPremisesController.get(index: Int)
-POST        /update-service/trading-premises/:index                                   @controllers.businessmatching.updateservice.add.TradingPremisesController.post(index: Int)
+GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get()
+POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post()
 
 GET         /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(index: Int)
 POST        /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(index: Int)

@@ -189,7 +189,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper with PrivateM
           ))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url))
 
         }
       }

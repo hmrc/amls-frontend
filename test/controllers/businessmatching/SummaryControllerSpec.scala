@@ -282,9 +282,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
         }
       }
+
       "UpdateService is not defined" which {
         "updates the hasAccepted flag on the model" in new Fixture {
 
@@ -309,7 +310,7 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
         }
       }
     }

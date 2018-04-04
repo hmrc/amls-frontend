@@ -60,6 +60,15 @@ trait DataCacheConnector {
    hc: HeaderCarrier
   ): Future[HttpResponse] =
     shortLivedCache.remove(cacheId)
+
+  def update[T](cacheId: String)(f: T => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]) = {
+    fetch(cacheId) flatMap {
+      case Some(t) =>
+        val $t = f(t)
+        save(cacheId, $t) map { _ => Some($t) }
+      case _ => Future.successful(None)
+    }
+  }
 }
 
 object DataCacheConnector extends DataCacheConnector {

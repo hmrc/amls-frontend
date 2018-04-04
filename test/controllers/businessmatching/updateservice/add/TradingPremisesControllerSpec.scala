@@ -18,22 +18,17 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.UpdateService
-import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.mockito.Matchers._
+import models.flowmanagement.AddServiceFlowModel
+import models.status.SubmissionDecisionApproved
+import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -42,41 +37,27 @@ import scala.concurrent.{ExecutionContext, Future}
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
-
-    self => val request = addToken(authRequest)
-
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    self =>
+    val request = addToken(authRequest)
 
     implicit val hc: HeaderCarrier = HeaderCarrier()
     implicit val authContext: AuthContext = mock[AuthContext]
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
+    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockApplicationStatus(SubmissionDecisionApproved)
 
-    mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
-    mockCacheSave[UpdateService]
-
-    val controller = app.injector.instanceOf[TradingPremisesController]
-
+    val controller = new TradingPremisesController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService
+    )
   }
 
   "TradingPremisesController" when {
 
     "get is called" must {
       "return OK with trading_premises view" in new Fixture {
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        when {
-          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
         val result = controller.get()(request)
         status(result) must be(OK)
 
@@ -86,204 +67,48 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
           ))
       }
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
-
-          mockApplicationStatus(NotCompleted)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-
-        }
-        "there are no additional services" in new Fixture {
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-
-        }
-      }
-      "return INTERNAL_SERVER_ERROR if activites cannot be retrieved" in new Fixture {
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        when {
-          controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-        } thenReturn OptionT.none[Future, Set[BusinessActivity]]
-
-        val result = controller.get()(request)
-        status(result) must be(INTERNAL_SERVER_ERROR)
-
-      }
     }
 
     "post is called" must {
 
       "with a valid request" must {
-        "redirect to WhichTradingPremises" when {
+        "redirect" when {
           "request equals Yes" in new Fixture {
 
-            mockApplicationStatus(SubmissionDecisionApproved)
-
-            when {
-              controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-            } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
 
             val result = controller.post()(request.withFormUrlEncodedBody(
-              "tradingPremisesNewActivities" -> "true",
-              "businessActivities" -> "04"
+              "tradingPremisesNewActivities" -> "true"
             ))
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0).url))
-
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(routes.WhichTradingPremisesController.get(0).url)
           }
         }
+
         "when request equals No" when {
           "progress to the 'new service information' page" when {
-            "fit and proper is not required" in new Fixture {
-
-              mockApplicationStatus(SubmissionDecisionApproved)
-
-              when {
-                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
-              when {
-                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
-              } thenReturn OptionT.some[Future, Boolean](false)
-
-              val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremisesNewActivities" -> "false"))
-
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
-
-            }
-          }
-
-          "progress to the 'fit and proper' page" when {
-            "fit and proper requirement is introduced" in new Fixture {
-
-              mockApplicationStatus(SubmissionDecisionApproved)
-
-              when {
-                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
-
-              when {
-                controller.businessMatchingService.fitAndProperRequired(any(),any(),any())
-              } thenReturn OptionT.some[Future, Boolean](true)
-
-              val result = controller.post(0)(request.withFormUrlEncodedBody("tradingPremisesNewActivities" -> "false"))
-
-              status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.FitAndProperController.get().url)
-
-            }
-          }
-        }
-        "redirect to TradingPremises" when {
-          "request equals No" when {
-            "there are more activities through which to iterate" in new Fixture {
-
-              mockApplicationStatus(SubmissionDecisionApproved)
-
-              when {
-                controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-              } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing, MoneyServiceBusiness))
+            "an activity that generates a section has been chosen" in new Fixture {
+              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing)))
 
               val result = controller.post()(request.withFormUrlEncodedBody(
                 "tradingPremisesNewActivities" -> "false"
               ))
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.TradingPremisesController.get(1).url))
-
+              status(result) mustBe SEE_OTHER
+              redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
             }
           }
         }
       }
 
       "on invalid request" must {
-
         "return badRequest" in new Fixture {
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
-
           val result = controller.post()(request)
 
-          status(result) must be(BAD_REQUEST)
-
-        }
-
-      }
-
-      "return NOT_FOUND" when {
-        "status is pre-submission" in new Fixture {
-
-          mockApplicationStatus(NotCompleted)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
-
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "tradingPremisesNewActivities" -> "false"
-          ))
-
-          status(result) must be(NOT_FOUND)
-
-        }
-        "there are no additional business activities" in new Fixture {
-
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
-
-          val result = controller.post(3)(request.withFormUrlEncodedBody(
-            "tradingPremisesNewActivities" -> "false"
-          ))
-
-          status(result) must be(NOT_FOUND)
-
+          status(result) mustBe BAD_REQUEST
         }
       }
-
-      "return INTERNAL_SERVER_ERROR" when {
-
-        "activities cannot be retrieved" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          when {
-            controller.businessMatchingService.getAdditionalBusinessActivities(any(),any(),any())
-          } thenReturn OptionT.none[Future, Set[BusinessActivity]]
-
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "tradingPremisesNewActivities" -> "false"
-          ))
-
-          status(result) must be(INTERNAL_SERVER_ERROR)
-
-        }
-
-      }
-
     }
   }
-
 }

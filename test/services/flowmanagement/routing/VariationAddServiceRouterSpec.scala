@@ -40,15 +40,28 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           activity = Some(HighValueDealing))
         val result = await(routingFile.getRoute(SelectActivitiesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0))
+        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get())
       }
     }
 
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "given the activity is not done at any trading premises" in new Fixture {
+      "given the activity is not done at any trading premises" +
+        "and the activity requires further information" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesNo))
+          areNewActivitiesAtTradingPremises = Some(false))
+        val result = await(routingFile.getRoute(TradingPremisesPageId, model))
+
+        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
+      }
+    }
+
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "given the activity is not done at any trading premises" +
+        "and the activity does NOT require further information" in new Fixture {
+        val model = AddServiceFlowModel(
+          activity = Some(BillPaymentServices),
+          areNewActivitiesAtTradingPremises = Some(false))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
@@ -59,7 +72,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+          areNewActivitiesAtTradingPremises = Some(true))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0))
@@ -70,7 +83,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       "given a set of trading premises has been chosen" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          areNewActivitiesAtTradingPremises = Some(true),
           tradingPremisesNewActivities = Some(TradingPremisesActivities(Set(0,1,2)))
         )
 
@@ -84,7 +97,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       "we're on the summary page and the user selects continue" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+          areNewActivitiesAtTradingPremises = Some(true))
 
         val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
 
@@ -97,7 +110,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         "and the use wants to add more activities" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          areNewActivitiesAtTradingPremises = Some(true),
           addMoreActivities = Some(true))
 
         val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
@@ -112,7 +125,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         "and the use doesn't want to add more activities" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          areNewActivitiesAtTradingPremises = Some(true),
           addMoreActivities = Some(false))
 
         val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
@@ -139,7 +152,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       "we're on the 'new service information' page" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
-          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+          areNewActivitiesAtTradingPremises = Some(true))
 
         val result = await(routingFile.getRoute(NewServiceInformationPageId, model))
 

@@ -16,27 +16,32 @@
 
 package models.flowmanagement
 
-import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.businessmatching.{BillPaymentServices, BusinessActivities, BusinessActivity, TelephonePaymentService}
 import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, TradingPremisesActivities}
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
                                 activity: Option[BusinessActivity] = None,
-                                areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
+                                areNewActivitiesAtTradingPremises: Option[Boolean] = None,
                                 tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
                                 tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
                                 addMoreActivities: Option[Boolean] = None
-                                ) {
+                              ) {
 
-    def isComplete: Boolean = this match {
-      case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_)) => true
-      case AddServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_), Some(_)) => true
-      case _ => false
-    }
-
+  def isComplete: Boolean = this match {
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_)) => true
+    case _ => false
   }
 
-object AddServiceFlowModel{
+  def informationRequired = this.activity.exists {
+    case BillPaymentServices | TelephonePaymentService => false
+    case _ => true
+  }
+
+}
+
+object AddServiceFlowModel {
 
   val key = "add-service-flow"
 

@@ -36,17 +36,22 @@ object VariationAddServiceRouter {
     EstateAgentBusinessService,
     AccountancyServices)
 
+  // scalastyle:off cyclomatic.complexity
   implicit val router = new Router[AddServiceFlowModel] {
+
     override def getRoute(pageId: PageId, model: AddServiceFlowModel): Future[Result] = pageId match {
 
-      case SelectActivitiesPageId => Future.successful(Redirect(addRoutes.TradingPremisesController.get(0)))
+      case SelectActivitiesPageId => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
 
       case TradingPremisesPageId =>
         model.areNewActivitiesAtTradingPremises match {
-          case Some(NewActivitiesAtTradingPremisesYes(_)) =>
+          case Some(true) =>
             Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(0)))
-          case _ =>
+          case _ => if (model.informationRequired) {
+            Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
+          } else {
             Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+          }
         }
 
       case WhichTradingPremisesPageId => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
@@ -54,22 +59,17 @@ object VariationAddServiceRouter {
       case UpdateServiceSummaryPageId => Future.successful(Redirect(addRoutes.AddMoreActivitiesController.get()))
 
       case AddMoreAcivitiesPageId => model.addMoreActivities match {
-        case Some(true) => {
+        case Some(true) =>
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-        }
-        case Some(false) => {
-          val informationRequired = model.activity.exists {
-            case BillPaymentServices | TelephonePaymentService => false
-            case _ => true
-          }
 
-          if (informationRequired) {
+        case _ =>
+          if (model.informationRequired) {
             Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
           } else {
             Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
           }
-        }
       }
+
       case NewServiceInformationPageId => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
     }
   }
