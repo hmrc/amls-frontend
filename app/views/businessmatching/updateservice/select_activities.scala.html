@@ -39,9 +39,7 @@
         <p>@Messages("businessmatching.registerservices.existing")</p>
         <p>@existing.mkString(", ")</p>
     }
-
-    <p>@Messages("lbl.select.all")</p>
-
+    
     @form(f, controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.post()) {
 
         <div class="form-group">
