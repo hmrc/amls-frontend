@@ -25,6 +25,7 @@ case object TradingPremisesPageId extends PageId
 case object WhichTradingPremisesPageId extends PageId
 case object UpdateServiceSummaryPageId extends PageId
 case object NewServiceInformationPageId extends PageId
+case object AddMoreAcivitiesPageId extends PageId
 
 // Remove service flow
 case object WhatServiceToRemovePageId extends PageId

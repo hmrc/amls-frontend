@@ -39,10 +39,11 @@ object VariationAddServiceRouter {
   implicit val router = new Router[AddServiceFlowModel] {
     override def getRoute(pageId: PageId, model: AddServiceFlowModel): Future[Result] = pageId match {
 
+
+        //Do we neeed this here - its in the ChangeServicesRouter
       case ChangeServicesPageId => Future.successful(Redirect(routes.ChangeServicesController.get()))
 
-      case SelectActivitiesPageId =>
-        Future.successful(Redirect(addRoutes.TradingPremisesController.get(0)))
+      case SelectActivitiesPageId => Future.successful(Redirect(addRoutes.TradingPremisesController.get(0)))
 
       case TradingPremisesPageId =>
         model.areNewActivitiesAtTradingPremises match {
@@ -52,22 +53,26 @@ object VariationAddServiceRouter {
             Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
-      case WhichTradingPremisesPageId =>
-        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case WhichTradingPremisesPageId => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
-      case UpdateServiceSummaryPageId =>
-        val informationRequired: Boolean = model.businessActivities exists { activities =>
-          activities.businessActivities.intersect(specialActivities).nonEmpty
-        }
+      case UpdateServiceSummaryPageId => Future.successful(Redirect(addRoutes.AddMoreActivitiesController.get()))
 
-        if (informationRequired) {
-          Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
+      case AddMoreAcivitiesPageId =>
+        if (model.addMoreActivities.getOrElse(false)) {
+          Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
         } else {
-          Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          val informationRequired: Boolean = model.businessActivities exists { activities =>
+            activities.businessActivities.intersect(specialActivities).nonEmpty
+          }
+
+          if (informationRequired) {
+            Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
+          } else {
+            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+          }
         }
 
-      case NewServiceInformationPageId =>
-        Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+      case NewServiceInformationPageId => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
     }
   }
 }

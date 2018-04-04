@@ -24,12 +24,13 @@ case class AddServiceFlowModel(
                                 businessActivities: Option[BusinessActivities] = None,
                                 areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
                                 tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
-                                tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None
+                                tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
+                                addMoreActivities: Option[Boolean] = None
                                 ) {
 
     def isComplete: Boolean = this match {
-      case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_)) => true
-      case AddServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_)) => true
+      case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_)) => true
+      case AddServiceFlowModel(Some(_), Some(NewActivitiesAtTradingPremisesNo), _, Some(_), Some(_)) => true
       case _ => false
     }
 

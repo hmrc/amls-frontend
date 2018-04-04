@@ -34,38 +34,44 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
   "getRoute" must {
 
-    "return the 'trading premises' page" when {
+    "return the 'trading premises' page (TradingPremisesController)" when {
       "given the 'BusinessActivities' model contains a single activity" in new Fixture {
-        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))))
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))))
         val result = await(routingFile.getRoute(SelectActivitiesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get(0))
       }
     }
 
-    "return the 'Check your answers' page" when {
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "given the activity is not done at any trading premises" in new Fixture {
-        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesNo))
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesNo))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
       }
     }
 
-    "return the 'which trading premises' page" when {
+    "return the 'which trading premises' page (WhichTradingPremisesController)" when {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
-        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))), Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0))
       }
     }
 
-    "return the 'Check your answers' page" when {
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "given a set of trading premises has been chosen" in new Fixture {
-        val model = AddServiceFlowModel(Some(BusinessActivities(Set(HighValueDealing))),
-          Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
-          Some(TradingPremisesActivities(Set(0,1,2)))
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          tradingPremisesNewActivities = Some(TradingPremisesActivities(Set(0,1,2)))
         )
 
         val result = await(routingFile.getRoute(WhichTradingPremisesPageId, model))
@@ -74,36 +80,66 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       }
     }
 
-    "return the 'new service information' page" when {
-      "we're on the summary page and a business activity has been chosen which requires more questions" in new Fixture {
+    "return the 'Do you want add more activities' page (addMoreActivitiesController)" when {
+      "we're on the summary page and the user selects continue" in new Fixture {
         val model = AddServiceFlowModel(
-          Some(BusinessActivities(Set(HighValueDealing))),
-          Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
 
         val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
+
+        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.AddMoreActivitiesController.get())
+      }
+    }
+
+    "return the 'Activities selection' page (SelectActivitiesController)" when {
+      "we're on the 'Do you want at add more activities' page " +
+        "and the use wants to add more activities" in new Fixture {
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          addMoreActivities = Some(true))
+
+        val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
+
+        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get())
+      }
+    }
+
+    "return the 'New Service questions' page (NewServiceInformationController)" when {
+      "we're on the 'Do you want at add more activities' page " +
+      "and the user has added Activities that require more questions" +
+        "and the use doesn't want to add more activities" in new Fixture {
+        val model = AddServiceFlowModel(
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)),
+          addMoreActivities = Some(false))
+
+        val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
 
         result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
       }
     }
 
-    "return the 'registration progress' page" when {
-      "we're on the summary page and 'Bill Payments' has been chosen as the activity to add" in new Fixture {
+    "return the 'Registration progress' page (RegistrationProgressController)" when {
+      "we're on the 'Do you want at add more activities' page " +
+        "and the user has NOT added Activities that require more questions" +
+        "and the use doesn't want to add more activities" in new Fixture {
         val model = AddServiceFlowModel(
-          Some(BusinessActivities(Set(BillPaymentServices))),
-          Some(NewActivitiesAtTradingPremisesYes(BillPaymentServices)))
+          businessActivities = Some(BusinessActivities(Set(BillPaymentServices))),
+          addMoreActivities = Some(false))
 
-        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
+        val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
 
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
 
-
     "return the 'registration progress' page" when {
       "we're on the 'new service information' page" in new Fixture {
         val model = AddServiceFlowModel(
-          Some(BusinessActivities(Set(HighValueDealing))),
-          Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
+          businessActivities = Some(BusinessActivities(Set(HighValueDealing))),
+          areNewActivitiesAtTradingPremises = Some(NewActivitiesAtTradingPremisesYes(HighValueDealing)))
 
         val result = await(routingFile.getRoute(NewServiceInformationPageId, model))
 

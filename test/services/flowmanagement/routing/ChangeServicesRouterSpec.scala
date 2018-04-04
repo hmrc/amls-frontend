@@ -32,7 +32,7 @@ class ChangeServicesRouterSpec extends PlaySpec {
   }
 
   "getRoute" must {
-    "return the 'service selection' page" when {
+    "return the 'Activities selection' page (SelectActivitiesController)" when {
       "given the 'register a service' model" in new Fixture {
 
         val result = router.getRoute(ChangeServicesPageId, ChangeServicesAdd)

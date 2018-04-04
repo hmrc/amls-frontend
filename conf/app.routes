@@ -290,6 +290,9 @@ GET         /update-information/add-person                                      
 GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
 POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
 
+GET         /update-information/add-more-activities                                   @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.get()
+POST        /update-information/add-more-activities                                   @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.post()
+
 GET         /update-information/activities-select                                     @controllers.businessmatching.updateservice.add.SelectActivitiesController.get()
 POST        /update-information/activities-select                                     @controllers.businessmatching.updateservice.add.SelectActivitiesController.post()
 
