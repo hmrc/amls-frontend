@@ -209,7 +209,7 @@ POST        /bank-details/check-your-answers                                    
 GET         /bank-details/remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
 POST        /bank-details/remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)
 
-GET         /business-activities/what-you-need                                        controllers.businessactivities.WhatYouNeedController.get()
+GET         /business-activities/what-you-need                                        @controllers.businessactivities.WhatYouNeedController.get()
 
 GET         /business-activities/franchise                                            controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
 POST        /business-activities/franchise                                            controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)

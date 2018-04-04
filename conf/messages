@@ -810,11 +810,11 @@ payments.bankdetails.bics.value = BARCGB22
 payments.bankdetails.iban.name = Account number (IBAN)
 payments.bankdetails.iban.value = GB03BARC20114783977692
 payments.bankdetails.accountnumber.name = Account number
-payments.bankdetails.accountnumber.value = 83977692
+payments.bankdetails.accountnumber.value = 12001020
 payments.bankdetails.accountname.name = Account name
 payments.bankdetails.accountname.value = HMRC Shipley Receipts
 payments.bankdetails.sortcode.name = Sort code
-payments.bankdetails.sortcode.value = 20 11 47
+payments.bankdetails.sortcode.value = 08 32 10
 payments.bankdetails.fee.name = Fee
 payments.bankdetails.reference.name = Reference
 
