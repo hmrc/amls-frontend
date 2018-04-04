@@ -59,19 +59,6 @@ class ChangeServicesController @Inject()(
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
                 router.getRoute(ChangeServicesPageId, data)
-
-//            case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
-//
-//            case ChangeServicesRemove => {
-//              OptionT(getActivities) map { activities =>
-//                if (activities.size < 2) {
-//                  Redirect(RemoveActivitiesInformationController.get())
-//                } else {
-//                  Redirect(RemoveActivitiesController.get())
-//                }
-//              } getOrElse InternalServerError("Unable to show the page")
-//            }
-
         }
       }
   }

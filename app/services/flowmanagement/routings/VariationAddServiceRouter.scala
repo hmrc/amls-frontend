@@ -39,10 +39,6 @@ object VariationAddServiceRouter {
   implicit val router = new Router[AddServiceFlowModel] {
     override def getRoute(pageId: PageId, model: AddServiceFlowModel): Future[Result] = pageId match {
 
-
-        //Do we neeed this here - its in the ChangeServicesRouter
-      case ChangeServicesPageId => Future.successful(Redirect(routes.ChangeServicesController.get()))
-
       case SelectActivitiesPageId => Future.successful(Redirect(addRoutes.TradingPremisesController.get(0)))
 
       case TradingPremisesPageId =>
@@ -57,10 +53,11 @@ object VariationAddServiceRouter {
 
       case UpdateServiceSummaryPageId => Future.successful(Redirect(addRoutes.AddMoreActivitiesController.get()))
 
-      case AddMoreAcivitiesPageId =>
-        if (model.addMoreActivities.getOrElse(false)) {
+      case AddMoreAcivitiesPageId => model.addMoreActivities match {
+        case Some(true) => {
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-        } else {
+        }
+        case Some(false) => {
           val informationRequired: Boolean = model.businessActivities exists { activities =>
             activities.businessActivities.intersect(specialActivities).nonEmpty
           }
@@ -71,7 +68,7 @@ object VariationAddServiceRouter {
             Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
           }
         }
-
+      }
       case NewServiceInformationPageId => Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
     }
   }

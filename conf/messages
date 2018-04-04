@@ -120,6 +120,7 @@ error.required.atb.lettersaddress = Select yes if this is the right address to s
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
 error.businessmatching.updateservice.responsiblepeople = Select one option to show which responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add more activities
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
@@ -1151,6 +1152,10 @@ businessmatching.updateservice.currenttradingpremises.header = Will you still do
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?
+
+
+businessmatching.updateservice.addmoreactivities.title = Do you want to add more business activities?
+businessmatching.updateservice.addmoreactivities.header = Do you want to add more business activities?
 
 businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.fitandproper.header = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?

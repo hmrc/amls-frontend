@@ -16,45 +16,66 @@
 
 package controllers.businessmatching.updateservice.add
 
+import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice._
-import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.status.{NotCompleted, SubmissionReady}
-import play.api.mvc.{Request, Result}
+import models.businessmatching.BusinessMatching
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.routings.VariationAddServiceRouter.router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import scala.concurrent.Future
+import utils.BooleanFormReadWrite
 
 @Singleton
 class AddMoreActivitiesController @Inject()(
                                            val authConnector: AuthConnector,
-                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService
                                          ) extends BaseController {
 
-  def get(index: Int = 0) = Authorised.async {
-    implicit authContext =>
-      implicit request => Future.successful(Ok(views.html.businessmatching.updateservice.add_more_activities(EmptyForm)))
 
+  val fieldName = "addmoreactivities"
+
+  implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)
+  implicit val boolRead = BooleanFormReadWrite.formRule(fieldName, "error.businessmatching.updateservice.addmoreactivities")
+
+  def get() = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        (for {
+          activities <- OptionT(getActivities)
+          preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
+        } yield Ok(views.html.businessmatching.updateservice.add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
   }
 
-  def post(index: Int = 0) = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext =>
-      implicit request => ???
-//        Form2[AreNewActivitiesAtTradingPremises](request.body) match {
-//        case ValidForm(_, data) => redirectTo(data, activities, index)
-//        case f: InvalidForm => Future.successful(
-//          BadRequest(views.html.businessmatching.updateservice.trading_premises(f, BusinessActivities.getValue(activity), index))
-//        )
+      implicit request =>
+        Form2[Boolean](request.body) match {
+          case f: InvalidForm =>
+            OptionT(getActivities) map { activities =>
+              BadRequest(views.html.businessmatching.updateservice.add_more_activities(f, activities))
+            } getOrElse InternalServerError("Unable to show the page")
+          case ValidForm(_, data) =>
+            val flowModel = AddServiceFlowModel(addMoreActivities = Some(data))
+            router.getRoute(AddMoreAcivitiesPageId, flowModel)
+        }
+  }
+
+  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = {
+    dataCacheConnector.fetchAll map {
+      optionalCache =>
+        for {
+          cache <- optionalCache
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+        } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+    }
   }
 }

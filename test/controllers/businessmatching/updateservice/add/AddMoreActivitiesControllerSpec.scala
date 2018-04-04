@@ -19,58 +19,64 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.ChangeServicesController
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.UpdateService
-import models.status.{NotCompleted, SubmissionDecisionApproved}
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
-    self => val request = addToken(authRequest)
+    val request = addToken(authRequest)
 
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
-
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
+    val bmService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[BusinessMatchingService].to(bmService))
       .build()
 
-    mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
-    mockCacheSave[UpdateService]
+    val controller = app.injector.instanceOf[AddMoreActivitiesController]
 
-    val controller = app.injector.instanceOf[TradingPremisesController]
+    val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
+    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+
+    val bmEmpty = Some(BusinessMatching())
+
+    mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
+
+    when {
+      bmService.preApplicationComplete(any(), any(), any())
+    } thenReturn Future.successful(false)
 
   }
 
   "AddMoreActivitiesController" when {
 
     "get is called" must {
-      "return OK with trading_premises view" in new Fixture {
+      "return OK with add_more_activities view" in new Fixture {
+        val result = controller.get()(request)
 
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.addmoreactivities.title"))
 
       }
       "return NOT_FOUND" when {

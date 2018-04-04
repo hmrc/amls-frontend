@@ -36,10 +36,10 @@ case class AddServiceFlowModel(
 
   }
 
-  object AddServiceFlowModel{
+object AddServiceFlowModel{
 
-    val key = "add-service-flow"
+  val key = "add-service-flow"
 
-    implicit val addServiceFlowModelFormat = Json.format[AddServiceFlowModel]
+  implicit val addServiceFlowModelFormat = Json.format[AddServiceFlowModel]
 
-  }
+}

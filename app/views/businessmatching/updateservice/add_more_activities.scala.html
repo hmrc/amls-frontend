@@ -18,7 +18,8 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], showReturnLink: Boolean = false)(implicit request: Request[_], m:Messages)
+
+@(f: forms.Form2[_], existing: Set[String], showReturnLink: Boolean = false)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -33,34 +34,42 @@
     heading = header
 )  {
 
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ){
+        <p>@Messages("businessmatching.registerservices.existing")</p> @{existing map{ value =>
+        value
+        } mkString(", ")}
+    }
+
     @form(f, controllers.businessmatching.updateservice.add.routes.AddMoreActivitiesController.post()) {
 
         @fieldset(
-            f = f("add-more-activities-fieldset"),
-            legend = "businessmatching.updateservice.addmoreactivitie.title",
+            f = f("addmoreactivities-fieldset"),
+            legend = "businessmatching.updateservice.addmoreactivities.title",
             legendHidden = true,
             panel = false
         ) {
 
             @errorGroup(
-                field = f("addMoreActivities")
+                field = f("addmoreactivities")
             ) {
                 @radio(
-                    f = f("addMoreActivities"),
-                    labelText = "addMoreActivities.choice.yes",
-                    value = "add"
+                    f = f("addmoreactivities"),
+                    labelText = "lbl.yes",
+                    value = "true",
+                    inline = true
                 )
                 @radio(
-                    f = f("addMoreActivities"),
-                    labelText = "addMoreActivities.choice.no",
-                    value = "remove"
+                    f = f("addmoreactivities"),
+                    labelText = "lbl.no",
+                    value = "false",
+                    inline = true
                 )
             }
         }
-
-
-       @submit(buttonMessageKey = Some("button.continue"), returnLink = showReturnLink)
-
+        @submit(buttonMessageKey = Some("button.continue"), returnLink = showReturnLink)
     }
-
 }
