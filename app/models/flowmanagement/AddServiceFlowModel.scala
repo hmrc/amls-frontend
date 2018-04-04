@@ -21,7 +21,7 @@ import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises,
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
-                                businessActivities: Option[BusinessActivities] = None,
+                                activity: Option[BusinessActivity] = None,
                                 areNewActivitiesAtTradingPremises: Option[AreNewActivitiesAtTradingPremises] = None,
                                 tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
                                 tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,

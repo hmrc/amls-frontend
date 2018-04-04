@@ -74,6 +74,8 @@ object BusinessActivity {
       case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
+
+
   implicit val activityFormWrite = Write[BusinessActivity, String] {
       case AccountancyServices => "01"
       case BillPaymentServices => "02"
