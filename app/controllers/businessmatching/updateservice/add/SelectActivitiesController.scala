@@ -25,7 +25,7 @@ import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
-import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
+import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -84,8 +84,13 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
     existing <- businessMatchingService.getSubmittedBusinessActivities
     } yield {
+      val availableActivities = BusinessMatchingActivities.all.filterNot {
+        case MoneyServiceBusiness | TrustAndCompanyServices => true
+        case _ => false
+      }
+
       val existingActivityNames = existing map { _.getMessage }
-      val activityValues = (BusinessMatchingActivities.all diff existing) map BusinessMatchingActivities.getValue
+      val activityValues = (availableActivities diff existing) map BusinessMatchingActivities.getValue
 
       (existingActivityNames, activityValues)
     }
