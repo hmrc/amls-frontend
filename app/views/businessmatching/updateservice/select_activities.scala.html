@@ -54,7 +54,7 @@
                 @errorGroup(
                     field = f("businessActivities")
                 ) {
-                    @{newActivities map( value => checkbox(
+                    @{newActivities map (value => radio(
                         f = f("businessActivities[]"),
                         labelText = s"businessmatching.registerservices.servicename.lbl.$value",
                         value = value
