@@ -52,8 +52,9 @@ class TradingPremisesController @Inject()(
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getFormData map { activity =>
-          Ok(views.html.businessmatching.updateservice.trading_premises(EmptyForm, BusinessActivities.getValue(activity)))
+        getFormData map { case (model, activity) =>
+          val form = model.areNewActivitiesAtTradingPremises map { v => Form2(v) } getOrElse EmptyForm
+          Ok(views.html.businessmatching.updateservice.trading_premises(form, BusinessActivities.getValue(activity)))
         } getOrElse InternalServerError("Unable to show the view")
   }
 
@@ -61,7 +62,7 @@ class TradingPremisesController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[Boolean](request.body) match {
-          case form: InvalidForm => getFormData map { activity =>
+          case form: InvalidForm => getFormData map { case (_, activity) =>
             BadRequest(views.html.businessmatching.updateservice.trading_premises(form, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Unable to show the view")
 
@@ -77,6 +78,6 @@ class TradingPremisesController @Inject()(
   private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
     model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
     activity <- OptionT.fromOption[Future](model.activity)
-  } yield activity
+  } yield (model, activity)
 
 }
