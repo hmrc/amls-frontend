@@ -20,6 +20,7 @@ import forms.EmptyForm
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching._
+import models.flowmanagement.AddServiceFlowModel
 import org.jsoup.nodes.Element
 import org.junit.Assert
 import org.scalatest.MustMatchers
@@ -39,7 +40,7 @@ class update_services_summarySpec extends GenericTestHelper
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, true)
+    def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, AddServiceFlowModel())
   }
 
   "update_services_summary view" must {

@@ -290,12 +290,6 @@ GET         /update-information/add-person                                      
 GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
 POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
 
-GET         /update-information/add-more-activities                                   @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.get()
-POST        /update-information/add-more-activities                                   @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.post()
-
-GET         /update-information/activities-select                                     @controllers.businessmatching.updateservice.add.SelectActivitiesController.get()
-POST        /update-information/activities-select                                     @controllers.businessmatching.updateservice.add.SelectActivitiesController.post()
-
 GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
 POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
 
@@ -319,8 +313,14 @@ POST        /update-information/further-updates                                 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
 
-GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get()
-POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post()
+GET         /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.get()
+POST        /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.post()
+
+GET         /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectActivitiesController.get(edit: Boolean ?= false)
+POST        /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectActivitiesController.post(edit: Boolean ?= false)
+
+GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get(edit: Boolean ?= false)
+POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post(edit: Boolean ?= false)
 
 GET         /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get()
 POST        /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post()

@@ -32,9 +32,16 @@ object VariationAddServiceRouter {
   // scalastyle:off cyclomatic.complexity
   implicit val router = new Router[AddServiceFlowModel] {
 
-    override def getRoute(pageId: PageId, model: AddServiceFlowModel): Future[Result] = pageId match {
+    override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false): Future[Result] = pageId match {
 
-      case SelectActivitiesPageId => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      case SelectActivitiesPageId if edit =>
+        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+
+      case SelectActivitiesPageId =>
+        Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+
+      case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
+        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
       case TradingPremisesPageId =>
         model.areNewActivitiesAtTradingPremises match {

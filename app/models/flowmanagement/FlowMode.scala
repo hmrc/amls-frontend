@@ -14,17 +14,9 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package models.flowmanagement
 
-import models.flowmanagement._
-import play.api.mvc.Result
-import services.flowmanagement.Router
+sealed trait FlowMode
 
-import scala.concurrent.Future
-
-object VariationRemoveServiceRouter {
-
-  implicit val router = new Router[RemoveServiceFlowModel] {
-    override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false): Future[Result] = ???
-  }
-}
+case object Flow extends FlowMode
+case object Edit extends FlowMode

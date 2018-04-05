@@ -35,6 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.select_activities
+import services.flowmanagement.Router._
 
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
@@ -75,7 +76,7 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               _.getOrElse(AddServiceFlowModel()).copy(activity = Some(data))
             } flatMap { case Some(model) =>
-              router.getRoute(SelectActivitiesPageId, model)
+              getRoute(SelectActivitiesPageId, model, edit)
             }
         }
   }

@@ -33,7 +33,7 @@ class trading_premisesSpec extends GenericTestHelper with MustMatchers {
 
   "change_services view" must {
     "have correct content" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.trading_premises(EmptyForm, activityName)
+      def view = views.html.businessmatching.updateservice.trading_premises(EmptyForm, edit = false, activityName)
 
       validateTitle(s"${Messages("businessmatching.updateservice.tradingpremises.title")} - ${Messages("summary.updateinformation")}")
 
@@ -49,7 +49,7 @@ class trading_premisesSpec extends GenericTestHelper with MustMatchers {
           (Path \ "tradingPremisesNewActivities") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessmatching.updateservice.trading_premises(form2, activityName)
+      def view = views.html.businessmatching.updateservice.trading_premises(form2, edit = false, activityName)
 
       errorSummary.html() must include("not a message Key")
 

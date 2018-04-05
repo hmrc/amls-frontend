@@ -49,21 +49,21 @@ class TradingPremisesController @Inject()(
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)
   implicit val boolRead = BooleanFormReadWrite.formRule(fieldName, "error.businessmatching.updateservice.tradingpremisesnewactivities")
 
-  def get = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getFormData map { case (model, activity) =>
           val form = model.areNewActivitiesAtTradingPremises map { v => Form2(v) } getOrElse EmptyForm
-          Ok(views.html.businessmatching.updateservice.trading_premises(form, BusinessActivities.getValue(activity)))
+          Ok(views.html.businessmatching.updateservice.trading_premises(form, edit, BusinessActivities.getValue(activity)))
         } getOrElse InternalServerError("Unable to show the view")
   }
 
-  def post() = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[Boolean](request.body) match {
           case form: InvalidForm => getFormData map { case (_, activity) =>
-            BadRequest(views.html.businessmatching.updateservice.trading_premises(form, BusinessActivities.getValue(activity)))
+            BadRequest(views.html.businessmatching.updateservice.trading_premises(form, edit, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>
@@ -73,7 +73,7 @@ class TradingPremisesController @Inject()(
                 tradingPremisesActivities = if(data) model.tradingPremisesActivities else None
               )
             } flatMap { model =>
-              router.getRoute(TradingPremisesPageId, model.get)
+              router.getRoute(TradingPremisesPageId, model.get, edit)
             }
         }
   }

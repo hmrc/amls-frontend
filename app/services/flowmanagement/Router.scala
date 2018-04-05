@@ -16,11 +16,20 @@
 
 package services.flowmanagement
 
-import models.flowmanagement.PageId
+import models.flowmanagement.{Edit, Flow, FlowMode, PageId}
 import play.api.mvc.Result
 
 import scala.concurrent.Future
 
 trait Router[A] {
-  def getRoute(pageId: PageId, model: A): Future[Result]
+  def getRoute(pageId: PageId, model: A, edit: Boolean = false): Future[Result]
+}
+
+object Router {
+
+  implicit def convertBoolToFlow(edit: Boolean): FlowMode = if (edit) Edit else Flow
+
+  def getRoute[A](pageId: PageId, model: A, edit: Boolean = false)(implicit router: Router[A]) =
+    router.getRoute(pageId, model, edit)
+
 }

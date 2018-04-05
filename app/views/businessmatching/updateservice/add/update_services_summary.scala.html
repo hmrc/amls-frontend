@@ -41,14 +41,14 @@
 
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
-        editUrl = routes.SelectActivitiesController.get().url
+        editUrl = routes.SelectActivitiesController.get(edit = true).url
     ) {
         <p>@(flowModel.activityName.getOrElse(""))</p>
     }
 
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.tradingpremises.title"),
-        editUrl = routes.TradingPremisesController.get().url
+        editUrl = routes.TradingPremisesController.get(edit = true).url
     ) {
         <p>@(flowModel.areNewActivitiesAtTradingPremises map {
             case true => Messages("lbl.yes")

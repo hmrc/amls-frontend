@@ -22,7 +22,7 @@ import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import models.businessmatching.BusinessMatching
 import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
-import models.flowmanagement.PageId
+import models.flowmanagement.{Flow, FlowMode, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.flowmanagement.Router
@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object ChangeServicesRouter {
 
   implicit val router = new Router[ChangeServices] {
-    override def getRoute(pageId: PageId, model: ChangeServices): Future[Result] = model match {
+    override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false): Future[Result] = model match {
       case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
       case ChangeServicesRemove => ???
 //      case ChangeServicesRemove => {
