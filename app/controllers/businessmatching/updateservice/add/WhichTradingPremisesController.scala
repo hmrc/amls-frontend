@@ -20,19 +20,19 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.TradingPremisesActivities
-import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.status.{NotCompleted, SubmissionReady}
+import models.flowmanagement.{AddServiceFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
 import services.businessmatching.BusinessMatchingService
-import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
+import views.html.businessmatching.updateservice.which_trading_premises
+import services.flowmanagement.routings.VariationAddServiceRouter.router
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,90 +40,47 @@ import scala.concurrent.Future
 @Singleton
 class WhichTradingPremisesController @Inject()(
                                                 val authConnector: AuthConnector,
-                                                val dataCacheConnector: DataCacheConnector,
-                                                val statusService: StatusService,
-                                                val businessMatchingService: BusinessMatchingService,
-                                                val tradingPremisesService: TradingPremisesService
-                                              )() extends BaseController with RepeatingSection {
+                                                val dataCacheConnector: DataCacheConnector
+                                                ) extends BaseController with RepeatingSection {
 
-  def get(index: Int = 0) = Authorised.async {
+  def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-        (for {
-          status <- OptionT.liftF(statusService.getStatus)
-          additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-          tradingPremises <- OptionT.liftF(tradingPremises)
-        } yield {
-          try {
-            status match {
-              case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
-                val activity = additionalActivities.toList(index)
-                Ok(views.html.businessmatching.updateservice.which_trading_premises(
-                  EmptyForm,
-                  tradingPremises,
-                  BusinessActivities.getValue(activity),
-                  index
-                ))
-            }
-          } catch {
-            case _: IndexOutOfBoundsException | _: MatchError => NotFound(notFoundView)
-          }
-        }) getOrElse InternalServerError("Cannot retrieve business activities")
+        getFormData map { case (flowModel, activity, tradingPremises) =>
+          val form = flowModel.tradingPremisesNewActivities.fold[Form2[TradingPremisesActivities]](EmptyForm)(Form2[TradingPremisesActivities])
+
+          Ok(which_trading_premises(
+            form,
+            tradingPremises,
+            BusinessActivities.getValue(activity)
+          ))
+        } getOrElse InternalServerError("Cannot retrieve form data")
   }
 
-  def post(index: Int = 0) = Authorised.async {
+  def post = Authorised.async {
     implicit authContext =>
-      implicit request => {
-        statusService.getStatus flatMap {
-          case st if !((st equals NotCompleted) | (st equals SubmissionReady)) =>
-            businessMatchingService.getAdditionalBusinessActivities.value flatMap {
-              case Some(additionalActivities) =>
-                val activity = additionalActivities.toList(index)
-                Form2[TradingPremisesActivities](request.body) match {
-                  case ValidForm(_, data) =>
-                    redirectTo(index, additionalActivities, activity, data)
-                  case f: InvalidForm =>
-                    tradingPremises map { tp =>
-                      BadRequest(views.html.businessmatching.updateservice.which_trading_premises(
-                        f,
-                        tp,
-                        BusinessActivities.getValue(activity),
-                        index
-                      ))
-                    }
-                }
-              case None => Future.successful(InternalServerError("Cannot retrieve activities"))
-            }
+      implicit request =>
+        Form2[TradingPremisesActivities](request.body) match {
+          case f: InvalidForm => getFormData map { case (_, activity, tradingPremises) =>
+            BadRequest(which_trading_premises(f, tradingPremises, BusinessActivities.getValue(activity)))
+          } getOrElse InternalServerError("Cannot retrieve form data")
+
+          case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            _.copy(tradingPremisesNewActivities = Some(data))
+          } flatMap {
+            case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
+          }
         }
-      } recoverWith {
-        case _: IndexOutOfBoundsException | _: MatchError => Future.successful(NotFound(notFoundView))
-      }
   }
 
-  private def redirectTo(index: Int, additionalActivities: Set[BusinessActivity], activity: BusinessActivity, data: TradingPremisesActivities)
-                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
-    updateTradingPremises(data, activity) flatMap { _ =>
-      if (businessMatchingService.activitiesToIterate(index, additionalActivities)) {
-        Future.successful(Redirect(TradingPremisesController.get()))
-      } else {
-        businessMatchingService.fitAndProperRequired.value map {
-          case Some(true) => Redirect(controllers.businessmatching.updateservice.add.routes.FitAndProperController.get())
-          case Some(false) => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
-          case _ => InternalServerError("Cannot retrieve activities")
-        }
-      }
-    }
-  }
-
-  private def updateTradingPremises(data: TradingPremisesActivities, activity: BusinessActivity)
-                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    updateDataStrict[TradingPremises] { tradingPremises: Seq[TradingPremises] =>
-      tradingPremisesService.addBusinessActivtiesToTradingPremises(data.index.toSeq, tradingPremises, activity, false)
-    }
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+    activity <- OptionT.fromOption[Future](flowModel.activity)
+    tradingPremises <- OptionT.liftF(tradingPremises)
+  } yield (flowModel, activity, tradingPremises)
 
   private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
-    getData[TradingPremises].map { tradingpremises =>
-      tradingpremises.zipWithIndex.filterNot { case (tp, _) =>
+    getData[TradingPremises].map { _.zipWithIndex.filterNot { case (tp, _) =>
         tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
       }
     }

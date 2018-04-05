@@ -29,13 +29,6 @@ import scala.concurrent.Future
 
 object VariationAddServiceRouter {
 
-  private val specialActivities = Set[BusinessActivity](
-    HighValueDealing,
-    MoneyServiceBusiness,
-    TrustAndCompanyServices,
-    EstateAgentBusinessService,
-    AccountancyServices)
-
   // scalastyle:off cyclomatic.complexity
   implicit val router = new Router[AddServiceFlowModel] {
 
@@ -46,7 +39,7 @@ object VariationAddServiceRouter {
       case TradingPremisesPageId =>
         model.areNewActivitiesAtTradingPremises match {
           case Some(true) =>
-            Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(0)))
+            Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
           case _ => if (model.informationRequired) {
             Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
           } else {

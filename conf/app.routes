@@ -322,8 +322,8 @@ POST        /update-information/remove-responsible-person                       
 GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get()
 POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post()
 
-GET         /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(index: Int)
-POST        /update-service/which-trading-premises/:index                             @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(index: Int)
+GET         /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get()
+POST        /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post()
 
 GET         /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.add.FitAndProperController.get()
 POST        /update-service/fit-and-proper/                                           @controllers.businessmatching.updateservice.add.FitAndProperController.post()

@@ -16,23 +16,18 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import models.status.SubmissionDecisionApproved
-import org.mockito.Matchers.{eq => eqTo, any}
-import org.mockito.Mockito._
+import org.mockito.Matchers.{eq => eqTo}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -82,7 +77,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             ))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.WhichTradingPremisesController.get(0).url)
+            redirectLocation(result) mustBe Some(routes.WhichTradingPremisesController.get().url)
           }
         }
 

@@ -16,15 +16,14 @@
 
 package services.flowmanagement.routing
 
-import models.businessmatching.updateservice.{NewActivitiesAtTradingPremisesNo, NewActivitiesAtTradingPremisesYes, TradingPremisesActivities}
-import models.businessmatching.{BillPaymentServices, BusinessActivities, HighValueDealing}
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import models.businessmatching.updateservice.TradingPremisesActivities
+import models.businessmatching.{BillPaymentServices, HighValueDealing}
 import models.flowmanagement._
-import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
-import services.flowmanagement._
-import services.flowmanagement.routings._
 import play.api.test.Helpers._
+import services.flowmanagement.routings._
 
 class VariationAddServiceRouterSpec extends PlaySpec {
 
@@ -40,7 +39,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           activity = Some(HighValueDealing))
         val result = await(routingFile.getRoute(SelectActivitiesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get())
+        result mustBe Redirect(addRoutes.TradingPremisesController.get())
       }
     }
 
@@ -52,7 +51,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           areNewActivitiesAtTradingPremises = Some(false))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
+        result mustBe Redirect(addRoutes.NewServiceInformationController.get())
       }
     }
 
@@ -64,7 +63,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           areNewActivitiesAtTradingPremises = Some(false))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
       }
     }
 
@@ -75,7 +74,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           areNewActivitiesAtTradingPremises = Some(true))
         val result = await(routingFile.getRoute(TradingPremisesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.get(0))
+        result mustBe Redirect(addRoutes.WhichTradingPremisesController.get())
       }
     }
 
@@ -89,7 +88,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
         val result = await(routingFile.getRoute(WhichTradingPremisesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
       }
     }
 
@@ -101,7 +100,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
         val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.AddMoreActivitiesController.get())
+        result mustBe Redirect(addRoutes.AddMoreActivitiesController.get())
       }
     }
 
@@ -115,7 +114,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
         val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get())
+        result mustBe Redirect(addRoutes.SelectActivitiesController.get())
       }
     }
 
@@ -130,7 +129,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
         val result = await(routingFile.getRoute(AddMoreAcivitiesPageId, model))
 
-        result mustBe Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
+        result mustBe Redirect(addRoutes.NewServiceInformationController.get())
       }
     }
 
