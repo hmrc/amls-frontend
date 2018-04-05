@@ -35,7 +35,7 @@ class RemoveActivitiesInformationController @Inject()(
     implicit authContext =>
       implicit request =>
         titlePlaceholder map { placeholder =>
-          Ok(views.html.businessmatching.updateservice.remove_activities_information(placeholder))
+          Ok(views.html.businessmatching.updateservice.remove.remove_activities_information(placeholder))
         }
   }
 

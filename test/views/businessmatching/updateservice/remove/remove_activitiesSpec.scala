@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.businessmatching.updateservice
+package views.businessmatching.updateservice.remove
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
@@ -37,7 +37,7 @@ class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with Mus
 
     "display the correct headings and title" in new ViewFixture {
 
-      def view = views.html.businessmatching.updateservice.remove_activities(EmptyForm, Set.empty)
+      def view = views.html.businessmatching.updateservice.remove.remove_activities(EmptyForm, Set.empty)
 
       doc.title must include(Messages("updateservice.removeactivities.title"))
       heading.html must include(Messages("updateservice.removeactivities.header"))
@@ -51,7 +51,7 @@ class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with Mus
         (Path \ "businessActivities") -> Seq(ValidationError("not a message Key"))
       ))
 
-      def view = views.html.businessmatching.updateservice.remove_activities(form2, Set.empty)
+      def view = views.html.businessmatching.updateservice.remove.remove_activities(form2, Set.empty)
 
       errorSummary.html must include("not a message Key")
 

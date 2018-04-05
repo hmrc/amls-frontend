@@ -14,10 +14,8 @@
  * limitations under the License.
  */
 
-package views.businessmatching.updateservice
+package views.businessmatching.updateservice.remove
 
-import forms.{EmptyForm, InvalidForm}
-import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -37,7 +35,7 @@ class remove_activities_informationSpec extends GenericTestHelper with MockitoSu
 
     "display the correct headings and title" in new ViewFixture {
 
-      def view = views.html.businessmatching.updateservice.remove_activities_information("placeholder")
+      def view = views.html.businessmatching.updateservice.remove.remove_activities_information("placeholder")
 
       doc.title must include(Messages("updateservice.removeactivitiesinformation.title") + " - " + Messages("summary.updateinformation"))
       heading.html must include(Messages("updateservice.removeactivitiesinformation.header", "placeholder"))
@@ -46,7 +44,7 @@ class remove_activities_informationSpec extends GenericTestHelper with MockitoSu
 
 
     "Check button redirects to status page" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.remove_activities_information("")
+      def view = views.html.businessmatching.updateservice.remove.remove_activities_information("")
 
       doc.html must include(controllers.routes.StatusController.get(false).url)
     }
@@ -56,14 +54,14 @@ class remove_activities_informationSpec extends GenericTestHelper with MockitoSu
   it when {
     "placeholder is all services" must {
       "contain all services content" in new ViewFixture {
-        def view = views.html.businessmatching.updateservice.remove_activities_information("all services")
+        def view = views.html.businessmatching.updateservice.remove.remove_activities_information("all services")
         doc.html must include(Messages("updateservice.removeactivitiesinformation.info.1.all"))
         doc.html must not include Messages("updateservice.removeactivitiesinformation.info.1")
         doc.html must include(Messages("updateservice.removeactivitiesinformation.info.2"))
       }
       "placeholder is not all services" must {
         "contain non services content" in new ViewFixture {
-          def view = views.html.businessmatching.updateservice.remove_activities_information("")
+          def view = views.html.businessmatching.updateservice.remove.remove_activities_information("")
           doc.html must not include Messages("updateservice.removeactivitiesinformation.info.1.all")
           doc.html must include(Messages("updateservice.removeactivitiesinformation.info.1"))
           doc.html must include(Messages("updateservice.removeactivitiesinformation.info.2"))

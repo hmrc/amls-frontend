@@ -79,72 +79,73 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.addmoreactivities.title"))
 
       }
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
 
-        }
-        "there are no additional services" in new Fixture {
-
-        }
-      }
       "return INTERNAL_SERVER_ERROR if activites cannot be retrieved" in new Fixture {
+fail()
+      }
 
+      "return OK and display existing submitted Activities" in new Fixture {
+        fail()
+      }
+
+      "return OK and display existing newly added Activities" in new Fixture {
+        fail()
       }
     }
 
-    "post is called" must {
-
-      "with a valid request" must {
-        "redirect to WhichTradingPremises" when {
-          "request equals Yes" in new Fixture {
-
-          }
-        }
-        "when request equals No" when {
-          "progress to the 'new service information' page" when {
-            "fit and proper is not required" in new Fixture {
-
-            }
-          }
-
-          "progress to the 'fit and proper' page" when {
-            "fit and proper requirement is introduced" in new Fixture {
-
-            }
-          }
-        }
-        "redirect to TradingPremises" when {
-          "request equals No" when {
-            "there are more activities through which to iterate" in new Fixture {
-
-            }
-          }
-        }
-      }
-
-      "on invalid request" must {
-
-        "return badRequest" in new Fixture {
-
-        }
-
-      }
-
-      "return NOT_FOUND" when {
-        "status is pre-submission" in new Fixture {
-
-        }
-      }
-
-      "return INTERNAL_SERVER_ERROR" when {
-
-        "activities cannot be retrieved" in new Fixture {
-
-        }
-
-      }
-
-    }
+//    "post is called" must {
+//
+//      "with a valid request" must {
+//        "redirect to WhichTradingPremises" when {
+//          "request equals Yes" in new Fixture {
+//
+//          }
+//        }
+//        "when request equals No" when {
+//          "progress to the 'new service information' page" when {
+//            "fit and proper is not required" in new Fixture {
+//
+//            }
+//          }
+//
+//          "progress to the 'fit and proper' page" when {
+//            "fit and proper requirement is introduced" in new Fixture {
+//
+//            }
+//          }
+//        }
+//        "redirect to TradingPremises" when {
+//          "request equals No" when {
+//            "there are more activities through which to iterate" in new Fixture {
+//
+//            }
+//          }
+//        }
+//      }
+//
+//      "on invalid request" must {
+//
+//        "return badRequest" in new Fixture {
+//
+//        }
+//
+//      }
+//
+//      "return NOT_FOUND" when {
+//        "status is pre-submission" in new Fixture {
+//
+//        }
+//      }
+//
+//      "return INTERNAL_SERVER_ERROR" when {
+//
+//        "activities cannot be retrieved" in new Fixture {
+//
+//        }
+//
+//      }
+//
+//    }
   }
 
 }

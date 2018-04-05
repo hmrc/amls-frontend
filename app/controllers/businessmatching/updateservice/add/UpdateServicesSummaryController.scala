@@ -18,9 +18,12 @@ package controllers.businessmatching.updateservice.add
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+
+import scala.concurrent.Future
 
 @Singleton
 class UpdateServicesSummaryController @Inject()(
@@ -30,7 +33,9 @@ class UpdateServicesSummaryController @Inject()(
 
   def get() = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+          Future.successful(Ok(views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, true)))
+
   }
 
   def post() = Authorised.async{
