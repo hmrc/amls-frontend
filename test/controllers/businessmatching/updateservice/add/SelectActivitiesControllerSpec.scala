@@ -69,7 +69,7 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     }
 
     "return the next page in the flow when valid data has been posted" in new Fixture {
-      mockCacheFetch(Some(AddServiceFlowModel()))
+      mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
       mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(HighValueDealing)), Some(AddServiceFlowModel.key))
 
       val result = controller.post()(request.withFormUrlEncodedBody(

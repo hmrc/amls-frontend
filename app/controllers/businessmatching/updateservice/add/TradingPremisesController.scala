@@ -67,8 +67,8 @@ class TradingPremisesController @Inject()(
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              _.copy(areNewActivitiesAtTradingPremises = Some(data))
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
+              model.copy(areNewActivitiesAtTradingPremises = Some(data))
             } flatMap { model =>
               router.getRoute(TradingPremisesPageId, model.get)
             }

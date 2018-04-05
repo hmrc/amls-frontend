@@ -72,11 +72,10 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
           } getOrElse InternalServerError("Could not get form data")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key) flatMap { modelFromStore =>
-              val model = modelFromStore.getOrElse(AddServiceFlowModel()).copy(activity = Some(data))
-              dataCacheConnector.save(AddServiceFlowModel.key, model) flatMap { _ =>
-                router.getRoute(SelectActivitiesPageId, model)
-              }
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              _.getOrElse(AddServiceFlowModel()).copy(activity = Some(data))
+            } flatMap { case Some(model) =>
+              router.getRoute(SelectActivitiesPageId, model)
             }
         }
   }

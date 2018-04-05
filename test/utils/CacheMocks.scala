@@ -66,25 +66,15 @@ trait CacheMocks extends MockitoSugar {
     } thenReturn Future.successful(mockCacheMap)
   }
 
-  def mockUpdate[T](key: Option[String] = None)(implicit cache: DataCacheConnector) = key match {
-    case Some(k) => when {
-      cache.update[T](eqTo(k))(any())(any(), any(), any())
-    } thenCallRealMethod()
-
-    case _ => when {
-      cache.update[T](any())(any())(any(), any(), any())
-    } thenCallRealMethod()
-  }
-
   def mockCacheUpdate[T](key: Option[String] = None, dbModel: T)(implicit cache: DataCacheConnector) = key match {
     case Some(k) =>
-      val funcCaptor = ArgumentCaptor.forClass(classOf[T => T])
+      val funcCaptor = ArgumentCaptor.forClass(classOf[Option[T] => T])
 
       when {
         cache.update[T](eqTo(k))(funcCaptor.capture())(any(), any(), any())
       } thenAnswer new Answer[Future[Option[T]]] {
         override def answer(invocation: InvocationOnMock): Future[Option[T]] = {
-          Future.successful(Some(funcCaptor.getValue()(dbModel)))
+          Future.successful(Some(funcCaptor.getValue()(Some(dbModel))))
         }
       }
   }
