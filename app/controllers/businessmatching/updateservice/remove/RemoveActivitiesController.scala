@@ -50,7 +50,7 @@ class RemoveActivitiesController @Inject()(
       implicit request =>
         statusService.isPreSubmission flatMap {
           case false => OptionT(getActivities) map { activities =>
-            Ok(views.html.businessmatching.updateservice.remove_activities(EmptyForm, activities))
+            Ok(views.html.businessmatching.updateservice.remove.remove_activities(EmptyForm, activities))
           } getOrElse InternalServerError("Could not retrieve activities")
           case true => Future.successful(NotFound(notFoundView))
         }
@@ -68,7 +68,7 @@ class RemoveActivitiesController @Inject()(
               } else {
                 Redirect(controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesInformationController.get())
               }
-            case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.remove_activities(f, activities))
+            case f: InvalidForm => BadRequest(views.html.businessmatching.updateservice.remove.remove_activities(f, activities))
           }
         } getOrElse InternalServerError("Could not retrieve activities")
   }

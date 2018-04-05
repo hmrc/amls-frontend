@@ -104,6 +104,38 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       }
     }
 
+    "redirect to the 'Registration Progress' page" when {
+        "we're on the summary page and the user selects continue " +
+        "if all possible activities are added" +
+        " and a none of the new ones require more information" in new Fixture {
+          fail()
+//        val model = AddServiceFlowModel(
+//          activity = Some(AccountancyServices),
+//          addMoreActivities = Some(false))
+//
+//        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
+//
+//        result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+    }
+
+//AccountancyServices extends BusinessActivity
+//case object BillPaymentServices extends  BusinessActivity
+//case object EstateAgentBusinessService extends BusinessActivity
+//case object HighValueDealing extends BusinessActivity
+//case object MoneyServiceBusiness extends BusinessActivity
+//case object TrustAndCompanyServices extends BusinessActivity
+//case object TelephonePaymentService extends BusinessActivity
+
+
+    "redirect to the 'New Service Information' page" when {
+      "we're on the summary page and the user selects continue " +
+        "and if all possible activities are added" +
+        " and a new one requires more information" in new Fixture {
+fail()
+      }
+    }
+
     "return the 'Activities selection' page (SelectActivitiesController)" when {
       "we're on the 'Do you want at add more activities' page " +
         "and the use wants to add more activities" in new Fixture {
@@ -146,6 +178,8 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
+
+
 
     "return the 'registration progress' page" when {
       "we're on the 'new service information' page" in new Fixture {

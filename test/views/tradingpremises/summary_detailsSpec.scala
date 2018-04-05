@@ -107,7 +107,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
     }
 
     "load summary details page when it is not an msb" in new ViewFixture {
-      
+
       val isNotMsb = false
       def view = views.html.tradingpremises.summary_details(tradingPremises, isNotMsb, 1, false)
 
@@ -138,7 +138,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
       val servicesSection = hTwo.get.parent.toString
 
-      println(servicesSection)
+      //println(servicesSection)
       servicesSection mustNot include("Edit")
     }
   }
