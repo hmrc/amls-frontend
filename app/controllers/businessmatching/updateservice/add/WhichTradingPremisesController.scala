@@ -47,7 +47,7 @@ class WhichTradingPremisesController @Inject()(
     implicit authContext =>
       implicit request =>
         getFormData map { case (flowModel, activity, tradingPremises) =>
-          val form = flowModel.tradingPremisesNewActivities.fold[Form2[TradingPremisesActivities]](EmptyForm)(Form2[TradingPremisesActivities])
+          val form = flowModel.tradingPremisesActivities.fold[Form2[TradingPremisesActivities]](EmptyForm)(Form2[TradingPremisesActivities])
 
           Ok(which_trading_premises(
             form,
@@ -66,7 +66,7 @@ class WhichTradingPremisesController @Inject()(
           } getOrElse InternalServerError("Cannot retrieve form data")
 
           case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-            model.copy(tradingPremisesNewActivities = Some(data))
+            model.copy(tradingPremisesActivities = Some(data))
           } flatMap {
             case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
           }

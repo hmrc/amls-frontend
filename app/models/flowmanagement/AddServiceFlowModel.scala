@@ -23,7 +23,7 @@ import play.api.libs.json.Json
 case class AddServiceFlowModel(
                                 activity: Option[BusinessActivity] = None,
                                 areNewActivitiesAtTradingPremises: Option[Boolean] = None,
-                                tradingPremisesNewActivities: Option[TradingPremisesActivities] = None,
+                                tradingPremisesActivities: Option[TradingPremisesActivities] = None,
                                 tradingPremisesSubmittedActivities: Option[TradingPremisesActivities] = None,
                                 addMoreActivities: Option[Boolean] = None
                               ) {

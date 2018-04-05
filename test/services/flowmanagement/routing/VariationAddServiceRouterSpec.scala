@@ -83,7 +83,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
-          tradingPremisesNewActivities = Some(TradingPremisesActivities(Set(0,1,2)))
+          tradingPremisesActivities = Some(TradingPremisesActivities(Set(0,1,2)))
         )
 
         val result = await(routingFile.getRoute(WhichTradingPremisesPageId, model))
