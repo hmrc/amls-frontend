@@ -38,6 +38,8 @@ case class AddServiceFlowModel(
     case _ => true
   }
 
+  def activityName = this.activity map { _.getMessage }
+
 }
 
 object AddServiceFlowModel {

@@ -18,7 +18,7 @@ package models.businessmatching.updateservice
 
 import models.businessmatching.{AccountancyServices, BillPaymentServices, HighValueDealing, MoneyServiceBusiness}
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.Json
 
 class ServiceChangeRegisterSpec extends PlaySpec {
 

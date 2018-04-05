@@ -1178,6 +1178,8 @@ businessmatching.updateservice.newserviceinformation.heading = We need to ask yo
 businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for: {0}
 businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
 
+businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
+
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
 bankdetails.whatyouneed.paragraph1.text = We need to identify the bank accounts used by your business. This isn’t the place to pay registration fees.

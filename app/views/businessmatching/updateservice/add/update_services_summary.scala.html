@@ -18,37 +18,58 @@
 @import forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
+@import controllers.businessmatching.updateservice.add.routes
+@import models.flowmanagement.AddServiceFlowModel
 
-@(f: forms.Form2[_], allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
+@(f: forms.Form2[_], flowModel: AddServiceFlowModel)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", if(allowEdit) "summary.updateinformation" else "")
+    @heading("title.cya", "summary.updateinformation")
 }
 
 @main(
     title = Messages("title.cya") + " - " + Messages("summary.updateinformation"),
     heading = header
 ) {
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ) {
+        @Messages("businessmatching.summary.icon.title")
+    }
 
-    @if(allowEdit) {
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
+    @checkYourAnswers(
+        question = Messages("businessmatching.updateservice.selectactivities.title"),
+        editUrl = routes.SelectActivitiesController.get().url
+    ) {
+        <p>@(flowModel.activityName.getOrElse(""))</p>
+    }
+
+    @checkYourAnswers(
+        question = Messages("businessmatching.updateservice.tradingpremises.title"),
+        editUrl = routes.TradingPremisesController.get().url
+    ) {
+        <p>@(flowModel.areNewActivitiesAtTradingPremises map {
+            case true => Messages("lbl.yes")
+            case _ => Messages("lbl.no")
+        })</p>
+    }
+
+    @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
+        @checkYourAnswers(
+            question = Messages("businessmatching.updateservice.whichtradingpremises.header", flowModel.activityName.getOrElse("")),
+            editUrl = routes.WhichTradingPremisesController.get().url
         ) {
-            @Messages("businessmatching.summary.icon.title")
+            <p>
+                @(flowModel.tradingPremisesActivities map { tp =>
+                    Messages("businessmatching.updateservice.summary.whichtradingpremises.count", tp.index.size)
+                })
+            </p>
         }
     }
 
-    @if(allowEdit) {
-        <p>"some stuff"</p>
-    } else {
-        @submitButton("businessmatching.summary.noedit.anchortext")
-    }
-}
-
-@submitButton(linkText: String) = {
-    @form(f, controllers.businessmatching.routes.SummaryController.post()) {
-        @submit(false, Some(Messages(linkText)), returnLink = false)
+    @form(f, controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.post()) {
+        @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 }

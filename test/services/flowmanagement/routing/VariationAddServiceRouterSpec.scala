@@ -55,18 +55,6 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       }
     }
 
-    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "given the activity is not done at any trading premises" +
-        "and the activity does NOT require further information" in new Fixture {
-        val model = AddServiceFlowModel(
-          activity = Some(BillPaymentServices),
-          areNewActivitiesAtTradingPremises = Some(false))
-        val result = await(routingFile.getRoute(TradingPremisesPageId, model))
-
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
-      }
-    }
-
     "return the 'which trading premises' page (WhichTradingPremisesController)" when {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
         val model = AddServiceFlowModel(
@@ -178,8 +166,6 @@ fail()
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
-
-
 
     "return the 'registration progress' page" when {
       "we're on the 'new service information' page" in new Fixture {

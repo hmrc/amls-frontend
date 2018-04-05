@@ -40,11 +40,8 @@ object VariationAddServiceRouter {
         model.areNewActivitiesAtTradingPremises match {
           case Some(true) =>
             Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
-          case _ => if (model.informationRequired) {
-            Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
-          } else {
+          case _ =>
             Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          }
         }
 
       case WhichTradingPremisesPageId => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
