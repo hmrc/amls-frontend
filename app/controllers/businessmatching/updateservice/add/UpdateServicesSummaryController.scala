@@ -22,9 +22,15 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessActivity
+import models.businessmatching.updateservice.{ChangeServices, ServiceChangeRegister}
+import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import services.flowmanagement.routings.VariationAddServiceRouter.router
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import services.flowmanagement.routings.VariationAddServiceRouter.router
 
 import scala.concurrent.Future
@@ -45,7 +51,20 @@ class UpdateServicesSummaryController @Inject()(
 
   def post() = Authorised.async{
     implicit authContext =>
-      implicit request =>  router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel())
-
+      implicit request => (for {
+        model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+        activity <- OptionT.fromOption[Future](model.activity)
+        _ <- OptionT(updateServicesRegister(activity))
+        route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
+      } yield {
+        route
+      }) getOrElse InternalServerError("Could not fetch the flow model")
   }
+
+  private def updateServicesRegister(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[ServiceChangeRegister]] =
+    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+      case Some(model@ServiceChangeRegister(Some(activities))) =>
+         model.copy(addedActivities = Some(activities + activity))
+      case _ => ServiceChangeRegister(Some(Set(activity)))
+    }
 }

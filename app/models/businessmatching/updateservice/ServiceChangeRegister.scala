@@ -19,8 +19,10 @@ package models.businessmatching.updateservice
 import models.businessmatching.BusinessActivity
 import play.api.libs.json.Json
 
-case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]])
+case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]] = None)
 
 object ServiceChangeRegister {
+  val key = "service-change-register"
+
   implicit val format = Json.format[ServiceChangeRegister]
 }
