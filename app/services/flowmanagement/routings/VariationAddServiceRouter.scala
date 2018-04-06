@@ -34,7 +34,7 @@ object VariationAddServiceRouter {
 
     override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false): Future[Result] = pageId match {
 
-      case SelectActivitiesPageId if edit =>
+      case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
         Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
       case SelectActivitiesPageId =>

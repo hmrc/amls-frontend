@@ -43,8 +43,18 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       }
     }
 
+    "return the 'trading premises' page (TradingPremisesController)" when {
+      "given the 'BusinessActivities' model contains a single activity " +
+        "and there is no trading premises question data in edit mode" in new Fixture {
+        val model = AddServiceFlowModel(Some(HighValueDealing))
+        val result = await(routingFile.getRoute(SelectActivitiesPageId, model, edit = true))
+
+        result mustBe Redirect(addRoutes.TradingPremisesController.get())
+      }
+    }
+
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "given the activity is not done at any trading premises" +
+      "given the activity is not done at any trading premises " +
         "and the activity requires further information" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
@@ -57,7 +67,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     }
 
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "given we've chosen an activity" +
+      "given we've chosen an activity " +
         "and we're in the edit flow" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
@@ -70,7 +80,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     }
 
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the trading premises yes/no question" +
+      "editing the trading premises yes/no question " +
       "the trading premises have already been selected" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
