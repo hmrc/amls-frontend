@@ -55,11 +55,15 @@ class UpdateServicesSummaryController @Inject()(
         model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
         activity <- OptionT.fromOption[Future](model.activity)
         _ <- OptionT(updateServicesRegister(activity))
+        _ <- updateHasAcceptedFlag(model)
         route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
       } yield {
         route
       }) getOrElse InternalServerError("Could not fetch the flow model")
   }
+
+  private def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
+    OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
 
   private def updateServicesRegister(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[ServiceChangeRegister]] =
     dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
