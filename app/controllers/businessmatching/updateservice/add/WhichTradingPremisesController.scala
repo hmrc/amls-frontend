@@ -40,7 +40,7 @@ import scala.concurrent.Future
 @Singleton
 class WhichTradingPremisesController @Inject()(
                                                 val authConnector: AuthConnector,
-                                                val dataCacheConnector: DataCacheConnector
+                                                implicit val dataCacheConnector: DataCacheConnector
                                                 ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {

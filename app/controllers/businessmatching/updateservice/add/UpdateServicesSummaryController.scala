@@ -22,16 +22,17 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import services.flowmanagement.routings.VariationAddServiceRouter.router
 
 import scala.concurrent.Future
 
 @Singleton
 class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector
+                                                 implicit val dataCacheConnector: DataCacheConnector
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
@@ -44,9 +45,7 @@ class UpdateServicesSummaryController @Inject()(
 
   def post() = Authorised.async{
     implicit authContext =>
-      implicit request =>  ???
+      implicit request =>  router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel())
 
   }
-
-
 }

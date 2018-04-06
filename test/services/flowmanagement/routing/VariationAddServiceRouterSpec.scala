@@ -24,10 +24,12 @@ import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.flowmanagement.routings._
+import utils.DependencyMocks
 
 class VariationAddServiceRouterSpec extends PlaySpec {
 
-  trait Fixture {
+
+  trait Fixture extends DependencyMocks{
     val routingFile = VariationAddServiceRouter.router
   }
 

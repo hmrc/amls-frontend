@@ -41,7 +41,7 @@ import scala.concurrent.Future
 @Singleton
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
-                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService
                                          ) extends BaseController {
 
@@ -76,7 +76,7 @@ class TradingPremisesController @Inject()(
         }
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel, BusinessActivity)] = for {
     model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
     activity <- OptionT.fromOption[Future](model.activity)
   } yield (model, activity)

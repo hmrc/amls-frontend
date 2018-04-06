@@ -18,20 +18,17 @@ package controllers.businessmatching.updateservice
 
 import controllers.businessmatching.updateservice.add.WhichTradingPremisesController
 import generators.tradingpremises.TradingPremisesGenerator
-import models.DateOfChange
 import models.businessmatching._
 import models.businessmatching.updateservice.UpdateService
 import models.flowmanagement.AddServiceFlowModel
-import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
-import org.joda.time.LocalDate
-import org.mockito.Matchers.{eq => eqTo}
+import models.tradingpremises.TradingPremises
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext
 

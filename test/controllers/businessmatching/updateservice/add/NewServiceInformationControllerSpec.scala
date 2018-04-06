@@ -41,66 +41,70 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
     val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, bmService, mockServiceFlow, messagesApi)
   }
 
-  "GET" when {
-    "called" must {
-      "return OK with the service name" which {
-        "clears the section data of the activity retrieved" in new Fixture {
-          when {
-            bmService.getAdditionalBusinessActivities(any(), any(), any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
-
-          when {
-            mockServiceFlow.next(any(), any(), any())
-          } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
-
-          when {
-            bmService.clearSection(eqTo(AccountancyServices))(any(),any())
-          } thenReturn Future.successful(mockCacheMap)
-
-          val result = controller.get()(request)
-
-          status(result) mustBe OK
-
-          contentAsString(result) must include(AccountancyServices.getMessage)
-          contentAsString(result) must include("/service")
-
-          verify(bmService).clearSection(eqTo(AccountancyServices))(any(),any())
-        }
-      }
-
-      "redirect to the 'update more information' page" when {
-        "there are no services left to update" in new Fixture {
-          when {
-            bmService.getAdditionalBusinessActivities(any(), any(), any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
-
-          when {
-            mockServiceFlow.next(any(), any(), any())
-          } thenReturn OptionT.none[Future, NextService]
-
-          val result = controller.get()(request)
-
-          status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url)
-        }
-      }
-    }
+  "GET" in new Fixture {
+ //   "called" must {
+    //TODO Fix test
+      fail()
+//      "return OK with the service name" which {
+//        "clears the section data of the activity retrieved" in new Fixture {
+//          when {
+//            bmService.getAdditionalBusinessActivities(any(), any(), any())
+//          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
+//
+//          when {
+//            mockServiceFlow.next(any(), any(), any())
+//          } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
+//
+//          when {
+//            bmService.clearSection(eqTo(AccountancyServices))(any(),any())
+//          } thenReturn Future.successful(mockCacheMap)
+//
+//          val result = controller.get()(request)
+//
+//          status(result) mustBe OK
+//
+//          contentAsString(result) must include(AccountancyServices.getMessage)
+//          contentAsString(result) must include("/service")
+//
+//          verify(bmService).clearSection(eqTo(AccountancyServices))(any(),any())
+//        }
+//      }
+//
+//      "redirect to the 'update more information' page" when {
+//        "there are no services left to update" in new Fixture {
+//          when {
+//            bmService.getAdditionalBusinessActivities(any(), any(), any())
+//          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
+//
+//          when {
+//            mockServiceFlow.next(any(), any(), any())
+//          } thenReturn OptionT.none[Future, NextService]
+//
+//          val result = controller.get()(request)
+//
+//          status(result) mustBe SEE_OTHER
+//          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url)
+//        }
+//      }
+//    }
   }
 
-  "POST" when {
-    "called" must {
-      "update UpdateService with isInNewFlow = true" in new Fixture {
-        val url = "/service"
-
-        when {
-          mockServiceFlow.setInServiceFlowFlag(eqTo(true))(any(), any(), any())
-        } thenReturn Future.successful(mock[CacheMap])
-
-        val result = controller.post()(request.withFormUrlEncodedBody("redirectUrl" -> url))
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(url)
-      }
-    }
+  "POST"  in new Fixture {
+    //TODO Fix test
+    fail()
+//    "called" must {
+//      "update UpdateService with isInNewFlow = true" in new Fixture {
+//        val url = "/service"
+//
+//        when {
+//          mockServiceFlow.setInServiceFlowFlag(eqTo(true))(any(), any(), any())
+//        } thenReturn Future.successful(mock[CacheMap])
+//
+//        val result = controller.post()(request.withFormUrlEncodedBody("redirectUrl" -> url))
+//
+//        status(result) mustBe SEE_OTHER
+//        redirectLocation(result) mustBe Some(url)
+//      }
+//    }
   }
 }

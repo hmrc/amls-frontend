@@ -22,10 +22,11 @@ import org.scalatestplus.play.PlaySpec
 import services.flowmanagement.Router
 import services.flowmanagement.routings._
 import play.api.test.Helpers._
+import utils.DependencyMocks
 
 class ChangeServicesRouterSpec extends PlaySpec {
 
-  trait Fixture {
+  trait Fixture extends DependencyMocks {
 
     val router = ChangeServicesRouter.router
 

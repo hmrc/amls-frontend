@@ -31,15 +31,17 @@ class add_more_activitiesSpec extends GenericTestHelper with MustMatchers  {
 
   "add_more_activities view" must {
     "have correct content" in new ViewFixture {
+      //TODO Fix test
+      fail()
 
-
-      doc.title must startWith(Messages("businessmatching.updateservice.addmoreactivities.title"))
-      heading.html must be(Messages("businessmatching.updateservice.addmoreactivities.title"))
-      subHeading.html must include(Messages("summary.updateinformation"))
-      //doc.body().text() must include(Messages("link.return.registration.progress"))
+//      doc.title must startWith(Messages("businessmatching.updateservice.addmoreactivities.title"))
+//      heading.html must be(Messages("businessmatching.updateservice.addmoreactivities.title"))
+//      subHeading.html must include(Messages("summary.updateinformation"))
+//      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
+      //TODO Fix test
       fail()
 //      val forPm2: InvalidForm = InvalidForm(Map.empty,
 //        Seq(A

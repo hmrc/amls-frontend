@@ -16,13 +16,14 @@
 
 package services.flowmanagement.routings
 
+import connectors.DataCacheConnector
 import models.businessmatching._
 import models.businessmatching.updateservice._
 import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import controllers.businessmatching.updateservice.routes
-import controllers.businessmatching.updateservice.add.{ routes => addRoutes }
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import services.flowmanagement.Router
 
 import scala.concurrent.Future
@@ -32,7 +33,7 @@ object VariationAddServiceRouter {
   // scalastyle:off cyclomatic.complexity
   implicit val router = new Router[AddServiceFlowModel] {
 
-    override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false): Future[Result] = pageId match {
+    override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)(implicit dataCacheConnector: DataCacheConnector): Future[Result] = pageId match {
 
       case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
         Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))

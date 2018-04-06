@@ -16,6 +16,13 @@
 
 package models.businessmatching.updateservice
 
-class UpdateServicesSummary {
+import scala.concurrent.Future
+
+
+case class UpdateServicesSummary (submittedActivities: Option[Future[Option[Set[String]]]] = None,
+                                  addedActivities: Option[Future[Option[Set[String]]]] = None
+                                 ){
+
+
 
 }

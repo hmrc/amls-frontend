@@ -16,6 +16,7 @@
 
 package services.flowmanagement.routings
 
+import connectors.DataCacheConnector
 import models.flowmanagement._
 import play.api.mvc.Result
 import services.flowmanagement.Router
@@ -25,6 +26,6 @@ import scala.concurrent.Future
 object VariationRemoveServiceRouter {
 
   implicit val router = new Router[RemoveServiceFlowModel] {
-    override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false): Future[Result] = ???
+    override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)(implicit dataCacheConnector: DataCacheConnector): Future[Result] = ???
   }
 }

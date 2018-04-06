@@ -28,11 +28,11 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
-    implicit override val request = addToken(FakeRequest())
+    implicit val requestWithToken = addToken(request)
 
     val nextPageUrl = controllers.asp.routes.WhatYouNeedController.get().url
 
-    def view = new_service_information(AccountancyServices, nextPageUrl)
+    def view = new_service_information(AccountancyServices)
 
   }
 
@@ -40,10 +40,6 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
     "display the correct headings and titles" in new ViewFixture {
       validateTitle("businessmatching.updateservice.newserviceinformation.title")
       doc.select("h1").text mustBe messages("businessmatching.updateservice.newserviceinformation.heading")
-    }
-
-    "displays the correct url on the button link" in new ViewFixture {
-      doc.select("input[name=\"redirectUrl\"]").attr("value") mustBe nextPageUrl
     }
   }
 

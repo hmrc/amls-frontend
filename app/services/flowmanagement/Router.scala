@@ -16,20 +16,21 @@
 
 package services.flowmanagement
 
-import models.flowmanagement.{Edit, Flow, FlowMode, PageId}
+import connectors.DataCacheConnector
 import play.api.mvc.Result
 
 import scala.concurrent.Future
+import models.flowmanagement.{Edit, Flow, FlowMode, PageId}
 
 trait Router[A] {
-  def getRoute(pageId: PageId, model: A, edit: Boolean = false): Future[Result]
+  def getRoute(pageId: PageId, model: A, edit: Boolean = false)(implicit dataCacheConnector: DataCacheConnector): Future[Result]
 }
 
-object Router {
-
-  implicit def convertBoolToFlow(edit: Boolean): FlowMode = if (edit) Edit else Flow
-
-  def getRoute[A](pageId: PageId, model: A, edit: Boolean = false)(implicit router: Router[A]) =
-    router.getRoute(pageId, model, edit)
-
-}
+//object Router {
+//
+//  implicit def convertBoolToFlow(edit: Boolean): FlowMode = if (edit) Edit else Flow
+//
+//  def getRoute[A](pageId: PageId, model: A, edit: Boolean = false)(implicit router: Router[A]) =
+//    router.getRoute(pageId, model, edit)
+//
+//}

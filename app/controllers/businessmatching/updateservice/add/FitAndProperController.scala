@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
-                                        val dataCacheConnector: DataCacheConnector,
+                                        implicit val dataCacheConnector: DataCacheConnector,
                                         val businessMatchingService: BusinessMatchingService,
                                         val statusService: StatusService,
                                         config: AppConfig) extends BaseController with RepeatingSection {

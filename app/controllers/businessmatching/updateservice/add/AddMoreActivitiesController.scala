@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel, TradingPremisesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.routings.VariationAddServiceRouter.router
@@ -31,6 +31,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
+
+import scala.concurrent.Future
 
 @Singleton
 class AddMoreActivitiesController @Inject()(
@@ -64,12 +66,15 @@ class AddMoreActivitiesController @Inject()(
               BadRequest(views.html.businessmatching.updateservice.add_more_activities(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
-            val flowModel = AddServiceFlowModel(addMoreActivities = Some(data))
-            router.getRoute(AddMoreAcivitiesPageId, flowModel)
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
+              model.copy(addMoreActivities = Some(data))
+            } flatMap { case Some(model) =>
+              router.getRoute(AddMoreAcivitiesPageId, model)
+            }
         }
   }
 
-  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = {
+  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext): Future[Option[Set[String]]] = {
     dataCacheConnector.fetchAll map {
       optionalCache =>
         for {

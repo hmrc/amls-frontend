@@ -35,12 +35,14 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.select_activities
-import services.flowmanagement.Router._
+
+
+import scala.concurrent.Future
 
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
-                                           val dataCacheConnector: DataCacheConnector,
+                                           implicit val dataCacheConnector: DataCacheConnector,
                                            val businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
@@ -80,7 +82,7 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
                 case m => m.activity(data)
               }
             } flatMap { case Some(model) =>
-              getRoute(SelectActivitiesPageId, model, edit)
+              router.getRoute(SelectActivitiesPageId, model, edit)
             }
         }
   }

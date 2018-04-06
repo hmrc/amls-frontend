@@ -16,42 +16,61 @@
 
 package controllers.businessmatching.updateservice.add
 
-import org.junit.Assert
+
+import models.businessmatching.HighValueDealing
+import models.flowmanagement.AddServiceFlowModel
+import models.status.SubmissionDecisionApproved
+import models.tradingpremises.TradingPremises
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext
 
 class UpdateServicesSummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
+
+    implicit val hc: HeaderCarrier = HeaderCarrier()
+    implicit val authContext: AuthContext = mock[AuthContext]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
+
+    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockApplicationStatus(SubmissionDecisionApproved)
 
     val controller = new UpdateServicesSummaryController(
-      dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector
+      self.authConnector,
+      mockCacheConnector
     )
   }
 
   "Get" must {
+    "return OK with update_service_summary view" in new Fixture {
 
-    "load the summary page with the correct link text when the section is incomplete" in new Fixture {
-      fail()
+      val result = controller.get()(request)
+      status(result) must be(OK)
+
+      contentAsString(result) must include(Messages("businessmatching.updateservice.selectactivities.title"))
+
+      contentAsString(result) must include(Messages("button.checkyouranswers.acceptandcomplete"))
     }
-
-
-    "load the summary page with the correct link text when the section is complete" in new Fixture {
-      fail()
-    }
-
   }
 
   "post is called" must {
-    "respond with OK and redirect to the 'do you want to add more activities' page if the user clicks continue" when {
+    "respond with OK and redirect to the 'do you want to add more activities' page " +
+      "if the user clicks continue and there are available Activities to select" in new Fixture {
 
-      "all questions are complete" in new Fixture {
-        fail()
-      }
+      val result = controller.post()(request)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.add.routes.AddMoreActivitiesController.get().url))
     }
+
   }
 }
 

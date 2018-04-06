@@ -19,7 +19,7 @@
 @import forms2._
 
 @import forms.EmptyForm
-@(activity: BusinessActivity, flowUrl: String)(implicit request: Request[_], messages: Messages)
+@(activity: BusinessActivity)(implicit request: Request[_], messages: Messages)
 
 @header = {
     @heading(
@@ -39,8 +39,8 @@
 
     <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
 
+
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.post()) {
-        <input type="hidden" name="redirectUrl" value="@flowUrl">
         @submit(false, Some("Continue"), false)
     }
 }

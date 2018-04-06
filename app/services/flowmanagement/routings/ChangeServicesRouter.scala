@@ -35,7 +35,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 object ChangeServicesRouter {
 
   implicit val router = new Router[ChangeServices] {
-    override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false): Future[Result] = model match {
+    override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)(implicit dataCacheConnector: DataCacheConnector): Future[Result] = model match {
       case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
       case ChangeServicesRemove => ???
 //      case ChangeServicesRemove => {

@@ -91,7 +91,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
               ))
 
               status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
+              redirectLocation(result) mustBe Some(routes.UpdateServicesSummaryController.get().url)
             }
           }
         }

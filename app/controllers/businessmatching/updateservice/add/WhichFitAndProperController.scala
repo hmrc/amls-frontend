@@ -40,7 +40,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class WhichFitAndProperController @Inject()(
                                              val authConnector: AuthConnector,
                                              val statusService: StatusService,
-                                             val dataCacheConnector: DataCacheConnector,
+                                             implicit val dataCacheConnector: DataCacheConnector,
                                              val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {

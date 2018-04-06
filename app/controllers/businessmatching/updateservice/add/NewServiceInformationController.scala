@@ -16,15 +16,20 @@
 
 package controllers.businessmatching.updateservice.add
 
+import java.lang.ProcessBuilder.Redirect
+
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import play.api.i18n.MessagesApi
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.new_service_information
+import services.flowmanagement.routings.VariationAddServiceRouter.router
+import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
 
@@ -32,28 +37,25 @@ import scala.concurrent.Future
 class NewServiceInformationController @Inject()
 (
   val authConnector: AuthConnector,
-  val dataCacheConnector: DataCacheConnector,
+  implicit val dataCacheConnector: DataCacheConnector,
   val businessMatchingService: BusinessMatchingService,
   val serviceFlow: ServiceFlow,
   val messages: MessagesApi
 ) extends BaseController {
 
   def get() = Authorised.async {
-    implicit authContext => implicit request => {
-        for {
-          next <- serviceFlow.next
-          _ <- OptionT.liftF(businessMatchingService.clearSection(next.activity))
-        } yield Ok(new_service_information(next.activity, next.url))
-      } getOrElse Redirect(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get())
+    implicit authContext => implicit request => (for {
+      model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+      activity <- OptionT.fromOption[Future](model.activity)
+    } yield {
+      Ok(new_service_information(activity))
+    }) getOrElse InternalServerError("Could not get the flow model")
   }
 
   def post() = Authorised.async {
-    implicit authContext => implicit request => {
-      for {
-        _ <- OptionT.liftF(serviceFlow.setInServiceFlowFlag(true))
-        form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
-        url <- OptionT.fromOption[Future](form.get("redirectUrl"))
-      } yield Redirect(url.head)
-    } getOrElse InternalServerError("Unable to configure UpdateService")
+    implicit authContext => implicit request => (for {
+      model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+      route <- OptionT.liftF(router.getRoute(NewServiceInformationPageId, model))
+    } yield route) getOrElse InternalServerError("Could not get the flow model")
   }
 }
