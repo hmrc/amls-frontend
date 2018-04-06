@@ -68,10 +68,8 @@ class TradingPremisesController @Inject()(
 
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-              model.copy(
-                areNewActivitiesAtTradingPremises = Some(data),
-                tradingPremisesActivities = if(data) model.tradingPremisesActivities else None
-              )
+              model.isActivityAtTradingPremises(data)
+                .tradingPremisesActivities(if(data) model.tradingPremisesActivities else None)
             } flatMap { model =>
               router.getRoute(TradingPremisesPageId, model.get, edit)
             }

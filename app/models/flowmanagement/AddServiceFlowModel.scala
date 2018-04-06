@@ -16,20 +16,36 @@
 
 package models.flowmanagement
 
-import models.businessmatching.{BillPaymentServices, BusinessActivities, BusinessActivity, TelephonePaymentService}
-import models.businessmatching.updateservice.{AreNewActivitiesAtTradingPremises, NewActivitiesAtTradingPremisesNo, TradingPremisesActivities}
+import models.businessmatching._
+import models.businessmatching.updateservice.TradingPremisesActivities
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
                                 activity: Option[BusinessActivity] = None,
                                 areNewActivitiesAtTradingPremises: Option[Boolean] = None,
                                 tradingPremisesActivities: Option[TradingPremisesActivities] = None,
-                                addMoreActivities: Option[Boolean] = None
+                                addMoreActivities: Option[Boolean] = None,
+                                hasChanged: Boolean = false,
+                                hasAccepted: Boolean = false
                               ) {
+  def activity(p: BusinessActivity): AddServiceFlowModel =
+    this.copy(activity = Some(p),
+      hasChanged = hasChanged || !this.activity.contains(p),
+      hasAccepted = hasAccepted && this.activity.contains(p))
+
+  def isActivityAtTradingPremises(p: Boolean): AddServiceFlowModel =
+    this.copy(areNewActivitiesAtTradingPremises = Some(p),
+      hasChanged = hasChanged || !this.areNewActivitiesAtTradingPremises.contains(p),
+      hasAccepted = hasAccepted && this.areNewActivitiesAtTradingPremises.contains(p))
+
+  def tradingPremisesActivities(p: Option[TradingPremisesActivities]): AddServiceFlowModel =
+    this.copy(tradingPremisesActivities = p,
+      hasChanged = hasChanged || !this.tradingPremisesActivities.equals(p),
+      hasAccepted = hasAccepted && this.tradingPremisesActivities.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_)) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_)) => true
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), _, true) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), _, true) => true
     case _ => false
   }
 

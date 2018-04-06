@@ -66,7 +66,7 @@ class WhichTradingPremisesController @Inject()(
           } getOrElse InternalServerError("Cannot retrieve form data")
 
           case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-            model.copy(tradingPremisesActivities = Some(data))
+            model.tradingPremisesActivities(Some(data))
           } flatMap {
             case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
           }

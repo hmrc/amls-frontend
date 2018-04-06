@@ -74,7 +74,7 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
 
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              _.getOrElse(AddServiceFlowModel()).copy(activity = Some(data))
+              _.getOrElse(AddServiceFlowModel()).activity(data)
             } flatMap { case Some(model) =>
               getRoute(SelectActivitiesPageId, model, edit)
             }
