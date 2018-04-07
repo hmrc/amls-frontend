@@ -16,18 +16,60 @@
 
 package views.businessmatching.updateservice
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{AccountancyServices, BusinessActivities}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class select_activitiesSpec extends GenericTestHelper with MustMatchers  {
+class select_activitiesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    override def view = views.html.businessmatching.updateservice.select_activities(EmptyForm,
+        true,
+        Set.empty[String],
+        Set.empty[String]
+      )
+
   }
 
+  "The select_Activities view" must {
+
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.selectactivities.title") + " - " + Messages("summary.updateservice"))
+    }
+
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.selectactivities.heading"))
+    }
+
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "show the correct content" in new ViewFixture {
+
+    }
+
+    "not show the return link" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.select_activities(EmptyForm,
+          true,
+          Set.empty[String],
+          Set.empty[String]
+        )
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq((Path \ "businessmatching.updateservice.selectactivities") -> Seq(ValidationError("not a message Key"))))
+
+      override def view = views.html.businessmatching.updateservice.select_activities(form2, true, Set.empty[String], Set.empty[String])
+
+      errorSummary.html() must include("not a message Key")
+    }
+  }
 }

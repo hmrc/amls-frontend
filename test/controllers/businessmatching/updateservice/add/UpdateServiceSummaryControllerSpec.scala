@@ -17,20 +17,26 @@
 package controllers.businessmatching.updateservice.add
 
 
-import models.businessmatching.HighValueDealing
+import generators.tradingpremises.TradingPremisesGenerator
+import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.AddServiceFlowModel
 import models.status.SubmissionDecisionApproved
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, when}
+import services.TradingPremisesService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext
 
-class UpdateServicesSummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class UpdateServicesSummaryControllerSpec extends GenericTestHelper with MockitoSugar with TradingPremisesGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -43,9 +49,12 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper with Mockito
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
     mockApplicationStatus(SubmissionDecisionApproved)
 
+    val mockTradingPremisesService = mock[TradingPremisesService]
+
     val controller = new UpdateServicesSummaryController(
       self.authConnector,
-      mockCacheConnector
+      mockCacheConnector,
+      mockTradingPremisesService
     )
   }
 
@@ -64,6 +73,32 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper with Mockito
   "post is called" must {
     "respond with OK and redirect to the 'do you want to add more activities' page " +
       "if the user clicks continue and there are available Activities to select" in new Fixture {
+
+      val tradingPremises = Gen.listOfN(5, tradingPremisesGen).sample.get.toSeq
+
+      val modifiedTradingPremises = tradingPremises map {_.copy(
+        whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing)))
+      )}
+
+      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+      val flowModel = AddServiceFlowModel(
+        Some(HighValueDealing),
+        Some(true),
+        Some(TradingPremisesActivities(Set(0)))
+      )
+
+      mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
+
+      when {
+        controller.tradingPremisesService.addBusinessActivtiesToTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(false))
+      } thenReturn modifiedTradingPremises
+
+      mockCacheSave(modifiedTradingPremises, Some(TradingPremises.key))
+
+      mockCacheUpdate[ServiceChangeRegister](Some(ServiceChangeRegister.key), ServiceChangeRegister())
+
+      mockCacheSave(flowModel.copy(hasAccepted = true), Some(AddServiceFlowModel.key))
 
       val result = controller.post()(request)
 

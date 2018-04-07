@@ -24,13 +24,13 @@
 @header = {
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
     @headingWithPlaceholder((
-        "businessmatching.updateservice.whichtradingpremises.header",
+        "businessmatching.updateservice.whichtradingpremises.heading",
         Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
-    ), "summary.updateinformation")
+    ), "summary.updateservice")
 }
 
 @main(
-    title = Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("progress.update.registration"),
+    title = Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("summary.updateservice"),
     heading = header
 )  {
 

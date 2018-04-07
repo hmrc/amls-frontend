@@ -41,7 +41,7 @@ import scala.concurrent.Future
 class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                 val tradingPremisesService: TradingPremisesService
+                                                   val tradingPremisesService: TradingPremisesService
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
@@ -80,9 +80,7 @@ class UpdateServicesSummaryController @Inject()(
   private def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) = for {
     tradingPremises <- OptionT.liftF(tradingPremisesData)
     activity <- OptionT.fromOption[Future](model.activity)
-    indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {
-      _.index.toSeq
-    }) orElse OptionT.some(Seq.empty)
+    indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {_.index.toSeq}) orElse OptionT.some(Seq.empty)
     newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](
       tradingPremisesService.addBusinessActivtiesToTradingPremises(indices, tradingPremises, activity, false)
     )

@@ -24,11 +24,11 @@
 @(f: forms.Form2[_], flowModel: AddServiceFlowModel)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", "summary.updateinformation")
+    @heading("title.cya", "summary.updateservice")
 }
 
 @main(
-    title = Messages("title.cya") + " - " + Messages("summary.updateinformation"),
+    title = Messages("title.cya") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
     @panel(

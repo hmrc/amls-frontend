@@ -22,14 +22,11 @@
 @(activity: BusinessActivity)(implicit request: Request[_], messages: Messages)
 
 @header = {
-    @heading(
-        "businessmatching.updateservice.newserviceinformation.heading",
-        "summary.updateservice"
-    )
+    @heading("businessmatching.updateservice.newserviceinformation.heading", "summary.updateservice")
 }
 
 @main(
-    title = messages("businessmatching.updateservice.newserviceinformation.title"),
+    title = messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
 

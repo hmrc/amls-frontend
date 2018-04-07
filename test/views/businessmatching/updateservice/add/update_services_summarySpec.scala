@@ -17,172 +17,40 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
-import org.jsoup.nodes.Element
-import org.junit.Assert
 import org.scalatest.MustMatchers
-import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.include.heading
-
-import scala.collection.JavaConversions._
 
 
-class update_services_summarySpec extends GenericTestHelper
-  with MustMatchers
-  with TableDrivenPropertyChecks {
+class update_services_summarySpec  extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
     def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, AddServiceFlowModel())
   }
 
-  "update_services_summary view" must {
-    "have correct title" in new ViewFixture {
+  "The update_services_summary view" must {
 
-      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateinformation"))
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
+    }
+
+    "have correct heading" in new ViewFixture {
       heading.html must be(Messages("title.cya"))
-      subHeading.html must include(Messages("summary.updateinformation"))
     }
 
-    "include the provided data when MoneyServicesBusiness and TransmittingMoney were selected for a Limited Company" in new ViewFixture {
-      //TODO Fix test
-fail()
-//      val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
-//      val BusinessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-//      val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-//      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-//      val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany), businessAddress, "XE0000000000000")
-//      val TypeOfBusinessModel = TypeOfBusiness("test")
-//      val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
-//      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberYes("123456")
-//
-//      val testBusinessMatching = BusinessMatching(
-//        Some(ReviewDetailsModel),
-//        Some(BusinessActivitiesModel),
-//        Some(msbServices),
-//        Some(TypeOfBusinessModel),
-//        Some(CompanyRegistrationNumberModel),
-//        Some(BusinessAppliedForPSRNumberModel))
-//
-//      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
-//
-//      val sectionChecks = Table[String, Element => Boolean, String](
-//        ("title key", "check", "editLink"),
-//        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom"), ""),
-//        ("businessmatching.registrationnumber.title", checkElementTextIncludes(_, "12345678"),
-//          controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString),
-//        ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
-//          "businessmatching.registerservices.servicename.lbl.01",
-//          "businessmatching.registerservices.servicename.lbl.02",
-//          "businessmatching.registerservices.servicename.lbl.03",
-//          "businessmatching.registerservices.servicename.lbl.04",
-//          "businessmatching.registerservices.servicename.lbl.05",
-//          "businessmatching.registerservices.servicename.lbl.06",
-//          "businessmatching.registerservices.servicename.lbl.07")),
-//          defaultActivitiesUrl),
-//        ("businessmatching.services.title", checkListContainsItems(_, Set(
-//          "businessmatching.services.list.lbl.01",
-//          "businessmatching.services.list.lbl.02",
-//          "businessmatching.services.list.lbl.03",
-//          "businessmatching.services.list.lbl.04")),
-//          controllers.businessmatching.routes.ServicesController.get(true).toString),
-//        ("businessmatching.psr.number.title", checkElementTextIncludes(_, "123456"),
-//          controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString)
-//      )
-//
-//      html must not include Messages("businessmatching.typeofbusiness.title")
-//
-//      html must not include Messages("button.logout")
-//      html must include(Messages("businessmatching.button.confirm.start"))
-//
-//      val sections = doc.getElementsByTag("section").zipWithIndex
-//
-//      for((section, index) <- sections) {
-//        val (key, check, editLink) = sectionChecks(index)
-//        section.select("h2").text() must be(Messages(key))
-//        check(section) must be(true)
-//        section.select("a[href]").attr("href") must be(editLink)
-//      }
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
     }
 
-    "include the provided data for an UnincorporatedBody with BusinessAppliedForPSRNumberNo" in new ViewFixture {
-      //TODO Fix test
-      fail()
-//      val msbServices = MsbServices(Set(CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
-//      val BusinessActivitiesModel = BusinessActivities(Set(
-//        AccountancyServices,
-//        BillPaymentServices,
-//        EstateAgentBusinessService,
-//        HighValueDealing,
-//        TrustAndCompanyServices,
-//        TelephonePaymentService))
-//      val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
-//      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
-//      val ReviewDetailsModel = ReviewDetails("BusinessName", Some(BusinessType.UnincorporatedBody), businessAddress, "XE0000000000000")
-//      val TypeOfBusinessModel = TypeOfBusiness("test")
-//      val CompanyRegistrationNumberModel = CompanyRegistrationNumber("12345678")
-//      val BusinessAppliedForPSRNumberModel = BusinessAppliedForPSRNumberNo
-//
-//      val testBusinessMatching = BusinessMatching(
-//        Some(ReviewDetailsModel),
-//        Some(BusinessActivitiesModel),
-//        Some(msbServices),
-//        Some(TypeOfBusinessModel),
-//        Some(CompanyRegistrationNumberModel),
-//        Some(BusinessAppliedForPSRNumberModel))
-//
-//      def view = views.html.businessmatching.summary(EmptyForm, testBusinessMatching, defaultActivitiesUrl)
-//
-//      val sectionChecks = Table[String, Element => Boolean, String](
-//        ("title key", "check", "editLink"),
-//        ("businessmatching.summary.business.address.lbl", checkElementTextIncludes(_, "line1", "line2", "line3", "line4", "AB1 2CD", "United Kingdom"), ""),
-//        ("businessmatching.typeofbusiness.title", checkElementTextIncludes(_, "test"),
-//          controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString),
-//        ("businessmatching.registerservices.title", checkListContainsItems(_, Set(
-//          "businessmatching.registerservices.servicename.lbl.01",
-//          "businessmatching.registerservices.servicename.lbl.02",
-//          "businessmatching.registerservices.servicename.lbl.03",
-//          "businessmatching.registerservices.servicename.lbl.04",
-//          "businessmatching.registerservices.servicename.lbl.06",
-//          "businessmatching.registerservices.servicename.lbl.07")),
-//          defaultActivitiesUrl
-//        )
-//      )
-//
-//      html must not include Messages("businessmatching.services.title")
-//      html must not include Messages("businessmatching.registrationnumber.title")
-//
-//      html must include(Messages("button.logout"))
-//      html must not include Messages("businessmatching.button.confirm.start")
-//      val sections = doc.getElementsByTag("section").zipWithIndex
-//
-//      for((section, index) <- sections) {
-//        val (key, check, editLink) = sectionChecks(index)
-//        section.select("h2").text() must be(Messages(key))
-//        check(section) must be(true)
-//        section.select("a[href]").attr("href") must be(editLink)
-//      }
-    }
-  }
+    "show the correct content" in new ViewFixture {
 
-  def checkElementTextIncludes(el:Element, keys : String*) = {
-    val t = el.text()
-    keys.foreach { k =>
-      t must include (Messages(k))
     }
-    true
-  }
 
-  def checkListContainsItems(parent:Element, keysToFind:Set[String]) = {
-    val texts = parent.select("li").toSet.map((el:Element) => el.text())
-    texts must be (keysToFind.map(k => Messages(k)))
-    true
+    "not show the return link" in new ViewFixture {
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
   }
 }

@@ -16,7 +16,7 @@
 
 package views.businessmatching.updateservice
 
-import forms.{EmptyForm, Form2, InvalidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -27,68 +27,51 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, true)
   }
 
-  "fit_and_proper view" must {
-    "have correct title" in new ViewFixture {
+  "The fit_and_proper view" must {
 
-      val form2: Form2[_] = EmptyForm
-
-      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
-
-      doc.title must be(
-        Messages("businessmatching.updateservice.fitandproper.title")
-          + " - " + Messages("summary.updateinformation") +
-          " - " + Messages("title.amls") +
-          " - " + Messages("title.gov")
-      )
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.fitandproper.title") + " - " + Messages("summary.updateservice"))
     }
 
-    "have correct headings" in new ViewFixture {
-
-      val form2: Form2[_] = EmptyForm
-
-      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
-
-      heading.html must be(Messages("businessmatching.updateservice.fitandproper.header"))
-      subHeading.html must include(Messages("summary.updateinformation"))
-
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.fitandproper.heading"))
     }
 
-    "have the correct content" when {
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "not show the return link" in new ViewFixture {
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+
+    "show the correct content" when {
       "fees are being shown" in new ViewFixture {
-
-        val form2: Form2[_] = EmptyForm
-
-        def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
+        override def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, true)
 
         doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info"))
-
       }
+
       "fees are being hidden" in new ViewFixture {
-
-        val form2: Form2[_] = EmptyForm
-
-        def view = views.html.businessmatching.updateservice.fit_and_proper(form2, false)
+        override def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, false)
 
         doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info.no.fees"))
       }
     }
 
     "show errors in the correct locations" in new ViewFixture {
-
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "passedFitAndProper") -> Seq(ValidationError("not a message Key"))
-        ))
+        Seq((Path \ "passedFitAndProper") -> Seq(ValidationError("not a message Key"))))
 
-      def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
+      override def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
       doc.getElementById("passedFitAndProper")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
     }
   }
 

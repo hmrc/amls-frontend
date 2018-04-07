@@ -54,7 +54,7 @@ class AddMoreActivitiesController @Inject()(
         (for {
           activities <- OptionT(getActivities)
           preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(views.html.businessmatching.updateservice.add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
+        } yield Ok(views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
   }
 
   def post() = Authorised.async {
@@ -63,7 +63,7 @@ class AddMoreActivitiesController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             OptionT(getActivities) map { activities =>
-              BadRequest(views.html.businessmatching.updateservice.add_more_activities(f, activities))
+              BadRequest(views.html.businessmatching.updateservice.add.add_more_activities(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>

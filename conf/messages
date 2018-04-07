@@ -868,15 +868,6 @@ changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
 changeservices.choice.remove = Remove a service
 
-updateservice.removeactivities.title = What do you need to remove?
-updateservice.removeactivities.header = What do you need to remove?
-
-updateservice.removeactivitiesinformation.title = Unable to remove services
-updateservice.removeactivitiesinformation.header = Unable to remove {0}
-updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
-updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
-updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
-
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
 
@@ -1146,24 +1137,49 @@ businessmatching.cannotchangeservices.requiredinfo = Your business must have a P
 
 businessmatching.cannotchangeservices.button.text = Return to update information
 
-businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
+########################################################################################################################
+########################################################################################################################
+##############                                                                                            ##############
+##############                    UPDATESERVICE                                                           ##############
+##############                                                                                            ##############
+########################################################################################################################
+########################################################################################################################
+
+businessmatching.updateservice.changeservices.title = What do you want to do?
+businessmatching.updateservice.changeservices.heading = What do you want to do?
+businessmatching.updateservice.changeservices.choice.add = Register another service
+businessmatching.updateservice.changeservices.choice.remove = Remove a service
+
+#remove route
+businessmatching.updateservice.removeactivities.title = What do you need to remove?
+businessmatching.updateservice.removeactivities.header = What do you need to remove?
+
+businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
+businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
+businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
+
+#add route
+businessmatching.updateservice.selectactivities.title = What type of business do you need to register
+businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
 businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
-businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
+
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
-businessmatching.updateservice.currenttradingpremises.header = Will you still do {0} from all of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
-businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?
-
+businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
-businessmatching.updateservice.addmoreactivities.header = You've told us your business type is:
+businessmatching.updateservice.addmoreactivities.heading = You've told us your business type is:
 
 businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
-businessmatching.updateservice.fitandproper.header = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.fitandproper.heading = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
@@ -1171,7 +1187,7 @@ businessmatching.updateservice.fitandproper.text.info.line1 = The responsible pe
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
-businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
 
 businessmatching.updateservice.newserviceinformation.title = We need to ask you about the new service you’ve added
 businessmatching.updateservice.newserviceinformation.heading = We need to ask you about the new service you’ve added
@@ -1179,6 +1195,8 @@ businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told
 businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
+
+########################################################################################################################
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need

@@ -101,9 +101,4 @@ trait TestOnlyController extends BaseController with Actions {
       Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
   }
 
-  def addMoreActivitiesView = Authorised.async {
-    implicit authContext => implicit request =>
-      val form = EmptyForm
-      Future.successful(Ok(views.html.businessmatching.updateservice.add_more_activities(form,Set("HVD"))))
-  }
 }

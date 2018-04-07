@@ -25,31 +25,45 @@ import utils.GenericTestHelper
 import views.Fixture
 
 class trading_premisesSpec extends GenericTestHelper with MustMatchers {
+
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
     val activityName = BusinessActivities.getValue(HighValueDealing)
+
+    def view = views.html.businessmatching.updateservice.trading_premises(EmptyForm, edit = false, activityName)
+
   }
 
-  "change_services view" must {
-    "have correct content" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.trading_premises(EmptyForm, edit = false, activityName)
+  "The trading_premises view" must {
 
-      validateTitle(s"${Messages("businessmatching.updateservice.tradingpremises.title")} - ${Messages("summary.updateinformation")}")
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("summary.updateservice"))
+    }
 
-      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.header", "High value dealer"))
-      subHeading.html must include(Messages("summary.updateinformation"))
+    "have correct heading" in new ViewFixture {
+
+      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.heading").replace("{0}", "High value dealer"))
+    }
+
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "show the correct content" in new ViewFixture {
+//TODO  content check
+    }
+
+    "not show the return link when specified" in new ViewFixture {
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "tradingPremisesNewActivities") -> Seq(ValidationError("not a message Key"))
-        ))
+        Seq((Path \ "tradingPremisesNewActivities") -> Seq(ValidationError("not a message Key"))))
 
-      def view = views.html.businessmatching.updateservice.trading_premises(form2, edit = false, activityName)
+      override def view = views.html.businessmatching.updateservice.trading_premises(form2, edit = false, activityName)
 
       errorSummary.html() must include("not a message Key")
 

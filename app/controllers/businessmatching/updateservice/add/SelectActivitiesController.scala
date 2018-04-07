@@ -61,7 +61,7 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
 
-          Ok(select_activities(form, edit, values, names, false))
+          Ok(select_activities(form, edit, values, names))
         }) getOrElse InternalServerError("Failed to get activities")
   }
 
@@ -71,7 +71,7 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessActivity](request.body) match {
           case f: InvalidForm => getFormData map {
             case (names, values) =>
-              BadRequest(select_activities(f, edit, values, names, false))
+              BadRequest(select_activities(f, edit, values, names))
           } getOrElse InternalServerError("Could not get form data")
 
           case ValidForm(_, data) =>

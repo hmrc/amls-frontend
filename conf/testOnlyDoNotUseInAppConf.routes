@@ -22,8 +22,5 @@ GET        /anti-money-laundering/test-only/companyname                         
 GET        /anti-money-laundering/test-only/payment/bacs/nontr                   controllers.testonly.TestOnlyController.confirmationBacs
 GET        /anti-money-laundering/test-only/payment/bacs/tr                      controllers.testonly.TestOnlyController.confirmationBacsTransitionalRenewal
 
-GET        /anti-money-laundering/test-only/update-information/add-more-activities  controllers.testonly.TestOnlyController.addMoreActivitiesView
-
-
 # Add all the application routes to the prod.routes file
 ->         /                                                                     prod.Routes

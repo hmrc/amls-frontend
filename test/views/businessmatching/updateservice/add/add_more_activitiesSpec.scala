@@ -16,7 +16,8 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.EmptyForm
+import forms.{EmptyForm, InvalidForm}
+import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -26,40 +27,48 @@ class add_more_activitiesSpec extends GenericTestHelper with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.add_more_activities(EmptyForm, Set.empty[String])
+    def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm,Set.empty[String])
   }
 
-  "add_more_activities view" must {
-    "have correct content" in new ViewFixture {
-      //TODO Fix test
-      fail()
+  "The add_more_activities view" must {
 
-//      doc.title must startWith(Messages("businessmatching.updateservice.addmoreactivities.title"))
-//      heading.html must be(Messages("businessmatching.updateservice.addmoreactivities.title"))
-//      subHeading.html must include(Messages("summary.updateinformation"))
-//      doc.body().text() must include(Messages("link.return.registration.progress"))
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.addmoreactivities.title") + " - " + Messages("summary.updateservice"))
+    }
+
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.addmoreactivities.heading"))
+    }
+
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "show the correct content" in new ViewFixture {
+      doc.body().text() must include(Messages("lbl.yes"))
+      doc.body().text() must include(Messages("lbl.no"))
+    }
+
+    "not show the return link when specified" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = false)
+
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+
+    " show the return link when specified" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = true)
+
+      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
-      //TODO Fix test
-      fail()
-//      val forPm2: InvalidForm = InvalidForm(Map.empty,
-//        Seq(A
-//          (Path \ "changeServices") -> Seq(ValidationError("not a message Key"))
-//        ))
-//
-//      def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String])
-//
-//      errorSummary.html() must include("not a message Key")
-//
-//      doc.getElementById("changeServices")
-//        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-    }
 
-    "show two radio buttons, yes and no" in new ViewFixture {
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq((Path \ "businessmatching.updateservice.addmoreactivities") -> Seq(ValidationError("not a message Key"))))
 
-      doc.body().text() must include(Messages("lbl.yes"))
-      doc.body().text() must include(Messages("lbl.no"))
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(form2, Set.empty[String])
+
+      errorSummary.html() must include("not a message Key")
     }
   }
 }

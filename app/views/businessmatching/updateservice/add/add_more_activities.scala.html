@@ -23,13 +23,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading(
-        Messages("businessmatching.updateservice.addmoreactivities.title"), "progress.update.registration"
-    )
+    @heading("businessmatching.updateservice.addmoreactivities.heading", "summary.updateservice")
 }
 
 @main(
-    title = Messages("businessmatching.updateservice.addmoreactivities.title") + " - " + Messages("progress.update.registration"),
+    title = Messages("businessmatching.updateservice.addmoreactivities.title") + " - " + Messages("summary.updateservice"),
     heading = header
 )  {
 
@@ -47,7 +45,7 @@
 
         @fieldset(
             f = f("addmoreactivities-fieldset"),
-            legend = "businessmatching.updateservice.addmoreactivities.title",
+            legend = "businessmatching.updateserviceaddmoreactivities.title",
             legendHidden = true,
             panel = false
         ) {

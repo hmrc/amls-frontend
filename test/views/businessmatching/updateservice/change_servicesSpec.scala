@@ -16,51 +16,62 @@
 
 package views.businessmatching.updateservice
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.BusinessType
-import models.businessmatching.BusinessType.LimitedCompany
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 
-class change_servicesSpec extends GenericTestHelper with MustMatchers  {
+class change_servicesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String])
   }
 
-  "change_services view" must {
-    "have correct content" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.change_services(EmptyForm,Set.empty[String])
+  "The change_services view" must {
 
-      doc.title must startWith(Messages("changeservices.title") + " - " + Messages("summary.updateinformation"))
-      heading.html must be(Messages("changeservices.title"))
-      subHeading.html must include(Messages("summary.updateinformation"))
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.changeservices.title") + " - " + Messages("summary.updateservice"))
+    }
+
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.changeservices.heading"))
+    }
+
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "show the correct content" in new ViewFixture {
+      <label class="block-label" for="changeServices-add">updateservice.changeservices.choice.add</label>
+      doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
+      doc.body().html() must include("changeServices-add")
+      //doc.body() must include("changeServices-remove"))
+      //doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.remove"))
+    }
+
+    "not show the return link when specified" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = false)
+
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+
+    " show the return link when specified" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = true)
+
       doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "changeServices") -> Seq(ValidationError("not a message Key"))
-        ))
+        Seq((Path \ "businessmatching.updateservice.changeServices") -> Seq(ValidationError("not a message Key"))))
 
-      def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String])
+      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String])
 
       errorSummary.html() must include("not a message Key")
-
-      doc.getElementById("changeServices")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
-    }
-
-    "not show the return link when specified" in new ViewFixture {
-      def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = false)
-
-      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }

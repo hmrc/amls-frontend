@@ -16,10 +16,9 @@
 
 package views.businessmatching.updateservice
 
-import models.businessmatching.AccountancyServices
+import models.businessmatching.{AccountancyServices, BusinessActivities, HighValueDealing}
 import org.scalatest.MustMatchers
-import org.scalatestplus.play.PlaySpec
-import play.api.test.FakeRequest
+import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 import views.html.businessmatching.updateservice.new_service_information
@@ -27,19 +26,31 @@ import views.html.businessmatching.updateservice.new_service_information
 class new_service_informationSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
-
     implicit val requestWithToken = addToken(request)
-
-    val nextPageUrl = controllers.asp.routes.WhatYouNeedController.get().url
-
     def view = new_service_information(AccountancyServices)
-
   }
 
-  "The view template" must {
-    "display the correct headings and titles" in new ViewFixture {
-      validateTitle("businessmatching.updateservice.newserviceinformation.title")
-      doc.select("h1").text mustBe messages("businessmatching.updateservice.newserviceinformation.heading")
+  "The new_service_information view" must {
+
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"))
+    }
+
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.newserviceinformation.heading"))
+    }
+
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
+
+    "show the correct content" in new ViewFixture {
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.gutter").replace("{0}", "Accountancy service provider"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info").replace("{0}", "Accountancy service provider"))
+    }
+
+    "not show the return link" in new ViewFixture {
+      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 

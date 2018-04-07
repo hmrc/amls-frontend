@@ -22,14 +22,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading(
-        "changeservices.title",
-        "summary.updateinformation"
-    )
+    @heading("businessmatching.updateservice.changeservices.heading", "summary.updateservice")
 }
 
 @main(
-    title = Messages("changeservices.title") + " - " + Messages("summary.updateinformation"),
+    title = Messages("businessmatching.updateservice.changeservices.title") + " - " + Messages("summary.updateservice"),
     heading = header
 )  {
 
@@ -47,7 +44,7 @@
 
         @fieldset(
             f = f("changeservices-fieldset"),
-            legend = "changeservices.title",
+            legend = "businessmatching.updateservice.changeservices.title",
             legendHidden = true,
             panel = false
         ) {
@@ -57,7 +54,7 @@
             ) {
                 @radio(
                     f = f("changeServices"),
-                    labelText = "changeservices.choice.add",
+                    labelText = "businessmatching.updateservice.changeservices.choice.add",
                     value = "add"
                 )
             }
