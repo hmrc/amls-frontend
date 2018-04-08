@@ -133,10 +133,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
           "appliedFor" -> "false"
         )
 
-        when {
-          controller.businessMatchingService.clearVariation(any(), any(), any())
-        } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
@@ -166,19 +162,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
           when {
             controller.businessMatchingService.getModel(any(), any(), any())
           } thenReturn OptionT.none[Future, BusinessMatching]
-
-          val result = controller.post()(newRequest)
-          status(result) mustBe INTERNAL_SERVER_ERROR
-        }
-
-        "'No' was given but there is no model" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "appliedFor" -> "false"
-          )
-
-          when {
-            controller.businessMatchingService.clearVariation(any(), any(), any())
-          } thenReturn OptionT.none[Future, CacheMap]
 
           val result = controller.post()(newRequest)
           status(result) mustBe INTERNAL_SERVER_ERROR

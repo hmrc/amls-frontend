@@ -88,10 +88,6 @@ class RegisterServicesControllerSpec extends GenericTestHelper
     } thenReturn Future.successful(true)
 
     when {
-      controller.businessMatchingService.commitVariationData(any(),any(),any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    when {
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 

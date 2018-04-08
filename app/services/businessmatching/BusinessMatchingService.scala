@@ -48,27 +48,12 @@ class BusinessMatchingService @Inject()(
     } yield bm.preAppComplete
   } getOrElse false
 
-  def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] = {
-    lazy val originalModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-    lazy val variationModel = OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.variationKey))
-
-    OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => originalModel
-      case _ => variationModel collect {
-        case x if !x.equals(BusinessMatching()) => x
-      } orElse originalModel
-    }
-  }
+  def getModel(implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BusinessMatching] =
+    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
 
   def updateModel(model: BusinessMatching)
-                 (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
-
-    OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
-      case _ => OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.variationKey, model))
-    }
-
-  }
+                 (implicit ac:AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
+      OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, model))
 
   private def fetchActivitySet(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     for {
@@ -95,32 +80,6 @@ class BusinessMatchingService @Inject()(
       !((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
         (current contains TrustAndCompanyServices) | (current contains MoneyServiceBusiness)
     }
-
-  def commitVariationData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] = {
-    OptionT.liftF(statusService.getStatus) flatMap {
-      case NotCompleted | SubmissionReady => OptionT(dataCacheConnector.fetchAll)
-      case _ =>
-        for {
-          cacheMap <- OptionT(dataCacheConnector.fetchAll)
-          primaryModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          variationModel <- OptionT.fromOption[Future](cacheMap.getEntry[BusinessMatching](BusinessMatching.variationKey)) if variationModel != BusinessMatching()
-          _ <- OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.key, updateBusinessMatching(primaryModel, variationModel)))
-          result <- clearVariation
-        } yield result
-    }
-  }
-
-  def clearVariation(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, CacheMap] =
-    OptionT.liftF(dataCacheConnector.save[BusinessMatching](BusinessMatching.variationKey, BusinessMatching()))
-
-  private def updateBusinessMatching(primaryModel: BusinessMatching, variationModel: BusinessMatching): BusinessMatching =
-    variationModel.activities match {
-      case Some(BusinessActivities(existing, Some(additional), removed, doc)) =>
-        variationModel.activities(BusinessActivities(existing ++ additional, None, removed, doc)).copy(hasAccepted = true)
-      case _ => variationModel.copy(hasChanged = primaryModel != variationModel, hasAccepted = true)
-    }
-
-  def activitiesToIterate(index: Int, activities: Set[BusinessActivity]) = activities.size > index + 1
 
   def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
     case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)

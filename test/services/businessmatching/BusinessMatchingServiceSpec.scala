@@ -16,28 +16,27 @@
 
 package services.businessmatching
 
-import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
 import models.aboutthebusiness.AboutTheBusiness
-import models.businessactivities.BusinessActivities
 import models.asp.Asp
-import models.hvd.Hvd
-import models.tcsp.Tcsp
-import models.estateagentbusiness.{EstateAgentBusiness => Eab}
-import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BMActivities, _}
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.estateagentbusiness.{EstateAgentBusiness => Eab}
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
+import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.tcsp.Tcsp
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
 import play.api.test.Helpers._
+import utils.{DependencyMocks, FutureAssertions, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -53,12 +52,9 @@ class BusinessMatchingServiceSpec extends PlaySpec
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
 
     val primaryModel = businessMatchingGen.sample.get
-    val variationModel = businessMatchingGen.sample.get
 
     mockCacheFetch(Some(primaryModel), Some(BusinessMatching.key))
-    mockCacheFetch(Some(variationModel), Some(BusinessMatching.variationKey))
     mockCacheSave[BusinessMatching]
-
   }
 
   "getModel" when {
@@ -76,19 +72,6 @@ class BusinessMatchingServiceSpec extends PlaySpec
           service.getModel returnsSome primaryModel
         }
       }
-
-      "return the variation model" when {
-        "in a amendment or variation status" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
-          service.getModel returnsSome variationModel
-        }
-      }
-
-      "not query for the original model when the variation model exists" in new Fixture {
-        mockApplicationStatus(SubmissionReadyForReview)
-        service.getModel returnsSome variationModel
-        verify(mockCacheConnector, never).fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-      }
     }
   }
 
@@ -103,29 +86,18 @@ class BusinessMatchingServiceSpec extends PlaySpec
           verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
         }
       }
-
-      "update the variation model" when {
-        "not in pre-application status" in new Fixture {
-          mockApplicationStatus(SubmissionReadyForReview)
-          mockCacheSave(primaryModel)
-
-          whenReady(service.updateModel(primaryModel).value) { _ =>
-            verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), any())(any(), any(), any())
-          }
-        }
-      }
     }
   }
 
   "getAdditionalBusinessActivities" must {
     "return saved activities not found in view response" in new Fixture {
-
-      val existing = BusinessMatching(
+      val api5BusinessMatching = BusinessMatching(
         activities = Some(BMActivities(
           Set(BillPaymentServices)
         ))
       )
-      val current = BusinessMatching(
+
+      val newBusinessMatching = BusinessMatching(
         activities = Some(BMActivities(
           Set(BillPaymentServices, HighValueDealing)
         ))
@@ -133,11 +105,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
 
       val viewResponse = ViewResponse(
         "",
-        businessMatchingSection = BusinessMatching(
-          activities = Some(BMActivities(
-            Set(BillPaymentServices)
-          ))
-        ),
+        businessMatchingSection = api5BusinessMatching,
         aboutTheBusinessSection = AboutTheBusiness(),
         bankDetailsSection = Seq.empty,
         businessActivitiesSection = BusinessActivities(),
@@ -152,20 +120,15 @@ class BusinessMatchingServiceSpec extends PlaySpec
         aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
       )
 
-      mockApplicationStatus(SubmissionDecisionApproved)
-
-      mockCacheFetch(Some(existing), Some(BusinessMatching.key))
-      mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+      mockCacheFetch(Some(newBusinessMatching), Some(BusinessMatching.key))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-
-      whenReady(service.getAdditionalBusinessActivities.value){ result =>
+      whenReady(service.getAdditionalBusinessActivities.value) { result =>
         result must be(Some(Set(HighValueDealing)))
       }
     }
 
     "return an empty set if saved business activities are the same as view response" in new Fixture {
-
       val businessMatching = BusinessMatching(
         activities = Some(BMActivities(
           Set(BillPaymentServices)
@@ -193,10 +156,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
       )
 
-      mockApplicationStatus(SubmissionDecisionApproved)
-
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
-      mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
       whenReady(service.getAdditionalBusinessActivities.value){ result =>
@@ -204,6 +164,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
 
     }
+
     "return none if all business activities cannot be retrieved" in new Fixture {
 
       val businessMatching = BusinessMatching(
@@ -291,91 +252,16 @@ class BusinessMatchingServiceSpec extends PlaySpec
     }
   }
 
-  "commitVariationData" when {
-    "called" must {
-      "simply return the cachemap when in pre-application status" in new Fixture {
-        mockApplicationStatus(SubmissionReady)
-        service.commitVariationData returnsSome mockCacheMap
-      }
-
-      "copy the variation data over the primary data when not in pre-application status" in new Fixture {
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
-        mockCacheGetEntry(variationModel.some, BusinessMatching.variationKey)
-
-        whenReady(service.commitVariationData.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](
-            eqTo(BusinessMatching.key), eqTo(variationModel.copy(hasAccepted = true, hasChanged = true))
-          )(any(), any(), any())
-          verify(mockCacheConnector).save[BusinessMatching](
-            eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching())
-          )(any(), any(), any())
-        }
-      }
-
-      "copy the variation data over the primary data, setting hasChanged to false when the models are the same" in new Fixture {
-        val newModel = businessMatchingGen.sample
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheGetEntry(newModel, BusinessMatching.key)
-        mockCacheGetEntry(newModel, BusinessMatching.variationKey)
-
-        whenReady(service.commitVariationData.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](
-            eqTo(BusinessMatching.key), eqTo(newModel.copy(hasAccepted = true, hasChanged = false))
-          )(any(), any(), any())
-          verify(mockCacheConnector).save[BusinessMatching](
-            eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching())
-          )(any(), any(), any())
-        }
-      }
-
-      "return None if the variation data is not available" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
-        mockCacheGetEntry(None, BusinessMatching.variationKey)
-
-        whenReady(service.commitVariationData.value) { result =>
-          verify(mockCacheConnector, never).save[BusinessMatching](any(), any())(any(), any(), any())
-          result mustBe None
-        }
-      }
-
-      "return None if the variation data is empty" in new Fixture {
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheGetEntry(primaryModel.some, BusinessMatching.key)
-        mockCacheGetEntry(BusinessMatching().some, BusinessMatching.variationKey)
-
-        whenReady(service.commitVariationData.value) { result =>
-          verify(mockCacheConnector, never).save[BusinessMatching](any(), any())(any(), any(), any())
-          result mustBe None
-        }
-      }
-
-    }
-  }
-
-  "clear" when {
-    "called" must {
-      "reset the variation model back to nothing" in new Fixture {
-        whenReady(service.clearVariation.value) { _ =>
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.variationKey), eqTo(BusinessMatching()))(any(), any(), any())
-        }
-      }
-    }
-  }
-
   "fitAndProperRequired" must {
     "return true" when {
       "existing activities does not contain msb and tcsp" when {
         "current activities contains msb" in new Fixture {
-
           val existing = BusinessMatching(
             activities = Some(BMActivities(
               Set(BillPaymentServices)
             ))
           )
+
           val current = BusinessMatching(
             activities = Some(BMActivities(
               Set(MoneyServiceBusiness)
@@ -399,9 +285,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
             aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
           )
 
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+          mockCacheFetch(Some(current), Some(BusinessMatching.key))
           mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
           whenReady(service.fitAndProperRequired.value) { result =>
@@ -439,9 +323,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
             aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
           )
 
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+          mockCacheFetch(Some(current), Some(BusinessMatching.key))
           mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
           whenReady(service.fitAndProperRequired.value) { result =>
@@ -481,9 +363,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
           aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
         )
 
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+        mockCacheFetch(Some(current), Some(BusinessMatching.key))
         mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
         whenReady(service.fitAndProperRequired.value) { result =>
@@ -520,36 +400,12 @@ class BusinessMatchingServiceSpec extends PlaySpec
           aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
         )
 
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
+        mockCacheFetch(Some(current), Some(BusinessMatching.key))
         mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
         whenReady(service.fitAndProperRequired.value) { result =>
           result must be(Some(false))
         }
-      }
-    }
-  }
-
-  "activitiesToIterate" must {
-    "return true" when {
-      "index is less than the amount of activities" in new Fixture {
-        val result = service.activitiesToIterate(0, Set(AccountancyServices, HighValueDealing))
-
-        result must be(true)
-      }
-    }
-    "return false" when {
-      "index is greater than the amount of activities" in new Fixture {
-        val result = service.activitiesToIterate(3, Set(AccountancyServices, HighValueDealing))
-
-        result must be(false)
-      }
-      "index is equal to the amount of activities" in new Fixture {
-        val result = service.activitiesToIterate(2, Set(AccountancyServices, HighValueDealing))
-
-        result must be(false)
       }
     }
   }

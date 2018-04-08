@@ -62,11 +62,8 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
               Redirect(routes.SummaryController.get())
             }) getOrElse InternalServerError("Could not update psr number")
           }
-          case ValidForm(_, _) => {
-            businessMatchingService.clearVariation map { _ =>
-              Redirect(routes.NoPsrController.get())
-            } getOrElse InternalServerError("Could not clear the variation data")
-          }
+          case ValidForm(_, _) =>
+            Future.successful(Redirect(routes.NoPsrController.get()))
         }
       }
   }

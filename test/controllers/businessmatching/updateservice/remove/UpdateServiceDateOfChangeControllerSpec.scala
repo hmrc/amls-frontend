@@ -77,10 +77,6 @@ class UpdateServiceDateOfChangeControllerSpec extends GenericTestHelper
       mockBusinessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
-    when {
-      mockBusinessMatchingService.commitVariationData(any(),any(),any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
     val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 

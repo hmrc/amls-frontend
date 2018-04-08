@@ -92,7 +92,6 @@ class UpdateServiceDateOfChangeController @Inject()(
                     activitiesToRemove
                   )
                 })
-                _ <- businessMatchingService.commitVariationData
                 _ <- OptionT.liftF(removeSection(activitiesToRemove))
                 responsiblePeople <- OptionT.liftF(getData[ResponsiblePeople])
                 fitAndProperRequired <- OptionT.pure[Future, Boolean](fitAndProperRequired(updatedBusinessActivities))

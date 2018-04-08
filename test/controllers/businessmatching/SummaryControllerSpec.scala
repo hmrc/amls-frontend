@@ -75,10 +75,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     def mockUpdateModel = when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   "Get" must {
@@ -146,7 +142,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](None)
 
           val result = controller.post()(postRequest)
@@ -211,10 +206,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     def mockUpdateModel = when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   "Get" must {
@@ -271,7 +262,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
 
           when {
@@ -299,7 +289,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](None, Some(UpdateService.key))
 
           when {
@@ -330,7 +319,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
         mockGetModel(Some(model))
         mockUpdateModel
-        mockCommit
         mockCacheFetch[UpdateService](Some(UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(1))),
