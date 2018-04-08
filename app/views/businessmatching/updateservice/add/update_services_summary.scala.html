@@ -58,7 +58,7 @@
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
         @checkYourAnswers(
-            question = Messages("businessmatching.updateservice.whichtradingpremises.header", flowModel.activityName.getOrElse("")),
+            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activityName.getOrElse("")),
             editUrl = routes.WhichTradingPremisesController.get().url
         ) {
             <p>
