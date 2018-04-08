@@ -1176,7 +1176,7 @@ businessmatching.updateservice.whichtradingpremises.title = Which premises will 
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
-businessmatching.updateservice.addmoreactivities.heading = You've told us your business type is:
+businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
 
 businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.fitandproper.heading = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
