@@ -17,8 +17,9 @@
 package controllers.businessmatching.updateservice.add
 
 
+import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.AddServiceFlowModel
 import models.status.SubmissionDecisionApproved
@@ -36,7 +37,10 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext
 
-class UpdateServicesSummaryControllerSpec extends GenericTestHelper with MockitoSugar with TradingPremisesGenerator {
+class UpdateServicesSummaryControllerSpec extends GenericTestHelper
+  with MockitoSugar
+  with TradingPremisesGenerator
+  with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -74,31 +78,35 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper with Mockito
     "respond with OK and redirect to the 'do you want to add more activities' page " +
       "if the user clicks continue and there are available Activities to select" in new Fixture {
 
+      //noinspection ScalaStyle
       val tradingPremises = Gen.listOfN(5, tradingPremisesGen).sample.get.toSeq
 
       val modifiedTradingPremises = tradingPremises map {_.copy(
         whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing)))
       )}
 
-      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-
       val flowModel = AddServiceFlowModel(
-        Some(HighValueDealing),
-        Some(true),
-        Some(TradingPremisesActivities(Set(0)))
+          Some(HighValueDealing),
+          Some(true),
+          Some(TradingPremisesActivities(Set(0)))
       )
 
-      mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
+      val businessMatchingModel = businessMatchingGen.sample.get.copy(
+          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+      )
 
       when {
         controller.tradingPremisesService.addBusinessActivtiesToTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(false))
       } thenReturn modifiedTradingPremises
 
+      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+      mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
+
       mockCacheSave(modifiedTradingPremises, Some(TradingPremises.key))
+      mockCacheSave(flowModel.copy(hasAccepted = true), Some(AddServiceFlowModel.key))
 
       mockCacheUpdate[ServiceChangeRegister](Some(ServiceChangeRegister.key), ServiceChangeRegister())
-
-      mockCacheSave(flowModel.copy(hasAccepted = true), Some(AddServiceFlowModel.key))
+      mockCacheUpdate[BusinessMatching](Some(BusinessMatching.key), businessMatchingModel)
 
       val result = controller.post()(request)
 

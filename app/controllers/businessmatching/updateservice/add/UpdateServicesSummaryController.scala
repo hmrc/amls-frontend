@@ -22,18 +22,16 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.BusinessActivity
-import models.businessmatching.updateservice.{ChangeServices, ServiceChangeRegister}
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import models.tradingpremises.TradingPremises
 import services.TradingPremisesService
-import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
 import services.flowmanagement.routings.VariationAddServiceRouter.router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import services.flowmanagement.routings.VariationAddServiceRouter.router
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -59,6 +57,7 @@ class UpdateServicesSummaryController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
           _ <- updateTradingPremises(model)
+          _ <- OptionT(updateBusinessMatching(activity))
           _ <- OptionT(updateServicesRegister(activity))
           _ <- updateHasAcceptedFlag(model)
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
@@ -90,5 +89,10 @@ class UpdateServicesSummaryController @Inject()(
   private def tradingPremisesData(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[TradingPremises]] =
     getData[TradingPremises].map {
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
+    }
+
+  private def updateBusinessMatching(activity: BusinessActivity)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[BusinessMatching]] =
+    dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
+      bm.copy(activities = bm.activities map { b => b.copy(businessActivities = b.businessActivities + activity) })
     }
 }
