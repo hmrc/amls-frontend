@@ -27,7 +27,7 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String])
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], allowAdd = true)
   }
 
   "The change_services view" must {
@@ -45,23 +45,14 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      <label class="block-label" for="changeServices-add">updateservice.changeservices.choice.add</label>
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
       doc.body().html() must include("changeServices-add")
-      //doc.body() must include("changeServices-remove"))
-      //doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.remove"))
     }
 
-    "not show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = false)
+    "not show the 'add service' radio when specified" in new ViewFixture {
+      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], allowAdd = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
-    }
-
-    " show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], showReturnLink = true)
-
-      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -69,7 +60,7 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.changeServices") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String])
+      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String], allowAdd = true)
 
       errorSummary.html() must include("not a message Key")
     }

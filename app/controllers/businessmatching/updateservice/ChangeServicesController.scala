@@ -46,9 +46,9 @@ class ChangeServicesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          activities <- getActivities
-          preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(change_services(EmptyForm, activities, showReturnLink = preApplicationComplete))) getOrElse InternalServerError("Unable to show the page")
+          (existingActivities, remainingActivities) <- getFormData
+        } yield Ok(change_services(EmptyForm, existingActivities, remainingActivities.nonEmpty)))
+          .getOrElse(InternalServerError("Unable to show the page"))
   }
 
   def post() = Authorised.async {
@@ -56,8 +56,8 @@ class ChangeServicesController @Inject()(
       implicit request => {
         Form2[ChangeServices](request.body) match {
           case f: InvalidForm =>
-            getActivities map { activities =>
-              BadRequest(change_services(f, activities))
+            getFormData map { case (existing, remaining) =>
+              BadRequest(change_services(f, existing, remaining.nonEmpty))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
                 router.getRoute(ChangeServicesPageId, data)
@@ -65,9 +65,14 @@ class ChangeServicesController @Inject()(
       }
   }
 
-  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = for {
+  private def getFormData(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = for {
     cache <- OptionT(dataCacheConnector.fetchAll)
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-  } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+    remainingActivities <- businessMatchingService.getRemainingBusinessActivities
+  } yield {
+    val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+
+    (existing, remainingActivities)
+  }
 
 }

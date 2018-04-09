@@ -16,6 +16,8 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import models.businessmatching._
 import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
 import models.flowmanagement.ChangeServicesPageId
@@ -29,6 +31,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -45,17 +48,15 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
       createRouter[ChangeServices]
     )
 
-    val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
+    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val businessMatching = BusinessMatching(activities = Some(businessActivitiesModel))
+    val emptyBusinessMatching = BusinessMatching()
 
-    val bmEmpty = Some(BusinessMatching())
-
-    mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
+    mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.preApplicationComplete(any(), any(), any())
-    } thenReturn Future.successful(false)
-
+      bmService.getRemainingBusinessActivities(any(), any(), any())
+    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
   }
 
   "ChangeServicesController" when {
@@ -71,13 +72,18 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
       }
 
       "return OK with change_services view - no activities" in new Fixture {
-        mockCacheGetEntry[BusinessMatching](Some(bmEmpty), BusinessMatching.key)
+        when {
+          bmService.getRemainingBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
 
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.title() must include(Messages("businessmatching.updateservice.changeservices.title"))
+        Option(doc.getElementById("changeServices-add")) must not be defined
       }
     }
 
