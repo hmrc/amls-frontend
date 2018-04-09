@@ -36,6 +36,8 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.select_activities
 
+import scala.concurrent.Future
+
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
                                            implicit val dataCacheConnector: DataCacheConnector,
@@ -85,17 +87,14 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
-    existing <- businessMatchingService.getSubmittedBusinessActivities
+    model <- businessMatchingService.getModel
+    activities <- OptionT.fromOption[Future](model.activities) map { _.businessActivities }
     } yield {
-      val availableActivities = BusinessMatchingActivities.all.filterNot {
-        case MoneyServiceBusiness | TrustAndCompanyServices => true
-        case _ => false
-      }
+      val allActivities = BusinessMatchingActivities.allWithoutMsbTcsp
+      val existingActivityNames = activities map { _.getMessage }
+      val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
 
-      val existingActivityNames = existing map { _.getMessage }
-      val activityValues = (availableActivities diff existing) map BusinessMatchingActivities.getValue
-
-      (existingActivityNames, activityValues)
+      (existingActivityNames, activityValues.toSet)
     }
 
 }
