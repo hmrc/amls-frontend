@@ -51,40 +51,29 @@ class BusinessMatchingServiceSpec extends PlaySpec
   trait Fixture extends DependencyMocks {
     val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
 
-    val primaryModel = businessMatchingGen.sample.get
+    val businessMatchingModel = businessMatchingGen.sample.get
 
-    mockCacheFetch(Some(primaryModel), Some(BusinessMatching.key))
+    mockCacheFetch(Some(businessMatchingModel), Some(BusinessMatching.key))
     mockCacheSave[BusinessMatching]
   }
 
   "getModel" when {
     "called" must {
-      "return the primary model" when {
-        "in a pre-application status" in new Fixture {
-          mockApplicationStatus(NotCompleted)
-          service.getModel returnsSome primaryModel
-        }
+      "return the model" in new Fixture {
+        mockCacheFetch(Some(businessMatchingModel), Some(BusinessMatching.key))
 
-        "the variation model is empty and status is post-preapp" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
-          mockCacheFetch(Some(BusinessMatching()), Some(BusinessMatching.variationKey))
-
-          service.getModel returnsSome primaryModel
-        }
+        service.getModel returnsSome businessMatchingModel
       }
     }
   }
 
   "updateModel" when {
     "called" must {
-      "update the original model" when {
-        "in pre-application status" in new Fixture {
-          mockApplicationStatus(NotCompleted)
-          mockCacheSave(primaryModel)
+      "update the model" in new Fixture {
+        mockCacheSave(businessMatchingModel)
 
-          service.updateModel(primaryModel) returnsSome mockCacheMap
-          verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
-        }
+        service.updateModel(businessMatchingModel) returnsSome mockCacheMap
+        verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       }
     }
   }
@@ -159,7 +148,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-      whenReady(service.getAdditionalBusinessActivities.value){ result =>
+      whenReady(service.getAdditionalBusinessActivities.value) { result =>
         result must be(Some(Set.empty))
       }
 
@@ -179,10 +168,40 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](None, Some(ViewResponse.key))
 
-      whenReady(service.getAdditionalBusinessActivities.value){ result =>
+      whenReady(service.getAdditionalBusinessActivities.value) { result =>
         result must be(None)
       }
 
+    }
+  }
+
+  "getRemainingBusinessActivities" must {
+    "return the activities (without MSB and TCSP) that the user has not yet added or previously submitted" in new Fixture {
+      val businessMatching = BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices, HighValueDealing, AccountancyServices)
+        ))
+      )
+
+      mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
+
+      whenReady(service.getRemainingBusinessActivities.value) { result =>
+        result mustBe Some(Set(TelephonePaymentService, EstateAgentBusinessService))
+      }
+    }
+
+    "return an empty set if all the available activities have been added, except MSB/TCSP" in new Fixture {
+      val businessMatching = BusinessMatching(
+        activities = Some(BMActivities(
+          Set(BillPaymentServices, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService)
+        ))
+      )
+
+      mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
+
+      whenReady(service.getRemainingBusinessActivities.value) { result =>
+        result mustBe Some(Set.empty)
+      }
     }
   }
 
@@ -227,7 +246,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(current), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
 
-      whenReady(service.getSubmittedBusinessActivities.value){ result =>
+      whenReady(service.getSubmittedBusinessActivities.value) { result =>
         result must be(Some(Set(BillPaymentServices)))
       }
     }
@@ -246,7 +265,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.variationKey))
       mockCacheFetch[ViewResponse](None, Some(ViewResponse.key))
 
-      whenReady(service.getSubmittedBusinessActivities.value){ result =>
+      whenReady(service.getSubmittedBusinessActivities.value) { result =>
         result must be(None)
       }
     }
@@ -421,7 +440,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       verify(mockCacheConnector).save[Asp](
         eqTo(Asp.key),
         eqTo(None)
-      )(any(),any(),any())
+      )(any(), any(), any())
 
     }
     "clear data of Hvd given HighValueDealing" in new Fixture {
@@ -433,7 +452,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       verify(mockCacheConnector).save[Hvd](
         eqTo(Hvd.key),
         eqTo(None)
-      )(any(),any(),any())
+      )(any(), any(), any())
 
     }
     "clear data of Msb given MoneyServiceBusiness" in new Fixture {
@@ -445,7 +464,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       verify(mockCacheConnector).save[Msb](
         eqTo(Msb.key),
         eqTo(None)
-      )(any(),any(),any())
+      )(any(), any(), any())
 
     }
     "clear data of Tcsp given TrustAndCompanyServices" in new Fixture {
@@ -457,7 +476,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       verify(mockCacheConnector).save[Tcsp](
         eqTo(Tcsp.key),
         eqTo(None)
-      )(any(),any(),any())
+      )(any(), any(), any())
 
     }
     "clear data of Eab given EstateAgentBusinessService" in new Fixture {
@@ -469,7 +488,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       verify(mockCacheConnector).save[Eab](
         eqTo(Eab.key),
         eqTo(None)
-      )(any(),any(),any())
+      )(any(), any(), any())
 
     }
 

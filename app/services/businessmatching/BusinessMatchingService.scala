@@ -75,6 +75,12 @@ class BusinessMatchingService @Inject()(
   def getSubmittedBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
     getActivitySet(_ intersect _)
 
+  def getRemainingBusinessActivities(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Set[BusinessActivity]] =
+    for {
+      model <- getModel
+      activities <- OptionT.fromOption[Future](model.activities)
+    } yield BusinessActivities.allWithoutMsbTcsp diff activities.businessActivities
+
   def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
     fetchActivitySet map { case (current, existing) =>
       !((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &

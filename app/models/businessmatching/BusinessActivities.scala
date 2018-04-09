@@ -122,6 +122,12 @@ object BusinessActivities {
     TelephonePaymentService
   )
 
+  // TODO: This can potentially be removed once the new 'MSB/TCSP' add service flow goes in
+  lazy val allWithoutMsbTcsp = all filterNot {
+    case MoneyServiceBusiness | TrustAndCompanyServices => true
+    case _ => false
+  }
+
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     FormTypes.businessActivityRule("error.required.bm.register.service")
 
