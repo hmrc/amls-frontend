@@ -26,13 +26,12 @@ import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.TradingPremisesActivities
 import models.flowmanagement.{AddServiceFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
-import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.businessmatching.updateservice.which_trading_premises
-import services.flowmanagement.routings.VariationAddServiceRouter.router
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -40,7 +39,8 @@ import scala.concurrent.Future
 @Singleton
 class WhichTradingPremisesController @Inject()(
                                                 val authConnector: AuthConnector,
-                                                implicit val dataCacheConnector: DataCacheConnector
+                                                implicit val dataCacheConnector: DataCacheConnector,
+                                                val router: Router[AddServiceFlowModel]
                                                 ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {

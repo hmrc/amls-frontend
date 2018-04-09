@@ -27,24 +27,24 @@ import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPrem
 import models.flowmanagement.AddServiceFlowModel
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.test.Helpers._
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import services.{StatusService, TradingPremisesService}
+import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import services.flowmanagement.Router
+import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.collection.immutable
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext
 
 class UpdateServicesSummaryControllerSpec extends GenericTestHelper
   with MockitoSugar
@@ -71,6 +71,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[TradingPremisesService].to(mockTradingPremisesService))
       .overrides(bind[UpdateServicesSummaryControllerHelper].to(mockUpdateServicesSummaryControllerHelper))
+      .overrides(bind[Router[AddServiceFlowModel]].to(createRouter[AddServiceFlowModel]))
       .build()
 
     val controller = app.injector.instanceOf[UpdateServicesSummaryController]

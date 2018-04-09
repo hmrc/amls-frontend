@@ -16,13 +16,11 @@
 
 package services.flowmanagement.routing
 
-import models.flowmanagement.RemoveServiceFlowModel
 import org.scalatestplus.play.PlaySpec
-import services.flowmanagement.Router
-import services.flowmanagement.routings.VariationRemoveServiceRouter._
+import services.flowmanagement.routings.VariationRemoveServiceRouter
 
 class VariationRemoveServiceRouterSpec extends PlaySpec {
   trait Fixture {
-    val routingFile = implicitly[Router[RemoveServiceFlowModel]]
+    val router = new VariationRemoveServiceRouter
   }
 }

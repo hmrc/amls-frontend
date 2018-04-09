@@ -16,26 +16,14 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
 import models.status.SubmissionDecisionApproved
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{eq => eqTo}
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-
-import scala.concurrent.{ExecutionContext, Future}
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -44,22 +32,12 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
 
     val request = addToken(authRequest)
 
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
-
-
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
-
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
-
-    val controller = app.injector.instanceOf[TradingPremisesController]
+    val controller = new TradingPremisesController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService,
+      createRouter[AddServiceFlowModel]
+    )
 
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
     mockApplicationStatus(SubmissionDecisionApproved)
@@ -93,7 +71,9 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
             ))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.WhichTradingPremisesController.get().url)
+
+            controller.router.verify(TradingPremisesPageId,
+              AddServiceFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
           }
         }
 
@@ -107,7 +87,9 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
               ))
 
               status(result) mustBe SEE_OTHER
-              redirectLocation(result) mustBe Some(routes.UpdateServicesSummaryController.get().url)
+
+              controller.router.verify(TradingPremisesPageId,
+                AddServiceFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
             }
           }
         }

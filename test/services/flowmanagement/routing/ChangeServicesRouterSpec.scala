@@ -28,7 +28,7 @@ class ChangeServicesRouterSpec extends PlaySpec {
 
   trait Fixture extends DependencyMocks {
 
-    val router = ChangeServicesRouter.router
+    val router = new ChangeServicesRouter
 
   }
 

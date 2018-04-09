@@ -26,7 +26,7 @@ import models.businessmatching.BusinessMatching
 import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel, TradingPremisesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.routings.VariationAddServiceRouter.router
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -39,7 +39,8 @@ class AddMoreActivitiesController @Inject()(
                                            val authConnector: AuthConnector,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService
+                                           val businessMatchingService: BusinessMatchingService,
+                                           val router: Router[AddServiceFlowModel]
                                          ) extends BaseController {
 
 

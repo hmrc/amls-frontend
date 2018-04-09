@@ -30,11 +30,11 @@ import models.status.{NotCompleted, SubmissionReady}
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
-import services.flowmanagement.routings.VariationAddServiceRouter.router
 
 import scala.concurrent.Future
 
@@ -42,7 +42,8 @@ import scala.concurrent.Future
 class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
                                            implicit val dataCacheConnector: DataCacheConnector,
-                                           val statusService: StatusService
+                                           val statusService: StatusService,
+                                           val router: Router[AddServiceFlowModel]
                                          ) extends BaseController {
 
   val fieldName = "tradingPremisesNewActivities"

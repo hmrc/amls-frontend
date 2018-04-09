@@ -29,20 +29,18 @@ import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, TrustAnd
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.routings.VariationAddServiceRouter.router
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.select_activities
 
-
-import scala.concurrent.Future
-
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
                                            implicit val dataCacheConnector: DataCacheConnector,
+                                           val router: Router[AddServiceFlowModel],
                                            val businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =

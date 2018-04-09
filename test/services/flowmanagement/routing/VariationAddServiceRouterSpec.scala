@@ -30,7 +30,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
 
   trait Fixture extends DependencyMocks{
-    val routingFile = VariationAddServiceRouter.router
+    val routingFile = new VariationAddServiceRouter
   }
 
   "getRoute" must {
@@ -160,7 +160,9 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       "we're on the summary page and the user selects continue " +
         "and if all possible activities are added" +
         " and a new one requires more information" ignore new Fixture {
-fail()
+
+
+
       }
     }
 

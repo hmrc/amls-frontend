@@ -28,8 +28,8 @@ import play.api.i18n.MessagesApi
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.new_service_information
-import services.flowmanagement.routings.VariationAddServiceRouter.router
 import play.api.mvc.Results.Redirect
+import services.flowmanagement.Router
 
 import scala.concurrent.Future
 
@@ -40,7 +40,8 @@ class NewServiceInformationController @Inject()
   implicit val dataCacheConnector: DataCacheConnector,
   val businessMatchingService: BusinessMatchingService,
   val serviceFlow: ServiceFlow,
-  val messages: MessagesApi
+  val messages: MessagesApi,
+  val router: Router[AddServiceFlowModel]
 ) extends BaseController {
 
   def get() = Authorised.async {

@@ -24,7 +24,7 @@ import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import services.TradingPremisesService
-import services.flowmanagement.routings.VariationAddServiceRouter.router
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,7 +37,8 @@ class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
                                                  val tradingPremisesService: TradingPremisesService,
-                                                 val updateServicesSummaryControllerHelper: UpdateServicesSummaryControllerHelper
+                                                 val updateServicesSummaryControllerHelper: UpdateServicesSummaryControllerHelper,
+                                                 val router: Router[AddServiceFlowModel]
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {

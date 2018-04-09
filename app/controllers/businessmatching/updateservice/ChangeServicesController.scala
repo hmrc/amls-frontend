@@ -26,25 +26,27 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ChangeServices
 import models.flowmanagement.ChangeServicesPageId
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.routings.ChangeServicesRouter.router
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.change_services
 
+import scala.concurrent.Future
+
 class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
-                                          val businessMatchingService: BusinessMatchingService
+                                          val businessMatchingService: BusinessMatchingService,
+                                          val router: Router[ChangeServices]
                                         ) extends BaseController with RepeatingSection {
-
 
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
-          activities <- OptionT(getActivities)
+          activities <- getActivities
           preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
         } yield Ok(change_services(EmptyForm, activities, showReturnLink = preApplicationComplete))) getOrElse InternalServerError("Unable to show the page")
   }
@@ -54,7 +56,7 @@ class ChangeServicesController @Inject()(
       implicit request => {
         Form2[ChangeServices](request.body) match {
           case f: InvalidForm =>
-            OptionT(getActivities) map { activities =>
+            getActivities map { activities =>
               BadRequest(change_services(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
@@ -63,13 +65,9 @@ class ChangeServicesController @Inject()(
       }
   }
 
-  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = {
-    dataCacheConnector.fetchAll map {
-      optionalCache =>
-        for {
-          cache <- optionalCache
-          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
-    }
-  }
+  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = for {
+    cache <- OptionT(dataCacheConnector.fetchAll)
+    businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+  } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+
 }

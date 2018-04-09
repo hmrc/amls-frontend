@@ -19,13 +19,14 @@ package controllers.businessmatching.updateservice
 import controllers.businessmatching.updateservice.add.WhichTradingPremisesController
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
-import models.businessmatching.updateservice.UpdateService
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
+import models.flowmanagement.{AddServiceFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -56,7 +57,8 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
 
     val controller = new WhichTradingPremisesController(
       self.authConnector,
-      mockCacheConnector
+      mockCacheConnector,
+      createRouter[AddServiceFlowModel]
     )
   }
 
@@ -99,10 +101,13 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
               "tradingPremises[]" -> "1"
             ))
 
-            status(result) must be(SEE_OTHER)
-          }
+          status(result) must be(SEE_OTHER)
+
+          controller.router.verify(WhichTradingPremisesPageId,
+            AddServiceFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
         }
       }
+    }
 
       "on invalid request" must {
 

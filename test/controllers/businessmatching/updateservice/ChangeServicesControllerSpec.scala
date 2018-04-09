@@ -17,9 +17,8 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
-import generators.ResponsiblePersonGenerator
 import models.businessmatching._
-import models.responsiblepeople.ResponsiblePeople
+import models.businessmatching.updateservice.ChangeServices
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -28,14 +27,13 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
@@ -54,6 +52,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[BusinessMatchingService].to(bmService))
+      .overrides(bind[Router[ChangeServices]].to(mock[Router[ChangeServices]]))
       .build()
 
     val controller = app.injector.instanceOf[ChangeServicesController]
