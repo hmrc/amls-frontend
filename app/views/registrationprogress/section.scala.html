@@ -18,7 +18,7 @@
 
 @(name: String, status: Status, call: Call)(implicit request: Request[_],m:Messages, lang: Lang)
 
-@getStatusId(name:String) = { @name.concat("-status") }
+@getStatusId(name:String) = {@name.concat("-status")}
 
 <li>
     @status match {
