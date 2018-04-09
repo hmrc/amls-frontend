@@ -42,15 +42,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
     val request = addToken(authRequest)
 
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -63,14 +63,14 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     val controller = app.injector.instanceOf[FitAndProperController]
 
     when {
-      controller.statusService.isPreSubmission(any(),any(),any())
-    } thenReturn Future.successful(false)
-
-    when {
       controller.businessMatchingService.getModel(any(),any(),any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
     ))
+
+    when {
+      controller.statusService.isPreSubmission(any(),any(),any())
+    } thenReturn Future.successful(false)
 
     val responsiblePeople = responsiblePeopleGen(5).sample.get
 
@@ -89,6 +89,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.fitandproper.title"))
 
       }
+
       "return NOT_FOUND" when {
         "pre-submission" in new Fixture {
 

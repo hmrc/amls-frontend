@@ -17,46 +17,73 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.add.UpdateServicesSummaryController
 import models.businessmatching.updateservice.UpdateService
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import views.Fixture
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
-  trait TestFixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
-    val request = addToken(self.authRequest)
+    val request = addToken(authRequest)
 
-    val statusService = mock[StatusService]
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[UpdateAnyInformationController]
+
+    mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)))
+    mockCacheSave[UpdateService]
 
     when {
       controller.statusService.isPreSubmission(any(),any(),any())
     } thenReturn Future.successful(false)
-
-    lazy val controller = new UpdateAnyInformationController(
-      mockCacheConnector,
-      self.authConnector,
-      statusService
-    )
-
-    mockCacheFetch(Some(UpdateService(inNewServiceFlow = true)))
-    mockCacheSave[UpdateService]
   }
 
   "UpdateAnyInformationController" when {
+
     "get is called" must {
-      "respond with OK with update_any_information" in new TestFixture {
+      "return OK with change_services view" in new Fixture {
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("summary.updateinformation"))
+
+      }
+
+      "respond with OK with update_any_information" in new Fixture {
         val result = controller.get()(request)
 
         status(result) mustBe OK
-        contentAsString(result) must include(Messages("updateanyinformation.title"))
+        contentAsString(result) must include(Messages("summary.updateinformation"))
 
         verify(mockCacheConnector).save[UpdateService](
           eqTo(UpdateService.key),
@@ -64,7 +91,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
       }
 
       "respond with NOT_FOUND" when {
-        "status is pre-submission" in new TestFixture {
+        "status is pre-submission" in new Fixture {
 
           when {
             controller.statusService.isPreSubmission(any(),any(),any())
@@ -80,7 +107,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
 
     "post is called" must {
       "redirect to RegistrationProgressController" when {
-        "yes is selected" in new TestFixture {
+        "yes is selected" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody(
             "updateAnyInformation" -> "true"
@@ -92,7 +119,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
         }
       }
       "redirect to WhoIsRegisteringController" when {
-        "no is selected" in new TestFixture {
+        "no is selected" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody(
             "updateAnyInformation" -> "false"
@@ -104,7 +131,7 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
         }
       }
       "respond with BAD_REQUEST" when {
-        "an invalid form is submitted" in new TestFixture {
+        "an invalid form is submitted" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody(
             "updateAnyInformation" -> ""

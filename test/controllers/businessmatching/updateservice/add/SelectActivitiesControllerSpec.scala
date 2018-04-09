@@ -18,66 +18,92 @@ package controllers.businessmatching.updateservice.add
 
 import cats.implicits._
 import cats.data.OptionT
-import models.businessmatching.{BillPaymentServices, BusinessActivities, BusinessActivity, HighValueDealing}
+import connectors.DataCacheConnector
+import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
+import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
+import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class SelectActivitiesControllerSpec extends GenericTestHelper {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
     val request = addToken(authRequest)
 
-    val controller = new SelectActivitiesController(
-      authConnector,
-      mockStatusService,
-      mockCacheConnector,
-      mock[BusinessMatchingService]
-    )
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[SelectActivitiesController]
+
+    when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+      activities = Some(BusinessActivities(Set(BillPaymentServices)))
+    ))
+
+    when {
+      controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+
+    mockCacheFetch(Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
+
   }
 
-  "get" must {
-    "return the view" in new Fixture {
-      mockCacheFetch[AddServiceFlowModel](None)
+  "SelectActivitiesController" when {
 
-      when {
-        controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
-      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+    "get is called" must {
+      "return OK with select_activities view" in new Fixture {
 
-      val result = controller.get()(request)
+        val result = controller.get()(request)
 
-      status(result) mustBe OK
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.selectactivities.title"))
+      }
+    }
+
+    "post" must {
+      "return a bad request when no data has been posted" in new Fixture {
+
+        val result = controller.post()(request.withFormUrlEncodedBody())
+
+        status(result) mustBe BAD_REQUEST
+      }
+
+      "return the next page in the flow when valid data has been posted" in new Fixture {
+        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
+        mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(HighValueDealing)), Some(AddServiceFlowModel.key))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[]" -> "04"
+        ))
+
+        status(result) mustBe SEE_OTHER
+      }
     }
   }
-
-  "post" must {
-    "return a bad request when no data has been posted" in new Fixture {
-
-      when {
-        controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
-      } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
-
-      val result = controller.post()(request.withFormUrlEncodedBody())
-
-      status(result) mustBe BAD_REQUEST
-    }
-
-    "return the next page in the flow when valid data has been posted" in new Fixture {
-      mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
-      mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(HighValueDealing)), Some(AddServiceFlowModel.key))
-
-      val result = controller.post()(request.withFormUrlEncodedBody(
-        "businessActivities[]" -> "04"
-      ))
-
-      status(result) mustBe SEE_OTHER
-    }
-  }
-
 }

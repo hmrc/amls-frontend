@@ -18,93 +18,86 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import connectors.DataCacheConnector
 import models.businessmatching._
+import models.flowmanagement.AddServiceFlowModel
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import services.StatusService
 import services.businessmatching.{BusinessMatchingService, NextService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class NewServiceInformationControllerSpec extends GenericTestHelper with MockitoSugar with FutureAssertions with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
     val request = addToken(authRequest)
 
-    val bmService = mock[BusinessMatchingService]
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
 
-    val controller = new NewServiceInformationController(self.authConnector, mockCacheConnector, bmService, mockServiceFlow, messagesApi)
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    lazy val app = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .build()
+
+    val controller = app.injector.instanceOf[NewServiceInformationController]
+
+    when {
+      controller.businessMatchingService.getModel(any(),any(),any())
+    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+      activities = Some(BusinessActivities(Set(AccountancyServices)))
+    ))
+
+    when {
+      controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
+    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
+
+    mockCacheFetch(Some(AddServiceFlowModel(Some(AccountancyServices), Some(true))), Some(AddServiceFlowModel.key))
   }
 
-  "GET" in new Fixture {
- //   "called" must {
-    //TODO Fix test
-      fail()
-//      "return OK with the service name" which {
-//        "clears the section data of the activity retrieved" in new Fixture {
-//          when {
-//            bmService.getAdditionalBusinessActivities(any(), any(), any())
-//          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(MoneyServiceBusiness))
-//
-//          when {
-//            mockServiceFlow.next(any(), any(), any())
-//          } thenReturn OptionT.some[Future, NextService](NextService("/service", AccountancyServices))
-//
-//          when {
-//            bmService.clearSection(eqTo(AccountancyServices))(any(),any())
-//          } thenReturn Future.successful(mockCacheMap)
-//
-//          val result = controller.get()(request)
-//
-//          status(result) mustBe OK
-//
-//          contentAsString(result) must include(AccountancyServices.getMessage)
-//          contentAsString(result) must include("/service")
-//
-//          verify(bmService).clearSection(eqTo(AccountancyServices))(any(),any())
-//        }
-//      }
-//
-//      "redirect to the 'update more information' page" when {
-//        "there are no services left to update" in new Fixture {
-//          when {
-//            bmService.getAdditionalBusinessActivities(any(), any(), any())
-//          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
-//
-//          when {
-//            mockServiceFlow.next(any(), any(), any())
-//          } thenReturn OptionT.none[Future, NextService]
-//
-//          val result = controller.get()(request)
-//
-//          status(result) mustBe SEE_OTHER
-//          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.UpdateAnyInformationController.get().url)
-//        }
-//      }
-//    }
+  "NewServiceInformationController" when {
+
+    "get is called" must {
+      "return OK with new_service_information view" in new Fixture {
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.newserviceinformation.title"))
+      }
+    }
   }
 
-  "POST"  in new Fixture {
-    //TODO Fix test
-    fail()
-//    "called" must {
-//      "update UpdateService with isInNewFlow = true" in new Fixture {
-//        val url = "/service"
-//
-//        when {
-//          mockServiceFlow.setInServiceFlowFlag(eqTo(true))(any(), any(), any())
-//        } thenReturn Future.successful(mock[CacheMap])
-//
-//        val result = controller.post()(request.withFormUrlEncodedBody("redirectUrl" -> url))
-//
-//        status(result) mustBe SEE_OTHER
-//        redirectLocation(result) mustBe Some(url)
-//      }
-//    }
+  "post is called" must {
+
+    "return OK with new_service_information view" in new Fixture {
+      mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(BillPaymentServices)))
+
+      val result = controller.post()(request.withFormUrlEncodedBody(
+        "addmoreactivities" -> "false"
+      ))
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+    }
   }
 }

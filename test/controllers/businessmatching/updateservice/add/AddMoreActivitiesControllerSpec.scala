@@ -27,11 +27,14 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -40,13 +43,17 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
 
     val request = addToken(authRequest)
 
-    val bmService = mock[BusinessMatchingService]
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[BusinessMatchingService].to(bmService))
       .build()
 
     val controller = app.injector.instanceOf[AddMoreActivitiesController]
@@ -59,7 +66,7 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
 
     when {
-      bmService.preApplicationComplete(any(), any(), any())
+      mockBusinessMatchingService.preApplicationComplete(any(), any(), any())
     } thenReturn Future.successful(false)
 
   }
@@ -72,7 +79,6 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
 
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.addmoreactivities.title"))
-
       }
     }
 

@@ -44,16 +44,15 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -93,6 +92,7 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.whichfitandproper.title"))
 
       }
+
       "return NOT_FOUND" when {
         "pre-submission" in new Fixture {
 

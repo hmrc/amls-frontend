@@ -37,8 +37,13 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
   with TradingPremisesGenerator
 {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
     val request = addToken(authRequest)
+
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
 
     // scalastyle:off magic.number
     val tradingPremises = Gen.listOfN(5, tradingPremisesGen).sample.get
@@ -47,9 +52,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
     mockCacheSave[UpdateService]
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
 
-    implicit val hc: HeaderCarrier = HeaderCarrier()
-    implicit val authContext: AuthContext = mock[AuthContext]
-    implicit val ec: ExecutionContext = mock[ExecutionContext]
+
 
     val controller = new WhichTradingPremisesController(
       self.authConnector,
@@ -57,67 +60,70 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
     )
   }
 
-  "get" must {
-    "return OK with trading_premises view" in new Fixture {
-      mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+  "WhichTradingPremisesController" when {
 
-      val result = controller.get()(request)
-      status(result) must be(OK)
-
-      contentAsString(result) must include(
-        Messages(
-          "businessmatching.updateservice.whichtradingpremises.heading",
-          Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
-        ))
-    }
-
-    "return INTERNAL_SERVER_ERROR" when {
-      "activities cannot be retrieved" in new Fixture {
-        mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+    "get is called" must {
+      "return OK with which_trading_premises view" in new Fixture {
         mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
 
         val result = controller.get()(request)
-        status(result) must be(INTERNAL_SERVER_ERROR)
-      }
-    }
-  }
+        status(result) must be(OK)
 
-  "post" must {
-
-    "on valid request" must {
-      "redirect away" when {
-        "trading premises are selected" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
-
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "tradingPremises[]" -> "1"
+        contentAsString(result) must include(
+          Messages(
+            "businessmatching.updateservice.whichtradingpremises.heading",
+            Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
           ))
+      }
 
-          status(result) must be(SEE_OTHER)
+      "return INTERNAL_SERVER_ERROR" when {
+        "activities cannot be retrieved" in new Fixture {
+          mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+
+          val result = controller.get()(request)
+          status(result) must be(INTERNAL_SERVER_ERROR)
         }
       }
     }
 
-    "on invalid request" must {
+    "post" must {
 
-      "return BAD_REQUEST" in new Fixture {
-        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+      "on valid request" must {
+        "redirect away" when {
+          "trading premises are selected" in new Fixture {
+            mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+            mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
 
-        val result = controller.post()(request)
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "tradingPremises[]" -> "1"
+            ))
 
-        status(result) must be(BAD_REQUEST)
+            status(result) must be(SEE_OTHER)
+          }
+        }
       }
 
-    }
+      "on invalid request" must {
 
-    "return INTERNAL_SERVER_ERROR" when {
-      "activities cannot be retrieved" in new Fixture {
-        mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+        "return BAD_REQUEST" in new Fixture {
+          mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
 
-        val result = controller.post()(request)
+          val result = controller.post()(request)
 
-        status(result) must be(INTERNAL_SERVER_ERROR)
+          status(result) must be(BAD_REQUEST)
+        }
+
+      }
+
+      "return INTERNAL_SERVER_ERROR" when {
+        "activities cannot be retrieved" in new Fixture {
+          mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+
+          val result = controller.post()(request)
+
+          status(result) must be(INTERNAL_SERVER_ERROR)
+        }
       }
     }
   }

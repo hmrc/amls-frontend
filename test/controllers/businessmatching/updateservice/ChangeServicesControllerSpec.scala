@@ -39,10 +39,13 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
+
+    implicit val authContext: AuthContext = mockAuthContext
+    implicit val ec: ExecutionContext = mockExecutionContext
 
     val bmService = mock[BusinessMatchingService]
 
@@ -76,7 +79,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("changeservices.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
 
       }
 
@@ -87,7 +90,7 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("changeservices.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
 
       }
     }

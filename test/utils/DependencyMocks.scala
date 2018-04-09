@@ -19,7 +19,10 @@ package utils
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.http.HeaderCarrier
 
+import scala.concurrent.ExecutionContext
+
 trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks {
   implicit val mockAuthContext = mock[AuthContext]
   implicit val headerCarrier = HeaderCarrier()
+  implicit val mockExecutionContext: ExecutionContext = mock[ExecutionContext]
 }
