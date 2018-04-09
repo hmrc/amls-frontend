@@ -18,10 +18,10 @@ package controllers.businessmatching.updateservice.add
 
 
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.DateOfChange
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.AddServiceFlowModel
@@ -38,6 +38,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import services.{StatusService, TradingPremisesService}
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -60,6 +61,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockTradingPremisesService = mock[TradingPremisesService]
+    val mockUpdateServicesSummaryControllerHelper = mock[UpdateServicesSummaryControllerHelper]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -68,11 +70,17 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
       .overrides(bind[StatusService].to(mockStatusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[TradingPremisesService].to(mockTradingPremisesService))
+      .overrides(bind[UpdateServicesSummaryControllerHelper].to(mockUpdateServicesSummaryControllerHelper))
       .build()
 
     val controller = app.injector.instanceOf[UpdateServicesSummaryController]
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    val flowModel = AddServiceFlowModel(
+      Some(HighValueDealing),
+      Some(true),
+      Some(TradingPremisesActivities(Set(0)))
+    )
+    mockCacheFetch(Some(flowModel))
     mockApplicationStatus(SubmissionDecisionApproved)
 
 
@@ -89,7 +97,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
         contentAsString(result) must include(Messages("title.cya"))
 
-        //contentAsString(result) must include(Messages("button.checkyouranswers.acceptandcomplete"))
+        contentAsString(result) must include(Messages("button.checkyouranswers.acceptandcomplete"))
       }
     }
 
@@ -107,28 +115,45 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
           )
         }
 
-        val flowModel = AddServiceFlowModel(
-          Some(HighValueDealing),
-          Some(true),
-          Some(TradingPremisesActivities(Set(0)))
+        val businessMatchingModel = businessMatchingGen.sample.get.copy(
+          activities = Some(BusinessActivities(Set(BillPaymentServices)))
         )
 
-        val businessMatchingModel = businessMatchingGen.sample.get.copy(
-          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
+        override val mockCacheMap = mock[CacheMap]
+
+        val serviceChangeRegister:ServiceChangeRegister = ServiceChangeRegister(
+          Some(Set(BillPaymentServices))
         )
+
+        when {
+          controller.updateServicesSummaryControllerHelper.updateTradingPremises(eqTo(flowModel))(any(), any())
+
+        } thenReturn OptionT.fromOption[Future](Some(modifiedTradingPremises))
+
+        when {
+          controller.updateServicesSummaryControllerHelper.updateBusinessMatching(eqTo(HighValueDealing))(any(), any())
+        } thenReturn Future.successful(Some(businessMatchingModel))
+
+        when {
+          controller.updateServicesSummaryControllerHelper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
+        } thenReturn Future.successful(Some(serviceChangeRegister))
 
         when {
           controller.tradingPremisesService.addBusinessActivtiesToTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(false))
         } thenReturn modifiedTradingPremises
 
-        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-        mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
-
-        mockCacheSave(modifiedTradingPremises, Some(TradingPremises.key))
-        mockCacheSave(flowModel.copy(hasAccepted = true), Some(AddServiceFlowModel.key))
-
-        mockCacheUpdate[ServiceChangeRegister](Some(ServiceChangeRegister.key), ServiceChangeRegister())
-        mockCacheUpdate[BusinessMatching](Some(BusinessMatching.key), businessMatchingModel)
+        when {
+          controller.updateServicesSummaryControllerHelper.updateHasAcceptedFlag(eqTo(flowModel))(any(), any())
+        } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
+//
+//        mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
+//        mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
+//
+//        mockCacheSave(modifiedTradingPremises, Some(TradingPremises.key))
+//        mockCacheSave(flowModel.copy(hasAccepted = true), Some(AddServiceFlowModel.key))
+//
+//        mockCacheUpdate[ServiceChangeRegister](Some(ServiceChangeRegister.key), ServiceChangeRegister())
+//        mockCacheUpdate[BusinessMatching](Some(BusinessMatching.key), businessMatchingModel)
 
         val result = controller.post()(request)
 

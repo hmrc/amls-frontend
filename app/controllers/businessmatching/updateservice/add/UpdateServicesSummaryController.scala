@@ -22,16 +22,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessActivity, BusinessMatching}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
-import models.tradingpremises.TradingPremises
 import services.TradingPremisesService
 import services.flowmanagement.routings.VariationAddServiceRouter.router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
@@ -39,7 +36,8 @@ import scala.concurrent.Future
 class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                   val tradingPremisesService: TradingPremisesService
+                                                 val tradingPremisesService: TradingPremisesService,
+                                                 val updateServicesSummaryControllerHelper: UpdateServicesSummaryControllerHelper
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
@@ -56,43 +54,13 @@ class UpdateServicesSummaryController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-          _ <- updateTradingPremises(model)
-          _ <- OptionT(updateBusinessMatching(activity))
-          _ <- OptionT(updateServicesRegister(activity))
-          _ <- updateHasAcceptedFlag(model)
+          _ <- updateServicesSummaryControllerHelper.updateTradingPremises(model)
+          _ <- OptionT(updateServicesSummaryControllerHelper.updateBusinessMatching(activity))
+          _ <- OptionT(updateServicesSummaryControllerHelper.updateServicesRegister(activity))
+          _ <- updateServicesSummaryControllerHelper.updateHasAcceptedFlag(model)
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
         } yield {
           route
         }) getOrElse InternalServerError("Could not fetch the flow model")
   }
-
-  private def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
-    OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
-
-  private def updateServicesRegister(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[ServiceChangeRegister]] =
-    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-      case Some(model@ServiceChangeRegister(Some(activities))) =>
-        model.copy(addedActivities = Some(activities + activity))
-      case _ => ServiceChangeRegister(Some(Set(activity)))
-    }
-
-  private def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) = for {
-    tradingPremises <- OptionT.liftF(tradingPremisesData)
-    activity <- OptionT.fromOption[Future](model.activity)
-    indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {_.index.toSeq}) orElse OptionT.some(Seq.empty)
-    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](
-      tradingPremisesService.addBusinessActivtiesToTradingPremises(indices, tradingPremises, activity, false)
-    )
-    _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, newTradingPremises))
-  } yield tradingPremises
-
-  private def tradingPremisesData(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[TradingPremises]] =
-    getData[TradingPremises].map {
-      _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
-    }
-
-  private def updateBusinessMatching(activity: BusinessActivity)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[BusinessMatching]] =
-    dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
-      bm.copy(activities = bm.activities map { b => b.copy(businessActivities = b.businessActivities + activity) })
-    }
 }
