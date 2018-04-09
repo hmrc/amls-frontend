@@ -16,13 +16,14 @@
 
 package services.flowmanagement.routing
 
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
+import models.businessmatching.updateservice.ChangeServicesAdd
 import models.flowmanagement.ChangeServicesPageId
 import org.scalatestplus.play.PlaySpec
-import services.flowmanagement.Router
-import services.flowmanagement.routings._
 import play.api.test.Helpers._
+import services.flowmanagement.routings._
 import utils.DependencyMocks
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeServicesRouterSpec extends PlaySpec {
 

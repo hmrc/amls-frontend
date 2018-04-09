@@ -35,18 +35,18 @@ trait RouterMocks extends MockitoSugar {
 
   implicit class RouterMocking[T](router: Router[T]) {
     def mockRoute(pageId: PageId, model: T, edit: Boolean = false, returnValue: Future[Result]) =
-      when(router.getRoute(pageId, model, edit)) thenReturn returnValue
+      when(router.getRoute(pageId, model, edit)(any(), any(), any())) thenReturn returnValue
 
     def mockRoute(returnValue: Future[Result]) =
-      when(router.getRoute(any(), any(), any())) thenReturn returnValue
+      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn returnValue
 
     def mockRoute(url: Call) =
-      when(router.getRoute(any(), any(), any())) thenReturn Future.successful(Redirect(url))
+      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect(url))
 
     def mockRoute =
-      when(router.getRoute(any(), any(), any())) thenReturn Future.successful(Redirect("/"))
+      when(router.getRoute(any(), any(), any())(any(), any(), any())) thenReturn Future.successful(Redirect("/"))
 
     def verify(pageId: PageId, model: T, edit: Boolean = false) =
-      org.mockito.Mockito.verify(router).getRoute(eqTo(pageId), eqTo(model), eqTo(edit))
+      org.mockito.Mockito.verify(router).getRoute(eqTo(pageId), eqTo(model), eqTo(edit))(any(), any(), any())
   }
 }

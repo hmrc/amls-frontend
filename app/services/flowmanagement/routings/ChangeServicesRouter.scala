@@ -23,11 +23,14 @@ import models.flowmanagement.PageId
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class ChangeServicesRouter @Inject() extends Router[ChangeServices] {
-  override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false): Future[Result] = model match {
+  override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
     case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
     case ChangeServicesRemove => ???

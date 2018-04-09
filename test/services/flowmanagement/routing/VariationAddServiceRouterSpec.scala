@@ -16,21 +16,29 @@
 
 package services.flowmanagement.routing
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching.updateservice.TradingPremisesActivities
-import models.businessmatching.{BillPaymentServices, HighValueDealing}
+import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService}
 import models.flowmanagement._
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.routings._
 import utils.DependencyMocks
+import org.mockito.Mockito.when
+import org.mockito.Matchers.any
+
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class VariationAddServiceRouterSpec extends PlaySpec {
 
-
   trait Fixture extends DependencyMocks{
-    val routingFile = new VariationAddServiceRouter
+    val businessMatchingService = mock[BusinessMatchingService]
+    val routingFile = new VariationAddServiceRouter(businessMatchingService)
   }
 
   "getRoute" must {
@@ -126,6 +134,10 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true))
 
+        when {
+          routingFile.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(TelephonePaymentService))
+
         val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
 
         result mustBe Redirect(addRoutes.AddMoreActivitiesController.get())
@@ -135,34 +147,29 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     "redirect to the 'Registration Progress' page" when {
         "we're on the summary page and the user selects continue " +
         "if all possible activities are added" +
-        " and a none of the new ones require more information" ignore new Fixture {
-          fail()
-//        val model = AddServiceFlowModel(
-//          activity = Some(AccountancyServices),
-//          addMoreActivities = Some(false))
-//
-//        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, model))
-//
-//        result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+        " and the new activity does not require more information" in new Fixture {
+          when {
+            routingFile.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
+          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+          val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(BillPaymentServices))))
+
+          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
-
-//AccountancyServices extends BusinessActivity
-//case object BillPaymentServices extends  BusinessActivity
-//case object EstateAgentBusinessService extends BusinessActivity
-//case object HighValueDealing extends BusinessActivity
-//case object MoneyServiceBusiness extends BusinessActivity
-//case object TrustAndCompanyServices extends BusinessActivity
-//case object TelephonePaymentService extends BusinessActivity
-
 
     "redirect to the 'New Service Information' page" when {
       "we're on the summary page and the user selects continue " +
         "and if all possible activities are added" +
-        " and a new one requires more information" ignore new Fixture {
+        " and the new one requires more information" in new Fixture {
 
+        when {
+          routingFile.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
+        val result = await(routingFile.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 
+        result mustBe Redirect(addRoutes.NewServiceInformationController.get())
       }
     }
 

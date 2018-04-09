@@ -16,19 +16,24 @@
 
 package services.flowmanagement.routings
 
+import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.Inject
 import models.flowmanagement._
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
+import play.api.mvc.Results.{InternalServerError, Redirect}
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class VariationAddServiceRouter @Inject() extends Router[AddServiceFlowModel] {
+class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessMatchingService) extends Router[AddServiceFlowModel] {
 
   // scalastyle:off cyclomatic.complexity
-  override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false): Future[Result] = pageId match {
+  override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
 
     case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
@@ -51,7 +56,14 @@ class VariationAddServiceRouter @Inject() extends Router[AddServiceFlowModel] {
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
     case UpdateServiceSummaryPageId =>
-      Future.successful(Redirect(addRoutes.AddMoreActivitiesController.get()))
+      businessMatchingService.getRemainingBusinessActivities map {
+        case set if set.nonEmpty =>
+          Redirect(addRoutes.AddMoreActivitiesController.get())
+        case _ if model.informationRequired =>
+          Redirect(addRoutes.NewServiceInformationController.get())
+        case _ =>
+          Redirect(controllers.routes.RegistrationProgressController.get())
+      } getOrElse error(pageId)
 
     case AddMoreAcivitiesPageId =>
       model.addMoreActivities match {
@@ -69,4 +81,6 @@ class VariationAddServiceRouter @Inject() extends Router[AddServiceFlowModel] {
     case NewServiceInformationPageId =>
       Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
+
+  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }

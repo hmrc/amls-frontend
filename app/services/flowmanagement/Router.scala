@@ -18,10 +18,12 @@ package services.flowmanagement
 
 import models.flowmanagement.PageId
 import play.api.mvc.Result
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 trait Router[A] {
-  def getRoute(pageId: PageId, model: A, edit: Boolean = false): Future[Result]
+  def getRoute(pageId: PageId, model: A, edit: Boolean = false)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result]
 }
 

@@ -20,9 +20,12 @@ import javax.inject.Inject
 import models.flowmanagement._
 import play.api.mvc.Result
 import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
 class VariationRemoveServiceRouter @Inject() extends Router[RemoveServiceFlowModel] {
-  override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false): Future[Result] = ???
+  override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = ???
 }
