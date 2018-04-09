@@ -59,7 +59,7 @@ class amls_turnoverSpec extends GenericTestHelper with MustMatchers  {
 
       def view = views.html.renewal.amls_turnover(form2, true, Some(BusinessActivities(Set(AccountancyServices))))
 
-      html must include("Accountancy service provider")
+      html must include("Accountancy services")
     }
 
     "show errors in the correct locations" in new ViewFixture {

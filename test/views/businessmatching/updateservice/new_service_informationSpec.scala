@@ -45,8 +45,8 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.gutter").replace("{0}", "Accountancy service provider"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info").replace("{0}", "Accountancy service provider"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.gutter", "Accountancy services"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info", "Accountancy services"))
     }
 
     "not show the return link" in new ViewFixture {

@@ -47,12 +47,7 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
     "show the correct content" in new ViewFixture {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
       doc.body().html() must include("changeServices-add")
-    }
-
-    "not show the 'add service' radio when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], allowAdd = false)
-
-      doc.body().text() must not include Messages("link.return.registration.progress")
+      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
