@@ -38,7 +38,6 @@ import views.html.businessmatching.updateservice.select_activities
 
 @Singleton
 class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
-                                           val statusService: StatusService,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val router: Router[AddServiceFlowModel],
                                            val businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {

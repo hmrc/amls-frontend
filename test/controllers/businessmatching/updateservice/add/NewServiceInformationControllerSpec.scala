@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
@@ -47,21 +47,15 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
-
-    val controller = app.injector.instanceOf[NewServiceInformationController]
+    val controller = new NewServiceInformationController(
+      self.authConnector,
+      mockCacheConnector,
+      mockBusinessMatchingService,
+      messagesApi,
+      createRouter[AddServiceFlowModel]
+    )
 
     when {
       controller.businessMatchingService.getModel(any(),any(),any())
@@ -73,7 +67,8 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
       controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(AccountancyServices), Some(true))), Some(AddServiceFlowModel.key))
+    val flowModel = AddServiceFlowModel(Some(AccountancyServices), Some(true))
+    mockCacheFetch(Some(flowModel), Some(AddServiceFlowModel.key))
   }
 
   "NewServiceInformationController" when {
@@ -91,14 +86,12 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
   "post is called" must {
 
     "return OK with new_service_information view" in new Fixture {
-      mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(BillPaymentServices)))
-
       val result = controller.post()(request.withFormUrlEncodedBody(
         "addmoreactivities" -> "false"
       ))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+      controller.router.verify(NewServiceInformationPageId, flowModel)
     }
   }
 }

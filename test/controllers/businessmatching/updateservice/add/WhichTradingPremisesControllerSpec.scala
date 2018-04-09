@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.add
 
-import controllers.businessmatching.updateservice.add.WhichTradingPremisesController
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
@@ -26,25 +25,16 @@ import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-
-import scala.concurrent.ExecutionContext
 
 class WhichTradingPremisesControllerSpec extends GenericTestHelper
   with PrivateMethodTester
-  with TradingPremisesGenerator
-{
+  with TradingPremisesGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
 
     // scalastyle:off magic.number
     val tradingPremises = Gen.listOfN(5, tradingPremisesGen).sample.get
@@ -52,8 +42,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
     mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
-
-
 
     val controller = new WhichTradingPremisesController(
       self.authConnector,
@@ -101,16 +89,15 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
               "tradingPremises[]" -> "1"
             ))
 
-          status(result) must be(SEE_OTHER)
+            status(result) must be(SEE_OTHER)
 
-          controller.router.verify(WhichTradingPremisesPageId,
-            AddServiceFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
+            controller.router.verify(WhichTradingPremisesPageId,
+              AddServiceFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
+          }
         }
       }
-    }
 
       "on invalid request" must {
-
         "return BAD_REQUEST" in new Fixture {
           mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
 
@@ -118,7 +105,6 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
 
           status(result) must be(BAD_REQUEST)
         }
-
       }
 
       "return INTERNAL_SERVER_ERROR" when {

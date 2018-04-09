@@ -39,7 +39,6 @@ class NewServiceInformationController @Inject()
   val authConnector: AuthConnector,
   implicit val dataCacheConnector: DataCacheConnector,
   val businessMatchingService: BusinessMatchingService,
-  val serviceFlow: ServiceFlow,
   val messages: MessagesApi,
   val router: Router[AddServiceFlowModel]
 ) extends BaseController {

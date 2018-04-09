@@ -44,22 +44,14 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[Router[AddServiceFlowModel]].to(createRouter[AddServiceFlowModel]))
-      .build()
-
-    val controller = app.injector.instanceOf[SelectActivitiesController]
+    val controller = new SelectActivitiesController(
+      self.authConnector,
+      mockCacheConnector,
+      createRouter[AddServiceFlowModel],
+      mockBusinessMatchingService
+    )
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -72,7 +64,6 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch(Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
-
   }
 
   "SelectActivitiesController" when {
