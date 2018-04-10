@@ -37,7 +37,7 @@
         gutter = true
     ){
         <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint")</p>
-        <p>@existing.mkString(", ")</p>
+        <p>@bulletedList(existing)</p>
     }
 
     <p>@Messages("businessmatching.updateservice.selectactivities.hint")</p>

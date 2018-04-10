@@ -35,10 +35,8 @@
         wide = true,
         gutter = true
     ){
-        <p>@Messages("businessmatching.registerservices.existing")</p> @{existing map{ value =>
-            value
-        } mkString ", "
-        }
+        <p>@Messages("businessmatching.registerservices.existing")</p>
+        @bulletedList(existing)
     }
 
     @form(f, controllers.businessmatching.updateservice.routes.ChangeServicesController.post()) {

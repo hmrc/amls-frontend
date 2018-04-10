@@ -20,21 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice._
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
-import models.status.{NotCompleted, SubmissionReady}
-import play.api.mvc.{Request, Result}
 import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.Future
 
@@ -55,7 +51,7 @@ class TradingPremisesController @Inject()(
       implicit request =>
         getFormData map { case (model, activity) =>
           val form = model.areNewActivitiesAtTradingPremises map { v => Form2(v) } getOrElse EmptyForm
-          Ok(views.html.businessmatching.updateservice.trading_premises(form, edit, BusinessActivities.getValue(activity)))
+          Ok(trading_premises(form, edit, BusinessActivities.getValue(activity)))
         } getOrElse InternalServerError("Unable to show the view")
   }
 
@@ -64,7 +60,7 @@ class TradingPremisesController @Inject()(
       implicit request =>
         Form2[Boolean](request.body) match {
           case form: InvalidForm => getFormData map { case (_, activity) =>
-            BadRequest(views.html.businessmatching.updateservice.trading_premises(form, edit, BusinessActivities.getValue(activity)))
+            BadRequest(trading_premises(form, edit, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>

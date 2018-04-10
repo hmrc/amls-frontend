@@ -14,30 +14,36 @@
  * limitations under the License.
  */
 
-package views.businessmatching.updateservice
+package views.businessmatching.updateservice.add
 
-import models.businessmatching.{AccountancyServices, BusinessActivities, HighValueDealing}
+import forms.{EmptyForm, InvalidForm}
+import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.new_service_information
+import views.html.businessmatching.updateservice.add._
 
-class new_service_informationSpec extends GenericTestHelper with MustMatchers {
+class select_activitiesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = new_service_information(AccountancyServices)
+    override def view = select_activities(EmptyForm,
+        true,
+        Set.empty[String],
+        Set.empty[String]
+      )
+
   }
 
-  "The new_service_information view" must {
+  "The select_Activities view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.selectactivities.title") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.newserviceinformation.heading"))
+      heading.html must be(Messages("businessmatching.updateservice.selectactivities.heading"))
     }
 
     "have correct subHeading" in new ViewFixture {
@@ -45,13 +51,26 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.gutter", "Accountancy services"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info", "Accountancy services"))
+
     }
 
     "not show the return link" in new ViewFixture {
+      override def view = select_activities(EmptyForm,
+          true,
+          Set.empty[String],
+          Set.empty[String]
+        )
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
-  }
 
+    "show errors in the correct locations" in new ViewFixture {
+
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq((Path \ "businessmatching.updateservice.selectactivities") -> Seq(ValidationError("not a message Key"))))
+
+      override def view = select_activities(form2, true, Set.empty[String], Set.empty[String])
+
+      errorSummary.html() must include("not a message Key")
+    }
+  }
 }

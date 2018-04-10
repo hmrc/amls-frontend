@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.businessmatching.updateservice
+package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
@@ -22,12 +22,13 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import views.html.businessmatching.updateservice.add._
 
 class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, true)
+    def view = fit_and_proper(EmptyForm, true)
   }
 
   "The fit_and_proper view" must {
@@ -50,13 +51,13 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
     "show the correct content" when {
       "fees are being shown" in new ViewFixture {
-        override def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, true)
+        override def view = fit_and_proper(EmptyForm, true)
 
         doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info"))
       }
 
       "fees are being hidden" in new ViewFixture {
-        override def view = views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, false)
+        override def view = fit_and_proper(EmptyForm, false)
 
         doc.body().html() must include(Messages("businessmatching.updateservice.fitandproper.info.no.fees"))
       }
@@ -66,7 +67,7 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "passedFitAndProper") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = views.html.businessmatching.updateservice.fit_and_proper(form2, true)
+      override def view = fit_and_proper(form2, true)
 
       errorSummary.html() must include("not a message Key")
 

@@ -32,6 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -48,7 +49,7 @@ class WhichFitAndProperController @Inject()(
       implicit request =>
         filterRequest {
           responsiblePeople map { rp =>
-            Ok(views.html.businessmatching.updateservice.which_fit_and_proper(EmptyForm, rp))
+            Ok(which_fit_and_proper(EmptyForm, rp))
           }
         }
   }
@@ -62,7 +63,7 @@ class WhichFitAndProperController @Inject()(
                 Redirect(routes.NewServiceInformationController.get())
               }
               case f: InvalidForm => responsiblePeople map { rp =>
-                BadRequest(views.html.businessmatching.updateservice.which_fit_and_proper(f, rp))
+                BadRequest(which_fit_and_proper(f, rp))
               }
             }
           }

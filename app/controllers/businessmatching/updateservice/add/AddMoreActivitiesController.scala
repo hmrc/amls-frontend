@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel, TradingPremisesPageId}
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -31,6 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.Future
 
@@ -55,7 +56,7 @@ class AddMoreActivitiesController @Inject()(
         (for {
           activities <- OptionT(getActivities)
           preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
+        } yield Ok(add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
   }
 
   def post() = Authorised.async {
@@ -64,14 +65,16 @@ class AddMoreActivitiesController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             OptionT(getActivities) map { activities =>
-              BadRequest(views.html.businessmatching.updateservice.add.add_more_activities(f, activities))
+              BadRequest(add_more_activities(f, activities))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) =>
               model.copy(addMoreActivities = Some(data))
             } flatMap { case Some(model) =>
               router.getRoute(AddMoreAcivitiesPageId, model)
             }
+
         }
   }
 

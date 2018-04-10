@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
-import views.html.businessmatching.updateservice.which_trading_premises
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

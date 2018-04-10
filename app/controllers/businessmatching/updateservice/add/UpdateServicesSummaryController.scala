@@ -25,10 +25,9 @@ import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import services.TradingPremisesService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.Future
 
@@ -45,7 +44,7 @@ class UpdateServicesSummaryController @Inject()(
     implicit authContext =>
       implicit request =>
         OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { model =>
-          Ok(views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, model))
+          Ok(update_services_summary(EmptyForm, model))
         } getOrElse InternalServerError("Unable to get the flow model")
   }
 

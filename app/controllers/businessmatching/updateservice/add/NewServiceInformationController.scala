@@ -16,8 +16,6 @@
 
 package controllers.businessmatching.updateservice.add
 
-import java.lang.ProcessBuilder.Redirect
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
@@ -25,11 +23,10 @@ import controllers.BaseController
 import javax.inject.Inject
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import play.api.i18n.MessagesApi
-import services.businessmatching.{BusinessMatchingService, ServiceFlow}
+import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.new_service_information
-import play.api.mvc.Results.Redirect
-import services.flowmanagement.Router
 
 import scala.concurrent.Future
 

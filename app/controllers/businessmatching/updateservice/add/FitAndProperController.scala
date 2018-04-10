@@ -33,6 +33,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BooleanFormReadWrite, RepeatingSection}
+import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -54,7 +55,7 @@ class FitAndProperController @Inject()(
     implicit authContext =>
       implicit request =>
         filterRequest {
-          Future.successful(Ok(views.html.businessmatching.updateservice.fit_and_proper(EmptyForm, config.showFeesToggle)))
+          Future.successful(Ok(fit_and_proper(EmptyForm, config.showFeesToggle)))
         }
   }
 
@@ -70,7 +71,7 @@ class FitAndProperController @Inject()(
               } map { _ => Redirect(NewServiceInformationController.get()) }
             case false => Future.successful(Redirect(WhichFitAndProperController.get()))
           }
-          case f: InvalidForm => Future.successful(BadRequest(views.html.businessmatching.updateservice.fit_and_proper(f, config.showFeesToggle)))
+          case f: InvalidForm => Future.successful(BadRequest(fit_and_proper(f, config.showFeesToggle)))
         }
       }
   }

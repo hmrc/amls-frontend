@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+.bulletedList>ul>li {
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
 a.block-link {
   display: block;
 }

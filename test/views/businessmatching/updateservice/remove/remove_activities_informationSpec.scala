@@ -16,11 +16,8 @@
 
 package views.businessmatching.updateservice.remove
 
-import forms.EmptyForm
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.Messages
-import play.api.test.FakeRequest
 import utils.GenericTestHelper
 import views.Fixture
 

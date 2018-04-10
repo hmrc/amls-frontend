@@ -25,16 +25,15 @@ import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BusinessMatchingActivities}
+import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.businessmatching.updateservice.select_activities
+import views.html.businessmatching.updateservice.add.select_activities
 
 import scala.concurrent.Future
 
