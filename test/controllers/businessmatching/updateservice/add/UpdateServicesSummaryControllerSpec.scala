@@ -103,15 +103,15 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         )
 
         when {
-          controller.updateServicesSummaryControllerHelper.updateTradingPremises(eqTo(flowModel))(any(), any())
+          controller.helper.updateTradingPremises(eqTo(flowModel))(any(), any())
         } thenReturn OptionT.fromOption[Future](Some(modifiedTradingPremises))
 
         when {
-          controller.updateServicesSummaryControllerHelper.updateBusinessMatching(eqTo(HighValueDealing))(any(), any())
+          controller.helper.updateBusinessMatching(eqTo(HighValueDealing))(any(), any())
         } thenReturn Future.successful(Some(businessMatchingModel))
 
         when {
-          controller.updateServicesSummaryControllerHelper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
+          controller.helper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
         } thenReturn Future.successful(Some(serviceChangeRegister))
 
         when {
@@ -119,8 +119,12 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn modifiedTradingPremises
 
         when {
-          controller.updateServicesSummaryControllerHelper.updateHasAcceptedFlag(eqTo(flowModel))(any(), any())
+          controller.helper.updateHasAcceptedFlag(eqTo(flowModel))(any(), any())
         } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
+
+        when {
+          controller.helper.updateBusinessActivities(eqTo(HighValueDealing))(any(), any())
+        } thenReturn Future.successful(Some(mock[models.businessactivities.BusinessActivities]))
 
         val result = controller.post()(request)
 
