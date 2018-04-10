@@ -35,7 +35,11 @@
         wide = true,
         gutter = true
     ){
-        <p>@Messages("businessmatching.registerservices.existing")</p>
+        @if(existing.size == 1) {
+            <p>@Messages("businessmatching.updateservice.changeservices.existing.single")</p>
+        } else {
+            <p>@Messages("businessmatching.updateservice.changeservices.existing.multiple")</p>
+        }
         @bulletedList(existing)
     }
 
