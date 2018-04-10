@@ -27,7 +27,12 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set.empty[String], allowAdd = true)
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne"), allowAdd = true)
+  }
+
+  trait MultipleViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd = true)
   }
 
   "The change_services view" must {
@@ -48,6 +53,14 @@ class change_servicesSpec extends GenericTestHelper with MustMatchers {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
       doc.body().html() must include("changeServices-add")
       doc.body().text() must include(Messages("link.return.registration.progress"))
+    }
+
+    "show the correct business type text for only one existing service" in new ViewFixture {
+      doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.existing.single"))
+    }
+
+    "show the correct business type text for more than one existing service" in new MultipleViewFixture {
+      doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.existing.multiple"))
     }
 
     "show errors in the correct locations" in new ViewFixture {
