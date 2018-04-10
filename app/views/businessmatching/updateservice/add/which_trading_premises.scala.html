@@ -21,25 +21,27 @@
 
 @(f: forms.Form2[_], tradingPremises: Seq[(TradingPremises, Int)], activity: String)(implicit request: Request[_], m:Messages)
 
+@pageHeading = @{
+    Messages("businessmatching.updateservice.whichtradingpremises.heading",
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+    )
+}
+
 @header = {
     @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
-    @headingWithPlaceholder((
-        "businessmatching.updateservice.whichtradingpremises.heading",
-        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
-    ), "summary.updateservice")
+    @heading(pageHeading, "summary.updateservice")
 }
 
 @main(
     title = Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("summary.updateservice"),
     heading = header
-)  {
+) {
 
     @trading_premises(
         f,
         tradingPremises,
-        Messages("businessmatching.updateservice.whichtradingpremises.title"),
+        pageHeading,
         controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post(),
         Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
     )
-
 }
