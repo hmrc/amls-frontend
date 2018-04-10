@@ -44,7 +44,12 @@ class UpdateServicesSummaryControllerHelper @Inject()(
 
   def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
       dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
-        case Some(model) if activity.equals(AccountancyServices) => model.accountantForAMLSRegulations(None).whoIsYourAccountant(None).taxMatters(None)
+        case Some(model) if activity.equals(AccountancyServices) =>
+          model.accountantForAMLSRegulations(None)
+            .whoIsYourAccountant(None)
+            .taxMatters(None)
+            .copy(hasAccepted = true)
+
         case Some(model) => model
       }
   }

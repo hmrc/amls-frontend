@@ -40,7 +40,8 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
         involvedInOther = Some(InvolvedInOtherNo),
         whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
         accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
-        taxMatters = Some(TaxMatters(true))
+        taxMatters = Some(TaxMatters(true)),
+        hasAccepted = true
       )
   }
 
@@ -54,6 +55,7 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
       result.whoIsYourAccountant must not be defined
       result.accountantForAMLSRegulations must not be defined
       result.taxMatters must not be defined
+      result.hasAccepted mustBe true
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
@@ -64,6 +66,7 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
       result.whoIsYourAccountant mustBe defined
       result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
       result.taxMatters mustBe Some(TaxMatters(true))
+      result.hasAccepted mustBe true
     }
   }
 }
