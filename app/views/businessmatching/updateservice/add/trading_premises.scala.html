@@ -21,10 +21,10 @@
 @(f: forms.Form2[_], edit: Boolean, activity: String)(implicit request: Request[_], m:Messages)
 
 @header = {
-    @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
+    @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
     @headingWithPlaceholder((
         "businessmatching.updateservice.tradingpremises.heading",
-        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
     ), "summary.updateservice")
 }
 
@@ -44,7 +44,7 @@
 
             @errorGroupWithPlaceholder(
                 field = f("tradingPremisesNewActivities"),
-                placeholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+                placeholder = Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
             ) {
                 @radio(
                     f = f("tradingPremisesNewActivities"),

@@ -43,7 +43,7 @@ class trading_premisesSpec extends GenericTestHelper with MustMatchers {
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.heading", "High value dealing"))
+      heading.html must be(Messages("businessmatching.updateservice.tradingpremises.heading", "high value dealing"))
     }
 
     "have correct subHeading" in new ViewFixture {
