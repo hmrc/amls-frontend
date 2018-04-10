@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice._
 
+import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 class ChangeServicesController @Inject()(
@@ -71,8 +72,11 @@ class ChangeServicesController @Inject()(
     remainingActivities <- businessMatchingService.getRemainingBusinessActivities
   } yield {
     val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+    val existingSorted = SortedSet[String]() ++ existing
+    val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
 
-    (existing, remainingActivities)
+    (existingSorted, remainingActivitiesSorted)
+    //(existing, remainingActivities)
   }
 
 }

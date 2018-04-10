@@ -35,6 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add.select_activities
 
+import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 @Singleton
@@ -92,8 +93,11 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
       val allActivities = BusinessMatchingActivities.allWithoutMsbTcsp
       val existingActivityNames = activities map { _.getMessage }
       val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
+    val namesSorted = SortedSet[String]() ++ existingActivityNames
+    val valueSorted = SortedSet[String]() ++ activityValues.toSet
 
-      (existingActivityNames, activityValues.toSet)
+    (namesSorted, valueSorted)
+     // (existingActivityNames, activityValues.toSet)
     }
 
 }

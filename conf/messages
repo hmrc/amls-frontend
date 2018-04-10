@@ -1101,8 +1101,8 @@ businessmatching.registerservices.servicename.details.02 = Bill Payment Service 
 businessmatching.registerservices.servicename.details.03 = Estate Agency Businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
 businessmatching.registerservices.servicename.details.04 = High Value Dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
 businessmatching.registerservices.servicename.details.05 = Money Service Businesses exchange currency, transmit money, or cash cheques for their customers.
-businessmatching.registerservices.servicename.details.06 = Trust or Company Service Providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
-businessmatching.registerservices.servicename.details.07 = Telecommunications, Digital and IT Payment Service Providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
+businessmatching.registerservices.servicename.details.06 = Telecommunications, Digital and IT Payment Service Providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
+businessmatching.registerservices.servicename.details.07 = Trust or Company Service Providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
 businessmatching.registrationnumber.title = What’s your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
 businessmatching.typeofbusiness.title = What’s your type of business?
@@ -1161,7 +1161,7 @@ businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 #add route
-businessmatching.updateservice.selectactivities.title = What type of business do you need to register
+businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
 businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:

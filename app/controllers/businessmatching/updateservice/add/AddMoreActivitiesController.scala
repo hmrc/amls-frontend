@@ -33,6 +33,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
 import views.html.businessmatching.updateservice.add._
 
+import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 @Singleton
@@ -84,7 +85,7 @@ class AddMoreActivitiesController @Inject()(
         for {
           cache <- optionalCache
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+        } yield SortedSet[String]() ++ businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
     }
   }
 }
