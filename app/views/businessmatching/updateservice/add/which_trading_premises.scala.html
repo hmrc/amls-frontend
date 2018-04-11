@@ -23,12 +23,12 @@
 
 @pageHeading = @{
     Messages("businessmatching.updateservice.whichtradingpremises.heading",
-        Messages(s"businessmatching.registerservices.servicename.lbl.$activity")
+        Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased")
     )
 }
 
 @header = {
-    @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
+    @errorSummaryWithPlaceholder(f, Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
     @heading(pageHeading, "summary.updateservice")
 }
 
@@ -42,6 +42,6 @@
         tradingPremises,
         pageHeading,
         controllers.businessmatching.updateservice.add.routes.WhichTradingPremisesController.post(),
-        Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity"))
+        Some(Messages(s"businessmatching.registerservices.servicename.lbl.$activity.phrased"))
     )
 }
