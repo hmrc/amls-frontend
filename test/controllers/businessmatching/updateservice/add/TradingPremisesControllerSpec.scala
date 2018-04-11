@@ -53,7 +53,7 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
         contentAsString(result) must include(
           Messages(
             "businessmatching.updateservice.tradingpremises.heading",
-            Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}")
+            Messages(s"businessmatching.registerservices.servicename.lbl.${BusinessActivities.getValue(HighValueDealing)}.phrased")
           ))
       }
     }
