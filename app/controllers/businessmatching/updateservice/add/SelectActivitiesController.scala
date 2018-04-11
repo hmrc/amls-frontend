@@ -97,7 +97,6 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
     val valueSorted = SortedSet[String]() ++ activityValues.toSet
 
     (namesSorted, valueSorted)
-     // (existingActivityNames, activityValues.toSet)
     }
 
 }

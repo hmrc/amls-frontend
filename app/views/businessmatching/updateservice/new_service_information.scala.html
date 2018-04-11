@@ -19,7 +19,7 @@
 @import forms2._
 
 @import forms.EmptyForm
-@(activity: BusinessActivity)(implicit request: Request[_], messages: Messages)
+@(activities: Set[String])(implicit request: Request[_], messages: Messages)
 
 @header = {
     @heading("businessmatching.updateservice.newserviceinformation.heading", "summary.updateservice")
@@ -30,11 +30,12 @@
     heading = header
 ) {
 
-    <div class="panel-indent panel-indent--gutter">
-        @messages("businessmatching.updateservice.newserviceinformation.info.gutter", activity.getMessage)
-    </div>
 
-    <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
+    <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
+
+    <p>@bulletedList(activities)</p>
+
+    <p>@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
 
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.post()) {

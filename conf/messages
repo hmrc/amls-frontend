@@ -1198,10 +1198,11 @@ businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
 businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
 
-businessmatching.updateservice.newserviceinformation.title = We need to ask you about the new service you’ve added
-businessmatching.updateservice.newserviceinformation.heading = We need to ask you about the new service you’ve added
-businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for: {0}
-businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
+businessmatching.updateservice.newserviceinformation.title = We need to ask you some more questions because of the changes you’ve made
+businessmatching.updateservice.newserviceinformation.heading = We need to ask you some more questions because of the changes you’ve made
+businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for:
+businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to complete:
+businessmatching.updateservice.newserviceinformation.info.2 = You might need to edit other sections based on any new information you provide.
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
 
