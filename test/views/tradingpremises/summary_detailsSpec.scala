@@ -82,7 +82,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       ("tradingpremises.summary.address", checkElementTextIncludes(_, "Address Answer: 1 2 asdfasdf")),
       ("tradingpremises.summary.tradingstartdate", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
       ("tradingpremises.summary.residential", checkElementTextIncludes(_, "lbl.yes")),
-      ("tradingpremises.summary.services", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money Service Business activities")),
+      ("tradingpremises.summary.services", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money service business activities")),
       ("tradingpremises.msb.services.title", checkElementTextIncludes(_, "Transmitting money","Currency exchange")),
       ("tradingpremises.summary.who-uses", checkElementTextIncludes(_, "tradingpremises.summary.agents")),
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),
@@ -138,7 +138,6 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
       val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
       val servicesSection = hTwo.get.parent.toString
 
-      //println(servicesSection)
       servicesSection mustNot include("Edit")
     }
   }
