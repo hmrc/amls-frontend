@@ -14,11 +14,10 @@
  * limitations under the License.
  *@
 
-@import models.businessmatching.BusinessActivity
 @import include._
 @import forms2._
-
 @import forms.EmptyForm
+
 @(activities: Set[String])(implicit request: Request[_], messages: Messages)
 
 @header = {
@@ -30,10 +29,14 @@
     heading = header
 ) {
 
-
-    <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
-
-    <p>@bulletedList(activities)</p>
+    @panel(
+        gutter = true,
+        wide = true,
+        jsHidden = false
+    ) {
+        <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
+        <p>@bulletedList(activities)</p>
+    }
 
     <p>@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
 

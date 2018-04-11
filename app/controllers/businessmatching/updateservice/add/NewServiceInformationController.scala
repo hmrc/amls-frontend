@@ -22,17 +22,14 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{BillPaymentServices, TelephonePaymentService, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import play.api.i18n.MessagesApi
 import services.businessmatching.BusinessMatchingService
-import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.new_service_information
 
-import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 
@@ -50,7 +47,11 @@ class NewServiceInformationController @Inject()
       model <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
       activity <- OptionT.fromOption[Future](model.addedActivities)
     } yield {
-      val activityNames: Set[String] = activity map { _.getMessage }
+      val activityNames = activity filterNot {
+        case BillPaymentServices | TelephonePaymentService => true
+        case _ => false
+      } map { _.getMessage }
+
       Ok(new_service_information(activityNames))
     }) getOrElse InternalServerError("Could not get the flow model")
   }
