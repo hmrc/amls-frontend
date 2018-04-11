@@ -31,15 +31,7 @@
     heading = header
 )  {
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ){
-        <p>@Messages("businessmatching.registerservices.existing")</p>
-
-        @bulletedList(existing)
-     }
+    @current_business_types(existing)
 
     @form(f, controllers.businessmatching.updateservice.add.routes.AddMoreActivitiesController.post()) {
 
