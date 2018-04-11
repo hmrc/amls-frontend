@@ -36,7 +36,7 @@ class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
                                                  val tradingPremisesService: TradingPremisesService,
-                                                 val updateServicesSummaryControllerHelper: UpdateServicesSummaryControllerHelper,
+                                                 val helper: UpdateServicesSummaryControllerHelper,
                                                  val router: Router[AddServiceFlowModel]
                                                ) extends BaseController with RepeatingSection {
 
@@ -54,10 +54,11 @@ class UpdateServicesSummaryController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-          _ <- updateServicesSummaryControllerHelper.updateTradingPremises(model)
-          _ <- OptionT(updateServicesSummaryControllerHelper.updateBusinessMatching(activity))
-          _ <- OptionT(updateServicesSummaryControllerHelper.updateServicesRegister(activity))
-          _ <- updateServicesSummaryControllerHelper.updateHasAcceptedFlag(model)
+          _ <- helper.updateTradingPremises(model)
+          _ <- OptionT(helper.updateBusinessMatching(activity))
+          _ <- OptionT(helper.updateServicesRegister(activity))
+          _ <- OptionT(helper.updateBusinessActivities(activity))
+          _ <- helper.updateHasAcceptedFlag(model)
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
         } yield {
           route

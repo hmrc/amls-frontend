@@ -41,14 +41,16 @@
 
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
-        editUrl = routes.SelectActivitiesController.get(edit = true).url
+        editUrl = routes.SelectActivitiesController.get(edit = true).url,
+        idTag = "selectactivities-edit"
     ) {
         <p>@(flowModel.activityName.getOrElse(""))</p>
     }
 
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.tradingpremises.title"),
-        editUrl = routes.TradingPremisesController.get(edit = true).url
+        editUrl = routes.TradingPremisesController.get(edit = true).url,
+        idTag = "tradingpremises-edit"
     ) {
         <p>@(flowModel.areNewActivitiesAtTradingPremises map {
             case true => Messages("lbl.yes")
@@ -59,7 +61,8 @@
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
         @checkYourAnswers(
             question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activityName.getOrElse("")),
-            editUrl = routes.WhichTradingPremisesController.get().url
+            editUrl = routes.WhichTradingPremisesController.get().url,
+            idTag = "whichtradingpremises-edit"
         ) {
             <p>
                 @(flowModel.tradingPremisesActivities map { tp =>

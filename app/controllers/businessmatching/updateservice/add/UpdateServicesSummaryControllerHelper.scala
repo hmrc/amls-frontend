@@ -20,12 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessActivity, BusinessMatching}
+import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching}
 import models.flowmanagement.AddServiceFlowModel
 import models.tradingpremises.TradingPremises
 import services.TradingPremisesService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
@@ -38,8 +40,19 @@ class UpdateServicesSummaryControllerHelper @Inject()(
                                                        val authConnector: AuthConnector,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        val tradingPremisesService: TradingPremisesService
-                                                     ) extends RepeatingSection
-{
+                                                     ) extends RepeatingSection {
+
+  def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
+      dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
+        case Some(model) if activity.equals(AccountancyServices) =>
+          model.accountantForAMLSRegulations(None)
+            .whoIsYourAccountant(None)
+            .taxMatters(None)
+            .copy(hasAccepted = true)
+
+        case Some(model) => model
+      }
+  }
 
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
     OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
