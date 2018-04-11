@@ -18,6 +18,7 @@ package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessActivities, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -29,9 +30,9 @@ class select_activitiesSpec extends GenericTestHelper with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
     override def view = select_activities(EmptyForm,
-        true,
-        Set.empty[String],
-        Set.empty[String]
+        edit = true,
+        Seq.empty[String],
+        Seq.empty[String]
       )
 
   }
@@ -52,13 +53,33 @@ class select_activitiesSpec extends GenericTestHelper with MustMatchers {
 
     "show the correct content" in new ViewFixture {
 
+      val addedActivities = Seq(AccountancyServices, BillPaymentServices)
+      val submittedActivities = Seq(MoneyServiceBusiness)
+
+      override def view = select_activities(EmptyForm,
+        edit = true,
+        addedActivities map BusinessActivities.getValue,
+        submittedActivities map (_.getMessage)
+      )
+
+      doc.body().text() must not include Messages("link.return.registration.progress")
+
+      addedActivities foreach { a =>
+        doc.body().text must include(Messages(a.getMessage))
+        doc.body().html() must include(BusinessActivities.getValue(a))
+      }
+
+      submittedActivities foreach { a =>
+        doc.body().text() must include(Messages(a.getMessage))
+      }
+
     }
 
     "not show the return link" in new ViewFixture {
       override def view = select_activities(EmptyForm,
-          true,
-          Set.empty[String],
-          Set.empty[String]
+          edit = true,
+          Seq.empty[String],
+          Seq.empty[String]
         )
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
@@ -68,7 +89,7 @@ class select_activitiesSpec extends GenericTestHelper with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.selectactivities") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = select_activities(form2, true, Set.empty[String], Set.empty[String])
+      override def view = select_activities(form2, edit = true, Seq.empty[String], Seq.empty[String])
 
       errorSummary.html() must include("not a message Key")
     }
