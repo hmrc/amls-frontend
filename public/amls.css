@@ -706,6 +706,10 @@ form .spaced:last-of-type {
     margin-bottom: 5px;
 }
 
+form .form-field--error .spaced:last-of-type {
+    margin: 0px;
+}
+
 form .block-label + fieldset {
   float: left;
   margin-top: 10px;
