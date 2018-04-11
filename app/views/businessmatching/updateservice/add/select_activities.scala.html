@@ -19,7 +19,7 @@
 @import include.forms2._
 @import config.ApplicationConfig
 
-@(f: Form2[_], edit: Boolean, newActivities: Set[String], existing: Set[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, activityValues: Seq[String], existing: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
@@ -31,7 +31,7 @@
     heading = header
 ) {
 
-    @current_business_types(existing)
+    @current_business_types(existing.toSet)
 
     <p>@Messages("businessmatching.updateservice.selectactivities.hint")</p>
 
@@ -47,7 +47,7 @@
                 @errorGroup(
                     field = f("businessActivities")
                 ) {
-                    @{newActivities map (value => radio(
+                    @{activityValues map (value => radio(
                         f = f("businessActivities[]"),
                         labelText = s"businessmatching.registerservices.servicename.lbl.$value",
                         value = value

@@ -91,12 +91,9 @@ class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
     activities <- OptionT.fromOption[Future](model.activities) map { _.businessActivities }
     } yield {
       val allActivities = BusinessMatchingActivities.allWithoutMsbTcsp
-      val existingActivityNames = activities map { _.getMessage }
+      val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map { _.getMessage }
       val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
-    val namesSorted = SortedSet[String]() ++ existingActivityNames
-    val valueSorted = SortedSet[String]() ++ activityValues.toSet
 
-    (namesSorted, valueSorted)
+      (existingActivityNames, activityValues)
     }
-
 }
