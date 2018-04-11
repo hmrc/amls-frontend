@@ -1174,6 +1174,7 @@ businessmatching.updateservice.selectactivities.title = What type of business do
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
 businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
+businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You’ve told us your business types are:
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
