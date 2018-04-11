@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -42,25 +42,18 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
-
-    val controller = app.injector.instanceOf[AddMoreActivitiesController]
+    val controller = new AddMoreActivitiesController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService,
+      mockBusinessMatchingService,
+      createRouter[AddServiceFlowModel]
+    )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
     val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
-
     val bmEmpty = Some(BusinessMatching())
 
     mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
@@ -94,40 +87,36 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
             ))
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.SelectActivitiesController.get().url)
+            controller.router.verify(AddMoreAcivitiesPageId, AddServiceFlowModel(addMoreActivities = Some(true)))
           }
         }
 
         "when request equals 'No'" must {
-          " progress to the 'registration progress' page " when {
-            "if no activity that generates a section has been chosen" when {
+          "progress to the 'registration progress' page " when {
+            "no activity that generates a section has been chosen" in new Fixture {
+              val flowModel = AddServiceFlowModel(Some(BillPaymentServices))
+              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
-              "an activity that generates a section has been chosen" in new Fixture {
-                mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(BillPaymentServices)))
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "addmoreactivities" -> "false"
+              ))
 
-                val result = controller.post()(request.withFormUrlEncodedBody(
-                  "addmoreactivities" -> "false"
-                ))
-
-                status(result) mustBe SEE_OTHER
-                redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
-              }
+              status(result) mustBe SEE_OTHER
+              controller.router.verify(AddMoreAcivitiesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
 
-          " progress to the 'registration progress' page " when {
-            "if an activity that generates a section has been chosen" when {
+          "progress to the next page " when {
+            "an activity that generates a section has been chosen" in new Fixture {
+              val flowModel = AddServiceFlowModel(Some(HighValueDealing))
+              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
-              "an activity that generates a section has been chosen" in new Fixture {
-                mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing)))
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "addmoreactivities" -> "false"
+              ))
 
-                val result = controller.post()(request.withFormUrlEncodedBody(
-                  "addmoreactivities" -> "false"
-                ))
-
-                status(result) mustBe SEE_OTHER
-                redirectLocation(result) mustBe Some(routes.NewServiceInformationController.get().url)
-              }
+              status(result) mustBe SEE_OTHER
+              controller.router.verify(AddMoreAcivitiesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
         }
@@ -142,4 +131,5 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
       }
     }
   }
+
 }

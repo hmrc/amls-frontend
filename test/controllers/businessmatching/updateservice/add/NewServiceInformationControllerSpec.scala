@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -68,13 +69,16 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
 
     val flowModel = AddServiceFlowModel(Some(AccountancyServices), Some(true))
-    mockCacheFetch(Some(flowModel), Some(AddServiceFlowModel.key))
+    mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
   }
 
   "NewServiceInformationController" when {
 
     "get is called" must {
       "return OK with new_service_information view" in new Fixture {
+
+        mockCacheFetch(Some(ServiceChangeRegister(Some(Set(HighValueDealing)))), Some(ServiceChangeRegister.key))
+
         val result = controller.get()(request)
 
         status(result) must be(OK)

@@ -27,7 +27,7 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = new_service_information(AccountancyServices)
+    def view = new_service_information(Set(AccountancyServices.getMessage))
   }
 
   "The new_service_information view" must {
@@ -45,8 +45,8 @@ class new_service_informationSpec extends GenericTestHelper with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.gutter", "Accountancy services"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info", "Accountancy services"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.1"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
     }
 
     "not show the return link" in new ViewFixture {
