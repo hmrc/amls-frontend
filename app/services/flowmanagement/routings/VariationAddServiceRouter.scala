@@ -19,6 +19,7 @@ package services.flowmanagement.routings
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.Inject
+import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
@@ -32,6 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessMatchingService) extends Router[AddServiceFlowModel] {
 
   // scalastyle:off cyclomatic.complexity
+  // scalastyle:off method.length
   override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
 
@@ -71,11 +73,16 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
 
         case _ =>
-          if (model.informationRequired) {
-            Future.successful(Redirect(addRoutes.NewServiceInformationController.get()))
-          } else {
-            Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-          }
+          businessMatchingService.getAdditionalBusinessActivities map { activities =>
+            if (!activities.forall {
+              case BillPaymentServices | TelephonePaymentService => true
+              case _ => false
+            }) {
+              Redirect(addRoutes.NewServiceInformationController.get())
+            } else {
+              Redirect(controllers.routes.RegistrationProgressController.get())
+            }
+          } getOrElse InternalServerError("Unable to get additional business activities")
       }
 
     case NewServiceInformationPageId =>
