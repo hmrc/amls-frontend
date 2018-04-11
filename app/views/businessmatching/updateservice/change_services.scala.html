@@ -30,18 +30,7 @@
     heading = header
 )  {
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ){
-        @if(existing.size == 1) {
-            <p>@Messages("businessmatching.updateservice.changeservices.existing.single")</p>
-        } else {
-            <p>@Messages("businessmatching.updateservice.changeservices.existing.multiple")</p>
-        }
-        @bulletedList(existing)
-    }
+    @current_business_types(existing)
 
     @form(f, controllers.businessmatching.updateservice.routes.ChangeServicesController.post()) {
 
@@ -59,6 +48,7 @@
                     @radio(
                         f = f("changeServices"),
                         labelText = "businessmatching.updateservice.changeservices.choice.add",
+                        spaced = true,
                         value = "add"
                     )
                 }
