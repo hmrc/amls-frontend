@@ -701,6 +701,11 @@ form .form-label-bold {
   margin-bottom: 0.5em;
 }
 
+form .spaced:last-of-type {
+    margin-top: -20px;
+    margin-bottom: 5px;
+}
+
 form .block-label + fieldset {
   float: left;
   margin-top: 10px;
