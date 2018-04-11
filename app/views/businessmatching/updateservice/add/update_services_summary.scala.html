@@ -48,7 +48,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessmatching.updateservice.tradingpremises.title"),
+        question = Messages("businessmatching.updateservice.tradingpremises.heading", flowModel.activityName.getOrElse("").toLowerCase),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
         idTag = "tradingpremises-edit"
     ) {
@@ -60,7 +60,7 @@
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
         @checkYourAnswers(
-            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activityName.getOrElse("")),
+            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activityName.getOrElse("").toLowerCase),
             editUrl = routes.WhichTradingPremisesController.get().url,
             idTag = "whichtradingpremises-edit"
         ) {
