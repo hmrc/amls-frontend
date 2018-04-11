@@ -127,7 +127,7 @@ error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select
 error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
 
 error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
-error.businessmatching.updateservice.changeservices = Select one option to show what you want to do
+error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
