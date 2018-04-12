@@ -22,8 +22,9 @@ import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching}
+import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.flowmanagement.AddServiceFlowModel
+import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import services.TradingPremisesService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -51,6 +52,20 @@ class UpdateServicesSummaryControllerHelper @Inject()(
           .copy(hasAccepted = true)
 
       case Some(model) => model
+    }
+  }
+
+  def updateSupervision(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)) flatMap { businessMatching =>
+      OptionT.fromOption[Future](businessMatching.activities) flatMap { activities =>
+        (OptionT(dataCacheConnector.fetch[Supervision](Supervision.key)) orElse OptionT.some(Supervision())) flatMap { supervision =>
+          if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
+            OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, Supervision())) map { _ => Supervision() }
+          } else {
+            OptionT.some(supervision)
+          }
+        }
+      }
     }
   }
 

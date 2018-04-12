@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching.updateservice.TradingPremisesActivities
-import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService}
+import models.businessmatching._
 import models.flowmanagement._
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class VariationAddServiceRouterSpec extends PlaySpec {
 
-  trait Fixture extends DependencyMocks{
+  trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]
     val router = new VariationAddServiceRouter(businessMatchingService)
   }
@@ -91,7 +91,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the trading premises yes/no question " +
-      "the trading premises have already been selected" in new Fixture {
+        "the trading premises have already been selected" in new Fixture {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
@@ -119,7 +119,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         val model = AddServiceFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
-          tradingPremisesActivities = Some(TradingPremisesActivities(Set(0,1,2)))
+          tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2)))
         )
 
         val result = await(router.getRoute(WhichTradingPremisesPageId, model))
@@ -144,28 +144,16 @@ class VariationAddServiceRouterSpec extends PlaySpec {
       }
     }
 
-    "redirect to the 'Registration Progress' page" when {
-        "we're on the summary page and the user selects continue " +
-        "if all possible activities are added" +
-        " and the new activity does not require more information" in new Fixture {
-          when {
-            router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
-          } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
-
-          val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(BillPaymentServices))))
-
-          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
-      }
-    }
-
     "redirect to the 'New Service Information' page" when {
       "we're on the summary page and the user selects continue " +
-        "and if all possible activities are added" +
-        " and the new one requires more information" in new Fixture {
-
+        "and if all possible activities are added" in new Fixture {
         when {
           router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+        when {
+          router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.allWithoutMsbTcsp)
 
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 
@@ -188,8 +176,8 @@ class VariationAddServiceRouterSpec extends PlaySpec {
     }
 
     "return the 'New Service questions' page (NewServiceInformationController)" when {
-      "we're on the 'Do you want at add more activities' page " +
-      "and the user has added Activities that require more questions " +
+      "we're on the 'Do you want to add more activities' page " +
+        "and the user has added Activities that require more questions " +
         "and the use doesn't want to add more activities" in new Fixture {
 
         val model = AddServiceFlowModel(
