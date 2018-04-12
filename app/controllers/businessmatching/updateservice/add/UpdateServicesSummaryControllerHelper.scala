@@ -43,15 +43,15 @@ class UpdateServicesSummaryControllerHelper @Inject()(
                                                      ) extends RepeatingSection {
 
   def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
-      dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
-        case Some(model) if activity.equals(AccountancyServices) =>
-          model.accountantForAMLSRegulations(None)
-            .whoIsYourAccountant(None)
-            .taxMatters(None)
-            .copy(hasAccepted = true)
+    dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
+      case Some(model) if activity.equals(AccountancyServices) =>
+        model.accountantForAMLSRegulations(None)
+          .whoIsYourAccountant(None)
+          .taxMatters(None)
+          .copy(hasAccepted = true)
 
-        case Some(model) => model
-      }
+      case Some(model) => model
+    }
   }
 
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
@@ -83,6 +83,7 @@ class UpdateServicesSummaryControllerHelper @Inject()(
 
   def updateBusinessMatching(activity: BusinessActivity)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[BusinessMatching]] =
     dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
-      bm.copy(activities = bm.activities map { b => b.copy(businessActivities = b.businessActivities + activity) })
+      val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
+      bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
     }
 }
