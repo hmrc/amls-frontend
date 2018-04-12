@@ -25,7 +25,7 @@
     }
 }
 
-@getStatusId(name:String) = { @name.concat("-status") }
+@getStatusId(name:String) = {@name.concat("-status")}
 
 <li>
     <a href="@call.url" class="@{progressClass(status)}" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @Messages("progress.visuallyhidden.view.amend")">

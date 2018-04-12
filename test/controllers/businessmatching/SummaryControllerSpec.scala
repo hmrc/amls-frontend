@@ -18,13 +18,10 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessType.LPrLLP
 import models.businessmatching._
 import models.businessmatching.updateservice._
-import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -62,6 +59,10 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       controller.statusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
 
+    when {
+      controller.statusService.isPending(any(), any(), any())
+    } thenReturn Future.successful(false)
+
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn {
@@ -74,10 +75,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
     def mockUpdateModel = when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
@@ -102,7 +99,7 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       status(result) must be(SEE_OTHER)
     }
 
-    "hide the edit links when not in pre-approved status" in new Fixture {
+    "hide the edit links when not in pre-approved status and is pending" in new Fixture {
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
       mockGetModel(Some(model))
@@ -110,6 +107,10 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       when {
         controller.statusService.isPreSubmission(any(), any(), any())
       } thenReturn Future.successful(false)
+
+      when {
+        controller.statusService.isPending(any(), any(), any())
+      } thenReturn Future.successful(true)
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -146,7 +147,6 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](None)
 
           val result = controller.post()(postRequest)
@@ -198,6 +198,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
       controller.statusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
 
+    when {
+      controller.statusService.isPending(any(), any(), any())
+    } thenReturn Future.successful(false)
+
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn {
@@ -211,15 +215,11 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
     def mockUpdateModel = when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-    def mockCommit = when {
-      controller.businessMatchingService.commitVariationData(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   "Get" must {
 
-    "show the edit links when not in pre-submission status" in new Fixture {
+    "show the edit links when not in pre-submission status  and the application is not pending" in new Fixture {
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
       mockGetModel(Some(model))
@@ -228,11 +228,33 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
         controller.statusService.isPreSubmission(any(), any(), any())
       } thenReturn Future.successful(false)
 
+
       val result = controller.get()(request)
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
       html.select("a.change-answer").size mustBe 2
+    }
+
+    "NOT show the service edit links when not in pre-submission status and the application is pending" in new Fixture {
+      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
+
+      mockGetModel(Some(model))
+
+      when {
+        controller.statusService.isPreSubmission(any(), any(), any())
+      } thenReturn Future.successful(false)
+
+      when {
+        controller.statusService.isPending(any(), any(), any())
+      } thenReturn Future.successful(true)
+
+
+      val result = controller.get()(request)
+      status(result) mustBe OK
+
+      val html = Jsoup.parse(contentAsString(result))
+      html.select("a.change-answer").size mustBe 1
     }
   }
 
@@ -271,7 +293,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
 
           when {
@@ -282,9 +303,10 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
         }
       }
+
       "UpdateService is not defined" which {
         "updates the hasAccepted flag on the model" in new Fixture {
 
@@ -298,7 +320,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           mockGetModel(Some(model))
           mockUpdateModel
-          mockCommit
           mockCacheFetch[UpdateService](None, Some(UpdateService.key))
 
           when {
@@ -309,7 +330,7 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
           status(result) mustBe SEE_OTHER
 
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.TradingPremisesController.get(0).url)
+          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
         }
       }
     }
@@ -329,7 +350,6 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
         mockGetModel(Some(model))
         mockUpdateModel
-        mockCommit
         mockCacheFetch[UpdateService](Some(UpdateService(
           Some(NewActivitiesAtTradingPremisesNo),
           Some(TradingPremisesActivities(Set(1))),

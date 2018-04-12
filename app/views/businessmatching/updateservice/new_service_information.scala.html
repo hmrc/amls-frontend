@@ -14,33 +14,34 @@
  * limitations under the License.
  *@
 
-@import models.businessmatching.BusinessActivity
 @import include._
 @import forms2._
-
 @import forms.EmptyForm
-@(activity: BusinessActivity, flowUrl: String)(implicit request: Request[_], messages: Messages)
+
+@(activities: Set[String])(implicit request: Request[_], messages: Messages)
 
 @header = {
-    @heading(
-        "businessmatching.updateservice.newserviceinformation.heading",
-        "summary.updateservice"
-    )
+    @heading("businessmatching.updateservice.newserviceinformation.heading", "summary.updateservice")
 }
 
 @main(
-    title = messages("businessmatching.updateservice.newserviceinformation.title"),
+    title = messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
 
-    <div class="panel-indent panel-indent--gutter">
-        @messages("businessmatching.updateservice.newserviceinformation.info.gutter", activity.getMessage)
-    </div>
+    @panel(
+        gutter = true,
+        wide = true,
+        jsHidden = false
+    ) {
+        <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
+        <p>@bulletedList(activities)</p>
+    }
 
-    <p>@messages("businessmatching.updateservice.newserviceinformation.info", activity.getMessage)</p>
+    <p>@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
 
-    @form(EmptyForm, controllers.businessmatching.updateservice.routes.NewServiceInformationController.post()) {
-        <input type="hidden" name="redirectUrl" value="@flowUrl">
+
+    @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.post()) {
         @submit(false, Some("Continue"), false)
     }
 }

@@ -19,10 +19,10 @@
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 
-@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, allowEdit: Boolean = true)(implicit request: Request[_],messages:Messages)
+@(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", if(allowEdit) "summary.businessmatching" else "")
+    @heading("title.cya", if(isPreSubmission) "summary.businessmatching" else "")
 }
 
 @main(
@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    @if(allowEdit) {
+    @if(isPreSubmission) {
         @panel(
             jsHidden = false,
             wide = true,
@@ -55,7 +55,7 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
-                        allowEdit = allowEdit
+                        allowEdit = isPreSubmission
                     ) {
                         <p>@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
@@ -66,7 +66,7 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.typeofbusiness.title"),
                         editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString,
-                        allowEdit = allowEdit
+                        allowEdit = isPreSubmission
                     ) {
                         <p>@model.typeOfBusiness.map { business =>
                             @business.typeOfBusiness
@@ -82,7 +82,7 @@
         @checkYourAnswers(
             question = Messages("businessmatching.registerservices.title"),
             editUrl = changeActivitiesUrl,
-            allowEdit = allowEdit,
+            allowEdit = !isPending,
             classes = Seq("register-services"),
             idTag = "edit-business-activities"
         ) {
@@ -106,7 +106,7 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
-                    allowEdit = allowEdit,
+                    allowEdit = !isPending,
                     idTag="edit-msb-services"
                 ) {
                     <ul class="list list--comma">
@@ -126,7 +126,7 @@
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
                             editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString,
-                            allowEdit = allowEdit
+                            allowEdit = isPreSubmission
                         ) {
                             <p>@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
@@ -139,7 +139,7 @@
         }
     }
 
-    @if(allowEdit) {
+    @if(isPreSubmission) {
         @model.businessAppliedForPSRNumber.map { psr =>
             @psr match {
                 case BusinessAppliedForPSRNumberNo => {

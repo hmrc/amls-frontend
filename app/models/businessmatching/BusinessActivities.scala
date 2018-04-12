@@ -74,6 +74,8 @@ object BusinessActivity {
       case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
+
+
   implicit val activityFormWrite = Write[BusinessActivity, String] {
       case AccountancyServices => "01"
       case BillPaymentServices => "02"
@@ -109,6 +111,22 @@ object BusinessActivity {
 object BusinessActivities {
 
   import utils.MappingUtils.Implicits._
+
+  val all: Set[BusinessActivity] = Set(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  )
+
+  // TODO: This can potentially be removed once the new 'MSB/TCSP' add service flow goes in
+  lazy val allWithoutMsbTcsp = all filterNot {
+    case MoneyServiceBusiness | TrustAndCompanyServices => true
+    case _ => false
+  }
 
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     FormTypes.businessActivityRule("error.required.bm.register.service")

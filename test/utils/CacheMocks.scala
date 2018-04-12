@@ -18,8 +18,11 @@ package utils
 
 import connectors.DataCacheConnector
 import models.businessmatching.BusinessMatching
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 import org.scalatest.mock.MockitoSugar
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -61,6 +64,19 @@ trait CacheMocks extends MockitoSugar {
     case _ => when {
       cache.save[T](any(), eqTo(item))(any(), any(), any())
     } thenReturn Future.successful(mockCacheMap)
+  }
+
+  def mockCacheUpdate[T](key: Option[String] = None, dbModel: T)(implicit cache: DataCacheConnector) = key match {
+    case Some(k) =>
+      val funcCaptor = ArgumentCaptor.forClass(classOf[Option[T] => T])
+
+      when {
+        cache.update[T](eqTo(k))(funcCaptor.capture())(any(), any(), any())
+      } thenAnswer new Answer[Future[Option[T]]] {
+        override def answer(invocation: InvocationOnMock): Future[Option[T]] = {
+          Future.successful(Some(funcCaptor.getValue()(Some(dbModel))))
+        }
+      }
   }
 
 }

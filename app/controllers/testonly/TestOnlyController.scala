@@ -19,11 +19,14 @@ package controllers.testonly
 import config.{AMLSAuthConnector, AmlsShortLivedCache, BusinessCustomerSessionCache}
 import connectors.AmlsConnector
 import controllers.BaseController
+import forms.{EmptyForm, Form2}
 import play.api.libs.json.Json
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.status.status_submitted
+import jto.validation.{Path, ValidationError}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 object TestOnlyController extends TestOnlyController {
@@ -97,7 +100,5 @@ trait TestOnlyController extends BaseController with Actions {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
   }
-
-
 
 }

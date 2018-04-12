@@ -47,6 +47,7 @@ class SummaryController @Inject()(
         (for {
           bm <- businessMatchingService.getModel
           ba <- OptionT.fromOption[Future](bm.activities)
+          isPending <- OptionT.liftF(statusService.isPending)
           isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
         } yield {
 
@@ -62,7 +63,7 @@ class SummaryController @Inject()(
             controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
           }
 
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, isPreSubmission || ApplicationConfig.businessMatchingVariationToggle))
+          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, (isPreSubmission || ApplicationConfig.businessMatchingVariationToggle), isPending))
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
@@ -74,10 +75,9 @@ class SummaryController @Inject()(
           businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
           isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
           _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
-          _ <- businessMatchingService.commitVariationData map (_ => true) orElse OptionT.some(false)
         } yield {
           if (goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)) {
-            Redirect(updateservice.routes.TradingPremisesController.get(0))
+            Redirect(updateservice.add.routes.TradingPremisesController.get())
           } else {
             Redirect(controllers.routes.RegistrationProgressController.get())
           }

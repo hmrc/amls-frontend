@@ -18,36 +18,25 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], existing: Set[String], showReturnLink: Boolean = true)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], existing: Set[String], allowAdd: Boolean)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading(
-        "changeservices.title",
-        "summary.updateinformation"
-    )
+    @heading("businessmatching.updateservice.changeservices.heading", "summary.updateservice")
 }
 
 @main(
-    title = Messages("changeservices.title") + " - " + Messages("summary.updateinformation"),
+    title = Messages("businessmatching.updateservice.changeservices.title") + " - " + Messages("summary.updateservice"),
     heading = header
 )  {
 
-    @panel(
-        jsHidden = false,
-        wide = true,
-        gutter = true
-    ){
-        <p>@Messages("businessmatching.registerservices.existing")</p> @{existing map{ value =>
-            value
-        } mkString(", ")}
-    }
+    @current_business_types(existing)
 
     @form(f, controllers.businessmatching.updateservice.routes.ChangeServicesController.post()) {
 
         @fieldset(
             f = f("changeservices-fieldset"),
-            legend = "businessmatching.updateservice.fitandproper.title",
+            legend = "businessmatching.updateservice.changeservices.title",
             legendHidden = true,
             panel = false
         ) {
@@ -55,24 +44,24 @@
             @errorGroup(
                 field = f("changeServices")
             ) {
-                @radio(
-                    f = f("changeServices"),
-                    labelText = "changeservices.choice.add",
-                    value = "add"
-                )
-                @radio(
-                    f = f("changeServices"),
-                    labelText = "changeservices.choice.remove",
-                    value = "remove"
-                )
-
+                @if(allowAdd) {
+                    @radio(
+                        f = f("changeServices"),
+                        labelText = "businessmatching.updateservice.changeservices.choice.add",
+                        spaced = true,
+                        value = "add"
+                    )
+                }
             }
-
         }
 
-
-       @submit(buttonMessageKey = Some("button.continue"), returnLink = showReturnLink)
-
+        @if(allowAdd) {
+            @submit(buttonMessageKey = Some("button.continue"))
+        } else {
+            <p class="return-link">
+                <a href="@controllers.routes.RegistrationProgressController.get().url">@Messages("link.return.registration.progress")</a>
+            </p>
+        }
     }
 
 }

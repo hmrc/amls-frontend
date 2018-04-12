@@ -16,17 +16,16 @@
 
 package services
 
-import config.ApplicationConfig
 import connectors.AmlsConnector
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.{Mode, Play}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait StatusService {
 
@@ -147,6 +146,10 @@ trait StatusService {
     {
       amlsConnector.status(amlsRefNumber)
     }
+  }
+
+  def isPending(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>
+    status.equals(SubmissionReadyForReview)
   }
 
   def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>

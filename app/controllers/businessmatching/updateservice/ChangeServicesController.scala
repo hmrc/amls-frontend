@@ -16,38 +16,40 @@
 
 package controllers.businessmatching.updateservice
 
-import javax.inject.Inject
-
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
+import models.businessmatching.updateservice.ChangeServices
+import models.flowmanagement.ChangeServicesPageId
+import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.businessmatching.updateservice.change_services
-import routes._
-import services.businessmatching.BusinessMatchingService
+import views.html.businessmatching.updateservice._
 
+import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
-                                          val businessMatchingService: BusinessMatchingService
+                                          val businessMatchingService: BusinessMatchingService,
+                                          val router: Router[ChangeServices]
                                         ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
-          activities <- OptionT(getActivities)
-          preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(change_services(EmptyForm, activities, showReturnLink = preApplicationComplete))) getOrElse InternalServerError("Unable to show the page")
+          (existingActivities, remainingActivities) <- getFormData
+        } yield Ok(change_services(EmptyForm, existingActivities, remainingActivities.nonEmpty)))
+          .getOrElse(InternalServerError("Unable to show the page"))
   }
 
   def post() = Authorised.async {
@@ -55,33 +57,26 @@ class ChangeServicesController @Inject()(
       implicit request => {
         Form2[ChangeServices](request.body) match {
           case f: InvalidForm =>
-            OptionT(getActivities) map { activities =>
-              BadRequest(change_services(f, activities))
+            getFormData map { case (existing, remaining) =>
+              BadRequest(change_services(f, existing, remaining.nonEmpty))
             } getOrElse InternalServerError("Unable to show the page")
-          case ValidForm(_, data) => data match {
-            case ChangeServicesAdd => Future.successful(Redirect(controllers.businessmatching.routes.RegisterServicesController.get()))
-            case ChangeServicesRemove => {
-              OptionT(getActivities) map { activities =>
-                if (activities.size < 2) {
-                  Redirect(RemoveActivitiesInformationController.get())
-                } else {
-                  Redirect(RemoveActivitiesController.get())
-                }
-              } getOrElse InternalServerError("Unable to show the page")
-            }
-          }
+          case ValidForm(_, data) =>
+                router.getRoute(ChangeServicesPageId, data)
         }
       }
   }
 
-  private def getActivities(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = {
-    dataCacheConnector.fetchAll map {
-      optionalCache =>
-        for {
-          cache <- optionalCache
-          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        } yield businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
-    }
+  private def getFormData(implicit dataCacheConnector: DataCacheConnector, hc: HeaderCarrier, ac: AuthContext) = for {
+    cache <- OptionT(dataCacheConnector.fetchAll)
+    businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+    remainingActivities <- businessMatchingService.getRemainingBusinessActivities
+  } yield {
+    val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+    val existingSorted = SortedSet[String]() ++ existing
+    val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
+
+    (existingSorted, remainingActivitiesSorted)
+    //(existing, remainingActivities)
   }
 
 }
