@@ -19,8 +19,8 @@ package services.flowmanagement.routing
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import models.businessmatching.updateservice.TradingPremisesActivities
-import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
+import models.businessmatching._
 import models.flowmanagement._
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
@@ -236,7 +236,98 @@ class VariationAddServiceRouterSpec extends PlaySpec {
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
     }
+//Start
+    "return the 'fitAndProper' page (FitAndProperController)" when {
+      "the user is on the 'What Type of business ....' (SelectActivities) page and TCSP is selected" in new Fixture {
+        val model = AddServiceFlowModel(
+          activity = Some(TrustAndCompanyServices))
+          val result = await(router.getRoute(SelectActivitiesPageId, model))
 
+          result mustBe Redirect(addRoutes.FitAndProperController.get())
+        }
+
+    }
+
+    "return the 'WhichfitAndProper' page (WhichFitAndProperController)" when {
+      "the user is on the Fit and proper page " when {
+        "given the 'BusinessActivities' model contains tcsp and the answer is yes" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            fitAndProper = Some(true))
+          val result = await(router.getRoute(FitAndProperPageId, model))
+
+          result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
+        }
+      }
+    }
+
+    "return the 'tradingPremises' page (TradingPremisesController)" when {
+      "the user is on the Fit and proper page " when {
+        "given the 'BusinessActivities' model contains tcsp and the answer is no" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            fitAndProper = Some(false))
+          val result = await(router.getRoute(FitAndProperPageId, model))
+
+          result mustBe Redirect(addRoutes.TradingPremisesController.get())
+        }
+      }
+    }
+
+    "return the 'tradingPremises' page (TradingPremisesController)" when {
+      "the user is on the Which Fit and proper page " when {
+        "given the 'BusinessActivities' model contains tcsp" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices))
+          val result = await(router.getRoute(WhichFitAndProperPageId, model))
+
+          result mustBe Redirect(addRoutes.TradingPremisesController.get())
+        }
+      }
+    }
+
+//Edit mode
+
+    "return the 'which fit and proper' page (WhichFitAndProperController)" when {
+      "editing the Fit and proper page " when {
+        "and the answer is yes" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            fitAndProper = Some(true))
+          val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
+        }
+      }
+    }
+
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "the user is on the Which Fit and proper page " when {
+        "the responsible people have already been selected and in edit mode" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            fitAndProper = Some(true),
+            responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0,1,2,3))))
+          val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "editing the fit and proper page " when {
+        " and the answer is no " in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            fitAndProper = Some(false))
+          val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
   }
 
 }

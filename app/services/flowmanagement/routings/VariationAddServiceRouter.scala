@@ -19,8 +19,9 @@ package services.flowmanagement.routings
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.Inject
-import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
+import models.businessmatching._
 import models.flowmanagement._
+
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.businessmatching.BusinessMatchingService
@@ -40,8 +41,29 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
-    case SelectActivitiesPageId =>
-      Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+    case SelectActivitiesPageId => {
+      model.activity match {
+        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+        //case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      }
+    }
+
+    case FitAndProperPageId if edit && model.responsiblePeople.isDefined =>
+      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+
+    case FitAndProperPageId =>
+      (model.fitAndProper, edit) match {
+        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get()))
+        case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      }
+
+    case WhichFitAndProperPageId =>
+      edit match {
+        case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      }
 
     case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))

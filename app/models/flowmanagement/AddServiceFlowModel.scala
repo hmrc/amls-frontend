@@ -17,7 +17,7 @@
 package models.flowmanagement
 
 import models.businessmatching._
-import models.businessmatching.updateservice.TradingPremisesActivities
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
@@ -25,6 +25,8 @@ case class AddServiceFlowModel(
                                 areNewActivitiesAtTradingPremises: Option[Boolean] = None,
                                 tradingPremisesActivities: Option[TradingPremisesActivities] = None,
                                 addMoreActivities: Option[Boolean] = None,
+                                fitAndProper: Option[Boolean] = None,
+                                responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
                                 hasChanged: Boolean = false,
                                 hasAccepted: Boolean = false
                               ) {
@@ -44,8 +46,14 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.tradingPremisesActivities.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), _, true) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), _, true) => true
+
+    //case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true) => true
+    //case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true) => true
+
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true) => true
+
+
     case _ => false
   }
 
