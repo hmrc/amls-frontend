@@ -25,6 +25,7 @@ import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import models.status.SubmissionDecisionApproved
+import models.supervision.Supervision
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.when
@@ -125,6 +126,10 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         when {
           controller.helper.updateBusinessActivities(eqTo(HighValueDealing))(any(), any())
         } thenReturn Future.successful(Some(mock[models.businessactivities.BusinessActivities]))
+
+        when {
+          controller.helper.updateSupervision(any(), any())
+        } thenReturn OptionT.some[Future, Supervision](Supervision())
 
         val result = controller.post()(request)
 

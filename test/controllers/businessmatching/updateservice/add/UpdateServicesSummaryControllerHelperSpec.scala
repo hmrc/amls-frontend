@@ -18,15 +18,20 @@ package controllers.businessmatching.updateservice.add
 
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
-import models.businessmatching.{AccountancyServices, HighValueDealing}
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.supervision._
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{verify, never}
 import org.scalatest.MustMatchers
-import services.TradingPremisesService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import play.api.test.Helpers._
+import services.TradingPremisesService
+import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
-class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with MustMatchers with BusinessActivitiesGenerator {
+class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with MustMatchers with BusinessActivitiesGenerator with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
 
@@ -37,12 +42,12 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
     )
 
     val businessActivitiesSection = BusinessActivities(
-        involvedInOther = Some(InvolvedInOtherNo),
-        whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
-        accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
-        taxMatters = Some(TaxMatters(true)),
-        hasAccepted = true
-      )
+      involvedInOther = Some(InvolvedInOtherNo),
+      whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
+      accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
+      taxMatters = Some(TaxMatters(true)),
+      hasAccepted = true
+    )
   }
 
   "updateBusinessActivities" must {
@@ -67,6 +72,62 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
       result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
       result.taxMatters mustBe Some(TaxMatters(true))
       result.hasAccepted mustBe true
+    }
+  }
+
+  "updateSupervision" must {
+    "return a blank supervision element" when {
+      "the business doesn't have ASP or TSCP" in new Fixture {
+        mockCacheFetch[Supervision](
+          Some(Supervision(Some(AnotherBodyNo), Some(ProfessionalBodyMemberNo), None, Some(ProfessionalBodyNo))),
+          Some(Supervision.key))
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(HighValueDealing))))),
+          Some(BusinessMatching.key))
+
+        mockCacheSave(Supervision(), Some(Supervision.key))
+
+        helper.updateSupervision.returnsSome(Supervision())
+
+        verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision()))(any(), any(), any())
+      }
+    }
+
+    "leave the supervision section alone" when {
+      "the business has ASP" in new Fixture {
+        val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", LocalDate.now, LocalDate.now, "no reason")),
+          Some(ProfessionalBodyMemberNo),
+          None,
+          Some(ProfessionalBodyNo))
+
+        mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(AccountancyServices))))),
+          Some(BusinessMatching.key))
+
+        helper.updateSupervision.returnsSome(supervisionModel)
+
+        verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
+      }
+    }
+
+    "the business has TCSP" in new Fixture {
+      val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", LocalDate.now, LocalDate.now, "no reason")),
+        Some(ProfessionalBodyMemberNo),
+        None,
+        Some(ProfessionalBodyNo))
+
+      mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
+
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(TrustAndCompanyServices))))),
+        Some(BusinessMatching.key))
+
+      helper.updateSupervision.returnsSome(supervisionModel)
+
+      verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
   }
 }
