@@ -47,9 +47,8 @@ case class AddServiceFlowModel(
 
   def isComplete: Boolean = this match {
 
-    //case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true) => true
-    //case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true) => true
-
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true) => true
     case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) => true
     case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true) => true
 

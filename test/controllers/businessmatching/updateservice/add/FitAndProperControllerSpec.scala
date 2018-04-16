@@ -19,14 +19,17 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
+import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import play.api.Application
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -51,8 +54,9 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     implicit val ec: ExecutionContext = mockExecutionContext
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
-    lazy val app = new GuiceApplicationBuilder()
+    lazy val app: Application = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
@@ -62,6 +66,16 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     val controller = app.injector.instanceOf[FitAndProperController]
 
+
+//    val controller = new FitAndProperController(
+//      authConnector = self.authConnector,
+//      dataCacheConnector= mockCacheConnector,
+//      statusService= mockStatusService,
+//      businessMatchingService= mockBusinessMatchingService,
+//      helper = mockUpdateServiceHelper,
+//      router = createRouter[AddServiceFlowModel]
+//      config =
+//    )
     when {
       controller.businessMatchingService.getModel(any(),any(),any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(

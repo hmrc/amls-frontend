@@ -53,6 +53,7 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     implicit val ec: ExecutionContext = mockExecutionContext
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]

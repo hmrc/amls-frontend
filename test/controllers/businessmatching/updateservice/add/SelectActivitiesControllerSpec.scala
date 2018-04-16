@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import org.jsoup.Jsoup
@@ -45,12 +46,15 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
 
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new SelectActivitiesController(
-      self.authConnector,
-      mockCacheConnector,
-      createRouter[AddServiceFlowModel],
-      mockBusinessMatchingService
+      authConnector = self.authConnector,
+      dataCacheConnector= mockCacheConnector,
+      statusService= mockStatusService,
+      businessMatchingService= mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
     )
 
     when {

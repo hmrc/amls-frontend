@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -27,6 +28,7 @@ import jto.validation.{Rule, Write}
 import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -39,10 +41,14 @@ import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 @Singleton
-class SelectActivitiesController @Inject()(val authConnector: AuthConnector,
-                                           implicit val dataCacheConnector: DataCacheConnector,
-                                           val router: Router[AddServiceFlowModel],
-                                           val businessMatchingService: BusinessMatchingService) extends BaseController with RepeatingSection {
+class SelectActivitiesController @Inject()(
+                                            val authConnector: AuthConnector,
+                                            implicit val dataCacheConnector: DataCacheConnector,
+                                            val statusService: StatusService,
+                                            val businessMatchingService: BusinessMatchingService,
+                                            val helper: UpdateServiceHelper,
+                                            val router: Router[AddServiceFlowModel]
+                                          ) extends BaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
     FormTypes.businessActivityRule("error.required.bm.register.service.single") map { _.businessActivities.head }

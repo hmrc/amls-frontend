@@ -19,14 +19,13 @@ package services.flowmanagement.flowrouters
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.businessmatching._
+import models.businessmatching.updateservice.TradingPremisesActivities
+import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService}
 import models.flowmanagement._
 import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.flowrouters._
 import utils.DependencyMocks
 import org.mockito.Mockito.when
 import org.mockito.Matchers.any
@@ -34,10 +33,14 @@ import services.flowmanagement.flowrouters.VariationAddServiceRouter
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
+import models.businessmatching._
+import services.flowmanagement.flowrouters._
+import services.flowmanagement.flowrouters.VariationAddServiceRouter
 
 class VariationAddServiceRouterSpec extends PlaySpec {
 
-  trait Fixture extends DependencyMocks{
+  trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]
     val router = new VariationAddServiceRouter(businessMatchingService)
   }
@@ -154,6 +157,10 @@ class VariationAddServiceRouterSpec extends PlaySpec {
           router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
+        when {
+          router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(BillPaymentServices))))
 
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
@@ -162,12 +169,14 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
     "redirect to the 'New Service Information' page" when {
       "we're on the summary page and the user selects continue " +
-        "and if all possible activities are added" +
-        " and the new one requires more information" in new Fixture {
-
+        "and if all possible activities are added" in new Fixture {
         when {
           router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+        when {
+          router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.allWithoutMsbTcsp)
 
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 

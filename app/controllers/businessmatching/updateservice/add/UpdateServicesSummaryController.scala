@@ -20,10 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
-import services.TradingPremisesService
+import services.businessmatching.BusinessMatchingService
+import services.{StatusService, TradingPremisesService}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
@@ -35,9 +37,11 @@ import scala.concurrent.Future
 class UpdateServicesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                 val tradingPremisesService: TradingPremisesService,
-                                                 val helper: UpdateServicesSummaryControllerHelper,
-                                                 val router: Router[AddServiceFlowModel]
+                                                 val statusService: StatusService,
+                                                 val businessMatchingService: BusinessMatchingService,
+                                                 val helper: UpdateServiceHelper,
+                                                 val router: Router[AddServiceFlowModel],
+                                                 val tradingPremisesService: TradingPremisesService
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
@@ -55,6 +59,7 @@ class UpdateServicesSummaryController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
           _ <- helper.updateTradingPremises(model)
+          _ <- helper.updateSupervision
           _ <- OptionT(helper.updateBusinessMatching(activity))
           _ <- OptionT(helper.updateServicesRegister(activity))
           _ <- OptionT(helper.updateBusinessActivities(activity))

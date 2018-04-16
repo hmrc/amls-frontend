@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice.add
+package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.flowmanagement.AddServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
+import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import services.TradingPremisesService
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
@@ -36,7 +37,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class UpdateServicesSummaryControllerHelper @Inject()(
+class UpdateServiceHelper @Inject()(
                                                        val authConnector: AuthConnector,
                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                        val tradingPremisesService: TradingPremisesService
@@ -51,6 +52,20 @@ class UpdateServicesSummaryControllerHelper @Inject()(
           .copy(hasAccepted = true)
 
       case Some(model) => model
+    }
+  }
+
+  def updateSupervision(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)) flatMap { businessMatching =>
+      OptionT.fromOption[Future](businessMatching.activities) flatMap { activities =>
+        (OptionT(dataCacheConnector.fetch[Supervision](Supervision.key)) orElse OptionT.some(Supervision())) flatMap { supervision =>
+          if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
+            OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, Supervision())) map { _ => Supervision() }
+          } else {
+            OptionT.some(supervision)
+          }
+        }
+      }
     }
   }
 
@@ -85,5 +100,25 @@ class UpdateServicesSummaryControllerHelper @Inject()(
     dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
       val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
       bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
+    }
+
+  def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
+    getData[ResponsiblePeople].map { responsiblePeople =>
+      responsiblePeople.zipWithIndex.filterNot { case (rp, _) =>
+        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
+      }
+    }
+
+  def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
+                                     (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
+      responsiblePeople.zipWithIndex.map { case (rp, index) =>
+        val updated = if (data.index contains index) {
+          rp.hasAlreadyPassedFitAndProper(Some(true))
+        } else {
+          rp.hasAlreadyPassedFitAndProper(Some(false))
+        }
+        updated.copy(hasAccepted = updated.hasChanged)
+      }
     }
 }

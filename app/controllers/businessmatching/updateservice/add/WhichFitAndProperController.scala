@@ -20,14 +20,17 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
+import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -40,15 +43,18 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class WhichFitAndProperController @Inject()(
                                              val authConnector: AuthConnector,
-                                             val statusService: StatusService,
                                              implicit val dataCacheConnector: DataCacheConnector,
-                                             val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
+                                             val statusService: StatusService,
+                                             val businessMatchingService: BusinessMatchingService,
+                                             val helper: UpdateServiceHelper,
+                                             val router: Router[AddServiceFlowModel]
+                                             )() extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         filterRequest {
-          responsiblePeople map { rp =>
+          helper.responsiblePeople map { rp =>
             Ok(which_fit_and_proper(EmptyForm, rp))
           }
         }
@@ -59,10 +65,10 @@ class WhichFitAndProperController @Inject()(
         implicit request =>
           filterRequest {
             Form2[ResponsiblePeopleFitAndProper](request.body) match {
-              case ValidForm(_, data) => updateResponsiblePeople(data) map { _ =>
+              case ValidForm(_, data) => helper.updateResponsiblePeople(data) map { _ =>
                 Redirect(routes.NewServiceInformationController.get())
               }
-              case f: InvalidForm => responsiblePeople map { rp =>
+              case f: InvalidForm => helper.responsiblePeople map { rp =>
                 BadRequest(which_fit_and_proper(f, rp))
               }
             }
@@ -80,24 +86,6 @@ class WhichFitAndProperController @Inject()(
       })
     }) getOrElse InternalServerError("Cannot retrieve activities")
 
-  private def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
-    getData[ResponsiblePeople].map { responsiblePeople =>
-      responsiblePeople.zipWithIndex.filterNot { case (rp, _) =>
-        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
-      }
-    }
 
-  private def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
-                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-      responsiblePeople.zipWithIndex.map { case (rp, index) =>
-        val updated = if (data.index contains index) {
-          rp.hasAlreadyPassedFitAndProper(Some(true))
-        } else {
-          rp.hasAlreadyPassedFitAndProper(Some(false))
-        }
-        updated.copy(hasAccepted = updated.hasChanged)
-      }
-    }
 
 }

@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
@@ -49,13 +50,15 @@ class NewServiceInformationControllerSpec extends GenericTestHelper with Mockito
 
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new NewServiceInformationController(
-      self.authConnector,
-      mockCacheConnector,
-      mockBusinessMatchingService,
-      messagesApi,
-      createRouter[AddServiceFlowModel]
+      authConnector = self.authConnector,
+      dataCacheConnector= mockCacheConnector,
+      statusService= mockStatusService,
+      businessMatchingService= mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
     )
 
     when {

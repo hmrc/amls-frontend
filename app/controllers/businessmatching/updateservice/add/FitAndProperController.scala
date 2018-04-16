@@ -21,14 +21,17 @@ import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
+import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -42,9 +45,12 @@ import scala.concurrent.{ExecutionContext, Future}
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val businessMatchingService: BusinessMatchingService,
                                         val statusService: StatusService,
-                                        config: AppConfig) extends BaseController with RepeatingSection {
+                                        val businessMatchingService: BusinessMatchingService,
+                                        val helper: UpdateServiceHelper,
+                                        val router: Router[AddServiceFlowModel],
+                                        config: AppConfig
+                                        ) extends BaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 

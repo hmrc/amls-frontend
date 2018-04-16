@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
@@ -23,6 +24,7 @@ import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers.{eq => eqTo}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
@@ -31,12 +33,16 @@ class TradingPremisesControllerSpec extends GenericTestHelper with BusinessMatch
     self =>
 
     val request = addToken(authRequest)
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new TradingPremisesController(
-      self.authConnector,
-      mockCacheConnector,
-      mockStatusService,
-      createRouter[AddServiceFlowModel]
+      authConnector = self.authConnector,
+      dataCacheConnector= mockCacheConnector,
+      statusService= mockStatusService,
+      businessMatchingService= mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
     )
 
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))

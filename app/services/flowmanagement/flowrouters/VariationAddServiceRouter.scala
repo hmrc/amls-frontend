@@ -16,6 +16,7 @@
 
 package services.flowmanagement.flowrouters
 
+import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
@@ -82,13 +83,11 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
     case UpdateServiceSummaryPageId =>
-      businessMatchingService.getRemainingBusinessActivities map {
+      businessMatchingService.getRemainingBusinessActivities flatMap {
         case set if set.nonEmpty =>
-          Redirect(addRoutes.AddMoreActivitiesController.get())
-        case _ if model.informationRequired =>
-          Redirect(addRoutes.NewServiceInformationController.get())
+          OptionT.some(Redirect(addRoutes.AddMoreActivitiesController.get()))
         case _ =>
-          Redirect(controllers.routes.RegistrationProgressController.get())
+          newServiceInformationRedirect
       } getOrElse error(pageId)
 
     case AddMoreAcivitiesPageId =>
@@ -97,16 +96,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
           Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
 
         case _ =>
-          businessMatchingService.getAdditionalBusinessActivities map { activities =>
-            if (!activities.forall {
-              case BillPaymentServices | TelephonePaymentService => true
-              case _ => false
-            }) {
-              Redirect(addRoutes.NewServiceInformationController.get())
-            } else {
-              Redirect(controllers.routes.RegistrationProgressController.get())
-            }
-          } getOrElse InternalServerError("Unable to get additional business activities")
+          newServiceInformationRedirect getOrElse error(pageId)
       }
 
     case NewServiceInformationPageId =>
@@ -114,4 +104,16 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
   }
 
   private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
+
+  private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
+    businessMatchingService.getAdditionalBusinessActivities map { activities =>
+      if (!activities.forall {
+        case BillPaymentServices | TelephonePaymentService => true
+        case _ => false
+      }) {
+        Redirect(addRoutes.NewServiceInformationController.get())
+      } else {
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+    }
 }
