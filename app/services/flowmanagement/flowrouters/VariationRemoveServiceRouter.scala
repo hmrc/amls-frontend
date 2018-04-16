@@ -14,13 +14,18 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routing
+package services.flowmanagement.flowrouters
 
-import org.scalatestplus.play.PlaySpec
-import services.flowmanagement.routings.VariationRemoveServiceRouter
+import javax.inject.Inject
+import models.flowmanagement._
+import play.api.mvc.Result
+import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-class VariationRemoveServiceRouterSpec extends PlaySpec {
-  trait Fixture {
-    val router = new VariationRemoveServiceRouter
-  }
+import scala.concurrent.{ExecutionContext, Future}
+
+class VariationRemoveServiceRouter @Inject() extends Router[RemoveServiceFlowModel] {
+  override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = ???
 }

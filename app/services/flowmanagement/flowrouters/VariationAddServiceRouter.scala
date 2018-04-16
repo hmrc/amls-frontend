@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package services.flowmanagement.flowrouters
 
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement._
-
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.businessmatching.BusinessMatchingService
@@ -31,7 +30,10 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessMatchingService) extends Router[AddServiceFlowModel] {
+
+
 
   // scalastyle:off cyclomatic.complexity
   // scalastyle:off method.length

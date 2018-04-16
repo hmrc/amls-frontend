@@ -14,18 +14,27 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package services.flowmanagement.flowrouters
 
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.Inject
-import models.flowmanagement._
+import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
+import models.flowmanagement.PageId
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class VariationRemoveServiceRouter @Inject() extends Router[RemoveServiceFlowModel] {
-  override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = ???
+class ChangeServicesRouter @Inject() extends Router[ChangeServices] {
+  override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
+
+    case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
+    case ChangeServicesRemove => ???
+  }
 }
+
+

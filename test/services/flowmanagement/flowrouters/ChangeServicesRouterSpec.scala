@@ -14,13 +14,14 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routing
+package services.flowmanagement.flowrouters
 
 import models.businessmatching.updateservice.ChangeServicesAdd
 import models.flowmanagement.ChangeServicesPageId
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import services.flowmanagement.routings._
+import services.flowmanagement.flowrouters.ChangeServicesRouter
+import services.flowmanagement.flowrouters._
 import utils.DependencyMocks
 
 import scala.concurrent.ExecutionContext.Implicits.global
