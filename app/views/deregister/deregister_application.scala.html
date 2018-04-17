@@ -21,7 +21,7 @@
 @import forms2._
 @import forms.EmptyForm
 
-@(businessName: String, activities: Set[String], regNumber: String, businessMatchingVariationToggle: Boolean)(implicit request: Request[_], messages: Messages)
+@(businessName: String, activities: Set[String], regNumber: String)(implicit request: Request[_], messages: Messages)
 
 @header = {
     @heading("status.deregister.title", "summary.status")
@@ -41,9 +41,11 @@
             }
         </ul>
 
-        @if(businessMatchingVariationToggle){
-        <p><a href="@controllers.businessmatching.routes.SummaryController.get()">@Messages("status.deregister.button.change")<span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a></p>
-        }
+        <p>
+            <a href="@controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url">
+            @Messages("status.deregister.button.change")<span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
+        </p>
+
     </div>
 
 

@@ -21,7 +21,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String], businessMatchingVariationToggle: Boolean)(implicit request: Request[_], m: Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String])(implicit request: Request[_], m: Messages)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 
