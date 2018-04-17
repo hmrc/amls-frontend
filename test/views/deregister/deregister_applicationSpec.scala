@@ -47,6 +47,8 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers wit
 
     "have correct body content" in new ViewFixture {
       validateParagraphizedContent("status.deregister.body-content")
+      
+      doc.getElementById("change-services").attr("href") mustBe controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
     }
   }
 }

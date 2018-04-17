@@ -24,6 +24,7 @@ import models.businessmatching.{AccountancyServices, BusinessActivities, Busines
 import models.deregister.DeRegisterSubscriptionResponse
 import models.status.SubmissionDecisionApproved
 import org.joda.time.{LocalDate, LocalDateTime}
+import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
@@ -40,7 +41,6 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
 
   implicit override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.allow-deregister" -> true)
-    .configure("microservice.services.feature-toggle.business-matching-variation" -> true)
     .build()
 
   trait TestFixture extends AuthorisedFixture { self =>
@@ -98,11 +98,6 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
         val result = controller.get()(request)
         contentAsString(result) must include("Accountancy services")
       }
-
-      "contain a link to change the business activities" in new TestFixture {
-        val result = controller.get()(request)
-        contentAsString(result) must include("<a href=\"/anti-money-laundering/business-matching/check-your-answers\">")
-      }
     }
 
     "POST is called" must {
@@ -114,55 +109,3 @@ class DeRegisterApplicationControllerSpec extends GenericTestHelper with MustMat
     }
   }
 }
-
-class DeRegisterApplicationControllerWithoutBusinessMatchingVariationToggleSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
-
-  implicit override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
-    .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
-    .build()
-
-  trait TestFixture extends AuthorisedFixture { self =>
-    val request = addToken(authRequest)
-
-    val businessName = "Test Business"
-    val applicationReference = "SUIYD3274890384"
-    val registrationDate = LocalDateTime.now()
-    val reviewDetails = mock[ReviewDetails]
-    val activities = mock[BusinessActivities]
-    val statusService = mock[StatusService]
-    val dataCache = mock[DataCacheConnector]
-    val enrolments = mock[AuthEnrolmentsService]
-    val amlsConnector = mock[AmlsConnector]
-    val controller = new DeRegisterApplicationController(self.authConnector, dataCache, statusService, enrolments, amlsConnector)
-
-    when {
-      dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
-    } thenReturn Future.successful(BusinessMatching(reviewDetails.some, activities.some).some)
-
-    when(reviewDetails.businessName).thenReturn(businessName)
-
-    when(activities.businessActivities).thenReturn(Set[BusinessActivity](AccountancyServices))
-
-    when {
-      enrolments.amlsRegistrationNumber(any(), any(), any())
-    } thenReturn Future.successful(applicationReference.some)
-
-    when {
-      amlsConnector.deregister(any(), any())(any(), any(), any())
-    } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
-
-
-  }
-
-  "The DeRegisterApplicationController" when {
-    "GET is called" must {
-
-      "NOT contain a link to change the business activities" in new TestFixture {
-        val result = controller.get()(request)
-        contentAsString(result) mustNot include("<a href=\"/anti-money-laundering/business-matching/check-your-answers\">")
-      }
-    }
-  }
-}
-
