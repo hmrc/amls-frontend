@@ -58,4 +58,49 @@ class ResponsiblePeopleServiceSpec extends PlaySpec with ResponsiblePersonGenera
       await(service.getActive) mustBe filtered
     }
   }
+
+  "updateResponsiblePeople" must {
+    "save fit and proper as true to responsible people to those matched by index" which {
+      "will save fit and proper as false to responsible people to those not matched by index" when {
+        "a single selection is made" in new Fixture {
+
+          //          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+          //
+          //          status(result) must be(SEE_OTHER)
+          //
+          //          verify(
+          //            controller.dataCacheConnector
+          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
+          //            responsiblePeople.head,
+          //            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(3),
+          //            responsiblePeople.last
+          //          )))(any(), any(), any())
+
+        }
+        "multiple selections are made" in new Fixture {
+
+          //          val result = controller.post()(request.withFormUrlEncodedBody(
+          //            "responsiblePeople[]" -> "0",
+          //            "responsiblePeople[]" -> "3",
+          //            "responsiblePeople[]" -> "4"
+          //          ))
+          //
+          //          status(result) must be(SEE_OTHER)
+          //
+          //          verify(
+          //            controller.dataCacheConnector
+          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
+          //            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(1),
+          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
+          //          )))(any(), any(), any())
+
+        }
+      }
+    }
+  }
 }

@@ -28,7 +28,7 @@ import utils.{RepeatingSection, StatusConstants}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) {
+class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
   def getAll(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
     dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map { _.getOrElse(Seq.empty) }
@@ -46,15 +46,14 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
 
   def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
                              (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] =
-//    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-//      responsiblePeople.zipWithIndex.map { case (rp, index) =>
-//        val updated = if (data.index contains index) {
-//          rp.hasAlreadyPassedFitAndProper(Some(true))
-//        } else {
-//          rp.hasAlreadyPassedFitAndProper(Some(false))
-//        }
-//        updated.copy(hasAccepted = updated.hasChanged)
-//      }
-//    }
-  ???
+    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
+      responsiblePeople.zipWithIndex.map { case (rp, index) =>
+        val updated = if (data.index contains index) {
+          rp.hasAlreadyPassedFitAndProper(Some(true))
+        } else {
+          rp.hasAlreadyPassedFitAndProper(Some(false))
+        }
+        updated.copy(hasAccepted = updated.hasChanged)
+      }
+    }
 }
