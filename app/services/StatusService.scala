@@ -148,13 +148,14 @@ trait StatusService {
     }
   }
 
-  def isPending(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>
-    status.equals(SubmissionReadyForReview)
+  def isPending(status: SubmissionStatus) = status match {
+    case SubmissionReadyForReview | RenewalSubmitted(_) => true
+    case _ => false
   }
 
-  def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>
-    status.equals(NotCompleted) | status.equals(SubmissionReady)
-  }
+  def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { s => isPreSubmission(s) }
+
+  def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 }
 
 object StatusService extends StatusService {

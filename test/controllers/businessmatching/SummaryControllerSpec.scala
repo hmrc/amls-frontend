@@ -219,7 +219,7 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
 
   "Get" must {
 
-    "show the edit links when not in pre-submission status  and the application is not pending" in new Fixture {
+    "show the edit links when not in pre-submission status and the application is not pending" in new Fixture {
       val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
 
       mockGetModel(Some(model))
@@ -233,7 +233,8 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.select("a.change-answer").size mustBe 2
+      Option(html.getElementById("edit-business-activities")) mustBe defined
+      Option(html.getElementById("edit-msb-services")) must not be defined
     }
 
     "NOT show the service edit links when not in pre-submission status and the application is pending" in new Fixture {
@@ -254,7 +255,8 @@ class SummaryControllerWithVariationSpec extends GenericTestHelper with Business
       status(result) mustBe OK
 
       val html = Jsoup.parse(contentAsString(result))
-      html.select("a.change-answer").size mustBe 1
+      Option(html.getElementById("edit-business-activities")) must not be defined
+      Option(html.getElementById("edit-msb-services")) must not be defined
     }
   }
 
