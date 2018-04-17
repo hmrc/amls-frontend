@@ -67,9 +67,8 @@
                 <li>@activity</li>
             }
             </ul>
-            @if(businessMatchingVariationToggle) {
-                <a id="change-registered-services" href="@controllers.businessmatching.updateservice.routes.ChangeServicesController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
-            }
+
+            <a id="change-registered-services" href="@controllers.businessmatching.updateservice.routes.ChangeServicesController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
 
             <div id="supervised-panel" class="panel-indent panel-indent--gutter panel-border-wide">
                 <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>
