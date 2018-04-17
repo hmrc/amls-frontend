@@ -54,4 +54,9 @@ trait BaseGenerator {
     b <- stringOfLengthGen(2)
   } yield s"$a$num1 $num2$b"
 
+  val emailGen: Gen[String] = for {
+    prefix <- stringOfLengthGen(6)
+    suffix <- stringOfLengthGen(15)
+  } yield s"$prefix@$suffix.com"
+
 }

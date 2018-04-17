@@ -42,6 +42,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
@@ -49,10 +50,6 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 

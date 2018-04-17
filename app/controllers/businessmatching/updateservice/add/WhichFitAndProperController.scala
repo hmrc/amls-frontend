@@ -28,7 +28,7 @@ import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
-import services.StatusService
+import services.{ResponsiblePeopleService, StatusService}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,15 +46,16 @@ class WhichFitAndProperController @Inject()(
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
+                                             val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: UpdateServiceHelper,
                                              val router: Router[AddServiceFlowModel]
-                                             )() extends BaseController with RepeatingSection {
+                                             ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         filterRequest {
-          helper.responsiblePeople map { rp =>
+          responsiblePeopleService.getActiveWithIndex map { rp =>
             Ok(which_fit_and_proper(EmptyForm, rp))
           }
         }
@@ -65,10 +66,10 @@ class WhichFitAndProperController @Inject()(
         implicit request =>
           filterRequest {
             Form2[ResponsiblePeopleFitAndProper](request.body) match {
-              case ValidForm(_, data) => helper.updateResponsiblePeople(data) map { _ =>
+              case ValidForm(_, data) => responsiblePeopleService.updateResponsiblePeople(data) map { _ =>
                 Redirect(routes.NewServiceInformationController.get())
               }
-              case f: InvalidForm => helper.responsiblePeople map { rp =>
+              case f: InvalidForm => responsiblePeopleService.getActiveWithIndex map { rp =>
                 BadRequest(which_fit_and_proper(f, rp))
               }
             }

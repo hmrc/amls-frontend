@@ -39,6 +39,7 @@ import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class UpdateServicesSummaryControllerSpec extends GenericTestHelper
   with MockitoSugar
