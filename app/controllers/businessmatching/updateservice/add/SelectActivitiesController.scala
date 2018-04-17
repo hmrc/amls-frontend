@@ -96,7 +96,7 @@ class SelectActivitiesController @Inject()(
     model <- businessMatchingService.getModel
     activities <- OptionT.fromOption[Future](model.activities) map { _.businessActivities }
     } yield {
-      val allActivities = BusinessMatchingActivities.allWithoutMsbTcsp
+      val allActivities = BusinessMatchingActivities.allWithoutMsb
       val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map { _.getMessage }
       val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
 

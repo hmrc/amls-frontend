@@ -18,7 +18,7 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], showFees: Boolean)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -30,52 +30,20 @@
     heading = header
 )  {
 
-    @form(f, controllers.businessmatching.updateservice.add.routes.FitAndProperController.post()) {
-
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
-        ) {
-            <p>@{
-                if(showFees){
-                    Messages("businessmatching.updateservice.fitandproper.info")
-                } else {
-                    Messages("businessmatching.updateservice.fitandproper.info.no.fees")
-                }
-            }</p>
-        }
+    @form(f, controllers.businessmatching.updateservice.add.routes.FitAndProperController.post(edit)) {
 
 
-        @detailsSummary(
-            summary = {
-                if(showFees){
-                    Messages("businessmatching.updateservice.fitandproper.info")
-                } else {
-                    Messages("businessmatching.updateservice.fitandproper.info.no.fees")
-                }
-            }
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false
+
+            @fieldset(
+                f = f("passedFitAndProper-fieldset"),
+                legend = Messages("businessmatching.updateservice.fitandproper.heading"),
+                legendHidden = true,
+                panel = false
             ) {
-                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
-                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line2")</p>
-            }
-        }
 
-
-        @fieldset(
-            f = f("passedFitAndProper-fieldset"),
-            legend = "businessmatching.updateservice.fitandproper.title",
-            legendHidden = true,
-            panel = false
-        ) {
-
-            @errorGroup(
-                field = f("passedFitAndProper")
-            ) {
+                @errorGroup(
+                    field = f("passedFitAndProper")
+                ) {
                 @radio(
                     f = f("passedFitAndProper"),
                     labelText = "lbl.yes",
@@ -92,8 +60,7 @@
 
         }
 
-
-       @submit(returnLink = false)
+        @submit(returnLink = false)
 
     }
 

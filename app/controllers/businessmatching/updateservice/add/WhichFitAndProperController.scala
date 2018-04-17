@@ -18,15 +18,17 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import com.sun.xml.internal.bind.util.Which
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
+import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices}
+import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId, WhichTradingPremisesPageId}
 import models.responsiblepeople.ResponsiblePeople
+import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -53,39 +55,44 @@ class WhichFitAndProperController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        filterRequest {
-          helper.responsiblePeople map { rp =>
-            Ok(which_fit_and_proper(EmptyForm, rp))
-          }
-        }
+
+        getFormData map { case (flowModel, responsiblePeopleSeq) =>
+          val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
+
+          Ok(which_fit_and_proper(
+            form,
+            responsiblePeopleSeq
+          ))
+        } getOrElse InternalServerError("Cannot retrieve form data")
+
+
   }
 
   def post() = Authorised.async {
       implicit authContext =>
         implicit request =>
-          filterRequest {
-            Form2[ResponsiblePeopleFitAndProper](request.body) match {
-              case ValidForm(_, data) => helper.updateResponsiblePeople(data) map { _ =>
-                Redirect(routes.NewServiceInformationController.get())
-              }
-              case f: InvalidForm => helper.responsiblePeople map { rp =>
-                BadRequest(which_fit_and_proper(f, rp))
-              }
+          Form2[ResponsiblePeopleFitAndProper](request.body) match {
+            case f: InvalidForm => getFormData map { case (_, responsiblePeopleSeq) =>
+              BadRequest(which_fit_and_proper(f, responsiblePeopleSeq))
+            } getOrElse InternalServerError("Cannot retrieve form data")
+
+            case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
+              model.responsiblePeople(Some(data))
+            } flatMap {
+              case Some(model) => router.getRoute(WhichFitAndProperPageId, model)
             }
           }
   }
 
-  private def filterRequest(fn: Future[Result])
-                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] =
-    (businessMatchingService.getModel flatMap { bm =>
-      OptionT.fromOption[Future](bm.activities)
-    } flatMap { ba =>
-      OptionT.liftF(statusService.isPreSubmission flatMap {
-        case false if ba.businessActivities.contains(MoneyServiceBusiness) | ba.businessActivities.contains(TrustAndCompanyServices) => fn
-        case _ => Future.successful(NotFound(notFoundView))
-      })
-    }) getOrElse InternalServerError("Cannot retrieve activities")
 
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+    responsiblePeopleSeq <- OptionT.liftF(responsiblePeopleFutureSeq)
+  } yield (flowModel, responsiblePeopleSeq)
 
-
+  private def responsiblePeopleFutureSeq(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
+    getData[ResponsiblePeople].map { _.zipWithIndex.filterNot { case (tp, _) =>
+      tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+    }
+  }
 }

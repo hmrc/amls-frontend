@@ -45,6 +45,16 @@ case class AddServiceFlowModel(
       hasChanged = hasChanged || !this.tradingPremisesActivities.equals(p),
       hasAccepted = hasAccepted && this.tradingPremisesActivities.equals(p))
 
+  def isfitAndProper(p: Option[Boolean]): AddServiceFlowModel =
+    this.copy(fitAndProper = p,
+      hasChanged = hasChanged || !this.fitAndProper.equals(p),
+      hasAccepted = hasAccepted && this.fitAndProper.equals(p))
+
+  def responsiblePeople(p: Option[ResponsiblePeopleFitAndProper]): AddServiceFlowModel =
+    this.copy(responsiblePeople = p,
+      hasChanged = hasChanged || !this.responsiblePeople.equals(p),
+      hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
+
   def isComplete: Boolean = this match {
 
     case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true) => true

@@ -25,8 +25,8 @@ import controllers.businessmatching.updateservice.UpdateServiceHelper
 import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching.{BusinessActivities, BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices}
+import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId, TradingPremisesPageId}
 import models.responsiblepeople.ResponsiblePeople
 import play.api.mvc.{Request, Result}
 import services.StatusService
@@ -48,8 +48,7 @@ class FitAndProperController @Inject()(
                                         val statusService: StatusService,
                                         val businessMatchingService: BusinessMatchingService,
                                         val helper: UpdateServiceHelper,
-                                        val router: Router[AddServiceFlowModel],
-                                        config: AppConfig
+                                        val router: Router[AddServiceFlowModel]
                                         ) extends BaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
@@ -57,41 +56,36 @@ class FitAndProperController @Inject()(
   implicit val boolWrite = BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(NAME, "error.businessmatching.updateservice.fitandproper")
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        filterRequest {
-          Future.successful(Ok(fit_and_proper(EmptyForm, config.showFeesToggle)))
-        }
+        getFormData map { case (model) =>
+          val form = model.fitAndProper map { v => Form2(v) } getOrElse EmptyForm
+          Ok(fit_and_proper(form, edit))
+        } getOrElse InternalServerError("Unable to show the view")
+
   }
 
-  def post() = Authorised.async{
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-      filterRequest {
         Form2[Boolean](request.body) match {
-          case ValidForm(_, data) => data match {
-            case true =>
-              updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-                responsiblePeople.map(_.hasAlreadyPassedFitAndProper(Some(true)).copy(hasAccepted = true))
-              } map { _ => Redirect(NewServiceInformationController.get()) }
-            case false => Future.successful(Redirect(WhichFitAndProperController.get()))
-          }
-          case f: InvalidForm => Future.successful(BadRequest(fit_and_proper(f, config.showFeesToggle)))
+          case form: InvalidForm => getFormData map { case (_) =>
+            BadRequest(fit_and_proper(form, edit))
+          } getOrElse InternalServerError("Unable to show the view")
+
+          case ValidForm(_, data) =>
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
+              model.isfitAndProper(Some(data))
+                .responsiblePeople(if(data) model.responsiblePeople else None)
+            } flatMap { model =>
+              router.getRoute(FitAndProperPageId, model.get, edit)
+            }
         }
-      }
   }
 
-  private def filterRequest(fn: Future[Result])
-                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] = {
-    (businessMatchingService.getModel flatMap { bm =>
-      OptionT.fromOption[Future](bm.activities)
-    } flatMap { ba =>
-      OptionT.liftF(statusService.isPreSubmission flatMap {
-        case false if ba.businessActivities.contains(MoneyServiceBusiness) | ba.businessActivities.contains(TrustAndCompanyServices) => fn
-        case _ => Future.successful(NotFound(notFoundView))
-      })
-    }) getOrElse InternalServerError("Cannot retrieve activities")
-  }
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel)] = for {
+    model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+  } yield (model)
 
 }

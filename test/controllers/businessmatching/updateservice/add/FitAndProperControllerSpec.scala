@@ -22,9 +22,10 @@ import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching._
+import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId, TradingPremisesPageId}
 import models.responsiblepeople.ResponsiblePeople
+import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -36,7 +37,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
+import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -50,149 +51,79 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     val request = addToken(authRequest)
 
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
-    lazy val app: Application = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
+    val controller = new FitAndProperController(
+      authConnector = self.authConnector,
+      dataCacheConnector= mockCacheConnector,
+      statusService= mockStatusService,
+      businessMatchingService= mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
+    )
 
-    val controller = app.injector.instanceOf[FitAndProperController]
+    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockApplicationStatus(SubmissionDecisionApproved)
 
-
-//    val controller = new FitAndProperController(
-//      authConnector = self.authConnector,
-//      dataCacheConnector= mockCacheConnector,
-//      statusService= mockStatusService,
-//      businessMatchingService= mockBusinessMatchingService,
-//      helper = mockUpdateServiceHelper,
-//      router = createRouter[AddServiceFlowModel]
-//      config =
-//    )
-    when {
-      controller.businessMatchingService.getModel(any(),any(),any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-      activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-    ))
-
-    when {
-      controller.statusService.isPreSubmission(any(),any(),any())
-    } thenReturn Future.successful(false)
-
-    val responsiblePeople = responsiblePeopleGen(5).sample.get
-
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople))
-    mockCacheSave[Seq[ResponsiblePeople]]
   }
 
   "FitAndProperController" when {
 
     "get is called" must {
       "return OK with fit_and_proper view" in new Fixture {
-
         val result = controller.get()(request)
-
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.fitandproper.title"))
 
-      }
-
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
-
-          when {
-            controller.statusService.isPreSubmission(any(),any(),any())
-          } thenReturn Future.successful(true)
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-
-        }
-        "without msb or tcsp" in new Fixture {
-
-          when {
-            controller.businessMatchingService.getModel(any(),any(),any())
-          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          ))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-
-        }
+        contentAsString(result) must include(
+          Messages(
+            "businessmatching.updateservice.fitandproper.heading")
+          )
       }
     }
 
     "post is called" must {
-      "redirect to WhichFitAndProperController" when {
-        "request is false" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "false"))
+      "with a valid request" must {
+        "redirect" when {
+          "request equals Yes" in new Fixture {
 
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhichFitAndProperController.get().url))
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
+
+            val result = controller.post()(request.withFormUrlEncodedBody(
+              "passedFitAndProper" -> "true"
+            ))
+
+            status(result) mustBe SEE_OTHER
+
+            controller.router.verify(FitAndProperPageId,
+              AddServiceFlowModel(fitAndProper = Some(true), hasChanged = true))
+          }
         }
-      }
-      "redirect to NewServiceInformationController" when {
-        "request is true" which {
-          "will set hasAlreadyPassedFitAndProper to true for each responsible person" in new Fixture {
 
-            val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
+        "when request equals No" when {
+          "progress to the 'new service information' page" when {
+            "an activity that generates a section has been chosen" in new Fixture {
+              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(TrustAndCompanyServices)))
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.NewServiceInformationController.get().url))
+              val result = controller.post()(request.withFormUrlEncodedBody(
+                "passedFitAndProper" -> "false"
+              ))
 
-            verify(
-              mockCacheConnector
-            ).save[Seq[ResponsiblePeople]](any(), eqTo(responsiblePeople.map(
-              _.copy(
-                hasAlreadyPassedFitAndProper = Some(true),
-                hasChanged = true,
-                hasAccepted = true
-              )
-            )))(any(),any(),any())
+              status(result) mustBe SEE_OTHER
 
+              controller.router.verify(FitAndProperPageId,
+                AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
+            }
           }
         }
       }
-      "return BAD_REQUEST" when {
-        "request is invalid" in new Fixture {
 
+      "on invalid request" must {
+        "return badRequest" in new Fixture {
           val result = controller.post()(request)
 
-          status(result) must be(BAD_REQUEST)
-
-        }
-      }
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
-
-          when {
-            controller.statusService.isPreSubmission(any(),any(),any())
-          } thenReturn Future.successful(true)
-
-          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
-          status(result) must be(NOT_FOUND)
-
-        }
-        "without msb or tcsp" in new Fixture {
-
-          when {
-            controller.businessMatchingService.getModel(any(),any(),any())
-          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          ))
-
-          val result = controller.post()(request.withFormUrlEncodedBody("passedFitAndProper" -> "true"))
-          status(result) must be(NOT_FOUND)
-
+          status(result) mustBe BAD_REQUEST
         }
       }
     }
