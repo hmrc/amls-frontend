@@ -17,7 +17,6 @@
 package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
@@ -25,6 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -47,9 +47,10 @@ class SummaryController @Inject()(
         (for {
           bm <- businessMatchingService.getModel
           ba <- OptionT.fromOption[Future](bm.activities)
-          isPending <- OptionT.liftF(statusService.isPending)
-          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
+          status <- OptionT.liftF(statusService.getStatus)
         } yield {
+
+          val isPreSubmission = statusService.isPreSubmission(status)
 
           val bmWithAdditionalActivities = bm.copy(
             activities = Some(BusinessActivities(
@@ -67,7 +68,7 @@ class SummaryController @Inject()(
             bmWithAdditionalActivities,
             changeActivitiesUrl,
             isPreSubmission,
-            isPending))
+            statusService.isPending(status)))
 
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
