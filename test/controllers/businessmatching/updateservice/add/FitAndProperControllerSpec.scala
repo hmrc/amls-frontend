@@ -16,33 +16,17 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId, TradingPremisesPageId}
-import models.responsiblepeople.ResponsiblePeople
+import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId}
 import models.status.SubmissionDecisionApproved
-import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.Application
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-
-import scala.concurrent.{ExecutionContext, Future}
 
 class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
@@ -56,9 +40,9 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
 
     val controller = new FitAndProperController(
       authConnector = self.authConnector,
-      dataCacheConnector= mockCacheConnector,
-      statusService= mockStatusService,
-      businessMatchingService= mockBusinessMatchingService,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
@@ -78,7 +62,7 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         contentAsString(result) must include(
           Messages(
             "businessmatching.updateservice.fitandproper.heading")
-          )
+        )
       }
     }
 

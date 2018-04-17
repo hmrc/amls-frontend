@@ -38,6 +38,7 @@ import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UpdateServicesSummaryControllerSpec extends GenericTestHelper
@@ -56,12 +57,12 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
     val controller = new UpdateServicesSummaryController(
       authConnector = self.authConnector,
-      dataCacheConnector= mockCacheConnector,
-      statusService= mockStatusService,
-      businessMatchingService= mockBusinessMatchingService,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel],
-      tradingPremisesService  = mockTradingPremisesService
+      tradingPremisesService = mockTradingPremisesService
     )
 
     val flowModel = AddServiceFlowModel(
@@ -105,7 +106,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         )
 
-        val serviceChangeRegister:ServiceChangeRegister = ServiceChangeRegister(
+        val serviceChangeRegister: ServiceChangeRegister = ServiceChangeRegister(
           Some(Set(BillPaymentServices))
         )
 

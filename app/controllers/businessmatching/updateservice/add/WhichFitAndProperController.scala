@@ -18,19 +18,17 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import com.sun.xml.internal.bind.util.Which
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices}
-import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId, WhichTradingPremisesPageId}
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
+import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
+import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
 import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.TradingPremises
 import play.api.mvc.{Request, Result}
-import services.StatusService
+import services.{ResponsiblePeopleService, StatusService}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,9 +46,10 @@ class WhichFitAndProperController @Inject()(
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
+                                             val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: UpdateServiceHelper,
                                              val router: Router[AddServiceFlowModel]
-                                             )() extends BaseController with RepeatingSection {
+                                             ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
@@ -65,12 +64,12 @@ class WhichFitAndProperController @Inject()(
           ))
         } getOrElse InternalServerError("Cannot retrieve form data")
 
-
   }
 
   def post() = Authorised.async {
       implicit authContext =>
         implicit request =>
+
           Form2[ResponsiblePeopleFitAndProper](request.body) match {
             case f: InvalidForm => getFormData map { case (_, responsiblePeopleSeq) =>
               BadRequest(which_fit_and_proper(f, responsiblePeopleSeq))

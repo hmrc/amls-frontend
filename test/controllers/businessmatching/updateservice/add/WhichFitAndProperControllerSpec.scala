@@ -18,7 +18,6 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.add.WhichFitAndProperController
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
@@ -26,24 +25,17 @@ import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueD
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.Application
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
+import services.ResponsiblePeopleService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-
+import scala.concurrent.Future
 
 class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
@@ -51,24 +43,19 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockRPService = mock[ResponsiblePeopleService]
 
-    lazy val app: Application = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[UpdateServiceHelper].to(mockUpdateServiceHelper))
-      .overrides(bind[Router[AddServiceFlowModel]].to(createRouter[AddServiceFlowModel]))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
-
-    val controller = app.injector.instanceOf[WhichFitAndProperController]
+    val controller = new WhichFitAndProperController(
+      self.authConnector,
+      mockCacheConnector,
+      mockStatusService,
+      mockBusinessMatchingService,
+      mockRPService,
+      mockUpdateServiceHelper,
+      createRouter[AddServiceFlowModel]
+    )
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
@@ -85,6 +72,14 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
     mockCacheSave[Seq[ResponsiblePeople]]
+
+    when {
+      mockRPService.getActiveWithIndex(any(), any(), any())
+    } thenReturn Future.successful(responsiblePeople.zipWithIndex)
+
+    when {
+      mockRPService.updateResponsiblePeople(any())(any(), any(), any())
+    } thenReturn Future.successful(mockCacheMap)
   }
 
   "WhichFitAndProperController" when {
@@ -186,40 +181,43 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
       "will save fit and proper as false to responsible people to those not matched by index" when {
         "a single selection is made" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-
-          status(result) must be(SEE_OTHER)
-
-          verify(
-            controller.dataCacheConnector
-          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-            responsiblePeople.head,
-            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3),
-            responsiblePeople.last
-          )))(any(), any(), any())
+          fail("Not yet implemented")
+          //          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+          //
+          //          status(result) must be(SEE_OTHER)
+          //
+          //          verify(
+          //            controller.dataCacheConnector
+          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
+          //            responsiblePeople.head,
+          //            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(3),
+          //            responsiblePeople.last
+          //          )))(any(), any(), any())
 
         }
         "multiple selections are made" in new Fixture {
 
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "responsiblePeople[]" -> "0",
-            "responsiblePeople[]" -> "3",
-            "responsiblePeople[]" -> "4"
-          ))
-
-          status(result) must be(SEE_OTHER)
-
-          verify(
-            controller.dataCacheConnector
-          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople(1),
-            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
-          )))(any(), any(), any())
+          fail("Not yet implemented")
+          //
+          //          val result = controller.post()(request.withFormUrlEncodedBody(
+          //            "responsiblePeople[]" -> "0",
+          //            "responsiblePeople[]" -> "3",
+          //            "responsiblePeople[]" -> "4"
+          //          ))
+          //
+          //          status(result) must be(SEE_OTHER)
+          //
+          //          verify(
+          //            controller.dataCacheConnector
+          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
+          //            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(1),
+          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+          //            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
+          //          )))(any(), any(), any())
 
         }
       }

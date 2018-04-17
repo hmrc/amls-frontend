@@ -37,11 +37,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class UpdateServiceHelper @Inject()(
-                                                       val authConnector: AuthConnector,
-                                                       implicit val dataCacheConnector: DataCacheConnector,
-                                                       val tradingPremisesService: TradingPremisesService
-                                                     ) extends RepeatingSection {
+class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
+                                    implicit val dataCacheConnector: DataCacheConnector,
+                                    val tradingPremisesService: TradingPremisesService
+                                   ) extends RepeatingSection {
 
   def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
     dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
@@ -100,25 +99,5 @@ class UpdateServiceHelper @Inject()(
     dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
       val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
       bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
-    }
-
-  def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
-    getData[ResponsiblePeople].map { responsiblePeople =>
-      responsiblePeople.zipWithIndex.filterNot { case (rp, _) =>
-        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
-      }
-    }
-
-  def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
-                                     (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-      responsiblePeople.zipWithIndex.map { case (rp, index) =>
-        val updated = if (data.index contains index) {
-          rp.hasAlreadyPassedFitAndProper(Some(true))
-        } else {
-          rp.hasAlreadyPassedFitAndProper(Some(false))
-        }
-        updated.copy(hasAccepted = updated.hasChanged)
-      }
     }
 }

@@ -49,9 +49,9 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
 
     val controller = new WhichTradingPremisesController(
       authConnector = self.authConnector,
-      dataCacheConnector= mockCacheConnector,
-      statusService= mockStatusService,
-      businessMatchingService= mockBusinessMatchingService,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )

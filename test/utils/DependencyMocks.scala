@@ -24,5 +24,4 @@ import scala.concurrent.ExecutionContext
 trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks {
   implicit val mockAuthContext = mock[AuthContext]
   implicit val headerCarrier = HeaderCarrier()
-  implicit val mockExecutionContext: ExecutionContext = mock[ExecutionContext]
 }

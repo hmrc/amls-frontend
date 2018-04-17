@@ -18,7 +18,6 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
@@ -26,18 +25,12 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class SelectActivitiesControllerSpec extends GenericTestHelper {
 
@@ -50,9 +43,9 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
 
     val controller = new SelectActivitiesController(
       authConnector = self.authConnector,
-      dataCacheConnector= mockCacheConnector,
-      statusService= mockStatusService,
-      businessMatchingService= mockBusinessMatchingService,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )

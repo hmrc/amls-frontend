@@ -16,7 +16,6 @@
 
 package controllers.businessmatching.updateservice.add
 
-import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -25,18 +24,11 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
@@ -48,12 +40,12 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new AddMoreActivitiesController(
-    authConnector = self.authConnector,
-    dataCacheConnector= mockCacheConnector,
-    statusService= mockStatusService,
-    businessMatchingService= mockBusinessMatchingService,
-    helper = mockUpdateServiceHelper,
-    router = createRouter[AddServiceFlowModel]
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))

@@ -17,6 +17,7 @@
 package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
+import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import models.responsiblepeople.ResponsiblePeople
 import org.scalatest.MustMatchers
@@ -25,11 +26,12 @@ import utils.GenericTestHelper
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_fit_and_properSpec extends GenericTestHelper with MustMatchers {
+class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator{
 
+  val rp = responsiblePersonGen.sample.get
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = which_fit_and_proper(EmptyForm, Seq.empty[(ResponsiblePeople, Int)])
+    def view = which_fit_and_proper(EmptyForm, Seq((rp, 0)))
   }
 
   "The which_fit_and_proper view" must {
@@ -54,7 +56,7 @@ class which_fit_and_properSpec extends GenericTestHelper with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "responsiblePeople") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = fit_and_proper(form2, true)
+      override def view = which_fit_and_proper(form2, Seq((rp, 0)))
 
       errorSummary.html() must include("not a message Key")
 
