@@ -57,13 +57,18 @@ class SummaryController @Inject()(
             ))
           )
 
-          val changeActivitiesUrl = if (isPreSubmission || !ApplicationConfig.businessMatchingVariationToggle) {
+          val changeActivitiesUrl = if (isPreSubmission) {
             controllers.businessmatching.routes.RegisterServicesController.get().url
           } else {
             controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
           }
 
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, (isPreSubmission || ApplicationConfig.businessMatchingVariationToggle), isPending))
+          Ok(summary(EmptyForm,
+            bmWithAdditionalActivities,
+            changeActivitiesUrl,
+            isPreSubmission,
+            isPending))
+
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
