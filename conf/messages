@@ -2004,22 +2004,22 @@ notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your an
 
 notification.reminder.to.pay.ReminderToPayForVariation = <p>You need to pay {0} for the recent changes made to your details.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForApplication = <p>You need to pay {0} for your application to register with HM Revenue and Customs.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForRenewal = <p>You need to pay {0} for your annual renewal.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay {0} for the recent charge added to your account.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.message.with.end.date.ApplicationApproval = <p>Your application to register has been approved. You’re now registered until {0}.</p>\
