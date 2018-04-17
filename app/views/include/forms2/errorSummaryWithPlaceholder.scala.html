@@ -21,7 +21,7 @@
 @if(form.errors.nonEmpty) {
     <div class="flash amls-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">
         <h2 class="heading-medium" id="error-summary-heading">@Messages("err.summary")</h2>
-        <ul>
+        <ul class="error-summary-list">
             @form.errors.map { case (path, errors) =>
                 <li>
                     <a href="#@form(path).id">
