@@ -182,8 +182,7 @@ class StatusController @Inject()(val landingService: LandingService,
             endDate,
             renewalFlow = false,
             ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-            activities,
-            ApplicationConfig.businessMatchingVariationToggle
+            activities
           )
         }
       }
@@ -248,8 +247,7 @@ class StatusController @Inject()(val landingService: LandingService,
               renewalDate,
               true,
               ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              activities,
-              ApplicationConfig.businessMatchingVariationToggle
+              activities
             )))
         }
       }

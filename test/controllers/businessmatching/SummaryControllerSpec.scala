@@ -22,11 +22,11 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching.BusinessType.LPrLLP
 import models.businessmatching._
 import models.businessmatching.updateservice._
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,15 +37,8 @@ import scala.concurrent.Future
 
 class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
 
-  override lazy val app = GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.business-matching-variation" -> false)
-    .build()
-
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
-
-    self =>
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new SummaryController (
@@ -56,12 +49,14 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
     )
 
     when {
-      controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(true)
+      mockStatusService.isPreSubmission(any())
+    } thenReturn true
 
     when {
-      controller.statusService.isPending(any(), any(), any())
-    } thenReturn Future.successful(false)
+      mockStatusService.isPending(any())
+    } thenReturn false
+
+    mockApplicationStatus(NotCompleted)
 
     def mockGetModel(model: Option[BusinessMatching]) = when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -105,12 +100,12 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       mockGetModel(Some(model))
 
       when {
-        controller.statusService.isPreSubmission(any(), any(), any())
-      } thenReturn Future.successful(false)
+        controller.statusService.isPreSubmission(any())
+      } thenReturn false
 
       when {
-        controller.statusService.isPending(any(), any(), any())
-      } thenReturn Future.successful(true)
+        controller.statusService.isPending(any())
+      } thenReturn true
 
       val result = controller.get()(request)
       status(result) mustBe OK
@@ -138,10 +133,9 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
 
   "Post" when {
     "called" must {
-
       "redirect to RegistrationProgressController" which {
-
         "updates the hasAccepted flag on the model" in new Fixture {
+
           val model = businessMatchingGen.sample.get.copy(hasAccepted = false)
           val postRequest = request.withFormUrlEncodedBody()
 
@@ -172,199 +166,4 @@ class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGener
       }
     }
   }
-}
-
-class SummaryControllerWithVariationSpec extends GenericTestHelper with BusinessMatchingGenerator with DependencyMocks {
-
-  override lazy val app = GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.business-matching-variation" -> true)
-    .build()
-
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
-
-    self =>
-    val request = addToken(authRequest)
-
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
-
-    val controller = new SummaryController (
-      dataCache = mockCacheConnector,
-      authConnector = self.authConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService
-    )
-
-    when {
-      controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(true)
-
-    when {
-      controller.statusService.isPending(any(), any(), any())
-    } thenReturn Future.successful(false)
-
-    def mockGetModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(), any(), any())
-    } thenReturn {
-      if (model.isDefined) {
-        OptionT.some[Future, BusinessMatching](model)
-      } else {
-        OptionT.none[Future, BusinessMatching]
-      }
-    }
-
-    def mockUpdateModel = when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-  }
-
-  "Get" must {
-
-    "show the edit links when not in pre-submission status and the application is not pending" in new Fixture {
-      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
-
-      mockGetModel(Some(model))
-
-      when {
-        controller.statusService.isPreSubmission(any(), any(), any())
-      } thenReturn Future.successful(false)
-
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-
-      val html = Jsoup.parse(contentAsString(result))
-      Option(html.getElementById("edit-business-activities")) mustBe defined
-      Option(html.getElementById("edit-msb-services")) must not be defined
-    }
-
-    "NOT show the service edit links when not in pre-submission status and the application is pending" in new Fixture {
-      val model = businessMatchingWithTypesGen(Some(LPrLLP)).sample.get
-
-      mockGetModel(Some(model))
-
-      when {
-        controller.statusService.isPreSubmission(any(), any(), any())
-      } thenReturn Future.successful(false)
-
-      when {
-        controller.statusService.isPending(any(), any(), any())
-      } thenReturn Future.successful(true)
-
-
-      val result = controller.get()(request)
-      status(result) mustBe OK
-
-      val html = Jsoup.parse(contentAsString(result))
-      Option(html.getElementById("edit-business-activities")) must not be defined
-      Option(html.getElementById("edit-msb-services")) must not be defined
-    }
-  }
-
-  "show the 'Change services' page when the user wants to change their services in a variation, and the feature is toggled on" in new Fixture {
-    val model = BusinessMatching(
-      activities = Some(BusinessActivities(Set(EstateAgentBusinessService)))
-    )
-
-    mockGetModel(Some(model))
-
-    when {
-      controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(false)
-
-    val result = controller.get()(request)
-    status(result) must be(OK)
-
-    val doc = Jsoup.parse(contentAsString(result))
-    val editUrl = doc.select("section.register-services a.change-answer").first().attr("href")
-
-    editUrl mustBe controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
-  }
-
-  "redirect to TradingPremisesController" when {
-    "status is post-submission" when {
-      "UpdateService is not complete" which {
-        "updates the hasAccepted flag on the model" in new Fixture {
-
-          val model = businessMatchingGen.sample.get.activities(
-            BusinessActivities(
-              Set(HighValueDealing),
-              Some(Set(BillPaymentServices))
-            )
-          )
-          val postRequest = request.withFormUrlEncodedBody()
-
-          mockGetModel(Some(model))
-          mockUpdateModel
-          mockCacheFetch[UpdateService](Some(UpdateService()), Some(UpdateService.key))
-
-          when {
-            controller.statusService.isPreSubmission(any(), any(), any())
-          } thenReturn Future.successful(false)
-
-          val result = controller.post()(postRequest)
-
-          status(result) mustBe SEE_OTHER
-
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
-        }
-      }
-
-      "UpdateService is not defined" which {
-        "updates the hasAccepted flag on the model" in new Fixture {
-
-          val model = businessMatchingGen.sample.get.activities(
-            BusinessActivities(
-              Set(HighValueDealing),
-              Some(Set(BillPaymentServices))
-            )
-          )
-          val postRequest = request.withFormUrlEncodedBody()
-
-          mockGetModel(Some(model))
-          mockUpdateModel
-          mockCacheFetch[UpdateService](None, Some(UpdateService.key))
-
-          when {
-            controller.statusService.isPreSubmission(any(), any(), any())
-          } thenReturn Future.successful(false)
-
-          val result = controller.post()(postRequest)
-
-          status(result) mustBe SEE_OTHER
-
-          redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.TradingPremisesController.get().url)
-        }
-      }
-    }
-  }
-
-  "redirect to RegistrationProgressController" when {
-    "UpdateService is complete" which {
-      "updates the hasAccepted flag on the model" in new Fixture {
-
-        val model = businessMatchingGen.sample.get.activities(
-          BusinessActivities(
-            Set(HighValueDealing),
-            Some(Set(BillPaymentServices))
-          )
-        )
-        val postRequest = request.withFormUrlEncodedBody()
-
-        mockGetModel(Some(model))
-        mockUpdateModel
-        mockCacheFetch[UpdateService](Some(UpdateService(
-          Some(NewActivitiesAtTradingPremisesNo),
-          Some(TradingPremisesActivities(Set(1))),
-          Some(TradingPremisesActivities(Set(1)))
-        )), Some(UpdateService.key))
-
-        val result = controller.post()(postRequest)
-
-        status(result) mustBe SEE_OTHER
-
-        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
-      }
-    }
-  }
-
 }

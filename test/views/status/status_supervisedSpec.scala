@@ -40,7 +40,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
 
       doc.title must be(Messages("status.submissiondecisionsupervised.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissiondecisionsupervised.heading"))
@@ -49,7 +49,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
     "contain the expected content elements" in new ViewFixture {
 
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
 
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.hassomethingchanged"))
       doc.getElementsByClass("panel-indent").html() must include(Messages("status.amendment.edit.uppercase.start"))
@@ -78,14 +78,14 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
 
     "not contain the business activities change link if businessMatchingVariationToggle is false" in new ViewFixture {
 
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, false)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
       doc.html mustNot include(controllers.businessmatching.routes.SummaryController.get().url)
 
     }
 
 
     "contain the expected content elements when status is ready for renewal" in new ViewFixture {
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, None, activities, true)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), true, None, activities)
 
       val renewalDate = LocalDate.now().plusDays(15)
 
@@ -104,7 +104,7 @@ class status_supervisedSpec extends GenericTestHelper with MustMatchers {
     }
 
     "contains expected survey link for supervised status" in new ViewFixture {
-      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities, true)
+      def view = views.html.status.status_supervised("XAML00000000000", Some("business Name"), Some(LocalDate.now), false, None, activities)
 
       doc.getElementsMatchingOwnText(Messages("survey.satisfaction.please")).text() must
         be(Messages("survey.satisfaction.please") + " " + Messages("survey.satisfaction.answer") + " " + Messages("survey.satisfaction.helpus"))

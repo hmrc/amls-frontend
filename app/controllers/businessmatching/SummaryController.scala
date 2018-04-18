@@ -16,15 +16,14 @@
 
 package controllers.businessmatching
 
-import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -75,22 +74,12 @@ class SummaryController @Inject()(
 
   def post() = Authorised.async {
     implicit authContext =>
-      implicit request =>
-        (for {
+      implicit request => {
+        for {
           businessMatching <- businessMatchingService.getModel
-          businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
-          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
           _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
-        } yield {
-          if (goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)) {
-            Redirect(updateservice.add.routes.TradingPremisesController.get())
-          } else {
-            Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        }) getOrElse InternalServerError("Unable to update business matching")
+        } yield Redirect(controllers.routes.RegistrationProgressController.get())
+      } getOrElse InternalServerError("Unable to update business matching")
   }
-
-  private def goToUpdateServices(additionalActivities: Option[Set[BusinessActivity]], isPreSubmission: Boolean): Boolean =
-    !isPreSubmission & (ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined)
 
 }
