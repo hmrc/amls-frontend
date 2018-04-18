@@ -175,7 +175,7 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
         when {
           router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.allWithoutMsbTcsp)
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.allWithoutMsb)
 
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 
