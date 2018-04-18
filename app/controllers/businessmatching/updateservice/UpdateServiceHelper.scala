@@ -27,7 +27,7 @@ import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
-import services.TradingPremisesService
+import services.{ResponsiblePeopleService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -39,7 +39,8 @@ import scala.concurrent.Future
 @Singleton
 class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
                                     implicit val dataCacheConnector: DataCacheConnector,
-                                    val tradingPremisesService: TradingPremisesService
+                                    val tradingPremisesService: TradingPremisesService,
+                                    val responsiblePeopleService: ResponsiblePeopleService
                                    ) extends RepeatingSection {
 
   def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
@@ -100,4 +101,12 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
       bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
     }
+
+  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Seq[ResponsiblePeople]]] = {
+    val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
+
+    dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+      case Some(people) => responsiblePeopleService.updateFitAndProperFlag(people, indices)
+    }
+  }
 }

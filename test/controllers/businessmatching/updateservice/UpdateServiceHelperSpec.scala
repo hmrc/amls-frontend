@@ -16,30 +16,41 @@
 
 package controllers.businessmatching.updateservice
 
+import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.flowmanagement.AddServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{never, verify}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.test.Helpers._
-import services.TradingPremisesService
+import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
-class UpdateServiceHelperSpec extends GenericTestHelper with MustMatchers with BusinessActivitiesGenerator with FutureAssertions {
+//noinspection ScalaStyle
+class UpdateServiceHelperSpec extends GenericTestHelper
+  with MustMatchers
+  with BusinessActivitiesGenerator
+  with ResponsiblePersonGenerator
+  with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val responsiblePeopleService = mock[ResponsiblePeopleService]
 
     val helper = new UpdateServiceHelper(
       self.authConnector,
       mockCacheConnector,
-      tradingPremisesService
+      tradingPremisesService,
+      responsiblePeopleService
     )
 
     val businessActivitiesSection = BusinessActivities(
@@ -130,5 +141,29 @@ class UpdateServiceHelperSpec extends GenericTestHelper with MustMatchers with B
 
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
+  }
+
+  "updateResponsiblePeople" in new Fixture {
+    val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+      _.copy(hasAlreadyPassedFitAndProper = Some(false))
+    }
+
+    val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+    mockCacheUpdate(Some(ResponsiblePeople.key), people)
+
+    val model = AddServiceFlowModel(
+      Some(MoneyServiceBusiness),
+      fitAndProper = Some(true),
+      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+    )
+
+    when {
+      responsiblePeopleService.updateFitAndProperFlag(any(), any())
+    } thenReturn updatedPeople
+
+    val result = await(helper.updateResponsiblePeople(model))
+
+    result mustBe Some(updatedPeople)
   }
 }
