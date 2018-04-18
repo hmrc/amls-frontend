@@ -162,8 +162,6 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       responsiblePeopleService.updateFitAndProperFlag(any(), any())
     } thenReturn updatedPeople
 
-    val result = await(helper.updateResponsiblePeople(model))
-
-    result mustBe Some(updatedPeople)
+    helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
   }
 }

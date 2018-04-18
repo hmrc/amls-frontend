@@ -24,6 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
+import models.responsiblepeople.PersonName
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -32,7 +33,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.ResponsiblePeopleService
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -58,7 +59,14 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     )
 
     val responsiblePeople = (responsiblePeopleGen(2).sample.get :+
-      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++ responsiblePeopleGen(2).sample.get
+      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
+      responsiblePeopleGen(2).sample.get
+
+    var peopleMixedWithInactive = Seq(
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1"))),
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "2")), status = Some(StatusConstants.Deleted)), // Deleted
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "3")), None) // isComplete = false
+    )
 
     mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
       AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
@@ -70,13 +78,6 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         hasChanged = true,
         hasAccepted = false))
 
-    // mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
-    // mockCacheSave[Seq[ResponsiblePeople]]
-
-    //    when {
-    //      controller.statusService.isPreSubmission(any(), any(), any())
-    //    } thenReturn Future.successful(false)
-
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
@@ -84,12 +85,8 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     ))
 
     when {
-      mockRPService.getActiveWithIndex(any(), any(), any())
-    } thenReturn Future.successful(responsiblePeople.zipWithIndex)
-
-    when {
-      mockRPService.updateResponsiblePeople(any())(any(), any(), any())
-    } thenReturn Future.successful(mockCacheMap)
+      mockRPService.getAll(any(), any(), any())
+    } thenReturn Future.successful(responsiblePeople)
   }
 
   "When the WhichFitAndProperController get is called it" must {
@@ -151,6 +148,38 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
 
         status(result) must be(BAD_REQUEST)
 
+      }
+    }
+  }
+
+  "Inactive people" must {
+    "be hidden from the selection list" when {
+      "showing the page on a GET request" in new Fixture {
+        when {
+          mockRPService.getAll(any(), any(), any())
+        } thenReturn Future.successful(peopleMixedWithInactive)
+
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        contentAsString(result) must include("Person 1")
+        contentAsString(result) must not include "Person 2"
+        contentAsString(result) must not include "Person 3"
+      }
+
+      "showing the page having POSTed with validation errors" in new Fixture {
+        when {
+          mockRPService.getAll(any(), any(), any())
+        } thenReturn Future.successful(peopleMixedWithInactive)
+
+        val result = controller.post()(request)
+
+        status(result) must be(BAD_REQUEST)
+
+        contentAsString(result) must include("Person 1")
+        contentAsString(result) must not include "Person 2"
+        contentAsString(result) must not include "Person 3"
       }
     }
   }

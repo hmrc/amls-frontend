@@ -29,6 +29,7 @@ import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add._
+import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -47,8 +48,8 @@ class WhichFitAndProperController @Inject()(
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        responsiblePeopleService.getActiveWithIndex map {
-          case (rp) => Ok(which_fit_and_proper(EmptyForm, edit, rp))
+        responsiblePeopleService.getAll map { rp =>
+          Ok(which_fit_and_proper(EmptyForm, rp.zipWithIndex.exceptInactive))
         }
   }
 
@@ -56,8 +57,8 @@ class WhichFitAndProperController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[ResponsiblePeopleFitAndProper](request.body) match {
-          case f: InvalidForm => responsiblePeopleService.getActiveWithIndex map { rp =>
-            BadRequest(which_fit_and_proper(f, edit, rp))
+          case f: InvalidForm => responsiblePeopleService.getAll map { rp =>
+            BadRequest(which_fit_and_proper(f, rp.zipWithIndex.exceptInactive))
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {

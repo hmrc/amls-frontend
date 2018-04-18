@@ -17,12 +17,16 @@
 package services
 
 import generators.ResponsiblePersonGenerator
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.responsiblepeople.ResponsiblePeople
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import utils.{DependencyMocks, StatusConstants}
+import org.mockito.Mockito.verify
+import org.mockito.Matchers.{eq => eqTo, any}
+import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -31,31 +35,22 @@ class ResponsiblePeopleServiceSpec extends PlaySpec with ResponsiblePersonGenera
   trait Fixture extends DependencyMocks {
 
     // scalastyle:off magic.number
-    val people = Gen.listOfN(10, responsiblePersonGen).sample.get
+    val responsiblePeople = Gen.listOfN(5, responsiblePersonGen).sample.get
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(people), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
 
     val service = new ResponsiblePeopleService(mockCacheConnector)
   }
 
   "getAll" must {
     "simply return all the people" in new Fixture {
-      await(service.getAll) mustBe people
+      await(service.getAll) mustBe responsiblePeople
     }
   }
 
   "getActive" must {
     "return only the people who are not deleted or not complete" in new Fixture {
-      val p = people.patch(0, Seq(
-        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
-        responsiblePersonGen.sample.get.copy(personName = None)),
-        2)
 
-      val filtered = p filter people.contains
-
-      mockCacheFetch[Seq[ResponsiblePeople]](Some(p), Some(ResponsiblePeople.key))
-
-      await(service.getActive) mustBe filtered
     }
   }
 
@@ -63,44 +58,46 @@ class ResponsiblePeopleServiceSpec extends PlaySpec with ResponsiblePersonGenera
     "save fit and proper as true to responsible people to those matched by index" which {
       "will save fit and proper as false to responsible people to those not matched by index" when {
         "a single selection is made" in new Fixture {
+          val indices = Set(1)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
 
-          //          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-          //
-          //          status(result) must be(SEE_OTHER)
-          //
-          //          verify(
-          //            controller.dataCacheConnector
-          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-          //            responsiblePeople.head,
-          //            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-          //            responsiblePeople(3),
-          //            responsiblePeople.last
-          //          )))(any(), any(), any())
-
+          result mustBe Seq(
+            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true)
+          )
         }
+
         "multiple selections are made" in new Fixture {
+          val indices = Set(0, 3, 4)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
 
-          //          val result = controller.post()(request.withFormUrlEncodedBody(
-          //            "responsiblePeople[]" -> "0",
-          //            "responsiblePeople[]" -> "3",
-          //            "responsiblePeople[]" -> "4"
-          //          ))
-          //
-          //          status(result) must be(SEE_OTHER)
-          //
-          //          verify(
-          //            controller.dataCacheConnector
-          //          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-          //            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-          //            responsiblePeople(1),
-          //            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-          //            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-          //            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
-          //          )))(any(), any(), any())
-
+          result mustBe Seq(
+              responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+              responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+              responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
+              responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
+              responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
+          )
         }
       }
+    }
+  }
+
+  "A list of responsible people" can {
+    "be filtered to only include people not deleted or are incomplete" in new Fixture {
+
+      val people = responsiblePeople.patch(0, Seq(
+        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+        responsiblePersonGen.sample.get.copy(personName = None)),
+        2).zipWithIndex
+
+      val filtered = people.exceptInactive
+
+      filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
+      filtered.collect { case (p, _) if !p.isComplete => p } mustBe empty
     }
   }
 }

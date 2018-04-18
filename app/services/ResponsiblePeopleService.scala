@@ -31,29 +31,31 @@ import scala.concurrent.{ExecutionContext, Future}
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
   def getAll(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map { _.getOrElse(Seq.empty) }
-
-  def getActive(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    getAll map { responsiblePeople =>
-      responsiblePeople.filterNot(rp =>
-        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete)
+    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+      _.getOrElse(Seq.empty)
     }
 
-  // $COVERAGE-OFF$
-  def getActiveWithIndex(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Seq[(ResponsiblePeople, Int)]] =
-    getActive map {_.zipWithIndex}
-  // $COVERAGE-ON$
-
-  def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
-                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] =
-    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-      responsiblePeople.zipWithIndex.map { case (rp, index) =>
-        val updated = if (data.index contains index) {
-          rp.hasAlreadyPassedFitAndProper(Some(true))
-        } else {
-          rp.hasAlreadyPassedFitAndProper(Some(false))
-        }
-        updated.copy(hasAccepted = updated.hasChanged)
+  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePeople], indices: Set[Int]): Seq[ResponsiblePeople] =
+    responsiblePeople.zipWithIndex.map { case (rp, index) =>
+      val updated = if (indices contains index) {
+        rp.hasAlreadyPassedFitAndProper(Some(true))
+      } else {
+        rp.hasAlreadyPassedFitAndProper(Some(false))
       }
+
+      updated.copy(hasAccepted = updated.hasChanged)
     }
+}
+
+object ResponsiblePeopleService {
+
+  def isActive(person: ResponsiblePeople) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
+
+  implicit class ResponsiblePeopleListHelpers(people: Seq[(ResponsiblePeople, Int)]) {
+    def exceptInactive = people filter {
+      case (person, _) if isActive(person) => true
+      case _ => false
+    }
+  }
+
 }

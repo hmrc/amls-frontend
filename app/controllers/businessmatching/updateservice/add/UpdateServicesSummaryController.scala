@@ -59,6 +59,7 @@ class UpdateServicesSummaryController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
           _ <- helper.updateTradingPremises(model)
+          _ <- helper.updateResponsiblePeople(model)
           _ <- helper.updateSupervision
           _ <- OptionT(helper.updateBusinessMatching(activity))
           _ <- OptionT(helper.updateServicesRegister(activity))

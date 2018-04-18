@@ -102,11 +102,11 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
     }
 
-  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[Seq[ResponsiblePeople]]] = {
+  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePeople]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
-    dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+    OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
       case Some(people) => responsiblePeopleService.updateFitAndProperFlag(people, indices)
-    }
+    })
   }
 }
