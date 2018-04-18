@@ -40,6 +40,37 @@
         <p>@(flowModel.activityName.getOrElse(""))</p>
     }
 
+    @if(flowModel.fitAndProper.isDefined) {
+        @checkYourAnswers(
+                question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                editUrl = routes.FitAndProperController.get(edit = true).url,
+                idTag = "fitandproper-edit"
+            ) {
+            <p>@(flowModel.fitAndProper map {
+                    case true => Messages("lbl.yes")
+                    case _ => Messages("lbl.no")
+                })</p>
+        }
+
+        @if(flowModel.fitAndProper.contains(true)) {
+            @checkYourAnswers(
+                question = Messages("businessmatching.updateservice.whichfitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                editUrl = routes.WhichFitAndProperController.get(edit = true).url,
+                idTag = "whichfitandproper-edit"
+            ) {
+            <p>
+                @(flowModel.responsiblePeople map { tp =>
+                    if(tp.index.size < 2) {
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count", tp.index.size)
+                    } else {
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", tp.index.size)
+                    }
+                })
+            </p>
+            }
+        }
+    }
+
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.tradingpremises.heading", flowModel.activityName.getOrElse("").toLowerCase),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
