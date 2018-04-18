@@ -18,17 +18,12 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import controllers.businessmatching.updateservice.add.routes._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivities, BusinessActivity, MoneyServiceBusiness, TrustAndCompanyServices}
-import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId, TradingPremisesPageId}
-import models.responsiblepeople.ResponsiblePeople
-import play.api.mvc.{Request, Result}
+import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -39,7 +34,7 @@ import utils.{BooleanFormReadWrite, RepeatingSection}
 import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class FitAndProperController @Inject()(
@@ -49,7 +44,7 @@ class FitAndProperController @Inject()(
                                         val businessMatchingService: BusinessMatchingService,
                                         val helper: UpdateServiceHelper,
                                         val router: Router[AddServiceFlowModel]
-                                        ) extends BaseController with RepeatingSection {
+                                      ) extends BaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
 
@@ -77,9 +72,12 @@ class FitAndProperController @Inject()(
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
               model.isfitAndProper(Some(data))
-                .responsiblePeople(if(data) model.responsiblePeople else None)
-            } flatMap { model =>
-              router.getRoute(FitAndProperPageId, model.get, edit)
+                .responsiblePeople(if (data) model.responsiblePeople else None)
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(FitAndProperPageId, model, edit)
+              }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
         }
   }
@@ -87,5 +85,4 @@ class FitAndProperController @Inject()(
   private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel)] = for {
     model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
   } yield (model)
-
 }

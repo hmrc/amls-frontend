@@ -44,16 +44,15 @@ class WhichFitAndProperController @Inject()(
                                              val router: Router[AddServiceFlowModel]
                                            ) extends BaseController with RepeatingSection {
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         responsiblePeopleService.getActiveWithIndex map {
           case (rp) => Ok(which_fit_and_proper(EmptyForm, rp))
-          case _ => InternalServerError("Unable to show the view")
         }
   }
 
-  def post() = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[ResponsiblePeopleFitAndProper](request.body) match {
@@ -61,17 +60,16 @@ class WhichFitAndProperController @Inject()(
             BadRequest(which_fit_and_proper(f, rp))
           }
           case ValidForm(_, data) => {
-            responsiblePeopleService.updateResponsiblePeople(data) flatMap { _ =>
-              dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key) flatMap {
-                case Some(model) => {
-                  router.getRoute(WhichFitAndProperPageId, model)
-                }
-                case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => model.responsiblePeople(Some(data))
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(WhichFitAndProperPageId, model, edit)
               }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }
           case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
         }
-      }
-
+  }
 }

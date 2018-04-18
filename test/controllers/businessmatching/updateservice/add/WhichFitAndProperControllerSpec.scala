@@ -22,9 +22,8 @@ import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.ResponsiblePeople
-import models.tradingpremises.TradingPremises
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -61,15 +60,22 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     val responsiblePeople = (responsiblePeopleGen(2).sample.get :+
       responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++ responsiblePeopleGen(2).sample.get
 
-    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(TrustAndCompanyServices), Some(true))), Some(AddServiceFlowModel.key))
-    mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(BillPaymentServices)))
+    mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+      AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(false),
+        tradingPremisesActivities = None,
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = None,
+        hasChanged = true,
+        hasAccepted = false))
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
-    mockCacheSave[Seq[ResponsiblePeople]]
+    // mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+    // mockCacheSave[Seq[ResponsiblePeople]]
 
-    when {
-      controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(false)
+    //    when {
+    //      controller.statusService.isPreSubmission(any(), any(), any())
+    //    } thenReturn Future.successful(false)
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -96,20 +102,6 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
       Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.whichfitandproper.title"))
 
     }
-    "return INTERNAL_SERVER_ERROR" when {
-      "activities cannot be retrieved" in new Fixture {
-        mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
-
-        when {
-          mockRPService.getActiveWithIndex(any(), any(), any())
-        } thenReturn Future.failed(new Exception("Failed to get responsible people"))
-
-
-        val result = controller.get()(request)
-        status(result) must be(INTERNAL_SERVER_ERROR)
-      }
-    }
   }
 
   "When the WhichFitAndProperController post is called it" must {
@@ -122,10 +114,34 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
 
         status(result) must be(SEE_OTHER)
         controller.router.verify(WhichFitAndProperPageId,
-          AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
+          AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+            areNewActivitiesAtTradingPremises = Some(false),
+            tradingPremisesActivities = None,
+            addMoreActivities = None,
+            fitAndProper = Some(true),
+            responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+            hasChanged = true,
+            hasAccepted = false), false)
 
       }
     }
+
+    "a valid call is made and editing" in new Fixture {
+
+      val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+      status(result) must be(SEE_OTHER)
+      controller.router.verify(WhichFitAndProperPageId,
+        AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+          areNewActivitiesAtTradingPremises = Some(false),
+          tradingPremisesActivities = None,
+          addMoreActivities = None,
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+          hasChanged = true,
+          hasAccepted = false), true)
+
+    }
+
 
     "return a BAD_REQUEST" when {
 
@@ -136,35 +152,6 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         status(result) must be(BAD_REQUEST)
 
       }
-
     }
   }
-//Cannot reach this page so tests redundant
-//      "return NOT_FOUND" when {
-//        "pre-submission" in new Fixture {
-//
-//          when {
-//            controller.statusService.isPreSubmission(any(), any(), any())
-//          } thenReturn Future.successful(true)
-//
-//          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-//          status(result) must be(NOT_FOUND)
-//
-//        }
-//        "without msb or tcsp" in new Fixture {
-//
-//          when {
-//            controller.businessMatchingService.getModel(any(), any(), any())
-//          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-//            activities = Some(BusinessActivities(Set(HighValueDealing)))
-//          ))
-//
-//          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-//          status(result) must be(NOT_FOUND)
-//
-//        }
-//      }
-//
-//    }
-//  }
 }

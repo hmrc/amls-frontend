@@ -328,8 +328,8 @@ POST        /update-service/which-trading-premises                              
 GET         /update-service/fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.get(edit: Boolean ?= false)
 POST        /update-service/fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.post(edit: Boolean ?= false)
 
-GET         /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get()
-POST        /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post()
+GET         /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
+POST        /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
 
 GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NewServiceInformationController.get()
 POST        /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NewServiceInformationController.post()
