@@ -46,9 +46,9 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
     case SelectActivitiesPageId => {
       model.activity match {
-        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
         //case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
-        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
     }
 
@@ -58,19 +58,19 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
     case FitAndProperPageId =>
       (model.fitAndProper, edit) match {
-        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get()))
+        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
         case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
 
     case WhichFitAndProperPageId =>
       edit match {
         case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
 
     case WhichFitAndProperPageId =>
-      Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
 
 //trading premmises pages
     case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
@@ -79,7 +79,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case TradingPremisesPageId =>
       model.areNewActivitiesAtTradingPremises match {
         case Some(true) =>
-          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
+          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
         case _ =>
           Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
       }
@@ -99,7 +99,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case AddMoreAcivitiesPageId =>
       model.addMoreActivities match {
         case Some(true) =>
-          Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
+          Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
 
         case _ =>
           newServiceInformationRedirect getOrElse error(pageId)

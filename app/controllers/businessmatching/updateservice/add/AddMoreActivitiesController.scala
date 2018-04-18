@@ -53,7 +53,7 @@ class AddMoreActivitiesController @Inject()(
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)
   implicit val boolRead = BooleanFormReadWrite.formRule(fieldName, "error.businessmatching.updateservice.addmoreactivities")
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
@@ -62,7 +62,7 @@ class AddMoreActivitiesController @Inject()(
         } yield Ok(add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
   }
 
-  def post() = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[Boolean](request.body) match {

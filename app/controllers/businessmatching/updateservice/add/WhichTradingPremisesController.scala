@@ -49,7 +49,7 @@ class WhichTradingPremisesController @Inject()(
                                                 val router: Router[AddServiceFlowModel]
                                               ) extends BaseController with RepeatingSection {
 
-  def get = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getFormData map { case (flowModel, activity, tradingPremises) =>
@@ -76,7 +76,7 @@ class WhichTradingPremisesController @Inject()(
       }
     }
 
-  def post = Authorised.async {
+  def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[TradingPremisesActivities](request.body) match {

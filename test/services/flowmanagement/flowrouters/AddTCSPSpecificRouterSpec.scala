@@ -51,7 +51,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
 
           val result = await(router.getRoute(SelectActivitiesPageId, model))
 
-          result mustBe Redirect(addRoutes.FitAndProperController.get())
+          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
       }
     }
@@ -65,7 +65,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
               fitAndProper = Some(true))
             val result = await(router.getRoute(FitAndProperPageId, model))
 
-            result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
+            result mustBe Redirect(addRoutes.WhichFitAndProperController.get(false))
           }
         }
       }
@@ -80,7 +80,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
               fitAndProper = Some(false))
             val result = await(router.getRoute(FitAndProperPageId, model))
 
-            result mustBe Redirect(addRoutes.TradingPremisesController.get())
+            result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
           }
         }
       }
@@ -91,7 +91,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
         "TCSP is the Business Activity" in new Fixture {
           val result = await(router.getRoute(WhichFitAndProperPageId, model))
 
-          result mustBe Redirect(addRoutes.TradingPremisesController.get())
+          result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
         }
       }
     }
@@ -108,7 +108,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
             fitAndProper = Some(true))
           val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
+          result mustBe Redirect(addRoutes.WhichFitAndProperController.get(true))
         }
       }
     }

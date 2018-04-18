@@ -322,8 +322,8 @@ POST        /update-service/activities-select                                   
 GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get(edit: Boolean ?= false)
 POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post(edit: Boolean ?= false)
 
-GET         /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get()
-POST        /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post()
+GET         /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.get(edit: Boolean ?= false)
+POST        /update-service/which-trading-premises                                    @controllers.businessmatching.updateservice.add.WhichTradingPremisesController.post(edit: Boolean ?= false)
 
 GET         /update-service/fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.get(edit: Boolean ?= false)
 POST        /update-service/fit-and-proper                                            @controllers.businessmatching.updateservice.add.FitAndProperController.post(edit: Boolean ?= false)
