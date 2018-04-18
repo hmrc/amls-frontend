@@ -47,7 +47,7 @@ class WhichTradingPremisesController @Inject()(
                                                 val businessMatchingService: BusinessMatchingService,
                                                 val helper: UpdateServiceHelper,
                                                 val router: Router[AddServiceFlowModel]
-                                                ) extends BaseController with RepeatingSection {
+                                              ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {
     implicit authContext =>
@@ -63,6 +63,19 @@ class WhichTradingPremisesController @Inject()(
         } getOrElse InternalServerError("Cannot retrieve form data")
   }
 
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
+    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+    activity <- OptionT.fromOption[Future](flowModel.activity)
+    tradingPremises <- OptionT.liftF(tradingPremises)
+  } yield (flowModel, activity, tradingPremises)
+
+  private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
+    getData[TradingPremises].map {
+      _.zipWithIndex.filterNot { case (tp, _) =>
+        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
+      }
+    }
+
   def post = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -75,20 +88,9 @@ class WhichTradingPremisesController @Inject()(
             model.tradingPremisesActivities(Some(data))
           } flatMap {
             case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
+            case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
           }
         }
   }
-
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
-    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
-    activity <- OptionT.fromOption[Future](flowModel.activity)
-    tradingPremises <- OptionT.liftF(tradingPremises)
-  } yield (flowModel, activity, tradingPremises)
-
-  private def tradingPremises(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(TradingPremises, Int)]] =
-    getData[TradingPremises].map { _.zipWithIndex.filterNot { case (tp, _) =>
-        tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
-      }
-    }
 
 }

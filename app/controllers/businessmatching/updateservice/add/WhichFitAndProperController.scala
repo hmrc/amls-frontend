@@ -16,29 +16,22 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
-import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.ResponsiblePeople
-import play.api.mvc.{Request, Result}
-import services.{ResponsiblePeopleService, StatusService}
+import models.flowmanagement._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class WhichFitAndProperController @Inject()(
@@ -49,49 +42,36 @@ class WhichFitAndProperController @Inject()(
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: UpdateServiceHelper,
                                              val router: Router[AddServiceFlowModel]
-                                             ) extends BaseController with RepeatingSection {
+                                           ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-        getFormData map { case (flowModel, responsiblePeopleSeq) =>
-          val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
-
-          Ok(which_fit_and_proper(
-            form,
-            responsiblePeopleSeq
-          ))
-        } getOrElse InternalServerError("Cannot retrieve form data")
-
+        responsiblePeopleService.getActiveWithIndex map {
+          case (rp) => Ok(which_fit_and_proper(EmptyForm, rp))
+          case _ => InternalServerError("Unable to show the view")
+        }
   }
 
   def post() = Authorised.async {
-      implicit authContext =>
-        implicit request =>
-
-          Form2[ResponsiblePeopleFitAndProper](request.body) match {
-            case f: InvalidForm => getFormData map { case (_, responsiblePeopleSeq) =>
-              BadRequest(which_fit_and_proper(f, responsiblePeopleSeq))
-            } getOrElse InternalServerError("Cannot retrieve form data")
-
-            case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-              model.responsiblePeople(Some(data))
-            } flatMap {
-              case Some(model) => router.getRoute(WhichFitAndProperPageId, model)
+    implicit authContext =>
+      implicit request =>
+        Form2[ResponsiblePeopleFitAndProper](request.body) match {
+          case f: InvalidForm => responsiblePeopleService.getActiveWithIndex map { rp =>
+            BadRequest(which_fit_and_proper(f, rp))
+          }
+          case ValidForm(_, data) => {
+            responsiblePeopleService.updateResponsiblePeople(data) flatMap { _ =>
+              dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key) flatMap {
+                case Some(model) => {
+                  router.getRoute(WhichFitAndProperPageId, model)
+                }
+                case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+              }
             }
           }
-  }
+          case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
+        }
+      }
 
-
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
-    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
-    responsiblePeopleSeq <- OptionT.liftF(responsiblePeopleFutureSeq)
-  } yield (flowModel, responsiblePeopleSeq)
-
-  private def responsiblePeopleFutureSeq(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
-    getData[ResponsiblePeople].map { _.zipWithIndex.filterNot { case (tp, _) =>
-      tp.status.contains(StatusConstants.Deleted) | !tp.isComplete
-    }
-  }
 }

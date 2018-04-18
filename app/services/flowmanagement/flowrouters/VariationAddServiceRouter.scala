@@ -52,6 +52,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
     }
 
+//fit and proper pages
     case FitAndProperPageId if edit && model.responsiblePeople.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
@@ -68,6 +69,10 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
         case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
       }
 
+    case WhichFitAndProperPageId =>
+      Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+
+//trading premmises pages
     case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
@@ -82,6 +87,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case WhichTradingPremisesPageId =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
+//update service page
     case UpdateServiceSummaryPageId =>
       businessMatchingService.getRemainingBusinessActivities flatMap {
         case set if set.nonEmpty =>

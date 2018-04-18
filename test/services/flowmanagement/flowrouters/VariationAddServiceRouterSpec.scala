@@ -47,7 +47,6 @@ class VariationAddServiceRouterSpec extends PlaySpec {
 
   "getRoute" must {
 
-
     "return the 'trading premises' page (TradingPremisesController)" when {
       "given the 'BusinessActivities' model contains a single activity" in new Fixture {
         val model = AddServiceFlowModel(

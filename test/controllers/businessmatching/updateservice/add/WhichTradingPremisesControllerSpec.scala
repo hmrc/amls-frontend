@@ -43,7 +43,7 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
 
     mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
+    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
