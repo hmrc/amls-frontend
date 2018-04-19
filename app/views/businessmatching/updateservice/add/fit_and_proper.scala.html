@@ -34,16 +34,16 @@
 
     @form(f, controllers.businessmatching.updateservice.add.routes.FitAndProperController.post(edit)) {
 
-            @fieldset(
-                f = f("passedFitAndProper-fieldset"),
-                legend = Messages("businessmatching.updateservice.fitandproper.heading"),
-                legendHidden = true,
-                panel = false
-            ) {
+        @fieldset(
+            f = f("passedFitAndProper-fieldset"),
+            legend = Messages("businessmatching.updateservice.fitandproper.heading"),
+            legendHidden = true,
+            panel = false
+        ) {
 
-                @errorGroup(
-                    field = f("passedFitAndProper")
-                ) {
+            @errorGroup(
+                field = f("passedFitAndProper")
+            ) {
                 @radio(
                     f = f("passedFitAndProper"),
                     labelText = "lbl.yes",
@@ -60,17 +60,19 @@
 
         }
 
-    @detailsSummary(
-        summary = Messages("businessmatching.updateservice.fitandproper.text.info")
-    ) {
-        @panel(
-            jsHidden = false,
-            wide = false
+        <p></p>
+
+        @detailsSummary(
+            summary = Messages("businessmatching.updateservice.fitandproper.text.info")
         ) {
-            <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
-            <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line2")</p>
+            @panel(
+                jsHidden = false,
+                wide = false
+            ) {
+                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line1")</p>
+                <p>@Messages("businessmatching.updateservice.fitandproper.text.info.line2")</p>
+            }
         }
-    }
 
         @submit(returnLink = false)
 
