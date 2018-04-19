@@ -1188,8 +1188,8 @@ businessmatching.updateservice.whichtradingpremises.heading = Which premises wil
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
 
-businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
-businessmatching.updateservice.fitandproper.heading = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed the HMRC fit and proper test?
+businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed the HMRC fit and proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
