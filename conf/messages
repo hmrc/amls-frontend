@@ -126,7 +126,7 @@ error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes i
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
 
-error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
+error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
