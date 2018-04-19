@@ -25,6 +25,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
+import models.responsiblepeople.ResponsiblePeople
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
@@ -137,6 +138,14 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         when {
           controller.helper.updateSupervision(any(), any())
         } thenReturn OptionT.some[Future, Supervision](Supervision())
+
+        when {
+          controller.helper.updateResponsiblePeople(any())(any(), any())
+        } thenReturn OptionT.some[Future, Seq[ResponsiblePeople]](Seq.empty)
+
+        when {
+          controller.helper.clearFlowModel()(any(), any())
+        } thenReturn OptionT.some[Future, AddServiceFlowModel](AddServiceFlowModel())
 
         val result = controller.post()(request)
 

@@ -49,7 +49,7 @@ class WhichFitAndProperController @Inject()(
     implicit authContext =>
       implicit request =>
         responsiblePeopleService.getAll map { rp =>
-          Ok(which_fit_and_proper(EmptyForm, rp.zipWithIndex.exceptInactive))
+          Ok(which_fit_and_proper(EmptyForm, edit, rp.zipWithIndex.exceptInactive))
         }
   }
 
@@ -58,7 +58,7 @@ class WhichFitAndProperController @Inject()(
       implicit request =>
         Form2[ResponsiblePeopleFitAndProper](request.body) match {
           case f: InvalidForm => responsiblePeopleService.getAll map { rp =>
-            BadRequest(which_fit_and_proper(f, rp.zipWithIndex.exceptInactive))
+            BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
@@ -76,15 +76,3 @@ class WhichFitAndProperController @Inject()(
         }
   }
 }
-//Form2[TradingPremisesActivities](request.body) match {
-//  case f: InvalidForm => getFormData map { case (_, activity, tradingPremises) =>
-//  BadRequest(which_trading_premises(f, tradingPremises, BusinessActivities.getValue(activity)))
-//} getOrElse InternalServerError("Cannot retrieve form data")
-//
-//  case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-//  model.tradingPremisesActivities(Some(data))
-//} flatMap {
-//  case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
-//  case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
-//}
-//}

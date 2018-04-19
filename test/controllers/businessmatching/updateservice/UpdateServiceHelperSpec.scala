@@ -143,25 +143,35 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     }
   }
 
-  "updateResponsiblePeople" in new Fixture {
-    val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-      _.copy(hasAlreadyPassedFitAndProper = Some(false))
+  "updateResponsiblePeople" must {
+    "set the fit and proper flag on the right people according to the indices" in new Fixture {
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(hasAlreadyPassedFitAndProper = Some(false))
+      }
+
+      val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+      mockCacheUpdate(Some(ResponsiblePeople.key), people)
+
+      val model = AddServiceFlowModel(
+        Some(MoneyServiceBusiness),
+        fitAndProper = Some(true),
+        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+      )
+
+      when {
+        responsiblePeopleService.updateFitAndProperFlag(any(), any())
+      } thenReturn updatedPeople
+
+      helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
     }
+  }
 
-    val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+  "clearFlowModel" must {
+    "set an empty model back into the cache" in new Fixture {
+      mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
-    mockCacheUpdate(Some(ResponsiblePeople.key), people)
-
-    val model = AddServiceFlowModel(
-      Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
-    )
-
-    when {
-      responsiblePeopleService.updateFitAndProperFlag(any(), any())
-    } thenReturn updatedPeople
-
-    helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
+      helper.clearFlowModel().returnsSome(AddServiceFlowModel())
+    }
   }
 }

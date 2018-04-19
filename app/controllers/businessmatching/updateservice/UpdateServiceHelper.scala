@@ -109,4 +109,8 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       case Some(people) => responsiblePeopleService.updateFitAndProperFlag(people, indices)
     })
   }
+
+  def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddServiceFlowModel] =
+    OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
+
 }
