@@ -53,7 +53,7 @@ class DeRegisterApplicationController @Inject()
               _.getMessage
             }
 
-            Ok(deregister_application(details.businessName, activities, amlsRegNumber, ApplicationConfig.businessMatchingVariationToggle))
+            Ok(deregister_application(details.businessName, activities, amlsRegNumber))
           }) getOrElse InternalServerError("Could not show the de-register page")
     }
   }

@@ -106,7 +106,7 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
-                    allowEdit = !isPending,
+                    allowEdit = isPreSubmission,
                     idTag="edit-msb-services"
                 ) {
                     <ul class="list list--comma">

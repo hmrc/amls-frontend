@@ -16,14 +16,13 @@
 
 package controllers.businessmatching
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -47,9 +46,10 @@ class SummaryController @Inject()(
         (for {
           bm <- businessMatchingService.getModel
           ba <- OptionT.fromOption[Future](bm.activities)
-          isPending <- OptionT.liftF(statusService.isPending)
-          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
+          status <- OptionT.liftF(statusService.getStatus)
         } yield {
+
+          val isPreSubmission = statusService.isPreSubmission(status)
 
           val bmWithAdditionalActivities = bm.copy(
             activities = Some(BusinessActivities(
@@ -57,34 +57,29 @@ class SummaryController @Inject()(
             ))
           )
 
-          val changeActivitiesUrl = if (isPreSubmission || !ApplicationConfig.businessMatchingVariationToggle) {
+          val changeActivitiesUrl = if (isPreSubmission) {
             controllers.businessmatching.routes.RegisterServicesController.get().url
           } else {
             controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
           }
 
-          Ok(summary(EmptyForm, bmWithAdditionalActivities, changeActivitiesUrl, (isPreSubmission || ApplicationConfig.businessMatchingVariationToggle), isPending))
+          Ok(summary(EmptyForm,
+            bmWithAdditionalActivities,
+            changeActivitiesUrl,
+            isPreSubmission,
+            statusService.isPending(status)))
+
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
   def post() = Authorised.async {
     implicit authContext =>
-      implicit request =>
-        (for {
+      implicit request => {
+        for {
           businessMatching <- businessMatchingService.getModel
-          businessActivities <- OptionT.fromOption[Future](businessMatching.activities)
-          isPreSubmission <- OptionT.liftF(statusService.isPreSubmission)
           _ <- businessMatchingService.updateModel(businessMatching.copy(hasAccepted = true, preAppComplete = true))
-        } yield {
-          if (goToUpdateServices(businessActivities.additionalActivities, isPreSubmission)) {
-            Redirect(updateservice.add.routes.TradingPremisesController.get())
-          } else {
-            Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        }) getOrElse InternalServerError("Unable to update business matching")
+        } yield Redirect(controllers.routes.RegistrationProgressController.get())
+      } getOrElse InternalServerError("Unable to update business matching")
   }
-
-  private def goToUpdateServices(additionalActivities: Option[Set[BusinessActivity]], isPreSubmission: Boolean): Boolean =
-    !isPreSubmission & (ApplicationConfig.businessMatchingVariationToggle & additionalActivities.isDefined)
 
 }

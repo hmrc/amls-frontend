@@ -31,7 +31,7 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers wit
     val businessName = "Test Business"
     val currentRegYearEndDate = LocalDate.now()
 
-    def view = views.html.deregister.deregister_application(businessName, Set.empty, amlsRegistrationNumber, true)
+    def view = views.html.deregister.deregister_application(businessName, Set.empty, amlsRegistrationNumber)
   }
 
   "deregister_application view" must {
@@ -47,6 +47,8 @@ class deregister_applicationSpec extends GenericTestHelper with MustMatchers wit
 
     "have correct body content" in new ViewFixture {
       validateParagraphizedContent("status.deregister.body-content")
+      
+      doc.getElementById("change-services").attr("href") mustBe controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
     }
   }
 }
