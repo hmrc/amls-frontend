@@ -31,34 +31,13 @@
         heading = header
     )  {
 
-        <p>@Messages("lbl.select.all")</p>
+    @responsible_people(
+        f,
+        responsiblePeople,
+        "heading",
+        controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)
+    )
 
-        <div class="form-group">
 
-            @form(f, controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)) {
-
-                @fieldset(
-                    f = f("responsiblePeople-fieldset"),
-                    legend = Messages("businessmatching.updateservice.whichtradingpremises.title"),
-                    legendHidden = true,
-                    panel = false
-                ) {
-                    @errorGroup(
-                        field = f("responsiblePeople")
-                    ) {
-                        @responsiblePeople.map{ case (rp, index) =>
-                            @checkbox(
-                                f = f("responsiblePeople[]"),
-                                labelText = rp.personName.fold("")(_.fullName),
-                                value = index.toString
-                            )
-                        }
-                    }
-                }
-
-                @submit(returnLink = false)
-
-            }
-        </div>
 
 }

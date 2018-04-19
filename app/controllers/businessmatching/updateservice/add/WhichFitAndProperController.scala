@@ -16,6 +16,8 @@
 
 package controllers.businessmatching.updateservice.add
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
@@ -23,13 +25,13 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement._
+import services.ResponsiblePeopleService._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add._
-import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -48,11 +50,17 @@ class WhichFitAndProperController @Inject()(
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        responsiblePeopleService.getAll map { rp =>
-          Ok(which_fit_and_proper(EmptyForm, edit, rp.zipWithIndex.exceptInactive))
-        }
+        (for {
+          rp <- OptionT.liftF(responsiblePeopleService.getAll)
+          flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+        } yield {
+          val indexedRp = rp.zipWithIndex.exceptInactive
+          val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
+          Ok(which_fit_and_proper(form, edit, indexedRp))
+        }) getOrElse InternalServerError("")
   }
 
+  //hasAlreadyPassedFitAndProper
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -63,7 +71,7 @@ class WhichFitAndProperController @Inject()(
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) => {
-                model.responsiblePeople(Some(data))
+               model.responsiblePeople(Some(data))
               }
             } flatMap {
               case Some(model) => {
@@ -76,3 +84,4 @@ class WhichFitAndProperController @Inject()(
         }
   }
 }
+

@@ -24,7 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.PersonName
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -58,7 +58,7 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
       router = createRouter[AddServiceFlowModel]
     )
 
-    val responsiblePeople = (responsiblePeopleGen(2).sample.get :+
+    val responsiblePeople: List[ResponsiblePeople] = (responsiblePeopleGen(2).sample.get :+
       responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
       responsiblePeopleGen(2).sample.get
 
@@ -77,6 +77,16 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         responsiblePeople = None,
         hasChanged = true,
         hasAccepted = false))
+
+    mockCacheFetch[AddServiceFlowModel](
+      Some(AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(false),
+        tradingPremisesActivities = None,
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+        hasChanged = true,
+        hasAccepted = false)),Some(AddServiceFlowModel.key))
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
