@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
-import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
+import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -106,7 +106,9 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
-      case Some(people) => responsiblePeopleService.updateFitAndProperFlag(people, indices)
+      case Some(people) if model.activity.contains(TrustAndCompanyServices) =>
+        responsiblePeopleService.updateFitAndProperFlag(people, indices)
+      case Some(people) => people
     })
   }
 

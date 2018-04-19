@@ -144,26 +144,44 @@ class UpdateServiceHelperSpec extends GenericTestHelper
   }
 
   "updateResponsiblePeople" must {
-    "set the fit and proper flag on the right people according to the indices" in new Fixture {
-      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-        _.copy(hasAlreadyPassedFitAndProper = Some(false))
+    "set the fit and proper flag on the right people according to the indices" when {
+      "adding the TCSP business type" in new Fixture {
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
+
+        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+        mockCacheUpdate(Some(ResponsiblePeople.key), people)
+
+        val model = AddServiceFlowModel(
+          Some(TrustAndCompanyServices),
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+        )
+
+        when {
+          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+        } thenReturn updatedPeople
+
+        helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
       }
+    }
 
-      val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+    "not touch the responsible people" when {
+      "adding a business type that isn't TCSP" in new Fixture {
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
 
-      mockCacheUpdate(Some(ResponsiblePeople.key), people)
+        mockCacheUpdate(Some(ResponsiblePeople.key), people)
 
-      val model = AddServiceFlowModel(
-        Some(MoneyServiceBusiness),
-        fitAndProper = Some(true),
-        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
-      )
+        val model = AddServiceFlowModel(Some(HighValueDealing))
 
-      when {
-        responsiblePeopleService.updateFitAndProperFlag(any(), any())
-      } thenReturn updatedPeople
+        helper.updateResponsiblePeople(model).returnsSome(people)
 
-      helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
+        verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any())
+      }
     }
   }
 
