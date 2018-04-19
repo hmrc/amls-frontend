@@ -72,7 +72,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case WhichFitAndProperPageId =>
       Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
 
-//trading premmises pages
+//trading premises pages
     case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 

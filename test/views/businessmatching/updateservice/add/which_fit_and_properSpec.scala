@@ -31,7 +31,7 @@ class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with 
   val rp = responsiblePersonGen.sample.get
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = which_fit_and_proper(EmptyForm, Seq((rp, 0)))
+    def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
   }
 
   "The which_fit_and_proper view" must {
@@ -56,7 +56,7 @@ class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "responsiblePeople") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = which_fit_and_proper(form2, Seq((rp, 0)))
+      override def view = which_fit_and_proper(form2, false, Seq((rp, 0)))
 
       errorSummary.html() must include("not a message Key")
 

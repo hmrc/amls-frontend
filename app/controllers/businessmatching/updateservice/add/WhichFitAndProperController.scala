@@ -48,7 +48,7 @@ class WhichFitAndProperController @Inject()(
     implicit authContext =>
       implicit request =>
         responsiblePeopleService.getActiveWithIndex map {
-          case (rp) => Ok(which_fit_and_proper(EmptyForm, rp))
+          case (rp) => Ok(which_fit_and_proper(EmptyForm, edit, rp))
         }
   }
 
@@ -57,7 +57,7 @@ class WhichFitAndProperController @Inject()(
       implicit request =>
         Form2[ResponsiblePeopleFitAndProper](request.body) match {
           case f: InvalidForm => responsiblePeopleService.getActiveWithIndex map { rp =>
-            BadRequest(which_fit_and_proper(f, rp))
+            BadRequest(which_fit_and_proper(f, edit, rp))
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
