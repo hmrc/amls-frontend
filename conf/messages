@@ -120,7 +120,7 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
-error.businessmatching.updateservice.responsiblepeople = Select one option to show which responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
@@ -1198,6 +1198,10 @@ businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform 
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
 businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.whichfitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
+businessmatching.updateservice.whichfitandproper.text.info = The fit and proper test
+businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
+businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
 businessmatching.updateservice.newserviceinformation.title = We need to ask you some more questions because of the changes you’ve made
 businessmatching.updateservice.newserviceinformation.heading = We need to ask you some more questions because of the changes you’ve made

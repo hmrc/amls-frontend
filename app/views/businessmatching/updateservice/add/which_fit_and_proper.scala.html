@@ -31,13 +31,13 @@
         heading = header
     )  {
 
-    @responsible_people(
-        f,
-        responsiblePeople,
-        "heading",
-        controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)
-    )
+        <p>@Messages("businessmatching.updateservice.whichfitandproper.info.no.fees")</p>
 
-
+        @responsible_people(
+            f,
+            responsiblePeople,
+            "heading",
+            controllers.businessmatching.updateservice.add.routes.WhichFitAndProperController.post(edit)
+        )
 
 }

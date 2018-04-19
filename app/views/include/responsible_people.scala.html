@@ -42,6 +42,20 @@
             }
         }
 
+        <p></p>
+
+        @detailsSummary(
+            summary = Messages("businessmatching.updateservice.whichfitandproper.text.info")
+        ) {
+            @panel(
+                jsHidden = false,
+                wide = false
+            ) {
+                <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line1")</p>
+                <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line2")</p>
+            }
+        }
+
         @submit(returnLink = false)
 
     }
