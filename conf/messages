@@ -126,7 +126,7 @@ error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes i
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
 error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
 
-error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
 error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
@@ -1188,12 +1188,12 @@ businessmatching.updateservice.whichtradingpremises.heading = Which premises wil
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
 
-businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed the HMRC fit and proper test?
-businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed the HMRC fit and proper test?
+businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
-businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
-businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
+businessmatching.updateservice.fitandproper.text.info = The fit and proper test
+businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
