@@ -13,7 +13,6 @@ $(window).load(function () {
         if ($('.amls-error-summary').length) {
             $('.amls-error-summary').focus()
             $('.amls-error-summary a').click(function (e) {
-                e.preventDefault()
                 var href = $(this).attr('href')
                 $(href).focus()
             })
