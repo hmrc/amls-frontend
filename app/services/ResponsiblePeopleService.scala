@@ -43,7 +43,7 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
         rp.hasAlreadyPassedFitAndProper(Some(false))
       }
 
-      updated.copy(hasAccepted = updated.hasChanged)
+      updated.copy(hasAccepted = rp.hasAccepted)
     }
 }
 
