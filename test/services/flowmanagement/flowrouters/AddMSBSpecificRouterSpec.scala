@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class AddMSBSpecificRouterSpec extends PlaySpec {
 
-  val model = AddServiceFlowModel(activity = Some(TrustAndCompanyServices))
+  val model = AddServiceFlowModel(activity = Some(MoneyServiceBusiness))
 
   trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]
@@ -51,46 +51,57 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
     }
   
 
-//    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
-//      "the user is on the 'Fit and proper' page (FitAndProperPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is yes" in new Fixture {
-//            val model = AddServiceFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              fitAndProper = Some(true))
-//            val result = await(router.getRoute(FitAndProperPageId, model))
-//
-//            result mustBe Redirect(addRoutes.WhichFitAndProperController.get(false))
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'trading-premises' page (TradingPremisesController)" when {
-//      "the user is on the 'Fit and Proper' page (FitAndProperPageId)" when {
-//        "TCSP is the Business Activity" when {
-//          "the answer is no" in new Fixture {
-//            val model = AddServiceFlowModel(
-//              activity = Some(TrustAndCompanyServices),
-//              fitAndProper = Some(false))
-//            val result = await(router.getRoute(FitAndProperPageId, model))
-//
-//            result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-//          }
-//        }
-//      }
-//    }
-//
-//    "return the 'trading-premises' page (TradingPremisesController)" when {
-//      "the user is on the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
-//        "TCSP is the Business Activity" in new Fixture {
-//          val result = await(router.getRoute(WhichFitAndProperPageId, model))
-//
-//          result mustBe Redirect(addRoutes.TradingPremisesController.get(false))
-//        }
-//      }
-//    }
-//  }
+    "return the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity"  in new Fixture {
+            val model = AddServiceFlowModel(
+              activity = Some(MoneyServiceBusiness))
+            val result = await(router.getRoute(SubServicesPageId, model))
+
+            result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(false))
+          }
+        }
+    }
+
+    "return the 'no-psr' page (NoPsrController)" when {
+      "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
+        "the answer is no and MSB is the Business Activity" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
+          // Need to add PSR model property
+          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model))
+
+          result mustBe Redirect(addRoutes.NoPsrController.get())
+        }
+      }
+    }
+
+    "return the 'FitAndProper' page (FitAndProperController)" when {
+      "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
+        "the answer is yes and MSB is the Business Activity" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
+          // Need to add PSR model property
+          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model))
+
+          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
+        }
+      }
+    }
+
+    "return the 'FitAndProper' page (FitAndProperController)" when {
+      "the user is on the 'no_psr' page (NoPSRPageId)" when {
+        "MSB is the Business Activity" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices))
+          val result = await(router.getRoute(NoPSRPageId, model))
+
+          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
+        }
+      }
+    }
 //
 //  "When Editing in the Add TCSP Add flow the getRoute method" must {
 //    //Edit mode TSCP sub-flow

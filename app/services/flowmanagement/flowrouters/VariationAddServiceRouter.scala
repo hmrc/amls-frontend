@@ -52,6 +52,21 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
     }
 
+// Money Service Business
+    case SubServicesPageId =>
+      Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+
+    case BusinessAppliedForPSRNumberPageId => {
+      model.businessAppliedForPSRNumber match {
+        case Some(BusinessAppliedForPSRNumberYes(_)) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+        case Some(BusinessAppliedForPSRNumberNo) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+      }
+    }
+
+    case NoPSRPageId => {
+      Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+    }
+
 //fit and proper pages
     case FitAndProperPageId if edit && model.responsiblePeople.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
