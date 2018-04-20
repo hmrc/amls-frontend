@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
@@ -25,6 +26,7 @@ import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
 class WhichTradingPremisesControllerSpec extends GenericTestHelper
@@ -41,12 +43,17 @@ class WhichTradingPremisesControllerSpec extends GenericTestHelper
 
     mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
+    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(
-      self.authConnector,
-      mockCacheConnector,
-      createRouter[AddServiceFlowModel]
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
     )
   }
 

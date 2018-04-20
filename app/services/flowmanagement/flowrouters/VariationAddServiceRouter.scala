@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package services.flowmanagement.flowrouters
 
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import javax.inject.Inject
-import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching._
 import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
@@ -31,7 +31,10 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessMatchingService) extends Router[AddServiceFlowModel] {
+
+
 
   // scalastyle:off cyclomatic.complexity
   // scalastyle:off method.length
@@ -41,16 +44,42 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
-    case SelectActivitiesPageId =>
-      Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+    case SelectActivitiesPageId => {
+      model.activity match {
+        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+        //case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+      }
+    }
 
+//fit and proper pages
+    case FitAndProperPageId if edit && model.responsiblePeople.isDefined =>
+      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+
+    case FitAndProperPageId =>
+      (model.fitAndProper, edit) match {
+        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
+        case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+      }
+
+    case WhichFitAndProperPageId =>
+      edit match {
+        case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+      }
+
+    case WhichFitAndProperPageId =>
+      Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+
+//trading premises pages
     case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
     case TradingPremisesPageId =>
       model.areNewActivitiesAtTradingPremises match {
         case Some(true) =>
-          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
+          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
         case _ =>
           Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
       }
@@ -58,6 +87,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case WhichTradingPremisesPageId =>
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
+//update service page
     case UpdateServiceSummaryPageId =>
       businessMatchingService.getRemainingBusinessActivities flatMap {
         case set if set.nonEmpty =>
@@ -69,7 +99,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case AddMoreAcivitiesPageId =>
       model.addMoreActivities match {
         case Some(true) =>
-          Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
+          Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
 
         case _ =>
           newServiceInformationRedirect getOrElse error(pageId)

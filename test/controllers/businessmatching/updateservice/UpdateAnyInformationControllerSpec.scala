@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import views.Fixture
-
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 class UpdateAnyInformationControllerSpec extends GenericTestHelper {
@@ -45,7 +45,6 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
     val request = addToken(authRequest)
 
     implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 

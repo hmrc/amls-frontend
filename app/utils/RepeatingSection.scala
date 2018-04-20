@@ -203,7 +203,7 @@ trait RepeatingSection {
    formats: Format[T],
    key: MongoKey[T],
    ec: ExecutionContext
-  ): Future[_] =
+  ): Future[CacheMap] =
     getData[T] flatMap {
       data => {
         putData(fn(data))
@@ -233,7 +233,7 @@ trait RepeatingSection {
    formats: Format[T],
    key: MongoKey[T],
    ec: ExecutionContext
-  ): Future[_] = {
+  ): Future[CacheMap] = {
     dataCacheConnector.save[Seq[T]](key(), data)
   }
 }

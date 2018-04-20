@@ -19,11 +19,13 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
+import models.responsiblepeople.ResponsiblePeople
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
@@ -34,8 +36,10 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
+import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class UpdateServicesSummaryControllerSpec extends GenericTestHelper
@@ -48,14 +52,18 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
     val request = addToken(authRequest)
     val mockTradingPremisesService = mock[TradingPremisesService]
-    val mockUpdateServicesSummaryControllerHelper = mock[UpdateServicesSummaryControllerHelper]
+    val mockUpdateServicesSummaryControllerHelper = mock[UpdateServiceHelper]
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new UpdateServicesSummaryController(
-      self.authConnector,
-      mockCacheConnector,
-      mockTradingPremisesService,
-      mockUpdateServicesSummaryControllerHelper,
-      createRouter[AddServiceFlowModel]
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel],
+      tradingPremisesService = mockTradingPremisesService
     )
 
     val flowModel = AddServiceFlowModel(
@@ -99,7 +107,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         )
 
-        val serviceChangeRegister:ServiceChangeRegister = ServiceChangeRegister(
+        val serviceChangeRegister: ServiceChangeRegister = ServiceChangeRegister(
           Some(Set(BillPaymentServices))
         )
 
@@ -130,6 +138,14 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         when {
           controller.helper.updateSupervision(any(), any())
         } thenReturn OptionT.some[Future, Supervision](Supervision())
+
+        when {
+          controller.helper.updateResponsiblePeople(any())(any(), any())
+        } thenReturn OptionT.some[Future, Seq[ResponsiblePeople]](Seq.empty)
+
+        when {
+          controller.helper.clearFlowModel()(any(), any())
+        } thenReturn OptionT.some[Future, AddServiceFlowModel](AddServiceFlowModel())
 
         val result = controller.post()(request)
 

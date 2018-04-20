@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package utils
+package services.flowmanagement
 
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.mvc.Result
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.ExecutionContext
+import scala.concurrent.{ExecutionContext, Future}
 
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks {
-  implicit val mockAuthContext = mock[AuthContext]
-  implicit val headerCarrier = HeaderCarrier()
+trait PageRouter[A] {
+  def getPageRoute(model: A, edit: Boolean = false)(implicit ac: AuthContext,
+                                                              hc: HeaderCarrier,
+                                                              ec: ExecutionContext
+  ): Future[Result]
 }
+

@@ -61,7 +61,7 @@ trait DataCacheConnector {
   ): Future[HttpResponse] =
     shortLivedCache.remove(cacheId)
 
-  def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]) = {
+  def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] = {
     fetch(cacheId) flatMap { t =>
         val $t = f(t)
         save(cacheId, $t) map { _ => Some($t) }

@@ -20,11 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import play.api.i18n.MessagesApi
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -33,14 +35,14 @@ import views.html.businessmatching.updateservice.new_service_information
 import scala.concurrent.Future
 
 
-class NewServiceInformationController @Inject()
-(
-  val authConnector: AuthConnector,
-  implicit val dataCacheConnector: DataCacheConnector,
-  val businessMatchingService: BusinessMatchingService,
-  val messages: MessagesApi,
-  val router: Router[AddServiceFlowModel]
-) extends BaseController {
+class NewServiceInformationController @Inject() (
+                                                   val authConnector: AuthConnector,
+                                                   implicit val dataCacheConnector: DataCacheConnector,
+                                                   val statusService: StatusService,
+                                                   val businessMatchingService: BusinessMatchingService,
+                                                   val helper: UpdateServiceHelper,
+                                                   val router: Router[AddServiceFlowModel]
+                                                  ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request => (for {

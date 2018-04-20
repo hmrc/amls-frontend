@@ -23,7 +23,7 @@ import models.businessmatching.updateservice.ChangeServices
 import models.flowmanagement.{AddServiceFlowModel, RemoveServiceFlowModel}
 import services._
 import services.flowmanagement.Router
-import services.flowmanagement.routings._
+import services.flowmanagement.flowrouters.{ChangeServicesRouter, DavesVariationAddServiceRouter, VariationAddServiceRouter, VariationRemoveServiceRouter}
 import uk.gov.hmrc.http.HttpPost
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
@@ -47,5 +47,8 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[VariationAddServiceRouter])
     bind(new TypeLiteral[Router[ChangeServices]] {}).to(classOf[ChangeServicesRouter])
     bind(new TypeLiteral[Router[RemoveServiceFlowModel]] {}).to(classOf[VariationRemoveServiceRouter])
+
+
+    //bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[DavesVariationAddServiceRouter])
   }
 }

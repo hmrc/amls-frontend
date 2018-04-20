@@ -176,7 +176,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
   }
 
   "getRemainingBusinessActivities" must {
-    "return the activities (without MSB and TCSP) that the user has not yet added or previously submitted" in new Fixture {
+    "return the activities (without MSB) that the user has not yet added or previously submitted" in new Fixture {
       val businessMatching = BusinessMatching(
         activities = Some(BMActivities(
           Set(BillPaymentServices, HighValueDealing, AccountancyServices)
@@ -186,14 +186,14 @@ class BusinessMatchingServiceSpec extends PlaySpec
       mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
 
       whenReady(service.getRemainingBusinessActivities.value) { result =>
-        result mustBe Some(Set(TelephonePaymentService, EstateAgentBusinessService))
+        result mustBe Some(Set(TelephonePaymentService, EstateAgentBusinessService,TrustAndCompanyServices))
       }
     }
 
-    "return an empty set if all the available activities have been added, except MSB/TCSP" in new Fixture {
+    "return an empty set if all the available activities have been added, except MSB" in new Fixture {
       val businessMatching = BusinessMatching(
         activities = Some(BMActivities(
-          Set(BillPaymentServices, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService)
+          Set(BillPaymentServices, HighValueDealing, AccountancyServices, TelephonePaymentService, EstateAgentBusinessService, TrustAndCompanyServices)
         ))
       )
 

@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package utils
+package services.flowmanagement.flowrouters
 
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.http.HeaderCarrier
+import org.scalatestplus.play.PlaySpec
+import services.flowmanagement.flowrouters.VariationRemoveServiceRouter
 
-import scala.concurrent.ExecutionContext
-
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks {
-  implicit val mockAuthContext = mock[AuthContext]
-  implicit val headerCarrier = HeaderCarrier()
+class VariationRemoveServiceRouterSpec extends PlaySpec {
+  trait Fixture {
+    val router = new VariationRemoveServiceRouter
+  }
 }

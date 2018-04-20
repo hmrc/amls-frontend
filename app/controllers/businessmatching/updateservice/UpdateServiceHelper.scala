@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice.add
+package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{AccountancyServices, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
-import services.TradingPremisesService
+import services.{ResponsiblePeopleService, TradingPremisesService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
@@ -37,11 +37,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class UpdateServicesSummaryControllerHelper @Inject()(
-                                                       val authConnector: AuthConnector,
-                                                       implicit val dataCacheConnector: DataCacheConnector,
-                                                       val tradingPremisesService: TradingPremisesService
-                                                     ) extends RepeatingSection {
+class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
+                                    implicit val dataCacheConnector: DataCacheConnector,
+                                    val tradingPremisesService: TradingPremisesService,
+                                    val responsiblePeopleService: ResponsiblePeopleService
+                                   ) extends RepeatingSection {
 
   def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
     dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
@@ -101,4 +101,18 @@ class UpdateServicesSummaryControllerHelper @Inject()(
       val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
       bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
     }
+
+  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePeople]] = {
+    val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
+
+    OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+      case Some(people) if model.activity.contains(TrustAndCompanyServices) =>
+        responsiblePeopleService.updateFitAndProperFlag(people, indices)
+      case Some(people) => people
+    })
+  }
+
+  def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddServiceFlowModel] =
+    OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
+
 }

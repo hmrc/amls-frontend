@@ -14,33 +14,29 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice
+package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
-import controllers.businessmatching.updateservice.add.WhichFitAndProperController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.{BusinessActivities, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
-import models.responsiblepeople.ResponsiblePeople
+import models.businessmatching._
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
+import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
+import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
+import services.ResponsiblePeopleService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
 
 class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator with BusinessMatchingGenerator {
 
@@ -48,25 +44,49 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-    implicit val ec: ExecutionContext = mockExecutionContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockRPService = mock[ResponsiblePeopleService]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[BusinessMatchingService].to(mockBusinessMatchingService))
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[StatusService].to(mockStatusService))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .build()
+    val controller = new WhichFitAndProperController(
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      businessMatchingService = mockBusinessMatchingService,
+      responsiblePeopleService = mockRPService,
+      helper = mockUpdateServiceHelper,
+      router = createRouter[AddServiceFlowModel]
+    )
 
-    val controller = app.injector.instanceOf[WhichFitAndProperController]
+    val responsiblePeople: List[ResponsiblePeople] = (responsiblePeopleGen(2).sample.get :+
+      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
+      responsiblePeopleGen(2).sample.get
 
-    when {
-      controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(false)
+    var peopleMixedWithInactive = Seq(
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1"))),
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "2")), status = Some(StatusConstants.Deleted)), // Deleted
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "3")), None) // isComplete = false
+    )
+
+    mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+      AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(false),
+        tradingPremisesActivities = None,
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = None,
+        hasChanged = true,
+        hasAccepted = false))
+
+    mockCacheFetch[AddServiceFlowModel](
+      Some(AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+        areNewActivitiesAtTradingPremises = Some(false),
+        tradingPremisesActivities = None,
+        addMoreActivities = None,
+        fitAndProper = Some(true),
+        responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+        hasChanged = true,
+        hasAccepted = false)),Some(AddServiceFlowModel.key))
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -74,150 +94,103 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
       activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
     ))
 
-    val responsiblePeople = (responsiblePeopleGen(2).sample.get :+
-      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++ responsiblePeopleGen(2).sample.get
-
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
-    mockCacheSave[Seq[ResponsiblePeople]]
+    when {
+      mockRPService.getAll(any(), any(), any())
+    } thenReturn Future.successful(responsiblePeople)
   }
 
-  "WhichFitAndProperController" when {
+  "When the WhichFitAndProperController get is called it" must {
 
-    "get is called" must {
-      "return OK with which_fit_and_proper view" in new Fixture {
+    "return OK with which_fit_and_proper view" in new Fixture {
+
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+      Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.whichfitandproper.title"))
+
+    }
+  }
+
+  "When the WhichFitAndProperController post is called it" must {
+
+    "redirect to the Trading Premises page" when {
+
+      "a valid call is made and not editing" in new Fixture {
+
+        val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+
+        status(result) must be(SEE_OTHER)
+        controller.router.verify(WhichFitAndProperPageId,
+          AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+            areNewActivitiesAtTradingPremises = Some(false),
+            tradingPremisesActivities = None,
+            addMoreActivities = None,
+            fitAndProper = Some(true),
+            responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+            hasChanged = true,
+            hasAccepted = false), false)
+
+      }
+    }
+
+    "a valid call is made and editing" in new Fixture {
+
+      val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
+      status(result) must be(SEE_OTHER)
+      controller.router.verify(WhichFitAndProperPageId,
+        AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+          areNewActivitiesAtTradingPremises = Some(false),
+          tradingPremisesActivities = None,
+          addMoreActivities = None,
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
+          hasChanged = true,
+          hasAccepted = false), true)
+
+    }
+
+
+    "return a BAD_REQUEST" when {
+
+      "an invalid request is made" in new Fixture {
+
+        val result = controller.post()(request)
+
+        status(result) must be(BAD_REQUEST)
+
+      }
+    }
+  }
+
+  "Inactive people" must {
+    "be hidden from the selection list" when {
+      "showing the page on a GET request" in new Fixture {
+        when {
+          mockRPService.getAll(any(), any(), any())
+        } thenReturn Future.successful(peopleMixedWithInactive)
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.whichfitandproper.title"))
 
+        contentAsString(result) must include("Person 1")
+        contentAsString(result) must not include "Person 2"
+        contentAsString(result) must not include "Person 3"
       }
 
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
+      "showing the page having POSTed with validation errors" in new Fixture {
+        when {
+          mockRPService.getAll(any(), any(), any())
+        } thenReturn Future.successful(peopleMixedWithInactive)
 
-          when {
-            controller.statusService.isPreSubmission(any(), any(), any())
-          } thenReturn Future.successful(true)
+        val result = controller.post()(request)
 
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
+        status(result) must be(BAD_REQUEST)
 
-        }
-        "without msb or tcsp" in new Fixture {
-
-          when {
-            controller.businessMatchingService.getModel(any(), any(), any())
-          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          ))
-
-          val result = controller.get()(request)
-          status(result) must be(NOT_FOUND)
-
-        }
-      }
-    }
-
-    "post is called" must {
-
-      "on valid request" must {
-
-        "redirect to NewServiceInformationController" in new Fixture {
-
-          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(add.routes.NewServiceInformationController.get().url))
-
-        }
-
-      }
-
-      "on invalid request" must {
-
-        "return BAD_REQUEST" in new Fixture {
-
-          val result = controller.post()(request)
-
-          status(result) must be(BAD_REQUEST)
-
-        }
-
-      }
-
-      "return NOT_FOUND" when {
-        "pre-submission" in new Fixture {
-
-          when {
-            controller.statusService.isPreSubmission(any(), any(), any())
-          } thenReturn Future.successful(true)
-
-          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-          status(result) must be(NOT_FOUND)
-
-        }
-        "without msb or tcsp" in new Fixture {
-
-          when {
-            controller.businessMatchingService.getModel(any(), any(), any())
-          } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          ))
-
-          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-          status(result) must be(NOT_FOUND)
-
-        }
-      }
-
-    }
-
-  }
-
-  it must {
-    "save fit and proper as true to responsible people to those matched by index" which {
-      "will save fit and proper as false to responsible people to those not matched by index" when {
-        "a single selection is made" in new Fixture {
-
-          val result = controller.post()(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
-
-          status(result) must be(SEE_OTHER)
-
-          verify(
-            controller.dataCacheConnector
-          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-            responsiblePeople.head,
-            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3),
-            responsiblePeople.last
-          )))(any(), any(), any())
-
-        }
-        "multiple selections are made" in new Fixture {
-
-          val result = controller.post()(request.withFormUrlEncodedBody(
-            "responsiblePeople[]" -> "0",
-            "responsiblePeople[]" -> "3",
-            "responsiblePeople[]" -> "4"
-          ))
-
-          status(result) must be(SEE_OTHER)
-
-          verify(
-            controller.dataCacheConnector
-          ).save[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key), eqTo(Seq(
-            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople(1),
-            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
-          )))(any(), any(), any())
-
-        }
+        contentAsString(result) must include("Person 1")
+        contentAsString(result) must not include "Person 2"
+        contentAsString(result) must not include "Person 3"
       }
     }
   }
-
 }

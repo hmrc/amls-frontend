@@ -21,6 +21,8 @@ sealed trait PageId
 // Add service flow
 case object ChangeServicesPageId extends PageId
 case object SelectActivitiesPageId extends PageId
+case object FitAndProperPageId extends PageId
+case object WhichFitAndProperPageId extends PageId
 case object TradingPremisesPageId extends PageId
 case object WhichTradingPremisesPageId extends PageId
 case object UpdateServiceSummaryPageId extends PageId

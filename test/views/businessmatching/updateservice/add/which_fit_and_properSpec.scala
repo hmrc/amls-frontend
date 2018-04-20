@@ -17,28 +17,31 @@
 package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
+import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
+import models.responsiblepeople.ResponsiblePeople
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class fit_and_properSpec extends GenericTestHelper with MustMatchers {
+class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator{
 
+  val rp = responsiblePersonGen.sample.get
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = fit_and_proper(EmptyForm, true)
+    def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
   }
 
-  "The fit_and_proper view" must {
+  "The which_fit_and_proper view" must {
 
       "have the correct title" in new ViewFixture {
-        doc.title must startWith(Messages("businessmatching.updateservice.fitandproper.title") + " - " + Messages("summary.updateservice"))
+        doc.title must startWith(Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"))
       }
 
       "have correct heading" in new ViewFixture {
-        heading.html must be(Messages("businessmatching.updateservice.fitandproper.heading"))
+        heading.html must be(Messages("businessmatching.updateservice.whichfitandproper.heading"))
       }
 
       "have correct subHeading" in new ViewFixture {
@@ -51,13 +54,13 @@ class fit_and_properSpec extends GenericTestHelper with MustMatchers {
 
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq((Path \ "passedFitAndProper") -> Seq(ValidationError("not a message Key"))))
+        Seq((Path \ "responsiblePeople") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = fit_and_proper(form2, true)
+      override def view = which_fit_and_proper(form2, false, Seq((rp, 0)))
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("passedFitAndProper")
+      doc.getElementById("responsiblePeople")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
   }

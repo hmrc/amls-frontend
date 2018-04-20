@@ -79,7 +79,7 @@ class BusinessMatchingService @Inject()(
     for {
       model <- getModel
       activities <- OptionT.fromOption[Future](model.activities)
-    } yield BusinessActivities.allWithoutMsbTcsp diff activities.businessActivities
+    } yield BusinessActivities.allWithoutMsb diff activities.businessActivities
 
   def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
     fetchActivitySet map { case (current, existing) =>

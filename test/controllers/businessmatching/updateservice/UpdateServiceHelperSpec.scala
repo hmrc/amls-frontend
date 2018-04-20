@@ -14,31 +14,43 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice.add
+package controllers.businessmatching.updateservice
 
+import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.flowmanagement.AddServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, never}
+import org.mockito.Mockito.{never, verify, when}
+import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.test.Helpers._
-import services.TradingPremisesService
+import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
-class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with MustMatchers with BusinessActivitiesGenerator with FutureAssertions {
+//noinspection ScalaStyle
+class UpdateServiceHelperSpec extends GenericTestHelper
+  with MustMatchers
+  with BusinessActivitiesGenerator
+  with ResponsiblePersonGenerator
+  with FutureAssertions {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
+    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val responsiblePeopleService = mock[ResponsiblePeopleService]
 
-    val helper = new UpdateServicesSummaryControllerHelper(
+    val helper = new UpdateServiceHelper(
       self.authConnector,
       mockCacheConnector,
-      tradingPremisesService
+      tradingPremisesService,
+      responsiblePeopleService
     )
 
     val businessActivitiesSection = BusinessActivities(
@@ -128,6 +140,56 @@ class UpdateServicesSummaryControllerHelperSpec extends GenericTestHelper with M
       helper.updateSupervision.returnsSome(supervisionModel)
 
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
+    }
+  }
+
+  "updateResponsiblePeople" must {
+    "set the fit and proper flag on the right people according to the indices" when {
+      "adding the TCSP business type" in new Fixture {
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
+
+        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+        mockCacheUpdate(Some(ResponsiblePeople.key), people)
+
+        val model = AddServiceFlowModel(
+          Some(TrustAndCompanyServices),
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+        )
+
+        when {
+          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+        } thenReturn updatedPeople
+
+        helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
+      }
+    }
+
+    "not touch the responsible people" when {
+      "adding a business type that isn't TCSP" in new Fixture {
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
+
+        mockCacheUpdate(Some(ResponsiblePeople.key), people)
+
+        val model = AddServiceFlowModel(Some(HighValueDealing))
+
+        helper.updateResponsiblePeople(model).returnsSome(people)
+
+        verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any())
+      }
+    }
+  }
+
+  "clearFlowModel" must {
+    "set an empty model back into the cache" in new Fixture {
+      mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
+
+      helper.clearFlowModel().returnsSome(AddServiceFlowModel())
     }
   }
 }

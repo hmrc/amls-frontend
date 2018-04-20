@@ -20,11 +20,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -39,6 +41,8 @@ class TradingPremisesController @Inject()(
                                            val authConnector: AuthConnector,
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService,
+                                           val helper: UpdateServiceHelper,
                                            val router: Router[AddServiceFlowModel]
                                          ) extends BaseController {
 

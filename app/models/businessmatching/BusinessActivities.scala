@@ -18,6 +18,7 @@ package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, _}
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.{DateOfChange, FormTypes}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
@@ -122,9 +123,13 @@ object BusinessActivities {
     TelephonePaymentService
   )
 
-  // TODO: This can potentially be removed once the new 'MSB/TCSP' add service flow goes in
+  // TODO: These can potentially be removed once the new 'MSB/TCSP' add service flow goes in
   lazy val allWithoutMsbTcsp = all filterNot {
     case MoneyServiceBusiness | TrustAndCompanyServices => true
+    case _ => false
+  }
+  lazy val allWithoutMsb = all filterNot {
+    case MoneyServiceBusiness => true
     case _ => false
   }
 

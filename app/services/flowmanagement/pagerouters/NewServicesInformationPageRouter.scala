@@ -14,26 +14,29 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.routings
+package services.flowmanagement.pagerouters
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import javax.inject.Inject
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
-import models.flowmanagement.PageId
+import javax.inject.{Inject, Singleton}
+import models.flowmanagement.AddServiceFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import services.flowmanagement.Router
+import services.StatusService
+import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeServicesRouter @Inject() extends Router[ChangeServices] {
-  override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
-    case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-    case ChangeServicesRemove => ???
+@Singleton
+class NewServicesInformationPageRouter @Inject()(val statusService: StatusService,
+                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+
+  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+
+    Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
 }
 

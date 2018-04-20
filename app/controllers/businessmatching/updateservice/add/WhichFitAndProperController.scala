@@ -20,84 +20,68 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices}
-import models.responsiblepeople.ResponsiblePeople
-import play.api.mvc.{Request, Result}
-import services.StatusService
+import models.flowmanagement._
+import services.ResponsiblePeopleService._
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import services.flowmanagement.Router
+import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class WhichFitAndProperController @Inject()(
                                              val authConnector: AuthConnector,
-                                             val statusService: StatusService,
                                              implicit val dataCacheConnector: DataCacheConnector,
-                                             val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
+                                             val statusService: StatusService,
+                                             val businessMatchingService: BusinessMatchingService,
+                                             val responsiblePeopleService: ResponsiblePeopleService,
+                                             val helper: UpdateServiceHelper,
+                                             val router: Router[AddServiceFlowModel]
+                                           ) extends BaseController with RepeatingSection {
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        filterRequest {
-          responsiblePeople map { rp =>
-            Ok(which_fit_and_proper(EmptyForm, rp))
-          }
-        }
+        (for {
+          rp <- OptionT.liftF(responsiblePeopleService.getAll)
+          flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+        } yield {
+          val indexedRp = rp.zipWithIndex.exceptInactive
+          val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
+          Ok(which_fit_and_proper(form, edit, indexedRp))
+        }) getOrElse InternalServerError("")
   }
 
-  def post() = Authorised.async {
-      implicit authContext =>
-        implicit request =>
-          filterRequest {
-            Form2[ResponsiblePeopleFitAndProper](request.body) match {
-              case ValidForm(_, data) => updateResponsiblePeople(data) map { _ =>
-                Redirect(routes.NewServiceInformationController.get())
+  //hasAlreadyPassedFitAndProper
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        Form2[ResponsiblePeopleFitAndProper](request.body) match {
+          case f: InvalidForm => responsiblePeopleService.getAll map { rp =>
+            BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
+          }
+          case ValidForm(_, data) => {
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => {
+               model.responsiblePeople(Some(data))
               }
-              case f: InvalidForm => responsiblePeople map { rp =>
-                BadRequest(which_fit_and_proper(f, rp))
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(WhichFitAndProperPageId, model, edit)
               }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }
-  }
-
-  private def filterRequest(fn: Future[Result])
-                           (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, request: Request[_]): Future[Result] =
-    (businessMatchingService.getModel flatMap { bm =>
-      OptionT.fromOption[Future](bm.activities)
-    } flatMap { ba =>
-      OptionT.liftF(statusService.isPreSubmission flatMap {
-        case false if ba.businessActivities.contains(MoneyServiceBusiness) | ba.businessActivities.contains(TrustAndCompanyServices) => fn
-        case _ => Future.successful(NotFound(notFoundView))
-      })
-    }) getOrElse InternalServerError("Cannot retrieve activities")
-
-  private def responsiblePeople(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[(ResponsiblePeople, Int)]] =
-    getData[ResponsiblePeople].map { responsiblePeople =>
-      responsiblePeople.zipWithIndex.filterNot { case (rp, _) =>
-        rp.status.contains(StatusConstants.Deleted) | !rp.isComplete
-      }
-    }
-
-  private def updateResponsiblePeople(data: ResponsiblePeopleFitAndProper)
-                                   (implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    updateDataStrict[ResponsiblePeople] { responsiblePeople: Seq[ResponsiblePeople] =>
-      responsiblePeople.zipWithIndex.map { case (rp, index) =>
-        val updated = if (data.index contains index) {
-          rp.hasAlreadyPassedFitAndProper(Some(true))
-        } else {
-          rp.hasAlreadyPassedFitAndProper(Some(false))
+          case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
         }
-        updated.copy(hasAccepted = updated.hasChanged)
-      }
-    }
-
+  }
 }
+
