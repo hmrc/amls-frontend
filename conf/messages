@@ -1170,6 +1170,14 @@ businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 #add route
+businessmatching.updateservice.msb.services.title = Which services does your business provide?
+businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.list.heading = Select all that apply
+businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
+businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
+businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time

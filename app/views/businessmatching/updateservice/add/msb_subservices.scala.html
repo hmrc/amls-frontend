@@ -22,21 +22,21 @@
 
 @header = {
     @errorSummary(f)
-    @heading("msb.services.title", "summary.businessmatching")
+    @heading("businessmatching.updateservice.msb.services.title", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("msb.services.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 
     <p>@Messages("lbl.select.all")</p>
 
-    @form(f, controllers.businessmatching.routes.ServicesController.post(edit)) {
+    @form(f, controllers.businessmatching.updateservice.add.routes.SubServicesController.post(edit)) {
 
       @fieldset(
         f = f("msbServices-fieldset"),
-        legend = "msb.services.title",
+        legend = "businessmatching.updateservice.msb.services.title",
         legendHidden = true,
         panel = false
       ) {
@@ -47,22 +47,22 @@
 
               @checkbox(
                 f = f("msbServices[]"),
-                labelText = "msb.services.list.lbl.01",
+                labelText = "businessmatching.updateservice.msb.services.list.lbl.01",
                 value = "01"
               )
               @checkbox(
                 f = f("msbServices[]"),
-                labelText = "msb.services.list.lbl.02",
+                labelText = "businessmatching.updateservice.msb.services.list.lbl.02",
                 value = "02"
               )
               @checkbox(
                 f = f("msbServices[]"),
-                labelText = "msb.services.list.lbl.03",
+                labelText = "businessmatching.updateservice.msb.services.list.lbl.03",
                 value = "03"
               )
               @checkbox(
                 f = f("msbServices[]"),
-                labelText = "msb.services.list.lbl.04",
+                labelText = "businessmatching.updateservice.msb.services.list.lbl.04",
                 value = "04"
               )
             }
