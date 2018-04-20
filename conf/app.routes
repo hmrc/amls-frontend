@@ -340,6 +340,9 @@ POST        /update-service/update-any-information                              
 GET         /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.get()
 POST        /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.post()
 
+GET         /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.get(edit: Boolean ?= false)
+POST        /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.post(edit: Boolean ?= false)
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()

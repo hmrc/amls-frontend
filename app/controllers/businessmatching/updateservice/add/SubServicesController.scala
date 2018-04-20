@@ -16,29 +16,23 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.ServicesController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.Play
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import play.api.mvc.Result
-import services.StatusService
-import services.flowmanagement.Router
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 @Singleton
@@ -61,12 +55,11 @@ class SubServicesController @Inject()(
               services <- bm.msbServices
             } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-            Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
+            Ok(views.html.businessmatching.updateservice.add.msb_subservices(form, edit, maybeBM.fold(false)(_.preAppComplete)))
         }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request => ???
 //        Form2[MsbServices](request.body) match {

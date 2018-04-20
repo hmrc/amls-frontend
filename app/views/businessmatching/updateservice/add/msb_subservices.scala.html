@@ -1,0 +1,74 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("msb.services.title", "summary.businessmatching")
+}
+
+@main(
+    title = Messages("msb.services.title") + " - " + Messages("summary.businessmatching"),
+    heading = header
+) {
+
+    <p>@Messages("lbl.select.all")</p>
+
+    @form(f, controllers.businessmatching.routes.ServicesController.post(edit)) {
+
+      @fieldset(
+        f = f("msbServices-fieldset"),
+        legend = "msb.services.title",
+        legendHidden = true,
+        panel = false
+      ) {
+
+          @errorGroup(
+                field = f("msbServices")
+            ) {
+
+              @checkbox(
+                f = f("msbServices[]"),
+                labelText = "msb.services.list.lbl.01",
+                value = "01"
+              )
+              @checkbox(
+                f = f("msbServices[]"),
+                labelText = "msb.services.list.lbl.02",
+                value = "02"
+              )
+              @checkbox(
+                f = f("msbServices[]"),
+                labelText = "msb.services.list.lbl.03",
+                value = "03"
+              )
+              @checkbox(
+                f = f("msbServices[]"),
+                labelText = "msb.services.list.lbl.04",
+                value = "04"
+              )
+            }
+      }
+
+      @submit(edit, returnLink = showReturnLink)
+
+    }
+}
