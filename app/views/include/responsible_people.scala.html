@@ -20,7 +20,7 @@
 
 @(f: forms.Form2[_], responsiblepeople: Seq[(ResponsiblePeople, Int)], legend: String, call: Call, placeholder: Option[String] = None)(implicit lang:Lang, m:Messages, request: Request[_])
 
-<p>@Messages("lbl.select.all")</p>
+<p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
 
 <div class="form-group">
 
@@ -52,6 +52,7 @@
                 wide = false
             ) {
                 <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line1")</p>
+                <p>@Messages("businessmatching.updateservice.whichfitandproper.text.info.line2")</p>
             }
         }
 

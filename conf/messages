@@ -1198,9 +1198,10 @@ businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform 
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
 businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
-businessmatching.updateservice.whichfitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
+businessmatching.updateservice.whichfitandproper.hint = Select all the responsible people that have passed the HMRC fit and proper test, you will be charged a fee for each person that has not.
 businessmatching.updateservice.whichfitandproper.text.info = The fit and proper test
-businessmatching.updateservice.whichfitandproper.text.info.line1 = Select all the responsible people that have passed the HMRC fit and proper test, you will be charged a fee for each person that has not.
+businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
+businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
 businessmatching.updateservice.newserviceinformation.title = We need to ask you some more questions because of the changes you’ve made
 businessmatching.updateservice.newserviceinformation.heading = We need to ask you some more questions because of the changes you’ve made
