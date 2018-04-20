@@ -38,8 +38,8 @@ class msb_subservicesSpec extends GenericTestHelper with MustMatchers  {
 
             def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = true)
 
-            doc.title must startWith(Messages("msb.services.title") + " - " + Messages("summary.businessmatching"))
-            heading.html must be(Messages("msb.services.title"))
+            doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.businessmatching"))
+            heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
             subHeading.html must include(Messages("summary.businessmatching"))
 
         }
