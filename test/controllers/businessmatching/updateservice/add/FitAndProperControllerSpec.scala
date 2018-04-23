@@ -57,11 +57,11 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     "get is called" must {
       "return OK with fit_and_proper view" in new Fixture {
         val result = controller.get()(request)
+
         status(result) must be(OK)
 
         contentAsString(result) must include(
-          Messages(
-            "businessmatching.updateservice.fitandproper.heading")
+          Messages("businessmatching.updateservice.fitandproper.heading")
         )
       }
     }

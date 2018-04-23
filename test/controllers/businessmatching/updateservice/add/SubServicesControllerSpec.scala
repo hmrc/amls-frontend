@@ -21,12 +21,14 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
+import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
@@ -44,7 +46,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
-    val controller = new FitAndProperController(
+    val controller = new SubServicesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
@@ -53,9 +55,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       router = createRouter[AddServiceFlowModel]
     )
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
-
-    //mockCacheMap = mock[CacheMap]
+    mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
@@ -64,77 +64,62 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     } thenReturn Future.successful(Some(mockCacheMap))
 
     when {
+      controller.businessMatchingService.getModel(any(), any(), any())
+    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+      activities = Some(BusinessActivities(Set(AccountancyServices)))
+    ))
+
+    when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
 
-    def setupModel(model: Option[BusinessMatching]) = when {
-      controller.businessMatchingService.getModel(any(), any(), any())
-    } thenReturn (model match {
-      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
-      case _ => OptionT.none[Future, BusinessMatching]
-    })
+//    def setupModel(model: Option[BusinessMatching]) = when {
+//      controller.businessMatchingService.getModel(any(), any(), any())
+//    } thenReturn (model match {
+//      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
+//      case _ => OptionT.none[Future, BusinessMatching]
+//    })
   }
 
 
   "SubServicesController" when {
 
-//    "get is called" must {
-//      "return OK with 'msb_subservices' view" in new Fixture {
-//        val result = controller.get()(request)
-//        status(result) must be(OK)
-//
-//        contentAsString(result) must include(
-//          Messages(
-//            "businessmatching.updateservice.subservices.heading")
-//        )
-//      }
-//    }
+    "get is called" must {
+      "return OK with 'msb_subservices' view" in new Fixture {
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        contentAsString(result) must include(
+          Messages("businessmatching.updateservice.msb.services.heading")
+        )
+      }
+    }
 
     "post is called" must {
 
-//      "with a valid request" must {
-//        "redirect" when {
-//          "request equals Transmitting Money" in new Fixture {
-//
-//            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
-//
-//            val result = controller.post()(request.withFormUrlEncodedBody(
-//              "passedFitAndProper" -> "true"
-//            ))
-//
-//            status(result) mustBe SEE_OTHER
-//
-//            controller.router.verify(SubServicesPageId,
-//              AddServiceFlowModel(fitAndProper = Some(true), hasChanged = true))
-//          }
-//        }
+      "return a bad request when no data has been posted" in new Fixture {
 
-//        "when request equals No" when {
-//          "progress to the 'new service information' page" when {
-//            "an activity that generates a section has been chosen" in new Fixture {
-//              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(TrustAndCompanyServices)))
-//
-//              val result = controller.post()(request.withFormUrlEncodedBody(
-//                "msbServices-01" -> "false"
-//              ))
-//
-//              status(result) mustBe SEE_OTHER
-//
-//              controller.router.verify(SubServicesPageId,
-//                AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
-//            }
-//          }
-//        }
+        val result = controller.post()(request.withFormUrlEncodedBody())
+
+        status(result) mustBe BAD_REQUEST
       }
 
-//      "on invalid request" must {
-//        "return badRequest" in new Fixture {
-//          val result = controller.post()(request)
-//
-//          status(result) mustBe BAD_REQUEST
-//        }
-//      }
-//    }
+      "return the next page in the flow when valid data has been posted" in new Fixture {
+        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
+        mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(MoneyServiceBusiness)), Some(AddServiceFlowModel.key))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "msbServices[]" -> "01"
+        ))
+
+        status(result) mustBe SEE_OTHER
+        controller.router.verify(BusinessAppliedForPSRNumberPageId,
+          AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123245")),
+            msbServices = Some(MsbServices(Set(TransmittingMoney))),
+            hasChanged = true))
+      }
+    }
 
   }
 

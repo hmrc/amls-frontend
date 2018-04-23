@@ -29,7 +29,8 @@ case class AddServiceFlowModel(
                                 responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
                                 hasChanged: Boolean = false,
                                 hasAccepted: Boolean = false,
-                                businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None
+                                businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                msbServices: Option[MsbServices] = None
                               ) {
   def activity(p: BusinessActivity): AddServiceFlowModel =
     this.copy(activity = Some(p),
@@ -57,11 +58,12 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
 
   def isComplete: Boolean = this match {
-
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _) => true
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _) => true
+    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _) => true
+    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _) => true
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _) => true
 
 
     case _ => false
