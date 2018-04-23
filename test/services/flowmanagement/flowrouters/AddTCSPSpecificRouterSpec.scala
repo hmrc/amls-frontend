@@ -95,11 +95,54 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
         }
       }
     }
+
+    "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
+      "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
+        "TCSP is the Business Activity" when {
+          "the answer is yes" in new Fixture {
+            val model = AddServiceFlowModel(
+              activity = Some(TrustAndCompanyServices),
+              areNewActivitiesAtTradingPremises = Some(true))
+
+            val result = await(router.getRoute(TradingPremisesPageId, model))
+
+            result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(false))
+          }
+        }
+      }
+    }
+
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'Which Trading Premises' page (TradingPremisesPageId)" when {
+        "TCSP is the Business Activity" when {
+          "the answer is no" in new Fixture {
+            val model = AddServiceFlowModel(
+              activity = Some(TrustAndCompanyServices),
+              areNewActivitiesAtTradingPremises = Some(false))
+
+            val result = await(router.getRoute(TradingPremisesPageId, model))
+
+            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          }
+        }
+      }
+    }
+
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
+        "TCSP is the Business Activity" in new Fixture {
+          val result = await(router.getRoute(WhichTradingPremisesPageId, model))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
   }
 
-  "When Editing in the Add TCSP Add flow the getRoute method" must {
-    //Edit mode TSCP sub-flow
-    //edit fit and proper
+
+  "When Editing in the TCSP Add flow, the getRoute method" must {
+
+    //edit fit and proper true
     "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
         "and the answer is yes" in new Fixture {
@@ -113,6 +156,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
       }
     }
 
+    //edit fit and proper false
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
         " and the answer is no " in new Fixture {
@@ -125,6 +169,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
         }
       }
     }
+
     //edit which fit and proper
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
@@ -134,6 +179,49 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
             fitAndProper = Some(true),
             responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+    //edit Trading Premises true
+    "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
+      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+        "and the answer is yes" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            areNewActivitiesAtTradingPremises = Some(true))
+          val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.WhichTradingPremisesController.get(true))
+        }
+      }
+    }
+
+    //edit Trading Premises false
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+        " and the answer is no " in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            areNewActivitiesAtTradingPremises = Some(false))
+          val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+    //edit which Trading Premises
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "editing the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
+        "responsible people have been selected" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(TrustAndCompanyServices),
+            areNewActivitiesAtTradingPremises = Some(true),
+            tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
+          val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
         }
