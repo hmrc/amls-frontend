@@ -110,7 +110,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
 
     case WhichTradingPremisesPageId =>
-      (model.msbServices.isDefined, model.msbServices.get.si edit)
+//      (model.msbServices.isDefined, model.msbServices.get.si edit)
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
 //update service page
