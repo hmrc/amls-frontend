@@ -191,6 +191,19 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 
   "When Editing in the MSB Add flow, the getRoute method" must {
 
+//    Edit Subservices
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness))
+          val result = await(router.getRoute(SubServicesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
 //edit Business Applied For PSR Number true
     "return the 'fit-and-proper' page (FitAndProperController)" when {
       "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {

@@ -52,9 +52,12 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
     }
 
-// Money Service Business
+    // Money Service Business
     case SubServicesPageId =>
-      Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+      edit match {
+        case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case false => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+      }
 
 
 //psr number pages
