@@ -16,7 +16,6 @@
 
 package services.flowmanagement.flowrouters
 
-import controllers.businessmatching.BusinessAppliedForPSRNumberController
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
@@ -193,15 +192,15 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
   "When Editing in the MSB Add flow, the getRoute method" must {
 
 //edit Business Applied For PSR Number true
-    "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
+    "return the 'fit-and-proper' page (FitAndProperController)" when {
       "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {
-        "and the answer is yes" in new Fixture {
+        "the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.WhichFitAndProperController.get(true))
+          result mustBe Redirect(addRoutes.FitAndProperController.get(true))
         }
       }
     }
@@ -209,7 +208,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //edit Business Applied For PSR Number false
     "return the 'no-psr' page (NoPsrController)" when {
       "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
-        "and the answer is yes" in new Fixture {
+        "the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
@@ -223,7 +222,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //edit fit and proper true
     "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-        "and the answer is yes" in new Fixture {
+        "the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             fitAndProper = Some(true))
@@ -237,7 +236,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //edit fit and proper false
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-        " and the answer is no " in new Fixture {
+        "the answer is no " in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             fitAndProper = Some(false))
