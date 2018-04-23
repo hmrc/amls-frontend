@@ -56,9 +56,14 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case SubServicesPageId =>
       edit match {
         case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        case false => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+        case false => {
+          if(model.msbServices.isDefined && model.msbServices.contains(TransmittingMoney)) {
+            Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+          } else {
+            Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+          }
+        }
       }
-
 
 //psr number pages
     case BusinessAppliedForPSRNumberPageId => {
@@ -105,6 +110,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
 
     case WhichTradingPremisesPageId =>
+      (model.msbServices.isDefined, model.msbServices.get.si edit)
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
 //update service page
