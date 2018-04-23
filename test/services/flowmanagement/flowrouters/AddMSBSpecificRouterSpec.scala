@@ -51,15 +51,28 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
-
     "return the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity" in new Fixture {
+        "MSB is the Business Activity and subservices contains TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
-            activity = Some(MoneyServiceBusiness))
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(TransmittingMoney))))
           val result = await(router.getRoute(SubServicesPageId, model))
 
           result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(false))
+        }
+      }
+    }
+
+    "return the 'fit_and_proper' page (FitAndProperController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+          val result = await(router.getRoute(SubServicesPageId, model))
+
+          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
       }
     }
@@ -194,12 +207,40 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //    Edit Subservices
     "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
-        "MSB is the Business Activity" in new Fixture {
+        "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
-            activity = Some(MoneyServiceBusiness))
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber is defined" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
+          val result = await(router.getRoute(SubServicesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+    "return the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberController)" when {
+      "the user is on the 'msb_subservice' page (SubServicePageId)" when {
+        "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
+          val result = await(router.getRoute(SubServicesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
         }
       }
     }
