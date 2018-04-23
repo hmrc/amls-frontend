@@ -16,18 +16,16 @@
 
 package services.businessmatching
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import javax.inject.Inject
 import models.ViewResponse
 import models.asp.Asp
 import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tcsp.Tcsp
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -79,7 +77,7 @@ class BusinessMatchingService @Inject()(
     for {
       model <- getModel
       activities <- OptionT.fromOption[Future](model.activities)
-    } yield BusinessActivities.allWithoutMsb diff activities.businessActivities
+    } yield BusinessActivities.all diff activities.businessActivities
 
   def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
     fetchActivitySet map { case (current, existing) =>

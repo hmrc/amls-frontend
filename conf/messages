@@ -1170,6 +1170,18 @@ businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 #add route
+businessmatching.updateservice.msb.services.title = Which services does your business provide?
+businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.list.heading = Select all that apply
+businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
+businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
+businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.updateservice.psr.number.lbl = PSR registration number
+businessmatching.updateservice.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
+
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
@@ -1198,7 +1210,7 @@ businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform 
 
 businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
 businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
-businessmatching.updateservice.whichfitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
+businessmatching.updateservice.whichfitandproper.hint = Select all the responsible people that have passed the HMRC fit and proper test, you will be charged a fee for each person that has not.
 businessmatching.updateservice.whichfitandproper.text.info = The fit and proper test
 businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.

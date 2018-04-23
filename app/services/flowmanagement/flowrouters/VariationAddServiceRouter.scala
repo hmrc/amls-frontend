@@ -47,9 +47,24 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     case SelectActivitiesPageId => {
       model.activity match {
         case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
-        //case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubServicesController.get()))
         case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
+    }
+
+// Money Service Business
+    case SubServicesPageId =>
+      Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get()))
+
+    case BusinessAppliedForPSRNumberPageId => {
+      model.businessAppliedForPSRNumber match {
+        case Some(BusinessAppliedForPSRNumberYes(_)) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+        case Some(BusinessAppliedForPSRNumberNo) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+      }
+    }
+
+    case NoPSRPageId => {
+      Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
     }
 
 //fit and proper pages

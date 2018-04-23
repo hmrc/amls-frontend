@@ -28,7 +28,8 @@ case class AddServiceFlowModel(
                                 fitAndProper: Option[Boolean] = None,
                                 responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
                                 hasChanged: Boolean = false,
-                                hasAccepted: Boolean = false
+                                hasAccepted: Boolean = false,
+                                businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None
                               ) {
   def activity(p: BusinessActivity): AddServiceFlowModel =
     this.copy(activity = Some(p),
@@ -57,10 +58,10 @@ case class AddServiceFlowModel(
 
   def isComplete: Boolean = this match {
 
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true) => true
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _) => true
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _) => true
 
 
     case _ => false
