@@ -69,7 +69,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
     }
 
     case NoPSRPageId => {
-      Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
     }
 
 //fit and proper pages
@@ -105,7 +105,14 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
 
     case WhichTradingPremisesPageId =>
+      (model.msbServices.isDefined, model.msbServices.get.msbServices.size > 1) match {
+        case (true, true) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+        case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      }
+
+    case WhatDoYouDoHerePageId => {
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+    }
 
 //update service page
     case UpdateServiceSummaryPageId =>

@@ -105,14 +105,12 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
-    "return the 'FitAndProper' page (FitAndProperController)" when {
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "the user is on the 'no_psr' page (NoPSRPageId)" when {
         "MSB is the Business Activity" in new Fixture {
-          val model = AddServiceFlowModel(
-            activity = Some(MoneyServiceBusiness))
           val result = await(router.getRoute(NoPSRPageId, model))
 
-          result mustBe Redirect(addRoutes.FitAndProperController.get(false))
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
         }
       }
     }
@@ -176,10 +174,10 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
     "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
       "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
         "MSB is the Business Activity" when {
-          "the answer is no" in new Fixture {
+          " the user has selected more than 1 subservice" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(true))
+              msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
 
             val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
@@ -189,16 +187,15 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
-
     "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
+      "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
         "MSB is the Business Activity" when {
-          "the answer is no" in new Fixture {
+          " the user has selected 1 subservice" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(true))
+              msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))))
 
-            val result = await(router.getRoute(WhatDoYouDoHerePageId, model))
+            val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
             result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
           }
@@ -206,10 +203,11 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
+
     "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
+      "the user is on the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
         "MSB is the Business Activity" in new Fixture {
-          val result = await(router.getRoute(WhichTradingPremisesPageId, model))
+          val result = await(router.getRoute(WhatDoYouDoHerePageId, model))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
         }
@@ -364,14 +362,32 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //edit which Trading Premises
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
-        "responsible people have been selected" in new Fixture {
+        "there is 1 MSB subservice selected" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             areNewActivitiesAtTradingPremises = Some(true),
+            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))),
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
+
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        }
+      }
+    }
+
+    "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
+      "the user is editing the 'which trading premises' page (WhichTradingPremisesPageId)" when {
+        "the user has selected more than 1 subservice" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))),
+            tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
+
+          val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
+
         }
       }
     }
