@@ -173,15 +173,32 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
-      "the user is on the 'Which Trading Premises' page (TradingPremisesPageId)" when {
+    "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
+      "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
         "MSB is the Business Activity" when {
           "the answer is no" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(false))
+              areNewActivitiesAtTradingPremises = Some(true))
 
-            val result = await(router.getRoute(TradingPremisesPageId, model))
+            val result = await(router.getRoute(WhichTradingPremisesPageId, model))
+
+            result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get())
+          }
+        }
+      }
+    }
+
+
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
+        "MSB is the Business Activity" when {
+          "the answer is no" in new Fixture {
+            val model = AddServiceFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              areNewActivitiesAtTradingPremises = Some(true))
+
+            val result = await(router.getRoute(WhatDoYouDoHerePageId, model))
 
             result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
           }
