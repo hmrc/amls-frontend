@@ -171,6 +171,22 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
       }
     }
 
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+      "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
+        "MSB is the Business Activity" when {
+          "the answer is no" in new Fixture {
+            val model = AddServiceFlowModel(
+              activity = Some(MoneyServiceBusiness),
+              areNewActivitiesAtTradingPremises = Some(true))
+
+            val result = await(router.getRoute(TradingPremisesPageId, model))
+
+            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          }
+        }
+      }
+    }
+
     "return the 'What do you do here' page (WhatDoYouDoHereController)" when {
       "the user is on the 'which trading premises' page (WhichTradingPremisesPageId)" when {
         "MSB is the Business Activity" when {
@@ -261,15 +277,15 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
     }
 
 //edit Business Applied For PSR Number true
-    "return the 'fit-and-proper' page (FitAndProperController)" when {
+    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
       "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")))
           val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.FitAndProperController.get(true))
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get(true))
         }
       }
     }
@@ -333,7 +349,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 
 //edit Trading Premises true
     "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
-      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         "and the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
@@ -347,7 +363,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 
 //edit Trading Premises false
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         " and the answer is no " in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
@@ -389,6 +405,18 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
 
         }
+      }
+    }
+
+    "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
+      "editing the 'What do you do here' page (WhatDoYouDoHerePageId)" in new Fixture {
+        val model = AddServiceFlowModel(
+          activity = Some(MoneyServiceBusiness),
+          areNewActivitiesAtTradingPremises = Some(false))
+        val result = await(router.getRoute(WhatDoYouDoHerePageId, model, edit = true))
+
+        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+
       }
     }
   }
