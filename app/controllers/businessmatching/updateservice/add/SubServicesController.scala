@@ -16,16 +16,13 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
-import play.api.mvc.Result
+import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -65,23 +62,19 @@ class SubServicesController @Inject()(
         Form2[MsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit)))
-          case ValidForm(_, data) =>
 
-            lazy val updateModel = for {
-              bm <- businessMatchingService.getModel
-              cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
-                case true => bm.msbServices(data)
-                case false => bm.msbServices(data).clearPSRNumber
-              })
-             // _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
-            } yield cache
-
-            lazy val redirectResult = OptionT.some[Future, Result](data.msbServices.contains(TransmittingMoney) match {
-              case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
-              case false => Redirect(routes.UpdateServicesSummaryController.get())
-            })
-
-            updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
+          case ValidForm(_, data) => {
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => {
+                model.msbServices(data)
+              }
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(SubServicesPageId, model, edit)
+              }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+            }
+          }
         }
   }
 

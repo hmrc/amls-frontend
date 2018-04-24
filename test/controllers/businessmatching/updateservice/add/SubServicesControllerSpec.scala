@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -105,20 +105,19 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         status(result) mustBe BAD_REQUEST
       }
 
-//      "return the next page in the flow when valid data has been posted" in new Fixture {
-//        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
-//        mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(MoneyServiceBusiness)), Some(AddServiceFlowModel.key))
-//
-//        val result = controller.post()(request.withFormUrlEncodedBody(
-//          "msbServices[]" -> "01"
-//        ))
-//
-//        status(result) mustBe SEE_OTHER
-//        controller.router.verify(BusinessAppliedForPSRNumberPageId,
-//          AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123245")),
-//            msbServices = Some(MsbServices(Set(TransmittingMoney))),
-//            hasChanged = true))
-//      }
+      "return the next page in the flow when valid data has been posted" in new Fixture {
+        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(MoneyServiceBusiness)))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "msbServices[]" -> "01"
+        ))
+
+        status(result) mustBe SEE_OTHER
+        controller.router.verify(SubServicesPageId,
+          AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(TransmittingMoney))),
+            hasChanged = true))
+      }
     }
 
   }
