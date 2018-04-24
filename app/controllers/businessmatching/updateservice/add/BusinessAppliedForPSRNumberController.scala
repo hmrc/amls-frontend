@@ -17,21 +17,17 @@
 package controllers.businessmatching.updateservice.add
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching}
-import play.api.Play
-import services.businessmatching.BusinessMatchingService
-import views.html.businessmatching.business_applied_for_psr_number
-import cats.data.OptionT
-import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching._
+import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
 import services.StatusService
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.business_applied_for_psr_number
 
 import scala.concurrent.Future
 
@@ -61,7 +57,24 @@ class BusinessAppliedForPSRNumberController @Inject()(
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
+      implicit request =>
+        Form2[BusinessAppliedForPSRNumber](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
+
+          case ValidForm(_, data) => {
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => {
+                model
+              }
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
+              }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+            }
+          }
+        }
 //      {
 //        Form2[BusinessAppliedForPSRNumber](request.body) match {
 //          case f: InvalidForm =>

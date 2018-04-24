@@ -19,15 +19,18 @@ package controllers.businessmatching.updateservice.add
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.MsbServices
+import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+
+import scala.concurrent.Future
 
 @Singleton
 class WhatDoYouDoHereController @Inject()(
@@ -53,28 +56,26 @@ class WhatDoYouDoHereController @Inject()(
         }
   }
 
-  //hasAlreadyPassedFitAndProper
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
-//        Form2[ResponsiblePeopleFitAndProper](request.body) match {
-//          case f: InvalidForm => responsiblePeopleService.getAll map { rp =>
-//            BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
-//          }
-//          case ValidForm(_, data) => {
-//            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-//              case Some(model) => {
-//               model.responsiblePeople(Some(data))
-//              }
-//            } flatMap {
-//              case Some(model) => {
-//                router.getRoute(WhichFitAndProperPageId, model, edit)
-//              }
-//              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
-//            }
-//          }
-//          case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
-//        }
+      implicit request =>
+        Form2[ResponsiblePeopleFitAndProper](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.businessmatching.updateservice.add.what_do_you_do_here(f, edit)))
+
+          case ValidForm(_, data) => {
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => {
+                model
+              }
+            } flatMap {
+              case Some(model) => {
+                router.getRoute(WhatDoYouDoHerePageId, model, edit)
+              }
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+            }
+          }
+        }
   }
 }
 
