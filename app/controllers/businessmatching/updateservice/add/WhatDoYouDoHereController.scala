@@ -19,7 +19,9 @@ package controllers.businessmatching.updateservice.add
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
+import forms.{EmptyForm, Form2}
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.MsbServices
 import models.flowmanagement._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -40,15 +42,15 @@ class WhatDoYouDoHereController @Inject()(
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
-      implicit request => ???
-//        (for {
-//          rp <- OptionT.liftF(responsiblePeopleService.getAll)
-//          flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
-//        } yield {
-//          val indexedRp = rp.zipWithIndex.exceptInactive
-//          val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
-//          Ok(which_fit_and_proper(form, edit, indexedRp))
-//        }) getOrElse InternalServerError("")
+      implicit request =>
+        businessMatchingService.getModel.value map { maybeBM =>
+          val form = (for {
+            bm <- maybeBM
+            services <- bm.msbServices
+          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
+
+          Ok(views.html.businessmatching.updateservice.add.what_do_you_do_here(form, edit, maybeBM.fold(false)(_.preAppComplete)))
+        }
   }
 
   //hasAlreadyPassedFitAndProper

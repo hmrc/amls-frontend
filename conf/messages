@@ -1197,6 +1197,14 @@ businessmatching.updateservice.currenttradingpremises.heading = Will you still d
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
 
+businessmatching.updateservice.whatdoyoudohere.title = Which services does your business provide?
+businessmatching.updateservice.whatdoyoudohere.heading = Which services does your business provide?
+businessmatching.updateservice.whatdoyoudohere.list.heading = Select all that apply
+businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
+businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
+businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
 
