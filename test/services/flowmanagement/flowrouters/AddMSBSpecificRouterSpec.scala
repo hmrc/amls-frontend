@@ -177,7 +177,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           "the answer is no" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              areNewActivitiesAtTradingPremises = Some(true))
+              areNewActivitiesAtTradingPremises = Some(false))
 
             val result = await(router.getRoute(TradingPremisesPageId, model))
 
@@ -285,7 +285,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")))
           val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get(true))
+          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
         }
       }
     }

@@ -62,9 +62,10 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
 //psr number pages
     case BusinessAppliedForPSRNumberPageId => {
-      model.businessAppliedForPSRNumber match {
-        case Some(BusinessAppliedForPSRNumberYes(_)) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
-        case Some(BusinessAppliedForPSRNumberNo) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+      (model.businessAppliedForPSRNumber, edit) match {
+        case (Some(BusinessAppliedForPSRNumberYes(_)), false) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+        case (Some(BusinessAppliedForPSRNumberYes(_)), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case (Some(BusinessAppliedForPSRNumberNo), _) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
       }
     }
 
