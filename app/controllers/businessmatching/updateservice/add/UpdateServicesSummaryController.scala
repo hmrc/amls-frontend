@@ -25,11 +25,11 @@ import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import services.businessmatching.BusinessMatchingService
-import services.{StatusService, TradingPremisesService}
 import services.flowmanagement.Router
+import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
 

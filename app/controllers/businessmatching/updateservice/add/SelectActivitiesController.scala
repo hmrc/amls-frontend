@@ -50,7 +50,9 @@ class SelectActivitiesController @Inject()(
                                           ) extends BaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
-    FormTypes.businessActivityRule("error.required.bm.register.service.single") map { _.businessActivities.head }
+    FormTypes.businessActivityRule("error.required.bm.register.service.single") map {
+      _.businessActivities.head
+    }
 
   implicit val activityWriter = Write[BusinessActivity, UrlFormEncoded] { a =>
     Map("businessActivities[]" -> Seq(BusinessMatchingActivities.getValue(a)))
@@ -69,6 +71,21 @@ class SelectActivitiesController @Inject()(
         }) getOrElse InternalServerError("Failed to get activities")
   }
 
+  private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
+    model <- businessMatchingService.getModel
+    activities <- OptionT.fromOption[Future](model.activities) map {
+      _.businessActivities
+    }
+  } yield {
+    val allActivities = BusinessMatchingActivities.all
+    val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
+      _.getMessage
+    }
+    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
+
+    (existingActivityNames, activityValues)
+  }
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -82,7 +99,7 @@ class SelectActivitiesController @Inject()(
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { model =>
               model.getOrElse(AddServiceFlowModel()) match {
                 case m if !m.activity.contains(data) =>
-                    m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
+                  m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
                 case m => m.activity(data)
               }
             } flatMap { case Some(model) =>
@@ -90,15 +107,4 @@ class SelectActivitiesController @Inject()(
             }
         }
   }
-
-  private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
-    model <- businessMatchingService.getModel
-    activities <- OptionT.fromOption[Future](model.activities) map { _.businessActivities }
-    } yield {
-      val allActivities = BusinessMatchingActivities.all
-      val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map { _.getMessage }
-      val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
-
-      (existingActivityNames, activityValues)
-    }
 }

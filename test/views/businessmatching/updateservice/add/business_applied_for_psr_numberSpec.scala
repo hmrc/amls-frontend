@@ -16,28 +16,32 @@
 
 package views.businessmatching.updateservice.add
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 
-class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMatchers  {
+class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    def view = business_applied_for_psr_number(EmptyForm, edit = false)
   }
 
 
-  "business_applied_for_psr_number view" must {
+  "The business_applied_for_psr_number view" must {
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
+      override def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = false)
 
       doc.title must startWith(Messages("businessmatching.updateservice.psr.number.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.updateservice.psr.number.title"))
@@ -53,7 +57,7 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
           (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
+      override def view = business_applied_for_psr_number(form2, edit = false)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -66,10 +70,11 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
 
     }
 
-    "hide the return to progress link"in new ViewFixture {
+    "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true, showReturnLink = false)
+      override def view = business_applied_for_psr_number(form2, edit = true, showReturnLink = false)
+
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }

@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.add_more_activities
 
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
@@ -53,7 +53,7 @@ class AddMoreActivitiesController @Inject()(
   implicit val boolWrite = BooleanFormReadWrite.formWrites(fieldName)
   implicit val boolRead = BooleanFormReadWrite.formRule(fieldName, "error.businessmatching.updateservice.addmoreactivities")
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
@@ -62,7 +62,7 @@ class AddMoreActivitiesController @Inject()(
         } yield Ok(add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext =>
       implicit request =>
         Form2[Boolean](request.body) match {
@@ -73,7 +73,7 @@ class AddMoreActivitiesController @Inject()(
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) =>
-              model.copy(addMoreActivities = Some(data))
+                model.copy(addMoreActivities = Some(data))
             } flatMap { case Some(model) =>
               router.getRoute(AddMoreAcivitiesPageId, model)
             }

@@ -27,6 +27,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.Future
 
@@ -46,12 +47,12 @@ class SubServicesController @Inject()(
     implicit authContext =>
       implicit request =>
         businessMatchingService.getModel.value map { maybeBM =>
-            val form = (for {
-              bm <- maybeBM
-              services <- bm.msbServices
-            } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
+          val form = (for {
+            bm <- maybeBM
+            services <- bm.msbServices
+          } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-            Ok(views.html.businessmatching.updateservice.add.msb_subservices(form, edit, maybeBM.fold(false)(_.preAppComplete)))
+          Ok(msb_subservices(form, edit, maybeBM.fold(false)(_.preAppComplete)))
         }
   }
 
@@ -78,41 +79,41 @@ class SubServicesController @Inject()(
         }
   }
 
-//  private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], cache: CacheMap)
-//                       (implicit ac: AuthContext, hc: HeaderCarrier) = {
-//
-//    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
-//
-//      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { msbServices =>
-//
-//        def updateCurrencyExchange = {
-//          if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
-//            msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
-//          } else {
-//            msb
-//          }
-//        }
-//
-//        def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
-//          if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
-//            msb.copy(
-//              businessUseAnIPSP = None,
-//              fundsTransfer = None,
-//              transactionsInNext12Months = None,
-//              sendMoneyToOtherCountry = None,
-//              sendTheLargestAmountsOfMoney = None,
-//              mostTransactions = None
-//            )
-//          } else {
-//            msb
-//          }
-//        }
-//
-//        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
-//
-//      }
-//
-//    }
-//  }
+  //  private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], cache: CacheMap)
+  //                       (implicit ac: AuthContext, hc: HeaderCarrier) = {
+  //
+  //    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
+  //
+  //      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { msbServices =>
+  //
+  //        def updateCurrencyExchange = {
+  //          if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
+  //            msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
+  //          } else {
+  //            msb
+  //          }
+  //        }
+  //
+  //        def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
+  //          if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
+  //            msb.copy(
+  //              businessUseAnIPSP = None,
+  //              fundsTransfer = None,
+  //              transactionsInNext12Months = None,
+  //              sendMoneyToOtherCountry = None,
+  //              sendTheLargestAmountsOfMoney = None,
+  //              mostTransactions = None
+  //            )
+  //          } else {
+  //            msb
+  //          }
+  //        }
+  //
+  //        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
+  //
+  //      }
+  //
+  //    }
+  //  }
 
 }

@@ -86,7 +86,7 @@ class WhichFitAndProperControllerSpec extends GenericTestHelper with MockitoSuga
         fitAndProper = Some(true),
         responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
         hasChanged = true,
-        hasAccepted = false)),Some(AddServiceFlowModel.key))
+        hasAccepted = false)), Some(AddServiceFlowModel.key))
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())

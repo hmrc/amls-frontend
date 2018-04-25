@@ -17,32 +17,32 @@
 package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
-import generators.ResponsiblePersonGenerator
+import generators.tradingpremises.TradingPremisesGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.which_fit_and_proper
+import views.html.businessmatching.updateservice.add.which_trading_premises
 
-class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator {
+class which_trading_premisesSpec extends GenericTestHelper with MustMatchers with TradingPremisesGenerator {
 
-  val rp = responsiblePersonGen.sample.get
+  val tp = tradingPremisesGen.sample.get
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
+    def view = which_trading_premises(EmptyForm, false, Seq((tp, 0)), "01")
   }
 
-  "The which_fit_and_proper view" must {
+  "The which_trading_premises view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.whichfitandproper.heading"))
+      heading.html must be(Messages("businessmatching.updateservice.whichtradingpremises.heading"))
     }
 
     "have correct subHeading" in new ViewFixture {
@@ -57,11 +57,11 @@ class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "responsiblePeople") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = which_fit_and_proper(form2, false, Seq((rp, 0)))
+      override def view = which_trading_premises(form2, false, Seq((tp, 0)), "01")
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("responsiblePeople")
+      doc.getElementById("tradingPremises")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
   }

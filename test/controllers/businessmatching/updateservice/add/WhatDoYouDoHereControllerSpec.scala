@@ -23,6 +23,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
+import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -36,7 +37,7 @@ import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -46,7 +47,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
-    val controller = new SubServicesController(
+    val controller = new WhatDoYouDoHereController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
@@ -54,6 +55,9 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
+
+    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockApplicationStatus(SubmissionDecisionApproved)
 
     mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
 

@@ -16,23 +16,21 @@
 
 package views.businessmatching.updateservice.add
 
-import models.businessmatching.AccountancyServices
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.new_service_information
+import views.html.businessmatching.updateservice.add.cannot_add_services
 
-
-class new_service_informationSpec extends GenericTestHelper with MustMatchers {
+class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = new_service_information(Set(AccountancyServices.getMessage))
+    def view = cannot_add_services()
   }
 
-  "The new_service_information view" must {
+  "The cannot_add_services view" must {
 
     "have the correct title" in new ViewFixture {
       doc.title must startWith(Messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"))

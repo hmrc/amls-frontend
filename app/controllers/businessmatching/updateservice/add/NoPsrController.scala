@@ -16,18 +16,19 @@
 
 package controllers.businessmatching.updateservice.add
 
-import config.AMLSAuthConnector
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
-import models.status
+import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.add.cannot_add_services
 
 @Singleton
 class NoPsrController @Inject()(
@@ -37,13 +38,23 @@ class NoPsrController @Inject()(
                                  val businessMatchingService: BusinessMatchingService,
                                  val helper: UpdateServiceHelper,
                                  val router: Router[AddServiceFlowModel]
-                                ) extends BaseController {
+                               ) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      statusService.getStatus map {
-        case NotCompleted | SubmissionReady => Ok(views.html.businessmatching.cannot_continue_with_the_application())
-        case _ => Ok(views.html.businessmatching.cannot_add_services())
-      }
+    implicit authContext =>
+      implicit request =>
+        statusService.getStatus map {
+          case NotCompleted | SubmissionReady => Ok(cannot_add_services())
+          case _ => Ok(cannot_add_services())
+        }
+  }
+
+  def post() = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        (for {
+          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+          route <- OptionT.liftF(router.getRoute(NoPSRPageId, model))
+        } yield route) getOrElse InternalServerError("Could not get the flow model")
   }
 }

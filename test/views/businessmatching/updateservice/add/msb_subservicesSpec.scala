@@ -16,54 +16,59 @@
 
 package views.businessmatching
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{MsbServices, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import views.html.businessmatching.updateservice.add.msb_subservices
 
 
-class msb_subservicesSpec extends GenericTestHelper with MustMatchers  {
+class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
 
-    trait ViewFixture extends Fixture {
-        implicit val requestWithToken = addToken(request)
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+
+    def view = msb_subservices(EmptyForm, edit = false)
+  }
+
+  "The msb_subservices view" must {
+
+    "have correct title" in new ViewFixture {
+
+      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+
+      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false)
+
+      doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.businessmatching"))
+      heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
+      subHeading.html must include(Messages("summary.businessmatching"))
+
     }
 
-    "services view" must {
-        "have correct title" in new ViewFixture {
+    "show errors in the correct locations" in new ViewFixture {
 
-            val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+      val form2: InvalidForm = InvalidForm(Map.empty,
+        Seq(
+          (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
+        ))
 
-            def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = true)
+      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false)
 
-            doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.businessmatching"))
-            heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
-            subHeading.html must include(Messages("summary.businessmatching"))
+      errorSummary.html() must include("not a message Key")
 
-        }
+      doc.getElementById("msbServices")
+        .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-        "show errors in the correct locations" in new ViewFixture {
-
-            val form2: InvalidForm = InvalidForm(Map.empty,
-                Seq(
-                    (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
-                ))
-
-            def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = true)
-
-            errorSummary.html() must include("not a message Key")
-
-            doc.getElementById("msbServices")
-                    .getElementsByClass("error-notification").first().html() must include("not a message Key")
-
-        }
-        "hide the return to progress link"in new ViewFixture {
-            val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
-
-            def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = true, showReturnLink = false)
-            doc.body().text() must not include Messages("link.return.registration.progress")
-        }
     }
+    "hide the return to progress link" in new ViewFixture {
+      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+
+      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false, showReturnLink = false)
+
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+  }
 }

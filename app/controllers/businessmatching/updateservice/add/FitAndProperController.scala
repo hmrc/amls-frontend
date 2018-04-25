@@ -31,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BooleanFormReadWrite, RepeatingSection}
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.fit_and_proper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future

@@ -24,24 +24,23 @@ import javax.inject.{Inject, Singleton}
 import models.businessmatching.MsbServices
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement._
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import views.html.businessmatching.updateservice.add.what_do_you_do_here
 
 import scala.concurrent.Future
 
 @Singleton
 class WhatDoYouDoHereController @Inject()(
-                                             val authConnector: AuthConnector,
-                                             implicit val dataCacheConnector: DataCacheConnector,
-                                             val statusService: StatusService,
-                                             val businessMatchingService: BusinessMatchingService,
-                                             val responsiblePeopleService: ResponsiblePeopleService,
-                                             val helper: UpdateServiceHelper,
-                                             val router: Router[AddServiceFlowModel]
-                                           ) extends BaseController with RepeatingSection {
+                                           val authConnector: AuthConnector,
+                                           implicit val dataCacheConnector: DataCacheConnector,
+                                           val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService,
+                                           val helper: UpdateServiceHelper,
+                                           val router: Router[AddServiceFlowModel]
+                                         ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -52,7 +51,7 @@ class WhatDoYouDoHereController @Inject()(
             services <- bm.msbServices
           } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
 
-          Ok(views.html.businessmatching.updateservice.add.what_do_you_do_here(form, edit, maybeBM.fold(false)(_.preAppComplete)))
+          Ok(what_do_you_do_here(form, edit, maybeBM.fold(false)(_.preAppComplete)))
         }
   }
 

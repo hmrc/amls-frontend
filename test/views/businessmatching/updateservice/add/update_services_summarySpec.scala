@@ -24,10 +24,11 @@ import utils.GenericTestHelper
 import views.Fixture
 
 
-class update_services_summarySpec  extends GenericTestHelper with MustMatchers {
+class update_services_summarySpec extends GenericTestHelper with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
     def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, AddServiceFlowModel())
   }
 

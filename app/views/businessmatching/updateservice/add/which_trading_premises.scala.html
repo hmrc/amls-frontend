@@ -19,7 +19,7 @@
 @import utils.HtmlElementHelpers._
 @import models.tradingpremises.TradingPremises
 
-@(f: forms.Form2[_], tradingPremises: Seq[(TradingPremises, Int)], activity: String)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], edit: Boolean, tradingPremises: Seq[(TradingPremises, Int)], activity: String)(implicit request: Request[_], m:Messages)
 
 @pageHeading = @{
     Messages("businessmatching.updateservice.whichtradingpremises.heading",

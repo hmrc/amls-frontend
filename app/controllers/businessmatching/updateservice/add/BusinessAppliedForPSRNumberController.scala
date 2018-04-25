@@ -27,20 +27,20 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.businessmatching.business_applied_for_psr_number
+import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 import scala.concurrent.Future
 
 
 @Singleton
 class BusinessAppliedForPSRNumberController @Inject()(
-                                   val authConnector: AuthConnector,
-                                   implicit val dataCacheConnector: DataCacheConnector,
-                                   val statusService: StatusService,
-                                   val businessMatchingService: BusinessMatchingService,
-                                   val helper: UpdateServiceHelper,
-                                   val router: Router[AddServiceFlowModel]
-                                 ) extends BaseController {
+                                                       val authConnector: AuthConnector,
+                                                       implicit val dataCacheConnector: DataCacheConnector,
+                                                       val statusService: StatusService,
+                                                       val businessMatchingService: BusinessMatchingService,
+                                                       val helper: UpdateServiceHelper,
+                                                       val router: Router[AddServiceFlowModel]
+                                                     ) extends BaseController {
 
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -75,23 +75,23 @@ class BusinessAppliedForPSRNumberController @Inject()(
             }
           }
         }
-//      {
-//        Form2[BusinessAppliedForPSRNumber](request.body) match {
-//          case f: InvalidForm =>
-//            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
-//          case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
-//            (for {
-//              bm <- businessMatchingService.getModel
-//              _ <- businessMatchingService.updateModel(
-//                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
-//              )
-//            } yield {
-//              Redirect(routes.SummaryController.get())
-//            }) getOrElse InternalServerError("Could not update psr number")
-//          }
-//          case ValidForm(_, _) =>
-//            Future.successful(Redirect(routes.NoPsrController.get()))
-//        }
-//      }
+    //      {
+    //        Form2[BusinessAppliedForPSRNumber](request.body) match {
+    //          case f: InvalidForm =>
+    //            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
+    //          case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
+    //            (for {
+    //              bm <- businessMatchingService.getModel
+    //              _ <- businessMatchingService.updateModel(
+    //                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
+    //              )
+    //            } yield {
+    //              Redirect(routes.SummaryController.get())
+    //            }) getOrElse InternalServerError("Could not update psr number")
+    //          }
+    //          case ValidForm(_, _) =>
+    //            Future.successful(Redirect(routes.NoPsrController.get()))
+    //        }
+    //      }
   }
 }

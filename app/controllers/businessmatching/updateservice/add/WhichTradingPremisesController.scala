@@ -34,7 +34,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.which_trading_premises
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -55,11 +55,8 @@ class WhichTradingPremisesController @Inject()(
         getFormData map { case (flowModel, activity, tradingPremises) =>
           val form = flowModel.tradingPremisesActivities.fold[Form2[TradingPremisesActivities]](EmptyForm)(Form2[TradingPremisesActivities])
 
-          Ok(which_trading_premises(
-            form,
-            tradingPremises,
-            BusinessActivities.getValue(activity)
-          ))
+          Ok(which_trading_premises(form, edit, tradingPremises, BusinessActivities.getValue(activity))
+          )
         } getOrElse InternalServerError("Cannot retrieve form data")
   }
 
@@ -81,7 +78,7 @@ class WhichTradingPremisesController @Inject()(
       implicit request =>
         Form2[TradingPremisesActivities](request.body) match {
           case f: InvalidForm => getFormData map { case (_, activity, tradingPremises) =>
-            BadRequest(which_trading_premises(f, tradingPremises, BusinessActivities.getValue(activity)))
+            BadRequest(which_trading_premises(f, edit, tradingPremises, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Cannot retrieve form data")
 
           case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
@@ -92,5 +89,4 @@ class WhichTradingPremisesController @Inject()(
           }
         }
   }
-
 }

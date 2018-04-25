@@ -32,7 +32,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.trading_premises
 
 import scala.concurrent.Future
 
@@ -59,6 +59,11 @@ class TradingPremisesController @Inject()(
         } getOrElse InternalServerError("Unable to show the view")
   }
 
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel, BusinessActivity)] = for {
+    model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+    activity <- OptionT.fromOption[Future](model.activity)
+  } yield (model, activity)
+
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -70,16 +75,11 @@ class TradingPremisesController @Inject()(
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
               model.isActivityAtTradingPremises(Some(data))
-                .tradingPremisesActivities(if(data) model.tradingPremisesActivities else None)
+                .tradingPremisesActivities(if (data) model.tradingPremisesActivities else None)
             } flatMap { model =>
               router.getRoute(TradingPremisesPageId, model.get, edit)
             }
         }
   }
-
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel, BusinessActivity)] = for {
-    model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
-    activity <- OptionT.fromOption[Future](model.activity)
-  } yield (model, activity)
 
 }
