@@ -22,20 +22,20 @@
 @()(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading("businessmatching.cannotchangeservices.title", "summary.businessmatching")
+    @heading("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading", "summary.businessmatching")
 }
 
 @main(
-    title = Messages("businessmatching.cannotchangeservices.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"),
     heading = header
 ) {
 
-    @m("businessmatching.cannotchangeservices.requiredinfo").paragraphizeH
+    @m("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo")
 
     @anchor(
         attrHref = controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get.url,
         attrRole = true,
-        linkText = Messages("businessmatching.cannotchangeservices.button.text"),
+        linkText = Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text"),
         visuallyhidden = Messages("summary.businessmatching")
     )
 }

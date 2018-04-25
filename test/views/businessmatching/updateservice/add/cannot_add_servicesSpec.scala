@@ -33,24 +33,19 @@ class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
   "The cannot_add_services view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.newserviceinformation.heading"))
+      heading.html must be(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading"))
     }
 
     "have correct subHeading" in new ViewFixture {
-      subHeading.html must include(Messages("summary.updateservice"))
+      subHeading.html must include(Messages("summary.businessmatching"))
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.1"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.newserviceinformation.info.2"))
-    }
-
-    "not show the return link" in new ViewFixture {
-      doc.body().text() must not include Messages("link.return.registration.progress")
+      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo"))
     }
   }
 

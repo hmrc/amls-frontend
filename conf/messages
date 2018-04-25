@@ -1182,6 +1182,12 @@ businessmatching.updateservice.psr.number.title = Does your business have a Paym
 businessmatching.updateservice.psr.number.lbl = PSR registration number
 businessmatching.updateservice.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
 
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You can’t continue with your application
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You can’t continue with your application
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo = Your business must have a Payment Services Regulations (PSR) reference number in order to register for Money Service Business as part of your anti-money laundering supervision from HM Revenue and Customs. You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
+
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to update information
+
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
