@@ -106,9 +106,12 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
       }
 
     case WhichTradingPremisesPageId =>
-      (model.msbServices.isDefined, model.msbServices.get.msbServices.size > 1) match {
-        case (true, true) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-        case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      model.msbServices.isDefined match {
+        case (true) =>  (model.msbServices.get.msbServices.size > 1) match {
+          case (true) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+          case (false) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        }
+        case (false) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
       }
 
     case WhatDoYouDoHerePageId => {

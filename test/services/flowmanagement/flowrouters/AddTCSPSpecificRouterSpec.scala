@@ -187,7 +187,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
 
     //edit Trading Premises true
     "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
-      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         "and the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(TrustAndCompanyServices),
@@ -201,7 +201,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
 
     //edit Trading Premises false
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-      "editing the 'Fit and Proper' page (TradingPremisesPageId)" when {
+      "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         " and the answer is no " in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(TrustAndCompanyServices),
@@ -216,7 +216,7 @@ class AddTCSPSpecificRouterSpec extends PlaySpec {
     //edit which Trading Premises
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
-        "responsible people have been selected" in new Fixture {
+        "trading premises have been selected" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(true),

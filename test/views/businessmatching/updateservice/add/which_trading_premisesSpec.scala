@@ -19,6 +19,7 @@ package views.businessmatching.updateservice.add
 import forms.{EmptyForm, InvalidForm}
 import generators.tradingpremises.TradingPremisesGenerator
 import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BusinessActivities, HighValueDealing}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -32,7 +33,9 @@ class which_trading_premisesSpec extends GenericTestHelper with MustMatchers wit
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = which_trading_premises(EmptyForm, false, Seq((tp, 0)), "01")
+    val activityName = BusinessActivities.getValue(HighValueDealing)
+
+    def view = which_trading_premises(EmptyForm, false, Seq((tp, 0)), activityName)
   }
 
   "The which_trading_premises view" must {
@@ -42,7 +45,8 @@ class which_trading_premisesSpec extends GenericTestHelper with MustMatchers wit
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.whichtradingpremises.heading"))
+      heading.html must be(Messages("businessmatching.updateservice.whichtradingpremises.heading",
+        Messages(s"businessmatching.registerservices.servicename.lbl."+ activityName + ".phrased")))
     }
 
     "have correct subHeading" in new ViewFixture {
@@ -55,7 +59,7 @@ class which_trading_premisesSpec extends GenericTestHelper with MustMatchers wit
 
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq((Path \ "responsiblePeople") -> Seq(ValidationError("not a message Key"))))
+        Seq((Path \ "tradingPremises") -> Seq(ValidationError("not a message Key"))))
 
       override def view = which_trading_premises(form2, false, Seq((tp, 0)), "01")
 
