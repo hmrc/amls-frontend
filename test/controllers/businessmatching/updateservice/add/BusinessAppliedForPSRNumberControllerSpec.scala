@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
 import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -62,6 +62,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
       router = createRouter[AddServiceFlowModel]
     )
 
+    mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
     mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
     mockApplicationStatus(SubmissionDecisionApproved)
 
@@ -74,21 +75,27 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+
+    when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+      (any(), any(), any())).thenReturn(Future.successful(None))
+
+    when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
   }
 
   "BusinessAppliedForPSRNumberController" when {
 
     "get is called" must {
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
-        when {
-          controller.businessMatchingService.getModel(any(), any(), any())
-        } thenReturn OptionT.none[Future, BusinessMatching]
+      "return OK with the business_applied_for_psr_number view" in new Fixture {
 
         val result = controller.get()(request)
+
         status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.psr.number.title"))
+
       }
 
-      "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
+      "return OK and display business_applied_for_psr_number view with pre populated data" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
         var psr = businessMatching.businessAppliedForPSRNumber match {
@@ -110,76 +117,147 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> "123789"
-        )
+      "with a valid request and not in edit mode" must {
+        "progress to the 'no psr' page" when {
+          "no is selected" in new Fixture {
+            val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+              msbServices = Some(MsbServices(Set(TransmittingMoney))),
+              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
 
-        val result = controller.post(false)(newRequest)
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
-        //status(result) must be(SEE_OTHER)
-        //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            val newRequest = request.withFormUrlEncodedBody(
+              "appliedFor" -> "false"
+            )
+
+            val result = controller.post(false)(newRequest)
+
+            status(result) must be(SEE_OTHER)
+            controller.router.verify(BusinessAppliedForPSRNumberPageId, flowModel)
+
+            redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
+          }
+        }
+
+        "progress to the 'fit and proper' page" when {
+          "yes is selected and a PSR is supplied" in new Fixture {
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> "123789"
+            )
+
+            val result = controller.post(false)(newRequest)
+
+            status(result) must be(SEE_OTHER)
+            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+
+            redirectLocation(result) must be(Some(routes.FitAndProperController.get().url))
+          }
+        }
       }
 
-      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is true" in new Fixture {
+      "with a valid request and in edit mode" must {
+        "progress to the 'no psr' page" when {
+          "no is selected" in new Fixture {
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)))
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> "123789"
-        )
+            val newRequest = request.withFormUrlEncodedBody(
+              "appliedFor" -> "false"
+            )
 
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+            val result = controller.post(true)(newRequest)
 
-        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+            status(result) must be(SEE_OTHER)
+            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
-        val result = controller.post(true)(newRequest)
-        //status(result) must be(SEE_OTHER)
-        //redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
+          }
+        }
+
+        "progress to the 'update services summary' page" when {
+          "yes is selected and a PSR is supplied" in new Fixture {
+            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "appliedFor" -> "true",
+              "regNumber" -> "123789"
+            )
+
+            val result = controller.post(true)(newRequest)
+
+            status(result) must be(SEE_OTHER)
+            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+              AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
+
+            redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
+          }
+        }
       }
 
-      "remove data from the cache and redirect to the CannotContinueWithTheApplicationController when No is selected" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "appliedFor" -> "false"
-        )
-
-        val result = controller.post(true)(newRequest)
-
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
-      }
-
-      "respond with BAD_REQUEST when given invalid data" in new Fixture {
-        val newRequest = request.withFormUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> ""
-        )
-
-        val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
-
-        val document: Document = Jsoup.parse(contentAsString(result))
-        document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
-      }
-
-      "return 500" when {
-        "'Yes' was given but there is no model" in new Fixture {
+      "with an invalid request (missing PSR)" must {
+        "return an error"  in new Fixture {
+          mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
+            AddServiceFlowModel())
           val newRequest = request.withFormUrlEncodedBody(
             "appliedFor" -> "true",
-            "regNumber" -> "123456"
+            "regNumber" -> ""
           )
 
-          when {
-            controller.businessMatchingService.getModel(any(), any(), any())
-          } thenReturn OptionT.none[Future, BusinessMatching]
-
           val result = controller.post()(newRequest)
-          status(result) mustBe INTERNAL_SERVER_ERROR
+          status(result) must be(BAD_REQUEST)
+
+          val document: Document = Jsoup.parse(contentAsString(result))
+          document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
         }
       }
     }
   }
 }
+
+
+//            "respond with SEE_OTHER and redirect to the UpdateServicesSummaryController when Yes is selected and edit is false" in new Fixture {
+//        val newRequest = request.withFormUrlEncodedBody(
+//          "appliedFor" -> "true",
+//          "regNumber" -> "123789"
+//        )
+//
+//        val result = controller.post(false)(newRequest)
+//
+//        status(result) must be(SEE_OTHER)
+//        controller.router.verify(BusinessAppliedForPSRNumberPageId,
+//                                AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
+//
+//        redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
+//      }
+//
+//      "respond with SEE_OTHER and redirect to the UpdateServicesSummaryController when Yes is selected and edit is true" in new Fixture {
+//
+//        val newRequest = request.withFormUrlEncodedBody(
+//          "appliedFor" -> "true",
+//          "regNumber" -> "123789"
+//        )
+//
+//        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
+//          (any(), any(), any())).thenReturn(Future.successful(None))
+//
+//        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
+//          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+//
+//        val result = controller.post(true)(newRequest)
+//        status(result) must be(SEE_OTHER)
+//        redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
+//      }
+
+
+
+
+
+
+

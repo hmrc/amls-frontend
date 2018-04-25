@@ -65,33 +65,16 @@ class BusinessAppliedForPSRNumberController @Inject()(
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) => {
-                model
+                model.businessAppliedForPSRNumber(data)
               }
             } flatMap {
               case Some(model) => {
+                println(">>>>>>>>>>>>>>>>>>>>>>>>>>" + model)
                 router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
               }
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }
         }
-    //      {
-    //        Form2[BusinessAppliedForPSRNumber](request.body) match {
-    //          case f: InvalidForm =>
-    //            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
-    //          case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
-    //            (for {
-    //              bm <- businessMatchingService.getModel
-    //              _ <- businessMatchingService.updateModel(
-    //                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
-    //              )
-    //            } yield {
-    //              Redirect(routes.SummaryController.get())
-    //            }) getOrElse InternalServerError("Could not update psr number")
-    //          }
-    //          case ValidForm(_, _) =>
-    //            Future.successful(Redirect(routes.NoPsrController.get()))
-    //        }
-    //      }
   }
 }

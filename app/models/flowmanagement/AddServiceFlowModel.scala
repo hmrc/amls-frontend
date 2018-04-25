@@ -37,6 +37,11 @@ case class AddServiceFlowModel(
       hasChanged = hasChanged || !this.activity.contains(p),
       hasAccepted = hasAccepted && this.activity.contains(p))
 
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddServiceFlowModel =
+    this.copy(businessAppliedForPSRNumber = Some(p),
+      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
+
   def msbServices(p: MsbServices): AddServiceFlowModel =
     this.copy(msbServices = Some(p),
       hasChanged = hasChanged || !this.msbServices.contains(p),
