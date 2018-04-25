@@ -40,6 +40,44 @@
         <p>@(flowModel.activityName.getOrElse(""))</p>
     }
 
+    @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
+        @flowModel.msbServices.map { services =>
+            @checkYourAnswers(
+                question = Messages("businessmatching.services.title"),
+                editUrl = routes.SubServicesController.get(true).toString,
+                allowEdit = true,
+                idTag="edit-msb-services"
+            ) {
+                <ul class="list list--comma">
+                    @services.msbServices.map { svc =>
+                    <li>@svc match {
+                        case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                        case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
+                        case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
+                        case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                        }</li>
+                    }
+                </ul>
+                }
+
+                @if(services.msbServices.contains(TransmittingMoney)) {
+                @flowModel.businessAppliedForPSRNumber.map { psr =>
+                @checkYourAnswers(
+                    question = Messages("businessmatching.psr.number.title"),
+                    editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                    allowEdit = true
+                )   {
+                        <p>@psr match {
+                            case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
+                            case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
+                        }</p>
+                    }
+                }
+            }
+        }
+    }
+
+
     @if(flowModel.fitAndProper.isDefined) {
         @checkYourAnswers(
                 question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),

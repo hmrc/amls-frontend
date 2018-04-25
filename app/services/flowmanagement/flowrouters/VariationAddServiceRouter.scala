@@ -40,7 +40,6 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
   // scalastyle:off method.length
   override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    println("<<<<<<<<<<<<<<<<<<<<,,," + model)
     pageId match {
 
       case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
@@ -64,7 +63,6 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
       //psr number pages
       case BusinessAppliedForPSRNumberPageId => {
-        println("<<<<<<<<<<<<<<<<<<<<,,," + model)
         model.businessAppliedForPSRNumber.isDefined match {
           case true => {
             edit match {

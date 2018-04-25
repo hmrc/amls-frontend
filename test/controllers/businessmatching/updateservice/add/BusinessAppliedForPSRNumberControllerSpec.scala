@@ -122,7 +122,8 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
           "no is selected" in new Fixture {
             val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
               msbServices = Some(MsbServices(Set(TransmittingMoney))),
-              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
+              businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+              hasChanged = true)
 
             mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
@@ -135,7 +136,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
             status(result) must be(SEE_OTHER)
             controller.router.verify(BusinessAppliedForPSRNumberPageId, flowModel)
 
-            redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
           }
         }
 
@@ -155,7 +155,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
             controller.router.verify(BusinessAppliedForPSRNumberPageId,
               AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
-            redirectLocation(result) must be(Some(routes.FitAndProperController.get().url))
           }
         }
       }
@@ -176,7 +175,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
             controller.router.verify(BusinessAppliedForPSRNumberPageId,
               AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
-            redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
           }
         }
 
@@ -196,7 +194,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
             controller.router.verify(BusinessAppliedForPSRNumberPageId,
               AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
 
-            redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
           }
         }
       }
@@ -220,40 +217,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     }
   }
 }
-
-
-//            "respond with SEE_OTHER and redirect to the UpdateServicesSummaryController when Yes is selected and edit is false" in new Fixture {
-//        val newRequest = request.withFormUrlEncodedBody(
-//          "appliedFor" -> "true",
-//          "regNumber" -> "123789"
-//        )
-//
-//        val result = controller.post(false)(newRequest)
-//
-//        status(result) must be(SEE_OTHER)
-//        controller.router.verify(BusinessAppliedForPSRNumberPageId,
-//                                AddServiceFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
-//
-//        redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
-//      }
-//
-//      "respond with SEE_OTHER and redirect to the UpdateServicesSummaryController when Yes is selected and edit is true" in new Fixture {
-//
-//        val newRequest = request.withFormUrlEncodedBody(
-//          "appliedFor" -> "true",
-//          "regNumber" -> "123789"
-//        )
-//
-//        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-//          (any(), any(), any())).thenReturn(Future.successful(None))
-//
-//        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-//          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-//
-//        val result = controller.post(true)(newRequest)
-//        status(result) must be(SEE_OTHER)
-//        redirectLocation(result) must be(Some(routes.UpdateServicesSummaryController.get().url))
-//      }
 
 
 
