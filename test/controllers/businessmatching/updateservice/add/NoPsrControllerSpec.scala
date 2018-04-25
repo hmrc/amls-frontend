@@ -64,7 +64,7 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.cannotcontinuewiththeapplication.title"))
+          contentAsString(result) must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
         }
 
         "application status is beyond pre-application" in new Fixture {
@@ -72,7 +72,7 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
 
           val result = controller.get()(request)
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.cannotchangeservices.title"))
+          contentAsString(result) must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
         }
       }
     }
