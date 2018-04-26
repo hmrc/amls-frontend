@@ -21,19 +21,15 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching._
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
 import services.StatusService
-import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.businessmatching.services
-import views.html.businessmatching.updateservice.add.{msb_subservices, select_activities}
+import views.html.businessmatching.updateservice.add.msb_subservices
 
 import scala.concurrent.Future
 
@@ -55,12 +51,8 @@ class SubServicesController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
         } yield {
-          val allSubServices: Set[MsbService] = MsbServices.all
-          val noSbServices: Set[MsbService] = Set()
-          val flowSubServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(noSbServices)).msbServices
-          val remainingSubservices: Set[MsbService] =  flowSubServices intersect allSubServices
-          val wrappedRemainingSubservices = MsbServices(remainingSubservices)
-          val form: Form2[MsbServices] = Form2(wrappedRemainingSubservices)
+          val flowSubServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
+          val form: Form2[MsbServices] = Form2(MsbServices(flowSubServices))
 
           Ok(msb_subservices(form, edit))
         }) getOrElse InternalServerError("Failed to get activities")
