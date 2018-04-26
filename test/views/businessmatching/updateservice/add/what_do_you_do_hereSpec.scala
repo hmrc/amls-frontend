@@ -39,7 +39,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.what_do_you_do_here
+import views.html.businessmatching.updateservice.add._
 
 
 class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
@@ -56,11 +56,11 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = views.html.businessmatching.updateservice.add.what_do_you_do_here(form2, edit = false)
+      override def view = what_do_you_do_here(form2, edit = false)
 
-      doc.title must startWith(Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.businessmatching"))
+      doc.title must startWith(Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.whatdoyoudohere.title"))
-      subHeading.html must include(Messages("summary.businessmatching"))
+      subHeading.html must include(Messages("summary.updateservice"))
 
     }
 
@@ -71,7 +71,7 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
           (Path \ "msbWhatdoyoudohere") -> Seq(ValidationError("not a message Key"))
         ))
 
-      override def view = views.html.businessmatching.updateservice.add.what_do_you_do_here(form2, edit = false)
+      override def view = what_do_you_do_here(form2, edit = false)
 
       errorSummary.html() must include("not a message Key")
 
@@ -83,7 +83,7 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
     "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = views.html.businessmatching.updateservice.add.what_do_you_do_here(form2, edit = false, showReturnLink = false)
+      override def view = what_do_you_do_here(form2, edit = false, showReturnLink = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

@@ -23,7 +23,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
+import views.html.businessmatching.updateservice.add._
 
 
 class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMatchers {
@@ -41,11 +41,11 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
 
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = false)
+      override def view = business_applied_for_psr_number(form2, edit = false)
 
-      doc.title must startWith(Messages("businessmatching.updateservice.psr.number.title") + " - " + Messages("summary.businessmatching"))
+      doc.title must startWith(Messages("businessmatching.updateservice.psr.number.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.psr.number.title"))
-      subHeading.html must include(Messages("summary.businessmatching"))
+      subHeading.html must include(Messages("summary.updateservice"))
 
     }
 

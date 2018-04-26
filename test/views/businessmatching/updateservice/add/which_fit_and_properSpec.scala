@@ -17,13 +17,14 @@
 package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
+import forms.EmptyForm
 import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.which_fit_and_proper
+import views.html.businessmatching.updateservice.add._
 
 class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator {
 

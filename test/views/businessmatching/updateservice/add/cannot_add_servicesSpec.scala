@@ -20,7 +20,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.cannot_add_services
+import views.html.businessmatching.updateservice.add._
 
 class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
 
@@ -33,7 +33,7 @@ class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
   "The cannot_add_services view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.businessmatching"))
+      doc.title must startWith(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
@@ -41,7 +41,7 @@ class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
     }
 
     "have correct subHeading" in new ViewFixture {
-      subHeading.html must include(Messages("summary.businessmatching"))
+      subHeading.html must include(Messages("summary.updateservice"))
     }
 
     "show the correct content" in new ViewFixture {

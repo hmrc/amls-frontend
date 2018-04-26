@@ -17,11 +17,13 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
+import forms.EmptyForm
 import models.flowmanagement.AddServiceFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
+import views.html.businessmatching.updateservice.add._
 
 
 class update_services_summarySpec extends GenericTestHelper with MustMatchers {
@@ -29,7 +31,7 @@ class update_services_summarySpec extends GenericTestHelper with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, AddServiceFlowModel())
+    def view = update_services_summary(EmptyForm, AddServiceFlowModel())
   }
 
   "The update_services_summary view" must {

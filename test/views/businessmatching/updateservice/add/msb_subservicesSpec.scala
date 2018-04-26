@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.businessmatching
+package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
@@ -23,7 +23,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.msb_subservices
+import views.html.businessmatching.updateservice.add._
 
 
 class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
@@ -40,11 +40,11 @@ class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
 
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false)
+      override def view = msb_subservices(form2, edit = false)
 
-      doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.businessmatching"))
+      doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
-      subHeading.html must include(Messages("summary.businessmatching"))
+      subHeading.html must include(Messages("summary.updateservice"))
 
     }
 
@@ -55,7 +55,7 @@ class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
           (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
         ))
 
-      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false)
+      override def view = msb_subservices(form2, edit = false)
 
       errorSummary.html() must include("not a message Key")
 
@@ -66,7 +66,7 @@ class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
     "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = views.html.businessmatching.updateservice.add.msb_subservices(form2, edit = false, showReturnLink = false)
+      override def view = msb_subservices(form2, edit = false, showReturnLink = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

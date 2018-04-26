@@ -21,7 +21,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.new_service_information
+import views.html.businessmatching.updateservice.add._
 
 
 class new_service_informationSpec extends GenericTestHelper with MustMatchers {

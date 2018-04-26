@@ -24,7 +24,7 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
 import views.Fixture
-import views.html.businessmatching.updateservice.add.which_trading_premises
+import views.html.businessmatching.updateservice.add._
 
 class which_trading_premisesSpec extends GenericTestHelper with MustMatchers with TradingPremisesGenerator {
 
