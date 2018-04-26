@@ -30,7 +30,8 @@ case class AddServiceFlowModel(
                                 hasChanged: Boolean = false,
                                 hasAccepted: Boolean = false,
                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                msbServices: Option[MsbServices] = None
+                                msbServices: Option[MsbServices] = None,
+                                tradingPremisesMsbServices: Option[MsbServices] = None
                               ) {
   def activity(p: BusinessActivity): AddServiceFlowModel =
     this.copy(activity = Some(p),
@@ -46,6 +47,11 @@ case class AddServiceFlowModel(
     this.copy(msbServices = Some(p),
       hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
+
+  def tradingPremisesMsbServices(p: MsbServices): AddServiceFlowModel =
+    this.copy(tradingPremisesMsbServices = Some(p),
+      hasChanged = hasChanged || !this.tradingPremisesMsbServices.contains(p),
+      hasAccepted = hasAccepted && this.tradingPremisesMsbServices.contains(p))
 
   def isActivityAtTradingPremises(p: Option[Boolean]): AddServiceFlowModel =
     this.copy(areNewActivitiesAtTradingPremises = p,
@@ -68,12 +74,12 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _) => true
-    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _) => true
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _) => true
+    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
+    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
+    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
+    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _, _) => true
+    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _, _) => true
 
 
     case _ => false

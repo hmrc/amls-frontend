@@ -57,15 +57,16 @@ class WhatDoYouDoHereController @Inject()(
   }
 
   def post(edit: Boolean = false) = Authorised.async {
+    import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
         Form2[MsbServices](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.businessmatching.updateservice.add.what_do_you_do_here(f, edit)))
+            Future.successful(BadRequest(what_do_you_do_here(f, edit)))
 
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) =>  model
+              case Some(model) =>  model.tradingPremisesMsbServices(data)
             } flatMap {
               case Some(model) => router.getRoute(WhatDoYouDoHerePageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
