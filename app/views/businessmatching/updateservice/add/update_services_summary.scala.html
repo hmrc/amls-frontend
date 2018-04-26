@@ -133,24 +133,25 @@
             </p>
         }
 
-        @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
-            @checkYourAnswers(
-                question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
-                editUrl = routes.WhatDoYouDoHereController.get(true).url,
-                allowEdit = false,
-                idTag = "WhatDoYouDoHere-edit"
-            ) {
-                <ul class="list list--comma">
-                    @tpMsbServices.msbServices.map { service =>
-                        <li>@service match {
-                            case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
-                            case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
-                            case ChequeCashingNotScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.03")}
-                            case ChequeCashingScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.04")}
-                        }</li>
-                    }
-                </ul>
-            }
+            @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
+                @checkYourAnswers(
+                    question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                    editUrl = routes.WhatDoYouDoHereController.get(true).url,
+                    allowEdit = flowModel.msbServices.getOrElse(MsbServices(Set())).msbServices.size > 1,
+                    idTag = "WhatDoYouDoHere-edit"
+                ) {
+                    <ul class="list list--comma">
+                        @tpMsbServices.msbServices.map { service =>
+                            <li>@service match {
+                                case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
+                                case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
+                                case ChequeCashingNotScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.03")}
+                                case ChequeCashingScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.04")}
+                            }</li>
+                        }
+                    </ul>
+                }
+
         }
     }
 
