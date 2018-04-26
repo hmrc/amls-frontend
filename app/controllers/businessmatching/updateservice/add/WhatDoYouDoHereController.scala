@@ -43,6 +43,8 @@ class WhatDoYouDoHereController @Inject()(
                                            val router: Router[AddServiceFlowModel]
                                          ) extends BaseController {
 
+  var msbServiceValues: Set[String] = Set()
+
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -51,7 +53,7 @@ class WhatDoYouDoHereController @Inject()(
         } yield {
           val msbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
           val form: Form2[MsbServices] = EmptyForm
-          val msbServiceValues: Set[String] = MsbServices.all.intersect(model.msbServices.getOrElse(MsbServices(Set())).msbServices).map(MsbServices.getValue)
+          msbServiceValues = MsbServices.all.intersect(model.msbServices.getOrElse(MsbServices(Set())).msbServices).map(MsbServices.getValue)
           Ok(what_do_you_do_here(form, edit, false, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
   }
@@ -61,9 +63,9 @@ class WhatDoYouDoHereController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[MsbServices](request.body) match {
-          case f: InvalidForm =>
-            Future.successful(BadRequest(what_do_you_do_here(f, edit)))
-
+          case f: InvalidForm => {
+            Future.successful(BadRequest(what_do_you_do_here(f, edit, false, msbServiceValues)))
+          }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) =>  model.tradingPremisesMsbServices(data)
