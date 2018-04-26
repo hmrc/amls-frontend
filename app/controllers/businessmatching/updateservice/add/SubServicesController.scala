@@ -58,10 +58,9 @@ class SubServicesController @Inject()(
           val allSubServices: Set[MsbService] = MsbServices.all
           val noSbServices: Set[MsbService] = Set()
           val flowSubServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(noSbServices)).msbServices
-          val remainingSubservices: Set[MsbService] = allSubServices diff flowSubServices
-
-          val stuff = MsbServices(remainingSubservices)
-          val form: Form2[MsbServices] = Form2(stuff)
+          val remainingSubservices: Set[MsbService] =  flowSubServices intersect allSubServices
+          val wrappedRemainingSubservices = MsbServices(remainingSubservices)
+          val form: Form2[MsbServices] = Form2(wrappedRemainingSubservices)
 
           Ok(msb_subservices(form, edit))
         }) getOrElse InternalServerError("Failed to get activities")
@@ -77,7 +76,9 @@ class SubServicesController @Inject()(
 
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) => model.msbServices(data)
+              case Some(model) => {
+                model.msbServices(data)
+              }
             } flatMap {
               case Some(model) => router.getRoute(SubServicesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
