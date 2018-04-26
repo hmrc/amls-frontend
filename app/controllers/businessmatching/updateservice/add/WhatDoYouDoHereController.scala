@@ -21,9 +21,8 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.businessmatching.{MsbService, MsbServices}
 import models.flowmanagement._
 import services.StatusService
@@ -51,7 +50,7 @@ class WhatDoYouDoHereController @Inject()(
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
         } yield {
           val msbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
-          val form: Form2[MsbServices] = Form2(MsbServices(msbServices))
+          val form: Form2[MsbServices] = EmptyForm
           val msbServiceValues: Set[String] = MsbServices.all.intersect(model.msbServices.getOrElse(MsbServices(Set())).msbServices).map(MsbServices.getValue)
           Ok(what_do_you_do_here(form, edit, false, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
@@ -60,7 +59,7 @@ class WhatDoYouDoHereController @Inject()(
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Form2[ResponsiblePeopleFitAndProper](request.body) match {
+        Form2[MsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.what_do_you_do_here(f, edit)))
 
