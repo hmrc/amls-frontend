@@ -132,6 +132,18 @@
                 })
             </p>
         }
+
+        @checkYourAnswers(
+            question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
+            editUrl = routes.WhatDoYouDoHereController.get().url,
+            idTag = "WhatDoYouDoHere-edit"
+            ) {
+            <p>
+                @(flowModel.tradingPremisesActivities map { tp =>
+                Messages("businessmatching.updateservice.summary.whichtradingpremises.activities.count", tp.index.size)
+                })
+            </p>
+        }
     }
 
     @form(f, controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.post()) {

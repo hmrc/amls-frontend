@@ -1236,6 +1236,7 @@ businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to c
 businessmatching.updateservice.newserviceinformation.info.2 = You might need to edit other sections based on any new information you provide.
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
+businessmatching.updateservice.summary.whichtradingpremises.activities.count = You’ve chosen {0} activities at your trading premises
 businessmatching.updateservice.summary.whichfitandproper.count = You’ve chosen {0} responsible person
 businessmatching.updateservice.summary.whichfitandproper.count.plural = You’ve chosen {0} responsible people
 
