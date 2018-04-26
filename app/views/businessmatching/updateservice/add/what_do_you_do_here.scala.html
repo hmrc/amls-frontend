@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, msbServiceValues: Set[String] = Set())(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -45,26 +45,34 @@
                 field = f("msbWhatdoyoudohere")
             ) {
 
-                @checkbox(
-                    f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
-                    value = "01"
-                )
-                @checkbox(
-                    f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.02",
-                    value = "02"
-                )
-                @checkbox(
-                    f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
-                    value = "03"
-                )
-                @checkbox(
-                    f = f("msbServices[]"),
-                    labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
-                    value = "04"
-                )
+                @if(msbServiceValues.contains("01")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
+                        value = "01"
+                    )
+                }
+                @if(msbServiceValues.contains("02")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.02",
+                        value = "02"
+                    )
+                }
+                @if(msbServiceValues.contains("03")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                        value = "03"
+                    )
+                }
+                @if(msbServiceValues.contains("04")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
+                        value = "04"
+                    )
+                }
             }
         }
 
