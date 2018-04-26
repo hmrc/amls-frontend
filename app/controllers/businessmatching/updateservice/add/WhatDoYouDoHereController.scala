@@ -64,13 +64,9 @@ class WhatDoYouDoHereController @Inject()(
 
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) => {
-                model
-              }
+              case Some(model) =>  model
             } flatMap {
-              case Some(model) => {
-                router.getRoute(WhatDoYouDoHerePageId, model, edit)
-              }
+              case Some(model) => router.getRoute(WhatDoYouDoHerePageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }

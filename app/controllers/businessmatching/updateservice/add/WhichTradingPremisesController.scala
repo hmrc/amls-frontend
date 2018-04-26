@@ -81,8 +81,9 @@ class WhichTradingPremisesController @Inject()(
             BadRequest(which_trading_premises(f, edit, tradingPremises, BusinessActivities.getValue(activity)))
           } getOrElse InternalServerError("Cannot retrieve form data")
 
-          case ValidForm(_, data) => dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-            model.tradingPremisesActivities(Some(data))
+          case ValidForm(_, data) =>
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => model.tradingPremisesActivities(Some(data))
           } flatMap {
             case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)
             case _ => Future.successful(InternalServerError("Cannot retrieve form data"))

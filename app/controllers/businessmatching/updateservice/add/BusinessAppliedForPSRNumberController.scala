@@ -17,6 +17,8 @@
 package controllers.businessmatching.updateservice.add
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
@@ -42,17 +44,13 @@ class BusinessAppliedForPSRNumberController @Inject()(
                                                        val router: Router[AddServiceFlowModel]
                                                      ) extends BaseController {
 
-
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        businessMatchingService.getModel.value map { maybeBm =>
-          val form: Form2[BusinessAppliedForPSRNumber] = (for {
-            bm <- maybeBm
-            number <- bm.businessAppliedForPSRNumber
-          } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
-          Ok(business_applied_for_psr_number(form, edit, maybeBm.fold(false)(_.preAppComplete)))
-        }
+        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { case model =>
+          val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
+          Ok(business_applied_for_psr_number(form, edit))
+        } getOrElse InternalServerError("Unable to show the view")
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -64,14 +62,9 @@ class BusinessAppliedForPSRNumberController @Inject()(
 
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) => {
-                model.businessAppliedForPSRNumber(data)
-              }
+              case Some(model) => model.businessAppliedForPSRNumber(data)
             } flatMap {
-              case Some(model) => {
-                println(">>>>>>>>>>>>>>>>>>>>>>>>>>" + model)
-                router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
-              }
+              case Some(model) => router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }

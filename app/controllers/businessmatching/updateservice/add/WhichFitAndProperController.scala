@@ -70,17 +70,12 @@ class WhichFitAndProperController @Inject()(
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) => {
-                model.responsiblePeople(Some(data))
-              }
+              case Some(model) => model.responsiblePeople(Some(data))
             } flatMap {
-              case Some(model) => {
-                router.getRoute(WhichFitAndProperPageId, model, edit)
-              }
+              case Some(model) => router.getRoute(WhichFitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }
-          case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
         }
   }
 }

@@ -17,14 +17,12 @@
 package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, _}
-import models.moneyservicebusiness.MoneyServiceBusiness
+import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, FormTypes}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.{Reads, Writes, _}
-import utils.TraversableValidators._
 import play.api.libs.functional.syntax._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
@@ -74,8 +72,6 @@ object BusinessActivity {
       case "07" => Valid(TelephonePaymentService)
       case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
-
-
 
   implicit val activityFormWrite = Write[BusinessActivity, String] {
       case AccountancyServices => "01"

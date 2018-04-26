@@ -55,7 +55,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       router = createRouter[AddServiceFlowModel]
     )
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
+    //mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
@@ -72,13 +72,6 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
-
-    //    def setupModel(model: Option[BusinessMatching]) = when {
-    //      controller.businessMatchingService.getModel(any(), any(), any())
-    //    } thenReturn (model match {
-    //      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
-    //      case _ => OptionT.none[Future, BusinessMatching]
-    //    })
   }
 
 
@@ -86,6 +79,9 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
     "get is called" must {
       "return OK with 'msb_subservices' view" in new Fixture {
+
+        mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+                                                msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)

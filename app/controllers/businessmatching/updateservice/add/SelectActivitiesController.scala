@@ -96,14 +96,15 @@ class SelectActivitiesController @Inject()(
           } getOrElse InternalServerError("Could not get form data")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { model =>
-              model.getOrElse(AddServiceFlowModel()) match {
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              model => model.getOrElse(AddServiceFlowModel()) match {
                 case m if !m.activity.contains(data) =>
                   m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
                 case m => m.activity(data)
               }
-            } flatMap { case Some(model) =>
-              router.getRoute(SelectActivitiesPageId, model, edit)
+            } flatMap {
+              case Some(model) => router.getRoute(SelectActivitiesPageId, model, edit)
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
         }
   }

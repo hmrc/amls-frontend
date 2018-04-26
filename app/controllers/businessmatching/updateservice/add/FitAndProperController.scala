@@ -58,7 +58,6 @@ class FitAndProperController @Inject()(
           val form = model.fitAndProper map { v => Form2(v) } getOrElse EmptyForm
           Ok(fit_and_proper(form, edit))
         } getOrElse InternalServerError("Unable to show the view")
-
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -70,13 +69,10 @@ class FitAndProperController @Inject()(
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-              model.isfitAndProper(Some(data))
-                .responsiblePeople(if (data) model.responsiblePeople else None)
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) => model.isfitAndProper(Some(data)).responsiblePeople(if (data) model.responsiblePeople else None)
             } flatMap {
-              case Some(model) => {
-                router.getRoute(FitAndProperPageId, model, edit)
-              }
+              case Some(model) => router.getRoute(FitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
         }

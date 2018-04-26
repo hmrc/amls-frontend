@@ -76,8 +76,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
-    when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-      (any(), any(), any())).thenReturn(Future.successful(None))
+
 
     when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -98,21 +97,16 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
       "return OK and display business_applied_for_psr_number view with pre populated data" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
-        var psr = businessMatching.businessAppliedForPSRNumber match {
-          case Some(BusinessAppliedForPSRNumberYes(num)) => num
-          case _ => "invalid"
-        }
+        mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+                                                businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")))))
 
-        when {
-          controller.businessMatchingService.getModel(any(), any(), any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
-        document.select("input[name=regNumber]").`val` mustBe psr
+        document.select("input[name=regNumber]").`val` mustBe "123456"
       }
     }
 

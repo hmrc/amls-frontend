@@ -17,15 +17,27 @@
 package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation._
-import jto.validation.ValidationError
-import play.api.libs.json._
-import cats.data.Validated.{Valid, Invalid}
+import jto.validation.{From, Rule, ValidationError, _}
+import play.api.Play.current
+import play.api.i18n.Messages.Implicits._
+import play.api.i18n.{Lang, Messages}
+import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
 
 case class MsbServices(msbServices : Set[MsbService])
 
-sealed trait MsbService
+sealed trait MsbService {
+
+  def getMessage(implicit lang: Lang): String = {
+    val message = "businessmatching.services.list.lbl."
+    this match {
+      case TransmittingMoney => Messages(s"${message}01")
+      case CurrencyExchange => Messages(s"${message}02")
+      case ChequeCashingNotScrapMetal => Messages(s"${message}03")
+      case ChequeCashingScrapMetal => Messages(s"${message}04")
+    }
+  }
+}
 
 case object TransmittingMoney extends MsbService
 case object CurrencyExchange extends MsbService
@@ -67,6 +79,13 @@ object MsbService {
 
 object MsbServices {
 
+  val all: Set[MsbService] = Set(
+    TransmittingMoney,
+    CurrencyExchange,
+    ChequeCashingNotScrapMetal,
+    ChequeCashingScrapMetal
+  )
+
   import utils.MappingUtils.Implicits._
 
   implicit def formReads
@@ -85,5 +104,13 @@ object MsbServices {
   }
 
   implicit val formats = Json.format[MsbServices]
+
+  def getValue(ba:MsbService): String =
+    ba match {
+      case TransmittingMoney => "01"
+      case CurrencyExchange => "02"
+      case ChequeCashingNotScrapMetal => "03"
+      case ChequeCashingScrapMetal => "04"
+    }
 }
 

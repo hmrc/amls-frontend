@@ -73,11 +73,12 @@ class TradingPremisesController @Inject()(
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) { case Some(model) =>
-              model.isActivityAtTradingPremises(Some(data))
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              case Some(model) =>model.isActivityAtTradingPremises(Some(data))
                 .tradingPremisesActivities(if (data) model.tradingPremisesActivities else None)
-            } flatMap { model =>
-              router.getRoute(TradingPremisesPageId, model.get, edit)
+            } flatMap {
+              case Some(model) => router.getRoute(TradingPremisesPageId, model, edit)
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
         }
   }

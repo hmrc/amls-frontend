@@ -72,10 +72,10 @@ class AddMoreActivitiesController @Inject()(
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) =>
-                model.copy(addMoreActivities = Some(data))
-            } flatMap { case Some(model) =>
-              router.getRoute(AddMoreAcivitiesPageId, model)
+              case Some(model) => model.copy(addMoreActivities = Some(data))
+            } flatMap {
+              case Some(model) => router.getRoute(AddMoreAcivitiesPageId, model)
+              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
 
         }
