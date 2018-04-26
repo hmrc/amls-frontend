@@ -43,10 +43,13 @@ case class AddServiceFlowModel(
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
       hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
 
-  def msbServices(p: MsbServices): AddServiceFlowModel =
+  def msbServices(p: MsbServices): AddServiceFlowModel = {
+    val tradingPremisesMsbActivities = Some(MsbServices(this.tradingPremisesMsbServices.getOrElse(MsbServices(Set())).msbServices.intersect(p.msbServices)))
     this.copy(msbServices = Some(p),
+      tradingPremisesMsbServices = tradingPremisesMsbActivities,
       hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
+  }
 
   def tradingPremisesMsbServices(p: MsbServices): AddServiceFlowModel =
     this.copy(tradingPremisesMsbServices = Some(p),
