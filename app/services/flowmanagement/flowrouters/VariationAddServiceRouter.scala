@@ -55,36 +55,21 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
       // Money Service Business
       case SubServicesPageId =>
-        (model.msbServices.isDefined, model.msbServices.get.msbServices.contains(TransmittingMoney), model.businessAppliedForPSRNumber.isEmpty, edit) match {
-          case (true, true, true, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (true, false, _, false) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-          case (_, _, _, true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        (model.msbServices.getOrElse(MsbServices(Set())).msbServices.contains(TransmittingMoney), edit, model.businessAppliedForPSRNumber.isDefined) match {
+          case (true, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+          case (false, false, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+          case (true, true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+          case (_, true, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
       //psr number pages
-      case BusinessAppliedForPSRNumberPageId => {
-        model.businessAppliedForPSRNumber.isDefined match {
-          case true => {
-            edit match {
-              case true => {
-                model.businessAppliedForPSRNumber match {
-                  case Some(BusinessAppliedForPSRNumberYes(_)) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-                  case Some(BusinessAppliedForPSRNumberNo) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-                }
-              }
-              case false => {
-                model.businessAppliedForPSRNumber match {
-                  case Some(BusinessAppliedForPSRNumberYes(_)) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-                  case Some(BusinessAppliedForPSRNumberNo) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-                }
-              }
-            }
-          }
-          case false => {
-            Future.successful(error(BusinessAppliedForPSRNumberPageId))
-          }
+      case BusinessAppliedForPSRNumberPageId =>
+        (edit, model.businessAppliedForPSRNumber) match {
+          case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+          case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+          case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
+          case (_, None) => Future.successful(error(BusinessAppliedForPSRNumberPageId))
         }
-      }
 
       case NoPSRPageId => {
         Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
@@ -123,12 +108,9 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
         }
 
       case WhichTradingPremisesPageId =>
-        model.msbServices.isDefined match {
-          case (true) =>  (model.msbServices.get.msbServices.size > 1) match {
-            case (true) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-            case (false) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          }
-          case (false) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        model.msbServices.getOrElse(MsbServices(Set())).msbServices.size > 1 match {
+          case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+          case false => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
       case WhatDoYouDoHerePageId => {
@@ -148,7 +130,6 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
         model.addMoreActivities match {
           case Some(true) =>
             Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
-
           case _ =>
             newServiceInformationRedirect getOrElse error(pageId)
         }
