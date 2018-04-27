@@ -33,6 +33,8 @@ case class AddServiceFlowModel(
                                 msbServices: Option[MsbServices] = None,
                                 tradingPremisesMsbServices: Option[MsbServices] = None
                               ) {
+  def clear(): AddServiceFlowModel = AddServiceFlowModel()
+
   def activity(p: BusinessActivity): AddServiceFlowModel =
     this.copy(activity = Some(p),
       hasChanged = hasChanged || !this.activity.contains(p),

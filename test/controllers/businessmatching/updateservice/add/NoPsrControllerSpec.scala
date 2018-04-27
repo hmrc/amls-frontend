@@ -17,8 +17,8 @@
 package controllers.businessmatching.updateservice.add
 
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import models.businessmatching.HighValueDealing
-import models.flowmanagement.AddServiceFlowModel
+import models.businessmatching._
+import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
@@ -80,11 +80,19 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
 
   "post is called" must {
 
-    "return SEE_OTHER" in new Fixture {
+    "clear the flow model" in new Fixture {
+
+      val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+        msbServices = Some(MsbServices(Set(TransmittingMoney))),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+        hasChanged = true)
+
+      mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
       val result = controller.post()(request.withFormUrlEncodedBody())
 
       status(result) mustBe SEE_OTHER
+      controller.router.verify(NoPSRPageId, AddServiceFlowModel())
     }
   }
 }
