@@ -77,4 +77,14 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
       }
     }
   }
+
+  "post is called" must {
+
+    "return SEE_OTHER" in new Fixture {
+
+      val result = controller.post()(request.withFormUrlEncodedBody())
+
+      status(result) mustBe SEE_OTHER
+    }
+  }
 }
