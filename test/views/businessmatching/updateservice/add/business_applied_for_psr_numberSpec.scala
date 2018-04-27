@@ -73,7 +73,7 @@ class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMat
     "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      override def view = business_applied_for_psr_number(form2, edit = true, showReturnLink = false)
+      override def view = business_applied_for_psr_number(form2, edit = true)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

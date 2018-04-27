@@ -54,7 +54,7 @@ class WhatDoYouDoHereController @Inject()(
           val msbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
           val form: Form2[MsbServices] = EmptyForm
           msbServiceValues = MsbServices.all.intersect(model.msbServices.getOrElse(MsbServices(Set())).msbServices).map(MsbServices.getValue)
-          Ok(what_do_you_do_here(form, edit, false, msbServiceValues))
+          Ok(what_do_you_do_here(form, edit, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
   }
 
@@ -64,7 +64,7 @@ class WhatDoYouDoHereController @Inject()(
       implicit request =>
         Form2[MsbServices](request.body) match {
           case f: InvalidForm => {
-            Future.successful(BadRequest(what_do_you_do_here(f, edit, false, msbServiceValues)))
+            Future.successful(BadRequest(what_do_you_do_here(f, edit, msbServiceValues)))
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {

@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, msbServiceValues: Set[String] = Set())(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, msbServiceValues: Set[String] = Set())(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -76,7 +76,7 @@
             }
         }
 
-        @submit(edit, returnLink = showReturnLink)
+        @submit(edit, returnLink = false)
 
     }
 }

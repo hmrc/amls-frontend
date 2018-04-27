@@ -59,7 +59,7 @@ class AddMoreActivitiesController @Inject()(
         (for {
           activities <- OptionT(getActivities)
           preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(add_more_activities(EmptyForm, activities, showReturnLink = false))) getOrElse InternalServerError("Unable to show the page")
+        } yield Ok(add_more_activities(EmptyForm, activities))) getOrElse InternalServerError("Unable to show the page")
   }
 
   def post() = Authorised.async {

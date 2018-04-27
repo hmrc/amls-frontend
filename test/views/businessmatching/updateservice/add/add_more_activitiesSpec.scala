@@ -52,15 +52,9 @@ class add_more_activitiesSpec extends GenericTestHelper with MustMatchers {
     }
 
     "not show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = false)
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String])
 
       doc.body().text() must not include Messages("link.return.registration.progress")
-    }
-
-    " show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = true)
-
-      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {

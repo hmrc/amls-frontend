@@ -83,7 +83,7 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
     "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = what_do_you_do_here(form2, edit = false, showReturnLink = false)
+      override def view = what_do_you_do_here(form2, edit = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

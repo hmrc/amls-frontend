@@ -19,7 +19,7 @@
 @import utils.HtmlElementHelpers._
 
 
-@(f: forms.Form2[_], existing: Set[String], showReturnLink: Boolean = false)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], existing: Set[String])(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -59,6 +59,6 @@
                 )
             }
         }
-        @submit(buttonMessageKey = Some("button.continue"), returnLink = showReturnLink)
+        @submit(buttonMessageKey = Some("button.continue"), returnLink = false)
     }
 }

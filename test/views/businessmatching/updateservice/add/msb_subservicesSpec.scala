@@ -66,7 +66,7 @@ class msb_subservicesSpec extends GenericTestHelper with MustMatchers {
     "hide the return to progress link" in new ViewFixture {
       val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
 
-      override def view = msb_subservices(form2, edit = false, showReturnLink = false)
+      override def view = msb_subservices(form2, edit = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
