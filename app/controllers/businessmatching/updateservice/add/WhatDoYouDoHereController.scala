@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{MsbService, MsbServices}
 import models.flowmanagement._
@@ -51,9 +51,9 @@ class WhatDoYouDoHereController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
         } yield {
-          val msbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
-          val form: Form2[MsbServices] = EmptyForm
-          msbServiceValues = MsbServices.all.intersect(model.msbServices.getOrElse(MsbServices(Set())).msbServices).map(MsbServices.getValue)
+          val form: Form2[MsbServices] = Form2(MsbServices(model.tradingPremisesMsbServices.getOrElse(MsbServices(Set())).msbServices))
+          val flowMsbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
+          msbServiceValues = MsbServices.all.intersect(flowMsbServices).map(MsbServices.getValue)
           Ok(what_do_you_do_here(form, edit, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
   }
