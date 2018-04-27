@@ -29,13 +29,17 @@
     title = Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
-
-    @m("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo")
-
+    <p>
+        @m("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1")
+    </p>
+    <p>
+        @m("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2")
+    </p>
     @anchor(
         attrHref = controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.get.url,
         attrRole = true,
         linkText = Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text"),
-        visuallyhidden = Messages("summary.businessmatching")
+        visuallyhidden = Messages("summary.businessmatching"
+        )
     )
 }

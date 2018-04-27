@@ -30,7 +30,7 @@
     heading = header
 ) {
 
-    <p>@Messages("lbl.select.all")</p>
+    <p>@Messages("businessmatching.updateservice.whatdoyoudohere.list.heading")</p>
 
     @form(f, controllers.businessmatching.updateservice.add.routes.WhatDoYouDoHereController.post(edit)) {
 
@@ -76,7 +76,7 @@
             }
         }
 
-        @submit(edit, returnLink = false)
+        @submit(edit, buttonId = Some("whatdoyouwanttodohere-submit"), returnLink = false)
 
     }
 }

@@ -156,6 +156,6 @@
     }
 
     @form(f, controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.post()) {
-        @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+        @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))
     }
 }

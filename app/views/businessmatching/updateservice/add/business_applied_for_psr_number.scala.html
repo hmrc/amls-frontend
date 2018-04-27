@@ -35,10 +35,12 @@
 )  {
 
     @form(f, controllers.businessmatching.updateservice.add.routes.BusinessAppliedForPSRNumberController.post(edit)) {
-
+<p>
+    @m("businessmatching.updateservice.psr.number.hint")
+</p>
         @fieldset(
             f = f("appliedfor-fieldset"),
-            legend = "businessmatching.psr.number.title",
+            legend = "businessmatching.updateservice.psr.number.title",
             legendHidden = true,
             panel = false,
             classes = Seq("inline")
@@ -76,11 +78,11 @@
                 // classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
                 dataAttrs = digitsOnlyAttributes,
                 field = f("regNumber"),
-                hintText = "businessmatching.psr.number.hint",
-                labelText = "businessmatching.psr.number.lbl"
+                hintText = "",
+                labelText = "businessmatching.updateservice.psr.number.lbl"
             )
         }
 
-        @submit(edit, returnLink = false)
+        @submit(edit, returnLink = false, buttonId = Some("appliedspsr-submit"))
    }
 }
