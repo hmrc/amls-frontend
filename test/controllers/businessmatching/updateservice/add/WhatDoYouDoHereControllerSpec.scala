@@ -21,9 +21,8 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddServiceFlowModel, WhatDoYouDoHerePageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
-import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -56,11 +55,6 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
       router = createRouter[AddServiceFlowModel]
     )
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
-
-    mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
-
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
@@ -76,20 +70,15 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
-
-    //    def setupModel(model: Option[BusinessMatching]) = when {
-    //      controller.businessMatchingService.getModel(any(), any(), any())
-    //    } thenReturn (model match {
-    //      case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
-    //      case _ => OptionT.none[Future, BusinessMatching]
-    //    })
   }
 
 
-  "SubServicesController" when {
+  "WhatDoYouDoHereController" when {
 
     "get is called" must {
       "return OK with 'whatdoyoudohere' view" in new Fixture {
+        mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+          msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -107,6 +96,42 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
         val result = controller.post()(request.withFormUrlEncodedBody())
 
         status(result) mustBe BAD_REQUEST
+      }
+
+      "update the tradingPremisesMsbServices when not all activities are selected" in new Fixture {
+        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+          msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+          hasChanged = true))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "msbServices[]" -> "01"
+        ))
+
+        status(result) mustBe SEE_OTHER
+        controller.router.verify(WhatDoYouDoHerePageId,
+          AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            tradingPremisesMsbServices = Some(MsbServices(Set(TransmittingMoney))),
+            hasChanged = true))
+      }
+
+      "update the tradingPremisesMsbServices when all activities are selected" in new Fixture {
+        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+          msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+          hasChanged = true)
+        )
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "msbServices[]" -> "03",
+          "msbServices[]" -> "04"
+        ))
+
+        status(result) mustBe SEE_OTHER
+        controller.router.verify(WhatDoYouDoHerePageId,
+          AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            tradingPremisesMsbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            hasChanged = true))
       }
     }
 
