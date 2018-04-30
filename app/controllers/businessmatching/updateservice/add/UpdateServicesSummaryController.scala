@@ -47,9 +47,9 @@ class UpdateServicesSummaryController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { model =>
-          Ok(update_services_summary(EmptyForm, model))
-        } getOrElse InternalServerError("Unable to get the flow model")
+        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) collect {
+          case model if !model.empty() => Ok(update_services_summary(EmptyForm, model))
+        } getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
   def post() = Authorised.async {

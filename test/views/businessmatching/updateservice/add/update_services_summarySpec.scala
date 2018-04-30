@@ -17,7 +17,6 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import forms.EmptyForm
 import models.flowmanagement.AddServiceFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -46,14 +45,6 @@ class update_services_summarySpec extends GenericTestHelper with MustMatchers {
 
     "have correct subHeading" in new ViewFixture {
       subHeading.html must include(Messages("summary.updateservice"))
-    }
-
-    "show the correct content" in new ViewFixture {
-
-    }
-
-    "show the return link" in new ViewFixture {
-      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
   }
 }
