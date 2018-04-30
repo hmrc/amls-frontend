@@ -52,8 +52,8 @@ class update_services_summarySpec extends GenericTestHelper with MustMatchers {
 
     }
 
-    "not show the return link" in new ViewFixture {
-      doc.body().text() must not include Messages("link.return.registration.progress")
+    "show the return link" in new ViewFixture {
+      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
   }
 }

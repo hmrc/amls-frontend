@@ -59,7 +59,8 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
       override def view = what_do_you_do_here(form2, edit = false)
 
       doc.title must startWith(Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.updateservice"))
-      heading.html must be(Messages("businessmatching.updateservice.whatdoyoudohere.title"))
+      heading.html must be(Messages("businessmatching.updateservice.whatdoyoudohere.heading"))
+
       subHeading.html must include(Messages("summary.updateservice"))
 
     }

@@ -81,12 +81,12 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
   "post is called" must {
 
     "clear the flow model" in new Fixture {
-
+//Not convinced this test is valid
       val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
         msbServices = Some(MsbServices(Set(TransmittingMoney))),
         businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
         hasChanged = true)
-
+      mockCacheFetch(Some(AddServiceFlowModel(None)))
       mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
 
       val result = controller.post()(request.withFormUrlEncodedBody())

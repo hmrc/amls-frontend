@@ -16,6 +16,7 @@
 
 package views.businessmatching.updateservice.add
 
+import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -27,7 +28,7 @@ class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = cannot_add_services()
+    def view = cannot_add_services(EmptyForm)
   }
 
   "The cannot_add_services view" must {
@@ -45,7 +46,8 @@ class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2"))
     }
   }
 

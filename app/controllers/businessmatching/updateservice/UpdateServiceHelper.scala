@@ -114,5 +114,10 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
 
   def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddServiceFlowModel] =
     OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
-
+//
+//  def updateTradingPremisesSubServices(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) = for {
+//    tradingPremises <- OptionT.liftF(tradingPremisesData)
+//    whatDoesYourBusinessDo: MsbServices <- model.tradingPremisesMsbServices
+//    Something <- tradingPremisesService.patchTradingPremisesBusinessActivities(tradingPremises)(whatDoesYourBusinessDo)
+//  }
 }

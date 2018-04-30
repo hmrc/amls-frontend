@@ -184,7 +184,7 @@ GET         /business-matching/check-your-answers                               
 POST        /business-matching/check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
 GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
-POST        /business-matching/no-psr                                                controllers.businessmatching.NoPsrController.post()
+#POST        /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.post()
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
@@ -351,6 +351,7 @@ GET         /update-service/what-do-you-do-here                                 
 POST        /update-service/what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
 
 GET         /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
+POST        /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
