@@ -51,4 +51,6 @@ trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar {
     )).withHeaders((csrfConfig.headerName, token))
   }
 
+  def and = afterWord("and")
+
 }
