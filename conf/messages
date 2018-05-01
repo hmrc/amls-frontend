@@ -1172,7 +1172,7 @@ businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want 
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which services does your business provide?
 businessmatching.updateservice.msb.services.heading = Which services does your business provide?
-businessmatching.updateservice.msb.services.list.heading = Select all that apply
+businessmatching.updateservice.msb.services.list.heading = Choose at least one
 businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
 businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
