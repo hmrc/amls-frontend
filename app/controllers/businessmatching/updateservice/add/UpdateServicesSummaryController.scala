@@ -61,7 +61,7 @@ class UpdateServicesSummaryController @Inject()(
           _ <- helper.updateTradingPremises(model)
           _ <- helper.updateResponsiblePeople(model)
           _ <- helper.updateSupervision
-          _ <- OptionT(helper.updateBusinessMatching(activity))
+          _ <- OptionT(helper.updateBusinessMatching(model))
           _ <- OptionT(helper.updateServicesRegister(activity))
           _ <- OptionT(helper.updateBusinessActivities(activity))
           _ <- helper.updateHasAcceptedFlag(model)
