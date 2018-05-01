@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
@@ -85,9 +85,8 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
     indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {
       _.index.toSeq
     }) orElse OptionT.some(Seq.empty)
-    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](
-      tradingPremisesService.addBusinessActivtiesToTradingPremises(indices, tradingPremises, activity, false)
-    )
+    msbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(MsbServices(Set.empty[MsbService]))
+    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](tradingPremisesService.updateTradingPremises(indices, tradingPremises, activity, Some(msbServices), false))
     _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, newTradingPremises))
   } yield tradingPremises
 
@@ -114,10 +113,16 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
 
   def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddServiceFlowModel] =
     OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
-//
-//  def updateTradingPremisesSubServices(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) = for {
+
+//  def updateTradingPremisesSubServices(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
 //    tradingPremises <- OptionT.liftF(tradingPremisesData)
-//    whatDoesYourBusinessDo: MsbServices <- model.tradingPremisesMsbServices
-//    Something <- tradingPremisesService.patchTradingPremisesBusinessActivities(tradingPremises)(whatDoesYourBusinessDo)
-//  }
+//    msbServices: models.tradingpremises.MsbServices <- model.tradingPremisesMsbServices
+//    indices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices map {
+//      _.msbServices
+//    }) orElse OptionT.some(Set.empty)
+//    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](
+//      tradingPremisesService.addSubServicesToTradingPremises(tradingPremises, msbServices, false)
+//    )
+//    _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, newTradingPremises))
+//  } yield tradingPremises
 }

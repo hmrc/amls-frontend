@@ -17,30 +17,51 @@
 package services
 
 import javax.inject.Singleton
-
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
+import models.tradingpremises
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+
+
 
 @Singleton
 class TradingPremisesService {
 
 
-  def addBusinessActivtiesToTradingPremises(
-                                             indices: Seq[Int],
-                                             tradingPremises: Seq[TradingPremises],
-                                             activity: BusinessActivity,
-                                             remove: Boolean): Seq[TradingPremises] =
-    patchTradingPremisesBusinessActivities(tradingPremises){ (wdybd, index) =>
-      wdybd.copy({
-        if (indices contains index) {
-          wdybd.activities + activity
-        } else if (remove) {
-          wdybd.activities - activity
-        } else {
-          wdybd.activities
-        }
-      })
+  def updateTradingPremises(
+                             indices: Seq[Int],
+                             tradingPremises: Seq[models.tradingpremises.TradingPremises],
+                             activity: models.businessmatching.BusinessActivity,
+                             msbServicesInput: Option[models.businessmatching.MsbServices],
+                             remove: Boolean): Seq[TradingPremises] = {
+
+    val updatedTradingPremises: Seq[TradingPremises] = {
+      patchTradingPremisesBusinessActivities(tradingPremises) { (wdybd, index) =>
+        wdybd.copy(
+          if (indices contains index) {
+            wdybd.activities + activity
+          } else if (remove) {
+            wdybd.activities - activity
+          } else {
+            wdybd.activities
+          }
+        )
+      }
     }
+
+    if(msbServicesInput.isDefined) {
+      patchTradingPremisesMsbSubServices(updatedTradingPremises) { (tpservices, index) =>
+        tpservices.copy(
+          if ((indices contains index)) {
+            tpservices.services ++ tradingpremises.MsbServices.convertServices(msbServicesInput.get.msbServices)
+          } else {
+            tpservices.services
+          }
+        )
+      }
+    } else {
+      updatedTradingPremises
+    }
+  }
 
   def removeBusinessActivitiesFromTradingPremises(
                                                    tradingPremises: Seq[TradingPremises],
@@ -61,15 +82,29 @@ class TradingPremisesService {
       }
     }
 
-
-  def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
-                                            (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] =
+  private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
+                                                    (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
-      tp.whatDoesYourBusinessDoAtThisAddress(
-        tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)){ wdybd =>
+      val stuff: TradingPremises = tp.whatDoesYourBusinessDoAtThisAddress {
+        tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)) { wdybd =>
           fn(wdybd, index)
         }
-      ).copy(hasAccepted = true)
+      }
+      stuff.copy(hasAccepted = true)
     }
+  }
 
+  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises])
+                                          (fn: ((models.tradingpremises.MsbServices, Int) => models.tradingpremises.MsbServices)): Seq[TradingPremises] = {
+    tradingPremises.zipWithIndex map { case (tp, index) =>
+      val stuff: TradingPremises = tp.msbServices {
+        //val emptyMsbServices = Set.e
+        tp.msbServices.fold(models.tradingpremises.MsbServices(Set.empty[models.tradingpremises.MsbService])) { tpservices =>
+          fn(tpservices, index)
+        }
+      }
+      stuff.copy(hasAccepted = true)
+    }
+  }
 }
+

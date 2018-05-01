@@ -65,12 +65,13 @@ case class TradingPremises(
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),
       hasAccepted = hasAccepted && this.whatDoesYourBusinessDoAtThisAddress.contains(p))
 
-  def msbServices(p: MsbServices): TradingPremises =
+  def msbServices(p: models.tradingpremises.MsbServices): models.tradingpremises.TradingPremises =
     this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def registeringAgentPremises(p: RegisteringAgentPremises): TradingPremises =
-    this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
+    this.copy(registeringAgentPremises = Some(p), hasChanged =
+      hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
   def isComplete: Boolean =

@@ -124,7 +124,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn Future.successful(Some(serviceChangeRegister))
 
         when {
-          controller.tradingPremisesService.addBusinessActivtiesToTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(false))
+          controller.tradingPremisesService.updateTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(None), eqTo(false))
         } thenReturn modifiedTradingPremises
 
         when {

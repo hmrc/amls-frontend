@@ -16,13 +16,17 @@
 
 package models.businessmatching
 
+import cats.std.map
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, _}
+import models.tradingpremises
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
+import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
+
 
 case class MsbServices(msbServices : Set[MsbService])
 
@@ -112,5 +116,18 @@ object MsbServices {
       case ChequeCashingNotScrapMetal => "03"
       case ChequeCashingScrapMetal => "04"
     }
+
+  implicit def convertServices(msbServices: Set[models.tradingpremises.MsbService]): Set[models.businessmatching.MsbService] =
+    msbServices map {s => convertSingleService(s)}
+
+
+  implicit def convertSingleService(msbService: models.tradingpremises.MsbService) : models.businessmatching.MsbService = {
+    msbService match {
+      case TPTransmittingMoney => TransmittingMoney
+      case TPCurrencyExchange => CurrencyExchange
+      case TPChequeCashingNotScrapMetal => ChequeCashingNotScrapMetal
+      case TPChequeCashingScrapMetal => ChequeCashingScrapMetal
+    }
+  }
 }
 
