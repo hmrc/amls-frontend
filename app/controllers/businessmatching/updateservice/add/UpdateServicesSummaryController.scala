@@ -49,7 +49,7 @@ class UpdateServicesSummaryController @Inject()(
       implicit request =>
         OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) collect {
           case model if !model.empty() => Ok(update_services_summary(EmptyForm, model))
-        } getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+        } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
   def post() = Authorised.async {
