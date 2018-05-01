@@ -88,6 +88,41 @@ class TradingPremisesServiceSpec extends PlaySpec
 
         }
       }
+
+      "there will be sub activities for MSB" which {
+        "will add a provided sub activity" when {
+          "no items exist" in new Fixture {
+
+            val models = Seq(
+              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+            )
+
+            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+
+            result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingScrapMetal)))
+            result.head.isComplete mustBe true
+            result.head.hasChanged mustBe true
+          }
+        }
+
+        "will add a provided sub activity" when {
+          "some items exist" in new Fixture {
+
+            val models = Seq(
+              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get.copy(msbServices = Some(TPMsbServices(Set(ChequeCashingNotScrapMetal))))
+            )
+
+            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+
+            result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+            result.head.isComplete mustBe true
+            result.head.hasChanged mustBe true
+          }
+        }
+      }
+
+
+
     }
     "mark the trading premises as incomplete if there are no activities left" in new Fixture {
 

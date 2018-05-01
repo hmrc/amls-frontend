@@ -49,7 +49,7 @@ class TradingPremisesService {
     }
 
     if(msbServicesInput.isDefined) {
-      patchTradingPremisesMsbSubServices(updatedTradingPremises) { (tpservices, index) =>
+      patchTradingPremisesMsbSubServices(updatedTradingPremises, msbServicesInput.get) { (tpservices, index) =>
         tpservices.copy(
           if ((indices contains index)) {
             tpservices.services ++ tradingpremises.MsbServices.convertServices(msbServicesInput.get.msbServices)
@@ -94,12 +94,12 @@ class TradingPremisesService {
     }
   }
 
-  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises])
+  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.MsbServices)
                                           (fn: ((models.tradingpremises.MsbServices, Int) => models.tradingpremises.MsbServices)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
       val stuff: TradingPremises = tp.msbServices {
         //val emptyMsbServices = Set.e
-        tp.msbServices.fold(models.tradingpremises.MsbServices(Set.empty[models.tradingpremises.MsbService])) { tpservices =>
+        tp.msbServices.fold(tradingpremises.MsbServices(tradingpremises.MsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
           fn(tpservices, index)
         }
       }
