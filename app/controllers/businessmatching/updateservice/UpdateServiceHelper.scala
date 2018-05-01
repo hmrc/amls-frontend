@@ -124,7 +124,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
-      case Some(people) if model.activity.contains(TrustAndCompanyServices) =>
+      case Some(people) if model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness) =>
         responsiblePeopleService.updateFitAndProperFlag(people, indices)
       case Some(people) => people
     })

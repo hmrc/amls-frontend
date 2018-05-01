@@ -26,8 +26,9 @@ import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
-import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
+import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
+import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -62,11 +63,14 @@ class SelectActivitiesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
+          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
+          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
+            AddServiceFlowModel(activity = None)))
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
-
+          println(responsiblePeople)
           Ok(select_activities(form, edit, values, names))
         }) getOrElse InternalServerError("Failed to get activities")
   }
