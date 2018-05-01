@@ -23,6 +23,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.MoneyServiceBusiness
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
@@ -54,7 +55,8 @@ class NoPsrController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
+          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
+            AddServiceFlowModel(activity = Some(MoneyServiceBusiness))))
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           route <- OptionT.liftF(router.getRoute(NoPSRPageId, model))
         } yield route) getOrElse InternalServerError("Could not get the flow model")
