@@ -19,7 +19,7 @@ package services
 import javax.inject.Singleton
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
 import models.tradingpremises
-import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.{MsbServices, TradingPremises, WhatDoesYourBusinessDo}
 
 
 
@@ -97,13 +97,19 @@ class TradingPremisesService {
   private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.MsbServices)
                                           (fn: ((models.tradingpremises.MsbServices, Int) => models.tradingpremises.MsbServices)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
-      val stuff: TradingPremises = tp.msbServices {
-        //val emptyMsbServices = Set.e
-        tp.msbServices.fold(tradingpremises.MsbServices(tradingpremises.MsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
-          fn(tpservices, index)
+      tp match {
+        case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined => {
+          t.whatDoesYourBusinessDoAtThisAddress match {
+            case Some(x) if x.activities.contains(MoneyServiceBusiness) =>
+              val services = tp.msbServices.fold(tradingpremises.MsbServices(tradingpremises.MsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
+                fn(tpservices, index)
+              }
+              tp.msbServices(services).copy(hasAccepted = true)
+            case _ => tp
+          }
         }
+        case _ => tp
       }
-      stuff.copy(hasAccepted = true)
     }
   }
 }
