@@ -119,6 +119,8 @@ class AppConfig @Inject()(val config: iServicesConfig) {
 
   def enrolmentStoreUrl = config.baseUrl("enrolment-store-proxy")
 
+  def enrolmentStubUrl = config.baseUrl("enrolment-stubs")
+
   def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
 
   def enrolmentStoreServiceStub = config.getString("enrolment-store-proxy.service-stub")
