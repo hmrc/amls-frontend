@@ -117,11 +117,11 @@ object BusinessMatchingMsbServices {
       case ChequeCashingScrapMetal => "04"
     }
 
-  implicit def convertServices(msbServices: Set[models.tradingpremises.MsbService]): Set[models.businessmatching.BusinessMatchingMsbService] =
+  implicit def convertServices(msbServices: Set[models.tradingpremises.TradingPremisesMsbService]): Set[models.businessmatching.BusinessMatchingMsbService] =
     msbServices map {s => convertSingleService(s)}
 
 
-  implicit def convertSingleService(msbService: models.tradingpremises.MsbService) : models.businessmatching.BusinessMatchingMsbService = {
+  implicit def convertSingleService(msbService: models.tradingpremises.TradingPremisesMsbService) : models.businessmatching.BusinessMatchingMsbService = {
     msbService match {
       case TPTransmittingMoney => TransmittingMoney
       case TPCurrencyExchange => CurrencyExchange

@@ -231,7 +231,7 @@ class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSui
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),

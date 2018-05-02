@@ -31,7 +31,7 @@ case class TradingPremises(
                             agentCompanyDetails: Option[AgentCompanyDetails] = None,
                             agentPartnership: Option[AgentPartnership] = None,
                             whatDoesYourBusinessDoAtThisAddress: Option[WhatDoesYourBusinessDo] = None,
-                            msbServices: Option[MsbServices] = None,
+                            msbServices: Option[TradingPremisesMsbServices] = None,
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
                             status: Option[String] = None,
@@ -65,7 +65,7 @@ case class TradingPremises(
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),
       hasAccepted = hasAccepted && this.whatDoesYourBusinessDoAtThisAddress.contains(p))
 
-  def msbServices(p: models.tradingpremises.MsbServices): models.tradingpremises.TradingPremises =
+  def msbServices(p: models.tradingpremises.TradingPremisesMsbServices): models.tradingpremises.TradingPremises =
     this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
 
@@ -160,7 +160,7 @@ object TradingPremises {
         readAgentCompanyDetails and
         backCompatibleReads[AgentPartnership]("agentPartnership") and
         backCompatibleReads[WhatDoesYourBusinessDo]("whatDoesYourBusinessDoAtThisAddress") and
-        backCompatibleReads[MsbServices]("msbServices") and
+        backCompatibleReads[TradingPremisesMsbServices]("msbServices") and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
         } and

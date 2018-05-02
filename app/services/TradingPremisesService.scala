@@ -19,7 +19,7 @@ package services
 import javax.inject.Singleton
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
 import models.tradingpremises
-import models.tradingpremises.{MsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
 
 
 
@@ -52,7 +52,7 @@ class TradingPremisesService {
       patchTradingPremisesMsbSubServices(updatedTradingPremises, msbServicesInput.get) { (tpservices, index) =>
         tpservices.copy(
           if ((indices contains index)) {
-            tpservices.services ++ tradingpremises.MsbServices.convertServices(msbServicesInput.get.msbServices)
+            tpservices.services ++ tradingpremises.TradingPremisesMsbServices.convertServices(msbServicesInput.get.msbServices)
           } else {
             tpservices.services
           }
@@ -95,13 +95,13 @@ class TradingPremisesService {
   }
 
   private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.BusinessMatchingMsbServices)
-                                          (fn: ((models.tradingpremises.MsbServices, Int) => models.tradingpremises.MsbServices)): Seq[TradingPremises] = {
+                                          (fn: ((models.tradingpremises.TradingPremisesMsbServices, Int) => models.tradingpremises.TradingPremisesMsbServices)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp match {
         case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined => {
           t.whatDoesYourBusinessDoAtThisAddress match {
             case Some(x) if x.activities.contains(MoneyServiceBusiness) =>
-              val services = tp.msbServices.fold(tradingpremises.MsbServices(tradingpremises.MsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
+              val services = tp.msbServices.fold(tradingpremises.TradingPremisesMsbServices(tradingpremises.TradingPremisesMsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
                 fn(tpservices, index)
               }
               tp.msbServices(services).copy(hasAccepted = true)

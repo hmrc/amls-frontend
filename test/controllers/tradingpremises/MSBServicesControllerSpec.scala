@@ -19,8 +19,8 @@ package controllers.tradingpremises
 import connectors.DataCacheConnector
 import models.{TradingPremisesSection}
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange}
-import models.tradingpremises.{MsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
-CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, MsbService}
+import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
+CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremisesMsbService}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -259,7 +259,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-        Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
+        Seq[(TradingPremisesMsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
           case (model, id) =>
             val currentModel = TradingPremises(
               msbServices = Some(TPMsbServices(
