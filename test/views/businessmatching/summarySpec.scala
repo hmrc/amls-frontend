@@ -41,14 +41,22 @@ class summarySpec extends GenericTestHelper
   }
 
   "businessmatching view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title when presubmission" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl)
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
+    }
+
+    "have correct title when not presubmission" in new ViewFixture {
+
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
+
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
+      heading.html must be(Messages("title.cya"))
     }
 
     def checkElementTextIncludes(el:Element, keys : String*) = {
