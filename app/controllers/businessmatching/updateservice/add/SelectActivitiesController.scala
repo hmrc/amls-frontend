@@ -64,9 +64,9 @@ class SelectActivitiesController @Inject()(
       implicit request =>
         (for {
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            AddServiceFlowModel().fitAndProperFromResponsiblePeople(responsiblePeople)))
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
+          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
+            model.fitAndProperFromResponsiblePeople(responsiblePeople)))
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
