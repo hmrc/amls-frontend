@@ -30,8 +30,8 @@ case class AddServiceFlowModel(
                                 hasChanged: Boolean = false,
                                 hasAccepted: Boolean = false,
                                 businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                msbServices: Option[MsbServices] = None,
-                                tradingPremisesMsbServices: Option[MsbServices] = None
+                                msbServices: Option[BusinessMatchingMsbServices] = None,
+                                tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
                               ) {
   def empty(): Boolean = this match {
     case AddServiceFlowModel(_, None, None, None, None, None, false, false, None, None, None) => true
@@ -48,11 +48,11 @@ case class AddServiceFlowModel(
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
       hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
 
-  def msbServices(p: MsbServices): AddServiceFlowModel = {
-    val tradingPremisesMsbActivities: Option[MsbServices] =
+  def msbServices(p: BusinessMatchingMsbServices): AddServiceFlowModel = {
+    val tradingPremisesMsbActivities: Option[BusinessMatchingMsbServices] =
 
       if (this.tradingPremisesMsbServices.isDefined) {
-        Some(MsbServices(this.tradingPremisesMsbServices.getOrElse(MsbServices(Set())).msbServices.intersect(p.msbServices)))
+        Some(BusinessMatchingMsbServices(this.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.intersect(p.msbServices)))
       } else None
 
     this.copy(msbServices = Some(p),
@@ -61,7 +61,7 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.msbServices.contains(p))
   }
 
-  def tradingPremisesMsbServices(p: MsbServices): AddServiceFlowModel = {
+  def tradingPremisesMsbServices(p: BusinessMatchingMsbServices): AddServiceFlowModel = {
     this.copy(tradingPremisesMsbServices = Some(p),
       hasChanged = hasChanged || !this.tradingPremisesMsbServices.contains(p),
       hasAccepted = hasAccepted && this.tradingPremisesMsbServices.contains(p))

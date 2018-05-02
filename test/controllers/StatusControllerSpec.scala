@@ -616,7 +616,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
             reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
           )))
 

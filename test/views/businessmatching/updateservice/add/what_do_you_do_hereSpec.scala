@@ -34,7 +34,7 @@ package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{MsbServices, TransmittingMoney}
+import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.GenericTestHelper
@@ -54,7 +54,7 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
       override def view = what_do_you_do_here(form2, edit = false)
 
@@ -82,7 +82,7 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
     }
 
     "hide the return to progress link" in new ViewFixture {
-      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
       override def view = what_do_you_do_here(form2, edit = false)
 

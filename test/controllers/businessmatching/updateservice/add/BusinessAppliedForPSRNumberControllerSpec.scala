@@ -115,7 +115,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
         "progress to the 'no psr' page" when {
           "no is selected" in new Fixture {
             val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(MsbServices(Set(TransmittingMoney))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
               hasChanged = true)
 

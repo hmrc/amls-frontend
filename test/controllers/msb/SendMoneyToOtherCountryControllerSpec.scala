@@ -78,7 +78,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      val msbServices = Some(MsbServices(
+      val msbServices = Some(BusinessMatchingMsbServices(
         Set(
           TransmittingMoney,
           CurrencyExchange
@@ -114,7 +114,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         hasChanged = true
       )
-      val msbServices = Some(MsbServices(
+      val msbServices = Some(BusinessMatchingMsbServices(
         Set(
           TransmittingMoney,
           CurrencyExchange
@@ -143,7 +143,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"
       )
-      val msbServices = Some(MsbServices(
+      val msbServices = Some(BusinessMatchingMsbServices(
         Set(
           TransmittingMoney,
           CurrencyExchange
@@ -188,7 +188,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
         hasChanged = true
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney
           )
@@ -224,7 +224,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
         hasChanged = true
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney
           )
@@ -253,7 +253,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
         "money" -> "false"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange
           )
@@ -291,7 +291,7 @@ class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with Mocki
 
       val incomingModel = MoneyServiceBusiness()
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney
           )

@@ -22,7 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbService, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import services.StatusService
@@ -55,14 +55,14 @@ class MostTransactionsController @Inject()(
       }
   }
 
-  private def standardRouting(services: Set[MsbService]): Result =
+  private def standardRouting(services: Set[BusinessMatchingMsbService]): Result =
     if (services contains CurrencyExchange) {
       Redirect(routes.CETransactionsInNext12MonthsController.get(false))
     } else {
       Redirect(routes.SummaryController.get())
     }
 
-  private def editRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+  private def editRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     if ((services contains CurrencyExchange) &&
       msb.ceTransactionsInNext12Months.isEmpty) {
         Redirect(routes.CETransactionsInNext12MonthsController.get(true))

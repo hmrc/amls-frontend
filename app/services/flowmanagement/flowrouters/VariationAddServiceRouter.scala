@@ -55,7 +55,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
 
       // Money Service Business
       case SubServicesPageId =>
-        (model.msbServices.getOrElse(MsbServices(Set())).msbServices.contains(TransmittingMoney), edit, model.businessAppliedForPSRNumber.isDefined) match {
+        (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney), edit, model.businessAppliedForPSRNumber.isDefined) match {
           case (true, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
           case (false, false, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
           case (true, true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
@@ -108,7 +108,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
         }
 
       case WhichTradingPremisesPageId =>
-        model.msbServices.getOrElse(MsbServices(Set())).msbServices.size > 1 match {
+        model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1 match {
           case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
           case false => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }

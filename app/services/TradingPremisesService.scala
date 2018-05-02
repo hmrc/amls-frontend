@@ -31,7 +31,7 @@ class TradingPremisesService {
                              indices: Seq[Int],
                              tradingPremises: Seq[models.tradingpremises.TradingPremises],
                              activity: models.businessmatching.BusinessActivity,
-                             msbServicesInput: Option[models.businessmatching.MsbServices],
+                             msbServicesInput: Option[models.businessmatching.BusinessMatchingMsbServices],
                              remove: Boolean): Seq[TradingPremises] = {
 
     val updatedTradingPremises: Seq[TradingPremises] = {
@@ -94,7 +94,7 @@ class TradingPremisesService {
     }
   }
 
-  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.MsbServices)
+  private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.BusinessMatchingMsbServices)
                                           (fn: ((models.tradingpremises.MsbServices, Int) => models.tradingpremises.MsbServices)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp match {

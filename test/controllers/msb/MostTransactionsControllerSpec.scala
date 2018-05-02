@@ -120,7 +120,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
     "on valid submission (no edit) (CE)" in new Fixture {
 
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange
           )
@@ -163,7 +163,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         ), hasChanged = true
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             ChequeCashingScrapMetal
           )
@@ -187,7 +187,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
     "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
 
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange
           )
@@ -228,7 +228,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
 
     "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange
           )
@@ -275,7 +275,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
         "mostTransactionsCountries[]" -> "GB"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             ChequeCashingScrapMetal
           )

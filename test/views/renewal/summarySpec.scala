@@ -112,7 +112,7 @@ class summarySpec extends GenericTestHelper
         )
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney,
               CurrencyExchange,

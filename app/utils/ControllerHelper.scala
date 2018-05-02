@@ -44,7 +44,7 @@ object ControllerHelper {
     }
   }
 
-  def getMsbServices(matching: Option[BusinessMatching]): Option[Set[MsbService]] = {
+  def getMsbServices(matching: Option[BusinessMatching]): Option[Set[BusinessMatchingMsbService]] = {
     matching flatMap { bm =>
         bm.msbServices match {
           case Some(service) => Some(service.msbServices)

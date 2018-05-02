@@ -78,7 +78,7 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
     "get is called" must {
       "return OK with 'whatdoyoudohere' view" in new Fixture {
         mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -100,7 +100,7 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
 
       "update the tradingPremisesMsbServices when not all activities are selected" in new Fixture {
         mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
           hasChanged = true))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -110,14 +110,14 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
         status(result) mustBe SEE_OTHER
         controller.router.verify(WhatDoYouDoHerePageId,
           AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = Some(MsbServices(Set(TransmittingMoney))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             hasChanged = true))
       }
 
       "update the tradingPremisesMsbServices when all activities are selected" in new Fixture {
         mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
           hasChanged = true)
         )
 
@@ -129,8 +129,8 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
         status(result) mustBe SEE_OTHER
         controller.router.verify(WhatDoYouDoHerePageId,
           AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             hasChanged = true))
       }
     }

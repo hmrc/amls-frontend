@@ -17,7 +17,7 @@
 package views.msb
 
 import models.Country
-import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbServices, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbServices, TransmittingMoney}
 import models.moneyservicebusiness._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -93,7 +93,7 @@ class summarySpec extends GenericTestHelper
           Some(TransactionsInNext12Months("10")),
           Some(CETransactionsInNext12Months("10"))
         ),
-        Some(MsbServices(Set(CurrencyExchange, TransmittingMoney))),
+        Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney))),
         true
       )
 

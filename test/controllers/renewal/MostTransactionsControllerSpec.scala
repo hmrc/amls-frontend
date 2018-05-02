@@ -119,7 +119,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
           "msb includes CE" in new FormSubmissionFixture {
 
             val msbServices = Some(
-              MsbServices(
+              BusinessMatchingMsbServices(
                 Set(
                   CurrencyExchange
                 )
@@ -165,7 +165,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
           "activities include hvd" in new FormSubmissionFixture {
             val incomingModel = Renewal()
 
-            val msbServices = Some(MsbServices(Set.empty))
+            val msbServices = Some(BusinessMatchingMsbServices(Set.empty))
 
             val outgoingModel = incomingModel.copy(
               mostTransactions = Some(
@@ -215,7 +215,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               ), hasChanged = true
             )
             val msbServices = Some(
-              MsbServices(
+              BusinessMatchingMsbServices(
                 Set(
                   ChequeCashingScrapMetal
                 )
@@ -253,7 +253,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
           "msb includes CE" in new FormSubmissionFixture {
 
             val msbServices = Some(
-              MsbServices(
+              BusinessMatchingMsbServices(
                 Set(
                   CurrencyExchange
                 )
@@ -317,7 +317,7 @@ class MostTransactionsControllerSpec extends GenericTestHelper with MockitoSugar
               "mostTransactionsCountries[]" -> "GB"
             )
             val msbServices = Some(
-              MsbServices(
+              BusinessMatchingMsbServices(
                 Set(
                   ChequeCashingScrapMetal
                 )

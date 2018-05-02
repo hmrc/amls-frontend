@@ -23,7 +23,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{MsbService, MsbServices}
+import models.businessmatching.{BusinessMatchingMsbService, BusinessMatchingMsbServices}
 import models.flowmanagement._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -51,9 +51,9 @@ class WhatDoYouDoHereController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
         } yield {
-          val form: Form2[MsbServices] = Form2(MsbServices(model.tradingPremisesMsbServices.getOrElse(MsbServices(Set())).msbServices))
-          val flowMsbServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
-          msbServiceValues = MsbServices.all.intersect(flowMsbServices).map(MsbServices.getValue)
+          val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(model.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices))
+          val flowMsbServices: Set[BusinessMatchingMsbService] = model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
+          msbServiceValues = BusinessMatchingMsbServices.all.intersect(flowMsbServices).map(BusinessMatchingMsbServices.getValue)
           Ok(what_do_you_do_here(form, edit, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
   }
@@ -62,7 +62,7 @@ class WhatDoYouDoHereController @Inject()(
     import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
-        Form2[MsbServices](request.body) match {
+        Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm => {
             Future.successful(BadRequest(what_do_you_do_here(f, edit, msbServiceValues)))
           }

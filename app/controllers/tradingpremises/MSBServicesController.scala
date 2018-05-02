@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.{BusinessActivity, BusinessMatching, MsbService => BMMsbServices}
+import models.businessmatching.{BusinessActivity, BusinessMatching, BusinessMatchingMsbService => BMMsbServices}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
 import models.tradingpremises.{MsbServices, TradingPremises}
 import play.api.mvc.Result

@@ -20,7 +20,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
 import models.tradingpremises.MsbServices._
-import models.businessmatching.{MsbServices => BMMsbServices}
+import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.tradingpremises.{MsbServices => TPMsbServices, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 

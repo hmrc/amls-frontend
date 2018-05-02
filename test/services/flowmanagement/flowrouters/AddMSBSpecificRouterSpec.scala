@@ -56,7 +56,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "MSB is the Business Activity and subservices contains TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(TransmittingMoney))))
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
           val result = await(router.getRoute(SubServicesPageId, model))
 
           result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(false))
@@ -69,7 +69,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model))
 
           result mustBe Redirect(addRoutes.FitAndProperController.get(false))
@@ -193,7 +193,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           " the user has selected more than 1 subservice" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
 
             val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
@@ -209,7 +209,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           " the user has selected 1 subservice" in new Fixture {
             val model = AddServiceFlowModel(
               activity = Some(MoneyServiceBusiness),
-              msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))))
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
 
             val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
@@ -241,7 +241,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))))
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
@@ -254,7 +254,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber is defined" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
@@ -268,7 +268,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
@@ -382,7 +382,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             areNewActivitiesAtTradingPremises = Some(true),
-            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
 
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
@@ -397,7 +397,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
         "the user has selected more than 1 subservice" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))),
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
 
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))

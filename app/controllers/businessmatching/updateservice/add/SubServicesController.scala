@@ -51,8 +51,8 @@ class SubServicesController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
         } yield {
-          val flowSubServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
-          val form: Form2[MsbServices] = Form2(MsbServices(flowSubServices))
+          val flowSubServices: Set[BusinessMatchingMsbService] = model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
+          val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
 
           Ok(msb_subservices(form, edit))
         }) getOrElse InternalServerError("Failed to get activities")
@@ -62,7 +62,7 @@ class SubServicesController @Inject()(
     import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
-        Form2[MsbServices](request.body) match {
+        Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit)))
 

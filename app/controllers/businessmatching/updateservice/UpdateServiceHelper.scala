@@ -87,7 +87,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
     indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {
       _.index.toSeq
     }) orElse OptionT.some(Seq.empty)
-    msbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(MsbServices(Set.empty[MsbService]))
+    msbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
     newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](tradingPremisesService.updateTradingPremises(indices, tradingPremises, activity, Some(msbServices), false))
     _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, newTradingPremises))
   } yield tradingPremises
@@ -100,13 +100,13 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
   def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
-      newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(MsbServices(Set.empty[MsbService]))
+      newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(BMBusinessActivities(Set.empty[BusinessActivity]))
       newBusinessMatching <- {
         OptionT(dataCacheConnector.update[BusinessMatching](BusinessMatching.key) {
           case Some(bm) if newActivity equals MoneyServiceBusiness  =>
-            val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(MsbServices(Set.empty))
+            val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty))
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
               .msbServices(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
               .copy(hasAccepted = true)

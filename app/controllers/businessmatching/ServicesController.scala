@@ -46,7 +46,7 @@ trait ServicesController extends BaseController {
             val form = (for {
               bm <- maybeBM
               services <- bm.msbServices
-            } yield Form2[MsbServices](services)).getOrElse(EmptyForm)
+            } yield Form2[BusinessMatchingMsbServices](services)).getOrElse(EmptyForm)
 
             Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
         }
@@ -56,7 +56,7 @@ trait ServicesController extends BaseController {
     import jto.validation.forms.Rules._
     implicit authContext =>
       implicit request =>
-        Form2[MsbServices](request.body) match {
+        Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
           case ValidForm(_, data) =>
@@ -79,7 +79,7 @@ trait ServicesController extends BaseController {
         }
   }
 
-  private def updateMsb(existingServices: Option[MsbServices], updatedServices: Set[MsbService], cache: CacheMap)
+  private def updateMsb(existingServices: Option[BusinessMatchingMsbServices], updatedServices: Set[BusinessMatchingMsbService], cache: CacheMap)
                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
 
     cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>

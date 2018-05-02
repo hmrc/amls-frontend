@@ -81,7 +81,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return OK with 'msb_subservices' view" in new Fixture {
 
         mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                msbServices = Some(MsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+                                                msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -104,7 +104,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return the 'Does Your Business ... PSR ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
           mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                          msbServices = Some(MsbServices(Set(TransmittingMoney))),
+                                                          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
                                                           hasChanged = true))
 
           val result = controller.post()(request.withFormUrlEncodedBody(
@@ -114,7 +114,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
             AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(MsbServices(Set(TransmittingMoney))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               hasChanged = true))
         }
       }
@@ -122,7 +122,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted" in new Fixture {
           mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             hasChanged = true)
           )
 
@@ -134,7 +134,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
             AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               hasChanged = true))
         }
       }

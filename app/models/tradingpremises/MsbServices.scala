@@ -135,10 +135,10 @@ object MsbServices {
   implicit val formR: Rule[UrlFormEncoded, MsbServices] = Cache.formR
   implicit val formW: Write[MsbServices, UrlFormEncoded] = Cache.formW
 
-  implicit def convertServices(msbService: Set[models.businessmatching.MsbService]): Set[MsbService] =
+  implicit def convertServices(msbService: Set[models.businessmatching.BusinessMatchingMsbService]): Set[MsbService] =
     msbService map {s => convertSingleService(s)}
 
-  implicit def convertSingleService(msbService: models.businessmatching.MsbService): models.tradingpremises.MsbService = {
+  implicit def convertSingleService(msbService: models.businessmatching.BusinessMatchingMsbService): models.tradingpremises.MsbService = {
     msbService match {
       case BMTransmittingMoney => TransmittingMoney
       case BMCurrencyExchange => CurrencyExchange

@@ -28,9 +28,9 @@ import utils.TraversableValidators._
 import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
 
 
-case class MsbServices(msbServices : Set[MsbService])
+case class BusinessMatchingMsbServices(msbServices : Set[BusinessMatchingMsbService])
 
-sealed trait MsbService {
+sealed trait BusinessMatchingMsbService {
 
   def getMessage(implicit lang: Lang): String = {
     val message = "businessmatching.services.list.lbl."
@@ -43,14 +43,14 @@ sealed trait MsbService {
   }
 }
 
-case object TransmittingMoney extends MsbService
-case object CurrencyExchange extends MsbService
-case object ChequeCashingNotScrapMetal extends MsbService
-case object ChequeCashingScrapMetal extends MsbService
+case object TransmittingMoney extends BusinessMatchingMsbService
+case object CurrencyExchange extends BusinessMatchingMsbService
+case object ChequeCashingNotScrapMetal extends BusinessMatchingMsbService
+case object ChequeCashingScrapMetal extends BusinessMatchingMsbService
 
-object MsbService {
+object BusinessMatchingMsbService {
 
-  implicit val serviceR = Rule[String, MsbService] {
+  implicit val serviceR = Rule[String, BusinessMatchingMsbService] {
     case "01" => Valid(TransmittingMoney)
     case "02" => Valid(CurrencyExchange)
     case "03" => Valid(ChequeCashingNotScrapMetal)
@@ -58,14 +58,14 @@ object MsbService {
     case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
-  implicit val serviceW = Write[MsbService, String] {
+  implicit val serviceW = Write[BusinessMatchingMsbService, String] {
     case TransmittingMoney => "01"
     case CurrencyExchange => "02"
     case ChequeCashingNotScrapMetal => "03"
     case ChequeCashingScrapMetal => "04"
   }
 
-  implicit val jsonR:Reads[MsbService] =  Reads {
+  implicit val jsonR:Reads[BusinessMatchingMsbService] =  Reads {
     case JsString("01") => JsSuccess(TransmittingMoney)
     case JsString("02") => JsSuccess(CurrencyExchange)
     case JsString("03") => JsSuccess(ChequeCashingNotScrapMetal)
@@ -73,7 +73,7 @@ object MsbService {
     case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
-  implicit val jsonW = Writes[MsbService] {
+  implicit val jsonW = Writes[BusinessMatchingMsbService] {
     case TransmittingMoney => JsString("01")
     case CurrencyExchange => JsString("02")
     case ChequeCashingNotScrapMetal => JsString("03")
@@ -81,9 +81,9 @@ object MsbService {
   }
 }
 
-object MsbServices {
+object BusinessMatchingMsbServices {
 
-  val all: Set[MsbService] = Set(
+  val all: Set[BusinessMatchingMsbService] = Set(
     TransmittingMoney,
     CurrencyExchange,
     ChequeCashingNotScrapMetal,
@@ -94,22 +94,22 @@ object MsbServices {
 
   implicit def formReads
   (implicit
-   p: Path => RuleLike[UrlFormEncoded, Set[MsbService]]
-  ): Rule[UrlFormEncoded, MsbServices] =
+   p: Path => RuleLike[UrlFormEncoded, Set[BusinessMatchingMsbService]]
+  ): Rule[UrlFormEncoded, BusinessMatchingMsbServices] =
     From[UrlFormEncoded] { __ =>
-      (__ \ "msbServices").read(minLengthR[Set[MsbService]](1).withMessage("error.required.msb.services")).flatMap(MsbServices.apply)
+      (__ \ "msbServices").read(minLengthR[Set[BusinessMatchingMsbService]](1).withMessage("error.required.msb.services")).flatMap(BusinessMatchingMsbServices.apply)
     }
 
   implicit def formWrites
   (implicit
-   w: Write[MsbService, String]
-  ) = Write[MsbServices, UrlFormEncoded] { data =>
+   w: Write[BusinessMatchingMsbService, String]
+  ) = Write[BusinessMatchingMsbServices, UrlFormEncoded] { data =>
     Map("msbServices[]" -> data.msbServices.toSeq.map(w.writes))
   }
 
-  implicit val formats = Json.format[MsbServices]
+  implicit val formats = Json.format[BusinessMatchingMsbServices]
 
-  def getValue(ba:MsbService): String =
+  def getValue(ba:BusinessMatchingMsbService): String =
     ba match {
       case TransmittingMoney => "01"
       case CurrencyExchange => "02"
@@ -117,11 +117,11 @@ object MsbServices {
       case ChequeCashingScrapMetal => "04"
     }
 
-  implicit def convertServices(msbServices: Set[models.tradingpremises.MsbService]): Set[models.businessmatching.MsbService] =
+  implicit def convertServices(msbServices: Set[models.tradingpremises.MsbService]): Set[models.businessmatching.BusinessMatchingMsbService] =
     msbServices map {s => convertSingleService(s)}
 
 
-  implicit def convertSingleService(msbService: models.tradingpremises.MsbService) : models.businessmatching.MsbService = {
+  implicit def convertSingleService(msbService: models.tradingpremises.MsbService) : models.businessmatching.BusinessMatchingMsbService = {
     msbService match {
       case TPTransmittingMoney => TransmittingMoney
       case TPCurrencyExchange => CurrencyExchange

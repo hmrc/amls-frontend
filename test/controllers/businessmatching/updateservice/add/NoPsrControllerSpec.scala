@@ -83,7 +83,7 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
     "clear the flow model" in new Fixture {
 //Not convinced this test is valid
       val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-        msbServices = Some(MsbServices(Set(TransmittingMoney))),
+        msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
         businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
         hasChanged = true)
       mockCacheFetch(Some(AddServiceFlowModel(None)))
