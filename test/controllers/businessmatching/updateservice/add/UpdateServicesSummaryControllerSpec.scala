@@ -121,7 +121,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
         when {
           controller.helper.updateServicesRegister(any())(any(), any())
-        } thenReturn Future.successful(Some(serviceChangeRegister))
+        } thenReturn OptionT.some[Future, ServiceChangeRegister](serviceChangeRegister)
 
         when {
           controller.tradingPremisesService.updateTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(None), eqTo(false))
@@ -133,7 +133,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
         when {
           controller.helper.updateBusinessActivities(any())(any(), any())
-        } thenReturn Future.successful(Some(mock[models.businessactivities.BusinessActivities]))
+        } thenReturn OptionT.some[Future, models.businessactivities.BusinessActivities](mock[models.businessactivities.BusinessActivities])
 
         when {
           controller.helper.updateSupervision(any(), any())

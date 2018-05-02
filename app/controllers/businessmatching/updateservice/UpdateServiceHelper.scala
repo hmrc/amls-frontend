@@ -44,8 +44,8 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
                                     val responsiblePeopleService: ResponsiblePeopleService
                                    ) extends RepeatingSection {
 
-  def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
-    dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
+  def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
+    OptionT(dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
       case Some(dcModel) if model.activity.get.equals(AccountancyServices) =>
         dcModel.accountantForAMLSRegulations(None)
           .whoIsYourAccountant(None)
@@ -53,7 +53,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
           .copy(hasAccepted = true)
 
       case Some(model) => model
-    }
+    })
   }
 
   def updateSupervision(implicit ac: AuthContext, hc: HeaderCarrier) = {
@@ -73,12 +73,12 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
     OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  Future[Option[ServiceChangeRegister]] =
-    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] =
+    OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
       case Some(dcModel@ServiceChangeRegister(Some(activities))) =>
         dcModel.copy(addedActivities = Some(activities +  model.activity.get))
       case _ => ServiceChangeRegister(Some(Set(model.activity.get)))
-    }
+    })
 
   def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
 

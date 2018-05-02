@@ -16,6 +16,8 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
@@ -33,6 +35,7 @@ import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import scala.concurrent.ExecutionContext.Implicits.global
 
 //noinspection ScalaStyle
 class UpdateServiceHelperSpec extends GenericTestHelper
@@ -68,25 +71,30 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(AccountancyServices))
-      val result = await(helper.updateBusinessActivities(model))
-
-      result.involvedInOther mustBe Some(InvolvedInOtherNo)
-      result.whoIsYourAccountant must not be defined
-      result.accountantForAMLSRegulations must not be defined
-      result.taxMatters must not be defined
-      result.hasAccepted mustBe true
+      for {
+        result <- helper.updateBusinessActivities(model)
+      } yield {
+        result.involvedInOther mustBe Some(InvolvedInOtherNo)
+        result.whoIsYourAccountant must not be defined
+        result.accountantForAMLSRegulations must not be defined
+        result.taxMatters must not be defined
+        result.hasAccepted mustBe true
+      }
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(HighValueDealing))
-      val result = await(helper.updateBusinessActivities(model))
 
-      result.whoIsYourAccountant mustBe defined
-      result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
-      result.taxMatters mustBe Some(TaxMatters(true))
-      result.hasAccepted mustBe true
+      for {
+        result <- helper.updateBusinessActivities(model)
+      } yield {
+        result.whoIsYourAccountant mustBe defined
+        result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
+        result.taxMatters mustBe Some(TaxMatters(true))
+        result.hasAccepted mustBe true
+      }
     }
   }
 
