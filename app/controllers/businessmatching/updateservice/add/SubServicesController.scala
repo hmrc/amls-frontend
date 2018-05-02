@@ -53,7 +53,6 @@ class SubServicesController @Inject()(
         } yield {
           val flowSubServices: Set[MsbService] = model.msbServices.getOrElse(MsbServices(Set())).msbServices
           val form: Form2[MsbServices] = Form2(MsbServices(flowSubServices))
-
           Ok(msb_subservices(form, edit))
         }) getOrElse InternalServerError("Failed to get activities")
   }

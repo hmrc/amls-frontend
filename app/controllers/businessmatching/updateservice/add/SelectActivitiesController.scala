@@ -26,7 +26,7 @@ import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, BusinessActivities => BusinessMatchingActivities}
+import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
 import models.responsiblepeople.ResponsiblePeople
 import services.StatusService
@@ -65,7 +65,7 @@ class SelectActivitiesController @Inject()(
         (for {
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
           _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            AddServiceFlowModel(activity = None)))
+            AddServiceFlowModel().fitAndProperFromResponsiblePeople(responsiblePeople)))
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
           (names, values) <- getFormData
         } yield {
