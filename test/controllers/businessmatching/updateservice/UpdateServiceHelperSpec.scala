@@ -67,7 +67,8 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     "remove the accountancy data from the 'business activities' section" in new Fixture {
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
-      val result = await(helper.updateBusinessActivities(AccountancyServices))
+      val model = AddServiceFlowModel(activity = Some(AccountancyServices))
+      val result = await(helper.updateBusinessActivities(model))
 
       result.involvedInOther mustBe Some(InvolvedInOtherNo)
       result.whoIsYourAccountant must not be defined
@@ -79,7 +80,8 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
-      val result = await(helper.updateBusinessActivities(HighValueDealing))
+      val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+      val result = await(helper.updateBusinessActivities(model))
 
       result.whoIsYourAccountant mustBe defined
       result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))

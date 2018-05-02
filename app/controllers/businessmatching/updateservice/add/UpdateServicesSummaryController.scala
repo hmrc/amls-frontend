@@ -62,8 +62,8 @@ class UpdateServicesSummaryController @Inject()(
                   _ <- helper.updateResponsiblePeople(model)
                   _ <- helper.updateSupervision
                   _ <- helper.updateBusinessMatching(model)
-                  _ <- OptionT(helper.updateServicesRegister(activity))
-                  _ <- OptionT(helper.updateBusinessActivities(activity))
+                  _ <- OptionT(helper.updateServicesRegister(model))
+                  _ <- OptionT(helper.updateBusinessActivities(model))
                   _ <- helper.updateHasAcceptedFlag(model)
                   _ <- helper.clearFlowModel()
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))

@@ -120,7 +120,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
         when {
-          controller.helper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
+          controller.helper.updateServicesRegister(any())(any(), any())
         } thenReturn Future.successful(Some(serviceChangeRegister))
 
         when {
@@ -132,7 +132,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
 
         when {
-          controller.helper.updateBusinessActivities(eqTo(HighValueDealing))(any(), any())
+          controller.helper.updateBusinessActivities(any())(any(), any())
         } thenReturn Future.successful(Some(mock[models.businessactivities.BusinessActivities]))
 
         when {
