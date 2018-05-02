@@ -181,6 +181,10 @@ trait ConfirmationController extends BaseController {
     getFees map {
       case Some(SubmissionData(Some(payRef), total, rows, None, Some(difference))) if difference.value > 0 =>
         Ok(confirm_amendvariation(payRef, total, rows, Some(difference), controllers.payments.routes.WaysToPayController.get().url)).some
+
+      case Some(SubmissionData(Some(payRef), total, rows, None, _)) if total.value > 0 =>
+        Ok(confirm_amendvariation(payRef, total, rows, Some(total), controllers.payments.routes.WaysToPayController.get().url)).some
+
       case _ => None
     }
   }
