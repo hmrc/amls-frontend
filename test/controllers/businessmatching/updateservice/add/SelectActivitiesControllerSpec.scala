@@ -61,7 +61,7 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     when {
       controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
-    
+
     mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
 
     mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePeople.key))
