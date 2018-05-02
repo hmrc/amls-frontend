@@ -150,13 +150,21 @@
                     )
                 }
                 case BusinessAppliedForPSRNumberYes(number) => {
-                    @submitButton("businessmatching.button.confirm.start")
+                    @if(model.preAppComplete) {
+                        @submitButton("businessmatching.summary.noedit.anchortext")
+                    } else {
+                        @submitButton("businessmatching.button.confirm.start")
+                    }
                 }
             }
         }
 
         @if(model.businessAppliedForPSRNumber.isEmpty) {
-            @submitButton("businessmatching.button.confirm.start")
+            @if(model.preAppComplete) {
+                @submitButton("businessmatching.summary.noedit.anchortext")
+            } else {
+                @submitButton("businessmatching.button.confirm.start")
+            }
         }
     } else {
         @submitButton("businessmatching.summary.noedit.anchortext")
