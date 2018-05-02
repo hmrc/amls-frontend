@@ -161,9 +161,11 @@ class UpdateServiceHelperSpec extends GenericTestHelper
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
           Some(BusinessMatching.key))
+
         mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
         helper.updateBusinessMatching(model).returnsSome(endResultMatching)
       }

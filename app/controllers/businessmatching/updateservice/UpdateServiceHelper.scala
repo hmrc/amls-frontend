@@ -98,17 +98,22 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
     }
 
   def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
+    println("££££££££££££££££££££££££££££££££££££££££££££££££££££££      " + OptionT.fromOption[Future](model.businessAppliedForPSRNumber))
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
       newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(BMBusinessActivities(Set.empty[BusinessActivity]))
+      //currentPsrNumber <- OptionT.fromOption[Future](currentBusinessMatching.businessAppliedForPSRNumber) orElse OptionT.none
+      newPsrNumber <- OptionT.fromOption[Future](model.businessAppliedForPSRNumber)
       newBusinessMatching <- {
+        println("££££££££££££££££££££££££££££££££££££££££££££££££££££££      " + newPsrNumber)
         OptionT(dataCacheConnector.update[BusinessMatching](BusinessMatching.key) {
           case Some(bm) if newActivity equals MoneyServiceBusiness  =>
             val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty))
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
               .msbServices(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
+              .businessAppliedForPSRNumber(newPsrNumber)
               .copy(hasAccepted = true)
           case Some(bm) =>
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))

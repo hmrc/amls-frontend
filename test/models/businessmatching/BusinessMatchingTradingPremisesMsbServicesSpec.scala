@@ -22,7 +22,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json._
 
-class BusinessMatchingBusinessMatchingTradingPremisesTradingPremisesMsbServicesSpec extends PlaySpec {
+class BusinessMatchingTradingPremisesMsbServicesSpec extends PlaySpec {
 
   "MsbServices" must {
     import jto.validation.forms.Rules._
