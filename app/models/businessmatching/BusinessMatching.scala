@@ -52,10 +52,10 @@ case class BusinessMatching(
       hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
-    this.copy(businessAppliedForPSRNumber = Some(p),
-      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+  def businessAppliedForPSRNumber(p: Option[BusinessAppliedForPSRNumber]): BusinessMatching = {
+    this.copy(businessAppliedForPSRNumber = p,
+      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.equals(p),
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.equals(p)
     )
   }
 
