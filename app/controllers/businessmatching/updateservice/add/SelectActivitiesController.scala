@@ -70,7 +70,6 @@ class SelectActivitiesController @Inject()(
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
-          println(responsiblePeople)
           Ok(select_activities(form, edit, values, names))
         }) getOrElse InternalServerError("Failed to get activities")
   }
