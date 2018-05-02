@@ -20,7 +20,8 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.{MsbServices => BMMsbServices}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
@@ -95,7 +96,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           Some(Supervision.key))
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(HighValueDealing))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))))),
           Some(BusinessMatching.key))
 
         mockCacheSave(Supervision(), Some(Supervision.key))
@@ -116,7 +117,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
         mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(AccountancyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
           Some(BusinessMatching.key))
 
         helper.updateSupervision.returnsSome(supervisionModel)
@@ -134,7 +135,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
       mockCacheFetch[BusinessMatching](
-        Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(TrustAndCompanyServices))))),
+        Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
         Some(BusinessMatching.key))
 
       helper.updateSupervision.returnsSome(supervisionModel)
@@ -142,6 +143,69 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
   }
+
+  "updateBusinessMatching" must {
+    "update the current activities and msb services" when {
+      "there are no msb services and the new activity is not MSB and there are existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are msb services and the new activity is MSB and there are existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(
+          activity = Some(MoneyServiceBusiness),
+          msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+        )
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                hasAccepted = true,
+                                hasChanged = true,
+                                msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal))))
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(
+          activity = Some(MoneyServiceBusiness),
+          msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+        )
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
+                                hasAccepted = true,
+                                hasChanged = true,
+                                msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal))))
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = None)),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+    }
+  }
+
 
   "updateResponsiblePeople" must {
     "set the fit and proper flag on the right people according to the indices" when {

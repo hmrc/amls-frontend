@@ -58,14 +58,14 @@ class UpdateServicesSummaryController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-          _ <- helper.updateTradingPremises(model)
-          _ <- helper.updateResponsiblePeople(model)
-          _ <- helper.updateSupervision
-          _ <- OptionT(helper.updateBusinessMatching(model))
-          _ <- OptionT(helper.updateServicesRegister(activity))
-          _ <- OptionT(helper.updateBusinessActivities(activity))
-          _ <- helper.updateHasAcceptedFlag(model)
-          _ <- helper.clearFlowModel()
+                  _ <- helper.updateTradingPremises(model)
+                  _ <- helper.updateResponsiblePeople(model)
+                  _ <- helper.updateSupervision
+                  _ <- helper.updateBusinessMatching(model)
+                  _ <- OptionT(helper.updateServicesRegister(activity))
+                  _ <- OptionT(helper.updateBusinessActivities(activity))
+                  _ <- helper.updateHasAcceptedFlag(model)
+                  _ <- helper.clearFlowModel()
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
         } yield {
           route

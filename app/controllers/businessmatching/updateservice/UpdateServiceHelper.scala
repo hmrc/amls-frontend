@@ -23,6 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
+import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -96,29 +97,26 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
     }
 
-  def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[BusinessMatching]] = {
+  def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
-      newMsbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(MsbServices(Set.empty[MsbService]))
+      newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(MsbServices(Set.empty[MsbService]))
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities)
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(BMBusinessActivities(Set.empty[BusinessActivity]))
       newBusinessMatching <- {
-        val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(MsbServices(Set.empty))
-
         OptionT(dataCacheConnector.update[BusinessMatching](BusinessMatching.key) {
-          case Some(bm) =>
+          case Some(bm) if newActivity equals MoneyServiceBusiness  =>
+            val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(MsbServices(Set.empty))
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
               .msbServices(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
+              .copy(hasAccepted = true)
+          case Some(bm) =>
+            bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
               .copy(hasAccepted = true)
         })
       }
     } yield newBusinessMatching
-
-//    dataCacheConnector.update[BusinessMatching](BusinessMatching.key) {
-//      case Some(bm) =>
-//      val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
-//      bm.activities(activities.copy(businessActivities = activities.businessActivities + newActivity)).copy(hasAccepted = true)
-    }.value
+  }
 
   def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePeople]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)

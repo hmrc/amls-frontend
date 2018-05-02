@@ -117,7 +117,7 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
 
         when {
           controller.helper.updateBusinessMatching(any())(any(), any())
-        } thenReturn Future.successful(Some(businessMatchingModel))
+        } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
         when {
           controller.helper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
