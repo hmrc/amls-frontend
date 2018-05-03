@@ -79,17 +79,16 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
 
   def msbServices(p: BusinessMatchingMsbServices): AddServiceFlowModel = {
-    val intersectingMsbServices: Set[BusinessMatchingMsbService] = this.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.intersect(p.msbServices)
+    val intersectingMsbServices: Set[BusinessMatchingMsbService] =
+      this.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.intersect(p.msbServices)
     val tradingPremisesMsbActivities: Option[BusinessMatchingMsbServices] =
-      if (this.tradingPremisesMsbServices.isDefined && intersectingMsbServices.size > 0) {
+      if (this.tradingPremisesMsbServices.isDefined && intersectingMsbServices.nonEmpty) {
         Some(BusinessMatchingMsbServices(intersectingMsbServices))
       } else if (p.msbServices.size == 1) {
         Some(BusinessMatchingMsbServices(p.msbServices))
       } else {
         None
       }
-    println(p.msbServices)
-    println(tradingPremisesMsbActivities)
 
     this.copy(msbServices = Some(p),
       tradingPremisesMsbServices = tradingPremisesMsbActivities,
