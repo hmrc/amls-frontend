@@ -20,26 +20,19 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.Future
 
-
 class NewServiceInformationController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                 val statusService: StatusService,
-                                                 val businessMatchingService: BusinessMatchingService,
-                                                 val helper: UpdateServiceHelper,
                                                  val router: Router[AddServiceFlowModel]
                                                ) extends BaseController {
 
@@ -58,7 +51,7 @@ class NewServiceInformationController @Inject()(
           }
 
           Ok(new_service_information(activityNames))
-        }) getOrElse InternalServerError("Could not get the flow model")
+        }) getOrElse InternalServerError("Get: Unable to show New Service Information page")
   }
 
   def post() = Authorised.async {
@@ -67,6 +60,6 @@ class NewServiceInformationController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           route <- OptionT.liftF(router.getRoute(NewServiceInformationPageId, model))
-        } yield route) getOrElse InternalServerError("Could not get the flow model")
+        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NewServiceInformationController")
   }
 }

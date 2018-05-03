@@ -16,8 +16,6 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -35,7 +33,6 @@ import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
@@ -65,16 +62,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
 
     val businessMatching = businessMatchingGen.sample.get
 
-//    when {
-//      controller.businessMatchingService.getModel(any(), any(), any())
-//    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
-//
-//    when {
-//      controller.businessMatchingService.updateModel(any())(any(), any(), any())
-//    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
-
-
-
     when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
   }
@@ -95,7 +82,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
         mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")))))
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123456")))))
 
 
         val result = controller.get()(request)
@@ -190,7 +177,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
       }
 
       "with an invalid request (missing PSR)" must {
-        "return an error"  in new Fixture {
+        "return an error" in new Fixture {
           mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
             AddServiceFlowModel())
           val newRequest = request.withFormUrlEncodedBody(
