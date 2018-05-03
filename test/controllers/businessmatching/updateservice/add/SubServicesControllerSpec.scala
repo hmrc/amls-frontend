@@ -104,7 +104,6 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return the 'Does Your Business ... PSR ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
           mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
                                                           hasChanged = true))
 
           val result = controller.post()(request.withFormUrlEncodedBody(
@@ -115,6 +114,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           controller.router.verify(SubServicesPageId,
             AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
               msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+              tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               hasChanged = true))
         }
       }
@@ -122,7 +122,6 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted" in new Fixture {
           mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             hasChanged = true)
           )
 
@@ -135,6 +134,73 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           controller.router.verify(SubServicesPageId,
             AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
               msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+              tradingPremisesMsbServices = None,
+              hasChanged = true))
+        }
+      }
+
+      "return the 'Responsible people' page in the flow" when {
+        "anything other than money transfer has been posted when editing existing full flow with only money transfer" in new Fixture {
+          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            hasChanged = true)
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "msbServices[]" -> "03",
+            "msbServices[]" -> "04"
+          ))
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify(SubServicesPageId,
+            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+              tradingPremisesMsbServices = None,
+              hasChanged = true))
+        }
+      }
+
+      "return the 'Responsible people' page in the flow" when {
+        "anything other than money transfer has been posted when editing existing full flow with money transfer and others" in new Fixture {
+          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
+            hasChanged = true)
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "msbServices[]" -> "03",
+            "msbServices[]" -> "04"
+          ))
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify(SubServicesPageId,
+            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+              tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
+              hasChanged = true))
+        }
+      }
+
+      "return the 'Responsible people' page in the flow" when {
+        "anything other than money transfer has been posted when completely changing selected services" in new Fixture {
+          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
+            hasChanged = true)
+          )
+
+          val result = controller.post()(request.withFormUrlEncodedBody(
+            "msbServices[]" -> "03",
+            "msbServices[]" -> "04"
+          ))
+
+          status(result) mustBe SEE_OTHER
+          controller.router.verify(SubServicesPageId,
+            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+              tradingPremisesMsbServices = None,
               hasChanged = true))
         }
       }
