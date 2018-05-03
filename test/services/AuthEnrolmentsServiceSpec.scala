@@ -16,46 +16,68 @@
 
 package services
 
-import connectors.{AuthConnector, Authority, EnrolmentStoreConnector}
+import config.AppConfig
+import connectors.{AuthConnector, Authority, EnrolmentStoreConnector, EnrolmentStubConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
+import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, EnrolmentStoreEnrolment, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.test.Helpers._
-
-import scala.concurrent.Future
-import scala.concurrent.ExecutionContext.Implicits.global
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import utils.AmlsSpec
 
-class AuthEnrolmentsServiceSpec extends PlaySpec
-  with MockitoSugar
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
+
+class AuthEnrolmentsServiceSpec extends AmlsSpec
   with ScalaFutures
   with IntegrationPatience
   with AmlsReferenceNumberGenerator
   with BaseGenerator {
 
+  // scalastyle:off magic.number
   trait Fixture {
     val enrolmentStore = mock[EnrolmentStoreConnector]
-    val service = new AuthEnrolmentsService(mock[AuthConnector], enrolmentStore)
+    val enrolmentStubConnector = mock[EnrolmentStubConnector]
+    val authConnector = mock[AuthConnector]
+    val config = mock[AppConfig]
 
-    implicit val hc = mock[HeaderCarrier]
-    implicit val ac = mock[AuthContext]
+    val groupId = stringOfLengthGen(10).sample.get
 
-    val enrolmentsList = List[GovernmentGatewayEnrolment](GovernmentGatewayEnrolment("HMCE-VATVAR-ORG",
-      List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"), GovernmentGatewayEnrolment("HMRC-MLR-ORG",
-      List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
+    val service = new AuthEnrolmentsService(authConnector, enrolmentStore, config, enrolmentStubConnector)
 
+    val enrolmentsList = List[GovernmentGatewayEnrolment](
+      GovernmentGatewayEnrolment("HMCE-VATVAR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("VATRegNo", "000000000")), "Activated"),
+      GovernmentGatewayEnrolment("HMRC-MLR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
+
+    when(config.enrolmentStubsEnabled) thenReturn false
   }
 
   "AuthEnrolmentsService" must {
+
+    "connect to the stubs microservice when enabled" in new Fixture {
+      when(config.enrolmentStubsEnabled) thenReturn true
+
+      when {
+        enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any(), any())
+      } thenReturn Future.successful(enrolmentsList)
+
+      when {
+        authConnector.userDetails(any(), any(), any())
+      } thenReturn Future.successful(UserDetails("Test", None, "Group", None, Some(groupId)))
+
+      whenReady(service.amlsRegistrationNumber) { result =>
+        result mustBe Some(amlsRegistrationNumber)
+        verify(service.authConnector, never).enrolments(any())(any(), any())
+      }
+    }
+
     "return an AMLS registration number" in new Fixture {
-      when(service.authConnector.enrollments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
-      when(ac.enrolmentsUri).thenReturn(Some("uri"))
+      when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
+      when(authContext.enrolmentsUri).thenReturn(Some("uri"))
 
       whenReady(service.amlsRegistrationNumber){
         number => number.get mustEqual amlsRegistrationNumber
@@ -64,7 +86,7 @@ class AuthEnrolmentsServiceSpec extends PlaySpec
 
     "create an enrolment" in new Fixture {
       when {
-        service.authConnector.getCurrentAuthority(any(), any())
+        authConnector.getCurrentAuthority(any(), any())
       } thenReturn Future.successful(Authority("", Accounts(), "/user-details", "/ids", "12345678"))
 
       when {

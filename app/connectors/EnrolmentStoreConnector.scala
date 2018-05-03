@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
 
-  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/${appConfig.enrolmentStubsUrl}"
+  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/enrolment-store-proxy"
   val warn: String => Unit = msg => Logger.warn(s"[EnrolmentStoreConnector] $msg")
 
   object ResponseCodes {
