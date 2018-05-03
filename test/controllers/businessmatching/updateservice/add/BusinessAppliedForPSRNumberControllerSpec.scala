@@ -56,9 +56,6 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     val controller = new BusinessAppliedForPSRNumberController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -68,13 +65,13 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
 
     val businessMatching = businessMatchingGen.sample.get
 
-    when {
-      controller.businessMatchingService.getModel(any(), any(), any())
-    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
-
-    when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
+//    when {
+//      controller.businessMatchingService.getModel(any(), any(), any())
+//    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+//
+//    when {
+//      controller.businessMatchingService.updateModel(any())(any(), any(), any())
+//    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
 
 

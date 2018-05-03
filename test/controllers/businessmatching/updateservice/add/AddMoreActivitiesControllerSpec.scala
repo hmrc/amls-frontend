@@ -42,9 +42,6 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
     val controller = new AddMoreActivitiesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -127,5 +124,4 @@ class AddMoreActivitiesControllerSpec extends GenericTestHelper with BusinessMat
       }
     }
   }
-
 }

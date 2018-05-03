@@ -21,26 +21,19 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
 
 import scala.concurrent.Future
 
-
 @Singleton
 class BusinessAppliedForPSRNumberController @Inject()(
                                                        val authConnector: AuthConnector,
                                                        implicit val dataCacheConnector: DataCacheConnector,
-                                                       val statusService: StatusService,
-                                                       val businessMatchingService: BusinessMatchingService,
-                                                       val helper: UpdateServiceHelper,
                                                        val router: Router[AddServiceFlowModel]
                                                      ) extends BaseController {
 
@@ -50,7 +43,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
         OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { case model =>
           val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
           Ok(business_applied_for_psr_number(form, edit))
-        } getOrElse InternalServerError("Unable to show the view")
+        } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -65,7 +58,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
               case Some(model) => model.businessAppliedForPSRNumber(data)
             } flatMap {
               case Some(model) => router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
             }
           }
         }

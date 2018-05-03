@@ -20,13 +20,10 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -41,12 +38,8 @@ import scala.concurrent.Future
 class AddMoreActivitiesController @Inject()(
                                              val authConnector: AuthConnector,
                                              implicit val dataCacheConnector: DataCacheConnector,
-                                             val statusService: StatusService,
-                                             val businessMatchingService: BusinessMatchingService,
-                                             val helper: UpdateServiceHelper,
                                              val router: Router[AddServiceFlowModel]
                                            ) extends BaseController {
-
 
   val fieldName = "addmoreactivities"
 
@@ -58,8 +51,7 @@ class AddMoreActivitiesController @Inject()(
       implicit request =>
         (for {
           activities <- OptionT(getActivities)
-          preApplicationComplete <- OptionT.liftF(businessMatchingService.preApplicationComplete)
-        } yield Ok(add_more_activities(EmptyForm, activities))) getOrElse InternalServerError("Unable to show the page")
+        } yield Ok(add_more_activities(EmptyForm, activities))) getOrElse InternalServerError("Get :Unable to show add more activities page")
   }
 
   def post() = Authorised.async {
@@ -69,15 +61,15 @@ class AddMoreActivitiesController @Inject()(
           case f: InvalidForm =>
             OptionT(getActivities) map { activities =>
               BadRequest(add_more_activities(f, activities))
-            } getOrElse InternalServerError("Unable to show the page")
+            } getOrElse InternalServerError("Post: Unable to show add more activities page")
+
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
             } flatMap {
               case Some(model) => router.getRoute(AddMoreAcivitiesPageId, model)
-              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
             }
-
         }
   }
 
