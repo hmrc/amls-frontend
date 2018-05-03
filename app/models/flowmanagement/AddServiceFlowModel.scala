@@ -89,8 +89,15 @@ case class AddServiceFlowModel(
       } else {
         None
       }
+    val businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] =
+      if (p.msbServices.contains(TransmittingMoney)) {
+        this.businessAppliedForPSRNumber
+      } else {
+        None
+      }
 
     this.copy(msbServices = Some(p),
+      businessAppliedForPSRNumber = businessAppliedForPSRNumber,
       tradingPremisesMsbServices = tradingPremisesMsbActivities,
       hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
