@@ -17,6 +17,7 @@
 package utils
 
 import connectors.DataCacheConnector
+import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.MessagesApi
@@ -26,11 +27,12 @@ import play.api.{Application, Mode}
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar {
+trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
   protected val bindModules: Seq[GuiceableModule] = Seq()
-
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .bindings(bindModules:_*).in(Mode.Test)
@@ -39,6 +41,8 @@ trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar {
   implicit val messagesApi = app.injector.instanceOf[MessagesApi]
   implicit val messages = messagesApi.preferred(FakeRequest())
 
+  implicit val headerCarrier = HeaderCarrier()
+  implicit val authContext = mock[AuthContext]
 
   def addToken[T](fakeRequest: FakeRequest[T]) = {
     val csrfConfig     = app.injector.instanceOf[CSRFConfigProvider].get

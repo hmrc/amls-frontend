@@ -43,9 +43,6 @@ class UpdateAnyInformationControllerSpec extends GenericTestHelper {
     self =>
 
     val request = addToken(authRequest)
-
-    implicit val authContext: AuthContext = mockAuthContext
-
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()

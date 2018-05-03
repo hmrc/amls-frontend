@@ -47,14 +47,16 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import utils.DependencyMocks
+import utils.{DependencyMocks, GenericTestHelper}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 
-class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with OneAppPerSuite
+class SubmissionServiceSpec extends GenericTestHelper
+  with ScalaFutures
+  with IntegrationPatience
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
@@ -73,7 +75,7 @@ class SubmissionServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures
     )
 
     when {
-      mockAuthContext.principal
+      authContext.principal
     } thenReturn Principal(None, Accounts(org = Some(OrgAccount("", Org("TestOrgRef")))))
 
     val enrolmentResponse = HttpResponse(OK)

@@ -34,14 +34,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
-class PaymentsServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with GenericTestHelper with PaymentGenerator {
+class PaymentsServiceSpec extends GenericTestHelper with ScalaFutures with PaymentGenerator {
 
   //noinspection ScalaStyle
   trait Fixture extends AuthorisedFixture {
     self =>
-
-    implicit val hc: HeaderCarrier = new HeaderCarrier()
-    implicit val authContext = mock[AuthContext]
 
     val testPaymentService = new PaymentsService(
       mock[AmlsConnector],

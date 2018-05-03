@@ -35,7 +35,6 @@ import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestH
 
 //noinspection ScalaStyle
 class UpdateServiceHelperSpec extends GenericTestHelper
-  with MustMatchers
   with BusinessActivitiesGenerator
   with ResponsiblePersonGenerator
   with FutureAssertions {

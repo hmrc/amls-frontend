@@ -20,25 +20,19 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching.updateservice.TradingPremisesActivities
-import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService}
+import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValueDealing, TelephonePaymentService, _}
 import models.flowmanagement._
-import org.scalatestplus.play.PlaySpec
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.DependencyMocks
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
-import services.flowmanagement.flowrouters.VariationAddServiceRouter
+import utils.{DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.businessmatching._
-import services.flowmanagement.flowrouters._
-import services.flowmanagement.flowrouters.VariationAddServiceRouter
+import scala.concurrent.Future
 
-class VariationAddServiceRouterSpec extends PlaySpec {
+class VariationAddServiceRouterSpec extends GenericTestHelper {
 
   trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]
