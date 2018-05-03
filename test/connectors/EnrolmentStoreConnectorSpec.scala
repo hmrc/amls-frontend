@@ -70,7 +70,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     } thenReturn baseUrl
 
     when {
-      appConfig.enrolmentStoreServiceStub
+      appConfig.enrolmentStubsUrl
     } thenReturn serviceStub
 
     when {

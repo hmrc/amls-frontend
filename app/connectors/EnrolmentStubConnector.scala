@@ -26,7 +26,7 @@ import scala.concurrent.ExecutionContext
 
 class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
 
-  lazy val baseUrl = config.enrolmentStubUrl
+  lazy val baseUrl = config.enrolmentStubsUrl
 
   def enrolments(groupId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
     val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"

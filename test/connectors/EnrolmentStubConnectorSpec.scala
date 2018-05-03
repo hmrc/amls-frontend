@@ -40,7 +40,7 @@ class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
     val connector = new EnrolmentStubConnector(http, config)
     val groupId = stringOfLengthGen(10).sample.get
 
-    when(config.enrolmentStubUrl) thenReturn "http://stubs"
+    when(config.enrolmentStubsUrl) thenReturn "http://stubs"
   }
 
   "The Enrolment Stub Connector" must {
