@@ -118,4 +118,5 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def authUrl = config.baseUrl("auth")
 
   def enrolmentStoreUrl = config.baseUrl("enrolment-store-proxy")
+  def enrolmentStoreServiceStub = config.getString("enrolment-store-proxy.service-stub")
 }
