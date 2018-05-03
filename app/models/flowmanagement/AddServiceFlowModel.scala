@@ -43,14 +43,29 @@ case class AddServiceFlowModel(
     val fitAndProperInts: Set[Int] = p.zipWithIndex
             .filter(personWithIndex => personWithIndex._1.hasAlreadyPassedFitAndProper.getOrElse(false))
             .map(personWithIndex => personWithIndex._2).toSet
+
     val responsiblePeopleFitAndProper: Option[ResponsiblePeopleFitAndProper] = if (fitAndProperInts.nonEmpty) {
       Some(ResponsiblePeopleFitAndProper(fitAndProperInts))
     } else {
       None
     }
+
     this.copy(responsiblePeople = responsiblePeopleFitAndProper,
+      fitAndProper = calculateFitAndProper(p),
       hasChanged = hasChanged || !this.activity.contains(p),
       hasAccepted = hasAccepted && this.activity.contains(p))
+  }
+
+  def calculateFitAndProper(p: Seq[ResponsiblePeople]):Option [Boolean] = {
+    val hasTrues = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(true)) > 0
+    val hasFalses = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(false)) > 0
+
+    if(!hasTrues && !hasFalses) {
+      None
+    } else {
+      Some(hasTrues)
+    }
+
   }
 
   def activity(p: BusinessActivity): AddServiceFlowModel =
