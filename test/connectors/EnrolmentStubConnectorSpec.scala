@@ -17,40 +17,43 @@
 package connectors
 
 import config.AppConfig
+import generators.BaseGenerator
 import models.enrolment.{EnrolmentIdentifier, GovernmentGatewayEnrolment}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{when, verify}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.http.HttpGet
 import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnrolmentStubConnectorSpec extends AmlsSpec {
+class EnrolmentStubConnectorSpec extends AmlsSpec with BaseGenerator {
 
-  def fixture = new {
-    implicit val hc = HeaderCarrier()
-
+  // scalastyle:off magic.number
+  trait TestFixture {
     val enrolments = Seq(GovernmentGatewayEnrolment("HMRC-MLR-ORG",
       List(EnrolmentIdentifier("MLRRefNumber", "AV23456789")), ""))
 
     val http = mock[HttpGet]
     val config = mock[AppConfig]
     val connector = new EnrolmentStubConnector(http, config)
+    val groupId = stringOfLengthGen(10).sample.get
+
+    when(config.enrolmentStubUrl) thenReturn "http://stubs"
   }
 
   "The Enrolment Stub Connector" must {
-    "get the enrolments from the stubs service" in {
-      val f = fixture
-
+    "get the enrolments from the stubs service" in new TestFixture {
       when {
-        f.http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
-      } thenReturn Future.successful(f.enrolments)
+        http.GET[Seq[GovernmentGatewayEnrolment]](any())(any(), any(), any())
+      } thenReturn Future.successful(enrolments)
 
-      val result = await(f.connector.enrolments)
+      val result = await(connector.enrolments(groupId))
 
-      result mustBe f.enrolments
+      result mustBe enrolments
+
+      verify(http).GET[Seq[GovernmentGatewayEnrolment]](eqTo(s"http://stubs/auth/oid/$groupId/enrolments"))(any(), any(), any())
     }
   }
 }

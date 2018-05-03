@@ -24,9 +24,13 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext
 
-class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig){
+class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
 
-  def enrolments(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) =
-    http.GET[Seq[GovernmentGatewayEnrolment]](config.enrolmentStubUrl)
+  lazy val baseUrl = config.enrolmentStubUrl
+
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
+    val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
+    http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
+  }
 
 }
