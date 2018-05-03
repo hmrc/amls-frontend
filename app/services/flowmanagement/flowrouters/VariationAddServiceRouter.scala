@@ -58,13 +58,15 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
         (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
                 edit,
                 model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
-                model.businessAppliedForPSRNumber.isDefined) match {
-          case (true, false, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (false, false, _, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-          case (true, true, false, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (true, true, false, true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (false, true, false, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (_, true, _, _) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+                model.businessAppliedForPSRNumber.isDefined,
+                model.areNewActivitiesAtTradingPremises) match {
+          case (true, false, _, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+          case (false, false, _, _, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+          case (true, true, false, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+          case (true, true, false, true, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+          case (false, true, false, _, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+          case (_, true, _, _, Some(true)) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+          case (_, true, _, _, Some(false)) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
       //psr number pages
