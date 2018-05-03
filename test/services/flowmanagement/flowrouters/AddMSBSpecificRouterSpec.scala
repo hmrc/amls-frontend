@@ -236,7 +236,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
   "When Editing in the MSB Add flow, the getRoute method" must {
 
 //    Edit Subservices
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices does not contain TransmittingMoney" in new Fixture {
           val model = AddServiceFlowModel(
@@ -245,12 +245,12 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
         }
       }
     }
 
-    "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
+    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney and PSRNumber and TP MSB activities is defined" in new Fixture {
           val model = AddServiceFlowModel(
@@ -260,12 +260,12 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
         }
       }
     }
 
-    "return the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberController)" when {
+    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney and PSR is not defined" in new Fixture {
           val model = AddServiceFlowModel(
@@ -273,7 +273,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubServicesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
+          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
         }
       }
     }
@@ -310,7 +310,7 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 //edit Business Applied For PSR Number true
     "return the 'update_services_summary' page (UpdateServicesSummaryController)" when {
       "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {
-        "the answer is yes and TP MSB Services is defined" in new Fixture {
+        "the answer is yes" in new Fixture {
           val model = AddServiceFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
@@ -319,21 +319,6 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
           val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
-        }
-      }
-    }
-
-    "return the 'What Do You Do Here' page (WhatDoYouDoHereController)" when {
-      "editing the 'Business PSR Number' page (BusinessAppliedForPSRNumberPageId)" when {
-        "the answer is yes and TP MSB Services is not defined" in new Fixture {
-          val model = AddServiceFlowModel(
-            activity = Some(MoneyServiceBusiness),
-            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
-            tradingPremisesMsbServices = None)
-          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
-
-          result mustBe Redirect(addRoutes.WhatDoYouDoHereController.get(true))
         }
       }
     }
@@ -465,6 +450,23 @@ class AddMSBSpecificRouterSpec extends PlaySpec {
 
         result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
 
+      }
+    }
+
+    "return the 'What's your PSR Number' page (BusinessAppliedForPSRNumberController)" when {
+      "editing the 'What do you do here' page (WhatDoYouDoHerePageId)" when {
+        "MSB services contains TransmittingMoney and PSR is not defined" in new Fixture {
+          val model = AddServiceFlowModel(
+            activity = Some(MoneyServiceBusiness),
+            businessAppliedForPSRNumber = None,
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            areNewActivitiesAtTradingPremises = Some(false))
+          val result = await(router.getRoute(WhatDoYouDoHerePageId, model, edit = true))
+
+          result mustBe Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(true))
+
+        }
       }
     }
   }
