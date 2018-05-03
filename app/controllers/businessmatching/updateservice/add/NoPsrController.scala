@@ -56,7 +56,7 @@ class NoPsrController @Inject()(
       implicit request =>
         (for {
           _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness))))
+            AddServiceFlowModel()))
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           route <- OptionT.liftF(router.getRoute(NoPSRPageId, model))
         } yield route) getOrElse InternalServerError("Could not get the flow model")
