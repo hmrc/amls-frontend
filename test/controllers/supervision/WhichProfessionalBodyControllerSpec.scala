@@ -24,9 +24,9 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class WhichProfessionalBodyControllerSpec extends PlaySpec with GenericTestHelper with MockitoSugar {
+class WhichProfessionalBodyControllerSpec extends PlaySpec with AmlsSpec with MockitoSugar {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
 

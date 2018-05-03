@@ -22,12 +22,12 @@ import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnrolmentStubConnectorSpec extends GenericTestHelper {
+class EnrolmentStubConnectorSpec extends AmlsSpec {
 
   def fixture = new {
     implicit val hc = HeaderCarrier()

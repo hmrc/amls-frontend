@@ -26,12 +26,12 @@ import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{CorePost, HttpResponse}
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
-import utils.{DependencyMocks, GenericTestHelper}
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class GovernmentGatewayConnectorSpec extends GenericTestHelper
+class GovernmentGatewayConnectorSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with BaseGenerator
   with GovernmentGatewayGenerator

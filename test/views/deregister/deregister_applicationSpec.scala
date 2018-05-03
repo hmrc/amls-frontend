@@ -20,10 +20,10 @@ import generators.AmlsReferenceNumberGenerator
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class deregister_applicationSpec extends GenericTestHelper with MustMatchers with AmlsReferenceNumberGenerator {
+class deregister_applicationSpec extends AmlsSpec with MustMatchers with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

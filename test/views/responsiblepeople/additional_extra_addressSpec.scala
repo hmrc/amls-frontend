@@ -19,7 +19,7 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.Country
@@ -28,7 +28,7 @@ import play.api.i18n.Messages
 import views.Fixture
 
 
-class additional_extra_addressSpec extends GenericTestHelper with MustMatchers {
+class additional_extra_addressSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

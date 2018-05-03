@@ -27,11 +27,11 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerNoRelease7Spec extends GenericTestHelper with MockitoSugar {
+class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val recordId = 1

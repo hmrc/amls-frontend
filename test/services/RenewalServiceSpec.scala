@@ -34,13 +34,13 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
+class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 
@@ -1479,7 +1479,7 @@ class RenewalServiceSpec extends GenericTestHelper with MockitoSugar {
   }
 }
 
-class RenewalServiceSpecNoToggleSpec extends GenericTestHelper with MustMatchers with OneAppPerSuite {
+class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with OneAppPerSuite {
 
   implicit val hc = HeaderCarrier()
 

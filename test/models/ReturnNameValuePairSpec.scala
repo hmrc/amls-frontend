@@ -18,9 +18,9 @@ package models
 
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class ReturnNameValuePairSpec extends GenericTestHelper with OneAppPerSuite {
+class ReturnNameValuePairSpec extends AmlsSpec with OneAppPerSuite {
 
   implicit override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.amls-frontend.public.host" -> "somehost:9000")

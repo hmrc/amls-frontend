@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator with ScalaFutures {
+class AmlsRefNumberBrokerSpec extends PlaySpec with AmlsSpec with PaymentGenerator with ScalaFutures {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]

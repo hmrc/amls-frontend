@@ -19,13 +19,13 @@ package views.responsiblepeople
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class remove_responsible_personSpec extends GenericTestHelper with MustMatchers  {
+class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

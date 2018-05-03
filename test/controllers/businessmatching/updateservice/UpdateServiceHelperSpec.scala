@@ -31,10 +31,10 @@ import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
 
 //noinspection ScalaStyle
-class UpdateServiceHelperSpec extends GenericTestHelper
+class UpdateServiceHelperSpec extends AmlsSpec
   with BusinessActivitiesGenerator
   with ResponsiblePersonGenerator
   with FutureAssertions {

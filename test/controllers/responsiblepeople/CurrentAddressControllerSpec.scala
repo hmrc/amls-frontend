@@ -30,7 +30,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 
@@ -49,7 +49,7 @@ import uk.gov.hmrc.play.audit.AuditExtensions._
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class CurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
+class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
   val mockDataCacheConnector = mock[DataCacheConnector]

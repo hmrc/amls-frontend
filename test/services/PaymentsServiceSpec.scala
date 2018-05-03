@@ -28,13 +28,13 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
-class PaymentsServiceSpec extends GenericTestHelper with ScalaFutures with PaymentGenerator {
+class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerator {
 
   //noinspection ScalaStyle
   trait Fixture extends AuthorisedFixture {

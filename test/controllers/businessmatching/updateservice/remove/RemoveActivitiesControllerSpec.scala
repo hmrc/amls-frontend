@@ -32,12 +32,12 @@ import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RemoveActivitiesControllerSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
+class RemoveActivitiesControllerSpec extends AmlsSpec with MockitoSugar with MustMatchers {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

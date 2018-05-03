@@ -18,9 +18,9 @@ package models.renewal
 
 import models.Country
 import play.api.libs.json.{JsSuccess, Json}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class RenewalSpec extends GenericTestHelper {
+class RenewalSpec extends AmlsSpec {
 
   "The Renewal model" must {
 

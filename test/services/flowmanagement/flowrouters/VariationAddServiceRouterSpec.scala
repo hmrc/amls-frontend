@@ -27,12 +27,12 @@ import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{DependencyMocks, GenericTestHelper}
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VariationAddServiceRouterSpec extends GenericTestHelper {
+class VariationAddServiceRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]

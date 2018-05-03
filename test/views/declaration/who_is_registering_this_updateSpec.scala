@@ -24,11 +24,11 @@ import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class who_is_registering_this_updateSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator {
+class who_is_registering_this_updateSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

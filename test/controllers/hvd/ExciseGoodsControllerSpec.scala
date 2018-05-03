@@ -27,12 +27,12 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import models.businessmatching.HighValueDealing
 
 import scala.concurrent.Future
 
-class ExciseGoodsControllerSpec extends GenericTestHelper {
+class ExciseGoodsControllerSpec extends AmlsSpec {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
 

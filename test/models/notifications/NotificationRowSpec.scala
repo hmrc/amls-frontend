@@ -20,9 +20,9 @@ import models.notifications.ContactType.NoSubject
 import org.joda.time.{DateTime, DateTimeZone}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class NotificationRowSpec extends PlaySpec with GenericTestHelper {
+class NotificationRowSpec extends PlaySpec with AmlsSpec {
 
   val testNotifications = NotificationRow(
     Some(

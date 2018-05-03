@@ -22,10 +22,10 @@ import models.autocomplete.NameValuePair
 import models.businessmatching.BusinessType
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class current_addressSpec extends GenericTestHelper with MustMatchers {
+class current_addressSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

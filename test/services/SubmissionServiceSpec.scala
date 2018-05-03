@@ -47,14 +47,14 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
 import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import utils.{DependencyMocks, GenericTestHelper}
+import utils.{DependencyMocks, AmlsSpec}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 
-class SubmissionServiceSpec extends GenericTestHelper
+class SubmissionServiceSpec extends AmlsSpec
   with ScalaFutures
   with IntegrationPatience
   with ResponsiblePersonGenerator

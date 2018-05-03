@@ -32,11 +32,11 @@ import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, ServiceFlowMocks}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, ServiceFlowMocks}
 
 import scala.concurrent.Future
 
-class ProductsControllerSpec extends GenericTestHelper with MockitoSugar {
+class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
 

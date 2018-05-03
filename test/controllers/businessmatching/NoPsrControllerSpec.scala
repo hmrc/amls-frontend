@@ -23,11 +23,11 @@ import play.api.http.Status
 import play.api.i18n.Messages
 import play.api.mvc.Result
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.mvc.Results.Ok
 
 //noinspection ScalaStyle
-class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
+class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
   implicit val defaultPatience =
     PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))

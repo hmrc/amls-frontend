@@ -30,12 +30,12 @@ import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 import cats.implicits._
 
 import scala.concurrent.Future
 
-class SendMoneyToOtherCountryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

@@ -30,12 +30,12 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class NewServiceInformationControllerSpec extends GenericTestHelper with MockitoSugar with FutureAssertions with ScalaFutures {
+class NewServiceInformationControllerSpec extends AmlsSpec with MockitoSugar with FutureAssertions with ScalaFutures {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

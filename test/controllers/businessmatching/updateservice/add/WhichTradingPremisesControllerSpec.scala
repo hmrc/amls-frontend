@@ -27,9 +27,9 @@ import org.scalatest.PrivateMethodTester
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class WhichTradingPremisesControllerSpec extends GenericTestHelper
+class WhichTradingPremisesControllerSpec extends AmlsSpec
   with PrivateMethodTester
   with TradingPremisesGenerator {
 

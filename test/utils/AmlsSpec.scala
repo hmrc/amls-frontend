@@ -16,21 +16,19 @@
 
 package utils
 
-import connectors.DataCacheConnector
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.MessagesApi
-import play.api.inject.bind
+import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
-import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.filters.csrf.CSRF.Token
 import play.filters.csrf.{CSRFConfigProvider, CSRFFilter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
+trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
   protected val bindModules: Seq[GuiceableModule] = Seq()
 
@@ -55,4 +53,3 @@ trait GenericTestHelper extends PlaySpec with OneAppPerSuite with MockitoSugar w
     )).withHeaders((csrfConfig.headerName, token))
   }
 }
-

@@ -32,12 +32,12 @@ import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar {
+class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

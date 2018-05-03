@@ -30,11 +30,11 @@ import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

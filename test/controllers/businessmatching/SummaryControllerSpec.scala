@@ -30,12 +30,12 @@ import org.mockito.Mockito._
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
+class SummaryControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)

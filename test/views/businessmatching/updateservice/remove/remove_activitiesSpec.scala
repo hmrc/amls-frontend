@@ -19,10 +19,10 @@ package views.businessmatching.updateservice.remove
 import forms.EmptyForm
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class remove_activitiesSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
+class remove_activitiesSpec extends AmlsSpec with MockitoSugar with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

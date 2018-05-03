@@ -25,7 +25,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -34,7 +34,7 @@ import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
-class IdentifyLinkedTransactionsControllerSpec extends GenericTestHelper with MockitoSugar  {
+class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

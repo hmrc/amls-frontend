@@ -26,7 +26,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import utils.AuthorisedFixture
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ConfirmRegisteredOfficeControllerSpec extends GenericTestHelper with MockitoSugar {
+class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

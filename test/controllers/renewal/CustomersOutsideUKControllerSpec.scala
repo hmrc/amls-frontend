@@ -33,12 +33,12 @@ import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class CustomersOutsideUKControllerSpec extends GenericTestHelper {
+class CustomersOutsideUKControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture {
     self =>

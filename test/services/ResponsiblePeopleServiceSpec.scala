@@ -23,14 +23,14 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{DependencyMocks, GenericTestHelper, StatusConstants}
+import utils.{DependencyMocks, AmlsSpec, StatusConstants}
 import org.mockito.Mockito.verify
 import org.mockito.Matchers.{any, eq => eqTo}
 import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ResponsiblePeopleServiceSpec extends GenericTestHelper with ResponsiblePersonGenerator with ScalaFutures {
+class ResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
 

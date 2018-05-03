@@ -27,7 +27,7 @@ import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
 import org.scalatest.{Pending, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.mvc.Call
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -36,7 +36,7 @@ import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDe
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-class ResponsiblePeopleAddControllerSpec extends GenericTestHelper
+class ResponsiblePeopleAddControllerSpec extends AmlsSpec
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {

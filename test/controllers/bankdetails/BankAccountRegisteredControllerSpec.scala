@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -30,7 +30,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class BankAccountRegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
+class BankAccountRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

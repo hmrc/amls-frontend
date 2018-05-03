@@ -20,13 +20,13 @@ import forms.{InvalidForm, ValidForm, Form2}
 import models.responsiblepeople.{VATRegisteredYes, VATRegistered, VATRegisteredNo}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import jto.validation.Path
 import jto.validation.ValidationError
 
 
-class vat_registeredSpec extends GenericTestHelper with MustMatchers {
+class vat_registeredSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

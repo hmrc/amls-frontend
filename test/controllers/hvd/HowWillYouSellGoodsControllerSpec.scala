@@ -24,9 +24,9 @@ import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class HowWillYouSellGoodsControllerSpec extends GenericTestHelper {
+class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 

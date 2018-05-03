@@ -32,12 +32,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import views.Fixture
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateAnyInformationControllerSpec extends GenericTestHelper {
+class UpdateAnyInformationControllerSpec extends AmlsSpec {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

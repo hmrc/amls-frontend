@@ -35,14 +35,14 @@ package views.hvd
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.{PaymentMethods, ReceiveCashPayments}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class receivingSpec extends GenericTestHelper with MustMatchers  {
+class receivingSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

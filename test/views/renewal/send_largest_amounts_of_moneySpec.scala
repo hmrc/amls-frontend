@@ -22,11 +22,11 @@ import models.Country
 import models.renewal.SendTheLargestAmountsOfMoney
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class send_largest_amounts_of_moneySpec extends GenericTestHelper with MustMatchers  {
+class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

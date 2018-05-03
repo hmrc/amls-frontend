@@ -24,7 +24,7 @@ import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,7 +34,7 @@ import uk.gov.hmrc.domain.Nino
 
 import scala.concurrent.Future
 
-class PersonResidentTypeControllerSpec extends GenericTestHelper with MockitoSugar with NinoUtil {
+class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
 
   trait Fixture extends AuthorisedFixture {
     self =>

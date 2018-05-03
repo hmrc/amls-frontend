@@ -21,10 +21,10 @@ import jto.validation.{Path, ValidationError}
 import models.tradingpremises.AgentCompanyDetails
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class agent_partnershipSpec extends GenericTestHelper with MustMatchers {
+class agent_partnershipSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

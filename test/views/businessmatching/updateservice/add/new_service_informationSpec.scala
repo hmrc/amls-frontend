@@ -19,11 +19,11 @@ package views.businessmatching.updateservice.add
 import models.businessmatching.AccountancyServices
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.new_service_information
 
-class new_service_informationSpec extends GenericTestHelper with MustMatchers {
+class new_service_informationSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

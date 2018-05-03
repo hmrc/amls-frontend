@@ -32,10 +32,10 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
-class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
+class StatusControllerWithoutAmendmentsSpec extends AmlsSpec with MockitoSugar {
 
   val cacheMap = mock[CacheMap]
 

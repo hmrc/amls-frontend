@@ -19,9 +19,9 @@ package models.payments
 import jto.validation.Valid
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class WaysToPaySpec extends PlaySpec with GenericTestHelper  with MockitoSugar {
+class WaysToPaySpec extends PlaySpec with AmlsSpec  with MockitoSugar {
 
   "Form Validation" must {
 

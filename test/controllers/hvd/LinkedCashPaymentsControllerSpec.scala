@@ -21,7 +21,7 @@ import models.hvd.{LinkedCashPayments, Hvd}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -29,7 +29,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class LinkedCashPaymentsControllerSpec extends GenericTestHelper {
+class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

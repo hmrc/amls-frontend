@@ -20,14 +20,14 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.WhoIsRegistering
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class who_is_registeringSpec extends GenericTestHelper with MustMatchers  {
+class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

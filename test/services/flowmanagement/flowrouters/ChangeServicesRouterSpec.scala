@@ -19,11 +19,11 @@ package services.flowmanagement.flowrouters
 import models.businessmatching.updateservice.ChangeServicesAdd
 import models.flowmanagement.ChangeServicesPageId
 import play.api.test.Helpers._
-import utils.{DependencyMocks, GenericTestHelper}
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ChangeServicesRouterSpec extends GenericTestHelper {
+class ChangeServicesRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 

@@ -20,9 +20,9 @@ import models.bankdetails._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class BankAccountAddControllerSpec extends GenericTestHelper
+class BankAccountAddControllerSpec extends AmlsSpec
   with MockitoSugar
   with BeforeAndAfter {
 
