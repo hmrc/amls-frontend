@@ -41,9 +41,6 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     val controller = new FitAndProperController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -51,6 +48,8 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
     mockApplicationStatus(SubmissionDecisionApproved)
 
   }
+
+  //TODO Possibly need more tests
 
   "FitAndProperController" when {
 
@@ -83,21 +82,21 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
             controller.router.verify(FitAndProperPageId,
               AddServiceFlowModel(fitAndProper = Some(true), hasChanged = true))
           }
-        }
 
-        "when request equals No" when {
-          "progress to the 'new service information' page" when {
-            "an activity that generates a section has been chosen" in new Fixture {
-              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(TrustAndCompanyServices)))
+          "request equals No" when {
+            "progress to the 'new service information' page" when {
+              "an activity that generates a section has been chosen" in new Fixture {
+                mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(TrustAndCompanyServices)))
 
-              val result = controller.post()(request.withFormUrlEncodedBody(
-                "passedFitAndProper" -> "false"
-              ))
+                val result = controller.post()(request.withFormUrlEncodedBody(
+                  "passedFitAndProper" -> "false"
+                ))
 
-              status(result) mustBe SEE_OTHER
+                status(result) mustBe SEE_OTHER
 
-              controller.router.verify(FitAndProperPageId,
-                AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
+                controller.router.verify(FitAndProperPageId,
+                  AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
+              }
             }
           }
         }
@@ -111,7 +110,5 @@ class FitAndProperControllerSpec extends GenericTestHelper with MockitoSugar wit
         }
       }
     }
-
   }
-
 }

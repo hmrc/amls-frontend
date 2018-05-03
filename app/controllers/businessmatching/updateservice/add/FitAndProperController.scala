@@ -20,12 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId}
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -40,9 +37,6 @@ import scala.concurrent.Future
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val statusService: StatusService,
-                                        val businessMatchingService: BusinessMatchingService,
-                                        val helper: UpdateServiceHelper,
                                         val router: Router[AddServiceFlowModel]
                                       ) extends BaseController with RepeatingSection {
 
@@ -57,7 +51,7 @@ class FitAndProperController @Inject()(
         getFormData map { case (model) =>
           val form = model.fitAndProper map { v => Form2(v) } getOrElse EmptyForm
           Ok(fit_and_proper(form, edit))
-        } getOrElse InternalServerError("Unable to show the view")
+        } getOrElse InternalServerError("Get: Unable to show Fit And Proper page")
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -66,14 +60,14 @@ class FitAndProperController @Inject()(
         Form2[Boolean](request.body) match {
           case form: InvalidForm => getFormData map { case (_) =>
             BadRequest(fit_and_proper(form, edit))
-          } getOrElse InternalServerError("Unable to show the view")
+          } getOrElse InternalServerError("Post: Unable to Fit And Proper page")
 
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
               case Some(model) => model.isfitAndProper(Some(data)).responsiblePeople(if (data) model.responsiblePeople else None)
             } flatMap {
               case Some(model) => router.getRoute(FitAndProperPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: FitAndProperController"))
             }
         }
   }
