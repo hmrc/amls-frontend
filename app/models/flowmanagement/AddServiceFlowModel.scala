@@ -51,21 +51,20 @@ case class AddServiceFlowModel(
     }
 
     this.copy(responsiblePeople = responsiblePeopleFitAndProper,
-      fitAndProper = calculateFitAndProper(p),
+      fitAndProper = mayHavePassedFitAndProper(p),
       hasChanged = hasChanged || !this.activity.contains(p),
       hasAccepted = hasAccepted && this.activity.contains(p))
   }
 
-  def calculateFitAndProper(p: Seq[ResponsiblePeople]):Option [Boolean] = {
-    val hasTrues = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(true)) > 0
-    val hasFalses = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(false)) > 0
+  def mayHavePassedFitAndProper(p: Seq[ResponsiblePeople]): Option[Boolean] = {
+    val hasTrues = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
+    val hasFalses = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
 
     if(!hasTrues && !hasFalses) {
       None
     } else {
       Some(hasTrues)
     }
-
   }
 
   def activity(p: BusinessActivity): AddServiceFlowModel =
