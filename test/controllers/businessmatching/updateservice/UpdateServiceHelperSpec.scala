@@ -21,7 +21,7 @@ import cats.implicits._
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.flowmanagement.AddServiceFlowModel
@@ -35,6 +35,7 @@ import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+
 import scala.concurrent.ExecutionContext.Implicits.global
 
 //noinspection ScalaStyle
@@ -266,6 +267,34 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
       helper.clearFlowModel().returnsSome(AddServiceFlowModel())
+    }
+  }
+
+  "updateHasAcceptedFlag" must {
+    "save the flow model with 'hasAccepted' = true" in new Fixture {
+      mockCacheSave[AddServiceFlowModel]
+
+      await(helper.updateHasAcceptedFlag(AddServiceFlowModel()).value)
+
+      verify(mockCacheConnector).save[AddServiceFlowModel](eqTo(AddServiceFlowModel.key), eqTo(AddServiceFlowModel(hasAccepted = true)))(any(), any(), any())
+    }
+  }
+
+  "updateServicesRegister" must {
+    "add the activity to the current activities in the register" when {
+      "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
+        mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
+
+        helper.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
+          .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
+      }
+
+      "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
+        mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
+
+        helper.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
+          .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
+      }
     }
   }
 }
