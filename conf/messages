@@ -1196,6 +1196,7 @@ businessmatching.updateservice.selectactivities.currentactivities.hint.plural = 
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.summary = Will you do {0} from any of your registered trading premises?
 
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?

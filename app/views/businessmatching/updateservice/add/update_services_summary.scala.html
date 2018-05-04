@@ -110,7 +110,7 @@
     }
 
     @checkYourAnswers(
-        question = Messages("businessmatching.updateservice.tradingpremises.heading", flowModel.activityName.getOrElse("").toLowerCase),
+        question = Messages("businessmatching.updateservice.tradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
         idTag = "tradingpremises-edit"
     ) {
