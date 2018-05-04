@@ -58,10 +58,6 @@ class WhatDoYouDoHereControllerSpec extends GenericTestHelper with ScalaFutures 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
-      controller.dataCacheConnector.fetchAll(any(), any())
-    } thenReturn Future.successful(Some(mockCacheMap))
-
-    when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
       activities = Some(BusinessActivities(Set(AccountancyServices)))
