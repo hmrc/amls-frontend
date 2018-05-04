@@ -69,14 +69,14 @@ class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "msbWhatdoyoudohere") -> Seq(ValidationError("not a message Key"))
+          (Path \ "msbServices") -> Seq(ValidationError("not a message Key"))
         ))
 
       override def view = what_do_you_do_here(form2, edit = false)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("msbWhatdoyoudohere")
+      doc.getElementById("msbServices")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
     }

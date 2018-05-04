@@ -1201,8 +1201,10 @@ businessmatching.updateservice.tradingpremises.summary = Will you do {0} from an
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
 
+
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
+businessmatching.updateservice.whichtradingpremises.summary = Which premises will you do {0} from?
 
 businessmatching.updateservice.whatdoyoudohere.title = What does your business do at these premises?
 businessmatching.updateservice.whatdoyoudohere.heading = What does your business do at these premises?

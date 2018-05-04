@@ -122,7 +122,7 @@
 
     @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
         @checkYourAnswers(
-            question = Messages("businessmatching.updateservice.whichtradingpremises.heading", flowModel.activityName.getOrElse("").toLowerCase),
+            question = Messages("businessmatching.updateservice.whichtradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
             editUrl = routes.WhichTradingPremisesController.get().url,
             idTag = "whichtradingpremises-edit"
         ) {

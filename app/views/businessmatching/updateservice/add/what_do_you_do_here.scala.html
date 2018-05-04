@@ -35,14 +35,14 @@
     @form(f, controllers.businessmatching.updateservice.add.routes.WhatDoYouDoHereController.post(edit)) {
 
         @fieldset(
-            f = f("msbWhatdoyoudohere-fieldset"),
+            f = f("msbServices-fieldset"),
             legend = "businessmatching.updateservice.whatdoyoudohere.title",
             legendHidden = true,
             panel = false
         ) {
 
             @errorGroup(
-                field = f("msbWhatdoyoudohere")
+                field = f("msbServices")
             ) {
 
                 @if(msbServiceValues.contains("01")) {
@@ -76,7 +76,7 @@
             }
         }
 
-        @submit(edit, buttonId = Some("whatdoyouwanttodohere-submit"), returnLink = false)
+        @submit(edit, buttonId = Some("msbServices-submit"), returnLink = false)
 
     }
 }
