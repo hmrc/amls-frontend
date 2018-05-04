@@ -41,9 +41,9 @@ case class AddServiceFlowModel(
 
   def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePeople]): AddServiceFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
-            .filter(personWithIndex => personWithIndex._1.hasAlreadyPassedFitAndProper.getOrElse(false))
-            .map(personWithIndex => personWithIndex._2).toSet
-
+            .collect({
+              case (person, index) if person.hasAlreadyPassedFitAndProper.getOrElse(false) => index
+            }).toSet
     val responsiblePeopleFitAndProper: Option[ResponsiblePeopleFitAndProper] = if (fitAndProperInts.nonEmpty) {
       Some(ResponsiblePeopleFitAndProper(fitAndProperInts))
     } else {
