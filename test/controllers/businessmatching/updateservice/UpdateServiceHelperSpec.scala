@@ -109,11 +109,11 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))))),
           Some(BusinessMatching.key))
 
-        mockCacheSave(Supervision(), Some(Supervision.key))
+        mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
-        helper.updateSupervision.returnsSome(Supervision())
+        helper.updateSupervision.returnsSome(Supervision(hasAccepted = true))
 
-        verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision()))(any(), any(), any())
+        verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any(), any())
       }
     }
 
