@@ -66,6 +66,7 @@ class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessM
           case (true, true, false, true, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
           case (false, true, false, _, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
           case (_, true, _, _, Some(true)) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+          case (true, true, _, false, Some(false)) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
           case (_, true, _, _, Some(false)) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
         }
 
