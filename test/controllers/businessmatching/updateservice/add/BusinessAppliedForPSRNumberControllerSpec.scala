@@ -61,9 +61,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
     mockApplicationStatus(SubmissionDecisionApproved)
 
     val businessMatching = businessMatchingGen.sample.get
-
-    when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-      (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    mockCacheSave[BusinessMatching]
   }
 
   "BusinessAppliedForPSRNumberController" when {

@@ -34,16 +34,11 @@ case class AddServiceFlowModel(
                                 msbServices: Option[BusinessMatchingMsbServices] = None,
                                 tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
                               ) {
-  def empty(): Boolean = this match {
-    case AddServiceFlowModel(_, None, None, None, None, None, false, false, None, None, None) => true
-    case _ => false
-  }
-
   def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePeople]): AddServiceFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
-            .filter(personWithIndex => personWithIndex._1.hasAlreadyPassedFitAndProper.getOrElse(false))
-            .map(personWithIndex => personWithIndex._2).toSet
-
+            .collect({
+              case (person, index) if person.hasAlreadyPassedFitAndProper.getOrElse(false) => index
+            }).toSet
     val responsiblePeopleFitAndProper: Option[ResponsiblePeopleFitAndProper] = if (fitAndProperInts.nonEmpty) {
       Some(ResponsiblePeopleFitAndProper(fitAndProperInts))
     } else {
@@ -51,21 +46,20 @@ case class AddServiceFlowModel(
     }
 
     this.copy(responsiblePeople = responsiblePeopleFitAndProper,
-      fitAndProper = calculateFitAndProper(p),
+      fitAndProper = mayHavePassedFitAndProper(p),
       hasChanged = hasChanged || !this.activity.contains(p),
       hasAccepted = hasAccepted && this.activity.contains(p))
   }
 
-  def calculateFitAndProper(p: Seq[ResponsiblePeople]):Option [Boolean] = {
-    val hasTrues = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(true)) > 0
-    val hasFalses = p.map (pt=> pt.hasAlreadyPassedFitAndProper).count(_ == Some(false)) > 0
+  def mayHavePassedFitAndProper(p: Seq[ResponsiblePeople]): Option[Boolean] = {
+    val hasTrues = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
+    val hasFalses = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
 
     if(!hasTrues && !hasFalses) {
       None
     } else {
       Some(hasTrues)
     }
-
   }
 
   def activity(p: BusinessActivity): AddServiceFlowModel =

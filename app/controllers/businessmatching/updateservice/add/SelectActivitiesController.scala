@@ -35,6 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching.updateservice.add.select_activities
+import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 
 import scala.concurrent.Future
 
@@ -61,9 +62,10 @@ class SelectActivitiesController @Inject()(
         (for {
           //Ensure that responsible people can be populated as required
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
-          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            model.fitAndProperFromResponsiblePeople(responsiblePeople)))
+          model <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(model => edit match {
+            case false => model.getOrElse(AddServiceFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
+            case _ => model.getOrElse(AddServiceFlowModel())
+          }))
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))

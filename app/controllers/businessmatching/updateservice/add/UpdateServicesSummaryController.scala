@@ -48,7 +48,7 @@ class UpdateServicesSummaryController @Inject()(
     implicit authContext =>
       implicit request =>
         OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) collect {
-          case model if !model.empty() => Ok(update_services_summary(EmptyForm, model))
+          case model if model != AddServiceFlowModel() => Ok(update_services_summary(EmptyForm, model))
         } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 

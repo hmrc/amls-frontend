@@ -51,11 +51,17 @@ object ResponsiblePeopleService {
 
   def isActive(person: ResponsiblePeople) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
 
-  implicit class ResponsiblePeopleListHelpers(people: Seq[(ResponsiblePeople, Int)]) {
+  implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePeople, Int)]) {
     def exceptInactive = people filter {
       case (person, _) if isActive(person) => true
       case _ => false
     }
   }
 
+  implicit class ResponsiblePeopleListHelpers(people: Seq[ResponsiblePeople]) {
+    def exceptInactive = people filter {
+      case person if isActive(person) => true
+      case _ => false
+    }
+  }
 }
