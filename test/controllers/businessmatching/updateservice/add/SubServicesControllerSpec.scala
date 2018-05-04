@@ -53,11 +53,8 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       router = createRouter[AddServiceFlowModel]
     )
 
-    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
-    when {
-      controller.dataCacheConnector.fetchAll(any(), any())
-    } thenReturn Future.successful(Some(mockCacheMap))
+    val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
