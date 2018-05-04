@@ -85,12 +85,12 @@ class TradingPremisesService {
   private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
                                                     (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
-      val stuff: TradingPremises = tp.whatDoesYourBusinessDoAtThisAddress {
+      val premise: TradingPremises = tp.whatDoesYourBusinessDoAtThisAddress {
         tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)) { wdybd =>
           fn(wdybd, index)
         }
       }
-      stuff.copy(hasAccepted = true)
+      premise.copy(hasAccepted = true)
     }
   }
 
