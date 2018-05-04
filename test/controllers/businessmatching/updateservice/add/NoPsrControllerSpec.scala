@@ -16,47 +16,40 @@
 
 package controllers.businessmatching.updateservice.add
 
+import cats.data.OptionT
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.time.{Millis, Seconds, Span}
+import org.mockito.Matchers.any
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.businessmatching.BusinessMatchingService
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-//noinspection ScalaStyle
-class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
+import scala.concurrent.Future
 
-  implicit val defaultPatience =
-    PatienceConfig(timeout = Span(5, Seconds), interval = Span(500, Millis))
+class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
-    val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
 
     val controller = new NoPsrController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
+      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
-
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
-    mockApplicationStatus(SubmissionDecisionApproved)
-
   }
 
   "get" when {
     "called" must {
       "return an OK status" when {
         "with the correct content" in new Fixture {
-          mockApplicationStatus(NotCompleted)
 
           val result = controller.get()(request)
 
@@ -70,13 +63,9 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
   "post is called" must {
 
     "clear the flow model" in new Fixture {
-      //TODO Not convinced this test is valid
-      val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-        msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
-        hasChanged = true)
-      mockCacheFetch(Some(AddServiceFlowModel(None)))
-      mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
+      when {
+        mockUpdateServiceHelper.clearFlowModel()(any(), any())
+      } thenReturn OptionT[Future, AddServiceFlowModel](Future.successful(Some(AddServiceFlowModel())))
 
       val result = controller.post()(request.withFormUrlEncodedBody())
 

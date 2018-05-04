@@ -46,7 +46,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
 
   def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
-      case Some(dcModel) if model.activity.get.equals(AccountancyServices) =>
+      case Some(dcModel) if model.activity.contains(AccountancyServices) =>
         dcModel.accountantForAMLSRegulations(None)
           .whoIsYourAccountant(None)
           .taxMatters(None)
