@@ -17,7 +17,7 @@
 package services
 
 import javax.inject.Singleton
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivity, MoneyServiceBusiness, BusinessMatchingMsbServices}
 import models.tradingpremises
 import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
 
@@ -29,9 +29,9 @@ class TradingPremisesService {
 
   def updateTradingPremises(
                              indices: Seq[Int],
-                             tradingPremises: Seq[models.tradingpremises.TradingPremises],
-                             activity: models.businessmatching.BusinessActivity,
-                             msbServicesInput: Option[models.businessmatching.BusinessMatchingMsbServices],
+                             tradingPremises: Seq[TradingPremises],
+                             activity: BusinessActivity,
+                             msbServicesInput: Option[BusinessMatchingMsbServices],
                              remove: Boolean): Seq[TradingPremises] = {
 
     val updatedTradingPremises: Seq[TradingPremises] = {
