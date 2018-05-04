@@ -49,13 +49,9 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
     val controller = new SubServicesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
-
-    //mockCacheFetch(Some(AddServiceFlowModel(Some(MoneyServiceBusiness))))
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
 
@@ -81,7 +77,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return OK with 'msb_subservices' view" in new Fixture {
 
         mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -104,7 +100,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
       "return the 'Does Your Business ... PSR ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
           mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-                                                          hasChanged = true))
+            hasChanged = true))
 
           val result = controller.post()(request.withFormUrlEncodedBody(
             "msbServices[]" -> "01"
@@ -126,7 +122,7 @@ class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           )
 
           val result = controller.post()(request.withFormUrlEncodedBody(
-              "msbServices[]" -> "03",
+            "msbServices[]" -> "03",
             "msbServices[]" -> "04"
           ))
 

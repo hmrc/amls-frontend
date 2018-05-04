@@ -20,12 +20,10 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -38,9 +36,7 @@ import scala.concurrent.Future
 class SubServicesController @Inject()(
                                        val authConnector: AuthConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
-                                       val statusService: StatusService,
                                        val businessMatchingService: BusinessMatchingService,
-                                       val helper: UpdateServiceHelper,
                                        val router: Router[AddServiceFlowModel]
                                      ) extends BaseController {
 
@@ -55,7 +51,7 @@ class SubServicesController @Inject()(
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
 
           Ok(msb_subservices(form, edit))
-        }) getOrElse InternalServerError("Failed to get activities")
+        }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -73,7 +69,7 @@ class SubServicesController @Inject()(
               }
             } flatMap {
               case Some(model) => router.getRoute(SubServicesPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
+              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
             }
           }
         }

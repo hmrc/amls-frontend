@@ -62,9 +62,8 @@ class SelectActivitiesController @Inject()(
           //Ensure that responsible people can be populated as required
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-            case Some(model) => model.fitAndProperFromResponsiblePeople(responsiblePeople)
-          })
+          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
+            model.fitAndProperFromResponsiblePeople(responsiblePeople)))
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
