@@ -72,7 +72,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
         EstateAgentBusinessService,
         MoneyServiceBusiness)
     )
-    val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+    val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
     val completeModel1 = TradingPremises(
       Some(RegisteringAgentPremises(true)),
@@ -466,7 +466,7 @@ class RemoveTradingPremisesControllerSpec extends GenericTestHelper with Mockito
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
   val completeTradingPremises1 = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),

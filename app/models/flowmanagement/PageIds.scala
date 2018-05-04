@@ -28,6 +28,10 @@ case object WhichTradingPremisesPageId extends PageId
 case object UpdateServiceSummaryPageId extends PageId
 case object NewServiceInformationPageId extends PageId
 case object AddMoreAcivitiesPageId extends PageId
+case object SubServicesPageId extends PageId
+case object BusinessAppliedForPSRNumberPageId extends PageId
+case object NoPSRPageId extends PageId
+case object WhatDoYouDoHerePageId extends PageId
 
 // Remove service flow
 case object WhatServiceToRemovePageId extends PageId

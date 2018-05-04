@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, CurrencyExchange, MsbService}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbService}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -44,7 +44,7 @@ trait SendMoneyToOtherCountryController extends BaseController {
       }
   }
 
-  private def standardRouting(next: Boolean, services: Set[MsbService]): Result =
+  private def standardRouting(next: Boolean, services: Set[BusinessMatchingMsbService]): Result =
     (next, services) match {
       case (true, _) =>
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
@@ -54,7 +54,7 @@ trait SendMoneyToOtherCountryController extends BaseController {
         Redirect(routes.SummaryController.get())
     }
 
-  private def editRouting(next: Boolean, services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+  private def editRouting(next: Boolean, services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     (next: Boolean, services) match {
       case (true, _) if !msb.sendTheLargestAmountsOfMoney.isDefined =>
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get(true))

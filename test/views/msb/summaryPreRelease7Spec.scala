@@ -16,7 +16,7 @@
 
 package views.msb
 
-import models.businessmatching.{CurrencyExchange, MsbServices}
+import models.businessmatching.{CurrencyExchange, BusinessMatchingMsbServices}
 import models.moneyservicebusiness.{MoneyServiceBusiness, WhichCurrencies}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
@@ -40,7 +40,7 @@ class summaryPreRelease7Spec extends  GenericTestHelper with MustMatchers {
 
       val model = MoneyServiceBusiness(whichCurrencies = Some(WhichCurrencies(Seq("GBP"), None, None, None, None)))
 
-      def view = views.html.msb.summary(model, Some(MsbServices(Set(CurrencyExchange))), false)
+      def view = views.html.msb.summary(model, Some(BusinessMatchingMsbServices(Set(CurrencyExchange))), false)
 
       html.contains(Messages("msb.which_currencies.foreign_currencies_question")) must be(false)
 

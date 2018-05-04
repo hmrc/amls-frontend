@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 trait AuthorisedFixture extends MockitoSugar {
 
-  val authConnector = mock[AuthConnector]
+    var authConnector = mock[AuthConnector]
 
   val authority = Authority(
     "Test User",

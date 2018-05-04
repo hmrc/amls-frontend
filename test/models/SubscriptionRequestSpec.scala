@@ -49,7 +49,7 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
   val completeModel = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),

@@ -116,15 +116,15 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn OptionT.fromOption[Future](Some(modifiedTradingPremises))
 
         when {
-          controller.helper.updateBusinessMatching(eqTo(HighValueDealing))(any(), any())
-        } thenReturn Future.successful(Some(businessMatchingModel))
+          controller.helper.updateBusinessMatching(any())(any(), any())
+        } thenReturn OptionT.fromOption[Future](Some(businessMatchingModel))
 
         when {
-          controller.helper.updateServicesRegister(eqTo(HighValueDealing))(any(), any())
-        } thenReturn Future.successful(Some(serviceChangeRegister))
+          controller.helper.updateServicesRegister(any())(any(), any())
+        } thenReturn OptionT.some[Future, ServiceChangeRegister](serviceChangeRegister)
 
         when {
-          controller.tradingPremisesService.addBusinessActivtiesToTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(false))
+          controller.tradingPremisesService.updateTradingPremises(eqTo(Seq(0)), eqTo(tradingPremises), eqTo(HighValueDealing), eqTo(None), eqTo(false))
         } thenReturn modifiedTradingPremises
 
         when {
@@ -132,8 +132,8 @@ class UpdateServicesSummaryControllerSpec extends GenericTestHelper
         } thenReturn OptionT.fromOption[Future](Some(mockCacheMap))
 
         when {
-          controller.helper.updateBusinessActivities(eqTo(HighValueDealing))(any(), any())
-        } thenReturn Future.successful(Some(mock[models.businessactivities.BusinessActivities]))
+          controller.helper.updateBusinessActivities(any())(any(), any())
+        } thenReturn OptionT.some[Future, models.businessactivities.BusinessActivities](mock[models.businessactivities.BusinessActivities])
 
         when {
           controller.helper.updateSupervision(any(), any())

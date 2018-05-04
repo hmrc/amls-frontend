@@ -22,16 +22,16 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.{BusinessActivity, BusinessMatching, MsbService => BMMsbServices}
+import models.businessmatching.{BusinessActivity, BusinessMatching, BusinessMatchingMsbService => BMMsbServices}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{MsbServices, TradingPremises}
+import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises}
 import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
-import models.tradingpremises.MsbServices._
+import models.tradingpremises.TradingPremisesMsbServices._
 
 import scala.concurrent.Future
 
@@ -59,14 +59,14 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             } yield {
                 if (msbServices.size == 1) {
                   updateDataStrict[TradingPremises](index) { utp =>
-                    Some(utp.msbServices(MsbServices(msbServices)))
+                    Some(utp.msbServices(TradingPremisesMsbServices(msbServices)))
                   }
                   Redirect(routes.PremisesRegisteredController.get(index))
                 } else {
                   (for {
                     tps <- tp.msbServices
                   } yield {
-                    Ok(views.html.tradingpremises.msb_services(Form2[MsbServices](tps), index, edit, changed, businessMatching))
+                    Ok(views.html.tradingpremises.msb_services(Form2[TradingPremisesMsbServices](tps), index, edit, changed, businessMatching))
                   }) getOrElse Ok(views.html.tradingpremises.msb_services(EmptyForm, index, edit, changed, businessMatching))
 
                 }
@@ -78,11 +78,11 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
 
 
   private def redirectBasedOnStatus(status: SubmissionStatus,
-                            tradingPremises: Option[TradingPremises],
-                            data:MsbServices,
-                            edit: Boolean,
-                            changed:Boolean,
-                            index:Int) = {
+                                    tradingPremises: Option[TradingPremises],
+                                    data:TradingPremisesMsbServices,
+                                    edit: Boolean,
+                                    changed:Boolean,
+                                    index:Int) = {
     if (this.redirectToDateOfChange(tradingPremises, data, changed, status)
       && edit && tradingPremises.lineId.isDefined) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
@@ -96,7 +96,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
 
   def post(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      Form2[MsbServices](request.body) match {
+      Form2[TradingPremisesMsbServices](request.body) match {
         case f: InvalidForm => {
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
@@ -121,7 +121,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       }
   }
 
-  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: MsbServices, force: Boolean = false, status: SubmissionStatus) =
+  private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean = false, status: SubmissionStatus) =
     ApplicationConfig.release7 && (!tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force)
 }
 

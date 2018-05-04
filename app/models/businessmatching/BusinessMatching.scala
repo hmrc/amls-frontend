@@ -24,7 +24,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
                              activities: Option[BusinessActivities] = None,
-                             msbServices: Option[MsbServices] = None,
+                             msbServices: Option[BusinessMatchingMsbServices] = None,
                              typeOfBusiness: Option[TypeOfBusiness] = None,
                              companyRegistrationNumber: Option[CompanyRegistrationNumber] = None,
                              businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
@@ -37,7 +37,7 @@ case class BusinessMatching(
   def activities(p: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p), hasAccepted = hasAccepted && this.activities.contains(p))
 
-  def msbServices(p: MsbServices): BusinessMatching =
+  def msbServices(p: BusinessMatchingMsbServices): BusinessMatching =
     this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p), hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def reviewDetails(p: ReviewDetails): BusinessMatching =
@@ -52,10 +52,10 @@ case class BusinessMatching(
       hasAccepted = hasAccepted && this.companyRegistrationNumber.contains(p)
     )
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): BusinessMatching = {
-    this.copy(businessAppliedForPSRNumber = Some(p),
-      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
-      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p)
+  def businessAppliedForPSRNumber(p: Option[BusinessAppliedForPSRNumber]): BusinessMatching = {
+    this.copy(businessAppliedForPSRNumber = p,
+      hasChanged = hasChanged || !this.businessAppliedForPSRNumber.equals(p),
+      hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.equals(p)
     )
   }
 
@@ -117,7 +117,7 @@ object BusinessMatching {
   implicit val reads: Reads[BusinessMatching] = (
     __.read(Reads.optionNoError[ReviewDetails]) and
       __.read(Reads.optionNoError[BusinessActivities]) and
-      __.read(Reads.optionNoError[MsbServices]) and
+      __.read(Reads.optionNoError[BusinessMatchingMsbServices]) and
       __.read(Reads.optionNoError[TypeOfBusiness]) and
       __.read(Reads.optionNoError[CompanyRegistrationNumber]) and
       __.read(Reads.optionNoError[BusinessAppliedForPSRNumber]) and

@@ -131,7 +131,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney
             )
@@ -176,7 +176,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               CurrencyExchange
             )
@@ -221,7 +221,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               ChequeCashingScrapMetal
             )
@@ -269,7 +269,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               ChequeCashingScrapMetal
             )
@@ -318,7 +318,7 @@ class TotalThroughputControllerSpec extends GenericTestHelper with MockitoSugar 
       val incomingModel = Renewal()
 
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             ChequeCashingScrapMetal
           )

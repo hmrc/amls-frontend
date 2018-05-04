@@ -19,8 +19,10 @@ package controllers.businessmatching.updateservice.add
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
+import generators.ResponsiblePersonGenerator
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -34,7 +36,7 @@ import scala.concurrent.Future
 
 class SelectActivitiesControllerSpec extends GenericTestHelper {
 
-  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks with ResponsiblePersonGenerator {
     self =>
 
     val request = addToken(authRequest)
@@ -44,9 +46,7 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     val controller = new SelectActivitiesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -60,7 +60,10 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
       controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
+    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
+
+    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePeople.key))
+    mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
   }
 
   "SelectActivitiesController" when {
