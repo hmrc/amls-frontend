@@ -74,12 +74,16 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
     OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] =
-    OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-      case Some(dcModel@ServiceChangeRegister(Some(activities))) =>
-        dcModel.copy(addedActivities = Some(activities +  model.activity.get))
-      case _ => ServiceChangeRegister(Some(Set(model.activity.get)))
-    })
+  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] = {
+    for {
+      activity <- OptionT.fromOption[Future](model.activity)
+      updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+        case Some(dcModel@ServiceChangeRegister(Some(activities))) =>
+          dcModel.copy(addedActivities = Some(activities + activity))
+        case _ => ServiceChangeRegister(Some(Set(activity)))
+      })
+    } yield updatedModel
+  }
 
   def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
 
