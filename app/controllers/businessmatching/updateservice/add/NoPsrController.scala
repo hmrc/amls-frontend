@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
@@ -33,7 +34,8 @@ import scala.concurrent.Future
 class NoPsrController @Inject()(
                                  val authConnector: AuthConnector,
                                  implicit val dataCacheConnector: DataCacheConnector,
-                                 val router: Router[AddServiceFlowModel]
+                                 val router: Router[AddServiceFlowModel],
+                                 val helper: UpdateServiceHelper
                                ) extends BaseController {
 
   def get = Authorised.async {
@@ -46,8 +48,7 @@ class NoPsrController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            AddServiceFlowModel()))
+          _ <- helper.clearFlowModel()
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           route <- OptionT.liftF(router.getRoute(NoPSRPageId, model))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
