@@ -44,9 +44,6 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
     val controller = new NoPsrController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -58,19 +55,11 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
   "get" when {
     "called" must {
       "return an OK status" when {
-        "application status is pre-application" in new Fixture {
+        "with the correct content" in new Fixture {
           mockApplicationStatus(NotCompleted)
 
           val result = controller.get()(request)
 
-          status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
-        }
-
-        "application status is beyond pre-application" in new Fixture {
-          mockApplicationStatus(SubmissionDecisionApproved)
-
-          val result = controller.get()(request)
           status(result) mustBe OK
           contentAsString(result) must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title"))
         }
@@ -81,7 +70,7 @@ class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
   "post is called" must {
 
     "clear the flow model" in new Fixture {
-//Not convinced this test is valid
+      //TODO Not convinced this test is valid
       val flowModel = AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
         msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
         businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
