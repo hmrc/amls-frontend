@@ -60,7 +60,7 @@ class FitAndProperController @Inject()(
         Form2[Boolean](request.body) match {
           case form: InvalidForm => getFormData map { case (_) =>
             BadRequest(fit_and_proper(form, edit))
-          } getOrElse InternalServerError("Post: Unable to Fit And Proper page")
+          } getOrElse InternalServerError("Post: Invalid form on Fit And Proper page")
 
           case ValidForm(_, data) =>
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {

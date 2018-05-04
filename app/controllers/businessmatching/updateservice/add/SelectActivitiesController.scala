@@ -20,7 +20,6 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.UrlFormEncoded
@@ -29,7 +28,6 @@ import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
 import models.responsiblepeople.ResponsiblePeople
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,9 +42,7 @@ import scala.concurrent.Future
 class SelectActivitiesController @Inject()(
                                             val authConnector: AuthConnector,
                                             implicit val dataCacheConnector: DataCacheConnector,
-                                            val statusService: StatusService,
                                             val businessMatchingService: BusinessMatchingService,
-                                            val helper: UpdateServiceHelper,
                                             val router: Router[AddServiceFlowModel]
                                           ) extends BaseController with RepeatingSection {
 
@@ -63,15 +59,41 @@ class SelectActivitiesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
+          //Ensure that responsible people can be populated as required
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
-          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ =>
-            model.fitAndProperFromResponsiblePeople(responsiblePeople)))
+          _ <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            case Some(model) => model.fitAndProperFromResponsiblePeople(responsiblePeople)
+          })
           (names, values) <- getFormData
         } yield {
           val form = model.activity.fold[Form2[BusinessActivity]](EmptyForm)(a => Form2(a))
           Ok(select_activities(form, edit, values, names))
-        }) getOrElse InternalServerError("Failed to get activities")
+        }) getOrElse InternalServerError("Get: Unable to show Select Activities page. Failed to retrieve data")
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        Form2[BusinessActivity](request.body) match {
+          case f: InvalidForm => getFormData map {
+            case (names, values) =>
+              BadRequest(select_activities(f, edit, values, names))
+          } getOrElse InternalServerError("Post: Invalid form on Select Activities page")
+
+          case ValidForm(_, data) =>
+            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+              model =>
+                model.getOrElse(AddServiceFlowModel()) match {
+                  case m if !m.activity.contains(data) =>
+                    m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
+                  case m => m.activity(data)
+                }
+            } flatMap {
+              case Some(model) => router.getRoute(SelectActivitiesPageId, model, edit)
+              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SelectActivitiesController"))
+            }
+        }
   }
 
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
@@ -87,28 +109,5 @@ class SelectActivitiesController @Inject()(
     val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
 
     (existingActivityNames, activityValues)
-  }
-
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext =>
-      implicit request =>
-        Form2[BusinessActivity](request.body) match {
-          case f: InvalidForm => getFormData map {
-            case (names, values) =>
-              BadRequest(select_activities(f, edit, values, names))
-          } getOrElse InternalServerError("Could not get form data")
-
-          case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              model => model.getOrElse(AddServiceFlowModel()) match {
-                case m if !m.activity.contains(data) =>
-                  m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
-                case m => m.activity(data)
-              }
-            } flatMap {
-              case Some(model) => router.getRoute(SelectActivitiesPageId, model, edit)
-              case _ => Future.successful(InternalServerError("Cannot retrieve data"))
-            }
-        }
   }
 }

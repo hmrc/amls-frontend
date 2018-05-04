@@ -46,9 +46,7 @@ class SelectActivitiesControllerSpec extends GenericTestHelper {
     val controller = new SelectActivitiesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
