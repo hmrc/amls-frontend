@@ -34,11 +34,6 @@ case class AddServiceFlowModel(
                                 msbServices: Option[BusinessMatchingMsbServices] = None,
                                 tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
                               ) {
-  def empty(): Boolean = this match {
-    case AddServiceFlowModel(_, None, None, None, None, None, false, false, None, None, None) => true
-    case _ => false
-  }
-
   def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePeople]): AddServiceFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
             .collect({
