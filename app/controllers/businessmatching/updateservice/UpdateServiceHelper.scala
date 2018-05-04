@@ -63,12 +63,12 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       activities <- OptionT.fromOption[Future](businessMatching.activities)
       supervision <- OptionT(dataCacheConnector.fetch[Supervision](Supervision.key)) orElse OptionT.some(emptyModel)
-      newModel <- if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
+      newSupervision <- if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
         OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, emptyModel)) map { _ => emptyModel }
       } else {
         OptionT.some[Future, Supervision](supervision)
       }
-    } yield newModel
+    } yield newSupervision
   }
 
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
