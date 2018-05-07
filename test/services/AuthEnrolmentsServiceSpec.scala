@@ -54,12 +54,15 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       GovernmentGatewayEnrolment("HMRC-MLR-ORG", List[EnrolmentIdentifier](EnrolmentIdentifier("MLRRefNumber", amlsRegistrationNumber)), "Activated"))
 
     when(config.enrolmentStubsEnabled) thenReturn false
+    when(authContext.enrolmentsUri).thenReturn(Some("uri"))
   }
 
   "AuthEnrolmentsService" must {
 
-    "connect to the stubs microservice when enabled" in new Fixture {
+    "connect to the stubs microservice when enabled and enrolments were returned by auth" in new Fixture {
       when(config.enrolmentStubsEnabled) thenReturn true
+
+      when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
 
       when {
         enrolmentStubConnector.enrolments(eqTo(groupId))(any(), any(), any())
@@ -71,13 +74,11 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
       whenReady(service.amlsRegistrationNumber) { result =>
         result mustBe Some(amlsRegistrationNumber)
-        verify(service.authConnector, never).enrolments(any())(any(), any())
       }
     }
 
     "return an AMLS registration number" in new Fixture {
       when(authConnector.enrolments(any())(any(),any())).thenReturn(Future.successful(enrolmentsList))
-      when(authContext.enrolmentsUri).thenReturn(Some("uri"))
 
       whenReady(service.amlsRegistrationNumber){
         number => number.get mustEqual amlsRegistrationNumber

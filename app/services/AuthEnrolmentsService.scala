@@ -38,14 +38,21 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
 
-    val enrolmentQuery = if (config.enrolmentStubsEnabled) {
+    val authEnrolments = authContext.enrolmentsUri map { uri =>
+      authConnector.enrolments(uri)
+    } getOrElse Future.successful(Seq.empty)
+
+    lazy val stubbedEnrolments = if (config.enrolmentStubsEnabled) {
       authConnector.userDetails flatMap { details =>
         stubConnector.enrolments(details.groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
       }
     } else {
-      authContext.enrolmentsUri map { uri =>
-        authConnector.enrolments(uri)
-      } getOrElse Future.successful(Seq.empty)
+      Future.successful(Seq.empty)
+    }
+
+    val enrolmentQuery = authEnrolments flatMap {
+      case enrolments if enrolments.count(_.key == amlsKey) > 0 => Future.successful(enrolments)
+      case _ => stubbedEnrolments
     }
 
     enrolmentQuery map { enrolmentsList =>
