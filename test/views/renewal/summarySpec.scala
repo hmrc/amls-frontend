@@ -112,7 +112,7 @@ class summarySpec extends AmlsSpec
         )
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney,
               CurrencyExchange,

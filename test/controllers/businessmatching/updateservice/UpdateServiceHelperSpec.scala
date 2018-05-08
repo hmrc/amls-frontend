@@ -16,11 +16,14 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities._
-import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
@@ -32,6 +35,8 @@ import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 //noinspection ScalaStyle
 class UpdateServiceHelperSpec extends AmlsSpec
@@ -65,24 +70,31 @@ class UpdateServiceHelperSpec extends AmlsSpec
     "remove the accountancy data from the 'business activities' section" in new Fixture {
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
-      val result = await(helper.updateBusinessActivities(AccountancyServices))
-
-      result.involvedInOther mustBe Some(InvolvedInOtherNo)
-      result.whoIsYourAccountant must not be defined
-      result.accountantForAMLSRegulations must not be defined
-      result.taxMatters must not be defined
-      result.hasAccepted mustBe true
+      val model = AddServiceFlowModel(activity = Some(AccountancyServices))
+      for {
+        result <- helper.updateBusinessActivities(model)
+      } yield {
+        result.involvedInOther mustBe Some(InvolvedInOtherNo)
+        result.whoIsYourAccountant must not be defined
+        result.accountantForAMLSRegulations must not be defined
+        result.taxMatters must not be defined
+        result.hasAccepted mustBe true
+      }
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
       mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
 
-      val result = await(helper.updateBusinessActivities(HighValueDealing))
+      val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
-      result.whoIsYourAccountant mustBe defined
-      result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
-      result.taxMatters mustBe Some(TaxMatters(true))
-      result.hasAccepted mustBe true
+      for {
+        result <- helper.updateBusinessActivities(model)
+      } yield {
+        result.whoIsYourAccountant mustBe defined
+        result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
+        result.taxMatters mustBe Some(TaxMatters(true))
+        result.hasAccepted mustBe true
+      }
     }
   }
 
@@ -94,14 +106,14 @@ class UpdateServiceHelperSpec extends AmlsSpec
           Some(Supervision.key))
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(HighValueDealing))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))))),
           Some(BusinessMatching.key))
 
-        mockCacheSave(Supervision(), Some(Supervision.key))
+        mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
-        helper.updateSupervision.returnsSome(Supervision())
+        helper.updateSupervision.returnsSome(Supervision(hasAccepted = true))
 
-        verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision()))(any(), any(), any())
+        verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any(), any())
       }
     }
 
@@ -115,7 +127,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
         mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(AccountancyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
           Some(BusinessMatching.key))
 
         helper.updateSupervision.returnsSome(supervisionModel)
@@ -133,7 +145,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
       mockCacheFetch[Supervision](Some(supervisionModel), Some(Supervision.key))
 
       mockCacheFetch[BusinessMatching](
-        Some(BusinessMatching(activities = Some(BusinessMatchingActivities(Set(TrustAndCompanyServices))))),
+        Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
         Some(BusinessMatching.key))
 
       helper.updateSupervision.returnsSome(supervisionModel)
@@ -141,6 +153,71 @@ class UpdateServiceHelperSpec extends AmlsSpec
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
   }
+
+  "updateBusinessMatching" must {
+    "update the current activities and msb services" when {
+      "there are no msb services and the new activity is not MSB and there are existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+
+        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are msb services and the new activity is MSB and there are existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(
+          activity = Some(MoneyServiceBusiness),
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+        )
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                hasAccepted = true,
+                                hasChanged = true,
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+
+      "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
+
+        val model = AddServiceFlowModel(
+          activity = Some(MoneyServiceBusiness),
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+        )
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
+                                hasAccepted = true,
+                                hasChanged = true,
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+        mockCacheFetch[BusinessMatching](
+          Some(BusinessMatching(activities = None)),
+          Some(BusinessMatching.key))
+        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+      }
+    }
+  }
+
 
   "updateResponsiblePeople" must {
     "set the fit and proper flag on the right people according to the indices" when {
@@ -189,6 +266,34 @@ class UpdateServiceHelperSpec extends AmlsSpec
       mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
       helper.clearFlowModel().returnsSome(AddServiceFlowModel())
+    }
+  }
+
+  "updateHasAcceptedFlag" must {
+    "save the flow model with 'hasAccepted' = true" in new Fixture {
+      mockCacheSave[AddServiceFlowModel]
+
+      await(helper.updateHasAcceptedFlag(AddServiceFlowModel()).value)
+
+      verify(mockCacheConnector).save[AddServiceFlowModel](eqTo(AddServiceFlowModel.key), eqTo(AddServiceFlowModel(hasAccepted = true)))(any(), any(), any())
+    }
+  }
+
+  "updateServicesRegister" must {
+    "add the activity to the current activities in the register" when {
+      "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
+        mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
+
+        helper.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
+          .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
+      }
+
+      "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
+        mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
+
+        helper.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
+          .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
+      }
     }
   }
 }

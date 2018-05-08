@@ -22,13 +22,15 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
+import views.html.businessmatching.updateservice.add._
 
 
 class update_services_summarySpec  extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.add.update_services_summary(EmptyForm, AddServiceFlowModel())
+
+    def view = update_services_summary(EmptyForm, AddServiceFlowModel())
   }
 
   "The update_services_summary view" must {
@@ -43,14 +45,6 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
 
     "have correct subHeading" in new ViewFixture {
       subHeading.html must include(Messages("summary.updateservice"))
-    }
-
-    "show the correct content" in new ViewFixture {
-
-    }
-
-    "not show the return link" in new ViewFixture {
-      doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
 }

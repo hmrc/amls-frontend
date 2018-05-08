@@ -16,15 +16,11 @@
 
 package controllers.businessmatching.updateservice.add
 
-import cats.data.OptionT
-import cats.implicits._
 import controllers.businessmatching.updateservice.UpdateServiceHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -47,21 +43,8 @@ class NewServiceInformationControllerSpec extends AmlsSpec with MockitoSugar wit
     val controller = new NewServiceInformationController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
-
-    when {
-      controller.businessMatchingService.getModel(any(), any(), any())
-    } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
-      activities = Some(BusinessActivities(Set(AccountancyServices)))
-    ))
-
-    when {
-      controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
-    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(AccountancyServices))
 
     val flowModel = AddServiceFlowModel(Some(AccountancyServices), Some(true))
     mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
@@ -83,11 +66,8 @@ class NewServiceInformationControllerSpec extends AmlsSpec with MockitoSugar wit
   }
 
   "post is called" must {
-
-    "return OK with new_service_information view" in new Fixture {
-      val result = controller.post()(request.withFormUrlEncodedBody(
-        "addmoreactivities" -> "false"
-      ))
+    "return OK with registration progress view" in new Fixture {
+      val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
       controller.router.verify(NewServiceInformationPageId, flowModel)

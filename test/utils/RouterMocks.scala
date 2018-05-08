@@ -18,11 +18,11 @@ package utils
 
 import models.flowmanagement.PageId
 import org.mockito.Matchers.{any, eq => eqTo}
-import org.mockito.Mockito.{verify, when}
+import org.mockito.Mockito.when
 import org.scalatest.mock.MockitoSugar
+import play.api.mvc.Results.Redirect
 import play.api.mvc.{Call, Result}
 import services.flowmanagement.Router
-import play.api.mvc.Results.Redirect
 
 import scala.concurrent.Future
 

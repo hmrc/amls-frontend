@@ -48,9 +48,7 @@ class SummaryController @Inject()(
           ba <- OptionT.fromOption[Future](bm.activities)
           status <- OptionT.liftF(statusService.getStatus)
         } yield {
-
           val isPreSubmission = statusService.isPreSubmission(status)
-
           val bmWithAdditionalActivities = bm.copy(
             activities = Some(BusinessActivities(
               ba.businessActivities ++ ba.additionalActivities.fold[Set[BusinessActivity]](Set.empty)(act => act)

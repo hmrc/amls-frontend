@@ -26,7 +26,7 @@
 }
 
 @main(
-    title = Messages("title.cya") + " - " + Messages("summary.businessmatching"),
+    title = Messages("title.cya") + " - " + (if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateservice")),
     heading = header
 ) {
 
@@ -150,13 +150,21 @@
                     )
                 }
                 case BusinessAppliedForPSRNumberYes(number) => {
-                    @submitButton("businessmatching.button.confirm.start")
+                    @if(model.preAppComplete) {
+                        @submitButton("businessmatching.summary.noedit.anchortext")
+                    } else {
+                        @submitButton("businessmatching.button.confirm.start")
+                    }
                 }
             }
         }
 
         @if(model.businessAppliedForPSRNumber.isEmpty) {
-            @submitButton("businessmatching.button.confirm.start")
+            @if(model.preAppComplete) {
+                @submitButton("businessmatching.summary.noedit.anchortext")
+            } else {
+                @submitButton("businessmatching.button.confirm.start")
+            }
         }
     } else {
         @submitButton("businessmatching.summary.noedit.anchortext")

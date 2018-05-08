@@ -53,7 +53,7 @@ sealed trait TestHelper extends AmlsSpec {
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
   val tradingPremises = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),

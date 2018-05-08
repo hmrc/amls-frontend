@@ -29,12 +29,12 @@ class select_activitiesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    override def view = select_activities(EmptyForm,
-        edit = true,
-        Seq.empty[String],
-        Seq.empty[String]
-      )
 
+    override def view = select_activities(EmptyForm,
+      edit = true,
+      Seq.empty[String],
+      Seq.empty[String]
+    )
   }
 
   "The select_Activities view" must {
@@ -77,10 +77,11 @@ class select_activitiesSpec extends AmlsSpec with MustMatchers {
 
     "not show the return link" in new ViewFixture {
       override def view = select_activities(EmptyForm,
-          edit = true,
-          Seq.empty[String],
-          Seq.empty[String]
-        )
+        edit = true,
+        Seq.empty[String],
+        Seq.empty[String]
+      )
+
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
 

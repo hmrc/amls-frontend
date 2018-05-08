@@ -63,7 +63,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
       "model is incomplete" should {
         "return a NotStarted Section" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(MsbServices(
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn
             Some(MoneyServiceBusiness( throughput = Some(ExpectedThroughput.Second)))
@@ -73,7 +73,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
       "model is complete" should {
         "return a Completed Section" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(MsbServices(
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
           MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get()))
@@ -82,7 +82,7 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
 
       "model is complete" should {
         "return a Completed Section when all msb options selected in business matching" in {
-          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(MsbServices(
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal, TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)))))
           when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)) thenReturn Some(completeMsb)
           MoneyServiceBusiness.section must be(Section(MoneyServiceBusiness.key, Completed, false,  controllers.msb.routes.SummaryController.get()))

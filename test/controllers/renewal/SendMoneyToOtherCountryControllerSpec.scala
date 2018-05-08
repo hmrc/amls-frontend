@@ -95,7 +95,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       val newRequest = request.withFormUrlEncodedBody(
       )
 
-      val msbServices = Some(MsbServices(
+      val msbServices = Some(BusinessMatchingMsbServices(
         Set(
           TransmittingMoney,
           CurrencyExchange
@@ -132,7 +132,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(TransmittingMoney))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
           activities = Some(BusinessActivities(Set(HighValueDealing)))
         )))
 
@@ -155,7 +155,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(CurrencyExchange))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
           activities = Some(BusinessActivities(Set(HighValueDealing)))
         )))
 
@@ -181,7 +181,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(TransmittingMoney))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
           activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
         )))
 
@@ -207,7 +207,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(TransmittingMoney))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
           activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
         )))
 
@@ -232,7 +232,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(CurrencyExchange))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
           activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
         )))
 
@@ -258,7 +258,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
         .thenReturn(Some(BusinessMatching(
-          msbServices = Some(MsbServices(Set(TransmittingMoney))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
           activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
         )))
 

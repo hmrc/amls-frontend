@@ -22,12 +22,14 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
+import views.html.businessmatching.updateservice.add.add_more_activities
 
 class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm,Set.empty[String])
+
+    def view = add_more_activities(EmptyForm, Set.empty[String])
   }
 
   "The add_more_activities view" must {
@@ -50,15 +52,9 @@ class add_more_activitiesSpec extends AmlsSpec with MustMatchers  {
     }
 
     "not show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = false)
+      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String])
 
       doc.body().text() must not include Messages("link.return.registration.progress")
-    }
-
-    " show the return link when specified" in new ViewFixture {
-      override def view = views.html.businessmatching.updateservice.add.add_more_activities(EmptyForm, Set.empty[String], showReturnLink = true)
-
-      doc.body().text() must include(Messages("link.return.registration.progress"))
     }
 
     "show errors in the correct locations" in new ViewFixture {

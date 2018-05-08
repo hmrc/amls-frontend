@@ -17,14 +17,12 @@
 package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, _}
-import models.moneyservicebusiness.MoneyServiceBusiness
+import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, FormTypes}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.{Reads, Writes, _}
-import utils.TraversableValidators._
 import play.api.libs.functional.syntax._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
@@ -75,8 +73,6 @@ object BusinessActivity {
       case _ => Invalid(Seq((Path \ "businessActivities") -> Seq(ValidationError("error.invalid"))))
   }
 
-
-
   implicit val activityFormWrite = Write[BusinessActivity, String] {
       case AccountancyServices => "01"
       case BillPaymentServices => "02"
@@ -122,16 +118,6 @@ object BusinessActivities {
     TrustAndCompanyServices,
     TelephonePaymentService
   )
-
-  // TODO: These can potentially be removed once the new 'MSB/TCSP' add service flow goes in
-  lazy val allWithoutMsbTcsp = all filterNot {
-    case MoneyServiceBusiness | TrustAndCompanyServices => true
-    case _ => false
-  }
-  lazy val allWithoutMsb = all filterNot {
-    case MoneyServiceBusiness => true
-    case _ => false
-  }
 
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     FormTypes.businessActivityRule("error.required.bm.register.service")

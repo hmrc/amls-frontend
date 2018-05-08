@@ -616,7 +616,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
             reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
           )))
 

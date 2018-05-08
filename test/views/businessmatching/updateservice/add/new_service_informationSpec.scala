@@ -21,12 +21,14 @@ import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.new_service_information
+import views.html.businessmatching.updateservice.add._
+
 
 class new_service_informationSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
     def view = new_service_information(Set(AccountancyServices.getMessage))
   }
 

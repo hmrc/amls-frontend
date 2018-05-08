@@ -25,11 +25,11 @@ import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
 import services.businessmatching.BusinessMatchingService
-import services.{StatusService, TradingPremisesService}
 import services.flowmanagement.Router
+import services.{StatusService, TradingPremisesService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.update_services_summary
 
 import scala.concurrent.Future
 
@@ -47,9 +47,9 @@ class UpdateServicesSummaryController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { model =>
-          Ok(update_services_summary(EmptyForm, model))
-        } getOrElse InternalServerError("Unable to get the flow model")
+        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) collect {
+          case model if model != AddServiceFlowModel() => Ok(update_services_summary(EmptyForm, model))
+        } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
   def post() = Authorised.async {
@@ -58,14 +58,14 @@ class UpdateServicesSummaryController @Inject()(
         (for {
           model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
-          _ <- helper.updateTradingPremises(model)
-          _ <- helper.updateResponsiblePeople(model)
-          _ <- helper.updateSupervision
-          _ <- OptionT(helper.updateBusinessMatching(activity))
-          _ <- OptionT(helper.updateServicesRegister(activity))
-          _ <- OptionT(helper.updateBusinessActivities(activity))
-          _ <- helper.updateHasAcceptedFlag(model)
-          _ <- helper.clearFlowModel()
+                  _ <- helper.updateTradingPremises(model)
+                  _ <- helper.updateResponsiblePeople(model)
+                  _ <- helper.updateSupervision
+                  _ <- helper.updateBusinessMatching(model)
+                  _ <- helper.updateServicesRegister(model)
+                  _ <- helper.updateBusinessActivities(model)
+                  _ <- helper.updateHasAcceptedFlag(model)
+                  _ <- helper.clearFlowModel()
           route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
         } yield {
           route

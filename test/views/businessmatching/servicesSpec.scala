@@ -17,7 +17,7 @@
 package views.businessmatching
 
 import forms.{InvalidForm, ValidForm, Form2}
-import models.businessmatching.{MsbServices, TransmittingMoney, MsbService}
+import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney, BusinessMatchingMsbService}
 import org.scalatest.{MustMatchers}
 import  utils.AmlsSpec
 import jto.validation.Path
@@ -35,7 +35,7 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
   "services view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
       def view = views.html.businessmatching.services(form2, edit = true)
 
@@ -61,7 +61,7 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
 
     }
     "hide the return to progress link"in new ViewFixture {
-      val form2: ValidForm[MsbServices] = Form2(MsbServices(Set(TransmittingMoney)))
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
       def view = views.html.businessmatching.services(form2, edit = true, showReturnLink = false)
       doc.body().text() must not include Messages("link.return.registration.progress")

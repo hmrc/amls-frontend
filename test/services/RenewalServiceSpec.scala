@@ -105,7 +105,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
           )))
 
         when {
@@ -178,7 +178,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -211,7 +211,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -246,7 +246,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -279,7 +279,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
 
@@ -316,7 +316,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -349,7 +349,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -387,7 +387,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -420,7 +420,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -455,7 +455,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
 
@@ -489,7 +489,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -525,7 +525,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -558,7 +558,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -599,7 +599,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -631,7 +631,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -665,7 +665,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -697,7 +697,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -732,7 +732,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -764,7 +764,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -802,7 +802,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -834,7 +834,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -868,7 +868,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
 
@@ -901,7 +901,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -937,7 +937,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -968,7 +968,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -1143,7 +1143,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -1177,7 +1177,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                 )))
 
 
@@ -1214,7 +1214,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -1251,7 +1251,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -1284,7 +1284,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                 )))
 
               val model = Renewal(
@@ -1319,7 +1319,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -1534,7 +1534,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1568,7 +1568,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1603,7 +1603,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1636,7 +1636,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
 
@@ -1673,7 +1673,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -1706,7 +1706,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -1744,7 +1744,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1777,7 +1777,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1812,7 +1812,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
 
@@ -1846,7 +1846,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                         MoneyServiceBusiness,
                         HighValueDealing
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1882,7 +1882,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -1915,7 +1915,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       MoneyServiceBusiness,
                       HighValueDealing
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -1956,7 +1956,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -1988,7 +1988,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2022,7 +2022,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2054,7 +2054,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2089,7 +2089,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -2121,7 +2121,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                   )))
 
                 val model = Renewal(
@@ -2159,7 +2159,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2191,7 +2191,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2225,7 +2225,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
 
@@ -2258,7 +2258,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                       activities = Some(BusinessActivities(Set(
                         MoneyServiceBusiness
                       ))),
-                      msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                     )))
 
                   val model = Renewal(
@@ -2294,7 +2294,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -2325,7 +2325,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     activities = Some(BusinessActivities(Set(
                       MoneyServiceBusiness
                     ))),
-                    msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal)))
+                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
                   )))
 
                 val model = Renewal(
@@ -2500,7 +2500,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -2534,7 +2534,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                 )))
 
 
@@ -2571,7 +2571,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                     MoneyServiceBusiness,
                     HighValueDealing
                   ))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -2608,7 +2608,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange, TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
                 )))
 
               val model = Renewal(
@@ -2641,7 +2641,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(CurrencyExchange)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
                 )))
 
               val model = Renewal(
@@ -2676,7 +2676,7 @@ class RenewalServiceSpecNoToggleSpec extends AmlsSpec with MustMatchers with One
                   activities = Some(BusinessActivities(Set(
                     MoneyServiceBusiness
                   ))),
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                 )))
 
               val model = Renewal(

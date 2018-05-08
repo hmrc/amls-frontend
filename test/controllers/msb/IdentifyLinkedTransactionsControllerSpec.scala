@@ -103,7 +103,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
@@ -143,7 +143,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
@@ -183,7 +183,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "false"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
@@ -224,7 +224,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
@@ -264,7 +264,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       )
 
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             ChequeCashingNotScrapMetal,
             ChequeCashingScrapMetal
@@ -303,7 +303,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
@@ -340,7 +340,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
@@ -375,7 +375,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
@@ -409,7 +409,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
         "linkedTxn" -> "true"
       )
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,

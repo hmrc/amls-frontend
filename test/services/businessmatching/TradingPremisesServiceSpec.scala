@@ -19,9 +19,11 @@ package services.businessmatching
 import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
-import models.tradingpremises.MsbServices._
-import models.tradingpremises.{MsbServices, WhatDoesYourBusinessDo}
+import models.tradingpremises.TradingPremisesMsbServices._
+import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
+import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
+
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
@@ -41,7 +43,7 @@ class TradingPremisesServiceSpec extends PlaySpec
 
   }
 
-  "addBusinessActivtiesToTradingPremises" must {
+  "addBusinessActivitiesToTradingPremises" must {
     "update activity of the trading premises identified by index in request data" when {
       "there is a single index" which {
         "will leave activity given remove equals false" in new Fixture {
@@ -56,7 +58,7 @@ class TradingPremisesServiceSpec extends PlaySpec
             tradingPremisesWithActivitiesGen(BillPaymentServices).sample.get
           )
 
-          val result = service.addBusinessActivtiesToTradingPremises(Seq(4), models, AccountancyServices, false)
+          val result = service.updateTradingPremises(Seq(4), models, AccountancyServices, None, false)
 
           result.head mustBe models.head
           result(1) mustBe models(1)
@@ -75,7 +77,7 @@ class TradingPremisesServiceSpec extends PlaySpec
             tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
           )
 
-          val result = service.addBusinessActivtiesToTradingPremises(Seq(0,2), models, AccountancyServices, true)
+          val result = service.updateTradingPremises(Seq(0,2), models, AccountancyServices, None, true)
 
           result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
           result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(HighValueDealing), None))
@@ -86,6 +88,41 @@ class TradingPremisesServiceSpec extends PlaySpec
 
         }
       }
+
+      "there will be sub activities for MSB" which {
+        "will add a provided sub activity" when {
+          "no items exist" in new Fixture {
+
+            val models = Seq(
+              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get
+            )
+
+            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+
+            result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingScrapMetal)))
+            result.head.isComplete mustBe true
+            result.head.hasChanged mustBe true
+          }
+        }
+
+        "will add a provided sub activity" when {
+          "some items exist" in new Fixture {
+
+            val models = Seq(
+              tradingPremisesWithActivitiesGen(MoneyServiceBusiness).sample.get.copy(msbServices = Some(TPMsbServices(Set(ChequeCashingNotScrapMetal))))
+            )
+
+            val result = service.updateTradingPremises(Seq(0), models, MoneyServiceBusiness, Some(BMMsbServices(Set(ChequeCashingScrapMetal))), true)
+
+            result.headOption.get.msbServices mustBe Some(TPMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+            result.head.isComplete mustBe true
+            result.head.hasChanged mustBe true
+          }
+        }
+      }
+
+
+
     }
     "mark the trading premises as incomplete if there are no activities left" in new Fixture {
 
@@ -94,7 +131,7 @@ class TradingPremisesServiceSpec extends PlaySpec
         tradingPremisesWithActivitiesGen(AccountancyServices, HighValueDealing).sample.get
       )
 
-      val result = service.addBusinessActivtiesToTradingPremises(Seq(1), models, AccountancyServices, true)
+      val result = service.updateTradingPremises(Seq(1), models, AccountancyServices, None, true)
 
       result.headOption.get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(), None))
       result.lift(1).get.whatDoesYourBusinessDoAtThisAddress mustBe Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing), None))
@@ -113,7 +150,7 @@ class TradingPremisesServiceSpec extends PlaySpec
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices).sample.get,
           tradingPremisesWithActivitiesGen(HighValueDealing).sample.get,
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, MoneyServiceBusiness).sample.get.copy(
-            msbServices = Some(MsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+            msbServices = Some(TPMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
           ),
           tradingPremisesWithActivitiesGen(HighValueDealing, AccountancyServices, EstateAgentBusinessService).sample.get
         )

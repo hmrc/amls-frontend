@@ -50,7 +50,7 @@ class ProgressService @Inject()(
                                  config: AppConfig
                                ){
 
-  def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[MsbServices])(implicit cache: CacheMap) =
+  def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[BusinessMatchingMsbServices])(implicit cache: CacheMap) =
     activities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>

@@ -90,7 +90,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
 
       val model = BusinessMatching(
         msbServices = Some(
-          MsbServices(Set(TransmittingMoney, CurrencyExchange))
+          BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))
         )
       )
 
@@ -125,7 +125,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
     "redirect to the 'How much Throughput' page on valid submission" in new Fixture {
 
       val model = BusinessMatching(
-        msbServices = Some(MsbServices(
+        msbServices = Some(BusinessMatchingMsbServices(
           Set(TransmittingMoney)
         )),
         businessAppliedForPSRNumber = None,
@@ -153,13 +153,13 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
     "redirect to the Psr Number page when adding 'Transmitting Money' as a service during edit" in new Fixture {
 
       val currentModel = BusinessMatching(
-        msbServices = Some(MsbServices(
+        msbServices = Some(BusinessMatchingMsbServices(
           Set(ChequeCashingNotScrapMetal)
         ))
       )
 
       val newModel = currentModel.copy(
-        msbServices = Some(MsbServices(
+        msbServices = Some(BusinessMatchingMsbServices(
           Set(TransmittingMoney, CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
         )), hasChanged = true
       )
@@ -188,7 +188,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
     "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingNotScrapMetal)
           ))
         )
@@ -220,7 +220,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         case (id) =>
 
           val currentModel = BusinessMatching(
-            msbServices = Some(MsbServices(
+            msbServices = Some(BusinessMatchingMsbServices(
               Set(TransmittingMoney)
             ))
           )
@@ -251,13 +251,13 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       "Transmitting Money is no longer present in selection" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingNotScrapMetal, TransmittingMoney)
           ))
         )
 
         val newModel = currentModel.copy(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingScrapMetal, ChequeCashingNotScrapMetal)
           )), hasChanged = true
         )
@@ -295,7 +295,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       "Currency Exchange is no longer present in selection" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(CurrencyExchange, ChequeCashingNotScrapMetal)
           ))
         )
@@ -329,7 +329,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       "Transmitting Money or Currency Exchange was not in existing MSB services" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingNotScrapMetal)
           ))
         )
@@ -358,7 +358,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       "Transmitting Money or Currency Exchange remains in updated MSB services" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal)
           ))
         )
@@ -390,7 +390,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       "MSB data does not exist" in new Fixture {
 
         val currentModel = BusinessMatching(
-          msbServices = Some(MsbServices(
+          msbServices = Some(BusinessMatchingMsbServices(
             Set(ChequeCashingNotScrapMetal)
           ))
         )

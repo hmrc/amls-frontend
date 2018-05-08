@@ -100,7 +100,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
     }
   }
 
-  private def msbServicesContainsTransmittingMoney(msbServices: Option[MsbServices]): Boolean = {
+  private def msbServicesContainsTransmittingMoney(msbServices: Option[BusinessMatchingMsbServices]): Boolean = {
     msbServices match {
       case Some(services) => services.msbServices.contains(TransmittingMoney)
       case _ => false

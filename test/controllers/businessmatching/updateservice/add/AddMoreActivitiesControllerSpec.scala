@@ -42,9 +42,6 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
     val controller = new AddMoreActivitiesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      helper = mockUpdateServiceHelper,
       router = createRouter[AddServiceFlowModel]
     )
 
@@ -73,7 +70,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
 
     "post is called" must {
       "with a valid request" must {
-        "progress to the 'select Activivtes' page" when {
+        "progress to the 'select Activities' page" when {
           "request equals Yes" in new Fixture {
 
             mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
@@ -127,5 +124,4 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
       }
     }
   }
-
 }

@@ -56,7 +56,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
             (for {
               bm <- businessMatchingService.getModel
               _ <- businessMatchingService.updateModel(
-                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
+                bm.businessAppliedForPSRNumber(Some(BusinessAppliedForPSRNumberYes(x)))
               )
             } yield {
               Redirect(routes.SummaryController.get())

@@ -99,7 +99,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   }
 
-  private def checkCompletionOfMsbAndHvd(renewal: Renewal, msbServices: Option[MsbServices]) = {
+  private def checkCompletionOfMsbAndHvd(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
 
     val maybeCountry = renewal.customersOutsideUK.flatMap {
       case CustomersOutsideUK(Some(country)) => Some(country)
@@ -208,7 +208,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   }
 
 
-  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[MsbServices]) = {
+  private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
 
     val maybeCountry = renewal.customersOutsideUK.flatMap {
       case CustomersOutsideUK(Some(country)) => Some(country)

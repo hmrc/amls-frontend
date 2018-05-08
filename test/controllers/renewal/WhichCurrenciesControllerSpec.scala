@@ -111,7 +111,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney
             )
@@ -155,7 +155,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney
             )
@@ -201,7 +201,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         val incomingModel = Renewal()
 
         val msbServices = Some(
-          MsbServices(
+          BusinessMatchingMsbServices(
             Set(
               TransmittingMoney
             )

@@ -18,7 +18,7 @@ package views.tradingpremises
 
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatching, MsbServices, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -30,7 +30,7 @@ class msb_servicesSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    val bmModel = BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney))))
+    val bmModel = BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
   }
 
   "msb_services view" must {

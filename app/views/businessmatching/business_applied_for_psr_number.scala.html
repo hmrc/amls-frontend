@@ -35,7 +35,9 @@
 )  {
 
     @form(f, controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.post(edit)) {
-
+        <p>
+            @m("businessmatching.psr.number.hint")
+        </p>
         @fieldset(
             f = f("appliedfor-fieldset"),
             legend = "businessmatching.psr.number.title",
@@ -76,7 +78,7 @@
                 // classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
                 dataAttrs = digitsOnlyAttributes,
                 field = f("regNumber"),
-                hintText = "businessmatching.psr.number.hint",
+                hintText = "",
                 labelText = "businessmatching.psr.number.lbl"
             )
         }

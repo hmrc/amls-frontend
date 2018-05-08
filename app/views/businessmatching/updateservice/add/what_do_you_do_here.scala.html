@@ -1,0 +1,82 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import forms.Form2
+@import include._
+@import include.forms2._
+
+@(f: Form2[_], edit: Boolean, msbServiceValues: Set[String] = Set())(implicit request: Request[_],m:Messages)
+
+@header = {
+    @errorSummary(f)
+    @heading("businessmatching.updateservice.whatdoyoudohere.heading", "summary.updateservice")
+}
+
+@main(
+    title = Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.updateservice"),
+    heading = header
+) {
+
+    <p>@Messages("businessmatching.updateservice.whatdoyoudohere.list.heading")</p>
+
+    @form(f, controllers.businessmatching.updateservice.add.routes.WhatDoYouDoHereController.post(edit)) {
+
+        @fieldset(
+            f = f("msbServices-fieldset"),
+            legend = "businessmatching.updateservice.whatdoyoudohere.title",
+            legendHidden = true,
+            panel = false
+        ) {
+
+            @errorGroup(
+                field = f("msbServices")
+            ) {
+
+                @if(msbServiceValues.contains("01")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.01",
+                        value = "01"
+                    )
+                }
+                @if(msbServiceValues.contains("02")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.02",
+                        value = "02"
+                    )
+                }
+                @if(msbServiceValues.contains("03")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.03",
+                        value = "03"
+                    )
+                }
+                @if(msbServiceValues.contains("04")) {
+                    @checkbox(
+                        f = f("msbServices[]"),
+                        labelText = "businessmatching.updateservice.whatdoyoudohere.list.lbl.04",
+                        value = "04"
+                    )
+                }
+            }
+        }
+
+        @submit(edit, buttonId = Some("msbServices-submit"), returnLink = false)
+
+    }
+}

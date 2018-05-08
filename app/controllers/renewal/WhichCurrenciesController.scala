@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing, MsbService}
+import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing, BusinessMatchingMsbService}
 import models.renewal.{Renewal, WhichCurrencies}
 import play.api.mvc.Result
 import services.RenewalService

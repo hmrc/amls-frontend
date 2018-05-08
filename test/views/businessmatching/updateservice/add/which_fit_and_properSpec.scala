@@ -17,9 +17,9 @@
 package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, InvalidForm}
+import forms.EmptyForm
 import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.ResponsiblePeople
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -29,28 +29,30 @@ import views.html.businessmatching.updateservice.add._
 class which_fit_and_properSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator{
 
   val rp = responsiblePersonGen.sample.get
+
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
     def view = which_fit_and_proper(EmptyForm, false, Seq((rp, 0)))
   }
 
   "The which_fit_and_proper view" must {
 
-      "have the correct title" in new ViewFixture {
-        doc.title must startWith(Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"))
-      }
+    "have the correct title" in new ViewFixture {
+      doc.title must startWith(Messages("businessmatching.updateservice.whichfitandproper.title") + " - " + Messages("summary.updateservice"))
+    }
 
-      "have correct heading" in new ViewFixture {
-        heading.html must be(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-      }
+    "have correct heading" in new ViewFixture {
+      heading.html must be(Messages("businessmatching.updateservice.whichfitandproper.heading"))
+    }
 
-      "have correct subHeading" in new ViewFixture {
-        subHeading.html must include(Messages("summary.updateservice"))
-      }
+    "have correct subHeading" in new ViewFixture {
+      subHeading.html must include(Messages("summary.updateservice"))
+    }
 
-      "not show the return link" in new ViewFixture {
-        doc.body().text() must not include Messages("link.return.registration.progress")
-      }
+    "not show the return link" in new ViewFixture {
+      doc.body().text() must not include Messages("link.return.registration.progress")
+    }
 
     "show errors in the correct locations" in new ViewFixture {
       val form2: InvalidForm = InvalidForm(Map.empty,

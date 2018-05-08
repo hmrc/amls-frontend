@@ -184,6 +184,7 @@ GET         /business-matching/check-your-answers                               
 POST        /business-matching/check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
 GET         /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.get()
+#POST        /business-matching/no-psr                                                 controllers.businessmatching.NoPsrController.post()
 
 GET         /bank-details/what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
 
@@ -339,6 +340,18 @@ POST        /update-service/update-any-information                              
 
 GET         /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.get()
 POST        /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.post()
+
+GET         /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.get(edit: Boolean ?= false)
+POST        /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.post(edit: Boolean ?= false)
+
+GET         /update-service/psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
+POST        /update-service/psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
+
+GET         /update-service/what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.get(edit: Boolean ?= false)
+POST        /update-service/what-do-you-do-here                                       @controllers.businessmatching.updateservice.add.WhatDoYouDoHereController.post(edit: Boolean ?= false)
+
+GET         /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
+POST        /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 

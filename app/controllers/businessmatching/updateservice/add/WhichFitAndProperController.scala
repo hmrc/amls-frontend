@@ -31,7 +31,7 @@ import services.flowmanagement.Router
 import services.{ResponsiblePeopleService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.add.which_fit_and_proper
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -70,17 +70,12 @@ class WhichFitAndProperController @Inject()(
           }
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
-              case Some(model) => {
-               model.responsiblePeople(Some(data))
-              }
+              case Some(model) => model.responsiblePeople(Some(data))
             } flatMap {
-              case Some(model) => {
-                router.getRoute(WhichFitAndProperPageId, model, edit)
-              }
+              case Some(model) => router.getRoute(WhichFitAndProperPageId, model, edit)
               case _ => Future.successful(InternalServerError("Cannot retrieve data"))
             }
           }
-          case _ => Future.successful(InternalServerError("Cannot retrieve form data"))
         }
   }
 }

@@ -105,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
         Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
 
-      val businessMatchingMsbServices = MsbServices(
+      val businessMatchingMsbServices = BusinessMatchingMsbServices(
         Set(TransmittingMoney, CurrencyExchange))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))

@@ -21,8 +21,9 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
-import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
+import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
@@ -43,51 +44,56 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
                                     val responsiblePeopleService: ResponsiblePeopleService
                                    ) extends RepeatingSection {
 
-  def updateBusinessActivities(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[BusinessActivities]] = {
-    dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
-      case Some(model) if activity.equals(AccountancyServices) =>
-        model.accountantForAMLSRegulations(None)
+  def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
+    OptionT(dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
+      case Some(dcModel) if model.activity.contains(AccountancyServices) =>
+        dcModel.accountantForAMLSRegulations(None)
           .whoIsYourAccountant(None)
           .taxMatters(None)
           .copy(hasAccepted = true)
 
       case Some(model) => model
-    }
+    })
   }
 
   def updateSupervision(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)) flatMap { businessMatching =>
-      OptionT.fromOption[Future](businessMatching.activities) flatMap { activities =>
-        (OptionT(dataCacheConnector.fetch[Supervision](Supervision.key)) orElse OptionT.some(Supervision())) flatMap { supervision =>
-          if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
-            OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, Supervision())) map { _ => Supervision() }
-          } else {
-            OptionT.some(supervision)
-          }
-        }
+    val emptyModel = Supervision(hasAccepted = true)
+
+    for {
+      businessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      activities <- OptionT.fromOption[Future](businessMatching.activities)
+      supervision <- OptionT(dataCacheConnector.fetch[Supervision](Supervision.key)) orElse OptionT.some(emptyModel)
+      newSupervision <- if (activities.businessActivities.intersect(Set(AccountancyServices, TrustAndCompanyServices)).isEmpty) {
+        OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, emptyModel)) map { _ => emptyModel }
+      } else {
+        OptionT.some[Future, Supervision](supervision)
       }
-    }
+    } yield newSupervision
   }
 
   def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
     OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier): Future[Option[ServiceChangeRegister]] =
-    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-      case Some(model@ServiceChangeRegister(Some(activities))) =>
-        model.copy(addedActivities = Some(activities + activity))
-      case _ => ServiceChangeRegister(Some(Set(activity)))
-    }
+  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] = {
+    for {
+      activity <- OptionT.fromOption[Future](model.activity)
+      updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+        case Some(dcModel@ServiceChangeRegister(Some(activities))) =>
+          dcModel.copy(addedActivities = Some(activities + activity))
+        case _ => ServiceChangeRegister(Some(Set(activity)))
+      })
+    } yield updatedModel
+  }
 
   def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
+
     tradingPremises <- OptionT.liftF(tradingPremisesData)
     activity <- OptionT.fromOption[Future](model.activity)
     indices <- OptionT.fromOption[Future](model.tradingPremisesActivities map {
       _.index.toSeq
     }) orElse OptionT.some(Seq.empty)
-    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](
-      tradingPremisesService.addBusinessActivtiesToTradingPremises(indices, tradingPremises, activity, false)
-    )
+    msbServices <- OptionT.fromOption[Future](model.tradingPremisesMsbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
+    newTradingPremises <- OptionT.some[Future, Seq[TradingPremises]](tradingPremisesService.updateTradingPremises(indices, tradingPremises, activity, Some(msbServices), false))
     _ <- OptionT.liftF(dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, newTradingPremises))
   } yield tradingPremises
 
@@ -96,17 +102,38 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
     }
 
-  def updateBusinessMatching(activity: BusinessActivity)(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[BusinessMatching]] =
-    dataCacheConnector.update[BusinessMatching](BusinessMatching.key) { case Some(bm) =>
-      val activities = bm.activities.getOrElse(throw new Exception("Business matching has no defined activities"))
-      bm.activities(activities.copy(businessActivities = activities.businessActivities + activity)).copy(hasAccepted = true)
-    }
+  def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
+    for {
+      newActivity <- OptionT.fromOption[Future](model.activity)
+      newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
+      currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(BMBusinessActivities(Set.empty[BusinessActivity]))
+
+      newBusinessMatching <- {
+
+        OptionT(dataCacheConnector.update[BusinessMatching](BusinessMatching.key) {
+          case Some(bm) if newActivity equals MoneyServiceBusiness  =>
+            val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty))
+            val newPsrNumber = model.businessAppliedForPSRNumber
+            bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
+              .msbServices(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
+              .businessAppliedForPSRNumber(newPsrNumber)
+              .copy(hasAccepted = true)
+          case Some(bm) => {
+            bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
+              .copy(hasAccepted = true)
+          }
+
+        })
+      }
+    } yield newBusinessMatching
+  }
 
   def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePeople]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
-      case Some(people) if model.activity.contains(TrustAndCompanyServices) =>
+      case Some(people) if model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness) =>
         responsiblePeopleService.updateFitAndProperFlag(people, indices)
       case Some(people) => people
     })

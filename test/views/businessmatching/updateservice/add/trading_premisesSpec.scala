@@ -51,7 +51,7 @@ class trading_premisesSpec extends AmlsSpec with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-//TODO  content check
+      //TODO  content check
     }
 
     "not show the return link when specified" in new ViewFixture {

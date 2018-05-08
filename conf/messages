@@ -1100,7 +1100,7 @@ businessmatching.registerservices.servicename.lbl.01.phrased = accountancy servi
 businessmatching.registerservices.servicename.lbl.02.phrased = bill payment services
 businessmatching.registerservices.servicename.lbl.03.phrased = estate agency services
 businessmatching.registerservices.servicename.lbl.04.phrased = high value dealing
-businessmatching.registerservices.servicename.lbl.05.phrased = money Service Business activities
+businessmatching.registerservices.servicename.lbl.05.phrased = money service business
 businessmatching.registerservices.servicename.lbl.06.phrased = trust or company services
 businessmatching.registerservices.servicename.lbl.07.phrased = telephone, digital and IT payment services
 businessmatching.registerservices.servicename.details.01 = Accountancy service providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
@@ -1117,7 +1117,7 @@ businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.psr.number.lbl = PSR registration number
-businessmatching.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
+businessmatching.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.heading = You can’t continue with your application
 businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
 businessmatching.summary.business.address.lbl = Your business
@@ -1169,7 +1169,25 @@ businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to 
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
-#add route
+#   Add route Start  ###################################################################################################
+businessmatching.updateservice.msb.services.title = Which services does your business provide?
+businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.list.heading = Choose at least one
+businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
+businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
+businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.updateservice.psr.number.lbl = PSR registration number
+businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
+
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You can’t continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You can’t continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a PSR reference number to include a money service business as part of your anti-money laundering supervision.
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to update information
+
 businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
 businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
@@ -1178,12 +1196,23 @@ businessmatching.updateservice.selectactivities.currentactivities.hint.plural = 
 
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
 businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.summary = Will you do {0} from any of your registered trading premises?
 
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
 businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
 
+
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
 businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
+businessmatching.updateservice.whichtradingpremises.summary = Which premises will you do {0} from?
+
+businessmatching.updateservice.whatdoyoudohere.title = What does your business do at these premises?
+businessmatching.updateservice.whatdoyoudohere.heading = What does your business do at these premises?
+businessmatching.updateservice.whatdoyoudohere.list.heading = Choose at least one
+businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
+businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
+businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
@@ -1210,6 +1239,7 @@ businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to c
 businessmatching.updateservice.newserviceinformation.info.2 = You might need to edit other sections based on any new information you provide.
 
 businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
+businessmatching.updateservice.summary.whichtradingpremises.activities.count = You’ve chosen {0} activities at your trading premises
 businessmatching.updateservice.summary.whichfitandproper.count = You’ve chosen {0} responsible person
 businessmatching.updateservice.summary.whichfitandproper.count.plural = You’ve chosen {0} responsible people
 

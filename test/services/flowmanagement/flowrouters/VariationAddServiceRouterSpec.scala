@@ -169,7 +169,7 @@ class VariationAddServiceRouterSpec extends AmlsSpec {
 
         when {
           router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
-        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.allWithoutMsb)
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.all)
 
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 

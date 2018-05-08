@@ -315,7 +315,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
 
   val tradingPremisesWithHasChangedFalse = TradingPremises(
     Some(RegisteringAgentPremises(true)),

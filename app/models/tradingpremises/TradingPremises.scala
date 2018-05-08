@@ -31,7 +31,7 @@ case class TradingPremises(
                             agentCompanyDetails: Option[AgentCompanyDetails] = None,
                             agentPartnership: Option[AgentPartnership] = None,
                             whatDoesYourBusinessDoAtThisAddress: Option[WhatDoesYourBusinessDo] = None,
-                            msbServices: Option[MsbServices] = None,
+                            msbServices: Option[TradingPremisesMsbServices] = None,
                             hasChanged: Boolean = false,
                             lineId: Option[Int] = None,
                             status: Option[String] = None,
@@ -65,12 +65,13 @@ case class TradingPremises(
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),
       hasAccepted = hasAccepted && this.whatDoesYourBusinessDoAtThisAddress.contains(p))
 
-  def msbServices(p: MsbServices): TradingPremises =
+  def msbServices(p: TradingPremisesMsbServices): models.tradingpremises.TradingPremises =
     this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
 
   def registeringAgentPremises(p: RegisteringAgentPremises): TradingPremises =
-    this.copy(registeringAgentPremises = Some(p), hasChanged = hasChanged || !this.registeringAgentPremises.contains(p),
+    this.copy(registeringAgentPremises = Some(p), hasChanged =
+      hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
   def isComplete: Boolean =
@@ -159,7 +160,7 @@ object TradingPremises {
         readAgentCompanyDetails and
         backCompatibleReads[AgentPartnership]("agentPartnership") and
         backCompatibleReads[WhatDoesYourBusinessDo]("whatDoesYourBusinessDoAtThisAddress") and
-        backCompatibleReads[MsbServices]("msbServices") and
+        backCompatibleReads[TradingPremisesMsbServices]("msbServices") and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
         } and
