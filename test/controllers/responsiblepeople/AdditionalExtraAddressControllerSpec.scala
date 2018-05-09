@@ -32,7 +32,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 
 import scala.collection.JavaConversions._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
@@ -44,7 +44,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class AdditionalExtraAddressControllerSpec extends GenericTestHelper with MockitoSugar {
+class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1

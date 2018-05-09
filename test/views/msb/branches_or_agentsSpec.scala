@@ -19,14 +19,14 @@ package views.msb
 import forms.{Form2, InvalidForm, ValidForm}
 import models.moneyservicebusiness.BranchesOrAgents
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import models.Country
 import play.api.i18n.Messages
 import views.Fixture
 
-class branches_or_agentsSpec extends GenericTestHelper with MustMatchers {
+class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

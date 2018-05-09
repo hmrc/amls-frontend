@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.{BusinessUseAnIPSP, BusinessUseAnIPSPNo}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class business_use_an_ipspSpec extends GenericTestHelper with MustMatchers {
+class business_use_an_ipspSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

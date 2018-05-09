@@ -34,12 +34,12 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class TypeOfBankControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator {
+class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 

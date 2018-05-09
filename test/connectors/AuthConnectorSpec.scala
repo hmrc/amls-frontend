@@ -52,7 +52,7 @@ class AuthConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
     "return list of government gateway enrolments" in new Fixture {
       when(authConnector.http.GET[List[GovernmentGatewayEnrolment]](any())(any(), any(), any())).thenReturn(Future.successful(Nil))
 
-      whenReady(authConnector.enrollments("thing")) {
+      whenReady(authConnector.enrolments("thing")) {
         results => results must equal(Nil)
       }
     }

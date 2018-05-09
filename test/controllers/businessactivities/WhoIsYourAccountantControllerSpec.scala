@@ -27,11 +27,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class WhoIsYourAccountantControllerSpec extends GenericTestHelper
+class WhoIsYourAccountantControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with PrivateMethodTester {

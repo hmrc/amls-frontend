@@ -20,9 +20,9 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class TcspServiceSpec extends GenericTestHelper {
+class TcspServiceSpec extends AmlsSpec {
 
   "TcspService" should {
 

@@ -18,9 +18,9 @@ package views
 
 import play.api.i18n.Messages
 import play.twirl.api.Html
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class DuplicateSubmissionViewSpec extends GenericTestHelper {
+class DuplicateSubmissionViewSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

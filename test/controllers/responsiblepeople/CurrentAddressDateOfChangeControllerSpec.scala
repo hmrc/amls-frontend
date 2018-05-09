@@ -24,7 +24,7 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
@@ -34,7 +34,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class CurrentAddressDateOfChangeControllerSpec extends GenericTestHelper with MockitoSugar {
+class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 

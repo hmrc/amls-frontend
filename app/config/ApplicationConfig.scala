@@ -16,8 +16,8 @@
 
 package config
 
+import config.ApplicationConfig.getConfBool
 import javax.inject.Inject
-
 import play.api.{Logger, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
@@ -118,4 +118,8 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def authUrl = config.baseUrl("auth")
 
   def enrolmentStoreUrl = config.baseUrl("enrolment-store-proxy")
+
+  def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
+
+  def enrolmentStubsUrl = config.baseUrl("enrolment-stubs")
 }

@@ -21,9 +21,9 @@ import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class AmlsControllerSpec extends GenericTestHelper {
+class AmlsControllerSpec extends AmlsSpec {
 
     trait UnauthenticatedFixture extends MockitoSugar {
       self =>

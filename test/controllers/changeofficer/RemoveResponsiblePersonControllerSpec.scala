@@ -28,11 +28,11 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
 
 import scala.concurrent.Future
 
-class RemoveResponsiblePersonControllerSpec extends GenericTestHelper with MockitoSugar {
+class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)

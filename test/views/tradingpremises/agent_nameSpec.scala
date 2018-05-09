@@ -21,11 +21,11 @@ import models.tradingpremises.AgentName
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import jto.validation.{Path, ValidationError}
 
-class agent_nameSpec extends GenericTestHelper with MustMatchers {
+class agent_nameSpec extends AmlsSpec with MustMatchers {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
 
@@ -72,7 +72,7 @@ class agent_nameSpec extends GenericTestHelper with MustMatchers {
 
 }
 
-class agent_nameSpecR7 extends GenericTestHelper with MustMatchers {
+class agent_nameSpecR7 extends AmlsSpec with MustMatchers {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 

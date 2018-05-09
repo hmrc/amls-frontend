@@ -23,11 +23,11 @@ import models.moneyservicebusiness.WhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class which_currenciesSpec extends GenericTestHelper with MustMatchers {
+class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

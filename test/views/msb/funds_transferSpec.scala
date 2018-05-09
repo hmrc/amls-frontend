@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.{FundsTransfer, TransactionsInNext12Months}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class funds_transferSpec extends GenericTestHelper with MustMatchers {
+class funds_transferSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

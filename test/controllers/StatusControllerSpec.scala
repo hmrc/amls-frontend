@@ -45,12 +45,12 @@ import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import scala.collection.JavaConverters._
 
 import scala.concurrent.Future
 
-class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 
@@ -824,7 +824,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   }
 }
 
-class StatusControllerWithoutReregisterSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerWithoutReregisterSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 

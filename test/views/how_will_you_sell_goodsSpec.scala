@@ -25,9 +25,9 @@ import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Request
 import play.api.test.FakeRequest
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class how_will_you_sell_goodsSpec extends GenericTestHelper with MustMatchers with MockitoSugar {
+class how_will_you_sell_goodsSpec extends AmlsSpec with MustMatchers with MockitoSugar {
 
   trait HowWillYouSellGoodsViewFixture {
     implicit val request : Request[_] = addToken(FakeRequest())

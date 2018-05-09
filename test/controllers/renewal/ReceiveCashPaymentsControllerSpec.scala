@@ -24,13 +24,13 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSugar {
+class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
   lazy val mockDataCacheConnector = mock[DataCacheConnector]
   lazy val mockRenewalService = mock[RenewalService]

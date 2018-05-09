@@ -26,11 +26,11 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class AgentPartnershipControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
+class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

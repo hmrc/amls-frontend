@@ -19,25 +19,19 @@ package connectors
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.mockito.Matchers.{any, eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
-import utils.DependencyMocks
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.{CorePost, HttpResponse}
+import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CorePost, HttpResponse}
 
-class GovernmentGatewayConnectorSpec extends PlaySpec
-  with OneAppPerSuite
-  with MustMatchers
-  with MockitoSugar
+class GovernmentGatewayConnectorSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with BaseGenerator
   with GovernmentGatewayGenerator

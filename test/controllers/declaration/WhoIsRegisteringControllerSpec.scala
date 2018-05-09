@@ -29,7 +29,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -41,7 +41,7 @@ import utils.{AuthorisedFixture, StatusConstants}
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class WhoIsRegisteringControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
+class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>

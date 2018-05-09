@@ -18,11 +18,11 @@ package views.status
 
 import forms.EmptyForm
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
-class status_rejectedSpec extends GenericTestHelper with MustMatchers {
+class status_rejectedSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

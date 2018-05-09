@@ -21,13 +21,13 @@ import models.tcsp._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper with MustMatchers with HtmlAssertions with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
+class summarySpec extends AmlsSpec with MustMatchers with HtmlAssertions with TableDrivenPropertyChecks with AmlsReferenceNumberGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

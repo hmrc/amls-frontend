@@ -32,11 +32,11 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class RoleInBusinessControllerSpec extends GenericTestHelper {
+class RoleInBusinessControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)

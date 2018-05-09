@@ -24,7 +24,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -33,7 +33,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import scala.concurrent.Future
 
-class ExpectedThroughputControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures{
+class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)

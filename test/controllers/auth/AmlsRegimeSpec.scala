@@ -17,10 +17,10 @@
 package controllers.auth
 
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{OrgAccount, SaAccount, CtAccount, Accounts}
 
-class AmlsRegimeSpec extends GenericTestHelper with MockitoSugar {
+class AmlsRegimeSpec extends AmlsSpec with MockitoSugar {
 
   "AmlsRegimeSpec" should {
 

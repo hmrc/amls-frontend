@@ -22,10 +22,10 @@ import models.responsiblepeople.TimeAtAddress
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class time_at_additional_addressSpec extends GenericTestHelper with MustMatchers  {
+class time_at_additional_addressSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

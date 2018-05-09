@@ -19,14 +19,14 @@ package views.asp
 import forms.{InvalidForm, ValidForm, Form2}
 import models.asp._
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class services_of_businessSpec extends GenericTestHelper with MustMatchers  {
+class services_of_businessSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

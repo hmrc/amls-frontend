@@ -18,10 +18,10 @@ package views.payments
 
 import generators.PaymentGenerator
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class bank_detailsSpec extends GenericTestHelper with PaymentGenerator{
+class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -30,11 +30,11 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, RepeatingSection}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, RepeatingSection}
 
 import scala.concurrent.Future
 
-class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
+class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with TradingPremisesGenerator with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

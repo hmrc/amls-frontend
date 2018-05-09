@@ -30,7 +30,7 @@ import org.scalatestplus.play.OneAppPerSuite
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.test.Helpers._
 import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.http.HeaderNames.LOCATION
@@ -39,7 +39,7 @@ import views.html.msb.which_currencies
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import scala.concurrent.Future
 
-class WhichCurrencyControllerSpec extends GenericTestHelper
+class WhichCurrencyControllerSpec extends AmlsSpec
                                     with MockitoSugar
                                     with MustMatchers
                                     with PatienceConfiguration

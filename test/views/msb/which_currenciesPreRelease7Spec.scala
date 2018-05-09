@@ -22,11 +22,11 @@ import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class which_currenciesPreRelease7Spec extends GenericTestHelper with MustMatchers  {
+class which_currenciesPreRelease7Spec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -27,7 +27,7 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
@@ -40,7 +40,7 @@ import org.mockito.Matchers.{eq => meq}
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"

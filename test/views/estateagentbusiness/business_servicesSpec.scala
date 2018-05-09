@@ -19,14 +19,14 @@ package views.estateagentbusiness
 import forms.{InvalidForm, ValidForm, Form2}
 import models.estateagentbusiness._
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class business_servicessSpec extends GenericTestHelper with MustMatchers  {
+class business_servicessSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
