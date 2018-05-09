@@ -80,7 +80,7 @@ class SendMoneyToOtherCountryController @Inject()(
         }
   }
 
-  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[MsbService], activities: Set[BusinessActivity], edit: Boolean) =
+  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) =
     if (!sendMoneyToOtherCountry && edit) {
       Redirect(routes.SummaryController.get())
     } else if (sendMoneyToOtherCountry) {

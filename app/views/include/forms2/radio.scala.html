@@ -19,10 +19,11 @@
     labelText: String,
     value: String,
     target: String = "",
-    inline: Boolean = false
+    inline: Boolean = false,
+    spaced: Boolean = false
 )(implicit lang:Lang, m: Messages)
 
-    <div class="@if(inline){} multiple-choice">
+    <div class="@if(inline){} @if(spaced){spaced} multiple-choice">
         <input type="radio" name="@f.name" id="@{f.id}-@value" value="@value" @if(f.value.contains(value)){ checked="checked"}@if(target.nonEmpty){ data-toggle="@target"} />
         <label class="block-label" for="@{f.id}-@value">@Messages(labelText)</label>
     </div>

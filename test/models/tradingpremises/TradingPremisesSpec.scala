@@ -53,7 +53,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
       EstateAgentBusinessService,
       MoneyServiceBusiness)
   )
-  val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange))
+  val msbServices = TradingPremisesMsbServices(Set(TransmittingMoney, CurrencyExchange))
   val completeModel = TradingPremises(
     Some(RegisteringAgentPremises(true)),
     Some(ytp),

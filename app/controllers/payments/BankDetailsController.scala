@@ -45,7 +45,7 @@ class BankDetailsController @Inject()(
           fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
           paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
-          val amount = if (status == SubmissionReady) Currency(fees.totalFees) else fees.difference.map(Currency(_)).getOrElse(Currency(0))
+          val amount = if (status == SubmissionReady) Currency(fees.totalFees) else Currency(fees.difference.getOrElse(fees.totalFees))
           Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }

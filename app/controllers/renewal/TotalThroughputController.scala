@@ -73,7 +73,7 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def standardRouting(services: Set[MsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
+  private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
     if ((services contains TransmittingMoney) && !edit ) {
       Redirect(routes.TransactionsInLast12MonthsController.get(edit))
     }

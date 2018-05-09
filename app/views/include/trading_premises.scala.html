@@ -18,7 +18,7 @@
 @import forms2._
 @import models.tradingpremises.TradingPremises
 
-@(f: forms.Form2[_], tradingpremises: Seq[(TradingPremises, Int)], legend: String, call: Call, placeholder: Option[String] = None)(implicit lang:Lang, m:Messages, request: Request[_])
+@(f: forms.Form2[_], tradingpremises: Seq[(TradingPremises, Int)], legend: String, call: Call, placeholder: Option[String] = None, id: Option[String] = None)(implicit lang:Lang, m:Messages, request: Request[_])
 
 <p>@Messages("lbl.select.all")</p>
 
@@ -42,7 +42,7 @@
             }
         }
 
-        @submit(returnLink = false)
+        @submit(returnLink = false, buttonId = Some(id + "-submit"))
 
     }
 </div>

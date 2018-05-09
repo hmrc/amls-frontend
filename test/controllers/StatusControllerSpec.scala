@@ -31,6 +31,7 @@ import models.withdrawal.WithdrawalStatus
 import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Element
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -45,6 +46,7 @@ import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import scala.collection.JavaConverters._
 
 import scala.concurrent.Future
 
@@ -555,7 +557,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
               MoneyServiceBusiness,
               HighValueDealing
             ))),
-            msbServices = Some(MsbServices(Set(CurrencyExchange))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
             reviewDetails = Some(ReviewDetails("BusinessName", None, mock[Address], "safeId", None))
           )))
 
@@ -698,7 +700,10 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         contentAsString(result) mustNot include(Messages("status.submissiondecisionsupervised.renewal.btn"))
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
+
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
+          _.text mustBe Messages("changeofficer.changelink.text")
+        }
 
       }
 
@@ -733,8 +738,10 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         contentAsString(result) must include(Messages("status.submissiondecisionsupervised.renewal.btn"))
 
         val doc = Jsoup.parse(contentAsString(result))
-        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").text mustBe Messages("changeofficer.changelink.text")
 
+        doc.select(s"a[href=${controllers.changeofficer.routes.StillEmployedController.get().url}]").asScala foreach {
+          _.text mustBe Messages("changeofficer.changelink.text")
+        }
       }
     }
   }

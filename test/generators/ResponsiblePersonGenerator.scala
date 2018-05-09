@@ -19,8 +19,10 @@ package generators
 import models.responsiblepeople._
 import org.scalacheck.Gen
 import models.FormTypes
+import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
 import org.joda.time.LocalDate
 
+// scalastyle:off magic.number
 trait ResponsiblePersonGenerator extends BaseGenerator {
 
   val positionInBusinessGen =
@@ -43,10 +45,42 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     lastName <- stringOfLengthGen(FormTypes.maxNameTypeLength)
   } yield PersonName(firstName, None, lastName)
 
+  val personAddressGen: Gen[PersonAddress] = for {
+    line1 <- stringOfLengthGen(10)
+    line2 <- stringOfLengthGen(10)
+    postCode <- postcodeGen
+  } yield PersonAddressUK(line1, line2, None, None, postCode)
+
   val responsiblePersonGen: Gen[ResponsiblePeople] = for {
     personName <- personNameGen
     positions <- positionsGen
-  } yield ResponsiblePeople(Some(personName), positions = Some(positions), hasAlreadyPassedFitAndProper = Some(false))
+    phoneNumber <- numSequence(10)
+    email <- emailGen
+    address <- personAddressGen
+  } yield ResponsiblePeople(
+    Some(personName),
+    Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
+    None,
+    Some(KnownBy(Some(false), None)),
+    Some(PersonResidenceType(NonUKResidence, None, None)),
+    None,
+    None,
+    None,
+    Some(ContactDetails(phoneNumber, email)),
+    Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
+    Some(positions),
+    Some(SaRegisteredNo),
+    None,
+    Some(ExperienceTrainingNo),
+    Some(TrainingNo),
+    None,
+    hasChanged = false,
+    hasAccepted = true,
+    None,
+    None,
+    None,
+    Some(SoleProprietorOfAnotherBusiness(false))
+  )
 
   def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePeople] = for {
     person <- responsiblePersonGen

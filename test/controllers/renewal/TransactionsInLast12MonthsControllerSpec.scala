@@ -121,7 +121,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
 
           when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
             .thenReturn(Some(BusinessMatching(
-              msbServices = Some(MsbServices(Set(TransmittingMoney)))
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
             )))
 
           when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
@@ -243,7 +243,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
         when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(
             activities = Some(BusinessActivities(Set(HighValueDealing))),
-            msbServices = Some(MsbServices(Set(TransmittingMoney)))
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
           )))
 
         when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
@@ -266,7 +266,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
           when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
             .thenReturn(Some(BusinessMatching(
               activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(MsbServices(Set(TransmittingMoney)))
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
             )))
 
           when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))
@@ -289,7 +289,7 @@ class TransactionsInLast12MonthsControllerSpec extends GenericTestHelper with Mo
         when(cache.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
           .thenReturn(Some(BusinessMatching(
             activities = Some(BusinessActivities(Set(HighValueDealing))),
-            msbServices = Some(MsbServices(Set(TransmittingMoney)))
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
           )))
 
         when(cache.getEntry[moneyServiceBusiness](eqTo(moneyServiceBusiness.key))(any()))

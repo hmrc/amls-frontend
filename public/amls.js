@@ -6,6 +6,22 @@
  * This is so that the file can be re-downloaded by clients.
  */
 
+// The follow code moves the focus to the error message summary if there is one, so that the screen reader is alerted.
+
+$(window).load(function () {
+        // If there is an error summary, set focus to the summary
+        if ($('.amls-error-summary').length) {
+            $('.amls-error-summary').focus()
+            $('.amls-error-summary a').click(function (e) {
+                var href = $(this).attr('href')
+                $(href).focus()
+            })
+        } else {
+            // Otherwise, set focus to the field with the error
+            $('.error input:first').focus()
+        }
+})
+
 // TODO: Tidy up
 $(function () {
   // avoids double panel-indented sections

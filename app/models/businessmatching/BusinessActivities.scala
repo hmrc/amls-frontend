@@ -17,13 +17,12 @@
 package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, _}
+import jto.validation.{Rule, ValidationError, _}
 import models.{DateOfChange, FormTypes}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.{Reads, Writes, _}
-import utils.TraversableValidators._
 import play.api.libs.functional.syntax._
 
 case class BusinessActivities(businessActivities: Set[BusinessActivity],
@@ -109,6 +108,16 @@ object BusinessActivity {
 object BusinessActivities {
 
   import utils.MappingUtils.Implicits._
+
+  val all: Set[BusinessActivity] = Set(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService
+  )
 
   implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
     FormTypes.businessActivityRule("error.required.bm.register.service")

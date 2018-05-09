@@ -53,10 +53,6 @@ class RegistrationProgressController @Inject()(
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-
-        // Reset the service flow flag here, don't worry about the result
-        serviceFlow.setInServiceFlowFlag(false)
-
         isRenewalFlow flatMap {
           case true => Future.successful(Redirect(controllers.renewal.routes.RenewalProgressController.get()))
           case _ =>

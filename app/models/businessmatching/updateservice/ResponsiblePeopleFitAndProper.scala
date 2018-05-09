@@ -18,6 +18,7 @@ package models.businessmatching.updateservice
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
+import play.api.libs.json.Json
 import utils.TraversableValidators.minLengthR
 
 case class ResponsiblePeopleFitAndProper(index: Set[Int])
@@ -36,5 +37,7 @@ object ResponsiblePeopleFitAndProper {
   implicit def formWrites(implicit w: Write[String, String]) = Write[ResponsiblePeopleFitAndProper, UrlFormEncoded] { data =>
     Map("responsiblePeople[]" -> data.index.toSeq.map(x => w.writes(x.toString)))
   }
+
+  implicit def format = Json.format[ResponsiblePeopleFitAndProper]
 
 }

@@ -25,6 +25,8 @@
     }
 }
 
+@getStatusId(name:String) = {@name.concat("-status")}
+
 <li>
     <a href="@call.url" class="@{progressClass(status)}" aria-label="@Messages(s"progress.$name.name"). @Messages(s"progress.$name.description"). @Messages("progress.visuallyhidden.view.amend")">
         <div class="grid-layout__column grid-layout__column--2-3 progress-step--details">
@@ -34,7 +36,7 @@
         <div class="grid-layout__column grid-layout__column--1-3 progress-step--status @if(hasChanged && status == Completed){progress-step_changed}else{@progressClass(status:Status)}">
 
             <div class="grid-layout__column grid-layout__column--2-3 progress-step--status-time">
-                <p class="font-xsmall">@Messages("progress.visuallyhidden.view.amend")</p>
+                <p id="@getStatusId(name)" class="font-xsmall">@Messages("progress.visuallyhidden.view.amend")</p>
             </div>
             <div class="grid-layout__column grid-layout__column--1-3">
                 &nbsp;

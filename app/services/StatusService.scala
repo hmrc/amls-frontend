@@ -16,17 +16,16 @@
 
 package services
 
-import config.ApplicationConfig
 import connectors.AmlsConnector
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
 import play.api.{Mode, Play}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait StatusService {
 
@@ -149,9 +148,14 @@ trait StatusService {
     }
   }
 
-  def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { status =>
-    status.equals(NotCompleted) | status.equals(SubmissionReady)
+  def isPending(status: SubmissionStatus) = status match {
+    case SubmissionReadyForReview | RenewalSubmitted(_) => true
+    case _ => false
   }
+
+  def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { s => isPreSubmission(s) }
+
+  def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
 }
 
 object StatusService extends StatusService {

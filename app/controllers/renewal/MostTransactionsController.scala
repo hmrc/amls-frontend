@@ -47,7 +47,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def redirectTo(services: Set[MsbService], businessActivities: BusinessActivities, edit: Boolean): Result =
+  private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: BusinessActivities, edit: Boolean): Result =
     if (edit) {
       Redirect(routes.SummaryController.get())
     } else if ((services contains CurrencyExchange) && !edit) {

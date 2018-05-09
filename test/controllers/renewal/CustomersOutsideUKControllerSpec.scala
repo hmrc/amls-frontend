@@ -205,7 +205,7 @@ class CustomersOutsideUKControllerSpec extends GenericTestHelper {
                 )
 
                 val businessMatching = BusinessMatching(
-                  msbServices = Some(MsbServices(Set(TransmittingMoney)))
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
                 )
 
                 post(

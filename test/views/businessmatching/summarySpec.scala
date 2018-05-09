@@ -41,14 +41,22 @@ class summarySpec extends GenericTestHelper
   }
 
   "businessmatching view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title when presubmission" in new ViewFixture {
 
-      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl)
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, true)
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
+    }
+
+    "have correct title when not presubmission" in new ViewFixture {
+
+      def view = views.html.businessmatching.summary(EmptyForm, BusinessMatching(), defaultActivitiesUrl, false)
+
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
+      heading.html must be(Messages("title.cya"))
     }
 
     def checkElementTextIncludes(el:Element, keys : String*) = {
@@ -67,7 +75,7 @@ class summarySpec extends GenericTestHelper
 
     "include the provided data when MoneyServicesBusiness and TransmittingMoney were selected for a Limited Company" in new ViewFixture {
 
-      val msbServices = MsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
+      val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
       val BusinessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
       val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
@@ -127,7 +135,7 @@ class summarySpec extends GenericTestHelper
 
     "include the provided data for an UnincorporatedBody with BusinessAppliedForPSRNumberNo" in new ViewFixture {
 
-      val msbServices = MsbServices(Set(CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
+      val msbServices = BusinessMatchingMsbServices(Set(CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
       val BusinessActivitiesModel = BusinessActivities(Set(
         AccountancyServices,
         BillPaymentServices,

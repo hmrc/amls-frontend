@@ -18,7 +18,8 @@
     classes: Seq[String] = Seq.empty,
     editUrl: String = "",
     removeUrl: String = "",
-    allowEdit: Boolean = true
+    allowEdit: Boolean = true,
+    idTag: String = ""
 )(content: Html)(implicit lang: Lang, m: Messages)
 
 <section class="check-your-answers @classes.mkString(" ")">
@@ -29,7 +30,9 @@
     @content
     @if(editUrl.nonEmpty && allowEdit) {
         <footer class="group">
-            <p><a href="@editUrl" class="change-answer">@Messages("button.edit") <span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
+            <p>
+                <a @if(idTag.nonEmpty) {id="@idTag"} href="@editUrl" class="change-answer"><span aria-hidden="true">@Messages("button.edit")</span> <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a>
+            </p>
         </footer>
     }
 </section>

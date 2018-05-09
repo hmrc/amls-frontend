@@ -16,17 +16,17 @@
 
 package controllers.businessmatching.updateservice
 
-import javax.inject.{Inject, Singleton}
-
-import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import services.StatusService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BooleanFormReadWrite
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.UpdateService
+import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.BooleanFormReadWrite
+
 import scala.concurrent.Future
 
 @Singleton

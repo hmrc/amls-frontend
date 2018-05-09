@@ -22,7 +22,7 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[MsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.msb")

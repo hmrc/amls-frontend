@@ -101,6 +101,7 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ########################################################################################################################
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
+error.required.bm.register.service.single = Select the type of business you need to register
 error.required.bm.remove.service = Select one or more options to show what you need to remove
 error.required.bm.registration.number = Enter a valid company registration number
 error.invalid.bm.registration.number = Enter a valid company registration number
@@ -119,13 +120,14 @@ error.invalid.atb.corporation.tax.number = Enter a valid Corporation Tax referen
 error.required.atb.lettersaddress = Select yes if this is the right address to send you letters
 error.mismatch.atb.email = The email addresses you’ve entered don’t match
 
-error.businessmatching.updateservice.responsiblepeople = Select one option to show which responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
+error.businessmatching.updateservice.responsiblepeople = Select at least one option to show which responsible people have passed the HMRC Money Laundering Regulations fit and proper test
+error.businessmatching.updateservice.addmoreactivities = Select yes if you want to add another type of business
 error.businessmatching.updateservice.tradingpremisesnewactivities = Select yes if you do {0} activities from any of your registered trading premises
 error.businessmatching.updateservice.tradingpremisessubmittedactivities = Select yes if you still do this activity from all of your registered trading premises
-error.businessmatching.updateservice.tradingpremises = Select one option to show which premises you will do {0} activities from
+error.businessmatching.updateservice.tradingpremises = Select which premises you will do {0} activities from
 
-error.businessmatching.updateservice.fitandproper = Select yes if all of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test
-error.businessmatching.updateservice.changeservices = Select one option to show what you want to do
+error.businessmatching.updateservice.fitandproper = Select yes if any of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test
+error.businessmatching.updateservice.changeservices = Select what you want to do
 
 ###############################  Bank Details ###############################
 error.bankdetails.accounttype = Select one option to show what kind of account your business uses
@@ -809,11 +811,11 @@ payments.bankdetails.bics.value = BARCGB22
 payments.bankdetails.iban.name = Account number (IBAN)
 payments.bankdetails.iban.value = GB03BARC20114783977692
 payments.bankdetails.accountnumber.name = Account number
-payments.bankdetails.accountnumber.value = 83977692
+payments.bankdetails.accountnumber.value = 12001020
 payments.bankdetails.accountname.name = Account name
 payments.bankdetails.accountname.value = HMRC Shipley Receipts
 payments.bankdetails.sortcode.name = Sort code
-payments.bankdetails.sortcode.value = 20 11 47
+payments.bankdetails.sortcode.value = 08 32 10
 payments.bankdetails.fee.name = Fee
 payments.bankdetails.reference.name = Reference
 
@@ -865,15 +867,6 @@ summary.linetext = Please check all the information you have provided.
 changeservices.title = What do you want to do?
 changeservices.choice.add = Register another service
 changeservices.choice.remove = Remove a service
-
-updateservice.removeactivities.title = What do you need to remove?
-updateservice.removeactivities.header = What do you need to remove?
-
-updateservice.removeactivitiesinformation.title = Unable to remove services
-updateservice.removeactivitiesinformation.header = Unable to remove {0}
-updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
-updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
-updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
 dateofchange.title = When did the change happen?
 dateofchange.hint = For example, 31 03 1980
@@ -1100,16 +1093,23 @@ businessmatching.registerservices.servicename.lbl.01 = Accountancy services
 businessmatching.registerservices.servicename.lbl.02 = Bill payment services
 businessmatching.registerservices.servicename.lbl.03 = Estate agency services
 businessmatching.registerservices.servicename.lbl.04 = High value dealing
-businessmatching.registerservices.servicename.lbl.05 = Money Service Business activities
+businessmatching.registerservices.servicename.lbl.05 = Money service business activities
 businessmatching.registerservices.servicename.lbl.06 = Trust or company services
 businessmatching.registerservices.servicename.lbl.07 = Telephone, digital and IT payment services
-businessmatching.registerservices.servicename.details.01 = Accountancy Service Providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
-businessmatching.registerservices.servicename.details.02 = Bill Payment Service Providers work on behalf of businesses to handle household bill payments from customers.
-businessmatching.registerservices.servicename.details.03 = Estate Agency Businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
-businessmatching.registerservices.servicename.details.04 = High Value Dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
-businessmatching.registerservices.servicename.details.05 = Money Service Businesses exchange currency, transmit money, or cash cheques for their customers.
-businessmatching.registerservices.servicename.details.06 = Trust or Company Service Providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
-businessmatching.registerservices.servicename.details.07 = Telecommunications, Digital and IT Payment Service Providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
+businessmatching.registerservices.servicename.lbl.01.phrased = accountancy services
+businessmatching.registerservices.servicename.lbl.02.phrased = bill payment services
+businessmatching.registerservices.servicename.lbl.03.phrased = estate agency services
+businessmatching.registerservices.servicename.lbl.04.phrased = high value dealing
+businessmatching.registerservices.servicename.lbl.05.phrased = money service business
+businessmatching.registerservices.servicename.lbl.06.phrased = trust or company services
+businessmatching.registerservices.servicename.lbl.07.phrased = telephone, digital and IT payment services
+businessmatching.registerservices.servicename.details.01 = Accountancy service providers provide professional bookkeeping services, accounts preparation and signing, or tax advice.
+businessmatching.registerservices.servicename.details.02 = Bill payment service providers work on behalf of businesses to handle household bill payments from customers.
+businessmatching.registerservices.servicename.details.03 = Estate agency businesses introduce people who want to buy or sell property, and facilitate the purchase or sale of property.
+businessmatching.registerservices.servicename.details.04 = High value dealers accept cash payments of €10,000 or more (or equivalent in any currency) in exchange for goods. Estate agents are not classed as High Value Dealers.
+businessmatching.registerservices.servicename.details.05 = Money service businesses exchange currency, transmit money, or cash cheques for their customers.
+businessmatching.registerservices.servicename.details.06 = Telecommunications, digital and IT payment service providers work on behalf of businesses to handle payments made with phones, computers, smart TVs, and other similar devices.
+businessmatching.registerservices.servicename.details.07 = Trust or company service providers form companies. They also provide other services such as acting - or arranging for another person to act - in a certain role in a company.
 businessmatching.registrationnumber.title = What’s your company registration number?
 businessmatching.registrationnumber.lbl = Company registration number
 businessmatching.typeofbusiness.title = What’s your type of business?
@@ -1117,7 +1117,7 @@ businessmatching.typeofbusiness.lbl = Type of business
 businessmatching.typeofbusiness.lbl.hint = For example, association, charity, trust
 businessmatching.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.psr.number.lbl = PSR registration number
-businessmatching.psr.number.hint = It’s 6 numbers with no letters, punctuation or other characters
+businessmatching.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
 businessmatching.cannotcontinuewiththeapplication.heading = You can’t continue with your application
 businessmatching.summary.icon.title = You’re applying to register the following business for anti-money laundering supervision
 businessmatching.summary.business.address.lbl = Your business
@@ -1144,29 +1144,106 @@ businessmatching.cannotchangeservices.requiredinfo = Your business must have a P
 
 businessmatching.cannotchangeservices.button.text = Return to update information
 
+########################################################################################################################
+########################################################################################################################
+##############                                                                                            ##############
+##############                    UPDATESERVICE                                                           ##############
+##############                                                                                            ##############
+########################################################################################################################
+########################################################################################################################
+
+businessmatching.updateservice.changeservices.title = What do you want to do?
+businessmatching.updateservice.changeservices.heading = What do you want to do?
+businessmatching.updateservice.changeservices.existing.multiple = You’ve told us your business types are
+businessmatching.updateservice.changeservices.existing.single = You’ve told us your business type is
+businessmatching.updateservice.changeservices.choice.add = Register another business type
+businessmatching.updateservice.changeservices.choice.remove = Remove a service
+
+#remove route
+businessmatching.updateservice.removeactivities.title = What do you need to remove?
+businessmatching.updateservice.removeactivities.header = What do you need to remove?
+
+businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
+businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
+businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
+
+#   Add route Start  ###################################################################################################
+businessmatching.updateservice.msb.services.title = Which services does your business provide?
+businessmatching.updateservice.msb.services.heading = Which services does your business provide?
+businessmatching.updateservice.msb.services.list.heading = Choose at least one
+businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
+businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
+businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
+businessmatching.updateservice.psr.number.lbl = PSR registration number
+businessmatching.updateservice.psr.number.hint = It’s 6 numbers, like 123456. You received it when you registered with the Financial Conduct Authority (FCA).
+
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading = You can’t continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title = You can’t continue with your change
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1 = Your business must have a PSR reference number to include a money service business as part of your anti-money laundering supervision.
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2 = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
+businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.button.text = Return to update information
+
+businessmatching.updateservice.selectactivities.title = What type of business do you need to register?
+businessmatching.updateservice.selectactivities.heading = What type of business do you need to register?
+businessmatching.updateservice.selectactivities.hint = You can only add one type of business at a time
+businessmatching.updateservice.selectactivities.currentactivities.hint = You’ve told us your business type is:
+businessmatching.updateservice.selectactivities.currentactivities.hint.plural = You’ve told us your business types are:
+
 businessmatching.updateservice.tradingpremises.title = Will you do these activities from any of your registered trading premises?
-businessmatching.updateservice.tradingpremises.header = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.heading = Will you do {0} activities from any of your registered trading premises?
+businessmatching.updateservice.tradingpremises.summary = Will you do {0} from any of your registered trading premises?
+
 businessmatching.updateservice.currenttradingpremises.title = Will you still do this activity from all of your registered trading premises?
-businessmatching.updateservice.currenttradingpremises.header = Will you still do {0} from all of your registered trading premises?
+businessmatching.updateservice.currenttradingpremises.heading = Will you still do {0} from all of your registered trading premises?
+
 
 businessmatching.updateservice.whichtradingpremises.title = Which premises will you do these activities from?
-businessmatching.updateservice.whichtradingpremises.header = Which premises will you do {0} activities from?
+businessmatching.updateservice.whichtradingpremises.heading = Which premises will you do {0} activities from?
+businessmatching.updateservice.whichtradingpremises.summary = Which premises will you do {0} from?
 
-businessmatching.updateservice.fitandproper.title = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
-businessmatching.updateservice.fitandproper.header = Have all your responsible people passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whatdoyoudohere.title = What does your business do at these premises?
+businessmatching.updateservice.whatdoyoudohere.heading = What does your business do at these premises?
+businessmatching.updateservice.whatdoyoudohere.list.heading = Choose at least one
+businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
+businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
+businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
+
+businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
+businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
+
+businessmatching.updateservice.fitandproper.title = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.fitandproper.heading = Have any of your responsible people passed the HMRC Money Laundering Regulations fit and proper test?
 businessmatching.updateservice.fitandproper.info = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 businessmatching.updateservice.fitandproper.info.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
-businessmatching.updateservice.fitandproper.text.info = The Fit and Proper test
-businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
+businessmatching.updateservice.fitandproper.text.info = The fit and proper test
+businessmatching.updateservice.fitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
 businessmatching.updateservice.fitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
-businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
-businessmatching.updateservice.whichfitandproper.header = Which of your responsible people have passed the HMRC Money Laundering Regulations Fit and Proper test?
+businessmatching.updateservice.whichfitandproper.title = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.whichfitandproper.heading = Which of your responsible people have passed the HMRC Money Laundering Regulations fit and proper test?
+businessmatching.updateservice.whichfitandproper.hint = Select all the responsible people that have passed the HMRC fit and proper test, you will be charged a fee for each person that has not.
+businessmatching.updateservice.whichfitandproper.text.info = The fit and proper test
+businessmatching.updateservice.whichfitandproper.text.info.line1 = The responsible people in your business need to pass a fit and proper test. If anyone has already passed the test before, they don’t need to do it again.
+businessmatching.updateservice.whichfitandproper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
-businessmatching.updateservice.newserviceinformation.title = We need to ask you about the new service you’ve added
-businessmatching.updateservice.newserviceinformation.heading = We need to ask you about the new service you’ve added
-businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for: {0}
-businessmatching.updateservice.newserviceinformation.info = You will need to complete the {0} section before you can submit your updated information.
+businessmatching.updateservice.newserviceinformation.title = We need to ask you some more questions because of the changes you’ve made
+businessmatching.updateservice.newserviceinformation.heading = We need to ask you some more questions because of the changes you’ve made
+businessmatching.updateservice.newserviceinformation.info.gutter = You’ve told us your business needs to register for:
+businessmatching.updateservice.newserviceinformation.info.1 = You’ll need to complete:
+businessmatching.updateservice.newserviceinformation.info.2 = You might need to edit other sections based on any new information you provide.
+
+businessmatching.updateservice.summary.whichtradingpremises.count = You’ve chosen {0} trading premises
+businessmatching.updateservice.summary.whichtradingpremises.activities.count = You’ve chosen {0} activities at your trading premises
+businessmatching.updateservice.summary.whichfitandproper.count = You’ve chosen {0} responsible person
+businessmatching.updateservice.summary.whichfitandproper.count.plural = You’ve chosen {0} responsible people
+
+########################################################################################################################
 
 bankdetails.whatyouneed.title = Bank details - What you need
 bankdetails.whatyouneed.heading = What you need
@@ -1963,22 +2040,22 @@ notification.static.text.DeRegistrationEffectiveDateChange = <p>The date your an
 
 notification.reminder.to.pay.ReminderToPayForVariation = <p>You need to pay {0} for the recent changes made to your details.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForApplication = <p>You need to pay {0} for your application to register with HM Revenue and Customs.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForRenewal = <p>You need to pay {0} for your annual renewal.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.reminder.to.pay.ReminderToPayForManualCharges = <p>You need to pay {0} for the recent charge added to your account.</p>\
 <p>Your payment reference is: {1}.</p>\
-<p>Pay online by credit or debit card.</p>\
+<p>Find details of how to pay on your online account home page.</p>\
 <p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>
 
 notification.message.with.end.date.ApplicationApproval = <p>Your application to register has been approved. You’re now registered until {0}.</p>\

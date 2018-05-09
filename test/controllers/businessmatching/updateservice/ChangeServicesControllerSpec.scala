@@ -16,56 +16,47 @@
 
 package controllers.businessmatching.updateservice
 
-import connectors.DataCacheConnector
-import generators.ResponsiblePersonGenerator
+import cats.data.OptionT
+import cats.implicits._
 import models.businessmatching._
-import models.responsiblepeople.ResponsiblePeople
+import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
+import models.flowmanagement.ChangeServicesPageId
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
 
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-
     val bmService = mock[BusinessMatchingService]
 
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[BusinessMatchingService].to(bmService))
-      .build()
+    val controller = new ChangeServicesController(
+      self.authConnector,
+      mockCacheConnector,
+      bmService,
+      createRouter[ChangeServices]
+    )
 
-    val controller = app.injector.instanceOf[ChangeServicesController]
+    val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
+    val businessMatching = BusinessMatching(activities = Some(businessActivitiesModel))
+    val emptyBusinessMatching = BusinessMatching()
 
-    val BusinessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
-    val bm = Some(BusinessMatching(activities = Some(BusinessActivitiesModel)))
-
-    val bmEmpty = Some(BusinessMatching())
-
-    mockCacheGetEntry[BusinessMatching](Some(bm), BusinessMatching.key)
+    mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
 
     when {
-      bmService.preApplicationComplete(any(), any(), any())
-    } thenReturn Future.successful(false)
-
+      bmService.getRemainingBusinessActivities(any(), any(), any())
+    } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
   }
 
   "ChangeServicesController" when {
@@ -76,78 +67,41 @@ class ChangeServicesControllerSpec extends GenericTestHelper with MockitoSugar {
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("changeservices.title"))
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.changeservices.title"))
 
       }
 
       "return OK with change_services view - no activities" in new Fixture {
-
-        mockCacheGetEntry[BusinessMatching](Some(bmEmpty), BusinessMatching.key)
+        when {
+          bmService.getRemainingBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("changeservices.title"))
 
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.title() must include(Messages("businessmatching.updateservice.changeservices.title"))
+        Option(doc.getElementById("changeServices-add")) must not be defined
       }
     }
 
     "post is called" must {
-      "redirect to WhichFitAndProperController" when {
+      "redirect to RegisterServicesController" when {
         "request is add" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
-        }
-
-        "request is add with no activities " in new Fixture {
-
-          mockCacheGetEntry[BusinessMatching](Some(bmEmpty), BusinessMatching.key)
-
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.routes.RegisterServicesController.get().url))
-        }
-
-      }
-
-      "redirect to RemoveActivitiesController" when {
-        "request is remove" in new Fixture {
-
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesController.get().url))
-
-        }
-      }
-
-      "redirect to RemoveActivitiesInformationController" when {
-        "there is a single service" in new Fixture {
-
-          mockCacheGetEntry[BusinessMatching](
-            Some(BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))),
-            BusinessMatching.key
-          )
-
-          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessmatching.updateservice.routes.RemoveActivitiesInformationController.get().url))
-
+          controller.router.verify(ChangeServicesPageId, ChangeServicesAdd)
         }
       }
 
       "return BAD_REQUEST" when {
         "request is invalid" in new Fixture {
-
           val result = controller.post()(request)
-
           status(result) must be(BAD_REQUEST)
-
         }
       }
 

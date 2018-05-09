@@ -75,7 +75,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
       val model = MoneyServiceBusiness(None)
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
@@ -100,7 +100,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
       when(controller.dataCache.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
       val msbServices = Some(
-        MsbServices(
+        BusinessMatchingMsbServices(
           Set(
             TransmittingMoney,
             CurrencyExchange,
@@ -121,7 +121,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
     "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        val bm = Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
           ChequeCashingNotScrapMetal,
           ChequeCashingScrapMetal)))))
 
@@ -151,7 +151,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
     "show edit link" when {
       "application not in variation mode" in new Fixture {
-        val bm = Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney,CurrencyExchange,
+        val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
           ChequeCashingNotScrapMetal,
           ChequeCashingScrapMetal)))))
 
@@ -203,7 +203,7 @@ class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
 
         val result = controller.post()(request)
 
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.routes.NewServiceInformationController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get().url)
 
       }
     }

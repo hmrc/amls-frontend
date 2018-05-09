@@ -21,7 +21,7 @@
 @import org.joda.time.LocalDate
 @import utils.DateHelper
 
-@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String], businessMatchingVariationToggle: Boolean)(implicit request: Request[_], m: Messages)
+@(regNo: String, businessName: Option[String], endDate: Option[LocalDate], renewalFlow: Boolean, name: Option[String], activities: Set[String])(implicit request: Request[_], m: Messages)
 
 @main2(title = Messages("status.submissiondecisionsupervised.heading") + " - Your registration", showURRBanner = true) {
 
@@ -50,7 +50,7 @@
                     <!-- <i class="icon icon-information"></i>  -->
                     <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
                 </div>
-                <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no">@regNo</p>
+                <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no-mobile">@regNo</p>
             </div>
             @endDate.map { date =>
                 <p class="heading-small">@Messages("lbl.registration.status.short")</p>
@@ -59,7 +59,7 @@
                 </p>
             }
             <div class="hide-if-desktop">
-                <p>@change_officer(name)</p>
+                <p>@change_officer(name, Some("change-officer-change-link-mobile"))</p>
             </div>
 
             <p id="deregister-services-list" class="heading-small">@Messages("status.deregister.services")</p>
@@ -67,9 +67,8 @@
                 <li>@activity</li>
             }
             </ul>
-            @if(businessMatchingVariationToggle) {
-                <a id="change-registered-services" href="@controllers.businessmatching.routes.SummaryController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
-            }
+
+            <a id="change-registered-services" href="@controllers.businessmatching.updateservice.routes.ChangeServicesController.get()">@Messages("status.deregister.button.change") <span class="visuallyhidden"> @Messages("status.deregister.visuallyhidden.change")</span></a>
 
             <div id="supervised-panel" class="panel-indent panel-indent--gutter panel-border-wide">
                 <h2 class="heading-small">@Messages("status.hassomethingchanged")</h2>

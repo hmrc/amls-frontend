@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{TransmittingMoney, CurrencyExchange, MsbService, BusinessMatching}
+import models.businessmatching.{TransmittingMoney, CurrencyExchange, BusinessMatchingMsbService, BusinessMatching}
 import models.moneyservicebusiness._
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -44,7 +44,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
       }
   }
 
-  private def standardRouting(services: Set[MsbService]): Result =
+  private def standardRouting(services: Set[BusinessMatchingMsbService]): Result =
     services match {
       case s if s contains TransmittingMoney =>
         Redirect(routes.BusinessUseAnIPSPController.get())
@@ -54,7 +54,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
         Redirect(routes.SummaryController.get())
     }
 
-  private def editRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+  private def editRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     services match {
       case s if s contains TransmittingMoney =>
         mtRouting(services, msb)
@@ -64,7 +64,7 @@ trait IdentifyLinkedTransactionsController extends BaseController {
         Redirect(routes.SummaryController.get())
     }
 
-  private def mtRouting(services: Set[MsbService], msb: MoneyServiceBusiness): Result =
+  private def mtRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     if (msb.businessUseAnIPSP.isDefined) {
       editRouting(services - TransmittingMoney, msb)
     } else {

@@ -18,9 +18,9 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.{TradingPremisesSection}
-import models.businessmatching.{BusinessMatching, MsbServices, TransmittingMoney, CurrencyExchange}
-import models.tradingpremises.{MsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
-CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, MsbService}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange}
+import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
+CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremisesMsbService}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
@@ -79,7 +79,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         .thenReturn(Some(Seq(model)))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
+        .thenReturn(Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -99,7 +99,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
         ))))
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
+        .thenReturn(Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
       val result = controller.get(1)(request)
       val document = Jsoup.parse(contentAsString(result))
@@ -138,7 +138,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
           .thenReturn(None)
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = Some(MsbServices(Set(TransmittingMoney, CurrencyExchange))))))
+          .thenReturn(Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))))))
 
           val result = controller.get(1, false)(request)
 
@@ -259,7 +259,7 @@ class MSBServicesControllerSpec extends GenericTestHelper with ScalaFutures with
 
       "adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
-        Seq[(MsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
+        Seq[(TradingPremisesMsbService, String)]((ChequeCashingNotScrapMetal, "03"), (ChequeCashingScrapMetal, "04")) foreach {
           case (model, id) =>
             val currentModel = TradingPremises(
               msbServices = Some(TPMsbServices(

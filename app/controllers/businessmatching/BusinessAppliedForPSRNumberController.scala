@@ -56,17 +56,14 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
             (for {
               bm <- businessMatchingService.getModel
               _ <- businessMatchingService.updateModel(
-                bm.businessAppliedForPSRNumber(BusinessAppliedForPSRNumberYes(x))
+                bm.businessAppliedForPSRNumber(Some(BusinessAppliedForPSRNumberYes(x)))
               )
             } yield {
               Redirect(routes.SummaryController.get())
             }) getOrElse InternalServerError("Could not update psr number")
           }
-          case ValidForm(_, _) => {
-            businessMatchingService.clearVariation map { _ =>
-              Redirect(routes.NoPsrController.get())
-            } getOrElse InternalServerError("Could not clear the variation data")
-          }
+          case ValidForm(_, _) =>
+            Future.successful(Redirect(routes.NoPsrController.get()))
         }
       }
   }

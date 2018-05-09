@@ -31,6 +31,7 @@ import models.status._
 import models.{status => _, _}
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -48,7 +49,7 @@ import utils.{AuthorisedFixture, GenericTestHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar with AmlsReferenceNumberGenerator with PaymentGenerator {
+class ConfirmationControllerSpec extends GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
   val mockAmlsConnector = mock[AmlsConnector]
@@ -235,6 +236,27 @@ class ConfirmationControllerSpec extends GenericTestHelper with MockitoSugar wit
       status(result) mustBe OK
       Jsoup.parse(contentAsString(result)).title must include("Application fee and reference")
       contentAsString(result) must include(paymentReferenceNumber)
+    }
+
+    "notify the user that there is a fee" when {
+      "submitting a variation" which {
+        "has no difference, but has a total fee value" in new Fixture {
+          setupStatus(SubmissionDecisionApproved)
+
+          // scalastyle:off magic.number
+          when {
+            controller.submissionResponseService.getSubmissionData(eqTo(SubmissionDecisionApproved))(any(), any(), any())
+          } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(100), Seq.empty, None, None)))
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.title must include(Messages("confirmation.amendment.header"))
+          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+        }
+      }
     }
 
     "notify user there is no fee" when {

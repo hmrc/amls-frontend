@@ -14,6 +14,11 @@
  * limitations under the License.
  */
 
+.bulletedList>ul>li {
+    list-style-type: disc;
+    list-style-position: inside;
+}
+
 a.block-link {
   display: block;
 }
@@ -359,6 +364,11 @@ div.hide-if-desktop > .messaging {
   margin-bottom: 20px;
 }
 
+.lte-ie8 .hide-if-desktop {
+    display:none;
+}
+
+
 /* -- TODO: fix this – IE10+ needs a chevron kick
 @media all and
   (-ms-high-contrast: none) and (max-width: 640px),
@@ -689,6 +699,15 @@ form .form-label-bold {
   font-size: 19px;
   line-height: 1.31579;
   margin-bottom: 0.5em;
+}
+
+form .spaced:last-of-type {
+    margin-top: -20px;
+    margin-bottom: 5px;
+}
+
+form .form-field--error .spaced:last-of-type {
+    margin: 0px;
 }
 
 form .block-label + fieldset {

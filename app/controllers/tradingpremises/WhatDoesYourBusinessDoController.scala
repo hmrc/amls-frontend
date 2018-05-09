@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{MsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.mvc.Result
 import services.StatusService

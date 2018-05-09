@@ -1,0 +1,162 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import forms2._
+@import models.businessmatching._
+@import config.{ApplicationConfig => appConfig}
+@import controllers.businessmatching.updateservice.add.routes
+@import models.flowmanagement.AddServiceFlowModel
+
+@(f: forms.Form2[_], flowModel: AddServiceFlowModel)(implicit request: Request[_],messages:Messages)
+
+@header = {
+    @heading("title.cya", "summary.updateservice")
+}
+
+@main(
+    title = Messages("title.cya") + " - " + Messages("summary.updateservice"),
+    heading = header
+) {
+
+    @checkYourAnswers(
+        question = Messages("businessmatching.updateservice.selectactivities.title"),
+        editUrl = routes.SelectActivitiesController.get(edit = true).url,
+        idTag = "selectactivities-edit"
+    ) {
+        <p>@(flowModel.activityName.getOrElse(""))</p>
+    }
+
+    @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
+        @flowModel.msbServices.map { services =>
+            @checkYourAnswers(
+                question = Messages("businessmatching.services.title"),
+                editUrl = routes.SubServicesController.get(true).toString,
+                allowEdit = true,
+                idTag="edit-msb-services"
+            ) {
+                <ul class="list list--comma">
+                    @services.msbServices.map { svc =>
+                    <li>@svc match {
+                        case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
+                        case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
+                        case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
+                        case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                        }</li>
+                    }
+                </ul>
+                }
+
+                @if(services.msbServices.contains(TransmittingMoney)) {
+                @flowModel.businessAppliedForPSRNumber.map { psr =>
+                @checkYourAnswers(
+                    question = Messages("businessmatching.psr.number.title"),
+                    editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                    allowEdit = true
+                )   {
+                        <p>@psr match {
+                            case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
+                            case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
+                        }</p>
+                    }
+                }
+            }
+        }
+    }
+
+
+    @if(flowModel.fitAndProper.isDefined) {
+        @checkYourAnswers(
+                question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                editUrl = routes.FitAndProperController.get(edit = true).url,
+                idTag = "fitandproper-edit"
+            ) {
+            <p>@(flowModel.fitAndProper map {
+                    case true => Messages("lbl.yes")
+                    case _ => Messages("lbl.no")
+                })</p>
+        }
+
+        @if(flowModel.fitAndProper.contains(true)) {
+            @checkYourAnswers(
+                question = Messages("businessmatching.updateservice.whichfitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                editUrl = routes.WhichFitAndProperController.get(edit = true).url,
+                idTag = "whichfitandproper-edit"
+            ) {
+            <p>
+                @(flowModel.responsiblePeople map { tp =>
+                    if(tp.index.size < 2) {
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count", tp.index.size)
+                    } else {
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", tp.index.size)
+                    }
+                })
+            </p>
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("businessmatching.updateservice.tradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
+        editUrl = routes.TradingPremisesController.get(edit = true).url,
+        idTag = "tradingpremises-edit"
+    ) {
+        <p>@(flowModel.areNewActivitiesAtTradingPremises map {
+            case true => Messages("lbl.yes")
+            case _ => Messages("lbl.no")
+        })</p>
+    }
+
+    @if(flowModel.areNewActivitiesAtTradingPremises.contains(true)) {
+        @checkYourAnswers(
+            question = Messages("businessmatching.updateservice.whichtradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
+            editUrl = routes.WhichTradingPremisesController.get().url,
+            idTag = "whichtradingpremises-edit"
+        ) {
+            <p>
+                @(flowModel.tradingPremisesActivities map { tp =>
+                    Messages("businessmatching.updateservice.summary.whichtradingpremises.count", tp.index.size)
+                })
+            </p>
+        }
+
+            @flowModel.tradingPremisesMsbServices.map { tpMsbServices =>
+                @checkYourAnswers(
+                    question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
+                    editUrl = routes.WhatDoYouDoHereController.get(true).url,
+                    allowEdit = flowModel.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
+                    idTag = "WhatDoYouDoHere-edit"
+                ) {
+                    <ul class="list list--comma">
+                        @tpMsbServices.msbServices.map { service =>
+                            <li>@service match {
+                                case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
+                                case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
+                                case ChequeCashingNotScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.03")}
+                                case ChequeCashingScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.04")}
+                            }</li>
+                        }
+                    </ul>
+                }
+
+        }
+    }
+
+    @form(f, controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.post()) {
+        @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))
+    }
+
+}

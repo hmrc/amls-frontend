@@ -17,10 +17,10 @@
 @import include._
 @import forms2._
 @import models.renewal._
-@import models.businessmatching.{BusinessActivities, MsbServices, TransmittingMoney, CurrencyExchange}
+@import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange}
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[MsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
+@(f: forms.Form2[_], model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[BusinessMatchingMsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.renewal")

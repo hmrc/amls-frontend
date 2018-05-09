@@ -19,11 +19,11 @@
 @(form: Form2[_])(implicit lang:Lang,  m: Messages)
 
 @if(form.errors.nonEmpty) {
-    <div class="flash amls-error-summary" role="alert" aria-labelledby="error-summary-heading" tabindex="-1">
-        <h1 class="heading-medium" id="error-summary-heading">@Messages("err.summary")</h1>
-        <ul>
+    <div class="flash amls-error-summary" role="alert"  tabindex="-1">
+        <h2 class="heading-medium" id="error-summary-heading">@Messages("err.summary")</h2>
+        <ul class="error-summary-list">
             @form.errors.map { case (path, errors) =>
-                <li>
+                <li role="tooltip" class="validation-summary-message">
                     @if(path.path.nonEmpty) {
                         <a href="#@form(path).id">@errors.toMessage</a>
                     } else {
