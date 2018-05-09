@@ -68,7 +68,7 @@ class RemoveServiceHelperSpec extends GenericTestHelper
                                                   hasChanged = true)
 
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))),
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )

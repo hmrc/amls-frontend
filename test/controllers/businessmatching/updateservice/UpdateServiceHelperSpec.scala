@@ -50,7 +50,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
 
-    val helper = new UpdateServiceHelper(
+    val SUT = new UpdateServiceHelper(
       self.authConnector,
       mockCacheConnector,
       tradingPremisesService,
@@ -72,7 +72,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
       val model = AddServiceFlowModel(activity = Some(AccountancyServices))
       for {
-        result <- helper.updateBusinessActivities(model)
+        result <- SUT.updateBusinessActivities(model)
       } yield {
         result.involvedInOther mustBe Some(InvolvedInOtherNo)
         result.whoIsYourAccountant must not be defined
@@ -88,7 +88,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
       for {
-        result <- helper.updateBusinessActivities(model)
+        result <- SUT.updateBusinessActivities(model)
       } yield {
         result.whoIsYourAccountant mustBe defined
         result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
@@ -111,7 +111,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
-        helper.updateSupervision.returnsSome(Supervision(hasAccepted = true))
+        SUT.updateSupervision.returnsSome(Supervision(hasAccepted = true))
 
         verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any(), any())
       }
@@ -130,7 +130,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
           Some(BusinessMatching.key))
 
-        helper.updateSupervision.returnsSome(supervisionModel)
+        SUT.updateSupervision.returnsSome(supervisionModel)
 
         verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
       }
@@ -148,7 +148,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
         Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
         Some(BusinessMatching.key))
 
-      helper.updateSupervision.returnsSome(supervisionModel)
+      SUT.updateSupervision.returnsSome(supervisionModel)
 
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
@@ -168,7 +168,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           Some(BusinessMatching.key))
 
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
       "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
@@ -176,15 +176,19 @@ class UpdateServiceHelperSpec extends GenericTestHelper
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
         var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))), hasAccepted = true, hasChanged = true)
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
           Some(BusinessMatching.key))
+
         mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
-      "there are msb services and the new activity is MSB and there are existing activities" in new Fixture {
+
+      "there are additional msb services and the activity is MSB and there are existing activities" in new Fixture {
 
         val model = AddServiceFlowModel(
           activity = Some(MoneyServiceBusiness),
@@ -200,11 +204,14 @@ class UpdateServiceHelperSpec extends GenericTestHelper
                                 hasAccepted = true,
                                 hasChanged = true,
                                 msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))))
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))),
           Some(BusinessMatching.key))
+
         mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
       "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
@@ -214,19 +221,21 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
         )
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())),
                                   hasAccepted = true,
-                                  hasChanged = false)
+                                  hasChanged = true)
 
-        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
                                 msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = None)),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
           Some(BusinessMatching.key))
+
         mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
     }
   }
@@ -253,7 +262,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
           responsiblePeopleService.updateFitAndProperFlag(any(), any())
         } thenReturn updatedPeople
 
-        helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
+        SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
       }
     }
 
@@ -267,7 +276,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         val model = AddServiceFlowModel(Some(HighValueDealing))
 
-        helper.updateResponsiblePeople(model).returnsSome(people)
+        SUT.updateResponsiblePeople(model).returnsSome(people)
 
         verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any())
       }
@@ -278,7 +287,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     "set an empty model back into the cache" in new Fixture {
       mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
-      helper.clearFlowModel().returnsSome(AddServiceFlowModel())
+      SUT.clearFlowModel().returnsSome(AddServiceFlowModel())
     }
   }
 
@@ -286,7 +295,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     "save the flow model with 'hasAccepted' = true" in new Fixture {
       mockCacheSave[AddServiceFlowModel]
 
-      await(helper.updateHasAcceptedFlag(AddServiceFlowModel()).value)
+      await(SUT.updateHasAcceptedFlag(AddServiceFlowModel()).value)
 
       verify(mockCacheConnector).save[AddServiceFlowModel](eqTo(AddServiceFlowModel.key), eqTo(AddServiceFlowModel(hasAccepted = true)))(any(), any(), any())
     }
@@ -297,14 +306,14 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
 
-        helper.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
+        SUT.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
       }
 
       "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
 
-        helper.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
+        SUT.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
       }
     }
