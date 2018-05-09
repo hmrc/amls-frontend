@@ -20,10 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities._
+import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
@@ -58,7 +57,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
       responsiblePeopleService
     )
 
-    val businessActivitiesSection = BusinessActivities(
+    val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),
       whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
       accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
@@ -69,7 +68,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
   "updateBusinessActivities" must {
     "remove the accountancy data from the 'business activities' section" in new Fixture {
-      mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(AccountancyServices))
       for {
@@ -84,7 +83,7 @@ class UpdateServiceHelperSpec extends GenericTestHelper
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
-      mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
@@ -161,13 +160,14 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
           Some(BusinessMatching.key))
 
-        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
         helper.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
@@ -175,11 +175,12 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
         helper.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
@@ -187,16 +188,22 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         val model = AddServiceFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
         )
+
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                  hasAccepted = true,
+                                  hasChanged = true,
+                                  msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))))
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
         helper.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
@@ -204,16 +211,21 @@ class UpdateServiceHelperSpec extends GenericTestHelper
 
         val model = AddServiceFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
         )
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
+
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                  hasAccepted = true,
+                                  hasChanged = false)
+
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = None)),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
+        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
         helper.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
     }
