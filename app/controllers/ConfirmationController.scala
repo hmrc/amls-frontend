@@ -177,7 +177,12 @@ class ConfirmationController @Inject()(
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     breakdownRows map {
       case Some(rows) =>
-        Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+        val amount = fees.difference.fold(fees.totalFees) {
+          case d if d > 0 => d
+          case _ => fees.totalFees
+        }
+
+        Ok(confirm_amendvariation(fees.paymentReference, Currency(amount), rows, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
   }

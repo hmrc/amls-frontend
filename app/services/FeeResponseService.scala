@@ -26,16 +26,15 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class FeeResponseService @Inject()(
-                                  val feeConnector: FeeConnector
-                                  ){
+class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
 
   def getFeeResponse(amlsReferenceNumber: String)
                     (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[FeeResponse]] = {
 
     feeConnector.feeResponse(amlsReferenceNumber) map ( feeResponse =>
       feeResponse.responseType match {
-        case AmendOrVariationResponseType if feeResponse.difference.fold(false)(_ > 0) => Some(feeResponse)
+        case AmendOrVariationResponseType
+          if feeResponse.difference.fold(false)(_ > 0) | feeResponse.totalFees > 0 => Some(feeResponse)
         case SubscriptionResponseType if feeResponse.totalFees > 0 => Some(feeResponse)
         case _ => None
     })
