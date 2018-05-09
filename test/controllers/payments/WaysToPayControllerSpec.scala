@@ -19,24 +19,22 @@ package controllers.payments
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
-import models.payments._
+import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, WaysToPay}
 import models.status.SubmissionReadyForReview
 import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
+class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>

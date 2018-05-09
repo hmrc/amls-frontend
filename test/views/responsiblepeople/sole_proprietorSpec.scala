@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.responsiblepeople.{SoleProprietorOfAnotherBusiness, ResponsiblePeople}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class sole_proprietorSpec extends GenericTestHelper with MustMatchers {
+class sole_proprietorSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

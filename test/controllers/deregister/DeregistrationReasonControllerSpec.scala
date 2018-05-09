@@ -31,11 +31,11 @@ import play.api.i18n.Messages
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class DeregistrationReasonControllerSpec extends GenericTestHelper with OneAppPerSuite {
+class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
   override lazy val app = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.allow-deregister" -> true)

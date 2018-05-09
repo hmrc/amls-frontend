@@ -23,11 +23,11 @@ import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class add_personSpec extends GenericTestHelper with MustMatchers  {
+class add_personSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

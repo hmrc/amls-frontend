@@ -21,9 +21,9 @@ import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class update_any_informationSpec extends GenericTestHelper with MustMatchers  {
+class update_any_informationSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

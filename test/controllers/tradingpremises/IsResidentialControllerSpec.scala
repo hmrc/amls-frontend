@@ -27,9 +27,9 @@ import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
 
-class IsResidentialControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with PrivateMethodTester {
+class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with PrivateMethodTester {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

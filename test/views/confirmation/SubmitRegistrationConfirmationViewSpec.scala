@@ -20,10 +20,10 @@ import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class SubmitRegistrationConfirmationViewSpec extends GenericTestHelper with MustMatchers with PaymentGenerator{
+class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

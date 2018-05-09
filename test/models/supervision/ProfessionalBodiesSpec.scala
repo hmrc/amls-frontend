@@ -19,9 +19,9 @@ package models.supervision
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class ProfessionalBodiesSpec extends PlaySpec with GenericTestHelper {
+class ProfessionalBodiesSpec extends PlaySpec with AmlsSpec {
 
   "Form validation" must {
 

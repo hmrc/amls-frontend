@@ -29,12 +29,12 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class NotificationServiceSpec extends GenericTestHelper with MockitoSugar {
+class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
 

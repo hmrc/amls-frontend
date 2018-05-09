@@ -36,7 +36,7 @@ import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 import cats.implicits._
 import services.businessmatching.BusinessMatchingService
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -44,7 +44,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class RenewalProgressControllerSpec extends GenericTestHelper with BusinessMatchingGenerator {
+class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>

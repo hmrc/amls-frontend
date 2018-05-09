@@ -23,13 +23,13 @@ import models.renewal._
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
 import org.jsoup.nodes.Element
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper
+class summarySpec extends AmlsSpec
   with MustMatchers
   with TableDrivenPropertyChecks
   with HtmlAssertions {

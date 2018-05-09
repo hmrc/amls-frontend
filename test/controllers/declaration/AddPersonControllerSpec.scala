@@ -31,7 +31,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
@@ -42,7 +42,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
+class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
     "microservice.services.feature-toggle.amendments" -> true,
@@ -298,7 +298,7 @@ class AddPersonControllerSpec extends GenericTestHelper with MockitoSugar {
   }
 }
 
-class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with MockitoSugar {
+class AddPersonControllerWithoutRelease7Spec extends AmlsSpec with MockitoSugar {
 
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
@@ -513,7 +513,7 @@ class AddPersonControllerWithoutRelease7Spec extends GenericTestHelper with Mock
 
 }
 
-class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with MockitoSugar {
+class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
     "microservice.services.feature-toggle.amendments" -> false,
@@ -583,7 +583,7 @@ class AddPersonControllerWithoutAmendmentSpec extends GenericTestHelper with Moc
   }
 }
 
-class AddPersonControllerWithoutAmendmentSpecRelease7 extends GenericTestHelper with MockitoSugar {
+class AddPersonControllerWithoutAmendmentSpecRelease7 extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
     "microservice.services.feature-toggle.amendments" -> false,

@@ -32,7 +32,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -42,7 +42,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class PositionWithinBusinessControllerSpec extends GenericTestHelper with MockitoSugar with ResponsiblePersonGenerator {
+class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>

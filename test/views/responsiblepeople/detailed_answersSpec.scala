@@ -27,12 +27,12 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.prop.Tables.Table
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class detailed_answersSpec extends GenericTestHelper
+class detailed_answersSpec extends AmlsSpec
   with TableDrivenPropertyChecks
   with HtmlAssertions
   with MustMatchers

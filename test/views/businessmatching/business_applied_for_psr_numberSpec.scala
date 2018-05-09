@@ -19,14 +19,14 @@ package views.businessmatching
 import forms.{InvalidForm, ValidForm, Form2}
 import models.businessmatching.{BusinessAppliedForPSRNumberYes, BusinessAppliedForPSRNumber}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMatchers  {
+class business_applied_for_psr_numberSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

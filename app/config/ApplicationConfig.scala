@@ -16,6 +16,7 @@
 
 package config
 
+import config.ApplicationConfig.getConfBool
 import javax.inject.Inject
 
 import config.ApplicationConfig.baseUrl
@@ -123,6 +124,10 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def authUrl = config.baseUrl("auth")
 
   def enrolmentStoreUrl = config.baseUrl("enrolment-store-proxy")
+
+  def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
+
+  def enrolmentStubsUrl = config.baseUrl("enrolment-stubs")
 
   def feePaymentUrl = s"$amlsUrl/amls/payment"
 

@@ -31,11 +31,11 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class CountryOfBirthControllerSpec extends GenericTestHelper with MockitoSugar with NinoUtil {
+class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil {
 
   val RecordId = 1
 

@@ -20,10 +20,10 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class withdrawal_reasonSpec extends GenericTestHelper with MustMatchers  {
+class withdrawal_reasonSpec extends AmlsSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

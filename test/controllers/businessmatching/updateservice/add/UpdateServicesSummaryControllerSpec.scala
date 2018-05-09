@@ -37,12 +37,12 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.TradingPremisesService
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UpdateServicesSummaryControllerSpec extends GenericTestHelper
+class UpdateServicesSummaryControllerSpec extends AmlsSpec
   with MockitoSugar
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {

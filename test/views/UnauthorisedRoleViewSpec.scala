@@ -17,9 +17,9 @@
 package views
 
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class UnauthorisedRoleViewSpec extends GenericTestHelper with MustMatchers {
+class UnauthorisedRoleViewSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

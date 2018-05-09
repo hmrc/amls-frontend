@@ -23,12 +23,12 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.businessmatching.ServiceFlow
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import models.businessmatching.HighValueDealing
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsControllerSpec extends GenericTestHelper with MockitoSugar {
+class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)

@@ -22,7 +22,7 @@ import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionDecisi
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import scala.concurrent.Future
 
-class TransactionsInNext12MonthsControllerSpec extends GenericTestHelper with MockitoSugar  {
+class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)

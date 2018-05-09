@@ -36,14 +36,14 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-class ProgressServiceSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

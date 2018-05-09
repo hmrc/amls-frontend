@@ -20,10 +20,10 @@ import forms.EmptyForm
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{DateHelper, GenericTestHelper}
+import utils.{DateHelper, AmlsSpec}
 import views.Fixture
 
-class status_supervisedSpec extends GenericTestHelper with MustMatchers {
+class status_supervisedSpec extends AmlsSpec with MustMatchers {
 
   val activities = Set {
     "Money Service Business activities"

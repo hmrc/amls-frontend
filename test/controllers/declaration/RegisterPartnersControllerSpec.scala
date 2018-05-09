@@ -27,7 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeApplication
 import services.{ProgressService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
 import play.api.inject.bind
 import play.api.test.Helpers._
 import org.mockito.Mockito._
@@ -38,7 +38,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import scala.concurrent.Future
 
 
-class RegisterPartnersControllerSpec extends GenericTestHelper with MockitoSugar {
+class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 

@@ -21,12 +21,12 @@ import models.businessactivities.{BusinessActivities, DigitalSpreadsheet, Paper,
 import org.jsoup.Jsoup
 import play.api.test.Helpers._
 import org.scalatest.MustMatchers
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import org.mockito.ArgumentCaptor
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
 
-class TransactionTypesControllerSpec extends GenericTestHelper
+class TransactionTypesControllerSpec extends AmlsSpec
   with MustMatchers
   with BusinessActivitiesGenerator {
 

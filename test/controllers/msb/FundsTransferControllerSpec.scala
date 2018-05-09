@@ -25,14 +25,14 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class FundsTransferControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

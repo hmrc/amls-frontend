@@ -25,7 +25,7 @@ import services._
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.{ChangeServicesRouter, DavesVariationAddServiceRouter, VariationAddServiceRouter, VariationRemoveServiceRouter}
-import uk.gov.hmrc.http.HttpPost
+import uk.gov.hmrc.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 
@@ -34,6 +34,7 @@ class Module extends AbstractModule {
   type HmrcAuthConnector = uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
   override def configure() = {
+    bind(classOf[HttpGet]).toInstance(WSHttp)
     bind(classOf[HttpPost]).toInstance(WSHttp)
     bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)

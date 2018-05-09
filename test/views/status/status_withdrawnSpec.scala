@@ -19,10 +19,10 @@ package views.status
 import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class status_withdrawnSpec extends GenericTestHelper with MustMatchers {
+class status_withdrawnSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

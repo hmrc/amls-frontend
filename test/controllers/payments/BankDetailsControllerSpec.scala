@@ -23,17 +23,16 @@ import models.status.SubmissionReadyForReview
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator{
+class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture { self =>
 

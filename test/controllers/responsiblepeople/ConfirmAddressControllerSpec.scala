@@ -29,12 +29,12 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ConfirmAddressControllerSpec extends GenericTestHelper with MockitoSugar {
+class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

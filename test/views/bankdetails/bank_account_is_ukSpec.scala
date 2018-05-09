@@ -19,14 +19,14 @@ package views.bankdetails
 import forms.{Form2, InvalidForm, ValidForm}
 import models.bankdetails.{Account, NonUKAccountNumber}
 import org.scalatest.MustMatchers
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
 import views.Fixture
 
-class bank_account_is_ukSpec extends GenericTestHelper with MustMatchers {
+class bank_account_is_ukSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

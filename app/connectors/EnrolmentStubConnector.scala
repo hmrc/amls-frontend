@@ -14,11 +14,23 @@
  * limitations under the License.
  */
 
-package utils
+package connectors
 
+import config.AppConfig
+import javax.inject.Inject
+import models.enrolment.GovernmentGatewayEnrolment
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks
+class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
+
+  lazy val baseUrl = config.enrolmentStubsUrl
+
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
+    val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
+    http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
+  }
+
+}

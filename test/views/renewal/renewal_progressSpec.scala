@@ -21,10 +21,10 @@ import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.Strings.TextHelpers
-import utils.{DateHelper, GenericTestHelper}
+import utils.{DateHelper, AmlsSpec}
 import views.Fixture
 
-class renewal_progressSpec extends GenericTestHelper with MustMatchers{
+class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

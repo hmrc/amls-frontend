@@ -42,7 +42,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
@@ -59,7 +59,7 @@ import services.AuthService
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
+class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
@@ -289,7 +289,7 @@ class LandingControllerWithoutAmendmentsSpec extends GenericTestHelper with Mock
   }
 }
 
-class LandingControllerWithAmendmentsSpec extends GenericTestHelper with MockitoSugar with MustMatchers {
+class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers {
 
   val businessCustomerUrl = "TestUrl"
 

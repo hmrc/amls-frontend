@@ -34,13 +34,12 @@ import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 //noinspection ScalaStyle
-class UpdateServiceHelperSpec extends GenericTestHelper
-  with MustMatchers
+class UpdateServiceHelperSpec extends AmlsSpec
   with BusinessActivitiesGenerator
   with ResponsiblePersonGenerator
   with FutureAssertions {

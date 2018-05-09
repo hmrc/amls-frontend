@@ -30,12 +30,12 @@ import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
 import uk.gov.hmrc.http.{HttpResponse, Upstream5xxResponse}
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 import views.ParagraphHelpers
 
 import scala.concurrent.Future
 
-class SubmissionControllerSpec extends GenericTestHelper with ScalaFutures with AmlsReferenceNumberGenerator {
+class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsReferenceNumberGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import models.tradingpremises.TradingPremises
 import org.scalatest.prop.PropertyChecks
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import utils.AuthorisedFixture
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
@@ -32,7 +32,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import scala.concurrent.Future
 
 
-class TradingPremisesAddControllerSpec extends GenericTestHelper with PropertyChecks with TradingPremisesGenerator{
+class TradingPremisesAddControllerSpec extends AmlsSpec with PropertyChecks with TradingPremisesGenerator{
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

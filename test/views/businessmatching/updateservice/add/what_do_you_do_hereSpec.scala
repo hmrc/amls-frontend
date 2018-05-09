@@ -35,14 +35,13 @@ package views.businessmatching.updateservice.add
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
 
-class what_do_you_do_hereSpec extends GenericTestHelper with MustMatchers {
+class what_do_you_do_hereSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

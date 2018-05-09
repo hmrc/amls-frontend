@@ -23,10 +23,10 @@ import models.DateOfChange
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
 import play.api.libs.json._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
 
-class BusinessActivitiesSpec extends GenericTestHelper with MockitoSugar {
+class BusinessActivitiesSpec extends AmlsSpec with MockitoSugar {
   import jto.validation.forms.Rules._
 
   "The BusinessActivities model" must {

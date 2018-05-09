@@ -38,12 +38,12 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RegisterServicesControllerSpec extends GenericTestHelper
+class RegisterServicesControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with PrivateMethodTester
