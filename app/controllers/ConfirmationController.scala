@@ -166,7 +166,7 @@ class ConfirmationController @Inject()(
           if (isRenewalDefined) {
             Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
           } else {
-            Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+            Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, fees.differenceOrTotalAmount, rows, controllers.payments.routes.WaysToPayController.get().url)).some
           }
         case _ => None
       }
@@ -177,12 +177,9 @@ class ConfirmationController @Inject()(
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     breakdownRows map {
       case Some(rows) =>
-        val amount = fees.difference.fold(fees.totalFees) {
-          case d if d > 0 => d
-          case _ => fees.totalFees
-        }
+        val amount = fees.differenceOrTotalAmount
 
-        Ok(confirm_amendvariation(fees.paymentReference, Currency(amount), rows, controllers.payments.routes.WaysToPayController.get().url)).some
+        Ok(confirm_amendvariation(fees.paymentReference, Currency(fees.totalFees), amount, rows, controllers.payments.routes.WaysToPayController.get().url)).some
       case _ => None
     }
   }

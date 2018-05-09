@@ -33,8 +33,8 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
     override def view = views.html.confirmation.confirm_amendvariation(
       Some(paymentReferenceNumber),
       Currency(100),
+      Currency(150),
       Seq.empty,
-      Some(Currency(150)),
       continueHref
     )
   }

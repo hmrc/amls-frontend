@@ -23,7 +23,7 @@ import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, Previo
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
-import models.payments.PaymentStatuses.{Cancelled, Failed}
+import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.renewal.{InvolvedInOtherNo, Renewal}
@@ -31,10 +31,8 @@ import models.status._
 import models.{status => _, _}
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -45,31 +43,31 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
-import utils.{AmlsRefNumberBroker, AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
-  val paymentsConnector = mock[PayApiConnector]
-  val mockAmlsConnector = mock[AmlsConnector]
-  val paymentsService = new PaymentsService(mockAmlsConnector, paymentsConnector, mock[ConfirmationService], mock[StatusService])
 
-  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-    .disable[com.kenshoo.play.metrics.PlayModule]
-    .bindings(bindModules: _*).in(Mode.Test)
-    .bindings(bind[PayApiConnector].to(paymentsConnector))
-    .bindings(bind[PaymentsService].to(paymentsService))
-    .bindings(bind[ConfirmationService].to(mock[ConfirmationService]))
-    .build()
-
+//  implicit override lazy val app: Application = new GuiceApplicationBuilder()
+//    .disable[com.kenshoo.play.metrics.PlayModule]
+//    .bindings(bindModules: _*).in(Mode.Test)
+//    .bindings(bind[PayApiConnector].to(paymentsConnector))
+//    .bindings(bind[PaymentsService].to(paymentsService))
+//    .bindings(bind[ConfirmationService].to(mock[ConfirmationService]))
+//    .build()
+//
   trait Fixture extends AuthorisedFixture {
     self =>
 
     implicit val authContext = mock[AuthContext]
     implicit val executionContext = mock[ExecutionContext]
     implicit val headerCarrier = HeaderCarrier()
+
+    val paymentsConnector = mock[PayApiConnector]
+    val mockAmlsConnector = mock[AmlsConnector]
+    val paymentsService = new PaymentsService(mockAmlsConnector, paymentsConnector, mock[ConfirmationService], mock[StatusService])
 
     val baseUrl = "http://localhost"
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
@@ -172,8 +170,6 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
       controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
     } thenReturn Future.successful(Some(aboutTheBusiness))
 
-
-
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
     def setupBusinessMatching(companyName: String) = {
@@ -244,10 +240,9 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         "has no difference, but has a total fee value" in new Fixture {
           setupStatus(SubmissionDecisionApproved)
 
-          // scalastyle:off magic.number
           when {
-            controller.submissionResponseService.getSubmissionData(eqTo(SubmissionDecisionApproved))(any(), any(), any())
-          } thenReturn Future.successful(Some(SubmissionData(paymentRefGen.sample, Currency.fromInt(100), Seq.empty, None, None)))
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
 
           val result = controller.get()(request)
           status(result) mustBe OK

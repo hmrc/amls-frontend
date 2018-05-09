@@ -17,10 +17,10 @@
 package services
 
 import javax.inject.Inject
-
 import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
+import models.status.RenewalSubmitted
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 

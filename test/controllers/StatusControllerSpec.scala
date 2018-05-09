@@ -17,7 +17,6 @@
 package controllers
 
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
@@ -31,7 +30,6 @@ import models.withdrawal.WithdrawalStatus
 import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -44,10 +42,9 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import scala.collection.JavaConverters._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
@@ -69,7 +66,8 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mock[AmlsConnector],
        mockCacheConnector,
        mock[AuthenticatorConnector],
-       self.authConnector
+       self.authConnector,
+       mock[FeeResponseService]
     )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
@@ -769,7 +767,8 @@ class StatusControllerWithoutReregisterSpec extends AmlsSpec with MockitoSugar w
       mock[AmlsConnector],
       mockCacheConnector,
       mock[AuthenticatorConnector],
-      self.authConnector
+      self.authConnector,
+      mock[FeeResponseService]
     )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))

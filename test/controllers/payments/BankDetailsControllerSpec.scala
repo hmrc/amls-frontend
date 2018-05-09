@@ -19,22 +19,22 @@ package controllers.payments
 import generators.PaymentGenerator
 import models.FeeResponse
 import models.ResponseType.SubscriptionResponseType
-import models.status.SubmissionReadyForReview
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, FeeResponseService}
+import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -45,7 +45,8 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
     val controller = new BankDetailsController(
       authConnector = self.authConnector,
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      feeResponseService = mock[FeeResponseService]
+      feeResponseService = mock[FeeResponseService],
+      statusService = mockStatusService
     )
 
   }
@@ -55,7 +56,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
     "get is called" must {
       "return OK with view" in new Fixture {
 
-        val submissionSatus = SubmissionReadyForReview
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         when {
           controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())

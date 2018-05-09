@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.BaseController
 import javax.inject.Inject
 import models.confirmation.Currency
-import models.status.SubmissionReady
+import models.status.{SubmissionReady, SubmissionReadyForReview}
 import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -45,7 +45,7 @@ class BankDetailsController @Inject()(
           fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
           paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
-          val amount = if (status == SubmissionReady) Currency(fees.totalFees) else Currency(fees.difference.getOrElse(fees.totalFees))
+          val amount = fees.differenceOrTotalAmount
           Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }
