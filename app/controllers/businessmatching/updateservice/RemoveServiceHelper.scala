@@ -17,15 +17,18 @@
 package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.businessmatching._
+import models.businessmatching.{MoneyServiceBusiness, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
 import models.flowmanagement.RemoveServiceFlowModel
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
+
+import scala.concurrent.ExecutionContext.Implicits.global
 
 @Singleton
 class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
@@ -33,8 +36,23 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
                                    ) {
 
 
-  def removeBusinessActivities(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessMatching] = {
-  ???
-  }
+  def removeBusinessMatchingBusinessActivities(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
 
+    for {
+      activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
+      currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some[Future, BMBusinessActivities](BMBusinessActivities(Set.empty[BMBusinessActivity]))
+
+      newBusinessMatching <- {
+
+        OptionT(dataCacheConnector.update[BMBusinessMatching](BMBusinessMatching.key) {
+          case Some(bm) if activitiesToRemove.contains(MoneyServiceBusiness)  =>
+            bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities - MoneyServiceBusiness))
+              .copy(hasAccepted = true)
+          }
+        )
+      }
+    } yield newBusinessMatching
+
+  }
 }
