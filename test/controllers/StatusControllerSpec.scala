@@ -183,31 +183,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
     "show correct content" when {
 
-      "the application status is Ready For Review, and the user has elected to pay by BACS" in new Fixture {
-        val paymentRef = paymentRefGen.sample.get
-        val payment = paymentGen.sample.get.copy(isBacs = Some(true))
-
-        when(controller.landingService.cacheMap(any(), any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(controller.statusService.getDetailedStatus(any(), any(), any()))
-          .thenReturn(Future.successful((SubmissionReadyForReview, None)))
-
-        when(controller.amlsConnector.getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(payment)))
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        verify(controller.amlsConnector).getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any())
-
-        contentAsString(result) must include(Messages("status.submissionreadyforreview.bacs"))
-      }
-
-      "application status is NotCompleted" in new Fixture {
+     "application status is NotCompleted" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -228,8 +204,31 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
       }
 
       "application status is SubmissionReadyForReview" when {
-        "there is no ReadStatusResponse" in new Fixture {
+        "there is a fee response available" in new Fixture {
+          val paymentRef = paymentRefGen.sample.get
+          val payment = paymentGen.sample.get.copy(isBacs = Some(true))
 
+          when(controller.landingService.cacheMap(any(), any(), any()))
+            .thenReturn(Future.successful(Some(cacheMap)))
+
+          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
+
+          when(controller.statusService.getDetailedStatus(any(), any(), any()))
+            .thenReturn(Future.successful((SubmissionReadyForReview, None)))
+
+          when(controller.amlsConnector.getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(payment)))
+
+          val result = controller.get()(request)
+          status(result) must be(OK)
+
+          verify(controller.amlsConnector).getPaymentByAmlsReference(eqTo(amlsRegistrationNumber))(any(), any(), any())
+
+          contentAsString(result) must include(Messages("status.submissionreadyforreview.description"))
+        }
+
+        "there is no ReadStatusResponse" in new Fixture {
           when(controller.landingService.cacheMap(any(), any(), any()))
             .thenReturn(Future.successful(Some(cacheMap)))
 
@@ -245,35 +244,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
           val result = controller.get()(request)
           status(result) must be(OK)
 
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.heading"))
-        }
-
-        "there is ReadStatusResponse data" in new Fixture {
-
-          when(controller.landingService.cacheMap(any(), any(), any()))
-            .thenReturn(Future.successful(Some(cacheMap)))
-
-          when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-            .thenReturn(Future.successful(None))
-
-          private val readStatusResponse = Some(ReadStatusResponse(
-            LocalDateTime.now,
-            "formBundleStatus",
-            None, None, None,
-            Some(LocalDate.now.plusDays(15)),
-            true, None, None, None
-          ))
-
-          when(controller.statusService.getDetailedStatus(any(), any(), any()))
-            .thenReturn(Future.successful((SubmissionReadyForReview, readStatusResponse)))
-
-          val result = controller.get()(request)
-          status(result) must be(OK)
-
-          contentAsString(result) must include(Messages("status.submissionreadyforreview.heading"))
+          contentAsString(result) must include(Messages("status.submissionreadyforreview.nofee.description"))
         }
       }
 
