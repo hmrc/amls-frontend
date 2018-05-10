@@ -20,19 +20,23 @@
 @import models.FeeResponse
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@(feeResponse: Option[FeeResponse], showBacsInfo: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @getHelpForm = {
     @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
 }
 
-@if(showBacsInfo) {
-    <p>@Messages("status.submissionreadyforreview.bacs")</p>
-} else {
-    <p>@Messages("status.submissionreadyforreview.description")</p>
-}
 
-<p>@Messages("status.submissionreadyforreview.description2")</p>
+<p>@Messages("status.submissionreadyforreview.description") @Messages("status.submissionreadyforreview.description.link")  @Messages("status.submissionreadyforreview.description.2") </p>
+<p>@Messages("status.submissionreadyforreview.description.3")</p>
+
+<h1>No fees....</h1>
+<p>@Messages("status.submissionreadyforreview.description") @Messages("status.submissionreadyforreview.description.link")  @Messages("status.submissionreadyforreview.description.2") </p>
+<p>@Messages("status.submissionreadyforreview.description.3")</p>
+
+
+
+
 
 @detailsSummary(summary = Messages("status.submissionreadyforreview.duplicate.link")) {
     @feeResponse match {

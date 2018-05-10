@@ -146,13 +146,12 @@ class StatusController @Inject()(val landingService: LandingService,
             Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
-      case _ => isBacsPayment.value map { maybeBacs =>
-        Ok(status_submitted(mlrRegNumber.getOrElse(""),
+      case _ =>
+        Future.successful(
+          Ok(status_submitted(mlrRegNumber.getOrElse(""),
           businessNameOption,
           feeResponse,
-          fromDuplicateSubmission,
-          showBacsContent = maybeBacs.getOrElse(false)))
-      }
+          fromDuplicateSubmission)))
     }
   }
 

@@ -24,8 +24,7 @@
 @(regNo: String,
         businessName: Option[String],
         feeResponse: Option[FeeResponse],
-        fromDuplicateSubmission: Boolean = false,
-        showBacsContent: Boolean = false)(implicit request: Request[_],m:Messages)
+        fromDuplicateSubmission: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @main2(title = Messages("status.submissionreadyforreview.heading") + " - Your registration", showURRBanner = true) {
 
@@ -81,7 +80,7 @@
             </ol>
         </div>
         <div class="grid-layout__column grid-layout__column--2-3">
-                @include.status.rightpanel_submissionreadyforreview(feeResponse, showBacsContent)
+                @include.status.rightpanel_submissionreadyforreview(feeResponse)
         </div>
     </div>
 
