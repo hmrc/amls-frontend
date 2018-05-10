@@ -116,7 +116,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
             val currentMsbServices = currentBusinessMatching.msbServices.getOrElse(BusinessMatchingMsbServices(Set.empty))
             val newPsrNumber = model.businessAppliedForPSRNumber
             bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities + newActivity))
-              .msbServices(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices))
+              .msbServices(Some(currentMsbServices.copy(msbServices = currentMsbServices.msbServices ++ newMsbServices.msbServices)))
               .businessAppliedForPSRNumber(newPsrNumber)
               .copy(hasAccepted = true)
           case Some(bm) => {
