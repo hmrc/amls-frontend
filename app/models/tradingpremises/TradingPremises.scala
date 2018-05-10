@@ -69,6 +69,10 @@ case class TradingPremises(
     this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
       hasAccepted = hasAccepted && this.msbServices.contains(p))
 
+  def msbServices(o: Option[TradingPremisesMsbServices]): models.tradingpremises.TradingPremises =
+    this.copy(msbServices = o, hasChanged = hasChanged || this.msbServices != o,
+      hasAccepted = hasAccepted && this.msbServices == o)
+
   def registeringAgentPremises(p: RegisteringAgentPremises): TradingPremises =
     this.copy(registeringAgentPremises = Some(p), hasChanged =
       hasChanged || !this.registeringAgentPremises.contains(p),
@@ -83,9 +87,9 @@ case class TradingPremises(
     }
 
   def label: Option[String] = {
-   this.yourTradingPremises.map{ tradingpremises =>
-     (Seq(tradingpremises.tradingName) ++ tradingpremises.tradingPremisesAddress.toLines).mkString(", ")
-   }
+    this.yourTradingPremises.map { tradingpremises =>
+      (Seq(tradingpremises.tradingName) ++ tradingpremises.tradingPremisesAddress.toLines).mkString(", ")
+    }
   }
 }
 
@@ -97,7 +101,9 @@ object TradingPremises {
 
   implicit val formatOption = Reads.optionWithNull[Seq[TradingPremises]]
 
-  def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists { _.hasChanged }
+  def anyChanged(newModel: Seq[TradingPremises]): Boolean = newModel exists {
+    _.hasChanged
+  }
 
   def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
 
@@ -186,4 +192,5 @@ object TradingPremises {
       case _ => false
     }
   }
+
 }

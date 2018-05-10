@@ -16,26 +16,14 @@
 
 package controllers.businessmatching.updateservice
 
-import cats.data.OptionT
-import cats.implicits._
-import generators.ResponsiblePersonGenerator
-import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveServiceFlowModel
-import org.scalatest.MustMatchers
-import services.{ResponsiblePeopleService, TradingPremisesService}
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo, CurrencyExchange}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
-
-import scala.concurrent.Future
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-//noinspection ScalaStyle
-class RemoveServiceHelperSpec extends GenericTestHelper
-  with MustMatchers
-  with BusinessActivitiesGenerator
-  with ResponsiblePersonGenerator
-  with FutureAssertions {
+class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
 
 
   val MSBOnlyModel = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
@@ -43,62 +31,138 @@ class RemoveServiceHelperSpec extends GenericTestHelper
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
-    val SUT = new RemoveServiceHelper(
+    val helper = new RemoveServiceHelper(
       self.authConnector,
       mockCacheConnector
     )
   }
 
-  "The removeBusinessMatchingBusinessActivities method" must {
+  "removing BusinessMatching business types" when {
 
-    "remove the BusinessMatching Business Activity MSB (Type) " when {
-      "MSB is not the only Activity in the list of existing activities" in new Fixture {
-        val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
+    "there is more than one business type" when {
 
-        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
-          hasAccepted = true,
-          hasChanged = true)
+      "removing an MSB" should {
 
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
-          hasAccepted = true,
-          hasChanged = true)
+        "remove the BusinessMatching Business Activity MSB (Type)" in new Fixture {
 
-        mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))),
-          Some(BusinessMatching.key))
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
+            hasAccepted = true,
+            hasChanged = true)
 
-        SUT.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+
+        "remove the BusinessMatching MSB Services" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            msbServices = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+
+        "remove the BusinessMatching PSR" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            businessAppliedForPSRNumber = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
       }
     }
-
-    "the BusinessMatching MSB services be removed" in {
-
-    }
-
-    "the BusinessMatching PSR must be removed" in {
-
-    }
-
-    "the TradingPremises Business.Activity must be removed" in {
-
-    }
-
-    "the TradingPremises MSBServices must be removed" in {
-
-    }
-
-    "the MSB Section Data must be removed" in {
-
-    }
-
-    "All the appropriate data has been removed" in {
-
-    }
-
-
   }
 
+  "removing TradingPremises business types" when {
+
+    "there is more than one business type" when {
+
+      "removing an MSB" should {
+
+        "remove the TradingPremises Business Activity MSB (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultMatching),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultMatching)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultMatching)
+        }
+
+        "remove the TradingPremises MSB Services" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+            msbServices = Some(TradingPremisesMsbServices(Set(CurrencyExchange))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            msbServices = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultMatching),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultMatching)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+    }
+  }
 
 }
+
+
