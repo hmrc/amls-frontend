@@ -36,11 +36,11 @@ import play.api.test.Helpers.{status, _}
 import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
 
 import scala.concurrent.Future
 
-class RemoveResponsiblePersonControllerSpec extends GenericTestHelper
+class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks with NinoUtil with ResponsiblePersonGenerator {
 
   trait Fixture extends AuthorisedFixture {

@@ -23,10 +23,10 @@ import models.ResponseType.SubscriptionResponseType
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.{DateHelper, GenericTestHelper}
+import utils.{DateHelper, AmlsSpec}
 import views.Fixture
 
-class status_submittedSpec extends GenericTestHelper with MustMatchers with AmlsReferenceNumberGenerator{
+class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReferenceNumberGenerator{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

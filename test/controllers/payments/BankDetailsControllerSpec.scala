@@ -27,11 +27,11 @@ import play.api.test.Helpers._
 import services.{StatusService, SubmissionResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BankDetailsControllerSpec extends PlaySpec with GenericTestHelper with PaymentGenerator{
+class BankDetailsControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator{
 
   trait Fixture extends AuthorisedFixture { self =>
 

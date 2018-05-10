@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness.ContactingYouPhone
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class contacting_you_phoneSpec extends GenericTestHelper with MustMatchers  {
+class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -22,11 +22,11 @@ import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_fit_and_properSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator {
+class which_fit_and_properSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator{
 
   val rp = responsiblePersonGen.sample.get
 

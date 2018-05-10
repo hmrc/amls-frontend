@@ -26,9 +26,9 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
 
-class PremisesRegisteredControllerSpec extends GenericTestHelper with MockitoSugar {
+class PremisesRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

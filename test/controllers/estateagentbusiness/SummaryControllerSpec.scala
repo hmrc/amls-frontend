@@ -23,7 +23,7 @@ import models.tcsp.Tcsp
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -32,7 +32,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

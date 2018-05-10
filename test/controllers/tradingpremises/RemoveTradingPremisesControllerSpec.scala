@@ -26,7 +26,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
@@ -36,7 +36,7 @@ import utils.{AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
-class RemoveTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar {
+class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

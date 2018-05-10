@@ -18,10 +18,10 @@ package views.confirmation
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class NoFeeConfirmationViewSpec extends GenericTestHelper with MustMatchers {
+class NoFeeConfirmationViewSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

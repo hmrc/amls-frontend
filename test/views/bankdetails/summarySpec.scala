@@ -24,12 +24,12 @@ import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.{GenericTestHelper, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-class summarySpec extends GenericTestHelper with MustMatchers with PropertyChecks with HtmlAssertions {
+class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

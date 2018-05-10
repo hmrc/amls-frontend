@@ -29,11 +29,11 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class FurtherUpdatesControllerSpec extends GenericTestHelper with MockitoSugar with PrivateMethodTester {
+class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with PrivateMethodTester {
 
   trait TestFixture extends AuthorisedFixture {
     self =>

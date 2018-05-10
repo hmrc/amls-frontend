@@ -18,9 +18,9 @@ package models.businessmatching.updateservice
 
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class ChangeServicesSpec extends GenericTestHelper {
+class ChangeServicesSpec extends AmlsSpec {
   "The ChangeServices model" when {
 
     "given a valid form" when {

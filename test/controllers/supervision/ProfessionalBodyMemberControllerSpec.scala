@@ -23,9 +23,9 @@ import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => eqTo, _}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class ProfessionalBodyMemberControllerSpec extends GenericTestHelper with MockitoSugar {
+class ProfessionalBodyMemberControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {self =>
     val request = addToken(authRequest)

@@ -22,10 +22,10 @@ import models.bankdetails.{Account, NonUKAccountNumber}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class bank_account_nameSpec extends GenericTestHelper with MustMatchers {
+class bank_account_nameSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

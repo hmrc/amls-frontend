@@ -19,14 +19,14 @@ package views.aboutthebusiness
 import forms.{Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{ContactingYou, ContactingYouEmail}
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class contacting_youSpec extends GenericTestHelper with MustMatchers  {
+class contacting_youSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

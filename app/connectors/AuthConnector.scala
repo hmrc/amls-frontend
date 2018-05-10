@@ -60,9 +60,9 @@ class AuthConnector @Inject()(val http: WSHttp, config: AppConfig) {
 
   private lazy val authUrl = config.authUrl
 
-  def enrollments(uri: String)(implicit
-                               headerCarrier: HeaderCarrier,
-                               ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
+  def enrolments(uri: String)(implicit
+                              headerCarrier: HeaderCarrier,
+                              ec: ExecutionContext): Future[List[GovernmentGatewayEnrolment]] = {
 
     http.GET[List[GovernmentGatewayEnrolment]](authUrl + uri)
   }

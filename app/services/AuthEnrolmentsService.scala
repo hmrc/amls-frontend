@@ -16,9 +16,9 @@
 
 package services
 
+import config.AppConfig
 import javax.inject.Inject
-
-import connectors.{AuthConnector, EnrolmentStoreConnector}
+import connectors.{AuthConnector, EnrolmentStoreConnector, EnrolmentStubConnector}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -26,40 +26,52 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector, val enrolmentStore: EnrolmentStoreConnector) {
+class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
+                                      val enrolmentStore: EnrolmentStoreConnector,
+                                      val config: AppConfig,
+                                      val stubConnector: EnrolmentStubConnector) {
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
 
   def amlsRegistrationNumber(implicit authContext: AuthContext,
-                                          headerCarrier: HeaderCarrier,
-                                          ec: ExecutionContext): Future[Option[String]] = {
+                             headerCarrier: HeaderCarrier,
+                             ec: ExecutionContext): Future[Option[String]] = {
 
-    authContext.enrolmentsUri match {
-      case Some(uri) =>
+    val authEnrolments = authContext.enrolmentsUri map { uri =>
+      authConnector.enrolments(uri)
+    } getOrElse Future.successful(Seq.empty)
 
-        val enrolments = authConnector.enrollments(uri)
+    lazy val stubbedEnrolments = if (config.enrolmentStubsEnabled) {
+      authConnector.userDetails flatMap { details =>
+        stubConnector.enrolments(details.groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
+      }
+    } else {
+      Future.successful(Seq.empty)
+    }
 
-        enrolments map {
-          enrolmentsList => {
-            for {
-              amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
-              amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
-            } yield {
-              val prefix = "[AuthEnrolmentsService][amlsRegistrationNumber]"
-              Logger.debug(s"$prefix : ${amlsIdentifier.value}")
-              amlsIdentifier.value
-            }
-          }
-        }
-      case None => Future.successful(None)
+    val enrolmentQuery = authEnrolments flatMap {
+      case enrolments if enrolments.count(_.key == amlsKey) > 0 => Future.successful(enrolments)
+      case _ => stubbedEnrolments
+    }
+
+    enrolmentQuery map { enrolmentsList =>
+      for {
+        amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
+        amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
+      } yield {
+        val prefix = "[AuthEnrolmentsService][amlsRegistrationNumber]"
+        Logger.debug(s"$prefix : ${amlsIdentifier.value}")
+        amlsIdentifier.value
+      }
     }
   }
 
   def enrol(amlsRegistrationNumber: String, postcode: String)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
-    authConnector.getCurrentAuthority flatMap { authority =>
-      enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
+    authConnector.getCurrentAuthority flatMap {
+      authority =>
+        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
     }
   }
 

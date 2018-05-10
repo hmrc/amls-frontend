@@ -30,7 +30,7 @@ import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -42,7 +42,7 @@ import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
 
-class NewOfficerControllerSpec extends GenericTestHelper with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
+class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)

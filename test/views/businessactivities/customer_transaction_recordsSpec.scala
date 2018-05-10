@@ -20,11 +20,11 @@ import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import utils.BooleanFormReadWrite._
 
-class customer_transaction_recordsSpec extends GenericTestHelper with MustMatchers {
+class customer_transaction_recordsSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -22,11 +22,11 @@ import models.aboutthebusiness.ActivityStartDate
 import org.joda.time.LocalDate
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class activity_start_dateSpec extends GenericTestHelper with MustMatchers {
+class activity_start_dateSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }

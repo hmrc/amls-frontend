@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class country_of_birthSpec extends GenericTestHelper with MustMatchers {
+class country_of_birthSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

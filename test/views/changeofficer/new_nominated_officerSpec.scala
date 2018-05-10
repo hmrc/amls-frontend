@@ -20,12 +20,12 @@ import forms.EmptyForm
 import generators.ResponsiblePersonGenerator
 import org.scalacheck.Gen
 import org.scalatest.{MustMatchers}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class new_nominated_officerSpec extends GenericTestHelper with MustMatchers with ResponsiblePersonGenerator {
+class new_nominated_officerSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

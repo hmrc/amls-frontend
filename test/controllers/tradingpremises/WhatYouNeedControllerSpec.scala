@@ -23,14 +23,14 @@ import org.jsoup.Jsoup
 import org.scalatest.mock.MockitoSugar
 import org.mockito.Mockito._
 import org.mockito.Matchers._
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhatYouNeedControllerSpec extends GenericTestHelper with MockitoSugar {
+class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
 

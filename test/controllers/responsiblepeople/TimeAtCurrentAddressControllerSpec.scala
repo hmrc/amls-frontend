@@ -28,7 +28,7 @@ import org.jsoup.select.Elements
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 
@@ -40,7 +40,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class TimeAtCurrentAddressControllerSpec extends GenericTestHelper with MockitoSugar {
+class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val RecordId = 1

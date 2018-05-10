@@ -17,12 +17,12 @@
 package views.declaration
 
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class declaration_Spec extends GenericTestHelper with MustMatchers  {
+class declaration_Spec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

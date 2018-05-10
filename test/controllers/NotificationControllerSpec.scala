@@ -41,12 +41,12 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class NotificationControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
+class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
   val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
 

@@ -27,11 +27,11 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class WithdrawalReasonControllerSpec extends GenericTestHelper with OneAppPerSuite {
+class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
   trait TestFixture extends AuthorisedFixture with DependencyMocks {
     self =>

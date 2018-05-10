@@ -20,10 +20,10 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class type_of_bankSpec extends PlaySpec with GenericTestHelper{
+class type_of_bankSpec extends PlaySpec with AmlsSpec{
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -22,11 +22,11 @@ import models.aboutthebusiness.{VATRegistered, VATRegisteredYes}
 import models.changeofficer.StillEmployed
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class remove_responsible_personSpec extends GenericTestHelper with MustMatchers  {
+class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

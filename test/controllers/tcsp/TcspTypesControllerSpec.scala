@@ -24,14 +24,14 @@ import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class TcspTypesControllerSpec extends GenericTestHelper with MockitoSugar {
+class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

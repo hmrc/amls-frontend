@@ -23,7 +23,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,7 +34,7 @@ import models.businessmatching.{BusinessActivities => BusinessMatchingActivities
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class RegisteringAgentPremisesControllerSpec extends GenericTestHelper with MockitoSugar {
+class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

@@ -18,10 +18,10 @@ package views.businessactivities
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class what_you_needSpec extends GenericTestHelper with MustMatchers {
+class what_you_needSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

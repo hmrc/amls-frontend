@@ -30,11 +30,11 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, GenericTestHelper}
+import utils.{AuthorisedFixture, DateHelper, AmlsSpec}
 
 import scala.concurrent.Future
 
-class WithdrawApplicationControllerSpec extends GenericTestHelper with OneAppPerSuite {
+class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
 
   trait TestFixture extends AuthorisedFixture {
     self =>

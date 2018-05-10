@@ -24,7 +24,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -34,7 +34,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class ExpectedBusinessTurnoverControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

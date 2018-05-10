@@ -20,13 +20,13 @@ import forms.{Form2, InvalidForm, ValidForm}
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
-class experience_trainingSpec extends GenericTestHelper with MustMatchers  {
+class experience_trainingSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

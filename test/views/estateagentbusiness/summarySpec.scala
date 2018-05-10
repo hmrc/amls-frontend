@@ -19,11 +19,11 @@ package views.estateagentbusiness
 import forms.EmptyForm
 import models.estateagentbusiness._
 import org.scalatest.MustMatchers
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
-class summarySpec extends GenericTestHelper with MustMatchers  {
+class summarySpec extends AmlsSpec with MustMatchers  {
 
   trait TestFixture extends Fixture {
       implicit val requestWithToken = addToken(request)

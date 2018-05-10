@@ -21,9 +21,9 @@ import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class WhatYouNeeControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

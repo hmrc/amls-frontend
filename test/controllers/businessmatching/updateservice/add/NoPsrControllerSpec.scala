@@ -18,18 +18,17 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import controllers.businessmatching.updateservice.UpdateServiceHelper
-import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
+import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
-import org.mockito.Matchers.any
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class NoPsrControllerSpec extends GenericTestHelper with ScalaFutures {
+class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

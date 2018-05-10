@@ -19,10 +19,10 @@ package views.confirmation
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class PaymentFailureViewSpec extends GenericTestHelper with MustMatchers {
+class PaymentFailureViewSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

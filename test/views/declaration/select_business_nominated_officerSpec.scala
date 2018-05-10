@@ -22,10 +22,10 @@ import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.{PersonName, ResponsiblePeople}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class select_business_nominated_officerSpec extends GenericTestHelper with MustMatchers {
+class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

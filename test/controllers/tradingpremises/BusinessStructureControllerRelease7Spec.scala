@@ -25,7 +25,7 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.FakeApplication
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,7 +35,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class BusinessStructureControllerRelease7Spec extends GenericTestHelper with ScalaFutures with MockitoSugar {
+class BusinessStructureControllerRelease7Spec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 

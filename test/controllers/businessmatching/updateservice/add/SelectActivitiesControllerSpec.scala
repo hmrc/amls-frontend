@@ -29,12 +29,12 @@ import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SelectActivitiesControllerSpec extends GenericTestHelper {
+class SelectActivitiesControllerSpec extends AmlsSpec {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks with ResponsiblePersonGenerator {
     self =>

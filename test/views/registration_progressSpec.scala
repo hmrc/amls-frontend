@@ -21,10 +21,10 @@ import models.registrationprogress.{Completed, Section}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import generators.businesscustomer.AddressGenerator
 
-class registration_progressSpec extends GenericTestHelper with MockitoSugar with AddressGenerator {
+class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
