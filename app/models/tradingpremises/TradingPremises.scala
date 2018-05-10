@@ -65,10 +65,6 @@ case class TradingPremises(
     this.copy(whatDoesYourBusinessDoAtThisAddress = Some(p), hasChanged = hasChanged || !this.whatDoesYourBusinessDoAtThisAddress.contains(p),
       hasAccepted = hasAccepted && this.whatDoesYourBusinessDoAtThisAddress.contains(p))
 
-  def msbServices(p: TradingPremisesMsbServices): models.tradingpremises.TradingPremises =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p),
-      hasAccepted = hasAccepted && this.msbServices.contains(p))
-
   def msbServices(o: Option[TradingPremisesMsbServices]): models.tradingpremises.TradingPremises =
     this.copy(msbServices = o, hasChanged = hasChanged || this.msbServices != o,
       hasAccepted = hasAccepted && this.msbServices == o)
