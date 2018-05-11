@@ -121,6 +121,30 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions wi
           helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
         }
       }
+
+//      "removing EAB" should {
+//
+//        "remove the BusinessMatching Business Activity EAB (Type)" in new Fixture {
+//
+//          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
+//
+//          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))),
+//            hasAccepted = true,
+//            hasChanged = true)
+//
+//          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+//            hasAccepted = true,
+//            hasChanged = true)
+//
+//          mockCacheFetch[BusinessMatching](
+//            Some(startResultMatching),
+//            Some(BusinessMatching.key))
+//
+//          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+//
+//          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+//        }
+//      }
     }
   }
 
