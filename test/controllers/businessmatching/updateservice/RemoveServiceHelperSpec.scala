@@ -23,7 +23,7 @@ import models.flowmanagement.RemoveServiceFlowModel
 import models.moneyservicebusiness.{BusinessUseAnIPSP, ExpectedThroughput}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import utils._
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -33,7 +33,7 @@ import org.scalatest.mock.MockitoSugar
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions with MockitoSugar with ScalaFutures {
+class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
 
   val MSBOnlyModel = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
