@@ -38,11 +38,11 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class FeeGuidanceControllerSpec extends GenericTestHelper
+class FeeGuidanceControllerSpec extends AmlsSpec
   with MockitoSugar
   with PrivateMethodTester
   with ServicesConfig

@@ -30,11 +30,11 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class NewHomeAddressControllerSpec extends GenericTestHelper with MockitoSugar {
+class NewHomeAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   val RecordId = 1
 

@@ -19,12 +19,12 @@ package views.businessactivities
 import forms.{InvalidForm, EmptyForm}
 import jto.validation.{Path, ValidationError}
 import org.scalatest.{MustMatchers}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class identify_suspicious_activitySpec extends GenericTestHelper with MustMatchers {
+class identify_suspicious_activitySpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

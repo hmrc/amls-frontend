@@ -18,9 +18,9 @@ package models.businessmatching.updateservice
 
 import models.businessmatching.HighValueDealing
 import play.api.libs.json.{JsSuccess, Json}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class UpdateServiceSpec extends GenericTestHelper{
+class UpdateServiceSpec extends AmlsSpec{
 
   val json = Json.obj(
     "areNewActivitiesAtTradingPremises" -> Json.toJson(NewActivitiesAtTradingPremisesNo),

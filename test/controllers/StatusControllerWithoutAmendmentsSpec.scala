@@ -16,12 +16,11 @@
 
 package controllers
 
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, AuthenticatorConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
-import models.withdrawal.WithdrawalStatus
 import models.{Country, FeeResponse}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -32,10 +31,10 @@ import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
-class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with MockitoSugar {
+class StatusControllerWithoutAmendmentsSpec extends AmlsSpec {
 
   val cacheMap = mock[CacheMap]
 
@@ -54,7 +53,6 @@ class StatusControllerWithoutAmendmentsSpec extends GenericTestHelper with Mocki
       self.authConnector
     )
 
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())), Some(ResponsiblePeople.key))
   }
 

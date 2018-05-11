@@ -24,10 +24,10 @@ import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class remove_agent_premises_reasonsSpec extends GenericTestHelper {
+class remove_agent_premises_reasonsSpec extends AmlsSpec {
 
   import models.tradingpremises.RemovalReasonConstants._
 

@@ -25,18 +25,16 @@ import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubServicesControllerSpec extends GenericTestHelper with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

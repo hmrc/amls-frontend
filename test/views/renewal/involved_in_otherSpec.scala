@@ -19,14 +19,14 @@ package views.renewal
 import forms.{InvalidForm, ValidForm, Form2}
 import models.renewal.{InvolvedInOtherNo, InvolvedInOther}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class involved_in_otherSpec extends GenericTestHelper with MustMatchers {
+class involved_in_otherSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

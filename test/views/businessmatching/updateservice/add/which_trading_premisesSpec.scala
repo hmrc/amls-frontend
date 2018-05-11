@@ -20,13 +20,12 @@ import forms.{EmptyForm, InvalidForm}
 import generators.tradingpremises.TradingPremisesGenerator
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessActivities, HighValueDealing}
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class which_trading_premisesSpec extends GenericTestHelper with MustMatchers with TradingPremisesGenerator {
+class which_trading_premisesSpec extends AmlsSpec with TradingPremisesGenerator {
 
   val tp = tradingPremisesGen.sample.get
 

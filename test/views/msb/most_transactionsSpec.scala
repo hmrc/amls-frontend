@@ -22,11 +22,11 @@ import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, MostTransactions}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class most_transactionsSpec extends GenericTestHelper with MustMatchers {
+class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

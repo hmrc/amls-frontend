@@ -22,10 +22,10 @@ import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremise
 import org.joda.time.LocalDate
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
-import utils.{GenericTestHelper, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import views.Fixture
 
-sealed trait ViewTestHelper extends GenericTestHelper {
+sealed trait ViewTestHelper extends AmlsSpec {
   val tradingPremises = Seq(TradingPremises(
     registeringAgentPremises = Some(RegisteringAgentPremises(true)),
     status = Some(StatusConstants.Added),

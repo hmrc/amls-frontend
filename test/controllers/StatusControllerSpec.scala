@@ -17,7 +17,6 @@
 package controllers
 
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
@@ -27,11 +26,9 @@ import models.registrationdetails.RegistrationDetails
 import models.renewal._
 import models.responsiblepeople.{PersonName, _}
 import models.status._
-import models.withdrawal.WithdrawalStatus
 import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Element
 import org.mockito.Matchers
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -44,13 +41,12 @@ import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
-import scala.collection.JavaConverters._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
-class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 
@@ -81,7 +77,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
   }
 
@@ -429,37 +424,6 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-      }
-
-      "application status is not SubmissionWithdrawn, but has WithdrawalStatus data" in new Fixture {
-        when(controller.landingService.cacheMap(any(), any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
-
-        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
-          .thenReturn(Future.successful(Some("amlsRegNo")))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
-        when(controller.statusService.getDetailedStatus(any(), any(), any()))
-          .thenReturn(Future.successful((SubmissionDecisionApproved, None)))
-
-        when(controller.feeConnector.feeResponse(any())(any(), any(), any(), any()))
-          .thenReturn(Future.successful(feeResponse))
-
-        mockCacheFetch[WithdrawalStatus](Some(WithdrawalStatus(withdrawn = true)), Some(WithdrawalStatus.key))(controller.dataCache)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-        contentAsString(result) must include(Messages("status.submissiondecisionwithdrawn.status"))
       }
 
       "application status is DeRegistered" in new Fixture {
@@ -824,7 +788,7 @@ class StatusControllerSpec extends GenericTestHelper with MockitoSugar with OneA
   }
 }
 
-class StatusControllerWithoutReregisterSpec extends GenericTestHelper with MockitoSugar with OneAppPerSuite with PaymentGenerator {
+class StatusControllerWithoutReregisterSpec extends AmlsSpec with MockitoSugar with OneAppPerSuite with PaymentGenerator {
 
   val cacheMap = mock[CacheMap]
 
@@ -858,7 +822,6 @@ class StatusControllerWithoutReregisterSpec extends GenericTestHelper with Mocki
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
   }
 

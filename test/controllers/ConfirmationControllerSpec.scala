@@ -46,12 +46,12 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
+import utils.{AmlsRefNumberBroker, AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationControllerSpec extends GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
+class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   val paymentsConnector = mock[PayApiConnector]
   val mockAmlsConnector = mock[AmlsConnector]

@@ -28,10 +28,10 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import services.TradingPremisesService
-import utils.{DependencyMocks, FutureAssertions, GenericTestHelper, StatusConstants}
+import utils.{DependencyMocks, FutureAssertions, AmlsSpec, StatusConstants}
 
 class TradingPremisesServiceSpec extends PlaySpec
-  with GenericTestHelper
+  with AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with FutureAssertions

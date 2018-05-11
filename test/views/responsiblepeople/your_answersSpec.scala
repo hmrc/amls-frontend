@@ -20,11 +20,11 @@ import forms.EmptyForm
 import models.responsiblepeople.ResponsiblePeople
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class your_answersSpec extends GenericTestHelper with MustMatchers {
+class your_answersSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

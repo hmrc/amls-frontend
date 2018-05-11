@@ -30,12 +30,12 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class PersonNonUKPassportControllerSpec extends GenericTestHelper with MockitoSugar {
+class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self =>

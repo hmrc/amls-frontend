@@ -19,21 +19,18 @@ package views.businessmatching.updateservice.add
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-
-class business_applied_for_psr_numberSpec extends GenericTestHelper with MustMatchers {
+class business_applied_for_psr_numberSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
     def view = business_applied_for_psr_number(EmptyForm, edit = false)
   }
-
 
   "The business_applied_for_psr_number view" must {
 

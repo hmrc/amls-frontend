@@ -22,11 +22,11 @@ import models.renewal.TotalThroughput
 import org.jsoup.nodes.Document
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.renewal.total_throughput
 
-class total_throughputSpec extends GenericTestHelper with MustMatchers {
+class total_throughputSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

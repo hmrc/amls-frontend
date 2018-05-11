@@ -23,14 +23,14 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class YourAnswersControllerSpec extends GenericTestHelper with MockitoSugar {
+class YourAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
     trait Fixture extends AuthorisedFixture {
       self => val request = addToken(authRequest)

@@ -25,7 +25,6 @@ import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseTy
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
-import models.withdrawal.WithdrawalStatus
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request, Result}
@@ -60,14 +59,10 @@ class StatusController @Inject()(val landingService: LandingService,
           statusResponse <- Future(statusInfo._2)
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-          withdrawalStatus <- dataCache.fetch[WithdrawalStatus](WithdrawalStatus.key)
           responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
           bm <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
           maybeActivities <- Future(bm.activities)
-          page <- if (withdrawalStatus.contains(WithdrawalStatus(true))) {
-            Future.successful(getDecisionPage(mlrRegNumber, (SubmissionWithdrawn, None), maybeBusinessName, responsiblePeople, maybeActivities))
-          } else {
-            getPageBasedOnStatus(
+          page <- getPageBasedOnStatus(
               mlrRegNumber,
               statusInfo,
               maybeBusinessName,
@@ -76,12 +71,7 @@ class StatusController @Inject()(val landingService: LandingService,
               responsiblePeople,
               maybeActivities
             )
-          }
         } yield page
-  }
-
-  def withdraw = Authorised.async {
-    implicit authContext => implicit request => ???
   }
 
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,

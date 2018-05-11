@@ -27,9 +27,9 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
-class SendTheLargestAmountsOfMoneyControllerSpec extends GenericTestHelper with MockitoSugar with PatienceConfiguration with IntegrationPatience {
+class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)

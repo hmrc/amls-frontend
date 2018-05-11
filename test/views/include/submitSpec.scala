@@ -25,11 +25,11 @@ import org.jsoup.select.Elements
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.include.forms2._
 
-class submitSpec extends GenericTestHelper with MustMatchers {
+class submitSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }

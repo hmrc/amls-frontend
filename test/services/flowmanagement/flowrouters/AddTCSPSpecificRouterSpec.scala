@@ -28,12 +28,12 @@ import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.DependencyMocks
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AddTCSPSpecificRouterSpec extends PlaySpec {
+class AddTCSPSpecificRouterSpec extends AmlsSpec {
 
   val model = AddServiceFlowModel(activity = Some(TrustAndCompanyServices))
 

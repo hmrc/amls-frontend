@@ -28,7 +28,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsRefNumberBroker, AuthorisedFixture, GenericTestHelper}
+import utils.{AmlsRefNumberBroker, AuthorisedFixture, AmlsSpec}
 import models.ReadStatusResponse
 import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, UpdateBacsRequest, WaysToPay}
 import models.ReturnLocation
@@ -38,7 +38,7 @@ import cats.implicits._
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with GenericTestHelper with AmlsReferenceNumberGenerator with PaymentGenerator {
+class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>

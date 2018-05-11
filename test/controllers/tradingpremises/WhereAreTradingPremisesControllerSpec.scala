@@ -29,7 +29,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 
 import scala.collection.JavaConversions._
@@ -43,7 +43,7 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class WhereAreTradingPremisesControllerSpec extends GenericTestHelper with MockitoSugar with BeforeAndAfter {
+class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter {
 
   private val mockDataCacheConnector = mock[DataCacheConnector]
 

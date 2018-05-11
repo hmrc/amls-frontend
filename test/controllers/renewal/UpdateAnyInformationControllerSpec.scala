@@ -25,11 +25,11 @@ import play.api.test.Helpers._
 import services.{ProgressService, RenewalService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class UpdateAnyInformationControllerSpec extends GenericTestHelper {
+class UpdateAnyInformationControllerSpec extends AmlsSpec {
 
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(self.authRequest)

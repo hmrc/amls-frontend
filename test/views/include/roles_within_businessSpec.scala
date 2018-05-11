@@ -23,9 +23,9 @@ import org.jsoup.nodes.{Document, Element}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.twirl.api.HtmlFormat
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class roles_within_businessSpec extends GenericTestHelper with MustMatchers {
+class roles_within_businessSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture {
 

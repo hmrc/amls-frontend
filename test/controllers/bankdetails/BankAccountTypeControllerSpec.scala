@@ -25,7 +25,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.matchers.Matcher
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, StatusConstants}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -37,7 +37,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-class BankAccountTypeControllerSpec extends GenericTestHelper with MockitoSugar {
+class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

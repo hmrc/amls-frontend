@@ -18,10 +18,10 @@ package views.notifications
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class no_longer_minded_to_revokeSpec extends GenericTestHelper with MustMatchers {
+class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 

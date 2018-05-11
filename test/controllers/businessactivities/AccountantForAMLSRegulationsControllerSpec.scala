@@ -23,7 +23,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -32,7 +32,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 
 
-class AccountantForAMLSRegulationsControllerSpec extends GenericTestHelper with MockitoSugar {
+class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

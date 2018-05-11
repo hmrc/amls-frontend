@@ -19,10 +19,10 @@ package views.withdrawal
 import org.joda.time.LocalDateTime
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import utils.{DateHelper, GenericTestHelper}
+import utils.{DateHelper, AmlsSpec}
 import views.Fixture
 
-class withdraw_applicationSpec extends GenericTestHelper with MockitoSugar {
+class withdraw_applicationSpec extends AmlsSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

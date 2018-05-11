@@ -22,7 +22,7 @@ import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito._
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -37,7 +37,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class AgentCompanyNameControllerSpec extends GenericTestHelper with OneAppPerSuite with MockitoSugar with ScalaFutures {
+class AgentCompanyNameControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

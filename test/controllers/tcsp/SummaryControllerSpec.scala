@@ -24,11 +24,11 @@ import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class SummaryControllerSpec extends GenericTestHelper {
+class SummaryControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 

@@ -22,9 +22,9 @@ import models.registrationprogress.{Completed, Section}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class fee_guidanceSpec extends GenericTestHelper with MockitoSugar {
+class fee_guidanceSpec extends AmlsSpec with MockitoSugar {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

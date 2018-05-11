@@ -17,13 +17,12 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class cannot_add_servicesSpec extends GenericTestHelper with MustMatchers {
+class cannot_add_servicesSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

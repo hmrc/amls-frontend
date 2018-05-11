@@ -19,14 +19,14 @@ package views.hvd
 import forms.{InvalidForm, ValidForm, Form2}
 import models.hvd.{OtherMotorVehicles, Cars, Products}
 import org.scalatest.{MustMatchers}
-import  utils.GenericTestHelper
+import  utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class productsSpec extends GenericTestHelper with MustMatchers  {
+class productsSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

@@ -20,10 +20,10 @@ import forms.EmptyForm
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.mvc.Call
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class status_not_submittedSpec extends GenericTestHelper with MustMatchers {
+class status_not_submittedSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

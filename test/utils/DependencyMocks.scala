@@ -21,7 +21,4 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.ExecutionContext
 
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks {
-  implicit val mockAuthContext = mock[AuthContext]
-  implicit val headerCarrier = HeaderCarrier()
-}
+trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks

@@ -22,7 +22,7 @@ import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, any}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -30,7 +30,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-class TransactionRecordControllerSpec extends GenericTestHelper with MockitoSugar {
+class TransactionRecordControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>

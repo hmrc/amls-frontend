@@ -21,10 +21,10 @@ import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessType
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
-class position_within_businessSpec extends GenericTestHelper with MustMatchers {
+class position_within_businessSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

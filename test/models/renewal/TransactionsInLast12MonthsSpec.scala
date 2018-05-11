@@ -19,9 +19,9 @@ package models.renewal
 import cats.implicits._
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import play.api.libs.json.Json
-import utils.GenericTestHelper
+import utils.AmlsSpec
 
-class TransactionsInLast12MonthsSpec extends GenericTestHelper {
+class TransactionsInLast12MonthsSpec extends AmlsSpec {
 
   "The form serialiser returns the correct model" when {
 

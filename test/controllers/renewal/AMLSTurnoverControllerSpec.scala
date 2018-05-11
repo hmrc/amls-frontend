@@ -30,11 +30,11 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, GenericTestHelper}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
-class AMLSTurnoverControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

@@ -24,12 +24,12 @@ import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.twirl.api.HtmlFormat
-import utils.{DateHelper, GenericTestHelper}
+import utils.{DateHelper, AmlsSpec}
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
 
-sealed trait TestHelper extends GenericTestHelper {
+sealed trait TestHelper extends AmlsSpec {
 
   val ytp = YourTradingPremises(
     "foo",

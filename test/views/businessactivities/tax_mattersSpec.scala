@@ -19,14 +19,14 @@ package views.businessactivities
 import forms.{InvalidForm, ValidForm, Form2}
 import models.businessactivities.TaxMatters
 import org.scalatest.{MustMatchers}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class tax_mattersSpec extends GenericTestHelper with MustMatchers {
+class tax_mattersSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

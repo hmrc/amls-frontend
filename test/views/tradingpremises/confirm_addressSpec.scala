@@ -22,11 +22,11 @@ import models.Country
 import models.businesscustomer.Address
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class confirm_addressSpec extends GenericTestHelper with MustMatchers {
+class confirm_addressSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

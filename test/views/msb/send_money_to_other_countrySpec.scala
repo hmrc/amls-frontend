@@ -22,11 +22,11 @@ import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, SendMoneyToOtherCountry}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 
 
-class send_money_to_other_countrySpec extends GenericTestHelper with MustMatchers {
+class send_money_to_other_countrySpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

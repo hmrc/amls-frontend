@@ -27,7 +27,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper, ServiceFlowMocks}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, ServiceFlowMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.StatusService
@@ -40,7 +40,7 @@ import services.businessmatching.ServiceFlow
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class SummaryControllerSpec extends GenericTestHelper with MockitoSugar with ScalaFutures {
+class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with ServiceFlowMocks { self =>
     val request = addToken(authRequest)

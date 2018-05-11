@@ -14,24 +14,23 @@
  * limitations under the License.
  */
 
-package models.withdrawal
+package connectors
 
-import org.scalatest.MustMatchers
-import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.Json
+import config.AppConfig
+import javax.inject.Inject
+import models.enrolment.GovernmentGatewayEnrolment
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-class WithdrawalStatusSpec extends PlaySpec with MustMatchers {
-  "The model" must {
-    "serialize to json" in {
-      val model = WithdrawalStatus(withdrawn = true)
+import scala.concurrent.ExecutionContext
 
-      Json.toJson(model) mustBe Json.obj("withdrawn" -> true)
-    }
+class EnrolmentStubConnector @Inject()(http: HttpGet, config: AppConfig) {
 
-    "deserialize from json" in {
-      val json = Json.obj("withdrawn" -> false)
+  lazy val baseUrl = config.enrolmentStubsUrl
 
-      Json.fromJson[WithdrawalStatus](json).asOpt mustBe Some(WithdrawalStatus(withdrawn = false))
-    }
+  def enrolments(groupId: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext) = {
+    val requestUrl = s"$baseUrl/auth/oid/$groupId/enrolments"
+    http.GET[Seq[GovernmentGatewayEnrolment]](requestUrl)
   }
+
 }

@@ -31,11 +31,11 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, GenericTestHelper}
+import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class BusinessAppliedForPSRNumberControllerSpec extends GenericTestHelper
+class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with BusinessMatchingGenerator {

@@ -24,16 +24,15 @@ import models.businessmatching.{BillPaymentServices, BusinessActivity, HighValue
 import models.flowmanagement._
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.DependencyMocks
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VariationAddServiceRouterSpec extends PlaySpec {
+class VariationAddServiceRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
     val businessMatchingService = mock[BusinessMatchingService]

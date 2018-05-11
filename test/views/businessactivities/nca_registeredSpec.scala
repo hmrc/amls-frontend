@@ -20,12 +20,12 @@ import forms.{InvalidForm, EmptyForm}
 import jto.validation.{ValidationError, Path}
 import models.businessactivities.NCARegistered
 import org.scalatest.{MustMatchers}
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
 
-class nca_registeredSpec extends GenericTestHelper with MustMatchers {
+class nca_registeredSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

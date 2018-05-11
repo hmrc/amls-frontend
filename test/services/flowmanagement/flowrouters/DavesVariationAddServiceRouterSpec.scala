@@ -29,12 +29,12 @@ import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.pagerouters._
-import utils.DependencyMocks
+import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DavesVariationAddServiceRouterSpec extends PlaySpec {
+class DavesVariationAddServiceRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 

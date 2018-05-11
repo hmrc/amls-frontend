@@ -32,7 +32,7 @@ import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfter
 import org.scalatest.mock.MockitoSugar
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -42,7 +42,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class WhatDoesYourBusinessDoControllerSpec extends GenericTestHelper with MockitoSugar with BeforeAndAfter {
+class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar with BeforeAndAfter {
 
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockCacheMap = mock[CacheMap]

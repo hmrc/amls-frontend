@@ -21,11 +21,11 @@ import jto.validation.{Path, ValidationError}
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessActivities, MoneyServiceBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
 
-class select_activitiesSpec extends GenericTestHelper with MustMatchers {
+class select_activitiesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

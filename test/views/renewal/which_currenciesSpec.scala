@@ -22,12 +22,12 @@ import models.renewal.WhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
-import utils.GenericTestHelper
+import utils.AmlsSpec
 import views.Fixture
 import views.html.renewal.which_currencies
 
 
-class which_currenciesSpec extends GenericTestHelper with MustMatchers {
+class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)

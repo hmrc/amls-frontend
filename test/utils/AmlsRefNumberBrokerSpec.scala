@@ -35,7 +35,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustMatchers with MockitoSugar with PaymentGenerator with ScalaFutures {
+class AmlsRefNumberBrokerSpec extends PlaySpec with AmlsSpec with PaymentGenerator with ScalaFutures {
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]
@@ -44,15 +44,10 @@ class AmlsRefNumberBrokerSpec extends PlaySpec with GenericTestHelper with MustM
     .build()
 
   trait Fixture {
-
-    implicit val hc = HeaderCarrier()
-    implicit val authContext = mock[AuthContext]
-
     val broker = new AmlsRefNumberBroker (
       mock[StatusService],
       mock[AuthEnrolmentsService]
     )
-
   }
 
   "The AMLS Reference number broker" must {

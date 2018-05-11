@@ -61,12 +61,17 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
     val connector = new EnrolmentStoreConnector(http, appConfig, authConnector, auditConnector)
     val baseUrl = "http://enrolment-store:3001"
+    val serviceStub = "enrolment-store-proxy"
     val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
     when {
       appConfig.enrolmentStoreUrl
     } thenReturn baseUrl
+
+    when {
+      appConfig.enrolmentStubsUrl
+    } thenReturn serviceStub
 
     when {
       authConnector.userDetails(any(), any(), any())
@@ -81,7 +86,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
-        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
@@ -130,7 +135,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
         val authority = mock[Authority]
-        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())
@@ -161,7 +166,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES7 API endpoint" in new Fixture {
 
-        val endpointUrl = s"$baseUrl/enrolment-store-proxy/enrolment-store/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())
