@@ -59,7 +59,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
             } yield {
                 if (msbServices.size == 1) {
                   updateDataStrict[TradingPremises](index) { utp =>
-                    Some(utp.msbServices(TradingPremisesMsbServices(msbServices)))
+                    Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                   }
                   Redirect(routes.PremisesRegisteredController.get(index))
                 } else {
@@ -111,7 +111,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
           for {
             tradingPremises <- getData[TradingPremises](index)
             _ <- updateDataStrict[TradingPremises](index) { tp =>
-              tp.msbServices(data)
+              tp.msbServices(Some(data))
             }
             status <- statusService.getStatus
           } yield redirectBasedOnStatus(status, tradingPremises, data, edit, changed, index)

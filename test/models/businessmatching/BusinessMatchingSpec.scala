@@ -326,7 +326,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
 
         val tests = Seq[(BusinessMatching => BusinessMatching, String)](
           (_.activities(BusinessActivities(Set(MoneyServiceBusiness))), "activities"),
-          (_.msbServices(BusinessMatchingMsbServices(Set(CurrencyExchange))), "msbServices"),
+          (_.msbServices(Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))), "msbServices"),
           (_.reviewDetails(reviewDetailsGen.sample.get), "reviewDetails"),
           (_.typeOfBusiness(TypeOfBusiness("type of business")), "typeOfBusiness"),
           (_.companyRegistrationNumber(CompanyRegistrationNumber("987654321")), "companyRegistrationNumber"),

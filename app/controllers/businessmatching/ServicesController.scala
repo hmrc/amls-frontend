@@ -64,8 +64,8 @@ trait ServicesController extends BaseController {
             lazy val updateModel = for {
               bm <- businessMatchingService.getModel
               cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
-                case true => bm.msbServices(data)
-                case false => bm.msbServices(data).clearPSRNumber
+                case true => bm.msbServices(Some(data))
+                case false => bm.msbServices(Some(data)).clearPSRNumber
               })
               _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield cache

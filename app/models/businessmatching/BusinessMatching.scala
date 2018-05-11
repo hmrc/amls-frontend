@@ -37,8 +37,8 @@ case class BusinessMatching(
   def activities(p: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p), hasAccepted = hasAccepted && this.activities.contains(p))
 
-  def msbServices(p: BusinessMatchingMsbServices): BusinessMatching =
-    this.copy(msbServices = Some(p), hasChanged = hasChanged || !this.msbServices.contains(p), hasAccepted = hasAccepted && this.msbServices.contains(p))
+  def msbServices(o: Option[BusinessMatchingMsbServices]): BusinessMatching =
+    this.copy(msbServices = o, hasChanged = hasChanged || this.msbServices != o, hasAccepted = hasAccepted && this.msbServices == o)
 
   def reviewDetails(p: ReviewDetails): BusinessMatching =
     this.copy(reviewDetails = Some(p), hasChanged = hasChanged || !this.reviewDetails.contains(p), hasAccepted = hasAccepted && this.reviewDetails.contains(p))
