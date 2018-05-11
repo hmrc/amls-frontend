@@ -36,7 +36,6 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.withdrawal.WithdrawalStatus
 import play.api.mvc.Request
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -167,7 +166,6 @@ trait LandingService {
     subscriptionResponse <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
     amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
     _ <- cacheConnector.remove(authContext.user.oid)
-    _ <- cacheConnector.save[WithdrawalStatus](WithdrawalStatus.key, withdrawalStatus getOrElse WithdrawalStatus(false))
     _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
     _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
     _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))

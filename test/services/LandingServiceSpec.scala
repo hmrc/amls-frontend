@@ -17,7 +17,7 @@
 package services
 
 import connectors._
-import models.aboutthebusiness.{AboutTheBusiness, ContactingYou, NonUKCorrespondenceAddress}
+import models.aboutthebusiness.{AboutTheBusiness, NonUKCorrespondenceAddress}
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.{CustomersOutsideUK => BACustomersOutsideUK, InvolvedInOtherYes => BAInvolvedInOtherYes, _}
@@ -26,7 +26,7 @@ import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
+import models.hvd.{Hvd, PaymentMethods, PercentageOfCashPaymentOver15000}
 import models.moneyservicebusiness.{MostTransactions => MsbMostTransactions, SendTheLargestAmountsOfMoney => MsbSendTheLargestAmountsOfMoney, WhichCurrencies => MsbWhichCurrencies, _}
 import models.renewal.{PaymentMethods => RPaymentMethods, PercentageOfCashPaymentOver15000 => RPercentageOfCashPaymentOver15000, ReceiveCashPayments => RReceiveCashPayments, _}
 import models.responsiblepeople.ResponsiblePeople
@@ -34,22 +34,21 @@ import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.withdrawal.WithdrawalStatus
-import models.{Country, ViewResponse}
+import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, ViewResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.http.Status.OK
 import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
-import play.api.http.Status.OK
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
 
@@ -245,17 +244,12 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
-      when {
-        TestLandingService.cacheConnector.fetch[WithdrawalStatus](eqTo(WithdrawalStatus.key))(any(), any(), any())
-      } thenReturn Future.successful(Some(WithdrawalStatus(true)))
-
       val user = mock[LoggedInUser]
 
       when(ac.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
 
-      setupCacheSave(TestLandingService.cacheConnector, cacheMap, WithdrawalStatus.key, Some(WithdrawalStatus(true)))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection.copy(hasAccepted = true))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
@@ -270,10 +264,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, SubscriptionResponse.key, Some(SubscriptionResponse("345678", "456789", None)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, AmendVariationRenewalResponse.key, Some(mock[AmendVariationRenewalResponse]))
 
       await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
     }
-
   }
 
   "refreshCache when status is renewalSubmitted" must {
