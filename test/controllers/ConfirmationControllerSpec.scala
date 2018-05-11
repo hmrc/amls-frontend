@@ -34,6 +34,7 @@ import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalacheck.Gen
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
@@ -49,6 +50,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
+// scalastyle:off magic.number
 class ConfirmationControllerSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with PaymentGenerator
@@ -210,8 +212,33 @@ class ConfirmationControllerSpec extends AmlsSpec
     }
 
     "notify the user that there is a fee" when {
-      "submitting an amendment" which {
-        "does not have a subscription response available for it" in new Fixture {
+      "submitting a new application" which {
+
+        "has response data" in new Fixture {
+          setupStatus(SubmissionReadyForReview)
+
+          val fees = feeResponse(SubscriptionResponseType)
+          val rows = Gen.listOfN(5, breakdownRowGen).sample
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          } thenReturn Future.successful(Some(fees))
+
+          when {
+            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+          } thenReturn Future.successful(rows)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.title must include(Messages("confirmation.header"))
+          contentAsString(result) must include(Messages("confirmation.submission.info"))
+          contentAsString(result) must include(Messages("confirmation.breakdown.details"))
+        }
+
+        "does not have response data" in new Fixture {
           setupStatus(SubmissionReadyForReview)
 
           val fees = feeResponse(SubscriptionResponseType)
