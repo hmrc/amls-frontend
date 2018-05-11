@@ -20,8 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{MoneyServiceBusiness, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
+import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
 import models.flowmanagement.RemoveServiceFlowModel
+import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -51,7 +52,8 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
               .msbServices(None)
               .businessAppliedForPSRNumber(None)
               .copy(hasAccepted = true)
-          }
+          case Some(bm) => bm
+        }
         )
       }
     } yield newBusinessMatching
@@ -65,17 +67,44 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
       currentTradingPremises <- OptionT(dataCacheConnector.fetch[TradingPremises](TradingPremises.key))
       currentActivities <- OptionT.fromOption[Future](currentTradingPremises.whatDoesYourBusinessDoAtThisAddress) orElse OptionT.some[Future, WhatDoesYourBusinessDo](WhatDoesYourBusinessDo(Set.empty[BMBusinessActivity]))
 
-      newBusinessMatching <- {
+      newTradingPremises <- {
 
         OptionT(dataCacheConnector.update[TradingPremises](TradingPremises.key) {
           case Some(tp) if activitiesToRemove.contains(MoneyServiceBusiness)  =>
             tp.whatDoesYourBusinessDoAtThisAddress(currentActivities.copy(activities = currentActivities.activities - MoneyServiceBusiness))
               .msbServices(None)
               .copy(hasAccepted = true)
+          case Some(tp) => tp
         }
         )
       }
-    } yield newBusinessMatching
+    } yield newTradingPremises
+
+  }
+
+  def removeFitAndProper(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, ResponsiblePeople] = {
+
+    for {
+      activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
+      currentResponsiblePeople <- OptionT(dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key))
+
+      currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some[Future, BMBusinessActivities](BMBusinessActivities(Set.empty[BMBusinessActivity]))
+
+
+      newResponsiblePeople <- {
+        val hasTCSP: Boolean = currentActivities.businessActivities.contains(TrustAndCompanyServices)
+
+        OptionT(dataCacheConnector.update[ResponsiblePeople](ResponsiblePeople.key) {
+          case Some(rp) if activitiesToRemove.contains(MoneyServiceBusiness) && !hasTCSP  =>
+            rp.hasAlreadyPassedFitAndProper(None)
+              .copy(hasAccepted = true)
+          case Some(rp) => rp
+        }
+
+        )
+      }
+    } yield newResponsiblePeople
 
   }
 }

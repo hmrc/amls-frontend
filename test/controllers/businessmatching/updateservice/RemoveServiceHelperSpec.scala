@@ -18,7 +18,8 @@ package controllers.businessmatching.updateservice
 
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveServiceFlowModel
-import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo, CurrencyExchange}
+import models.responsiblepeople.ResponsiblePeople
+import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -158,6 +159,73 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
           mockCacheUpdate(Some(TradingPremises.key), startResultMatching)
 
           helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+    }
+  }
+
+  "removing Responsible People types" when {
+
+    "there is more than one business type" when {
+
+      "removing an MSB" should {
+
+        "remove the ResponsiblePeople fit and proper if there is no TCSP" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          mockCacheFetch[ResponsiblePeople](
+            Some(startResultRP),
+            Some(ResponsiblePeople.key))
+
+          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+
+          val endResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          helper.removeFitAndProper(model).returnsSome(endResultRP)
+        }
+
+        "not remove the ResponsiblePeople fit and proper if there is TCSP" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          mockCacheFetch[ResponsiblePeople](
+            Some(startResultRP),
+            Some(ResponsiblePeople.key))
+
+          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+
+          helper.removeFitAndProper(model).returnsSome(startResultRP)
         }
       }
     }
