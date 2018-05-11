@@ -48,9 +48,9 @@ class ConfirmationService @Inject()(
    ac: AuthContext
   ): Future[Seq[BreakdownRow]] =
     cacheConnector.fetchAll flatMap {
-      option =>
+      maybeCache =>
         (for {
-          cache <- option
+          cache <- maybeCache
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
           people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
@@ -67,9 +67,9 @@ class ConfirmationService @Inject()(
    hc: HeaderCarrier,
    ac: AuthContext
   ): Future[Option[Seq[BreakdownRow]]] = {
-    cacheConnector.fetchAll flatMap { option =>
+    cacheConnector.fetchAll flatMap { maybeCache =>
       (for {
-        cache <- option
+        cache <- maybeCache
         amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
         people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
@@ -91,9 +91,9 @@ class ConfirmationService @Inject()(
    ac: AuthContext
   ): Future[Option[Seq[BreakdownRow]]] = {
     cacheConnector.fetchAll flatMap {
-      option =>
+      maybeCache =>
         (for {
-          cache <- option
+          cache <- maybeCache
           variationResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
@@ -112,9 +112,9 @@ class ConfirmationService @Inject()(
    ac: AuthContext
   ): Future[Option[Seq[BreakdownRow]]] = {
     cacheConnector.fetchAll flatMap {
-      option =>
+      maybeCache =>
         (for {
-          cache <- option
+          cache <- maybeCache
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
           Future.successful(Some(
@@ -130,7 +130,7 @@ class ConfirmationService @Inject()(
   def getBreakdownRows(status: SubmissionStatus, feeResponse: FeeResponse)
                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
     status match {
-      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment
+      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment.recover { case _ => None }
       case SubmissionDecisionApproved => getVariation
       case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined flatMap {
         case true => getRenewal

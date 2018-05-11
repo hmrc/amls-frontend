@@ -16,7 +16,7 @@
 
 package models
 
-import play.api.libs.json.Json
+import play.api.libs.json.{Json, Reads}
 
 case class AmendVariationRenewalResponse(
                                     processingDate: String,
@@ -54,6 +54,9 @@ case class AmendVariationRenewalResponse(
 object AmendVariationRenewalResponse {
 
   val key = "AmendVariationResponse"
+
   implicit val format = Json.format[AmendVariationRenewalResponse]
+  implicit val formatOption = Reads.optionWithNull[AmendVariationRenewalResponse]
+
 
 }

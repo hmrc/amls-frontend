@@ -190,7 +190,7 @@ class ConfirmationController @Inject()(
     OptionT.liftF(retrieveFeeResponse) flatMap {
       case Some(fees) if fees.paymentReference.isDefined =>
 
-        val breakdownRows = confirmationService.getBreakdownRows(status, fees)
+        lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
@@ -198,10 +198,9 @@ class ConfirmationController @Inject()(
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
             OptionT(showRenewalConfirmation(fees, breakdownRows, status))
           case _ =>
-            OptionT.liftF(breakdownRows map {
-              case Some(rows) =>
-                Ok(confirmation_new(fees.paymentReference, fees.totalFees, rows, controllers.payments.routes.WaysToPayController.get().url))
-            })
+            OptionT.liftF(breakdownRows) map { maybeRows =>
+              Ok(confirmation_new(fees.paymentReference, fees.totalFees, maybeRows, controllers.payments.routes.WaysToPayController.get().url))
+            }
         }
 
       case _ => for {

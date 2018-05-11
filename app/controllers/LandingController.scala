@@ -18,7 +18,7 @@ package controllers
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{ AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.aboutthebusiness.AboutTheBusiness
@@ -45,6 +45,8 @@ import services.AuthService
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.util.{Success, Try}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -143,14 +145,20 @@ class LandingController @Inject()(val landingService: LandingService,
 
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
-        val fromDuplicate = cacheMap match {
-          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
-            _.previouslySubmitted.contains(true)
+        Try {
+          val fromDuplicate = cacheMap match {
+            case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
+              _.previouslySubmitted.contains(true)
+            }
+            case _ => false
           }
-          case _ => false
-        }
 
-        Redirect(controllers.routes.StatusController.get(fromDuplicate))
+          Redirect(controllers.routes.StatusController.get(fromDuplicate))
+        }
+      } match {
+        case Success(r) => r
+        case _ => Redirect(controllers.routes.StatusController.get())
+
       }
     }
 

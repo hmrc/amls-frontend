@@ -32,7 +32,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
 
     val fee = 100
 
-    override def view = views.html.confirmation.confirmation_new(Some(paymentReferenceNumber), Currency(fee), Seq.empty, continueHref)
+    override def view = views.html.confirmation.confirmation_new(Some(paymentReferenceNumber), Currency(fee), None, continueHref)
   }
 
   "The amendment confirmation view" must {

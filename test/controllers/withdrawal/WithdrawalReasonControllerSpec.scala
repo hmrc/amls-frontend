@@ -17,17 +17,14 @@
 package controllers.withdrawal
 
 import cats.implicits._
-import connectors.{AmlsConnector, DataCacheConnector}
-import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason, WithdrawalStatus}
-import org.joda.time.LocalDate
+import connectors.AmlsConnector
+import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse, WithdrawalReason}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Prop.Exception
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
 import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
@@ -55,10 +52,7 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
     when {
       amlsConnector.withdraw(eqTo(amlsRegistrationNumber), any())(any(), any(), any())
     } thenReturn Future.successful(mock[WithdrawSubscriptionResponse])
-
-    mockCacheSave[WithdrawalStatus]
   }
-
 
   "WithdrawalReasonController" when {
 
@@ -123,18 +117,6 @@ class WithdrawalReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
             }
           }
         }
-
-        "save the withdrawal status to Save4Later" in new TestFixture {
-          val postRequest = request.withFormUrlEncodedBody(
-            "withdrawalReason" -> "01"
-          )
-
-          val result = controller.post()(postRequest)
-          status(result) mustBe SEE_OTHER
-
-          verify(mockCacheConnector).save[WithdrawalStatus](eqTo(WithdrawalStatus.key), eqTo(WithdrawalStatus(true)))(any(), any(), any())
-        }
-
       }
 
       "given invalid data" must {

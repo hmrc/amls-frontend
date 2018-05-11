@@ -26,7 +26,6 @@ import models.registrationdetails.RegistrationDetails
 import models.renewal._
 import models.responsiblepeople.{PersonName, _}
 import models.status._
-import models.withdrawal.WithdrawalStatus
 import models.{status => _, _}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
@@ -79,7 +78,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
 
     when(controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any()))
@@ -369,31 +367,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-      }
-
-      "application status is not SubmissionWithdrawn, but has WithdrawalStatus data" in new Fixture {
-        when(controller.landingService.cacheMap(any(), any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[BusinessMatching](Matchers.contains(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(Some(reviewDetails), None)))
-
-        when(cacheMap.getEntry[SubscriptionResponse](Matchers.contains(SubscriptionResponse.key))(any()))
-          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 0, None, None, 0, None, 0)))))
-
-        when(authConnector.currentAuthority(any(), any()))
-          .thenReturn(Future.successful(Some(authority.copy(enrolments = Some("bar")))))
-
-        when(controller.statusService.getDetailedStatus(any(), any(), any()))
-          .thenReturn(Future.successful((SubmissionDecisionApproved, None)))
-
-        mockCacheFetch[WithdrawalStatus](Some(WithdrawalStatus(withdrawn = true)), Some(WithdrawalStatus.key))(controller.dataCache)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-
-        contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
-        contentAsString(result) must include(Messages("status.submissiondecisionwithdrawn.status"))
       }
 
       "application status is DeRegistered" in new Fixture {
@@ -751,7 +724,6 @@ class StatusControllerWithoutReregisterSpec extends AmlsSpec with MockitoSugar w
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[WithdrawalStatus](None, Some(WithdrawalStatus.key))
     mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
   }
 
