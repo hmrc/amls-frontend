@@ -16,15 +16,24 @@
 
 package controllers.businessmatching.updateservice
 
+import cats.data.OptionT
+import cats.implicits._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveServiceFlowModel
+import models.moneyservicebusiness.{BusinessUseAnIPSP, ExpectedThroughput}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, GenericTestHelper}
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
 
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
-class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
+class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions with MockitoSugar with ScalaFutures {
 
 
   val MSBOnlyModel = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
@@ -69,7 +78,7 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+
             hasAccepted = true,
             hasChanged = true)
 
@@ -92,11 +101,13 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
             hasAccepted = true,
             hasChanged = true)
 
           val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            msbServices = None,
             businessAppliedForPSRNumber = None,
             hasAccepted = true,
             hasChanged = true)
@@ -122,43 +133,43 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
         "remove the TradingPremises Business Activity MSB (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
             hasAccepted = true,
             hasChanged = true)
 
-          val endResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
             hasChanged = true)
 
           mockCacheFetch[TradingPremises](
-            Some(startResultMatching),
+            Some(startResultTP),
             Some(TradingPremises.key))
 
-          mockCacheUpdate(Some(TradingPremises.key), startResultMatching)
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
         }
 
         "remove the TradingPremises MSB Services" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
             msbServices = Some(TradingPremisesMsbServices(Set(CurrencyExchange))),
             hasAccepted = true,
             hasChanged = true)
 
-          val endResultMatching = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             msbServices = None,
             hasAccepted = true,
             hasChanged = true)
 
           mockCacheFetch[TradingPremises](
-            Some(startResultMatching),
+            Some(startResultTP),
             Some(TradingPremises.key))
 
-          mockCacheUpdate(Some(TradingPremises.key), startResultMatching)
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
         }
       }
     }
@@ -230,7 +241,6 @@ class RemoveServiceHelperSpec extends GenericTestHelper with FutureAssertions {
       }
     }
   }
-
 }
 
 
