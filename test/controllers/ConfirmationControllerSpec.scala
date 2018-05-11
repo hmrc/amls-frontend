@@ -17,6 +17,7 @@
 package controllers
 
 import connectors._
+import generators.submission.SubscriptionResponseGenerator
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
@@ -45,30 +46,16 @@ import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
+class ConfirmationControllerSpec extends AmlsSpec
+  with AmlsReferenceNumberGenerator
+  with PaymentGenerator
+  with SubscriptionResponseGenerator {
 
-
-//  implicit override lazy val app: Application = new GuiceApplicationBuilder()
-//    .disable[com.kenshoo.play.metrics.PlayModule]
-//    .bindings(bindModules: _*).in(Mode.Test)
-//    .bindings(bind[PayApiConnector].to(paymentsConnector))
-//    .bindings(bind[PaymentsService].to(paymentsService))
-//    .bindings(bind[ConfirmationService].to(mock[ConfirmationService]))
-//    .build()
-//
   trait Fixture extends AuthorisedFixture {
     self =>
-
-    implicit val authContext = mock[AuthContext]
-    implicit val executionContext = mock[ExecutionContext]
-    implicit val headerCarrier = HeaderCarrier()
-
-    val paymentsConnector = mock[PayApiConnector]
-    val mockAmlsConnector = mock[AmlsConnector]
-    val paymentsService = new PaymentsService(mockAmlsConnector, paymentsConnector, mock[ConfirmationService], mock[StatusService])
-
     val baseUrl = "http://localhost"
     val request = addToken(authRequest).copyFakeRequest(uri = baseUrl)
 
@@ -77,35 +64,22 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
       authConnector = self.authConnector,
       statusService = mock[StatusService],
       dataCacheConnector = mock[DataCacheConnector],
-      amlsConnector = mockAmlsConnector,
+      amlsConnector = mock[AmlsConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
       authenticator = mock[AuthenticatorConnector],
-      paymentsConnector = paymentsConnector,
+      paymentsConnector = mock[PayApiConnector],
       confirmationService = mock[ConfirmationService],
-      paymentsService = paymentsService,
+      paymentsService = mock[PaymentsService],
       auditConnector = mock[AuditConnector]
     )
 
-    val response = SubscriptionResponse(
-      etmpFormBundleNumber = "",
-      amlsRefNo = amlsRegistrationNumber, Some(SubscriptionFees(
-        paymentReference = paymentReferenceNumber,
-        registrationFee = 0,
-        fpFee = None,
-        fpFeeRate = None,
-        premiseFee = 0,
-        premiseFeeRate = None,
-        totalFees = 0
-      ))
-    )
+    val response = subscriptionResponseGen(hasFees = true).sample.get
 
     protected val mockCacheMap = mock[CacheMap]
     val companyName = "My Test Company"
 
     setupBusinessMatching(companyName)
-
-    reset(paymentsConnector)
 
     when {
       controller.authenticator.refreshProfile(any(), any())
@@ -124,23 +98,23 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
     } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
     when {
-      paymentsConnector.createPayment(any())(any(), any())
+      controller.paymentsConnector.createPayment(any())(any(), any())
     } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
 
     when {
-      mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+      controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
     } thenReturn Future.successful(paymentStatusResultGen.sample.get.copy(currentStatus = PaymentStatuses.Successful))
 
     when {
-      mockAmlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
+      controller.amlsConnector.getPaymentByPaymentReference(any())(any(), any(), any())
     } thenReturn Future.successful(paymentGen.sample)
 
     when {
-      mockAmlsConnector.savePayment(any(), any(), any())(any(), any(), any())
+      controller.amlsConnector.savePayment(any(), any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(CREATED))
 
     when {
-      mockAmlsConnector.registrationDetails(any())(any(), any(), any())
+      controller.amlsConnector.registrationDetails(any())(any(), any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyName, isIndividual = false))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
@@ -167,7 +141,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
 
     val aboutTheBusiness = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
-      controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+      controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
     } thenReturn Future.successful(Some(aboutTheBusiness))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
@@ -236,6 +210,31 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
     }
 
     "notify the user that there is a fee" when {
+      "submitting an amendment" which {
+        "does not have a subscription response available for it" in new Fixture {
+          setupStatus(SubmissionReadyForReview)
+
+          val fees = feeResponse(SubscriptionResponseType)
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          } thenReturn Future.successful(Some(fees))
+
+          when {
+            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.title must include(Messages("confirmation.header"))
+          contentAsString(result) must include(Messages("confirmation.submission.info"))
+          contentAsString(result) must not include Messages("confirmation.breakdown.details")
+        }
+      }
+
       "submitting a variation" which {
         "has no difference, but has a total fee value" in new Fixture {
           setupStatus(SubmissionDecisionApproved)
@@ -295,29 +294,27 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
         contentAsString(result) must include(Messages("confirmation.no.fee"))
         contentAsString(result) must include(companyName)
-
       }
-
     }
 
     "allow a payment to be retried" in new Fixture {
-
-      val paymentsRedirectUrl = "/payments"
-      val amountInPence = 87654
+      val amountInPence = 8765
       val postData = "paymentRef" -> paymentReferenceNumber
       val payment = paymentGen.sample.get
+      val paymentResponse = paymentResponseGen.sample.get
 
       when {
-        mockAmlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(Some(payment.copy(reference = paymentReferenceNumber, amountInPence = amountInPence)))
+
+      when {
+        controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any())(any(), any(), any(), any())
+      } thenReturn Future.successful(paymentResponse)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(paymentsRedirectUrl)
-
-      verify(controller.paymentsConnector).createPayment(eqTo(
-        CreatePaymentRequest("other", paymentReferenceNumber, "AMLS Payment", amountInPence, paymentsReturnLocation(paymentReferenceNumber))))(any(), any())
+      redirectLocation(result) mustBe Some(paymentResponse.links.nextUrl)
     }
 
     "fail if a payment cannot be retried" in new Fixture {
@@ -325,7 +322,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
       val postData = "paymentRef" -> paymentReferenceNumber
 
       when {
-        mockAmlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
+        controller.amlsConnector.getPaymentByPaymentReference(eqTo(paymentReferenceNumber))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
@@ -359,14 +356,14 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         setupStatus(SubmissionReady)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(None)
 
 
         val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
-          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
         } thenReturn Future.successful(Some(aboutTheBusinessYes))
 
         val result = controller.paymentConfirmation(paymentReferenceNumber)(request)
@@ -496,7 +493,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val failedRequest = addToken(authRequest).copyFakeRequest(uri = baseUrl + "?paymentStatus=Failed")
@@ -504,7 +501,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
 
         status(result) mustBe OK
 
-        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.failure"))
       }
@@ -521,7 +518,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
@@ -529,7 +526,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
 
         status(result) mustBe OK
 
-        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }
@@ -538,18 +535,18 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         setupStatus(SubmissionReadyForReview)
 
         when {
-          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(),any(),any())
+          controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(None)
 
         val payment = paymentGen.sample.get.copy(status = Created)
         val paymentStatus = paymentStatusResultGen.sample.get.copy(currentStatus = payment.status)
 
         when {
-          mockAmlsConnector.refreshPaymentStatus(any())(any(), any(), any())
+          controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
         } thenReturn Future.successful(paymentStatus)
 
         when {
-          mockAmlsConnector.getPaymentByAmlsReference(any())(any(), any(), any())
+          controller.amlsConnector.getPaymentByAmlsReference(any())(any(), any(), any())
         } thenReturn Future.successful(Some(payment))
 
         val cancelledRequest = request.copyFakeRequest(uri = baseUrl + "?paymentStatus=Cancelled")
@@ -557,7 +554,7 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
 
         status(result) mustBe OK
 
-        verify(mockAmlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
+        verify(controller.amlsConnector).refreshPaymentStatus(eqTo(payment.reference))(any(), any(), any())
         contentAsString(result) must include(Messages("confirmation.payment.failed.header"))
         contentAsString(result) must include(Messages("confirmation.payment.failed.reason.cancelled"))
       }
@@ -581,11 +578,11 @@ class ConfirmationControllerSpec extends AmlsSpec with AmlsReferenceNumberGenera
         val aboutTheBusinessYes = AboutTheBusiness(previouslyRegistered = Some(PreviouslyRegisteredYes("123456")))
 
         when {
-          controller.statusService.getReadStatus(any())(any(),any(),any())
+          controller.statusService.getReadStatus(any())(any(), any(), any())
         } thenReturn Future.successful(ReadStatusResponse(LocalDateTime.now(), "", None, None, None, None, false))
 
         when {
-          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(),any(),any())
+          controller.dataCacheConnector.fetch[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any(), any(), any())
         } thenReturn Future.successful(Some(aboutTheBusinessYes))
 
         val result = controller.bacsConfirmation()(request)

@@ -136,7 +136,7 @@ class ConfirmationService @Inject()(
         case true => getRenewal
         case false => getVariation
       }
-      case _ => getSubscription map (Some(_))
+      case _ => getSubscription map (Some(_)) recover { case _ => None }
     }
 
 }
