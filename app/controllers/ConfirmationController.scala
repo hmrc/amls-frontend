@@ -69,6 +69,7 @@ class ConfirmationController @Inject()(
         } yield result
   }
 
+  // scalastyle:off cyclomatic.complexity
   def paymentConfirmation(reference: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
@@ -111,7 +112,7 @@ class ConfirmationController @Inject()(
           case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
             case PreviouslyRegisteredYes(_) => true
             case _ => false
-          } =>  Ok(payment_confirmation_transitional_renewal(businessName, reference))
+          } => Ok(payment_confirmation_transitional_renewal(businessName, reference))
 
           case _ => Ok(payment_confirmation(businessName, reference))
         }
@@ -128,11 +129,11 @@ class ConfirmationController @Inject()(
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
           aboutTheBusiness <- OptionT(dataCacheConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
-          } yield() match {
+        } yield () match {
           case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
             case PreviouslyRegisteredYes(_) => true
             case _ => false
-          } =>  Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))
+          } => Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))
           case _ => Ok(views.html.confirmation.confirmation_bacs(name))
         }
 
@@ -162,11 +163,15 @@ class ConfirmationController @Inject()(
 
     confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
-        case Some(rows) if fees.totalFees > 0 =>
+        case maybeRows@Some(rows) if fees.totalFees > 0 =>
           if (isRenewalDefined) {
             Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
           } else {
-            Ok(confirm_amendvariation(fees.paymentReference, fees.totalFees, fees.differenceOrTotalAmount, rows, controllers.payments.routes.WaysToPayController.get().url)).some
+            Ok(confirm_amendvariation(fees.paymentReference,
+              fees.totalFees,
+              fees.differenceOrTotalAmount,
+              maybeRows,
+              controllers.payments.routes.WaysToPayController.get().url)).some
           }
         case _ => None
       }
@@ -175,12 +180,14 @@ class ConfirmationController @Inject()(
 
   private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
-    breakdownRows map {
-      case Some(rows) =>
-        val amount = fees.differenceOrTotalAmount
+    breakdownRows map { maybeRows =>
+      val amount = fees.differenceOrTotalAmount
 
-        Ok(confirm_amendvariation(fees.paymentReference, Currency(fees.totalFees), amount, rows, controllers.payments.routes.WaysToPayController.get().url)).some
-      case _ => None
+      Ok(confirm_amendvariation(fees.paymentReference,
+        Currency(fees.totalFees),
+        amount,
+        maybeRows,
+        controllers.payments.routes.WaysToPayController.get().url)).some
     }
   }
 

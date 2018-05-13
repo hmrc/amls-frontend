@@ -262,6 +262,56 @@ class ConfirmationControllerSpec extends AmlsSpec
         }
       }
 
+      "submitting an amendment or variation" which {
+
+        "has response data" in new Fixture {
+          setupStatus(SubmissionReadyForReview)
+
+          val fees = feeResponse(AmendOrVariationResponseType)
+          val rows = Gen.listOfN(5, breakdownRowGen).sample
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          } thenReturn Future.successful(Some(fees))
+
+          when {
+            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+          } thenReturn Future.successful(rows)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.title must include(Messages("confirmation.amendment.header"))
+          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+          contentAsString(result) must include(Messages("confirmation.breakdown.details"))
+        }
+
+        "does not have response data" in new Fixture {
+          setupStatus(SubmissionReadyForReview)
+
+          val fees = feeResponse(AmendOrVariationResponseType)
+
+          when {
+            controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+          } thenReturn Future.successful(Some(fees))
+
+          when {
+            controller.confirmationService.getBreakdownRows(eqTo(SubmissionReadyForReview), eqTo(fees))(any(), any(), any())
+          } thenReturn Future.successful(None)
+
+          val result = controller.get()(request)
+          status(result) mustBe OK
+
+          val doc = Jsoup.parse(contentAsString(result))
+
+          doc.title must include(Messages("confirmation.amendment.header"))
+          contentAsString(result) must include(Messages("confirmation.amendment.info"))
+          contentAsString(result) must not include Messages("confirmation.breakdown.details")
+        }
+      }
+
       "submitting a variation" which {
         "has no difference, but has a total fee value" in new Fixture {
           setupStatus(SubmissionDecisionApproved)

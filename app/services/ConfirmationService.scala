@@ -129,14 +129,16 @@ class ConfirmationService @Inject()(
 
   def getBreakdownRows(status: SubmissionStatus, feeResponse: FeeResponse)
                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[Option[Seq[BreakdownRow]]] =
-    status match {
-      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment.recover { case _ => None }
+    (status match {
+      case SubmissionReadyForReview if feeResponse.responseType equals AmendOrVariationResponseType => getAmendment
       case SubmissionDecisionApproved => getVariation
       case ReadyForRenewal(_) | RenewalSubmitted(_) => isRenewalDefined flatMap {
         case true => getRenewal
         case false => getVariation
       }
-      case _ => getSubscription map (Some(_)) recover { case _ => None }
-    }
+      case _ => getSubscription map (Some(_))
+    }).recover({
+      case _ => None
+    })
 
 }

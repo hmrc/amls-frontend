@@ -20,7 +20,7 @@
 @import config.ApplicationConfig
 @import views.html.confirmation.{breakdown => breakdown_display}
 
-@(paymentReference: Option[String], total: Currency, amountToPay: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_], m:Messages)
+@(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages)
 
 @main(
     title = Messages("confirmation.amendment.header")
@@ -44,7 +44,9 @@
         }
     </div>
 
-    @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
+    @maybeBreakdown.map { breakdown =>
+        @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
+    }
 
     <p><a class="button" href="@paymentsUrl">@Messages("button.continue")</a></p>
 
