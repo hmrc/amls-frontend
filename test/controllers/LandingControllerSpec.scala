@@ -500,7 +500,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               } thenReturn None
 
               when {
-                controller.landingService.setAlCorrespondenceAddressWithRegNo(any(), any())(any(),any(),any())
+                controller.landingService.setAltCorrespondenceAddress(any(), any())(any(),any(),any())
               } thenReturn Future.successful(testCacheMap)
 
               setUpMocksForAnEnrolmentExists(controller)

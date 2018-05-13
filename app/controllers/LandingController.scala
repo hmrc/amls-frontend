@@ -161,15 +161,6 @@ class LandingController @Inject()(val landingService: LandingService,
 
       }
     }
-
-  }
-
-  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
-                                                   (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-
-    landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber, cacheMap) map {
-      _ => Redirect(controllers.routes.StatusController.get())
-    }
   }
 
   private def dataHasChanged(cacheMap: CacheMap) = {
@@ -221,19 +212,21 @@ class LandingController @Inject()(val landingService: LandingService,
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
         case Some(c) =>
-          val fix = for {
-            c2 <- fixEmptyRecords[ResponsiblePeople](c, ResponsiblePeople.key)
+          lazy val fixEmpties = for {
+            c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
+            c2 <- fixEmptyRecords[ResponsiblePeople](c1, ResponsiblePeople.key)
           } yield c2
 
           //there is data in S4l
-          fix flatMap { cacheMap =>
+          fixEmpties flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
               (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
                 cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
                 case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
                 case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-
+                case _ => landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
+                  Redirect(controllers.routes.StatusController.get())
+                }
               }
             } else {
               //DataHasNotChanged
@@ -253,7 +246,7 @@ class LandingController @Inject()(val landingService: LandingService,
       cache.getEntry[Seq[T]](key)
       Future.successful(cache)
     } catch {
-      case e: JsResultException =>
+      case _: JsResultException =>
         cacheConnector.save[Seq[T]](key, Seq.empty[T])
     }
   }

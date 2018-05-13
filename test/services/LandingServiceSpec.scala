@@ -177,7 +177,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", None)) mustEqual cache
+      await(TestLandingService.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
 
       verify(TestLandingService.desConnector).view(any())(any(), any(), any(), any())
     }
@@ -200,7 +200,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
         setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-        await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", Some(cache)))
+        await(TestLandingService.setAltCorrespondenceAddress("regNo", Some(cache)))
 
         verify(TestLandingService.desConnector, never()).view(any())(any(), any(), any(), any())
       }

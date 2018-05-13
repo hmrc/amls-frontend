@@ -133,14 +133,10 @@ trait LandingService {
     case _ => model
   }
 
-  def setAlCorrespondenceAddressWithRegNo(amlsRefNumber: String, cacheMap: Option[CacheMap])
-                                         (implicit
-                                          authContext: AuthContext,
-                                          hc: HeaderCarrier,
-                                          ec: ExecutionContext
-                                         ): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap])
+                                 (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val cachedModel = for {
-      cache <- OptionT.fromOption[Future](cacheMap)
+      cache <- OptionT.fromOption[Future](maybeCacheMap)
       entry <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
     } yield entry
 
