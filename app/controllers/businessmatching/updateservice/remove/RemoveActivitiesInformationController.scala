@@ -33,23 +33,7 @@ class RemoveActivitiesInformationController @Inject()(
 
   def get() = Authorised.async {
     implicit authContext =>
-      implicit request =>
-        titlePlaceholder map { placeholder =>
-          Ok(views.html.businessmatching.updateservice.remove.remove_activities_information(placeholder))
-        }
-  }
-
-  private def titlePlaceholder(implicit hc: HeaderCarrier, ac: AuthContext) = businessMatchingService.getModel.value map { bm =>
-    val activities = for {
-      businessMatching <- bm
-      businessActivities <- businessMatching.activities
-    } yield businessActivities.businessActivities map BusinessActivities.getValue
-
-    activities match {
-      case Some(act) if act.size equals 1 => Messages(s"businessmatching.registerservices.servicename.lbl.${act.head}")
-      case _ => "all services"
-    }
-
+      implicit request => ???
   }
 
 }
