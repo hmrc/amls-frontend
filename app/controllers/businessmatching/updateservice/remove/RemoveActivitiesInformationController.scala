@@ -31,7 +31,7 @@ class RemoveActivitiesInformationController @Inject()(
                                                      val businessMatchingService: BusinessMatchingService
                                                      ) extends BaseController {
 
-  def get() = Authorised.async {
+  def get = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }

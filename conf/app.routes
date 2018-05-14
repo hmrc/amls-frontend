@@ -291,14 +291,6 @@ GET         /update-information/add-person                                      
 GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
 POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
 
-GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
-POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
-
-GET         /update-information/date-of-change/*services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get(services: String)
-POST        /update-information/date-of-change/*services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post(services: String)
-
-GET         /update-information/activities-remove-information                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
-
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
 
@@ -353,12 +345,27 @@ POST        /update-service/what-do-you-do-here                                 
 GET         /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
 POST        /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
+GET         /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
+POST        /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
+
+GET         /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveActivitiesController.get()
+POST        /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveActivitiesController.post()
+
+GET         /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get()
+POST        /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post()
+
+GET         /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveServicesSummaryController.get()
+POST        /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveServicesSummaryController.post()
+
+GET         /update-service/ask-removed-business                                      @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
+
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
 GET         /update-information/declaration                                           controllers.declaration.DeclarationController.getWithAmendment()
 
 GET         /confirmation                                                             controllers.ConfirmationController.get()
+
 GET         /confirmation/payment-complete                                            controllers.ConfirmationController.paymentConfirmation(reference: String)
 POST        /confirmation/payment/retry                                               controllers.ConfirmationController.retryPayment()
 

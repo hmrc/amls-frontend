@@ -28,13 +28,13 @@ class UpdateServiceDateOfChangeController @Inject()(
                                                    val dataCacheConnector: DataCacheConnector
                                                    ) extends BaseController with RepeatingSection {
 
-  def get(services: String) = Authorised.async {
+  def get = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }
 
 
-  def post(activitiesInRequest: String) = Authorised.async {
+  def post = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }
