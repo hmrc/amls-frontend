@@ -36,9 +36,4 @@ class UnableToRemoveActivitiesController @Inject()(
       implicit request => ???
   }
 
-  def post = Authorised.async{
-    implicit authContext =>
-      implicit request => ???
-  }
-
 }

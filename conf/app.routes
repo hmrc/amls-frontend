@@ -349,7 +349,6 @@ GET         /update-service/activities-remove                                   
 POST        /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
 
 GET         /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveActivitiesController.get()
-POST        /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveActivitiesController.post()
 
 GET         /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get()
 POST        /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post()
