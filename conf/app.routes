@@ -294,8 +294,8 @@ POST        /update-information/change-services                                 
 GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
 POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
 
-GET         /update-information/date-of-change/*services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get(services: String)
-POST        /update-information/date-of-change/*services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post(services: String)
+GET         /update-information/date-of-change/services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get(services: String)
+POST        /update-information/date-of-change/services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post(services: String)
 
 GET         /update-information/activities-remove-information                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
 
