@@ -16,9 +16,15 @@
 
 package services.flowmanagement.flowrouters
 
-import javax.inject.Inject
+import cats.data.OptionT
+import cats.implicits._
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching._
 import models.flowmanagement._
 import play.api.mvc.Result
+import play.api.mvc.Results.{InternalServerError, Redirect}
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -26,6 +32,12 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class VariationRemoveServiceRouter @Inject() extends Router[RemoveServiceFlowModel] {
+
   override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = ???
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+    pageId match {
+      case _ => ???
+    }
+
+  }
 }

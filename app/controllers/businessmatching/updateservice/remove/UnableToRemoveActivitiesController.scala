@@ -26,20 +26,12 @@ import models.businessmatching.{BusinessActivities, BusinessActivity}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
-class RemoveActivitiesController @Inject()(
+class UnableToRemoveActivitiesController @Inject()(
                                           val authConnector: AuthConnector,
                                           val dataCacheConnector: DataCacheConnector
                                           ) extends BaseController {
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
-    FormTypes.businessActivityRule("error.required.bm.remove.service")
-
   def get = Authorised.async{
-    implicit authContext =>
-      implicit request => ???
-  }
-
-  def post = Authorised.async{
     implicit authContext =>
       implicit request => ???
   }

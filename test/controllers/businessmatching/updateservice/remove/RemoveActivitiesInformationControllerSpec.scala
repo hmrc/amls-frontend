@@ -16,60 +16,12 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import cats.data.OptionT
-import cats.implicits._
-import generators.businessmatching.BusinessMatchingGenerator
-import models.businessmatching.BusinessMatching
-import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-
-class RemoveActivitiesInformationControllerSpec extends AmlsSpec with MockitoSugar with MustMatchers with BusinessMatchingGenerator {
+class RemoveActivitiesInformationControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
-
-    val request = addToken(authRequest)
-
-    lazy val app = new GuiceApplicationBuilder()
-      .disable[com.kenshoo.play.metrics.PlayModule]
-      .overrides(bind[AuthConnector].to(self.authConnector))
-      .overrides(bind[BusinessMatchingService].to(mock[BusinessMatchingService]))
-      .build()
-
-    val controller = app.injector.instanceOf[RemoveActivitiesInformationController]
-
-  }
-
-  "RemoveActivitiesInformationController" when {
-    "get is called" must {
-
-      "display the view" in new Fixture {
-
-        when {
-          controller.businessMatchingService.getModel(any(),any(),any())
-        } thenReturn OptionT.some[Future, BusinessMatching](businessMatchingGen.sample.get)
-
-        val result = controller.get()(request)
-
-        status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title() must include(Messages("updateservice.removeactivitiesinformation.title"))
-
-      }
-
-    }
   }
 
 }
