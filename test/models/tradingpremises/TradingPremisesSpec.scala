@@ -141,7 +141,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
       "given 'msb' data" in {
         val tp = TradingPremises(None, None, None)
-        val newTP = tp.msbServices(msbServices)
+        val newTP = tp.msbServices(Some(msbServices))
         newTP must be(tp.copy(msbServices = Some(msbServices), hasChanged = true))
       }
     }

@@ -20,10 +20,9 @@ import cats.data.OptionT
 import cats.implicits._
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
-import models.businessactivities._
+import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.businessmatching.{BusinessMatchingMsbServices => BMMsbServices}
 import models.flowmanagement.AddServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.supervision._
@@ -50,14 +49,14 @@ class UpdateServiceHelperSpec extends AmlsSpec
     val mockUpdateServiceHelper = mock[UpdateServiceHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
 
-    val helper = new UpdateServiceHelper(
+    val SUT = new UpdateServiceHelper(
       self.authConnector,
       mockCacheConnector,
       tradingPremisesService,
       responsiblePeopleService
     )
 
-    val businessActivitiesSection = BusinessActivities(
+    val businessActivitiesSection = BABusinessActivities(
       involvedInOther = Some(InvolvedInOtherNo),
       whoIsYourAccountant = Some(mock[WhoIsYourAccountant]),
       accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
@@ -68,11 +67,11 @@ class UpdateServiceHelperSpec extends AmlsSpec
 
   "updateBusinessActivities" must {
     "remove the accountancy data from the 'business activities' section" in new Fixture {
-      mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(AccountancyServices))
       for {
-        result <- helper.updateBusinessActivities(model)
+        result <- SUT.updateBusinessActivities(model)
       } yield {
         result.involvedInOther mustBe Some(InvolvedInOtherNo)
         result.whoIsYourAccountant must not be defined
@@ -83,12 +82,12 @@ class UpdateServiceHelperSpec extends AmlsSpec
     }
 
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
-      mockCacheUpdate[BusinessActivities](Some(BusinessActivities.key), businessActivitiesSection)
+      mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
       val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
       for {
-        result <- helper.updateBusinessActivities(model)
+        result <- SUT.updateBusinessActivities(model)
       } yield {
         result.whoIsYourAccountant mustBe defined
         result.accountantForAMLSRegulations mustBe Some(AccountantForAMLSRegulations(true))
@@ -111,7 +110,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
 
         mockCacheSave(Supervision(hasAccepted = true), Some(Supervision.key))
 
-        helper.updateSupervision.returnsSome(Supervision(hasAccepted = true))
+        SUT.updateSupervision.returnsSome(Supervision(hasAccepted = true))
 
         verify(mockCacheConnector).save(eqTo(Supervision.key), eqTo(Supervision(hasAccepted = true)))(any(), any(), any())
       }
@@ -130,7 +129,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))))),
           Some(BusinessMatching.key))
 
-        helper.updateSupervision.returnsSome(supervisionModel)
+        SUT.updateSupervision.returnsSome(supervisionModel)
 
         verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
       }
@@ -148,7 +147,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
         Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
         Some(BusinessMatching.key))
 
-      helper.updateSupervision.returnsSome(supervisionModel)
+      SUT.updateSupervision.returnsSome(supervisionModel)
 
       verify(mockCacheConnector, never).save(any(), any())(any(), any(), any())
     }
@@ -160,60 +159,82 @@ class UpdateServiceHelperSpec extends AmlsSpec
 
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
 
         mockCacheFetch[BusinessMatching](
           Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
           Some(BusinessMatching.key))
 
-        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
       "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
 
         val model = AddServiceFlowModel(activity = Some(HighValueDealing))
 
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
+
+        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))), hasAccepted = true, hasChanged = true)
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key), endResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching )
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
-      "there are msb services and the new activity is MSB and there are existing activities" in new Fixture {
+
+      "there are additional msb services and the activity is MSB and there are existing activities" in new Fixture {
 
         val model = AddServiceFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
         )
+
+        var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                  hasAccepted = true,
+                                  hasChanged = true,
+                                  msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))))
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))))),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+
+        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
 
       "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
 
         val model = AddServiceFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
         )
-        var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
+
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())),
+                                  hasAccepted = true,
+                                  hasChanged = true)
+
+        val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness))),
                                 hasAccepted = true,
                                 hasChanged = true,
-                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal))))
+                                msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
+
         mockCacheFetch[BusinessMatching](
-          Some(BusinessMatching(activities = None)),
+          Some(BusinessMatching(activities = Some(BMBusinessActivities(Set())))),
           Some(BusinessMatching.key))
-        mockCacheUpdate(Some(BusinessMatching.key),  endResultMatching )
-        helper.updateBusinessMatching(model).returnsSome(endResultMatching)
+
+        mockCacheUpdate(Some(BusinessMatching.key),  startResultMatching )
+        SUT.updateBusinessMatching(model).returnsSome(endResultMatching)
       }
     }
   }
@@ -240,7 +261,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
           responsiblePeopleService.updateFitAndProperFlag(any(), any())
         } thenReturn updatedPeople
 
-        helper.updateResponsiblePeople(model).returnsSome(updatedPeople)
+        SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
       }
     }
 
@@ -254,7 +275,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
 
         val model = AddServiceFlowModel(Some(HighValueDealing))
 
-        helper.updateResponsiblePeople(model).returnsSome(people)
+        SUT.updateResponsiblePeople(model).returnsSome(people)
 
         verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any())
       }
@@ -265,7 +286,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
     "set an empty model back into the cache" in new Fixture {
       mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
-      helper.clearFlowModel().returnsSome(AddServiceFlowModel())
+      SUT.clearFlowModel().returnsSome(AddServiceFlowModel())
     }
   }
 
@@ -273,7 +294,7 @@ class UpdateServiceHelperSpec extends AmlsSpec
     "save the flow model with 'hasAccepted' = true" in new Fixture {
       mockCacheSave[AddServiceFlowModel]
 
-      await(helper.updateHasAcceptedFlag(AddServiceFlowModel()).value)
+      await(SUT.updateHasAcceptedFlag(AddServiceFlowModel()).value)
 
       verify(mockCacheConnector).save[AddServiceFlowModel](eqTo(AddServiceFlowModel.key), eqTo(AddServiceFlowModel(hasAccepted = true)))(any(), any(), any())
     }
@@ -284,14 +305,14 @@ class UpdateServiceHelperSpec extends AmlsSpec
       "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
 
-        helper.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
+        SUT.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
       }
 
       "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
 
-        helper.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
+        SUT.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
       }
     }

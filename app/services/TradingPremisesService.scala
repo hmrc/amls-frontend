@@ -104,7 +104,7 @@ class TradingPremisesService {
               val services = tp.msbServices.fold(tradingpremises.TradingPremisesMsbServices(tradingpremises.TradingPremisesMsbServices.convertServices(newMsbServices.msbServices))) { tpservices =>
                 fn(tpservices, index)
               }
-              tp.msbServices(services).copy(hasAccepted = true)
+              tp.msbServices(Some(services)).copy(hasAccepted = true)
             case _ => tp
           }
         }

@@ -17,10 +17,27 @@
 package services.flowmanagement.flowrouters
 
 import org.scalatestplus.play.PlaySpec
-import services.flowmanagement.flowrouters.VariationRemoveServiceRouter
+import utils.DependencyMocks
 
 class VariationRemoveServiceRouterSpec extends PlaySpec {
-  trait Fixture {
-    val router = new VariationRemoveServiceRouter
+
+  trait Fixture extends DependencyMocks {
+
+    val router = new VariationRemoveServiceRouter()
+  }
+
+  "getRoute" must {
+
+    "return the 'xxxxxxxxxx' page (xxxxxxxxController)" when {
+      "given the 'xxxxxxx' model contains a single activity" in new Fixture {
+//        val model = AddServiceFlowModel(
+//          activity = Some(HighValueDealing))
+//        val result = await(router.getRoute(SelectActivitiesPageId, model))
+
+        //result mustBe Redirect(addRoutes.TradingPremisesController.get())
+      }
+    }
+
+
   }
 }
