@@ -40,10 +40,9 @@ class TradingPremisesPageRouter @Inject()(val statusService: StatusService,
     if (edit && model.tradingPremisesActivities.isDefined) {
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
     } else {
-
       model.areNewActivitiesAtTradingPremises match {
         case Some(true) =>
-          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
+          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
         case _ =>
           Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
       }

@@ -18,7 +18,6 @@ package services.flowmanagement.pagerouters
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.BusinessMatchingMsbServices
 import models.flowmanagement.AddServiceFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -30,19 +29,19 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 @Singleton
-class WhichTradingPremisesPageRouter @Inject()(val statusService: StatusService,
+class WhatServicesToRemovePageRouter @Inject()(val statusService: StatusService,
                                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+                           (implicit ac: AuthContext,
+                            hc: HeaderCarrier,
+                            ec: ExecutionContext
 
-    model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1 match {
-      case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-      case false => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    }
+                           ): Future[Result] = {
+    ???
   }
 }
+
 
 

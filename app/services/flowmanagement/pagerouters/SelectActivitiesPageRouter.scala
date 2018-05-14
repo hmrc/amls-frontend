@@ -42,9 +42,9 @@ class SelectActivitiesPageRouter @Inject()(val statusService: StatusService,
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
     } else {
       model.activity match {
-        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
-        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubServicesController.get()))
+        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
     }
   }

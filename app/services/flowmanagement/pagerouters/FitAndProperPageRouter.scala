@@ -44,9 +44,9 @@ class FitAndProperPageRouter @Inject()(val statusService: StatusService,
       Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
     } else {
       (model.fitAndProper, edit) match {
-        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get()))
+        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
         case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
     }
   }

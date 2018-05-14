@@ -45,11 +45,11 @@ class Module extends AbstractModule {
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
     bind(classOf[FeeConnector]).toInstance(FeeConnector)
     bind(classOf[LandingService]).toInstance(LandingService)
-    bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[VariationAddServiceRouter])
+    //bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[VariationAddServiceRouter])
     bind(new TypeLiteral[Router[ChangeServices]] {}).to(classOf[ChangeServicesRouter])
     bind(new TypeLiteral[Router[RemoveServiceFlowModel]] {}).to(classOf[VariationRemoveServiceRouter])
 
 
-    //bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[DavesVariationAddServiceRouter])
+    bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[DavesVariationAddServiceRouter])
   }
 }

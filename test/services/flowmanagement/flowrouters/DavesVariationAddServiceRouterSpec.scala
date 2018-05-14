@@ -41,16 +41,26 @@ class DavesVariationAddServiceRouterSpec extends AmlsSpec {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val router = new DavesVariationAddServiceRouter(
-      statusService = mockStatusService,
-      businessMatchingService = mockBusinessMatchingService,
-      addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
-      fitAndProperPageRoutes = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      newServicesInformationPageRouter = new NewServicesInformationPageRouter(mockStatusService, mockBusinessMatchingService),
-      selectActivitiesPageRouter = new SelectActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
-      tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      updateServicesSummaryPageRoutes =new UpdateServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
-      whichFitAndProperPageRoutes = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService)
+    businessMatchingService = mockBusinessMatchingService,
+    addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
+    businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
+    fitAndProperPageRouter = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
+    newServicesInformationPageRouter = new NewServicesInformationPageRouter(mockStatusService, mockBusinessMatchingService),
+    noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
+    selectActivitiesPageRouter = new SelectActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
+    subServicesPageRouter = new SubServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+    tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
+    changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+    updateServicesSummaryPageRouter = new UpdateServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+    whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
+    whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
+    whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
+    updateAnyInformationPageRouter = new UpdateAnyInformationPageRouter(mockStatusService, mockBusinessMatchingService),
+    whatServicesToRemovePageRouter = new WhatServicesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
+    needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
+    removeServicesSummaryPageRouter = new RemoveServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+    unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
+    whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
 
     )
   }
@@ -73,7 +83,7 @@ class DavesVariationAddServiceRouterSpec extends AmlsSpec {
         val model = AddServiceFlowModel(Some(HighValueDealing))
         val result = await(router.getRoute(SelectActivitiesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.TradingPremisesController.get())
+        result mustBe Redirect(addRoutes.TradingPremisesController.get(true))
       }
     }
 
@@ -166,6 +176,10 @@ class DavesVariationAddServiceRouterSpec extends AmlsSpec {
           router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
 
+        when {
+          router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
+
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(BillPaymentServices))))
 
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
@@ -174,12 +188,14 @@ class DavesVariationAddServiceRouterSpec extends AmlsSpec {
 
     "redirect to the 'New Service Information' page" when {
       "we're on the summary page and the user selects continue " +
-        "and if all possible activities are added" +
-        " and the new one requires more information" in new Fixture {
-
+        "and if all possible activities are added" in new Fixture {
         when {
           router.businessMatchingService.getRemainingBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set.empty)
+
+        when {
+          router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
+        } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.all)
 
         val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
 
@@ -251,107 +267,5 @@ class DavesVariationAddServiceRouterSpec extends AmlsSpec {
       }
     }
   }
-    "when in the TCSP flow" must {
-      //Start TSCP sub-flow
-      "return the 'fitAndProper' page (FitAndProperController)" when {
-        "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
-          "TCSP is selected" in new Fixture {
-            val model = AddServiceFlowModel(
-              activity = Some(TrustAndCompanyServices))
-
-            val result = await(router.getRoute(SelectActivitiesPageId, model))
-
-            result mustBe Redirect(addRoutes.FitAndProperController.get())
-          }
-        }
-      }
-
-      "return the 'WhichfitAndProper' page (WhichFitAndProperController)" when {
-        "the user is on the 'Fit and proper' page (FitAndProperPageId)" when {
-          "TCSP is the Business Activity" when {
-            "the answer is yes" in new Fixture {
-              val model = AddServiceFlowModel(
-                activity = Some(TrustAndCompanyServices),
-                fitAndProper = Some(true))
-              val result = await(router.getRoute(FitAndProperPageId, model))
-
-              result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
-            }
-          }
-        }
-      }
-
-      "return the 'tradingPremises' page (TradingPremisesController)" when {
-        "the user is on the 'Fit and Proper' page (FitAndProperPageId)" when {
-          "TCSP is the Business Activity" when {
-            "the answer is no" in new Fixture {
-              val model = AddServiceFlowModel(
-                activity = Some(TrustAndCompanyServices),
-                fitAndProper = Some(false))
-              val result = await(router.getRoute(FitAndProperPageId, model))
-
-              result mustBe Redirect(addRoutes.TradingPremisesController.get())
-            }
-          }
-        }
-      }
-
-      "return the 'tradingPremises' page (TradingPremisesController)" when {
-        "the user is on the Which Fit and Proper page (WhichFitAndProperPageId)" when {
-          "TCSP is the Business Activity" in new Fixture {
-            val model = AddServiceFlowModel(
-              activity = Some(TrustAndCompanyServices))
-            val result = await(router.getRoute(WhichFitAndProperPageId, model))
-
-            result mustBe Redirect(addRoutes.TradingPremisesController.get())
-          }
-        }
-      }
-
-      "edit mode" must {
-        //Edit mode TSCP sub-flow
-        //edit fit and proper
-        "return the 'which fit and proper' page (WhichFitAndProperController)" when {
-          "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-            "and the answer is yes" in new Fixture {
-              val model = AddServiceFlowModel(
-                activity = Some(TrustAndCompanyServices),
-                fitAndProper = Some(true))
-              val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
-
-              result mustBe Redirect(addRoutes.WhichFitAndProperController.get())
-            }
-          }
-        }
-
-        "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-          "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
-            " and the answer is no " in new Fixture {
-              val model = AddServiceFlowModel(
-                activity = Some(TrustAndCompanyServices),
-                fitAndProper = Some(false))
-              val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
-
-              result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
-            }
-          }
-        }
-        //edit which fit and proper
-        "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
-          "editing the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
-            "responsible people have been selected" in new Fixture {
-              val model = AddServiceFlowModel(
-                activity = Some(TrustAndCompanyServices),
-                fitAndProper = Some(true),
-                responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
-              val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
-
-              result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
-            }
-          }
-        }
-      }
-    }
-
 
 }

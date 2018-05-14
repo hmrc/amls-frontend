@@ -17,10 +17,10 @@
 package services.flowmanagement.flowrouters
 
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement._
+import models.flowmanagement.{UpdateAnyInformationPageId, _}
 import play.api.mvc.Result
 import play.api.mvc.Results.InternalServerError
-import services.StatusService
+import play.mvc.Controller
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.flowmanagement.pagerouters._
@@ -30,16 +30,27 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class DavesVariationAddServiceRouter @Inject()(val statusService: StatusService,
-                                               val businessMatchingService: BusinessMatchingService,
-                                               val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
-                                               val fitAndProperPageRoutes: FitAndProperPageRouter,
+class DavesVariationAddServiceRouter @Inject()(
+                                                val businessMatchingService: BusinessMatchingService,
+                                                val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
+                                               val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
+                                               val fitAndProperPageRouter: FitAndProperPageRouter,
                                                val newServicesInformationPageRouter: NewServicesInformationPageRouter,
+                                               val noPSRPageRouter: NoPSRPageRouter,
                                                val selectActivitiesPageRouter: SelectActivitiesPageRouter,
+                                               val subServicesPageRouter: SubServicesPageRouter,
                                                val tradingPremisesPageRouter: TradingPremisesPageRouter,
-                                               val updateServicesSummaryPageRoutes: UpdateServicesSummaryPageRouter,
-                                               val whichFitAndProperPageRoutes: WhichFitAndProperPageRouter,
-                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
+                                               val changeServicesPageRouter: ChangeServicesPageRouter,
+                                               val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
+                                               val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
+                                               val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
+                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter,
+                                               val updateAnyInformationPageRouter: UpdateAnyInformationPageRouter,
+                                               val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
+                                               val needToUpdatePageRouter: NeedToUpdatePageRouter,
+                                               val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
+                                               val unableToRemovePageRouter: UnableToRemovePageRouter,
+                                               val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
                                               ) extends Router[AddServiceFlowModel] {
 
 
@@ -47,13 +58,27 @@ class DavesVariationAddServiceRouter @Inject()(val statusService: StatusService,
                        (implicit  ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case AddMoreAcivitiesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
-      case FitAndProperPageId => fitAndProperPageRoutes.getPageRoute(model, edit)
+      case BusinessAppliedForPSRNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
+      case FitAndProperPageId => fitAndProperPageRouter.getPageRoute(model, edit)
       case NewServiceInformationPageId => newServicesInformationPageRouter.getPageRoute(model, edit)
+      case NoPSRPageId => noPSRPageRouter.getPageRoute(model, edit)
       case SelectActivitiesPageId => selectActivitiesPageRouter.getPageRoute(model, edit)
+      case SubServicesPageId => subServicesPageRouter.getPageRoute(model, edit)
       case TradingPremisesPageId => tradingPremisesPageRouter.getPageRoute(model, edit)
-      case UpdateServiceSummaryPageId => updateServicesSummaryPageRoutes.getPageRoute(model, edit)
-      case WhichFitAndProperPageId => whichFitAndProperPageRoutes.getPageRoute(model, edit)
+      case UpdateServiceSummaryPageId => updateServicesSummaryPageRouter.getPageRoute(model, edit)
+      case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRoute(model, edit)
+      case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRoute(model, edit)
       case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
+
+      case ChangeServicesPageId => changeServicesPageRouter.getPageRoute(model, edit)
+      case UpdateAnyInformationPageId => updateAnyInformationPageRouter.getPageRoute(model, edit)
+
+      // Remove service flow
+      case WhatServiceToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)
+      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRoute(model, edit)
+      case RemoveServiceSummaryPageId => removeServicesSummaryPageRouter.getPageRoute(model, edit)
+      case UnableToRemovePageId => unableToRemovePageRouter.getPageRoute(model, edit)
+      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
     }
   }
 

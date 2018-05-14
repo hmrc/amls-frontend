@@ -39,7 +39,7 @@ class WhichFitAndProperPageRouter @Inject()(val statusService: StatusService,
 
     edit match {
       case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
     }
   }
 }

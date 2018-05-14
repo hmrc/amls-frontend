@@ -37,16 +37,8 @@ class ChangeServicesPageRouter @Inject()(val statusService: StatusService,
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-
-    if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    } else {
-      model.activity match {
-        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
-        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
-      }
-    }
+//TODO
+???
   }
 }
 
