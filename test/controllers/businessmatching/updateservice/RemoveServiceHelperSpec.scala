@@ -16,22 +16,15 @@
 
 package controllers.businessmatching.updateservice
 
-import cats.data.OptionT
-import cats.implicits._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveServiceFlowModel
-import models.moneyservicebusiness.{BusinessUseAnIPSP, ExpectedThroughput}
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
-import utils._
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
 
 class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
@@ -122,29 +115,149 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         }
       }
 
-//      "removing EAB" should {
-//
-//        "remove the BusinessMatching Business Activity EAB (Type)" in new Fixture {
-//
-//          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
-//
-//          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))),
-//            hasAccepted = true,
-//            hasChanged = true)
-//
-//          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
-//            hasAccepted = true,
-//            hasChanged = true)
-//
-//          mockCacheFetch[BusinessMatching](
-//            Some(startResultMatching),
-//            Some(BusinessMatching.key))
-//
-//          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
-//
-//          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
-//        }
-//      }
+      "removing EAB" should {
+
+        "remove the BusinessMatching Business Activity EAB (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+
+      "removing TCSP" should {
+
+        "remove the BusinessMatching Business Activity TCSP (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, TrustAndCompanyServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+
+      "removing BP" should {
+
+        "remove the BusinessMatching Business Activity BP (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+
+      "removing TDI" should {
+
+        "remove the BusinessMatching Business Activity TDI (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, TelephonePaymentService)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+
+      "removing ASP" should {
+
+        "remove the BusinessMatching Business Activity ASP (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, AccountancyServices)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
+
+      "removing HVD" should {
+
+        "remove the BusinessMatching Business Activity HVD (Type)" in new Fixture {
+
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, HighValueDealing)))
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(AccountancyServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+        }
+      }
     }
   }
 
@@ -184,6 +297,144 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             msbServices = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an EAB" should {
+
+        "remove the TradingPremises Business Activity EAB (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an TCSP" should {
+
+        "remove the TradingPremises Business Activity TCSP (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TrustAndCompanyServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an BP" should {
+
+        "remove the TradingPremises Business Activity BP (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, BillPaymentServices))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an TDI" should {
+
+        "remove the TradingPremises Business Activity TDI (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TelephonePaymentService, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TelephonePaymentService))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an ASP" should {
+
+        "remove the TradingPremises Business Activity ASP (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(AccountancyServices, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[TradingPremises](
+            Some(startResultTP),
+            Some(TradingPremises.key))
+
+          mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing an HVD" should {
+
+        "remove the TradingPremises Business Activity HVD (Type)" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(HighValueDealing, BillPaymentServices)))
+
+          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(EstateAgentBusinessService))),
             hasAccepted = true,
             hasChanged = true)
 
@@ -238,6 +489,67 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
         "not remove the ResponsiblePeople fit and proper if there is TCSP" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+          val startResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          mockCacheFetch[ResponsiblePeople](
+            Some(startResultRP),
+            Some(ResponsiblePeople.key))
+
+          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+
+          helper.removeFitAndProper(model).returnsSome(startResultRP)
+        }
+      }
+
+      "removing an TCSP" should {
+
+        "remove the ResponsiblePeople fit and proper if there is no MSB" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+
+          val startResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+            businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+            hasAccepted = true,
+            hasChanged = true)
+
+          mockCacheFetch[BusinessMatching](
+            Some(startResultMatching),
+            Some(BusinessMatching.key))
+
+          mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+          mockCacheFetch[ResponsiblePeople](
+            Some(startResultRP),
+            Some(ResponsiblePeople.key))
+
+          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+
+          val endResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = None,
+            hasAccepted = true,
+            hasChanged = true)
+
+          helper.removeFitAndProper(model).returnsSome(endResultRP)
+        }
+
+        "not remove the ResponsiblePeople fit and proper if there is MSB" in new Fixture {
+          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultRP = ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
