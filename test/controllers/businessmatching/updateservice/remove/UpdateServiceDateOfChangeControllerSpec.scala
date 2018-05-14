@@ -20,7 +20,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class UpdateServiceDateOfChangeControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
   }
 
 }
