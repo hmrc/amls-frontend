@@ -16,23 +16,11 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import connectors.DataCacheConnector
-import controllers.BaseController
-import javax.inject.Inject
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-class RemoveServicesSummaryController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends BaseController {
+class RemoveActivitiesSummaryControllerSpec extends AmlsSpec {
 
-  def get = Authorised.async{
-    implicit authContext =>
-      implicit request => ???
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
   }
 
-  def post = Authorised.async{
-    implicit authContext =>
-      implicit request => ???
-  }
 }

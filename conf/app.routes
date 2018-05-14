@@ -353,8 +353,8 @@ GET         /update-service/unable-to-remove                                    
 GET         /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get()
 POST        /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post()
 
-GET         /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveServicesSummaryController.get()
-POST        /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveServicesSummaryController.post()
+GET         /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveActivitiesSummaryController.get()
+POST        /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveActivitiesSummaryController.post()
 
 GET         /update-service/ask-removed-business                                      @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
 
