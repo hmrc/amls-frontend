@@ -35,5 +35,7 @@ case object WhatDoYouDoHerePageId extends PageId
 
 // Remove service flow
 case object WhatServiceToRemovePageId extends PageId
+case object UnableToRemovePageId extends PageId
 case object WhatDateRemovedPageId extends PageId
 case object NeedToUpdatePageId extends PageId
+case object RemoveServiceSummaryPageId extends PageId
