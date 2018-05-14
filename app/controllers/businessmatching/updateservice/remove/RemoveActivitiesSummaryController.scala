@@ -16,10 +16,16 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.flowmanagement.RemoveServiceFlowModel
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.updateservice.remove.remove_activities_summary
+
+import scala.concurrent.Future
 
 class RemoveActivitiesSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
@@ -28,7 +34,11 @@ class RemoveActivitiesSummaryController @Inject()(
 
   def get = Authorised.async{
     implicit authContext =>
-      implicit request => ???
+      implicit request => {
+        for {
+          flow <- OptionT(dataCacheConnector.fetch[RemoveServiceFlowModel](RemoveServiceFlowModel.key))
+        } yield Ok(remove_activities_summary(flow))
+      } getOrElse InternalServerError("Could not access the flow model")
   }
 
   def post = Authorised.async{

@@ -16,11 +16,54 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import models.businessmatching.MoneyServiceBusiness
+import models.flowmanagement.RemoveServiceFlowModel
+import org.jsoup.Jsoup
+import play.api.i18n.Messages
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import play.api.test.Helpers._
+import views.TitleValidator
 
-class RemoveActivitiesSummaryControllerSpec extends AmlsSpec {
+class RemoveActivitiesSummaryControllerSpec extends AmlsSpec with TitleValidator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
+    val request = addToken(authRequest)
+
+    val controller = new RemoveActivitiesSummaryController(
+      self.authConnector,
+      mockCacheConnector
+    )
   }
 
+  "A successful result is returned" when {
+    "the user visits the page" when {
+      "editing data that has no date of change" in new Fixture {
+        mockCacheFetch(Some(RemoveServiceFlowModel(Some(Set(MoneyServiceBusiness)))))
+
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        validateTitle(s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}")(implicitly, doc)
+        doc.getElementsByTag("h1").text must include(Messages("title.cya"))
+        doc.getElementsByClass("check-your-answers").text must include(MoneyServiceBusiness.getMessage)
+      }
+    }
+  }
+
+  "A failure is returned" when {
+    "the user visits the page" when {
+      "there is no data to show" in new Fixture {
+        mockCacheFetch(None)
+
+        val result = controller.get()(request)
+
+        status(result) mustBe INTERNAL_SERVER_ERROR
+      }
+    }
+  }
 }
