@@ -34,7 +34,7 @@ import models.responsiblepeople.ResponsiblePeople
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, FormTypes, SubmissionRequestStatus, SubscriptionResponse}
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
@@ -220,13 +220,10 @@ class LandingController @Inject()(val landingService: LandingService,
           //there is data in S4l
           fixEmpties flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
-              (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
-                cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
-                case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case _ => landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
-                  Redirect(controllers.routes.StatusController.get())
-                }
+              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+                case SubmissionRequestStatus(true) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+              } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
+                Redirect(controllers.routes.StatusController.get())
               }
             } else {
               //DataHasNotChanged
