@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.{AddServiceFlowModel, PageId, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, PageId, UpdateServiceSummaryPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -34,9 +34,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddBusinessTypeSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext

@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, WhatDoYouDoHerePageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, WhatDoYouDoHerePageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -50,7 +50,7 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
@@ -71,8 +71,8 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
 
     "get is called" must {
       "return OK with 'whatdoyoudohere' view" in new Fixture {
-        mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -93,8 +93,8 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
       }
 
       "update the tradingPremisesMsbServices when not all activities are selected" in new Fixture {
-        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+        mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
           hasChanged = true))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
@@ -103,15 +103,15 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
 
         status(result) mustBe SEE_OTHER
         controller.router.verify(WhatDoYouDoHerePageId,
-          AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+          AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             hasChanged = true))
       }
 
       "update the tradingPremisesMsbServices when all activities are selected" in new Fixture {
-        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+        mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
           hasChanged = true)
         )
 
@@ -122,8 +122,8 @@ class WhatDoYouDoHereControllerSpec extends AmlsSpec with MoneyServiceBusinessTe
 
         status(result) mustBe SEE_OTHER
         controller.router.verify(WhatDoYouDoHerePageId,
-          AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+          AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
             hasChanged = true))
       }

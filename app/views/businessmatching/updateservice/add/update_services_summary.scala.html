@@ -19,9 +19,9 @@
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 @import controllers.businessmatching.updateservice.add.routes
-@import models.flowmanagement.AddServiceFlowModel
+@import models.flowmanagement.AddBusinessTypeFlowModel
 
-@(f: forms.Form2[_], flowModel: AddServiceFlowModel)(implicit request: Request[_],messages:Messages)
+@(f: forms.Form2[_], flowModel: AddBusinessTypeFlowModel)(implicit request: Request[_],messages:Messages)
 
 @header = {
     @heading("title.cya", "summary.updateservice")
@@ -41,7 +41,7 @@
     }
 
     @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
-        @flowModel.msbServices.map { services =>
+        @flowModel.subSectors.map { services =>
             @checkYourAnswers(
                 question = Messages("businessmatching.services.title"),
                 editUrl = routes.SubServicesController.get(true).toString,
@@ -137,7 +137,7 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
                     editUrl = routes.WhatDoYouDoHereController.get(true).url,
-                    allowEdit = flowModel.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
+                    allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
                     idTag = "WhatDoYouDoHere-edit"
                 ) {
                     <ul class="list list--comma">

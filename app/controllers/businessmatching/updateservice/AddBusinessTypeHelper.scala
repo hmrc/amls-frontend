@@ -24,7 +24,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
@@ -44,7 +44,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                       val responsiblePeopleService: ResponsiblePeopleService
                                    ) extends RepeatingSection {
 
-  def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
+  def updateBusinessActivities(model: AddBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
     OptionT(dataCacheConnector.update[BusinessActivities](BusinessActivities.key) {
       case Some(dcModel) if model.activity.contains(AccountancyServices) =>
         dcModel.accountantForAMLSRegulations(None)
@@ -71,10 +71,10 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newSupervision
   }
 
-  def updateHasAcceptedFlag(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
-    OptionT.liftF(dataCacheConnector.save[AddServiceFlowModel](AddServiceFlowModel.key, model.copy(hasAccepted = true)))
+  def updateHasAcceptedFlag(model: AddBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier) =
+    OptionT.liftF(dataCacheConnector.save[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key, model.copy(hasAccepted = true)))
 
-  def updateServicesRegister(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] = {
+  def updateServicesRegister(model: AddBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier):  OptionT[Future, ServiceChangeRegister] = {
     for {
       activity <- OptionT.fromOption[Future](model.activity)
       updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
@@ -85,7 +85,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield updatedModel
   }
 
-  def updateTradingPremises(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
+  def updateTradingPremises(model: AddBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, Seq[TradingPremises]] = for {
 
     tradingPremises <- OptionT.liftF(tradingPremisesData)
     activity <- OptionT.fromOption[Future](model.activity)
@@ -102,10 +102,10 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
     }
 
-  def updateBusinessMatching(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
+  def updateBusinessMatching(model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
     for {
       newActivity <- OptionT.fromOption[Future](model.activity)
-      newMsbServices <- OptionT.fromOption[Future](model.msbServices) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
+      newMsbServices <- OptionT.fromOption[Future](model.subSectors) orElse OptionT.some(BusinessMatchingMsbServices(Set.empty[BusinessMatchingMsbService]))
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(BMBusinessActivities(Set.empty[BusinessActivity]))
 
@@ -129,7 +129,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newBusinessMatching
   }
 
-  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePerson]] = {
+  def updateResponsiblePeople(model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePerson]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
@@ -139,7 +139,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     })
   }
 
-  def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddServiceFlowModel] =
-    OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(_ => AddServiceFlowModel()))
+  def clearFlowModel()(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, AddBusinessTypeFlowModel] =
+    OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)(_ => AddBusinessTypeFlowModel()))
 
 }

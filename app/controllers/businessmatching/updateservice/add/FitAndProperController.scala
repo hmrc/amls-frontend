@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -37,7 +37,7 @@ import scala.concurrent.Future
 class FitAndProperController @Inject()(
                                         val authConnector: AuthConnector,
                                         implicit val dataCacheConnector: DataCacheConnector,
-                                        val router: Router[AddServiceFlowModel]
+                                        val router: Router[AddBusinessTypeFlowModel]
                                       ) extends BaseController with RepeatingSection {
 
   val NAME = "passedFitAndProper"
@@ -63,7 +63,7 @@ class FitAndProperController @Inject()(
           } getOrElse InternalServerError("Post: Invalid form on Fit And Proper page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.isfitAndProper(Some(data)).responsiblePeople(if (data) model.responsiblePeople else None)
             } flatMap {
               case Some(model) => router.getRoute(FitAndProperPageId, model, edit)
@@ -72,7 +72,7 @@ class FitAndProperController @Inject()(
         }
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel)] = for {
-    model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddBusinessTypeFlowModel)] = for {
+    model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
   } yield (model)
 }

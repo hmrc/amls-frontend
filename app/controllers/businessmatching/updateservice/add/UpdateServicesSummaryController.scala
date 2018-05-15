@@ -23,7 +23,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, UpdateServiceSummaryPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
@@ -40,15 +40,15 @@ class UpdateServicesSummaryController @Inject()(
                                                  val statusService: StatusService,
                                                  val businessMatchingService: BusinessMatchingService,
                                                  val helper: AddBusinessTypeHelper,
-                                                 val router: Router[AddServiceFlowModel],
+                                                 val router: Router[AddBusinessTypeFlowModel],
                                                  val tradingPremisesService: TradingPremisesService
                                                ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) collect {
-          case model if model != AddServiceFlowModel() => Ok(update_services_summary(EmptyForm, model))
+        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) collect {
+          case model if model != AddBusinessTypeFlowModel() => Ok(update_services_summary(EmptyForm, model))
         } getOrElse Redirect(controllers.businessmatching.routes.SummaryController.get())
   }
 
@@ -56,7 +56,7 @@ class UpdateServicesSummaryController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
           activity <- OptionT.fromOption[Future](model.activity)
                   _ <- helper.updateTradingPremises(model)
                   _ <- helper.updateResponsiblePeople(model)

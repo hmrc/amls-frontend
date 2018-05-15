@@ -34,10 +34,10 @@ class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
                                          val removeServicesSummaryPageRouter: RemoveBusinessTypesSummaryPageRouter,
                                          val unableToRemovePageRouter: UnableToRemovePageRouter,
                                          val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
-                                        ) extends Router[RemoveServiceFlowModel] {
+                                        ) extends Router[RemoveBusinessTypeFlowModel] {
 
 
-  override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
+  override def getRoute(pageId: PageId, model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case WhatServiceToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)

@@ -23,7 +23,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.cannot_add_services
@@ -35,7 +35,7 @@ class NoPsrController @Inject()(
                                  val authConnector: AuthConnector,
                                  implicit val dataCacheConnector: DataCacheConnector,
                                  val helper: AddBusinessTypeHelper,
-                                 val router: Router[AddServiceFlowModel]
+                                 val router: Router[AddBusinessTypeFlowModel]
                                ) extends BaseController {
 
   def get = Authorised.async {
@@ -49,7 +49,7 @@ class NoPsrController @Inject()(
       implicit request =>
         (for {
           _ <- helper.clearFlowModel()
-          route <- OptionT.liftF(router.getRoute(NoPSRPageId, AddServiceFlowModel()))
+          route <- OptionT.liftF(router.getRoute(NoPSRPageId, AddBusinessTypeFlowModel()))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NoPsrController")
   }
 }

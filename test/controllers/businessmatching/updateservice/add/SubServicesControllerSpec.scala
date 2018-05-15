@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SubServicesPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -48,7 +48,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
 
@@ -71,8 +71,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
     "get is called" must {
       "return OK with 'msb_subservices' view" in new Fixture {
 
-        mockCacheFetch(Some(AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
@@ -94,7 +94,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
       "return the 'Does Your Business ... PSR ...' page in the flow" when {
         "money transfer has been posted" in new Fixture {
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             hasChanged = true))
 
           val result = controller.post()(request.withFormUrlEncodedBody(
@@ -103,8 +103,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               hasChanged = true))
         }
@@ -112,7 +112,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted" in new Fixture {
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
+          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
             hasChanged = true)
           )
 
@@ -123,8 +123,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
               hasChanged = true))
         }
@@ -132,8 +132,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when editing existing full flow with only money transfer" in new Fixture {
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
             hasChanged = true)
           )
@@ -145,8 +145,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
               hasChanged = true))
         }
@@ -154,8 +154,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when editing existing full flow with money transfer and others" in new Fixture {
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
+          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
             hasChanged = true)
           )
@@ -167,8 +167,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
               hasChanged = true))
         }
@@ -176,8 +176,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
       "return the 'Responsible people' page in the flow" when {
         "anything other than money transfer has been posted when completely changing selected services" in new Fixture {
-          mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
+          mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+            subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
             hasChanged = true)
           )
@@ -189,8 +189,8 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
 
           status(result) mustBe SEE_OTHER
           controller.router.verify(SubServicesPageId,
-            AddServiceFlowModel(activity = Some(MoneyServiceBusiness),
-              msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
+            AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+              subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
               hasChanged = true))
         }

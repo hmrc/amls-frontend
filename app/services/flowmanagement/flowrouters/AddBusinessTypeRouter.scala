@@ -36,16 +36,16 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
                                       val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
                                       val noPSRPageRouter: NoPSRPageRouter,
                                       val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
-                                      val subServicesPageRouter: MsbServicesPageRouter,
+                                      val subServicesPageRouter: SubSectorsPageRouter,
                                       val tradingPremisesPageRouter: TradingPremisesPageRouter,
                                       val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter,
                                       val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
                                       val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
                                       val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
-                                     ) extends Router[AddServiceFlowModel] {
+                                     ) extends Router[AddBusinessTypeFlowModel] {
 
 
-  override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
+  override def getRoute(pageId: PageId, model: AddBusinessTypeFlowModel, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case AddMoreAcivitiesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)

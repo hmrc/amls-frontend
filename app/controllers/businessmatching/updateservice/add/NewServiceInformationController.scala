@@ -23,7 +23,7 @@ import controllers.BaseController
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, NewServiceInformationPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.new_service_information
@@ -33,7 +33,7 @@ import scala.concurrent.Future
 class NewServiceInformationController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
-                                                 val router: Router[AddServiceFlowModel]
+                                                 val router: Router[AddBusinessTypeFlowModel]
                                                ) extends BaseController {
 
   def get() = Authorised.async {
@@ -58,7 +58,7 @@ class NewServiceInformationController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
           route <- OptionT.liftF(router.getRoute(NewServiceInformationPageId, model))
         } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NewServiceInformationController")
   }

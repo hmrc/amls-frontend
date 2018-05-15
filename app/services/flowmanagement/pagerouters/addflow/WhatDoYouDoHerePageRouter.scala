@@ -19,7 +19,7 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -32,15 +32,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
-                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
+    (model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
       model.businessAppliedForPSRNumber.isDefined) match {
       case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
       case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))

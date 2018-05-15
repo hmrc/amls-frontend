@@ -40,7 +40,7 @@ class WhatDoYouDoHereController @Inject()(
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
                                            val helper: AddBusinessTypeHelper,
-                                           val router: Router[AddServiceFlowModel]
+                                           val router: Router[AddBusinessTypeFlowModel]
                                          ) extends BaseController {
 
   var msbServiceValues: Set[String] = Set()
@@ -49,10 +49,10 @@ class WhatDoYouDoHereController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
         } yield {
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(model.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices))
-          val flowMsbServices: Set[BusinessMatchingMsbService] = model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
+          val flowMsbServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
           msbServiceValues = BusinessMatchingMsbServices.all.intersect(flowMsbServices).map(BusinessMatchingMsbServices.getValue)
           Ok(what_do_you_do_here(form, edit, msbServiceValues))
         }) getOrElse InternalServerError("Failed to get subservices")
@@ -67,7 +67,7 @@ class WhatDoYouDoHereController @Inject()(
             Future.successful(BadRequest(what_do_you_do_here(f, edit, msbServiceValues)))
           }
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) =>  model.tradingPremisesMsbServices(data)
             } flatMap {
               case Some(model) => router.getRoute(WhatDoYouDoHerePageId, model, edit)

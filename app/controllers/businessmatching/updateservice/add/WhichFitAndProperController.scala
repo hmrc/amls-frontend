@@ -44,7 +44,7 @@ class WhichFitAndProperController @Inject()(
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
                                              val helper: AddBusinessTypeHelper,
-                                             val router: Router[AddServiceFlowModel]
+                                             val router: Router[AddBusinessTypeFlowModel]
                                            ) extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -52,7 +52,7 @@ class WhichFitAndProperController @Inject()(
       implicit request =>
         (for {
           rp <- OptionT.liftF(responsiblePeopleService.getAll)
-          flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+          flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
         } yield {
           val indexedRp = rp.zipWithIndex.exceptInactive
           val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
@@ -69,7 +69,7 @@ class WhichFitAndProperController @Inject()(
             BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
           }
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.responsiblePeople(Some(data))
             } flatMap {
               case Some(model) => router.getRoute(WhichFitAndProperPageId, model, edit)

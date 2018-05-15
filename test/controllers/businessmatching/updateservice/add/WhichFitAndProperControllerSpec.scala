@@ -23,7 +23,7 @@ import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -55,7 +55,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       businessMatchingService = mockBusinessMatchingService,
       responsiblePeopleService = mockRPService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
     val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+
@@ -68,8 +68,8 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "3")), None) // isComplete = false
     )
 
-    mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key),
-      AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+    mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key),
+      AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
         areNewActivitiesAtTradingPremises = Some(false),
         tradingPremisesActivities = None,
         addMoreActivities = None,
@@ -78,15 +78,15 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         hasChanged = true,
         hasAccepted = false))
 
-    mockCacheFetch[AddServiceFlowModel](
-      Some(AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+    mockCacheFetch[AddBusinessTypeFlowModel](
+      Some(AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
         areNewActivitiesAtTradingPremises = Some(false),
         tradingPremisesActivities = None,
         addMoreActivities = None,
         fitAndProper = Some(true),
         responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
         hasChanged = true,
-        hasAccepted = false)), Some(AddServiceFlowModel.key))
+        hasAccepted = false)), Some(AddBusinessTypeFlowModel.key))
 
     when {
       controller.businessMatchingService.getModel(any(), any(), any())
@@ -121,7 +121,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
         status(result) must be(SEE_OTHER)
         controller.router.verify(WhichFitAndProperPageId,
-          AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+          AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false),
             tradingPremisesActivities = None,
             addMoreActivities = None,
@@ -138,7 +138,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       val result = controller.post(true)(request.withFormUrlEncodedBody("responsiblePeople[]" -> "1"))
       status(result) must be(SEE_OTHER)
       controller.router.verify(WhichFitAndProperPageId,
-        AddServiceFlowModel(activity = Some(TrustAndCompanyServices),
+        AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices),
           areNewActivitiesAtTradingPremises = Some(false),
           tradingPremisesActivities = None,
           addMoreActivities = None,

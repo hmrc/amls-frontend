@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddBusinessTypeFlowModel}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -42,7 +42,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
     val controller = new AddMoreActivitiesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
     val BusinessActivitiesModel = BusinessActivities(Set(BillPaymentServices, TelephonePaymentService))
@@ -73,22 +73,22 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
         "progress to the 'select Activities' page" when {
           "request equals Yes" in new Fixture {
 
-            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
+            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
             val result = controller.post()(request.withFormUrlEncodedBody(
               "addmoreactivities" -> "true"
             ))
 
             status(result) mustBe SEE_OTHER
-            controller.router.verify(AddMoreAcivitiesPageId, AddServiceFlowModel(addMoreActivities = Some(true)))
+            controller.router.verify(AddMoreAcivitiesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
           }
         }
 
         "when request equals 'No'" must {
           "progress to the 'registration progress' page " when {
             "no activity that generates a section has been chosen" in new Fixture {
-              val flowModel = AddServiceFlowModel(Some(BillPaymentServices))
-              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
+              val flowModel = AddBusinessTypeFlowModel(Some(BillPaymentServices))
+              mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
               val result = controller.post()(request.withFormUrlEncodedBody(
                 "addmoreactivities" -> "false"
@@ -101,8 +101,8 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
 
           "progress to the next page " when {
             "an activity that generates a section has been chosen" in new Fixture {
-              val flowModel = AddServiceFlowModel(Some(HighValueDealing))
-              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), flowModel)
+              val flowModel = AddBusinessTypeFlowModel(Some(HighValueDealing))
+              mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), flowModel)
 
               val result = controller.post()(request.withFormUrlEncodedBody(
                 "addmoreactivities" -> "false"

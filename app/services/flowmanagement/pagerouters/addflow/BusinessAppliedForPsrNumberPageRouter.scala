@@ -19,7 +19,7 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId, PageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, BusinessAppliedForPSRNumberPageId, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -32,9 +32,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusService,
-                                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+                                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext

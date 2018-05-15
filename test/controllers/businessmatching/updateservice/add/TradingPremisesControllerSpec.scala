@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, TradingPremisesPageId}
 import models.status.SubmissionDecisionApproved
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -41,10 +41,10 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
     mockApplicationStatus(SubmissionDecisionApproved)
   }
 
@@ -69,7 +69,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
         "redirect" when {
           "request equals Yes" in new Fixture {
 
-            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
+            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
             val result = controller.post()(request.withFormUrlEncodedBody(
               "tradingPremisesNewActivities" -> "true"
@@ -78,14 +78,14 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
             status(result) mustBe SEE_OTHER
 
             controller.router.verify(TradingPremisesPageId,
-              AddServiceFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
+              AddBusinessTypeFlowModel(areNewActivitiesAtTradingPremises = Some(true), hasChanged = true))
           }
         }
 
         "when request equals No" when {
           "progress to the 'new service information' page" when {
             "an activity that generates a section has been chosen" in new Fixture {
-              mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing)))
+              mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing)))
 
               val result = controller.post()(request.withFormUrlEncodedBody(
                 "tradingPremisesNewActivities" -> "false"
@@ -94,7 +94,7 @@ class TradingPremisesControllerSpec extends AmlsSpec with BusinessMatchingGenera
               status(result) mustBe SEE_OTHER
 
               controller.router.verify(TradingPremisesPageId,
-                AddServiceFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
+                AddBusinessTypeFlowModel(Some(HighValueDealing), areNewActivitiesAtTradingPremises = Some(false), hasChanged = true))
             }
           }
         }

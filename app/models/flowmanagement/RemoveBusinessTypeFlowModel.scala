@@ -19,11 +19,11 @@ package models.flowmanagement
 import models.businessmatching.BusinessActivity
 import play.api.libs.json.Json
 
-case class RemoveServiceFlowModel(activitiesToRemove: Option[Set[BusinessActivity]] = None)
+case class RemoveBusinessTypeFlowModel(activitiesToRemove: Option[Set[BusinessActivity]] = None)
 
-object RemoveServiceFlowModel {
+object RemoveBusinessTypeFlowModel {
 
   val key = "remove-service-flow"
 
-  implicit val removeServiceFlowModelFormat = Json.format[RemoveServiceFlowModel]
+  implicit val removeServiceFlowModelFormat = Json.format[RemoveBusinessTypeFlowModel]
 }

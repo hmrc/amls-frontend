@@ -19,7 +19,7 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -31,18 +31,18 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class MsbServicesPageRouter @Inject()(val statusService: StatusService,
-                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class SubSectorsPageRouter @Inject()(val statusService: StatusService,
+                                     val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
+    (model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
       edit,
-      model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
+      model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
       model.businessAppliedForPSRNumber.isDefined,
       model.areNewActivitiesAtTradingPremises) match {
       case (true, false, _, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))

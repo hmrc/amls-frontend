@@ -21,20 +21,20 @@ import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, Tra
 import models.responsiblepeople.ResponsiblePerson
 import play.api.libs.json.Json
 
-case class AddServiceFlowModel(
-                                activity: Option[BusinessActivity] = None,
-                                areNewActivitiesAtTradingPremises: Option[Boolean] = None,
-                                tradingPremisesActivities: Option[TradingPremisesActivities] = None,
-                                addMoreActivities: Option[Boolean] = None,
-                                fitAndProper: Option[Boolean] = None,
-                                responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
-                                hasChanged: Boolean = false,
-                                hasAccepted: Boolean = false,
-                                businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
-                                msbServices: Option[BusinessMatchingMsbServices] = None,
-                                tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
+case class AddBusinessTypeFlowModel(
+                                     activity: Option[BusinessActivity] = None,
+                                     areNewActivitiesAtTradingPremises: Option[Boolean] = None,
+                                     tradingPremisesActivities: Option[TradingPremisesActivities] = None,
+                                     addMoreActivities: Option[Boolean] = None,
+                                     fitAndProper: Option[Boolean] = None,
+                                     responsiblePeople: Option[ResponsiblePeopleFitAndProper] = None,
+                                     hasChanged: Boolean = false,
+                                     hasAccepted: Boolean = false,
+                                     businessAppliedForPSRNumber: Option[BusinessAppliedForPSRNumber] = None,
+                                     subSectors: Option[BusinessMatchingMsbServices] = None,
+                                     tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
                               ) {
-  def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePerson]): AddServiceFlowModel = {
+  def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePerson]): AddBusinessTypeFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
             .collect({
               case (person, index) if person.hasAlreadyPassedFitAndProper.getOrElse(false) => index
@@ -62,17 +62,17 @@ case class AddServiceFlowModel(
     }
   }
 
-  def activity(p: BusinessActivity): AddServiceFlowModel =
+  def activity(p: BusinessActivity): AddBusinessTypeFlowModel =
     this.copy(activity = Some(p),
       hasChanged = hasChanged || !this.activity.contains(p),
       hasAccepted = hasAccepted && this.activity.contains(p))
 
-  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddServiceFlowModel =
+  def businessAppliedForPSRNumber(p: BusinessAppliedForPSRNumber): AddBusinessTypeFlowModel =
     this.copy(businessAppliedForPSRNumber = Some(p),
       hasChanged = hasChanged || !this.businessAppliedForPSRNumber.contains(p),
       hasAccepted = hasAccepted && this.businessAppliedForPSRNumber.contains(p))
 
-  def msbServices(p: BusinessMatchingMsbServices): AddServiceFlowModel = {
+  def msbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
     val intersectingMsbServices: Set[BusinessMatchingMsbService] =
       this.tradingPremisesMsbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.intersect(p.msbServices)
     val tradingPremisesMsbActivities: Option[BusinessMatchingMsbServices] =
@@ -90,46 +90,46 @@ case class AddServiceFlowModel(
         None
       }
 
-    this.copy(msbServices = Some(p),
+    this.copy(subSectors = Some(p),
       businessAppliedForPSRNumber = businessAppliedForPSRNumber,
       tradingPremisesMsbServices = tradingPremisesMsbActivities,
-      hasChanged = hasChanged || !this.msbServices.contains(p),
-      hasAccepted = hasAccepted && this.msbServices.contains(p))
+      hasChanged = hasChanged || !this.subSectors.contains(p),
+      hasAccepted = hasAccepted && this.subSectors.contains(p))
   }
 
-  def tradingPremisesMsbServices(p: BusinessMatchingMsbServices): AddServiceFlowModel = {
+  def tradingPremisesMsbServices(p: BusinessMatchingMsbServices): AddBusinessTypeFlowModel = {
     this.copy(tradingPremisesMsbServices = Some(p),
       hasChanged = hasChanged || !this.tradingPremisesMsbServices.contains(p),
       hasAccepted = hasAccepted && this.tradingPremisesMsbServices.contains(p))
   }
 
-  def isActivityAtTradingPremises(p: Option[Boolean]): AddServiceFlowModel =
+  def isActivityAtTradingPremises(p: Option[Boolean]): AddBusinessTypeFlowModel =
     this.copy(areNewActivitiesAtTradingPremises = p,
       hasChanged = hasChanged || !this.areNewActivitiesAtTradingPremises.equals(p),
       hasAccepted = hasAccepted && this.areNewActivitiesAtTradingPremises.equals(p))
 
-  def tradingPremisesActivities(p: Option[TradingPremisesActivities]): AddServiceFlowModel =
+  def tradingPremisesActivities(p: Option[TradingPremisesActivities]): AddBusinessTypeFlowModel =
     this.copy(tradingPremisesActivities = p,
       hasChanged = hasChanged || !this.tradingPremisesActivities.equals(p),
       hasAccepted = hasAccepted && this.tradingPremisesActivities.equals(p))
 
-  def isfitAndProper(p: Option[Boolean]): AddServiceFlowModel =
+  def isfitAndProper(p: Option[Boolean]): AddBusinessTypeFlowModel =
     this.copy(fitAndProper = p,
       hasChanged = hasChanged || !this.fitAndProper.equals(p),
       hasAccepted = hasAccepted && this.fitAndProper.equals(p))
 
-  def responsiblePeople(p: Option[ResponsiblePeopleFitAndProper]): AddServiceFlowModel =
+  def responsiblePeople(p: Option[ResponsiblePeopleFitAndProper]): AddBusinessTypeFlowModel =
     this.copy(responsiblePeople = p,
       hasChanged = hasChanged || !this.responsiblePeople.equals(p),
       hasAccepted = hasAccepted && this.responsiblePeople.equals(p))
 
   def isComplete: Boolean = this match {
-    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
-    case AddServiceFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
-    case AddServiceFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
-    case AddServiceFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _, _) => true
-    case AddServiceFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(MoneyServiceBusiness), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(_), Some(_), Some(_), Some(true), Some(_), _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), Some(false), _, Some(_), Some(false), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(_), Some(_), Some(_), Some(_), Some(_), _, _, true, _, _, _) => true
+    case AddBusinessTypeFlowModel(Some(_), Some(false), _, Some(_), Some(_), _, _, true, _, _, _) => true
 
 
     case _ => false
@@ -144,10 +144,10 @@ case class AddServiceFlowModel(
 
 }
 
-object AddServiceFlowModel {
+object AddBusinessTypeFlowModel {
 
   val key = "add-service-flow"
 
-  implicit val addServiceFlowModelFormat = Json.format[AddServiceFlowModel]
+  implicit val addServiceFlowModelFormat = Json.format[AddBusinessTypeFlowModel]
 
 }

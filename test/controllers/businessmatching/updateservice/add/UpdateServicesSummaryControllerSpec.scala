@@ -24,7 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
-import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, UpdateServiceSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
@@ -62,11 +62,11 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel],
+      router = createRouter[AddBusinessTypeFlowModel],
       tradingPremisesService = mockTradingPremisesService
     )
 
-    val flowModel = AddServiceFlowModel(
+    val flowModel = AddBusinessTypeFlowModel(
       Some(HighValueDealing),
       Some(true),
       Some(TradingPremisesActivities(Set(0)))
@@ -145,7 +145,7 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
 
         when {
           controller.helper.clearFlowModel()(any(), any())
-        } thenReturn OptionT.some[Future, AddServiceFlowModel](AddServiceFlowModel())
+        } thenReturn OptionT.some[Future, AddBusinessTypeFlowModel](AddBusinessTypeFlowModel())
 
         val result = controller.post()(request)
 

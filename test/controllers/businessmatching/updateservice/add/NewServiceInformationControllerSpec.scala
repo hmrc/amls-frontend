@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, NewServiceInformationPageId}
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -43,11 +43,11 @@ class NewServiceInformationControllerSpec extends AmlsSpec with MockitoSugar wit
     val controller = new NewServiceInformationController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
-    val flowModel = AddServiceFlowModel(Some(AccountancyServices), Some(true))
-    mockCacheFetch[AddServiceFlowModel](Some(flowModel), Some(AddServiceFlowModel.key))
+    val flowModel = AddBusinessTypeFlowModel(Some(AccountancyServices), Some(true))
+    mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel), Some(AddBusinessTypeFlowModel.key))
   }
 
   "NewServiceInformationController" when {

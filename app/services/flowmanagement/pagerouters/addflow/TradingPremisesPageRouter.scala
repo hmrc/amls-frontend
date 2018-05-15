@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -32,9 +32,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class TradingPremisesPageRouter @Inject()(val statusService: StatusService,
-                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: AddBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     if (edit && model.tradingPremisesActivities.isDefined) {

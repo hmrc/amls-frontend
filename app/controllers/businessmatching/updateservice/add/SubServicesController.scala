@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SubServicesPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -37,7 +37,7 @@ class SubServicesController @Inject()(
                                        val authConnector: AuthConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val businessMatchingService: BusinessMatchingService,
-                                       val router: Router[AddServiceFlowModel]
+                                       val router: Router[AddBusinessTypeFlowModel]
                                      ) extends BaseController {
 
 
@@ -45,9 +45,9 @@ class SubServicesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) orElse OptionT.some(AddServiceFlowModel())
+          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) orElse OptionT.some(AddBusinessTypeFlowModel())
         } yield {
-          val flowSubServices: Set[BusinessMatchingMsbService] = model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
+          val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
 
           Ok(msb_subservices(form, edit))
@@ -63,7 +63,7 @@ class SubServicesController @Inject()(
             Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit)))
 
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => {
                 model.msbServices(data)
               }

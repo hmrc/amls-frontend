@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.RemoveServiceFlowModel
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +43,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
 
-  def removeBusinessMatchingBusinessTypes(model: RemoveServiceFlowModel)
+  def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)
                                          (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
@@ -71,7 +71,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newBusinessMatching
   }
 
-  def removeTradingPremisesBusinessTypes(model: RemoveServiceFlowModel)
+  def removeTradingPremisesBusinessTypes(model: RemoveBusinessTypeFlowModel)
                                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
 
     val setAccepted = (tp: TradingPremises) => tp.copy(hasAccepted = true)
@@ -100,7 +100,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newTradingPremises
   }
 
-  def removeFitAndProper(model: RemoveServiceFlowModel)
+  def removeFitAndProper(model: RemoveBusinessTypeFlowModel)
                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])

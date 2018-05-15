@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice
 
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.flowmanagement.RemoveServiceFlowModel
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import org.scalatest.concurrent.ScalaFutures
@@ -29,7 +29,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
 
-  val MSBOnlyModel = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
+  val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -48,7 +48,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity MSB (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
             hasAccepted = true,
@@ -68,7 +68,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         }
 
         "remove the BusinessMatching MSB Services" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
 
@@ -91,7 +91,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching PSR" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))),
             msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -119,7 +119,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity EAB (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, EstateAgentBusinessService))),
             hasAccepted = true,
@@ -143,7 +143,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity TCSP (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, TrustAndCompanyServices))),
             hasAccepted = true,
@@ -167,7 +167,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity BP (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
             hasAccepted = true,
@@ -191,7 +191,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity TDI (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, TelephonePaymentService)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, TelephonePaymentService)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, TelephonePaymentService))),
             hasAccepted = true,
@@ -215,7 +215,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity ASP (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, AccountancyServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, AccountancyServices)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, AccountancyServices))),
             hasAccepted = true,
@@ -239,7 +239,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
         "remove the BusinessMatching Business Activity HVD (Type)" in new Fixture {
 
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, HighValueDealing)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, HighValueDealing)))
 
           val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, AccountancyServices))),
             hasAccepted = true,
@@ -268,7 +268,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an MSB" should {
 
         "remove the TradingPremises Business Activity MSB (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
@@ -289,7 +289,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         }
 
         "remove the TradingPremises MSB Services" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
             msbServices = Some(TradingPremisesMsbServices(Set(CurrencyExchange))),
@@ -314,7 +314,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an EAB" should {
 
         "remove the TradingPremises Business Activity EAB (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
@@ -338,7 +338,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an TCSP" should {
 
         "remove the TradingPremises Business Activity TCSP (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TrustAndCompanyServices))),
@@ -362,7 +362,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an BP" should {
 
         "remove the TradingPremises Business Activity BP (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, BillPaymentServices))),
             hasAccepted = true,
@@ -385,7 +385,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an TDI" should {
 
         "remove the TradingPremises Business Activity TDI (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TelephonePaymentService, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TelephonePaymentService, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TelephonePaymentService))),
             hasAccepted = true,
@@ -408,7 +408,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an ASP" should {
 
         "remove the TradingPremises Business Activity ASP (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(AccountancyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(AccountancyServices, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))),
             hasAccepted = true,
@@ -431,7 +431,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an HVD" should {
 
         "remove the TradingPremises Business Activity HVD (Type)" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(HighValueDealing, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing, BillPaymentServices)))
 
           val startResultTP = Seq(TradingPremises(
             whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
@@ -461,7 +461,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an MSB" should {
 
         "remove the ResponsiblePeople fit and proper if there is no TCSP" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
@@ -485,7 +485,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         }
 
         "not remove the ResponsiblePeople fit and proper if there is TCSP" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
@@ -515,7 +515,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing an TCSP" should {
 
         "remove the ResponsiblePeople fit and proper if there is no MSB" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
@@ -546,7 +546,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         }
 
         "not remove the ResponsiblePeople fit and proper if there is MSB" in new Fixture {
-          val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+          val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,

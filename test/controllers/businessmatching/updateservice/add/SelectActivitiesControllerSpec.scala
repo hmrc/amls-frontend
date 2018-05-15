@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import models.businessmatching._
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
@@ -47,7 +47,7 @@ class SelectActivitiesControllerSpec extends AmlsSpec {
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
     when {
@@ -60,10 +60,10 @@ class SelectActivitiesControllerSpec extends AmlsSpec {
       controller.businessMatchingService.getSubmittedBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
-    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
+    mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(BillPaymentServices), Some(true))), Some(AddBusinessTypeFlowModel.key))
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePerson.key))
-    mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
+    mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
   }
 
   "SelectActivitiesController" when {
@@ -87,8 +87,8 @@ class SelectActivitiesControllerSpec extends AmlsSpec {
       }
 
       "return the next page in the flow when valid data has been posted" in new Fixture {
-        mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
-        mockCacheSave[AddServiceFlowModel](AddServiceFlowModel(Some(HighValueDealing)), Some(AddServiceFlowModel.key))
+        mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
+        mockCacheSave[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel(Some(HighValueDealing)), Some(AddBusinessTypeFlowModel.key))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[]" -> "04"

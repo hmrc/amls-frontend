@@ -17,7 +17,7 @@
 package services.flowmanagement.pagerouters.removeflow
 
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.RemoveServiceFlowModel
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import play.api.mvc.Result
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -29,9 +29,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class NeedToUpdatePageRouter @Inject()(val statusService: StatusService,
-                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
+                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext

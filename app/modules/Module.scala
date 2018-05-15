@@ -20,7 +20,7 @@ import com.google.inject.{AbstractModule, TypeLiteral}
 import config.{AMLSAuditConnector, WSHttp}
 import connectors._
 import models.businessmatching.updateservice.ChangeBusinessType
-import models.flowmanagement.{AddServiceFlowModel, RemoveServiceFlowModel}
+import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
 import services._
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.{ChangeBusinessTypeRouter, AddBusinessTypeRouter, RemoveBusinessTypeRouter}
@@ -45,8 +45,8 @@ class Module extends AbstractModule {
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
     bind(classOf[FeeConnector]).toInstance(FeeConnector)
     bind(classOf[LandingService]).toInstance(LandingService)
-    bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
+    bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
-    bind(new TypeLiteral[Router[RemoveServiceFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
+    bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
   }
 }

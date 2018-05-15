@@ -20,7 +20,7 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, FitAndProperPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, FitAndProperPageId}
 import models.status.SubmissionDecisionApproved
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
@@ -41,10 +41,10 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
     val controller = new FitAndProperController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
 
-    mockCacheFetch(Some(AddServiceFlowModel(Some(HighValueDealing))))
+    mockCacheFetch(Some(AddBusinessTypeFlowModel(Some(HighValueDealing))))
     mockApplicationStatus(SubmissionDecisionApproved)
 
   }
@@ -71,7 +71,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
         "redirect" when {
           "request equals Yes" in new Fixture {
 
-            mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel())
+            mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
             val result = controller.post()(request.withFormUrlEncodedBody(
               "passedFitAndProper" -> "true"
@@ -80,13 +80,13 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
             status(result) mustBe SEE_OTHER
 
             controller.router.verify(FitAndProperPageId,
-              AddServiceFlowModel(fitAndProper = Some(true), hasChanged = true))
+              AddBusinessTypeFlowModel(fitAndProper = Some(true), hasChanged = true))
           }
 
           "request equals No" when {
             "progress to the 'new service information' page" when {
               "an activity that generates a section has been chosen" in new Fixture {
-                mockCacheUpdate[AddServiceFlowModel](Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(TrustAndCompanyServices)))
+                mockCacheUpdate[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(TrustAndCompanyServices)))
 
                 val result = controller.post()(request.withFormUrlEncodedBody(
                   "passedFitAndProper" -> "false"
@@ -95,7 +95,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
                 status(result) mustBe SEE_OTHER
 
                 controller.router.verify(FitAndProperPageId,
-                  AddServiceFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
+                  AddBusinessTypeFlowModel(Some(TrustAndCompanyServices), fitAndProper = Some(false), hasChanged = true))
               }
             }
           }

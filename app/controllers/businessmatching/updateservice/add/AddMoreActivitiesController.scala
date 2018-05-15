@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel}
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddBusinessTypeFlowModel}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class AddMoreActivitiesController @Inject()(
                                              val authConnector: AuthConnector,
                                              implicit val dataCacheConnector: DataCacheConnector,
-                                             val router: Router[AddServiceFlowModel]
+                                             val router: Router[AddBusinessTypeFlowModel]
                                            ) extends BaseController {
 
   val fieldName = "addmoreactivities"
@@ -64,7 +64,7 @@ class AddMoreActivitiesController @Inject()(
             } getOrElse InternalServerError("Post: Unable to show add more activities page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
             } flatMap {
               case Some(model) => router.getRoute(AddMoreAcivitiesPageId, model)

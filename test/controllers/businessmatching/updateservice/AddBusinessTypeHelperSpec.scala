@@ -23,7 +23,7 @@ import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision._
 import org.joda.time.LocalDate
@@ -69,7 +69,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     "remove the accountancy data from the 'business activities' section" in new Fixture {
       mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
-      val model = AddServiceFlowModel(activity = Some(AccountancyServices))
+      val model = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
       for {
         result <- SUT.updateBusinessActivities(model)
       } yield {
@@ -84,7 +84,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     "not touch the accountancy data if the activity is not 'accountancy services'" in new Fixture {
       mockCacheUpdate[BABusinessActivities](Some(models.businessactivities.BusinessActivities.key), businessActivitiesSection)
 
-      val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+      val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
       for {
         result <- SUT.updateBusinessActivities(model)
@@ -157,7 +157,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     "update the current activities and msb services" when {
       "there are no msb services and the new activity is not MSB and there are existing activities" in new Fixture {
 
-        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+        val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
         var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices))), hasAccepted = true, hasChanged = true)
         var endResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, HighValueDealing))), hasAccepted = true, hasChanged = true)
@@ -172,7 +172,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       "there are no msb services and the new activity is not MSB and there are no existing activities" in new Fixture {
 
-        val model = AddServiceFlowModel(activity = Some(HighValueDealing))
+        val model = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
 
         var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())), hasAccepted = true, hasChanged = true)
 
@@ -189,9 +189,9 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       "there are additional msb services and the activity is MSB and there are existing activities" in new Fixture {
 
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
+          subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal)))
         )
 
         var startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
@@ -215,9 +215,9 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
       "there are msb services and the new activity is MSB and there are no existing activities" in new Fixture {
 
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(MoneyServiceBusiness),
-          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
+          subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
         )
 
         val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set())),
@@ -251,7 +251,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           Some(TrustAndCompanyServices),
           fitAndProper = Some(true),
           responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
@@ -273,7 +273,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
-        val model = AddServiceFlowModel(Some(HighValueDealing))
+        val model = AddBusinessTypeFlowModel(Some(HighValueDealing))
 
         SUT.updateResponsiblePeople(model).returnsSome(people)
 
@@ -284,19 +284,19 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
   "clearFlowModel" must {
     "set an empty model back into the cache" in new Fixture {
-      mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
+      mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel(Some(HighValueDealing), fitAndProper = Some(true)))
 
-      SUT.clearFlowModel().returnsSome(AddServiceFlowModel())
+      SUT.clearFlowModel().returnsSome(AddBusinessTypeFlowModel())
     }
   }
 
   "updateHasAcceptedFlag" must {
     "save the flow model with 'hasAccepted' = true" in new Fixture {
-      mockCacheSave[AddServiceFlowModel]
+      mockCacheSave[AddBusinessTypeFlowModel]
 
-      await(SUT.updateHasAcceptedFlag(AddServiceFlowModel()).value)
+      await(SUT.updateHasAcceptedFlag(AddBusinessTypeFlowModel()).value)
 
-      verify(mockCacheConnector).save[AddServiceFlowModel](eqTo(AddServiceFlowModel.key), eqTo(AddServiceFlowModel(hasAccepted = true)))(any(), any(), any())
+      verify(mockCacheConnector).save[AddBusinessTypeFlowModel](eqTo(AddBusinessTypeFlowModel.key), eqTo(AddBusinessTypeFlowModel(hasAccepted = true)))(any(), any(), any())
     }
   }
 
@@ -305,14 +305,14 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "a ServicesRegister model is already available with pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
 
-        SUT.updateServicesRegister(AddServiceFlowModel(Some(BillPaymentServices)))
+        SUT.updateServicesRegister(AddBusinessTypeFlowModel(Some(BillPaymentServices)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, BillPaymentServices))))
       }
 
       "a ServiceChangeRegister does not exist or has no pre-existing activities" in new Fixture {
         mockCacheUpdate(Some(ServiceChangeRegister.key), ServiceChangeRegister())
 
-        SUT.updateServicesRegister(AddServiceFlowModel(Some(MoneyServiceBusiness)))
+        SUT.updateServicesRegister(AddBusinessTypeFlowModel(Some(MoneyServiceBusiness)))
           .returnsSome(ServiceChangeRegister(Some(Set(MoneyServiceBusiness))))
       }
     }

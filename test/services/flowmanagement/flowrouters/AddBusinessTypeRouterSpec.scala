@@ -49,7 +49,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
       newServicesInformationPageRouter = new NeedMoreInformationPageRouter(mockStatusService, mockBusinessMatchingService),
       noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
-      subServicesPageRouter = new MsbServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+      subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
       changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
@@ -64,7 +64,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "return the 'trading premises' page (TradingPremisesController)" when {
       "given the 'BusinessActivities' model contains a single activity" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing))
         val result = await(router.getRoute(SelectActivitiesPageId, model))
 
@@ -75,7 +75,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'trading premises' page (TradingPremisesController)" when {
       "given the 'BusinessActivities' model contains a single activity " +
         "and there is no trading premises question data in edit mode" in new Fixture {
-        val model = AddServiceFlowModel(Some(HighValueDealing))
+        val model = AddBusinessTypeFlowModel(Some(HighValueDealing))
         val result = await(router.getRoute(SelectActivitiesPageId, model, edit = true))
 
         result mustBe Redirect(addRoutes.TradingPremisesController.get(true))
@@ -85,7 +85,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "given the activity is not done at any trading premises " +
         "and the activity requires further information" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(false))
 
@@ -98,7 +98,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "given we've chosen an activity " +
         "and we're in the edit flow" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(false))
 
@@ -111,7 +111,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the trading premises yes/no question " +
         "the trading premises have already been selected" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
           tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1))))
@@ -124,7 +124,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "return the 'which trading premises' page (WhichTradingPremisesController)" when {
       "given the 'NewActivitiesAtTradingPremisesYes' model contains HVD" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true))
         val result = await(router.getRoute(TradingPremisesPageId, model))
@@ -135,7 +135,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "given a set of trading premises has been chosen" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
           tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2)))
@@ -149,7 +149,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "return the 'Do you want add more activities' page (addMoreActivitiesController)" when {
       "we're on the summary page and the user selects continue" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true))
 
@@ -175,7 +175,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
-        val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(BillPaymentServices))))
+        val result = await(router.getRoute(UpdateServiceSummaryPageId, AddBusinessTypeFlowModel(Some(BillPaymentServices))))
 
         result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
       }
@@ -192,7 +192,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
           router.businessMatchingService.getAdditionalBusinessActivities(any(), any(), any())
         } thenReturn OptionT.some[Future, Set[BusinessActivity]](BusinessActivities.all)
 
-        val result = await(router.getRoute(UpdateServiceSummaryPageId, AddServiceFlowModel(Some(HighValueDealing))))
+        val result = await(router.getRoute(UpdateServiceSummaryPageId, AddBusinessTypeFlowModel(Some(HighValueDealing))))
 
         result mustBe Redirect(addRoutes.NewServiceInformationController.get())
       }
@@ -201,7 +201,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Activities selection' page (SelectActivitiesController)" when {
       "we're on the 'Do you want at add more activities' page " +
         "and the use wants to add more activities" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
           addMoreActivities = Some(true))
@@ -217,7 +217,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
         "and the user has added Activities that require more questions " +
         "and the use doesn't want to add more activities" in new Fixture {
 
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
           addMoreActivities = Some(false))
@@ -236,7 +236,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
       "we're on the 'Do you want at add more activities' page " +
         "and the user has NOT added Activities that require more questions" +
         "and the use doesn't want to add more activities" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(BillPaymentServices),
           addMoreActivities = Some(false))
 
@@ -252,7 +252,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
     "return the 'registration progress' page" when {
       "we're on the 'new service information' page" in new Fixture {
-        val model = AddServiceFlowModel(
+        val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true))
 

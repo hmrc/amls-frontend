@@ -26,7 +26,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
-import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SelectActivitiesPageId}
 import models.responsiblepeople.ResponsiblePerson
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -44,7 +44,7 @@ class SelectActivitiesController @Inject()(
                                             val authConnector: AuthConnector,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
-                                            val router: Router[AddServiceFlowModel]
+                                            val router: Router[AddBusinessTypeFlowModel]
                                           ) extends BaseController with RepeatingSection {
 
   implicit val activityReader: Rule[UrlFormEncoded, BusinessActivity] =
@@ -62,9 +62,9 @@ class SelectActivitiesController @Inject()(
         (for {
           //Ensure that responsible people can be populated as required
           responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)) orElse OptionT.none
-          model <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(model => edit match {
-            case false => model.getOrElse(AddServiceFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
-            case _ => model.getOrElse(AddServiceFlowModel())
+          model <- OptionT(dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)(model => edit match {
+            case false => model.getOrElse(AddBusinessTypeFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
+            case _ => model.getOrElse(AddBusinessTypeFlowModel())
           }))
           (names, values) <- getFormData
         } yield {
@@ -83,9 +83,9 @@ class SelectActivitiesController @Inject()(
           } getOrElse InternalServerError("Post: Invalid form on Select Activities page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               model =>
-                model.getOrElse(AddServiceFlowModel()) match {
+                model.getOrElse(AddBusinessTypeFlowModel()) match {
                   case m if !m.activity.contains(data) =>
                     m.activity(data).isActivityAtTradingPremises(None).tradingPremisesActivities(None)
                   case m => m.activity(data)
