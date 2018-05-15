@@ -39,8 +39,8 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
-                                    implicit val dataCacheConnector: DataCacheConnector
+class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
+                                         implicit val dataCacheConnector: DataCacheConnector
                                    ) {
 
   def removeBusinessMatchingBusinessTypes(model: RemoveServiceFlowModel)

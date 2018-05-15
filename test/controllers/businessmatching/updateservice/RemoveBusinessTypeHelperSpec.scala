@@ -26,7 +26,7 @@ import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
+class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
 
   val MSBOnlyModel = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
@@ -34,7 +34,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
-    val helper = new RemoveServiceHelper(
+    val helper = new RemoveBusinessTypeHelper(
       self.authConnector,
       mockCacheConnector
     )
