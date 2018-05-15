@@ -24,8 +24,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessPartners
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{Partner, Positions, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{Partner, Positions, ResponsiblePerson}
 import models.status.{RenewalSubmitted, _}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{ProgressService, StatusService}
@@ -44,7 +44,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
                                            implicit val progressService: ProgressService
                                           ) extends BaseController {
 
-  def businessPartnersView(status: Status, form: Form2[BusinessPartners], rp: Seq[ResponsiblePeople])
+  def businessPartnersView(status: Status, form: Form2[BusinessPartners], rp: Seq[ResponsiblePerson])
                           (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     statusService.getStatus map {
       case SubmissionReady =>
@@ -60,9 +60,9 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
 
   private def saveAndRedirect(data : BusinessPartners) (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] = {
     (for {
-      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+      responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
       rp <- updatePartners(responsiblePeople, data)
-      _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
+      _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
       url <- progressService.getSubmitRedirect
     } yield url match {
       case Some(x) => Redirect(x)
@@ -72,11 +72,11 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def updatePartners(eventualMaybePeoples: Option[Seq[ResponsiblePeople]],
-                     data: BusinessPartners): Future[Option[Seq[ResponsiblePeople]]] = {
+  def updatePartners(eventualMaybePeoples: Option[Seq[ResponsiblePerson]],
+                     data: BusinessPartners): Future[Option[Seq[ResponsiblePerson]]] = {
     eventualMaybePeoples match {
       case Some(rpSeq) =>
-        val updatedList = ResponsiblePeople.filter(rpSeq).map { responsiblePerson =>
+        val updatedList = ResponsiblePerson.filter(rpSeq).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
             case true =>
               val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions + Partner, p.startDate)))
@@ -89,7 +89,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def getNonPartners(people: Seq[ResponsiblePeople]) = {
+  def getNonPartners(people: Seq[ResponsiblePerson]) = {
     people.filter(_.positions.fold(false)(p => !p.positions.contains(Partner)))
   }
 
@@ -98,7 +98,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
 
       val result = for {
         subtitle <- OptionT.liftF(statusSubtitle())
-        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+        responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       } yield {
         Ok(views.html.declaration.register_partners(
           subtitle,
@@ -115,7 +115,7 @@ class RegisterPartnersController @Inject()(val authConnector: AuthConnector,
     implicit authContext => implicit request => {
       Form2[BusinessPartners](request.body) match {
         case f: InvalidForm => {
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
             case Some(data) => {
               businessPartnersView(BadRequest, f, data)
             }

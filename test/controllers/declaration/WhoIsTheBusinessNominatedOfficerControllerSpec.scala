@@ -18,7 +18,7 @@ package controllers.declaration
 
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.declaration.BusinessNominatedOfficer
-import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -57,17 +57,17 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
     val personName = PersonName("firstName", Some("middleName"), "lastName")
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-    val rp = ResponsiblePeople (
+    val rp = ResponsiblePerson (
       personName = Some(personName),
       positions = Some(positions),
       status = None
     )
-    val rp2 = ResponsiblePeople (
+    val rp2 = ResponsiblePerson (
       personName = Some(personName1),
       positions = Some(positions),
       status = None
     )
-    val rp1 = ResponsiblePeople(
+    val rp1 = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = Some(StatusConstants.Deleted)
@@ -79,7 +79,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         "status is pre-submission" in new Fixture {
 
           mockApplicationStatus(SubmissionReady)
-          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
@@ -91,7 +91,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         "status is pending" in new Fixture {
 
           mockApplicationStatus(SubmissionReadyForReview)
-          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
@@ -103,7 +103,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         "status is approved" in new Fixture {
 
           mockApplicationStatus(SubmissionDecisionApproved)
-          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
@@ -115,7 +115,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
         "status is ready for renewal" in new Fixture {
 
           mockApplicationStatus(ReadyForRenewal(Some(new LocalDate())))
-          mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+          mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
           mockCacheGetEntry[BusinessNominatedOfficer](None, BusinessNominatedOfficer.key)
 
           val result = controller.get()(request)
@@ -135,9 +135,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
           positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
         ), rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
-        mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
+        mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -158,9 +158,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
           ), rp2)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionDecisionApproved)
-          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
+          mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -175,9 +175,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
           ), rp2)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionReadyForReview)
-          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
+          mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -198,9 +198,9 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
             positions = Some(positions.copy(positions = Set(BeneficialOwner, InternalAccountant, NominatedOfficer)))
           ), rp2)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionReady)
-          mockCacheSave[Option[Seq[ResponsiblePeople]]](Some(updatedList))
+          mockCacheSave[Option[Seq[ResponsiblePerson]]](Some(updatedList))
 
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
@@ -216,7 +216,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
       "selected option is 'Register someone else'" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("value" -> "-1")
 
-        mockCacheGetEntry[Seq[ResponsiblePeople]](Some(responsiblePeoples), ResponsiblePeople.key)
+        mockCacheGetEntry[Seq[ResponsiblePerson]](Some(responsiblePeoples), ResponsiblePerson.key)
         mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)
@@ -229,7 +229,7 @@ class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with Mocki
       "no option is selected on the UI" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody()
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeoples), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeoples), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
 
         val result = controller.post()(newRequest)

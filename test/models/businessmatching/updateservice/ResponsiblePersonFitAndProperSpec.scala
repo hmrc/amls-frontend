@@ -21,7 +21,7 @@ import jto.validation.{Path, ValidationError}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
-class ResponsiblePeopleFitAndProperSpec extends PlaySpec with MustMatchers {
+class ResponsiblePersonFitAndProperSpec extends PlaySpec with MustMatchers {
 
   "The ResponsiblePeopleFitAndProper model" when {
     "given a valid form" when {

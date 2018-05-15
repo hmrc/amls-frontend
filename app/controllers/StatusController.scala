@@ -23,7 +23,7 @@ import connectors._
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
@@ -59,7 +59,7 @@ class StatusController @Inject()(val landingService: LandingService,
           statusResponse <- Future(statusInfo._2)
           maybeBusinessName <- getBusinessName(statusResponse.fold(none[String])(_.safeId)).value
           feeResponse <- getFeeResponse(mlrRegNumber, statusInfo._1)
-          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          responsiblePeople <- dataCache.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
           bm <- dataCache.fetch[BusinessMatching](BusinessMatching.key)
           maybeActivities <- Future(bm.activities)
           page <- getPageBasedOnStatus(
@@ -110,7 +110,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                    businessNameOption: Option[String],
                                    feeResponse: Option[FeeResponse],
                                    fromDuplicateSubmission: Boolean,
-                                   responsiblePeople: Option[Seq[ResponsiblePeople]],
+                                   responsiblePeople: Option[Seq[ResponsiblePerson]],
                                    activities: Option[BusinessActivities])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
     statusInfo match {
@@ -157,7 +157,7 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getDecisionPage(mlrRegNumber: Option[String],
                               statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                               businessNameOption: Option[String],
-                              responsiblePeople: Option[Seq[ResponsiblePeople]],
+                              responsiblePeople: Option[Seq[ResponsiblePerson]],
                               maybeActivities: Option[BusinessActivities])(implicit request: Request[AnyContent]) = {
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
@@ -194,7 +194,7 @@ class StatusController @Inject()(val landingService: LandingService,
   private def getRenewalFlowPage(mlrRegNumber: Option[String],
                                  statusInfo: (SubmissionStatus, Option[ReadStatusResponse]),
                                  businessNameOption: Option[String],
-                                 responsiblePeople: Option[Seq[ResponsiblePeople]],
+                                 responsiblePeople: Option[Seq[ResponsiblePerson]],
                                  maybeActivities: Option[BusinessActivities])
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {

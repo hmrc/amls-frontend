@@ -25,7 +25,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
 import models.flowmanagement.{AddServiceFlowModel, UpdateServiceSummaryPageId}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
@@ -141,7 +141,7 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
 
         when {
           controller.helper.updateResponsiblePeople(any())(any(), any())
-        } thenReturn OptionT.some[Future, Seq[ResponsiblePeople]](Seq.empty)
+        } thenReturn OptionT.some[Future, Seq[ResponsiblePerson]](Seq.empty)
 
         when {
           controller.helper.clearFlowModel()(any(), any())

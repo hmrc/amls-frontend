@@ -42,17 +42,17 @@ class StillEmployedControllerSpec extends AmlsSpec {
 
     lazy val controller = injector.instanceOf[StillEmployedController]
 
-    val nominatedOfficer = ResponsiblePeople(
+    val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
       positions = Some(Positions(Set(NominatedOfficer),None))
     )
 
-    val otherResponsiblePerson = ResponsiblePeople(
+    val otherResponsiblePerson = ResponsiblePerson(
       personName = Some(PersonName("otherFirstName", None, "otherLastName")),
       positions = Some(Positions(Set(Director),None))
     )
 
-    when(cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+    when(cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
   }
 
@@ -70,7 +70,7 @@ class StillEmployedControllerSpec extends AmlsSpec {
       "redirect to NewOfficerController" when {
         "no nominated officer is found" in new TestFixture {
 
-          when(cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(otherResponsiblePerson))))
 
           val result = controller.get()(request)

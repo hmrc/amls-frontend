@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import utils.RepeatingSection
 import views.html.responsiblepeople.your_answers
 
@@ -30,7 +30,7 @@ trait YourAnswersController extends RepeatingSection with BaseController {
   def get() =
       Authorised.async {
         implicit authContext => implicit request =>
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
             case Some(data) => Ok(your_answers(data))
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }

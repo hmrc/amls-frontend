@@ -24,7 +24,7 @@ import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherN
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.AddServiceFlowModel
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -249,7 +249,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
 
-        mockCacheUpdate(Some(ResponsiblePeople.key), people)
+        mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
         val model = AddServiceFlowModel(
           Some(TrustAndCompanyServices),
@@ -271,7 +271,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
           _.copy(hasAlreadyPassedFitAndProper = Some(false))
         }
 
-        mockCacheUpdate(Some(ResponsiblePeople.key), people)
+        mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
         val model = AddServiceFlowModel(Some(HighValueDealing))
 

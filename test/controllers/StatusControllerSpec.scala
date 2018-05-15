@@ -69,15 +69,15 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
     )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-    val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-    val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+    val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+    val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
     val responsiblePeople = Seq(rp1, rp2)
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
   }
 
   val feeResponse = FeeResponse(
@@ -814,15 +814,15 @@ class StatusControllerWithoutReregisterSpec extends AmlsSpec with MockitoSugar w
     )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-    val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-    val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+    val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+    val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
     val responsiblePeople = Seq(rp1, rp2)
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
       .thenReturn(Future.successful((NotCompleted, None)))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
   }
 
   val feeResponse = FeeResponse(

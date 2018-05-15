@@ -51,13 +51,13 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     postCode <- postcodeGen
   } yield PersonAddressUK(line1, line2, None, None, postCode)
 
-  val responsiblePersonGen: Gen[ResponsiblePeople] = for {
+  val responsiblePersonGen: Gen[ResponsiblePerson] = for {
     personName <- personNameGen
     positions <- positionsGen
     phoneNumber <- numSequence(10)
     email <- emailGen
     address <- personAddressGen
-  } yield ResponsiblePeople(
+  } yield ResponsiblePerson(
     Some(personName),
     Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
     None,
@@ -82,10 +82,10 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     Some(SoleProprietorOfAnotherBusiness(false))
   )
 
-  def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePeople] = for {
+  def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePerson] = for {
     person <- responsiblePersonGen
   } yield person.copy(positions = positions.fold[Option[Positions]](None)(p => Some(Positions(p, None))))
 
-  def responsiblePeopleGen(i: Int) = Gen.listOfN[ResponsiblePeople](i, responsiblePersonGen)
+  def responsiblePeopleGen(i: Int) = Gen.listOfN[ResponsiblePerson](i, responsiblePersonGen)
 
 }

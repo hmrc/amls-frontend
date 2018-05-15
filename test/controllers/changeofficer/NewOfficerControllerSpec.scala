@@ -22,7 +22,7 @@ import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
 import models.responsiblepeople._
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
+import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
 import org.jsoup.Jsoup
 import org.scalacheck.Gen
 import play.api.inject.bind
@@ -57,13 +57,13 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     lazy val controller = injector.instanceOf[NewOfficerController]
 
     lazy val responsiblePeople = Gen.listOf(responsiblePersonGen).sample.get
-    lazy val emptyPerson = ResponsiblePeople()
+    lazy val emptyPerson = ResponsiblePerson()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
 
     lazy val changeOfficer = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))
 
     when {
-      cache.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+      cache.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(responsiblePeopleWithEmptyPerson))
 
     when {
@@ -78,7 +78,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
         status(result) mustBe OK
 
-        verify(cache).fetch(eqTo(ResponsiblePeople.key))(any(), any(), any())
+        verify(cache).fetch(eqTo(ResponsiblePerson.key))(any(), any(), any())
 
         val html = Jsoup.parse(contentAsString(result))
 
@@ -90,12 +90,12 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       "prepopulate the view with the selected person" in new TestFixture {
 
         override lazy val responsiblePeople = Gen.listOfN(3, responsiblePersonGen).sample.get :+
-          ResponsiblePeople(Some(PersonName("Test", None, "Person")))
+          ResponsiblePerson(Some(PersonName("Test", None, "Person")))
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
 
         when {
-          cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
         when {
@@ -183,10 +183,10 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         )
 
         when {
-          cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
+          cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
         } thenReturn Future.successful(Some(responsiblePeople))
 
-        val getPeopleAndSelectedOfficer = PrivateMethod[OptionT[Future, (NewOfficer, Seq[ResponsiblePeople])]]('getPeopleAndSelectedOfficer)
+        val getPeopleAndSelectedOfficer = PrivateMethod[OptionT[Future, (NewOfficer, Seq[ResponsiblePerson])]]('getPeopleAndSelectedOfficer)
 
         val result = controller invokePrivate getPeopleAndSelectedOfficer(HeaderCarrier(), mock[AuthContext]) getOrElse fail("Could not retrieve")
 

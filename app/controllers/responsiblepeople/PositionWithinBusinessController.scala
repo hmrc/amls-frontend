@@ -40,12 +40,12 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
               val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                 .getOrElse(BusinessType.SoleProprietor)
 
-              val data = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+              val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
               getResponsiblePersonFromData(data,index) match {
-                case Some(rp@ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_, Some(positions),_,_,_,_,_,_,_,_,_,_,_))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_, Some(positions),_,_,_,_,_,_,_,_,_,_,_))
                 => Ok(position_within_business(Form2[Positions](positions), edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
-                case Some(rp@ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+                case Some(rp@ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
                 => Ok(position_within_business(EmptyForm, edit, index, bt, personName.titleName, displayNominatedOfficer(rp, hasNominatedOfficer(data)), flow))
                 case _
                 => NotFound(notFoundView)
@@ -65,7 +65,7 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
                 val bt = ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
                   .getOrElse(BusinessType.SoleProprietor)
 
-                val data = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+                val data = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
                 getResponsiblePersonFromData(data,index) match {
                   case s@Some(rp) =>
@@ -75,10 +75,10 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.positions(data)
               }
-              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
             } yield {
               if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
@@ -95,9 +95,9 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
         }
   }
 
-  private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePeople]]): Boolean = {
+  private[controllers] def hasNominatedOfficer(rpSeqOption: Option[Seq[ResponsiblePerson]]): Boolean = {
     rpSeqOption match {
-      case Some(rps) => ResponsiblePeople.filter(rps).exists {
+      case Some(rps) => ResponsiblePerson.filter(rps).exists {
         rp =>
           rp.positions match {
             case Some(position) => position.isNominatedOfficer
@@ -108,13 +108,13 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     }
   }
 
-  private[controllers] def displayNominatedOfficer(rp: ResponsiblePeople, hasNominatedOfficer: Boolean): Boolean = {
+  private[controllers] def displayNominatedOfficer(rp: ResponsiblePerson, hasNominatedOfficer: Boolean): Boolean = {
     (rp.positions.map{ positions =>
       positions.positions.contains(NominatedOfficer)
     } contains true) || !hasNominatedOfficer
   }
 
-  private def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePeople]], index: Int) = data.flatMap{
+  private def getResponsiblePersonFromData(data: Option[Seq[ResponsiblePerson]], index: Int) = data.flatMap{
     case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
     case _ => None
   }

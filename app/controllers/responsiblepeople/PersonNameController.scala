@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import play.api.i18n.Messages
 import play.api.mvc.Request
 import utils.RepeatingSection
@@ -35,10 +35,10 @@ trait PersonNameController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_name(Form2[PersonName](name), edit, index, flow))
-          case Some(ResponsiblePeople(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_name(EmptyForm, edit, index, flow))
           case _
           => NotFound(notFoundView)
@@ -53,7 +53,7 @@ trait PersonNameController extends RepeatingSection with BaseController {
             Future.successful(BadRequest(views.html.responsiblepeople.person_name(f, edit, index, flow)))
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.personName(data)
               }
             } yield edit match {

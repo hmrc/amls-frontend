@@ -22,7 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.responsiblepeople._
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
@@ -62,7 +62,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
     val reviewDetails = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
       Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "XE0001234567890")
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(model)), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(model)), Some(ResponsiblePerson.key))
 
     mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails), None)), Some(BusinessMatching.key))
 
@@ -82,7 +82,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
     "redirect to the main amls summary page when section data is unavailable" in new Fixture {
 
-      mockCacheFetch[Seq[ResponsiblePeople]](None, Some(ResponsiblePeople.key))
+      mockCacheFetch[Seq[ResponsiblePerson]](None, Some(ResponsiblePerson.key))
 
       val result = controller.get()(request)
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
@@ -93,14 +93,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
       val personName = Some(PersonName("firstname", None, "lastname"))
 
-      mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+      mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
         personName,
         personResidenceType = Some(PersonResidenceType(
           NonUKResidence,
           Some(Country("United Kingdom", "GB")),
           Some(Country("France", "FR")))
         )
-      ))), Some(ResponsiblePeople.key))
+      ))), Some(ResponsiblePerson.key))
 
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -124,13 +124,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
       "'flow flag is not defined" which {
         "will update hasAccepted flag" in new Fixture {
 
-          mockCacheSave[Seq[ResponsiblePeople]]
+          mockCacheSave[Seq[ResponsiblePerson]]
 
           val result = controller.post()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
         }
 
         "will strip out empty responsible people models" in new Fixture {
@@ -140,11 +140,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
           val models = Seq(
             responsiblePersonGen.sample.get,
-            ResponsiblePeople()
+            ResponsiblePerson()
           )
 
           when {
-            controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
           } thenReturn Future.successful(Some(models))
 
           val result = controller.post()(request)
@@ -152,7 +152,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
           verify(controller.dataCacheConnector)
-            .save[Seq[ResponsiblePeople]](any(), eqTo(Seq(models.head.copy(hasAccepted = true))))(any(),any(),any())
+            .save[Seq[ResponsiblePerson]](any(), eqTo(Seq(models.head.copy(hasAccepted = true))))(any(),any(),any())
         }
       }
     }
@@ -160,13 +160,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
     "redirect to 'Who is the business’s nominated officer?'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is pending'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -174,13 +174,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
       }
       s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None,None,None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None,None,None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -191,13 +191,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
     "redirect to 'Fee Guidance'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is pre amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -209,13 +209,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
     "redirect to 'Who is registering this business?'" when {
       s"'flow flag set to Some($flowFromDeclaration) and status is SubmissionDecisionApproved'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
         status(result) must be(SEE_OTHER)
@@ -224,13 +224,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
       s"'flow flag set to Some($flowFromDeclaration) and status is amendment'" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None, None, None,None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None, None, None,None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReadyForReview)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -244,13 +244,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
           mockApplicationStatus(SubmissionReady)
-          mockCacheSave[Seq[ResponsiblePeople]]
+          mockCacheSave[Seq[ResponsiblePerson]]
 
           val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -268,14 +268,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
         val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer, Partner), Some(new LocalDate()))
         val positions2 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
+        val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
         val responsiblePeople = Seq(rp1, rp2)
 
         mockCacheFetch[BusinessMatching](Some(BusinessMatching(Some(reviewDetails2), None)), Some(BusinessMatching.key))
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockApplicationStatus(SubmissionReady)
-        mockCacheSave[Seq[ResponsiblePeople]]
+        mockCacheSave[Seq[ResponsiblePerson]]
 
         val result = controller.post(Some(flowFromDeclaration))(request)
 
@@ -289,14 +289,14 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ResponsibleP
 
       val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer, Partner), Some(new LocalDate()))
       val positions2 = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-      val rp1 = ResponsiblePeople(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
-      val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
+      val rp1 = ResponsiblePerson(Some(PersonName("first", Some("middle"), "last")), None, None, None, None, None, None, None, None, None, Some(positions1))
+      val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "middle2")), None, None, None,None, None, None, None, None, None, Some(positions2))
       val responsiblePeople = Seq(rp1, rp2)
 
       mockCacheFetch[BusinessMatching](Some(BusinessMatching(None, None)), Some(BusinessMatching.key))
-      mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+      mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
       mockApplicationStatus(SubmissionReady)
-      mockCacheSave[Seq[ResponsiblePeople]]
+      mockCacheSave[Seq[ResponsiblePerson]]
 
       val result = controller.post(Some(flowFromDeclaration))(request)
 

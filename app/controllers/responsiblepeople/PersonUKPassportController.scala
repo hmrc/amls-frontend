@@ -23,7 +23,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ResponsiblePeople, UKPassport, UKPassportNo, UKPassportYes}
+import models.responsiblepeople.{ResponsiblePerson, UKPassport, UKPassportNo, UKPassportYes}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
@@ -41,10 +41,10 @@ class PersonUKPassportController @Inject()(
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,Some(ukPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(Form2[UKPassport](ukPassport), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_uk_passport(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -54,18 +54,18 @@ class PersonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[UKPassport](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(person_uk_passport(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 data match {
                   case UKPassportYes(_) if rp.ukPassport.contains(UKPassportNo) => rp.ukPassport(data).copy(nonUKPassport = None)
                   case _ => rp.ukPassport(data)
                 }
               })
-              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
             } yield {
               redirectTo(rp, data, index, edit, flow)
             }) getOrElse NotFound(notFoundView)
@@ -75,7 +75,7 @@ class PersonUKPassportController @Inject()(
         }
   }
 
-  private def redirectTo(rp: Seq[ResponsiblePeople], data: UKPassport, index: Int, edit: Boolean, flow: Option[String]) = {
+  private def redirectTo(rp: Seq[ResponsiblePerson], data: UKPassport, index: Int, edit: Boolean, flow: Option[String]) = {
     val responsiblePerson = rp(index - 1)
     data match {
       case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, flow))

@@ -25,15 +25,15 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
-import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import services.{StatusService, SubmissionService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper}
 import views.html.responsiblepeople._
-import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.responsiblepeople.ResponsiblePerson.FilterUtils
 import models.status.SubmissionStatus
 import models.tradingpremises.TradingPremises
 import play.api.mvc.Result
@@ -47,7 +47,7 @@ class SummaryController @Inject()(
                                    config: AppConfig
                                  ) extends BaseController {
 
-  private def updateResponsiblePeople(rp: Option[Seq[ResponsiblePeople]]) : Future[Option[Seq[ResponsiblePeople]]] = {
+  private def updateResponsiblePeople(rp: Option[Seq[ResponsiblePerson]]) : Future[Option[Seq[ResponsiblePerson]]] = {
     rp match {
       case Some(rpSeq) => {
         val updatedList = rpSeq.filterEmpty.map { people =>
@@ -77,7 +77,7 @@ class SummaryController @Inject()(
         case None => {
           (for {
             model <- OptionT(fetchModel)
-            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
+            _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
           } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update ResponsiblePeople")
         }
       }
@@ -86,8 +86,8 @@ class SummaryController @Inject()(
   private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
     (for {
       model <- OptionT(fetchModel)
-      _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePeople.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
-      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)))
+      _ <- OptionT.liftF(dataCacheConnector.save(ResponsiblePerson.key, model.filterEmpty.map(_.copy(hasAccepted = true))))
+      hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)))
       businessmatching <- OptionT.liftF(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)
       businessType <- OptionT.fromOption[Future](reviewDetails.businessType)
@@ -100,5 +100,5 @@ class SummaryController @Inject()(
     }) getOrElse InternalServerError("Cannot determine redirect")
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
-    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 }

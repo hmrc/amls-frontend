@@ -33,8 +33,8 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Conversions._
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.ResponsiblePerson.FilterUtils
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -106,7 +106,7 @@ class SubmissionService @Inject()
    ec: ExecutionContext
   ): SubscriptionRequest = {
 
-    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
+    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
 
     def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 

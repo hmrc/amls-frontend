@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{Nationality, ResponsiblePeople}
+import models.responsiblepeople.{Nationality, ResponsiblePerson}
 import services.AutoCompleteService
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
@@ -36,13 +36,13 @@ trait NationalityController extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          getData[ResponsiblePerson](index) map {
+            case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => residencyType.nationality match {
                 case Some(country) => Ok(nationality(Form2[Nationality](country), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
                 case _ => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
               }
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(nationality(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
@@ -55,12 +55,12 @@ trait NationalityController extends RepeatingSection with BaseController {
 
           Form2[Nationality](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map {rp =>
+              getData[ResponsiblePerson](index) map { rp =>
                 BadRequest(nationality(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               for {
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                   val residenceType = rp.personResidenceType.map(x => x.copy(nationality = Some(data)))
                   rp.personResidenceType(residenceType)
                 }

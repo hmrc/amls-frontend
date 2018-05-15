@@ -27,7 +27,7 @@ import jto.validation.{Rule, Write}
 import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
 import models.flowmanagement.{AddServiceFlowModel, SelectActivitiesPageId}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -61,7 +61,7 @@ class SelectActivitiesController @Inject()(
       implicit request =>
         (for {
           //Ensure that responsible people can be populated as required
-          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)) orElse OptionT.none
+          responsiblePeople <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)) orElse OptionT.none
           model <- OptionT(dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key)(model => edit match {
             case false => model.getOrElse(AddServiceFlowModel()).fitAndProperFromResponsiblePeople(responsiblePeople.exceptInactive)
             case _ => model.getOrElse(AddServiceFlowModel())

@@ -25,7 +25,7 @@ import models.declaration.AddPerson
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -41,7 +41,7 @@ case class ViewResponse(
                          bankDetailsSection: Seq[BankDetails],
                          aboutYouSection: AddPerson,
                          businessActivitiesSection: BusinessActivities,
-                         responsiblePeopleSection: Option[Seq[ResponsiblePeople]],
+                         responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
                          tcspSection: Option[Tcsp],
                          aspSection: Option[Asp],
                          msbSection: Option[MoneyServiceBusiness],
@@ -66,7 +66,7 @@ object ViewResponse {
       (__ \ "bankDetailsSection").read[Seq[BankDetails]] and
       (__ \ "aboutYouSection").read[AddPerson] and
       (__ \ "businessActivitiesSection").read[BusinessActivities] and
-      (__ \ "responsiblePeopleSection").readNullable[Seq[ResponsiblePeople]] and
+      (__ \ "responsiblePeopleSection").readNullable[Seq[ResponsiblePerson]] and
       (__ \ "tcspSection").readNullable[Tcsp] and
       (__ \ "aspSection").readNullable[Asp] and
       (__ \ "msbSection").readNullable[MoneyServiceBusiness] and

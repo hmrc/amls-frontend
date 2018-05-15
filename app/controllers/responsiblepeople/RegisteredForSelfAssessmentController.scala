@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.responsiblepeople.{ResponsiblePeople, SaRegistered}
+import models.responsiblepeople.{ResponsiblePerson, SaRegistered}
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
@@ -33,10 +33,10 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_,_))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_, Some(person),_,_,_,_,_,_,_,_,_,_))
           => Ok(registered_for_self_assessment(Form2[SaRegistered](person), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(registered_for_self_assessment(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -48,12 +48,12 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
       implicit authContext => implicit request =>
         Form2[SaRegistered](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map {rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(registered_for_self_assessment(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.saRegistered(data)
               }
             } yield {

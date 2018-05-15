@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{ContactDetails, PersonName, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{ContactDetails, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -50,8 +50,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
     "get is called" must {
       "display the contact details page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -65,9 +65,9 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       "display the contact details page with pre populated data" in new Fixture {
 
         val contact = ContactDetails("07702745869", "test@test.com")
-        val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
+        val res = ResponsiblePerson(personName = personName, contactDetails = Some(contact))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(res))))
 
         val result = controller.get(1)(request)
@@ -81,9 +81,9 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       "respond with NOT_FOUND" when {
         "there is no responsible person for the index" in new Fixture {
           val contact = ContactDetails("07000000000", "test@test.com")
-          val res = ResponsiblePeople(personName = personName, contactDetails = Some(contact))
+          val res = ResponsiblePerson(personName = personName, contactDetails = Some(contact))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(res))))
 
           val result = controller.get(0)(request)
@@ -102,8 +102,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
             when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -121,8 +121,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(), ResponsiblePerson()))))
 
             when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -140,8 +140,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(), ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(), ResponsiblePerson()))))
 
             when(controller.dataCacheConnector.save[ContactDetails](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -158,8 +158,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
               "emailAddress" -> "test@test.com"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
             when(controller.dataCacheConnector.save[ContactDetails](any(), any())
               (any(), any(), any())).thenReturn(Future.successful(emptyCache))
@@ -179,8 +179,8 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
             "emailAddress" -> "test@test.com"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
           when(controller.dataCacheConnector.save[ContactDetails](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))

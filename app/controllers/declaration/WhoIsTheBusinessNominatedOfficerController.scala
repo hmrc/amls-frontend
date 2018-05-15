@@ -23,8 +23,8 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration.BusinessNominatedOfficer
-import models.responsiblepeople.ResponsiblePeople.flowFromDeclaration
-import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
+import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
@@ -44,7 +44,7 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                                                              val statusService: StatusService,
                                                              config: AppConfig) extends BaseController {
 
-  def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePeople])
+  def businessNominatedOfficerView(status: Status, form: Form2[BusinessNominatedOfficer], rp: Seq[ResponsiblePerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus map {
       case SubmissionReady => status(select_business_nominated_officer("submit.registration", form, rp))
@@ -60,19 +60,19 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
           optionalCache =>
             (for {
               cache <- optionalCache
-              responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-            } yield businessNominatedOfficerView(Ok, EmptyForm, ResponsiblePeople.filter(responsiblePeople))
+              responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+            } yield businessNominatedOfficerView(Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
               ) getOrElse businessNominatedOfficerView(Ok, EmptyForm, Seq.empty)
         }
   }
 
   def getWithAmendment() = get
 
-  def updateNominatedOfficer(eventualMaybePeoples: Option[Seq[ResponsiblePeople]],
-                             data: BusinessNominatedOfficer): Future[Option[Seq[ResponsiblePeople]]] = {
+  def updateNominatedOfficer(eventualMaybePeoples: Option[Seq[ResponsiblePerson]],
+                             data: BusinessNominatedOfficer): Future[Option[Seq[ResponsiblePerson]]] = {
     eventualMaybePeoples match {
       case Some(rpSeq) =>
-        val updatedList = ResponsiblePeople.filter(rpSeq).map { responsiblePerson =>
+        val updatedList = ResponsiblePerson.filter(rpSeq).map { responsiblePerson =>
           responsiblePerson.personName.exists(name => name.fullNameWithoutSpace.equals(data.value)) match {
             case true =>
               val position = responsiblePerson.positions.fold[Option[Positions]](None)(p => Some(Positions(p.positions. + (NominatedOfficer), p.startDate)))
@@ -92,9 +92,9 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
             case "-1" => Future.successful(Redirect(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(true, Some(flowFromDeclaration))))
             case _ => for {
               serviceStatus <- statusService.getStatus
-              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+              responsiblePeople <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
               rp <- updateNominatedOfficer(responsiblePeople, data)
-              _ <- dataCacheConnector.save(ResponsiblePeople.key, rp)
+              _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
             } yield serviceStatus match {
               case SubmissionReady | NotCompleted if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
               case _ => Redirect(routes.WhoIsRegisteringController.get())
@@ -107,8 +107,8 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
                      (fn: BusinessNominatedOfficer => Future[Result])
                      (implicit ac: AuthContext, hc: HeaderCarrier, request: Request[AnyContent]): Future[Result] = {
     form match {
-      case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-        case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePeople.filter(data))
+      case f: InvalidForm => dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
+        case Some(data) => businessNominatedOfficerView(BadRequest, f, ResponsiblePerson.filter(data))
         case None => businessNominatedOfficerView(BadRequest, f, Seq.empty)
       }
       case ValidForm(_, data) => fn(data)

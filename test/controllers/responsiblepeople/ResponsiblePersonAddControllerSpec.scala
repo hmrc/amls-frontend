@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -31,12 +31,12 @@ import utils.{AuthorisedFixture, AmlsSpec}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.responsiblepeople.ResponsiblePeople.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
 
-class ResponsiblePeopleAddControllerSpec extends AmlsSpec
+class ResponsiblePersonAddControllerSpec extends AmlsSpec
   with MustMatchers with MockitoSugar with ScalaFutures with PropertyChecks {
 
   trait Fixture extends AuthorisedFixture {
@@ -48,12 +48,12 @@ class ResponsiblePeopleAddControllerSpec extends AmlsSpec
     }
 
     @tailrec
-    final def buildTestSequence(requiredCount: Int, acc: Seq[ResponsiblePeople] = Nil): Seq[ResponsiblePeople] = {
+    final def buildTestSequence(requiredCount: Int, acc: Seq[ResponsiblePerson] = Nil): Seq[ResponsiblePerson] = {
       require(requiredCount >= 0, "cannot build a sequence with negative elements")
       if (requiredCount == acc.size) {
         acc
       } else {
-        buildTestSequence(requiredCount, acc :+ ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(false)))
+        buildTestSequence(requiredCount, acc :+ ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(false)))
       }
     }
 
@@ -82,10 +82,10 @@ class ResponsiblePeopleAddControllerSpec extends AmlsSpec
           forAll(guidanceOptions(currentCount)) { (guidanceRequested: Boolean, fromDeclaration: Option[String], expectedRedirect: Call) =>
             val testSeq  = buildTestSequence(currentCount)
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(testSeq)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
 
             val resultF = controller.get(guidanceRequested, fromDeclaration)(request)
@@ -94,7 +94,7 @@ class ResponsiblePeopleAddControllerSpec extends AmlsSpec
             redirectLocation(resultF) must be(Some(expectedRedirect.url))
 
             verify(controller.dataCacheConnector)
-              .save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(testSeq :+ ResponsiblePeople()))(any(), any(), any())
+              .save[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key), meq(testSeq :+ ResponsiblePerson()))(any(), any(), any())
 
             reset(controller.dataCacheConnector)
           }

@@ -23,8 +23,8 @@ import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
-import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.FilterUtils
+import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.ResponsiblePerson.FilterUtils
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
 import play.api.i18n.Messages
@@ -60,7 +60,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
     dataCacheConnector.fetchAll map { optCacheMap =>
       (for {
         cacheMap <- optCacheMap
-        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).map(_.filterEmpty)
+        responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
         tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
         aboutthebusiness <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
         businessmatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)

@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{BeneficialOwner, PersonName, Positions, ResponsiblePeople}
+import models.responsiblepeople.{BeneficialOwner, PersonName, Positions, ResponsiblePerson}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved, SubmissionReady}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -45,11 +45,11 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
       override val statusService = mock[StatusService]
     }
 
-    val model = ResponsiblePeople(None, None)
+    val model = ResponsiblePerson(None, None)
 
     val personName = PersonName("first name", None, "last name")
 
-    when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+    when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(model))))
 
     when(controller.statusService.getStatus(any(), any(), any()))
@@ -71,9 +71,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load yourAnswers page when the status is approved" in new Fixture {
-      override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
+      override val model = ResponsiblePerson(Some(personName), None, lineId = Some(121212))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -88,9 +88,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load yourAnswers page when the status is renewal submitted" in new Fixture {
-      override val model = ResponsiblePeople(Some(personName), None, lineId = Some(121212))
+      override val model = ResponsiblePerson(Some(personName), None, lineId = Some(121212))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -105,9 +105,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load yourAnswers page when the status is approved and has no lineId" in new Fixture {
-      override val model = ResponsiblePeople(Some(personName), None, lineId = None)
+      override val model = ResponsiblePerson(Some(personName), None, lineId = None)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -122,9 +122,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load yourAnswers page when the status is ready for renewal" in new Fixture {
-      override val model = ResponsiblePeople(Some(personName), lineId = Some(121212))
+      override val model = ResponsiblePerson(Some(personName), lineId = Some(121212))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(model))))
 
       when(controller.statusService.getStatus(any(), any(), any()))
@@ -141,9 +141,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     "get is called - NOT from the yourAnswers controller" must {
       "respond with OK and show the detailed answers page with a 'confirm and continue'" in new Fixture {
 
-        override val model = ResponsiblePeople(None, None)
+        override val model = ResponsiblePerson(None, None)
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(model))))
 
         val result = controller.get(1, false)(request)
@@ -170,9 +170,9 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
           private val testStartDate = new LocalDate(1999,1,1)
 
-          override val model = ResponsiblePeople(positions = Some(Positions(Set(BeneficialOwner),Some(testStartDate))))
+          override val model = ResponsiblePerson(positions = Some(Positions(Set(BeneficialOwner),Some(testStartDate))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(model))))
 
           val result = controller.get(1, false)(request)
@@ -185,7 +185,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
       "respond with SEE_OTHER and show the registration progress page" when {
         "section data is unavailable" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(None))
           val result = controller.get(1, false)(request)
           status(result) must be(SEE_OTHER)
@@ -201,7 +201,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
           "updates hasAccepted" in new Fixture {
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(),any())(any(),any(),any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
             val result = controller.post(1, true, None)(request)
@@ -219,7 +219,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
             val flow = None
 
             when {
-              controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(),any())(any(),any(),any())
+              controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(),any())(any(),any(),any())
             } thenReturn Future.successful(CacheMap("", Map.empty))
 
             val result = controller.post(1, false, flow)(request)

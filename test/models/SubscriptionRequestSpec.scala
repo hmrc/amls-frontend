@@ -17,7 +17,7 @@
 package models
 
 import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness}
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
@@ -81,8 +81,8 @@ class SubscriptionRequestSpec extends PlaySpec with MockitoSugar {
 
     "serialize without including empty responsible people" in {
 
-      val nonEmptyRp = ResponsiblePeople(personName = Some(PersonName("Smith", None, "Jones")))
-      val emptyRp = ResponsiblePeople()
+      val nonEmptyRp = ResponsiblePerson(personName = Some(PersonName("Smith", None, "Jones")))
+      val emptyRp = ResponsiblePerson()
       val sequenceOfRps = Seq(nonEmptyRp, emptyRp)
 
       val testRequest = SubscriptionRequest(None, None, None, None, None, None, None, Some(sequenceOfRps), None, None, None, None, None)

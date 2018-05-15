@@ -46,22 +46,22 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     lazy val controller = injector.instanceOf[RemoveResponsiblePersonController]
 
-    val nominatedOfficer = ResponsiblePeople(
+    val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
       positions = Some(Positions(Set(NominatedOfficer),None))
     )
 
-    val otherResponsiblePerson = ResponsiblePeople(
+    val otherResponsiblePerson = ResponsiblePerson(
       personName = Some(PersonName("otherFirstName", None, "otherLastName")),
       positions = Some(Positions(Set(Director),None))
     )
 
     when {
-      dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+      dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson)))
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())
     } thenReturn Future.successful(CacheMap("", Map.empty))
 
   }
@@ -80,7 +80,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
         "nominated officer name cannot be found" in new TestFixture {
 
           when {
-            dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+            dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
           } thenReturn Future.successful(None)
 
           val result = controller.get()(request)
@@ -118,7 +118,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
           "invalid form is submitted" in new TestFixture {
 
             when {
-              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
             } thenReturn Future.successful(None)
 
             val result = controller.post()(request)
@@ -128,7 +128,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
           "valid form is submitted" in new TestFixture {
 
             when {
-              dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+              dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
             } thenReturn Future.successful(None)
 
             val result = controller.post()(request.withFormUrlEncodedBody(
@@ -155,7 +155,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar {
 
       status(result) mustBe SEE_OTHER
 
-      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(
         Seq(
           nominatedOfficer.copy(
             endDate = Some(ResponsiblePersonEndDate(new LocalDate(2001,11,10))),

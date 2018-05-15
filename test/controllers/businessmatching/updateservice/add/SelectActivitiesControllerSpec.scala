@@ -22,7 +22,7 @@ import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -62,7 +62,7 @@ class SelectActivitiesControllerSpec extends AmlsSpec {
 
     mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(BillPaymentServices), Some(true))), Some(AddServiceFlowModel.key))
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), Some(ResponsiblePerson.key))
     mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
   }
 

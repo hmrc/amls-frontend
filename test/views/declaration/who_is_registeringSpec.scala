@@ -18,7 +18,7 @@ package views.declaration
 
 import forms.{Form2, InvalidForm, ValidForm}
 import models.declaration.WhoIsRegistering
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.{MustMatchers}
 import  utils.AmlsSpec
 import jto.validation.Path
@@ -37,7 +37,7 @@ class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
     "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
-      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
 
       doc.title mustBe s"${Messages("declaration.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.registering.title"))
@@ -55,7 +55,7 @@ class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
 
       errorSummary.html() must include("not a message Key")
 
@@ -69,8 +69,8 @@ class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("A Person"))
 
       val people = Seq(
-        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1"))),
-        ResponsiblePeople(personName = Some(PersonName("A",  None, "Name 2")))
+        ResponsiblePerson(personName = Some(PersonName("A", None, "Name 1"))),
+        ResponsiblePerson(personName = Some(PersonName("A",  None, "Name 2")))
       )
 
       def view = views.html.declaration.who_is_registering_this_registration(form2, people)
@@ -86,8 +86,8 @@ class who_is_registeringSpec extends AmlsSpec with MustMatchers  {
       val f = Form2(WhoIsRegistering("1"))
 
       val people = Seq(
-        ResponsiblePeople(personName = Some(PersonName("A", None, "Name 1"))),
-        ResponsiblePeople(personName = Some(PersonName("A",  None, "Person")))
+        ResponsiblePerson(personName = Some(PersonName("A", None, "Name 1"))),
+        ResponsiblePerson(personName = Some(PersonName("A",  None, "Person")))
       )
 
       def view = views.html.declaration.who_is_registering_this_registration(f, people)

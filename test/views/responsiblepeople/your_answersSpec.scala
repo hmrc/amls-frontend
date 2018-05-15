@@ -17,7 +17,7 @@
 package views.responsiblepeople
 
 import forms.EmptyForm
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -34,7 +34,7 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.your_answers(Seq(ResponsiblePeople()))
+      def view = views.html.responsiblepeople.your_answers(Seq(ResponsiblePerson()))
 
       doc.title must be(Messages("title.ya") +
         " - " + Messages("summary.responsiblepeople") +

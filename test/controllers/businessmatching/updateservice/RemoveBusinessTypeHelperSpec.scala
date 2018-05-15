@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice
 
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveServiceFlowModel
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -463,7 +463,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "remove the ResponsiblePeople fit and proper if there is no TCSP" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
             hasChanged = true))
 
@@ -473,11 +473,11 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
             hasChanged = true)
 
           mockCacheFetch[BusinessMatching](Some(startResultMatching), Some(BusinessMatching.key))
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(startResultRP), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(startResultRP), Some(ResponsiblePerson.key))
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
-          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+          mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
-          val endResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = None,
+          val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
             hasAccepted = true,
             hasChanged = true))
 
@@ -487,7 +487,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "not remove the ResponsiblePeople fit and proper if there is TCSP" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
             hasChanged = true))
 
@@ -502,11 +502,11 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](
+          mockCacheFetch[Seq[ResponsiblePerson]](
             Some(startResultRP),
-            Some(ResponsiblePeople.key))
+            Some(ResponsiblePerson.key))
 
-          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+          mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
           helper.removeFitAndProper(model).returnsSome(startResultRP)
         }
@@ -517,7 +517,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "remove the ResponsiblePeople fit and proper if there is no MSB" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
             hasChanged = true))
 
@@ -532,13 +532,13 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](
+          mockCacheFetch[Seq[ResponsiblePerson]](
             Some(startResultRP),
-            Some(ResponsiblePeople.key))
+            Some(ResponsiblePerson.key))
 
-          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+          mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
-          val endResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = None,
+          val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
             hasAccepted = true,
             hasChanged = true))
 
@@ -548,7 +548,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "not remove the ResponsiblePeople fit and proper if there is MSB" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePeople(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
             hasAccepted = true,
             hasChanged = true))
 
@@ -563,11 +563,11 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](
+          mockCacheFetch[Seq[ResponsiblePerson]](
             Some(startResultRP),
-            Some(ResponsiblePeople.key))
+            Some(ResponsiblePerson.key))
 
-          mockCacheUpdate(Some(ResponsiblePeople.key), startResultRP)
+          mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
           helper.removeFitAndProper(model).returnsSome(startResultRP)
         }

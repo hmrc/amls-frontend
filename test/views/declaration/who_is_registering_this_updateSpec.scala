@@ -20,7 +20,7 @@ import forms.{Form2, InvalidForm, ValidForm}
 import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import models.declaration.WhoIsRegistering
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -62,7 +62,7 @@ class who_is_registering_this_updateSpec extends AmlsSpec with MustMatchers with
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering_this_update(form2, Seq(ResponsiblePeople()))
+      def view = views.html.declaration.who_is_registering_this_update(form2, Seq(ResponsiblePerson()))
 
       errorSummary.html() must include("not a message Key")
 

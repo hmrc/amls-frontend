@@ -69,7 +69,7 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       Seq(p1, p2)
     }).sample.get
 
-    def run(status: SubmissionStatus, renewal: Option[Renewal] = None, people: Seq[ResponsiblePeople] = responsiblePeople)(block: Unit => Any) = {
+    def run(status: SubmissionStatus, renewal: Option[Renewal] = None, people: Seq[ResponsiblePerson] = responsiblePeople)(block: Unit => Any) = {
       when {
         controller.renewalService.getRenewal(any(), any(), any())
       } thenReturn Future.successful(renewal)
@@ -80,13 +80,13 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(status))
 
-      when(cacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+      when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
         .thenReturn(Some(people))
 
 //      when(cacheMap.getEntry[WhoIsRegistering](WhoIsRegistering.key))
 //        .thenReturn(None)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(people)))
 
       when(controller.dataCacheConnector.save[AddPerson](any(), any())

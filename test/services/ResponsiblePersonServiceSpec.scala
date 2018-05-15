@@ -18,7 +18,7 @@ package services
 
 import generators.ResponsiblePersonGenerator
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
@@ -30,14 +30,14 @@ import ResponsiblePeopleService._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ResponsiblePeopleServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
+class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenerator with ScalaFutures {
 
   trait Fixture extends DependencyMocks {
 
     // scalastyle:off magic.number
     val responsiblePeople = Gen.listOfN(5, responsiblePersonGen).sample.get
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
 
     val service = new ResponsiblePeopleService(mockCacheConnector)
   }

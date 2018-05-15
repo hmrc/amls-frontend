@@ -28,7 +28,7 @@ import utils.StatusConstants
 
 import scala.collection.Seq
 
-case class ResponsiblePeople(personName: Option[PersonName] = None,
+case class ResponsiblePerson(personName: Option[PersonName] = None,
                              legalName: Option[PreviousName] = None,
                              legalNameChangeDate: Option[LocalDate] = None,
                              knownBy: Option[KnownBy] = None,
@@ -52,79 +52,79 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
                              soleProprietorOfAnotherBusiness: Option[SoleProprietorOfAnotherBusiness] = None
                             ) {
 
-  def personName(p: PersonName): ResponsiblePeople =
+  def personName(p: PersonName): ResponsiblePerson =
     this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
 
-  def legalName(p: PreviousName): ResponsiblePeople =
+  def legalName(p: PreviousName): ResponsiblePerson =
     this.copy(legalName = Some(p), hasChanged = hasChanged || !this.legalName.contains(p),
       hasAccepted = hasAccepted && this.legalName.contains(p))
 
-  def legalNameChangeDate(p: LocalDate): ResponsiblePeople =
+  def legalNameChangeDate(p: LocalDate): ResponsiblePerson =
     this.copy(legalNameChangeDate = Some(p), hasChanged = hasChanged || !this.legalNameChangeDate.contains(p),
       hasAccepted = hasAccepted && this.legalNameChangeDate.contains(p))
 
-  def knownBy(p: KnownBy): ResponsiblePeople =
+  def knownBy(p: KnownBy): ResponsiblePerson =
     this.copy(knownBy = Some(p), hasChanged = hasChanged || !this.knownBy.contains(p),
       hasAccepted = hasAccepted && this.knownBy.contains(Some(p)))
 
-  def personResidenceType(p: PersonResidenceType): ResponsiblePeople =
+  def personResidenceType(p: PersonResidenceType): ResponsiblePerson =
     this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p),
       hasAccepted = hasAccepted && this.personResidenceType.contains(p))
 
-  def personResidenceType(p: Option[PersonResidenceType]): ResponsiblePeople =
+  def personResidenceType(p: Option[PersonResidenceType]): ResponsiblePerson =
     this.copy(personResidenceType = p, hasChanged = hasChanged || this.personResidenceType != p,
       hasAccepted = hasAccepted && this.personResidenceType.equals(p))
 
-  def contactDetails(p: ContactDetails): ResponsiblePeople =
+  def contactDetails(p: ContactDetails): ResponsiblePerson =
     this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p),
       hasAccepted = hasAccepted && this.contactDetails.contains(p))
 
-  def saRegistered(p: SaRegistered): ResponsiblePeople =
+  def saRegistered(p: SaRegistered): ResponsiblePerson =
     this.copy(saRegistered = Some(p), hasChanged = hasChanged || !this.saRegistered.contains(p),
       hasAccepted = hasAccepted && this.saRegistered.contains(p))
 
-  def addressHistory(p: ResponsiblePersonAddressHistory): ResponsiblePeople =
+  def addressHistory(p: ResponsiblePersonAddressHistory): ResponsiblePerson =
     this.copy(addressHistory = Some(p), hasChanged = hasChanged || !this.addressHistory.contains(p),
       hasAccepted = hasAccepted && this.addressHistory.contains(p))
 
-  def positions(p: Positions): ResponsiblePeople =
+  def positions(p: Positions): ResponsiblePerson =
     this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p),
       hasAccepted = hasAccepted && this.positions.contains(p))
 
-  def soleProprietorOfAnotherBusiness(p: SoleProprietorOfAnotherBusiness): ResponsiblePeople =
+  def soleProprietorOfAnotherBusiness(p: SoleProprietorOfAnotherBusiness): ResponsiblePerson =
     this.copy(soleProprietorOfAnotherBusiness = Some(p), hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p),
       hasAccepted = hasAccepted && this.soleProprietorOfAnotherBusiness.contains(p))
 
-  def vatRegistered(p: VATRegistered): ResponsiblePeople =
+  def vatRegistered(p: VATRegistered): ResponsiblePerson =
     this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p),
       hasAccepted = hasAccepted && this.vatRegistered.contains(p))
 
-  def experienceTraining(p: ExperienceTraining): ResponsiblePeople =
+  def experienceTraining(p: ExperienceTraining): ResponsiblePerson =
     this.copy(experienceTraining = Some(p), hasChanged = hasChanged || !this.experienceTraining.contains(p),
       hasAccepted = hasAccepted && this.experienceTraining.contains(p))
 
-  def training(p: Training): ResponsiblePeople =
+  def training(p: Training): ResponsiblePerson =
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def hasAlreadyPassedFitAndProper(p: Option[Boolean]): ResponsiblePeople =
+  def hasAlreadyPassedFitAndProper(p: Option[Boolean]): ResponsiblePerson =
     this.copy(hasAlreadyPassedFitAndProper = p, hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.equals(p),
       hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.equals(p))
 
-  def ukPassport(p: UKPassport): ResponsiblePeople =
+  def ukPassport(p: UKPassport): ResponsiblePerson =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
       hasAccepted = hasAccepted && this.ukPassport.contains(p))
 
-  def nonUKPassport(p: NonUKPassport): ResponsiblePeople =
+  def nonUKPassport(p: NonUKPassport): ResponsiblePerson =
     this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p),
       hasAccepted = hasAccepted && this.nonUKPassport.contains(p))
 
-  def dateOfBirth(p: DateOfBirth): ResponsiblePeople =
+  def dateOfBirth(p: DateOfBirth): ResponsiblePerson =
     this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p),
       hasAccepted = hasAccepted && this.dateOfBirth.contains(p))
 
-  def status(p: String): ResponsiblePeople =
+  def status(p: String): ResponsiblePerson =
     this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p),
       hasAccepted = hasAccepted && this.status.contains(p))
 
@@ -141,9 +141,9 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
     this match {
-      case ResponsiblePeople(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
         if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory => true
-      case ResponsiblePeople(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
         if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get => true
       case _ => false
     }
@@ -170,27 +170,27 @@ case class ResponsiblePeople(personName: Option[PersonName] = None,
   }
 }
 
-object ResponsiblePeople {
+object ResponsiblePerson {
 
-  def anyChanged(newModel: Seq[ResponsiblePeople]): Boolean =
+  def anyChanged(newModel: Seq[ResponsiblePerson]): Boolean =
     newModel exists {
       _.hasChanged
     }
 
-  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePeople]]
+  implicit val formatOption = Reads.optionWithNull[Seq[ResponsiblePerson]]
 
-  def filter(rp: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
-    rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePeople())
+  def filter(rp: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
+    rp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == ResponsiblePerson())
 
-  def filterWithIndex(rp: Seq[ResponsiblePeople]): Seq[(ResponsiblePeople, Int)] =
-    rp.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePeople())
+  def filterWithIndex(rp: Seq[ResponsiblePerson]): Seq[(ResponsiblePerson, Int)] =
+    rp.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == ResponsiblePerson())
 
   def section(implicit cache: CacheMap): Section = {
 
     val messageKey = "responsiblepeople"
     val notStarted = Section(messageKey, NotStarted, false, controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
 
-    cache.getEntry[Seq[ResponsiblePeople]](key).fold(notStarted) { rp =>
+    cache.getEntry[Seq[ResponsiblePerson]](key).fold(notStarted) { rp =>
 
       if (filter(rp).equals(Nil)) {
         Section(messageKey, NotStarted, anyChanged(rp), controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get())
@@ -211,7 +211,7 @@ object ResponsiblePeople {
 
   }
 
-  def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePeople]): Option[(ResponsiblePeople, Int)] = {
+  def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePerson]): Option[(ResponsiblePerson, Int)] = {
     responsiblePeople.zipWithIndex.filter {
       case (p, _) => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)
     } find {
@@ -228,7 +228,7 @@ object ResponsiblePeople {
 
   val key = "responsible-people"
 
-  implicit val mongoKey = new MongoKey[ResponsiblePeople] {
+  implicit val mongoKey = new MongoKey[ResponsiblePerson] {
     override def apply(): String = key
   }
 
@@ -243,9 +243,9 @@ object ResponsiblePeople {
       maybeName.fold[Option[KnownBy]](None)(name => Some(KnownBy(Some(true), Some(name))))
     } orElse constant(None)
 
-  implicit val writes: Writes[ResponsiblePeople] = Json.writes[ResponsiblePeople]
+  implicit val writes: Writes[ResponsiblePerson] = Json.writes[ResponsiblePerson]
 
-  implicit val reads: Reads[ResponsiblePeople] = {
+  implicit val reads: Reads[ResponsiblePerson] = {
     (
       (__ \ "personName").readNullable[PersonName] and
         ((__ \ "legalName").readNullable[PreviousName] flatMap {
@@ -279,7 +279,7 @@ object ResponsiblePeople {
         (__ \ "endDate").readNullable[ResponsiblePersonEndDate] and
         (__ \ "soleProprietorOfAnotherBusiness").readNullable[SoleProprietorOfAnotherBusiness]
       ).tupled.map { t =>
-      val r = (ResponsiblePeople.apply _).tupled(t)
+      val r = (ResponsiblePerson.apply _).tupled(t)
 
       if (hasUkPassportNumber(r)) {
         r.copy(nonUKPassport = None)
@@ -291,24 +291,24 @@ object ResponsiblePeople {
     }
   }
 
-  private def hasUkPassportNumber(rp: ResponsiblePeople): Boolean = rp.ukPassport match {
+  private def hasUkPassportNumber(rp: ResponsiblePerson): Boolean = rp.ukPassport match {
     case Some(UKPassportYes(_)) => true
     case _ => false
   }
 
-  private def hasNonUkPassportNumber(rp: ResponsiblePeople): Boolean = rp.nonUKPassport match {
+  private def hasNonUkPassportNumber(rp: ResponsiblePerson): Boolean = rp.nonUKPassport match {
     case Some(NonUKPassportYes(_)) => true
     case _ => false
   }
 
-  private def hasDateOfBirth(rp: ResponsiblePeople): Boolean = rp.dateOfBirth.isDefined
+  private def hasDateOfBirth(rp: ResponsiblePerson): Boolean = rp.dateOfBirth.isDefined
 
-  def default(responsiblePeople: Option[ResponsiblePeople]): ResponsiblePeople =
-    responsiblePeople.getOrElse(ResponsiblePeople())
+  def default(responsiblePeople: Option[ResponsiblePerson]): ResponsiblePerson =
+    responsiblePeople.getOrElse(ResponsiblePerson())
 
-  implicit class FilterUtils(people: Seq[ResponsiblePeople]) {
-    def filterEmpty: Seq[ResponsiblePeople] = people.filterNot {
-      case _@ResponsiblePeople(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
+  implicit class FilterUtils(people: Seq[ResponsiblePerson]) {
+    def filterEmpty: Seq[ResponsiblePerson] = people.filterNot {
+      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
       case _ => false
     }
   }

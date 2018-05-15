@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessActivities, BusinessMatching}
-import models.responsiblepeople.{ExperienceTraining, ResponsiblePeople}
+import models.responsiblepeople.{ExperienceTraining, ResponsiblePerson}
 import play.api.Logger
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, RepeatingSection}
@@ -54,10 +54,10 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
       implicit authContext => implicit request =>
         businessActivitiesData flatMap {
           activities =>
-            getData[ResponsiblePeople](index) map {
-              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
+            getData[ResponsiblePerson](index) map {
+              case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_, Some(experienceTraining),_,_,_,_,_,_,_,_))
               => Ok(experience_training(Form2[ExperienceTraining](experienceTraining), activities, edit, index, flow, personName.titleName))
-              case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+              case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
               => Ok(experience_training(EmptyForm, activities, edit, index, flow, personName.titleName))
               case _
               => NotFound(notFoundView)
@@ -72,12 +72,12 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
           activities =>
             Form2[ExperienceTraining](request.body) match {
               case f: InvalidForm =>
-                getData[ResponsiblePeople](index) map {rp =>
+                getData[ResponsiblePerson](index) map { rp =>
                   BadRequest(views.html.responsiblepeople.experience_training(f, activities, edit, index, flow, ControllerHelper.rpTitleName(rp)))
                 }
               case ValidForm(_, data) => {
                 for {
-                  result <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                  result <- updateDataStrict[ResponsiblePerson](index) { rp =>
                     rp.experienceTraining(data)
                   }
                 } yield edit match {

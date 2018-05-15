@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{PersonName, ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegisteredNo}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{PersonName, ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegisteredNo}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
@@ -54,8 +54,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
     "get is called" must {
       "display page" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
         val result = controller.get(1)(request)
 
@@ -68,8 +68,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "display page and prepopulate data from save4later" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
+        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -83,8 +83,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       "display page Not Found" when {
         "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -104,10 +104,10 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(vatRegistered = Some(VATRegisteredNo))))))
 
-          when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
@@ -116,7 +116,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
           verify(controller.dataCacheConnector).save(
             any(),
-            meq(Seq(ResponsiblePeople(
+            meq(Seq(ResponsiblePerson(
               soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true)), vatRegistered = Some(VATRegisteredNo)
             )))
           )(any(), any(), any())
@@ -134,10 +134,10 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
               "soleProprietorOfAnotherBusiness" -> "false",
               "personName" -> "Person Name")
 
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1,true,Some(flowFromDeclaration))(newRequest)
@@ -154,10 +154,10 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
               "soleProprietorOfAnotherBusiness" -> "false",
               "personName" -> "Person Name")
 
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(mockDataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
@@ -166,7 +166,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
             verify(controller.dataCacheConnector).save(
               any(),
-              meq(Seq(ResponsiblePeople(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)))))
+              meq(Seq(ResponsiblePerson(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)))))
             )(any(), any(), any())
           }
         }
@@ -179,8 +179,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             "soleProprietorOfAnotherBusiness" -> "",
             "personName" -> "Person Name")
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -195,7 +195,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
 
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = controller.post(1)(newRequest)

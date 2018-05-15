@@ -25,7 +25,7 @@ import connectors.DataCacheConnector
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MSB}
 import models.confirmation.{Currency, SubmissionData}
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionResponse}
@@ -56,7 +56,7 @@ class SubmissionResponseService @Inject()(
           cache <- option
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
@@ -128,7 +128,7 @@ class SubmissionResponseService @Inject()(
       cache <- option
       amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
       premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-      people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+      people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
       businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
       businessActivities <- businessMatching.activities
     } yield {

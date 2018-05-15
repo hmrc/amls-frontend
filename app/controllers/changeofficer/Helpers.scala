@@ -19,7 +19,7 @@ package controllers.changeofficer
 import cats.data.OptionT
 import connectors.DataCacheConnector
 import models.changeofficer.NewOfficer
-import models.responsiblepeople.{NominatedOfficer, ResponsiblePeople}
+import models.responsiblepeople.{NominatedOfficer, ResponsiblePerson}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 
@@ -33,15 +33,15 @@ object Helpers {
                                 dataCacheConnector: DataCacheConnector,
                                 f: cats.Monad[Future]): OptionT[Future, String] = {
     for {
-      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
-      (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(ResponsiblePeople.filterWithIndex(people)))
+      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+      (nominatedOfficer, _) <- OptionT.fromOption[Future](getOfficer(ResponsiblePerson.filterWithIndex(people)))
       name <- OptionT.fromOption[Future](nominatedOfficer.personName)
     } yield {
       name.fullName
     }
   }
 
-  def getOfficer(people: Seq[(ResponsiblePeople, Int)]): Option[(ResponsiblePeople, Int)] = {
+  def getOfficer(people: Seq[(ResponsiblePerson, Int)]): Option[(ResponsiblePerson, Int)] = {
     people.map {
       case (person, index) => (person, index + 1)
     } find {
@@ -52,9 +52,9 @@ object Helpers {
   def getNominatedOfficerWithIndex()(implicit authContext: AuthContext,
                                 headerCarrier: HeaderCarrier,
                                 dataCacheConnector: DataCacheConnector,
-                                f: cats.Monad[Future]): OptionT[Future, (ResponsiblePeople, Int)] = {
+                                f: cats.Monad[Future]): OptionT[Future, (ResponsiblePerson, Int)] = {
     for {
-      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      people <- OptionT(dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       nominatedOfficer <- OptionT.fromOption[Future](getOfficer(people.zipWithIndex))
     } yield nominatedOfficer
   }

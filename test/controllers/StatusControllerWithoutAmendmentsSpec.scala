@@ -19,7 +19,7 @@ package controllers
 import connectors.{AmlsConnector, AuthenticatorConnector, FeeConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.{Country, FeeResponse}
 import org.jsoup.Jsoup
@@ -53,7 +53,7 @@ class StatusControllerWithoutAmendmentsSpec extends AmlsSpec {
       self.authConnector
     )
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())), Some(ResponsiblePeople.key))
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())), Some(ResponsiblePerson.key))
   }
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false) )

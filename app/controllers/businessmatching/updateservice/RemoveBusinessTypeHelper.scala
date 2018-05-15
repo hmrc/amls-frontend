@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.RemoveServiceFlowModel
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -101,7 +101,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
   }
 
   def removeFitAndProper(model: RemoveServiceFlowModel)
-                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePeople]] = {
+                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
 
@@ -117,7 +117,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
       currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(emptyActivities)
       newResponsiblePeople <- {
-        OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+        OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
             rpList.map(_.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true))
           case Some(rpList) => rpList

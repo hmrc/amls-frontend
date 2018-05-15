@@ -18,7 +18,7 @@ package models.flowmanagement
 
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import play.api.libs.json.Json
 
 case class AddServiceFlowModel(
@@ -34,7 +34,7 @@ case class AddServiceFlowModel(
                                 msbServices: Option[BusinessMatchingMsbServices] = None,
                                 tradingPremisesMsbServices: Option[BusinessMatchingMsbServices] = None
                               ) {
-  def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePeople]): AddServiceFlowModel = {
+  def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePerson]): AddServiceFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
             .collect({
               case (person, index) if person.hasAlreadyPassedFitAndProper.getOrElse(false) => index
@@ -51,7 +51,7 @@ case class AddServiceFlowModel(
       hasAccepted = hasAccepted && this.activity.contains(p))
   }
 
-  def mayHavePassedFitAndProper(p: Seq[ResponsiblePeople]): Option[Boolean] = {
+  def mayHavePassedFitAndProper(p: Seq[ResponsiblePerson]): Option[Boolean] = {
     val hasTrues = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
     val hasFalses = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
 

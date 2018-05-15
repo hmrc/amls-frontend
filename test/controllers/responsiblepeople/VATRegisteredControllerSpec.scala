@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{PersonName, ResponsiblePeople, VATRegisteredNo, VATRegisteredYes}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{PersonName, ResponsiblePerson, VATRegisteredNo, VATRegisteredYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -54,8 +54,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "display the Registered for VAT page" when {
         "with pre populated data" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName,vatRegistered = Some(VATRegisteredYes("123456789")))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,vatRegistered = Some(VATRegisteredYes("123456789")))))))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -67,8 +67,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         }
 
         "without data" in new Fixture {
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -81,8 +81,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "display Not Found" when {
         "a populated ResponsiblePeople model cannot be found" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -102,10 +102,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
               "personName" -> "Person Name"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(vatRegistered = Some(VATRegisteredNo))))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(vatRegistered = Some(VATRegisteredNo))))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
               (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1)(newRequest)
@@ -123,10 +123,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
               "personName" -> "Person Name"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
               (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
@@ -143,8 +143,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
               "registeredForVATYes" -> "1234567890",
               "personName" -> "Person Name"
             )
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(BAD_REQUEST)
@@ -158,10 +158,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             "vrnNumber" -> "123456789",
             "personName" -> "Person Name"
           )
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           val result = controller.post(3)(newRequest)

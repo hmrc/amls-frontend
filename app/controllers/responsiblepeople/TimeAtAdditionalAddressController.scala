@@ -37,10 +37,10 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,Some(ResponsiblePersonAddress(_,Some(additionalAddress))),_)),_,_,_,_,_,_,_,_,_,_,_, _)) =>
             Ok(time_at_additional_address(Form2[TimeAtAddress](additionalAddress), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(time_at_additional_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -50,11 +50,11 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
     implicit authContext => implicit request => {
         (Form2[TimeAtAddress](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(time_at_additional_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
-            getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+            getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
               (for {
                 rp <- responsiblePerson
                 addressHistory <- rp.addressHistory
@@ -84,7 +84,7 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
   }
 
   private def doUpdate(index: Int, data: ResponsiblePersonAddress)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) { res =>
+    updateDataStrict[ResponsiblePerson](index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) if data.timeAtAddress.contains(ThreeYearsPlus) | data.timeAtAddress.contains(OneToThreeYears) =>

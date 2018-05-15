@@ -18,7 +18,7 @@ package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.{SoleProprietorOfAnotherBusiness, ResponsiblePeople}
+import models.responsiblepeople.{SoleProprietorOfAnotherBusiness, ResponsiblePerson}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec

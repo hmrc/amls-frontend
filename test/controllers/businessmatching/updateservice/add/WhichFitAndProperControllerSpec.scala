@@ -24,7 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddServiceFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -58,7 +58,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       router = createRouter[AddServiceFlowModel]
     )
 
-    val responsiblePeople: List[ResponsiblePeople] = (responsiblePeopleGen(2).sample.get :+
+    val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+
       responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
       responsiblePeopleGen(2).sample.get
 

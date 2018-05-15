@@ -16,9 +16,9 @@
 
 @import include._
 @import forms2._
-@import models.responsiblepeople.ResponsiblePeople
+@import models.responsiblepeople.ResponsiblePerson
 
-@(f: forms.Form2[_], responsiblepeople: Seq[(ResponsiblePeople, Int)], legend: String, call: Call, placeholder: Option[String] = None, id: Option[String] = None)(implicit lang:Lang, m:Messages, request: Request[_])
+@(f: forms.Form2[_], responsiblepeople: Seq[(ResponsiblePerson, Int)], legend: String, call: Call, placeholder: Option[String] = None, id: Option[String] = None)(implicit lang:Lang, m:Messages, request: Request[_])
 
 <p>@Messages("businessmatching.updateservice.whichfitandproper.hint")</p>
 

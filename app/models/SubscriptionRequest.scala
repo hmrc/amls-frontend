@@ -25,7 +25,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.asp.Asp
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -41,7 +41,7 @@ case class SubscriptionRequest(
                                 bankDetailsSection: Option[Seq[BankDetails]],
                                 aboutYouSection: Option[AddPerson],
                                 businessActivitiesSection: Option[BusinessActivities],
-                                responsiblePeopleSection: Option[Seq[ResponsiblePeople]],
+                                responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
                                 tcspSection: Option[Tcsp],
                                 aspSection: Option[Asp],
                                 msbSection: Option[MoneyServiceBusiness],
@@ -57,8 +57,8 @@ object SubscriptionRequest {
     }))
   }
 
-  implicit def rpSequenceWrites(implicit responsiblePeopleWrites: Writes[ResponsiblePeople]): Writes[Seq[ResponsiblePeople]] = {
-    Writes(x => JsArray(x.filterNot(_ == ResponsiblePeople()).map {
+  implicit def rpSequenceWrites(implicit responsiblePeopleWrites: Writes[ResponsiblePerson]): Writes[Seq[ResponsiblePerson]] = {
+    Writes(x => JsArray(x.filterNot(_ == ResponsiblePerson()).map {
       rp => responsiblePeopleWrites.writes(rp)
     }))
   }

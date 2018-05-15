@@ -25,7 +25,7 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching._
 import models.businessmatching.{BusinessActivities => BMBusinessActivities}
 import models.flowmanagement.AddServiceFlowModel
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tradingpremises.TradingPremises
 import services.{ResponsiblePeopleService, TradingPremisesService}
@@ -129,10 +129,10 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newBusinessMatching
   }
 
-  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePeople]] = {
+  def updateResponsiblePeople(model: AddServiceFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, Seq[ResponsiblePerson]] = {
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
-    OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+    OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
       case Some(people) if model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness) =>
         responsiblePeopleService.updateFitAndProperFlag(people, indices)
       case Some(people) => people
