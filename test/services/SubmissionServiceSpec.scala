@@ -118,6 +118,7 @@ class SubmissionServiceSpec extends AmlsSpec
     mockCacheFetchAll
     mockCacheSave[SubscriptionResponse]
     mockCacheSave[AmendVariationRenewalResponse]
+    mockCacheSave[SubmissionRequestStatus]
 
     when {
       reviewDetails.safeId

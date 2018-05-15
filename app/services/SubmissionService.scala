@@ -17,7 +17,6 @@
 package services
 
 import javax.inject.Inject
-
 import com.fasterxml.jackson.core.JsonParseException
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
@@ -43,10 +42,11 @@ import models._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import play.api.http.Status.UNPROCESSABLE_ENTITY
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
 import utils.Strings._
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class SubmissionService @Inject()
@@ -87,7 +87,7 @@ class SubmissionService @Inject()
       safeId <- safeId(cache)
       request <- Future.successful(createSubscriptionRequest(cache))
       subscription <- amlsConnector.subscribe(request, safeId)
-      _ <- cacheConnector.save[SubscriptionResponse](SubscriptionResponse.key, subscription)
+      _ <- saveResponse(subscription, SubscriptionResponse.key)
       _ <- enrol(safeId, subscription.amlsRefNo, request.aboutTheBusinessSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
@@ -140,7 +140,7 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][update] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
+      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
     } yield amendment
   }
 
@@ -157,7 +157,8 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][variation] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, amendment)
+      _ <- saveResponse(amendment, AmendVariationRenewalResponse.key)
+
     } yield amendment
   }
 
@@ -169,7 +170,7 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
+      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
     } yield response
   }
 
@@ -181,9 +182,15 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
       )
-      _ <- cacheConnector.save[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key, response)
+      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
     } yield response
   }
+
+  private def saveResponse[T](response: T, key: String)
+                             (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
+    _ <- cacheConnector.save[T](key, response)
+    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true))
+  } yield c
 
   private def safeId(cache: CacheMap): Future[String] = {
     (for {

@@ -16,13 +16,13 @@
 
 package controllers.payments
 
-import javax.inject.Inject
 import cats.data.OptionT
 import cats.implicits._
 import controllers.BaseController
-import models.confirmation.{Currency, SubmissionData}
-import models.status.SubmissionReady
-import services.{StatusService, SubmissionResponseService}
+import javax.inject.Inject
+import models.confirmation.Currency
+import models.status.{SubmissionReady, SubmissionReadyForReview}
+import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -30,7 +30,8 @@ import scala.concurrent.Future
 
 class BankDetailsController @Inject()(
                                       val authConnector: AuthConnector,
-                                      val submissionResponseService: SubmissionResponseService,
+                                      val authEnrolmentsService: AuthEnrolmentsService,
+                                      val feeResponseService: FeeResponseService,
                                       val statusService: StatusService
                                     ) extends BaseController{
 
@@ -40,11 +41,11 @@ class BankDetailsController @Inject()(
       implicit request =>
         (for {
           status <- OptionT.liftF(statusService.getStatus)
-          SubmissionData(payRef, totalFees, _, _, difference) <- OptionT(submissionResponseService.getSubmissionData(status))
-          paymentReference <- OptionT.fromOption[Future](payRef)
+          amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
+          fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
+          paymentReference <- OptionT.fromOption[Future](fees.paymentReference)
         } yield {
-          val amount = if (status == SubmissionReady) totalFees else difference.getOrElse(totalFees)
-
+          val amount = fees.differenceOrTotalAmount
           Ok(views.html.payments.bank_details(isUK, amount, paymentReference))
         }) getOrElse InternalServerError("Failed to retrieve submission data")
   }

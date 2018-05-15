@@ -53,7 +53,14 @@ case class FeeResponse(responseType: ResponseType,
                        totalFees: BigDecimal,
                        paymentReference: Option[String],
                        difference: Option[BigDecimal],
-                       createdAt: DateTime)
+                       createdAt: DateTime) {
+
+  def differenceOrTotalAmount: BigDecimal = difference match {
+    case Some(d) if d > 0 => d
+    case _ => totalFees
+  }
+
+}
 
 object FeeResponse {
 

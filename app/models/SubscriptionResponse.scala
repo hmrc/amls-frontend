@@ -16,9 +16,6 @@
 
 package models
 
-import play.api.libs.json
-import play.api.libs.json.{Json, Reads}
-
 
 case class SubscriptionResponse(
                                  etmpFormBundleNumber: String,
@@ -52,13 +49,14 @@ case class SubscriptionResponse(
 
 object SubscriptionResponse {
 
-  import play.api.libs.json._
-  import play.api.libs.json.Reads._
   import play.api.libs.functional.syntax._
+  import play.api.libs.json.Reads._
+  import play.api.libs.json._
 
   val key = "Subscription"
 
   implicit val format = Json.format[SubscriptionResponse]
+  implicit val formatOption = Reads.optionNoError[SubscriptionResponse]
 
   val oldFeesStructureTransformer: Reads[JsObject] =
     (

@@ -16,29 +16,25 @@
 
 package controllers.payments
 
-import connectors.PayApiConnector
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.confirmation.{Currency, SubmissionData}
+import models.ResponseType.SubscriptionResponseType
+import models.confirmation.Currency
+import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, WaysToPay}
 import models.status.SubmissionReadyForReview
+import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
+import org.joda.time.DateTime
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
+import services._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsRefNumberBroker, AuthorisedFixture, AmlsSpec}
-import models.ReadStatusResponse
-import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, UpdateBacsRequest, WaysToPay}
-import models.ReturnLocation
-import cats.data.OptionT
-import cats.implicits._
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
+class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator with PaymentGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -52,25 +48,19 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
 
     val controller = new WaysToPayController(
       authConnector = self.authConnector,
-      paymentsConnector = mock[PayApiConnector],
       statusService = mock[StatusService],
       paymentsService = mock[PaymentsService],
-      submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
-      amlsRefBroker = mock[AmlsRefNumberBroker]
+      feeResponseService = mock[FeeResponseService]
     )
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
+    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
+
     when {
       controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
     } thenReturn Future.successful(HttpResponse(OK))
-
-    when {
-      controller.amlsRefBroker.get(any(), any(), any())
-    } thenReturn OptionT.pure[Future, String](amlsRegistrationNumber)
-
-    val submissionData = SubmissionData(Some(paymentReferenceNumber), Currency.fromInt(100), Seq(), None, Some(Currency.fromInt(100)))
 
     val submissionStatus = SubmissionReadyForReview
 
@@ -98,8 +88,8 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
     } thenReturn Future.successful((submissionStatus, Some(readStatusResponse)))
 
     when {
-      controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-    } thenReturn Future.successful(Some(submissionData))
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+    } thenReturn Future.successful(Some(fees))
 
   }
 
@@ -118,7 +108,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
 
     "post is called" when {
 
-      "enum is bacs" must {
+      "bacs" must {
         "redirect to TypeOfBankController" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Bacs.entryName
@@ -135,7 +125,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
         }
       }
 
-      "enum is card" must {
+      "card" must {
         "go to the payments url" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
             "waysToPay" -> WaysToPay.Card.entryName
@@ -149,7 +139,7 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
           val body = contentAsString(result)
 
           verify(controller.paymentsService).requestPaymentsUrl(
-            eqTo(submissionData),
+            eqTo(fees),
             eqTo(controllers.routes.ConfirmationController.paymentConfirmation(paymentReferenceNumber).url),
             eqTo(amlsRegistrationNumber),
             eqTo(safeId)
@@ -172,10 +162,6 @@ class WaysToPayControllerSpec extends PlaySpec with MockitoSugar with AmlsSpec w
             when {
               controller.statusService.getStatus(any(), any(), any())
             } thenReturn Future.successful(submissionStatus)
-
-            when {
-              controller.submissionResponseService.getSubmissionData(eqTo(submissionStatus))(any(), any(), any())
-            } thenReturn Future.successful(None)
 
             val result = controller.post()(postRequest)
             val body = contentAsString(result)

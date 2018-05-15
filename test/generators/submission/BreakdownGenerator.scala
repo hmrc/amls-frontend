@@ -14,26 +14,18 @@
  * limitations under the License.
  */
 
-package models.confirmation
+package generators.submission
 
-case class Currency(value: BigDecimal) {
+import generators.BaseGenerator
+import models.confirmation.{BreakdownRow, Currency}
+import org.scalacheck.Gen
 
-  override def toString: String =
-    f"£$value%1.2f"
+//scalastyle:off magic.number
+trait BreakdownGenerator extends BaseGenerator {
 
-  def map(fn: BigDecimal => BigDecimal): Currency = fn(value)
-}
-
-object Currency {
-
-  implicit def fromBD(value: BigDecimal): Currency = Currency(value)
-
-  implicit def fromBDO(value: Option[BigDecimal]): Option[Currency] = value.map(Currency(_))
-
-  implicit def fromInt(value: Int): Currency = Currency(value)
-
-  implicit def currencyToDouble(c: Currency): Double = c.value.toDouble
-
-  implicit def currencyToFloat(c: Currency): Float = c.value.toFloat
+  def breakdownRowGen: Gen[BreakdownRow] = for {
+    label <- stringOfLengthGen(10)
+    quantity <- Gen.choose(1, 10)
+  } yield BreakdownRow(label, quantity, Currency(100), Currency(quantity * 100))
 
 }

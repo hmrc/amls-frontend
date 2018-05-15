@@ -33,11 +33,12 @@ trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustM
   protected val bindModules: Seq[GuiceableModule] = Seq()
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
+    .disable[com.kenshoo.play.metrics.PlayModule]
     .bindings(bindModules:_*).in(Mode.Test)
     .build()
 
-  implicit val messagesApi = app.injector.instanceOf[MessagesApi]
-  implicit val messages = messagesApi.preferred(FakeRequest())
+  implicit lazy val messagesApi = app.injector.instanceOf[MessagesApi]
+  implicit lazy val messages = messagesApi.preferred(FakeRequest())
 
   implicit val headerCarrier = HeaderCarrier()
   implicit val authContext = mock[AuthContext]

@@ -19,9 +19,8 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors._
+import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePeople
 import models.status._
@@ -29,7 +28,7 @@ import models.{FeeResponse, ReadStatusResponse}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request, Result}
 import services._
-import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BusinessName, ControllerHelper}
@@ -47,7 +46,8 @@ class StatusController @Inject()(val landingService: LandingService,
                                   val amlsConnector: AmlsConnector,
                                   val dataCache: DataCacheConnector,
                                   val authenticator: AuthenticatorConnector,
-                                 val authConnector: AuthConnector = AMLSAuthConnector
+                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                 val feeResponseService: FeeResponseService
                                  ) extends BaseController {
 
   def get(fromDuplicateSubmission: Boolean = false) = Authorised.async {
@@ -77,15 +77,7 @@ class StatusController @Inject()(val landingService: LandingService,
   def getFeeResponse(mlrRegNumber: Option[String], submissionStatus: SubmissionStatus)(implicit authContext: AuthContext,
                                                                                        headerCarrier: HeaderCarrier): Future[Option[FeeResponse]] = {
     (mlrRegNumber, submissionStatus) match {
-      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => {
-        feeConnector.feeResponse(mlNumber).map(x => x.responseType match {
-          case AmendOrVariationResponseType if x.difference.fold(false)(_ > 0) => Some(x)
-          case SubscriptionResponseType if x.totalFees > 0 => Some(x)
-          case _ => None
-        })
-      }.recoverWith {
-        case _: NotFoundException => Future.successful(None)
-      }
+      case (Some(mlNumber), (SubmissionReadyForReview | SubmissionDecisionApproved)) => feeResponseService.getFeeResponse(mlNumber)
       case _ => Future.successful(None)
     }
   }
@@ -144,13 +136,12 @@ class StatusController @Inject()(val landingService: LandingService,
             Ok(status_not_submitted(mlrRegNumber.getOrElse(""), businessNameOption, url))
           ) getOrElse InternalServerError("Unable to get redirect data")
       }
-      case _ => isBacsPayment.value map { maybeBacs =>
-        Ok(status_submitted(mlrRegNumber.getOrElse(""),
+      case _ =>
+        Future.successful(
+          Ok(status_submitted(mlrRegNumber.getOrElse(""),
           businessNameOption,
           feeResponse,
-          fromDuplicateSubmission,
-          showBacsContent = maybeBacs.getOrElse(false)))
-      }
+          fromDuplicateSubmission)))
     }
   }
 
