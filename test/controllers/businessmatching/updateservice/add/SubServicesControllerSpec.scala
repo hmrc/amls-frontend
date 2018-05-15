@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, SubServicesPageId}
@@ -42,7 +42,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
     val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new SubServicesController(
       authConnector = self.authConnector,

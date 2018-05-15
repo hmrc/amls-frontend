@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
@@ -34,7 +34,7 @@ import scala.concurrent.Future
 class NoPsrController @Inject()(
                                  val authConnector: AuthConnector,
                                  implicit val dataCacheConnector: DataCacheConnector,
-                                 val helper: UpdateServiceHelper,
+                                 val helper: AddBusinessTypeHelper,
                                  val router: Router[AddServiceFlowModel]
                                ) extends BaseController {
 

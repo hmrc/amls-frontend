@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -35,7 +35,7 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
     val request = addToken(authRequest)
 
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NoPsrController(
       authConnector = self.authConnector,

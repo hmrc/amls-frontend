@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
@@ -52,9 +52,9 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
 
     val request = addToken(authRequest)
     val mockTradingPremisesService = mock[TradingPremisesService]
-    val mockUpdateServicesSummaryControllerHelper = mock[UpdateServiceHelper]
+    val mockUpdateServicesSummaryControllerHelper = mock[AddBusinessTypeHelper]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new UpdateServicesSummaryController(
       authConnector = self.authConnector,

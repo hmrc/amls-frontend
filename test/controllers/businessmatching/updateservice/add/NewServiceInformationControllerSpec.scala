@@ -16,7 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{AddServiceFlowModel, NewServiceInformationPageId}
@@ -38,7 +38,7 @@ class NewServiceInformationControllerSpec extends AmlsSpec with MockitoSugar wit
 
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NewServiceInformationController(
       authConnector = self.authConnector,

@@ -16,7 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
@@ -44,7 +44,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
     mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
     mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(

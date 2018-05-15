@@ -38,7 +38,7 @@ import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 //noinspection ScalaStyle
-class UpdateServiceHelperSpec extends AmlsSpec
+class AddBusinessTypeHelperSpec extends AmlsSpec
   with BusinessActivitiesGenerator
   with ResponsiblePersonGenerator
   with FutureAssertions {
@@ -46,10 +46,10 @@ class UpdateServiceHelperSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val tradingPremisesService = mock[TradingPremisesService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
 
-    val SUT = new UpdateServiceHelper(
+    val SUT = new AddBusinessTypeHelper(
       self.authConnector,
       mockCacheConnector,
       tradingPremisesService,

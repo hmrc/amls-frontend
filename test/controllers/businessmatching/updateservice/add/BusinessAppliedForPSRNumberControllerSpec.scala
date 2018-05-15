@@ -16,7 +16,7 @@
 
 package controllers.businessmatching.updateservice.add
 
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
@@ -48,7 +48,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new BusinessAppliedForPSRNumberController(
       authConnector = self.authConnector,

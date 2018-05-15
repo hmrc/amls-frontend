@@ -38,10 +38,10 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
-class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
-                                    implicit val dataCacheConnector: DataCacheConnector,
-                                    val tradingPremisesService: TradingPremisesService,
-                                    val responsiblePeopleService: ResponsiblePeopleService
+class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
+                                      implicit val dataCacheConnector: DataCacheConnector,
+                                      val tradingPremisesService: TradingPremisesService,
+                                      val responsiblePeopleService: ResponsiblePeopleService
                                    ) extends RepeatingSection {
 
   def updateBusinessActivities(model: AddServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
@@ -52,7 +52,7 @@ class UpdateServiceHelper @Inject()(val authConnector: AuthConnector,
           .taxMatters(None)
           .copy(hasAccepted = true)
 
-      case Some(model) => model
+      case Some(dcModel) => dcModel
     })
   }
 

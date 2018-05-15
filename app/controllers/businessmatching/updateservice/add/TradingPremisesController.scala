@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
@@ -42,7 +42,7 @@ class TradingPremisesController @Inject()(
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
-                                           val helper: UpdateServiceHelper,
+                                           val helper: AddBusinessTypeHelper,
                                            val router: Router[AddServiceFlowModel]
                                          ) extends BaseController {
 

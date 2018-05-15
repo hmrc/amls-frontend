@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -45,7 +45,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
 
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val mockRPService = mock[ResponsiblePeopleService]
 
     val controller = new WhichFitAndProperController(
