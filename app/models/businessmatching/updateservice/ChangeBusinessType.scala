@@ -19,21 +19,19 @@ package models.businessmatching.updateservice
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
 
-sealed trait ChangeServices
+sealed trait ChangeBusinessType
 
-case object ChangeServicesAdd extends ChangeServices
-case object ChangeServicesRemove extends ChangeServices
-case object ChangeServicesReplace extends ChangeServices
+case object Add extends ChangeBusinessType
+case object Remove extends ChangeBusinessType
 
-object ChangeServices {
+object ChangeBusinessType {
   import jto.validation._
   import utils.MappingUtils.Implicits._
 
-  implicit val formReads: Rule[UrlFormEncoded, ChangeServices] = From[UrlFormEncoded] { __ =>
+  implicit val formReads: Rule[UrlFormEncoded, ChangeBusinessType] = From[UrlFormEncoded] { __ =>
     (__ \ "changeServices").read[String].withMessage("error.businessmatching.updateservice.changeservices") map {
-      case "add" => ChangeServicesAdd
-      case "remove" => ChangeServicesRemove
-      case "replace" => ChangeServicesReplace
+      case "add" => Add
+      case "remove" => Remove
     }
   }
 

@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
-import models.businessmatching.updateservice.ChangeServices
+import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.ChangeServicesPageId
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -40,7 +40,7 @@ class ChangeServicesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
                                           val businessMatchingService: BusinessMatchingService,
-                                          val router: Router[ChangeServices]
+                                          val router: Router[ChangeBusinessType]
                                         ) extends BaseController with RepeatingSection {
 
   def get = Authorised.async {
@@ -55,7 +55,7 @@ class ChangeServicesController @Inject()(
   def post() = Authorised.async {
     implicit authContext =>
       implicit request => {
-        Form2[ChangeServices](request.body) match {
+        Form2[ChangeBusinessType](request.body) match {
           case f: InvalidForm =>
             getFormData map { case (existing, remaining) =>
               BadRequest(change_services(f, existing, remaining.nonEmpty))

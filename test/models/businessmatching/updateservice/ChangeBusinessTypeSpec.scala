@@ -20,7 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, ValidationError}
 import utils.AmlsSpec
 
-class ChangeServicesSpec extends AmlsSpec {
+class ChangeBusinessTypeSpec extends AmlsSpec {
   "The ChangeServices model" when {
 
     "given a valid form" when {
@@ -30,9 +30,9 @@ class ChangeServicesSpec extends AmlsSpec {
             "changeServices" -> Seq("add")
           )
 
-          val result = ChangeServices.formReads.validate(formData)
+          val result = ChangeBusinessType.formReads.validate(formData)
 
-          result mustBe Valid(ChangeServicesAdd)
+          result mustBe Valid(Add)
         }
       }
 
@@ -41,7 +41,7 @@ class ChangeServicesSpec extends AmlsSpec {
         "return the validation errors" in {
           val formData = Map.empty[String, Seq[String]]
 
-          val result = ChangeServices.formReads.validate(formData)
+          val result = ChangeBusinessType.formReads.validate(formData)
 
           result mustBe Invalid(
             Seq(

@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd}
+import models.businessmatching.updateservice.{ChangeBusinessType, Add}
 import models.flowmanagement.ChangeServicesPageId
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -33,7 +33,7 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ChangeServicesControllerSpec extends AmlsSpec with MockitoSugar {
+class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -45,7 +45,7 @@ class ChangeServicesControllerSpec extends AmlsSpec with MockitoSugar {
       self.authConnector,
       mockCacheConnector,
       bmService,
-      createRouter[ChangeServices]
+      createRouter[ChangeBusinessType]
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -94,7 +94,7 @@ class ChangeServicesControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeServicesPageId, ChangeServicesAdd)
+          controller.router.verify(ChangeServicesPageId, Add)
         }
       }
 

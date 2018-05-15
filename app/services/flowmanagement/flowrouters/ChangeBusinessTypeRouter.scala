@@ -18,7 +18,7 @@ package services.flowmanagement.flowrouters
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.Inject
-import models.businessmatching.updateservice.{ChangeServices, ChangeServicesAdd, ChangeServicesRemove}
+import models.businessmatching.updateservice.{ChangeBusinessType, Add, Remove}
 import models.flowmanagement.PageId
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -28,13 +28,11 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeBusinessTypeRouter @Inject() extends Router[ChangeServices] {
-  override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)
+class ChangeBusinessTypeRouter @Inject() extends Router[ChangeBusinessType] {
+  override def getRoute(pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
-    case ChangeServicesAdd => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-    case ChangeServicesRemove => ???
+    case Add => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
+    case Remove => ???
   }
 }
-
-
