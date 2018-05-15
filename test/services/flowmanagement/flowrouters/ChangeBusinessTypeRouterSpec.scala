@@ -23,11 +23,11 @@ import utils.{DependencyMocks, AmlsSpec}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class ChangeServicesRouterSpec extends AmlsSpec {
+class ChangeBusinessTypeRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 
-    val router = new ChangeServicesRouter
+    val router = new ChangeBusinessTypeRouter
 
   }
 

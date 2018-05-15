@@ -29,26 +29,25 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VariationAddServiceRouter @Inject()(
-                                                val businessMatchingService: BusinessMatchingService,
-                                                val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
-                                               val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
-                                               val fitAndProperPageRouter: FitAndProperPageRouter,
-                                               val newServicesInformationPageRouter: NewServicesInformationPageRouter,
-                                               val noPSRPageRouter: NoPSRPageRouter,
-                                               val selectActivitiesPageRouter: SelectActivitiesPageRouter,
-                                               val subServicesPageRouter: SubServicesPageRouter,
-                                               val tradingPremisesPageRouter: TradingPremisesPageRouter,
-                                               val changeServicesPageRouter: ChangeServicesPageRouter,
-                                               val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
-                                               val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
-                                               val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
-                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
-                                              ) extends Router[AddServiceFlowModel] {
+class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService,
+                                      val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
+                                      val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
+                                      val fitAndProperPageRouter: FitAndProperPageRouter,
+                                      val newServicesInformationPageRouter: NewServicesInformationPageRouter,
+                                      val noPSRPageRouter: NoPSRPageRouter,
+                                      val selectActivitiesPageRouter: SelectActivitiesPageRouter,
+                                      val subServicesPageRouter: SubServicesPageRouter,
+                                      val tradingPremisesPageRouter: TradingPremisesPageRouter,
+                                      val changeServicesPageRouter: ChangeServicesPageRouter,
+                                      val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
+                                      val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
+                                      val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
+                                      val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
+                                     ) extends Router[AddServiceFlowModel] {
 
 
   override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
-                       (implicit  ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case AddMoreAcivitiesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
       case BusinessAppliedForPSRNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
@@ -62,11 +61,7 @@ class VariationAddServiceRouter @Inject()(
       case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRoute(model, edit)
       case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRoute(model, edit)
       case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
-
       case ChangeServicesPageId => changeServicesPageRouter.getPageRoute(model, edit)
-
     }
   }
-
-  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }

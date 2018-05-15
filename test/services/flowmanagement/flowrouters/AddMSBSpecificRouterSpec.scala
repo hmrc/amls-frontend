@@ -38,7 +38,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val router = new VariationAddServiceRouter(
+    val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
       businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),

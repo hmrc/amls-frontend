@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeServicesRouter @Inject() extends Router[ChangeServices] {
+class ChangeBusinessTypeRouter @Inject() extends Router[ChangeServices] {
   override def getRoute(pageId: PageId, model: ChangeServices, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 

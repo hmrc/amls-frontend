@@ -35,13 +35,13 @@ import utils.{AmlsSpec, DependencyMocks}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class VariationAddServiceRouterSpec extends AmlsSpec {
+class AddBusinessTypeRouterSpec extends AmlsSpec {
 
   trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val router = new VariationAddServiceRouter(
+    val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
       businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),

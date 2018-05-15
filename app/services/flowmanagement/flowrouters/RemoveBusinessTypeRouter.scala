@@ -19,7 +19,6 @@ package services.flowmanagement.flowrouters
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement._
 import play.api.mvc.Result
-import play.api.mvc.Results.InternalServerError
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.flowmanagement.pagerouters.removeflow._
@@ -29,18 +28,17 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VariationRemoveServiceRouter @Inject()(
-                                           val businessMatchingService: BusinessMatchingService,
-                                           val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
-                                           val needToUpdatePageRouter: NeedToUpdatePageRouter,
-                                           val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
-                                           val unableToRemovePageRouter: UnableToRemovePageRouter,
-                                           val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
-                                         ) extends Router[RemoveServiceFlowModel] {
+class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService,
+                                          val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
+                                          val needToUpdatePageRouter: NeedToUpdatePageRouter,
+                                          val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
+                                          val unableToRemovePageRouter: UnableToRemovePageRouter,
+                                          val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
+                                        ) extends Router[RemoveServiceFlowModel] {
 
 
   override def getRoute(pageId: PageId, model: RemoveServiceFlowModel, edit: Boolean = false)
-                       (implicit  ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case WhatServiceToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)
       case NeedToUpdatePageId => needToUpdatePageRouter.getPageRoute(model, edit)
@@ -49,6 +47,4 @@ class VariationRemoveServiceRouter @Inject()(
       case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
     }
   }
-
-  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }

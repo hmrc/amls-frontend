@@ -21,13 +21,13 @@ import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.pagerouters.removeflow._
 import utils.DependencyMocks
 
-class VariationRemoveServiceRouterSpec extends PlaySpec {
+class RemoveBusinessTypeRouterSpec extends PlaySpec {
 
   trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val router = new VariationRemoveServiceRouter(
+    val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       whatServicesToRemovePageRouter = new WhatServicesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
