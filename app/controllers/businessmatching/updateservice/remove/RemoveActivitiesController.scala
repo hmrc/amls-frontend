@@ -100,7 +100,6 @@ class RemoveActivitiesController @Inject()(
       _.businessActivities
     }
   } yield {
-    val allActivities = BusinessActivities.all
     val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
       _.getMessage
     }

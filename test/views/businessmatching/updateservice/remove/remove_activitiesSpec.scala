@@ -64,10 +64,6 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
 
-      submittedActivities foreach { a =>
-        doc.body().text() must include(Messages(a.getMessage))
-      }
-
       doc.body().text() must include (Messages("businessmatching.updateservice.removeactivities.summary"))
       doc.getElementById("removeactivities-submit").text() must include (Messages("businessmatching.updateservice.removeactivities.button"))
 

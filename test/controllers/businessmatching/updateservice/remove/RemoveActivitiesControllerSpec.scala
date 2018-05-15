@@ -61,10 +61,10 @@ class RemoveActivitiesControllerSpec extends AmlsSpec {
     mockCacheUpdate[RemoveServiceFlowModel](Some(RemoveServiceFlowModel.key), RemoveServiceFlowModel())
   }
 
-  "SelectActivitiesController" when {
+  "RemoveActivitiesController" when {
 
     "get is called" must {
-      "return OK with select_activities view" in new Fixture {
+      "return OK with remove_activities view" in new Fixture {
 
         val result = controller.get()(request)
         status(result) must be(OK)
