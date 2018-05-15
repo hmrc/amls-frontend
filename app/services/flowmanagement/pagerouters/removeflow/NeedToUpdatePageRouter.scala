@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.removeflow
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.RemoveServiceFlowModel
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -30,25 +28,16 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class FitAndProperPageRouter @Inject()(val statusService: StatusService,
-                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class NeedToUpdatePageRouter @Inject()(val statusService: StatusService,
+                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: RemoveServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-
-    if (edit && model.responsiblePeople.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    } else {
-      (model.fitAndProper, edit) match {
-        case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
-        case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-      }
-    }
+    ???
   }
 }
 

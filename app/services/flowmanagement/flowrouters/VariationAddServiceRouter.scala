@@ -17,13 +17,12 @@
 package services.flowmanagement.flowrouters
 
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{UpdateAnyInformationPageId, _}
+import models.flowmanagement._
 import play.api.mvc.Result
 import play.api.mvc.Results.InternalServerError
-import play.mvc.Controller
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
-import services.flowmanagement.pagerouters._
+import services.flowmanagement.pagerouters.addflow._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -44,13 +43,7 @@ class VariationAddServiceRouter @Inject()(
                                                val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
                                                val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
                                                val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
-                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter,
-                                               val updateAnyInformationPageRouter: UpdateAnyInformationPageRouter,
-                                               val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
-                                               val needToUpdatePageRouter: NeedToUpdatePageRouter,
-                                               val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
-                                               val unableToRemovePageRouter: UnableToRemovePageRouter,
-                                               val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
+                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
                                               ) extends Router[AddServiceFlowModel] {
 
 
@@ -71,14 +64,7 @@ class VariationAddServiceRouter @Inject()(
       case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
 
       case ChangeServicesPageId => changeServicesPageRouter.getPageRoute(model, edit)
-      case UpdateAnyInformationPageId => updateAnyInformationPageRouter.getPageRoute(model, edit)
 
-      // Remove service flow
-      case WhatServiceToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)
-      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRoute(model, edit)
-      case RemoveServiceSummaryPageId => removeServicesSummaryPageRouter.getPageRoute(model, edit)
-      case UnableToRemovePageId => unableToRemovePageRouter.getPageRoute(model, edit)
-      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
     }
   }
 

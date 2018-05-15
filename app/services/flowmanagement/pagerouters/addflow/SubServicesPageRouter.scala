@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
@@ -31,8 +31,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
-                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class SubServicesPageRouter @Inject()(val statusService: StatusService,
+                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
@@ -41,11 +41,20 @@ class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
 
                            ): Future[Result] = {
     (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
-      model.businessAppliedForPSRNumber.isDefined) match {
-      case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-      case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    }
+      edit,
+      model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
+      model.businessAppliedForPSRNumber.isDefined,
+      model.areNewActivitiesAtTradingPremises) match {
+      case (true, false, _, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+      case (false, false, _, _, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
+      case (true, true, false, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+      case (true, true, false, true, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case (false, true, false, _, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case (_, true, _, _, Some(true)) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
+      case (true, true, _, false, Some(false)) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+      case (_, true, _, _, Some(false)) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
+    }
   }
 }
 

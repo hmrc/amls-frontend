@@ -17,13 +17,25 @@
 package services.flowmanagement.flowrouters
 
 import org.scalatestplus.play.PlaySpec
+import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.pagerouters.addflow._
+import services.flowmanagement.pagerouters.removeflow._
 import utils.DependencyMocks
 
 class VariationRemoveServiceRouterSpec extends PlaySpec {
 
   trait Fixture extends DependencyMocks {
 
-    val router = new VariationRemoveServiceRouter()
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    val router = new VariationRemoveServiceRouter(
+      businessMatchingService = mockBusinessMatchingService,
+      whatServicesToRemovePageRouter = new WhatServicesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
+      needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
+      removeServicesSummaryPageRouter = new RemoveServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+      unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
+      whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
+    )
   }
 
   "getRoute" must {

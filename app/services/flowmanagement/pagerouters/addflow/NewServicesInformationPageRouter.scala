@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.AddServiceFlowModel
 import play.api.mvc.Result
@@ -31,21 +30,14 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class TradingPremisesPageRouter @Inject()(val statusService: StatusService,
-                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class NewServicesInformationPageRouter @Inject()(val statusService: StatusService,
+                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    if (edit && model.tradingPremisesActivities.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    } else {
-      model.areNewActivitiesAtTradingPremises match {
-        case Some(true) =>
-          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
-        case _ =>
-          Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-      }
-    }
+    Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
 }
+
+

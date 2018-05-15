@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching._
+import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
 import models.flowmanagement.AddServiceFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -30,16 +30,24 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-
 @Singleton
-class ChangeServicesPageRouter @Inject()(val statusService: StatusService,
-                                         val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
+                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-//TODO
-???
+                           (implicit ac: AuthContext,
+                            hc: HeaderCarrier,
+                            ec: ExecutionContext
+
+                           ): Future[Result] = {
+    (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
+      model.businessAppliedForPSRNumber.isDefined) match {
+      case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
+      case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+    }
+
   }
 }
+
 
 

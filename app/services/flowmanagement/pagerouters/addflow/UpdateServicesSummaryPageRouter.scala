@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId, PageId}
+import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
+import models.flowmanagement.{AddServiceFlowModel, PageId, UpdateServiceSummaryPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -31,8 +33,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusService,
-                                                      val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class UpdateServicesSummaryPageRouter @Inject()(val statusService: StatusService,
+                                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
@@ -40,15 +42,29 @@ class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusS
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    (edit, model.businessAppliedForPSRNumber) match {
-      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-      case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-      case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-      case (_, None) => Future.successful(error(BusinessAppliedForPSRNumberPageId))
-    }
+
+    businessMatchingService.getRemainingBusinessActivities flatMap {
+      case set if set.nonEmpty =>
+        OptionT.some(Redirect(addRoutes.AddMoreActivitiesController.get()))
+      case _ =>
+        newServiceInformationRedirect
+    } getOrElse error(UpdateServiceSummaryPageId)
+
   }
 
   private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
+
+  private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
+    businessMatchingService.getAdditionalBusinessActivities map { activities =>
+      if (!activities.forall {
+        case BillPaymentServices | TelephonePaymentService => true
+        case _ => false
+      }) {
+        Redirect(addRoutes.NewServiceInformationController.get())
+      } else {
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+    }
 }
 
 

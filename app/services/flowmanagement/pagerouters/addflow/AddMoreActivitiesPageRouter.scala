@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
-import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.{AddServiceFlowModel, PageId, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -32,25 +31,22 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+
 @Singleton
-class UpdateServicesSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class AddMoreActivitiesPageRouter @Inject()(val statusService: StatusService,
+                                            val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
+                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-                           ): Future[Result] = {
-
-    businessMatchingService.getRemainingBusinessActivities flatMap {
-      case set if set.nonEmpty =>
-        OptionT.some(Redirect(addRoutes.AddMoreActivitiesController.get()))
+    model.addMoreActivities match {
+      case Some(true) =>
+        Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
       case _ =>
-        newServiceInformationRedirect
-    } getOrElse error(UpdateServiceSummaryPageId)
-
+        newServiceInformationRedirect getOrElse error(AddMoreAcivitiesPageId)
+    }
   }
+
 
   private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 
@@ -66,6 +62,5 @@ class UpdateServicesSummaryPageRouter @Inject()(val statusService: StatusService
       }
     }
 }
-
 
 

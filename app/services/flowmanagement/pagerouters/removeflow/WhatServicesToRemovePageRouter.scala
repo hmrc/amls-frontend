@@ -14,13 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.removeflow
 
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.RemoveServiceFlowModel
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -31,9 +29,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class WhatServicesToRemovePageRouter @Inject()(val statusService: StatusService,
-                                               val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+                                               val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: RemoveServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext

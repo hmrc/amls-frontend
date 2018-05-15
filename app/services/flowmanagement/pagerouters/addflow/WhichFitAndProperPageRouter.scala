@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
@@ -29,19 +29,19 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
+
 @Singleton
-class WhatDateToRemovePageRouter @Inject()(val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class WhichFitAndProperPageRouter @Inject()(val statusService: StatusService,
+                                            val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
+                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-                           ): Future[Result] = {
-    ???
+    edit match {
+      case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+    }
   }
 }
-
 
 

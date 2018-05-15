@@ -24,6 +24,8 @@ import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.pagerouters._
+import services.flowmanagement.pagerouters.addflow._
+import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -50,13 +52,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       updateServicesSummaryPageRouter = new UpdateServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
       whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      updateAnyInformationPageRouter = new UpdateAnyInformationPageRouter(mockStatusService, mockBusinessMatchingService),
-      whatServicesToRemovePageRouter = new WhatServicesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
-      needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
-      removeServicesSummaryPageRouter = new RemoveServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
-      unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
-      whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
+      whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService)
 
     )
   }
