@@ -14,14 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.removeflow
 
-import cats.implicits._
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{AddServiceFlowModel, PageId, UpdateServiceSummaryPageId}
+import models.flowmanagement.RemoveServiceFlowModel
 import play.api.mvc.Result
-import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -31,29 +28,17 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateServicesSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class NeedToUpdatePageRouter @Inject()(val statusService: StatusService,
+                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
 
-  override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
+  override def getPageRoute(model: RemoveServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-
-    businessMatchingService.getRemainingBusinessActivities map {
-      case set if set.nonEmpty =>
-        Redirect(addRoutes.AddMoreActivitiesController.get())
-      case _ if model.informationRequired =>
-        Redirect(addRoutes.NewServiceInformationController.get())
-      case _ =>
-        Redirect(controllers.routes.RegistrationProgressController.get())
-    } getOrElse error(UpdateServiceSummaryPageId)
-
-
+    ???
   }
-
-  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }
 
 

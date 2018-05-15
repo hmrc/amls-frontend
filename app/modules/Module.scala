@@ -24,7 +24,7 @@ import models.flowmanagement.{AddServiceFlowModel, RemoveServiceFlowModel}
 import services._
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import services.flowmanagement.Router
-import services.flowmanagement.flowrouters.{ChangeServicesRouter, DavesVariationAddServiceRouter, VariationAddServiceRouter, VariationRemoveServiceRouter}
+import services.flowmanagement.flowrouters.{ChangeServicesRouter, VariationAddServiceRouter, VariationRemoveServiceRouter}
 import uk.gov.hmrc.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
@@ -51,8 +51,5 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[VariationAddServiceRouter])
     bind(new TypeLiteral[Router[ChangeServices]] {}).to(classOf[ChangeServicesRouter])
     bind(new TypeLiteral[Router[RemoveServiceFlowModel]] {}).to(classOf[VariationRemoveServiceRouter])
-
-
-    //bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[DavesVariationAddServiceRouter])
   }
 }

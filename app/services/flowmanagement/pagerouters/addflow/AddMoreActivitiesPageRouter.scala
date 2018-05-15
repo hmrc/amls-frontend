@@ -14,13 +14,13 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.{AddMoreAcivitiesPageId, AddServiceFlowModel, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -41,21 +41,26 @@ class AddMoreActivitiesPageRouter @Inject()(val statusService: StatusService,
 
     model.addMoreActivities match {
       case Some(true) =>
-        Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
-
+        Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
       case _ =>
-        businessMatchingService.getAdditionalBusinessActivities map { activities =>
-          if (!activities.forall {
-            case BillPaymentServices | TelephonePaymentService => true
-            case _ => false
-          }) {
-            Redirect(addRoutes.NewServiceInformationController.get())
-          } else {
-            Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        } getOrElse InternalServerError("Unable to get additional business activities")
+        newServiceInformationRedirect getOrElse error(AddMoreAcivitiesPageId)
     }
   }
+
+
+  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
+
+  private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
+    businessMatchingService.getAdditionalBusinessActivities map { activities =>
+      if (!activities.forall {
+        case BillPaymentServices | TelephonePaymentService => true
+        case _ => false
+      }) {
+        Redirect(addRoutes.NewServiceInformationController.get())
+      } else {
+        Redirect(controllers.routes.RegistrationProgressController.get())
+      }
+    }
 }
 
 

@@ -20,10 +20,12 @@ import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import models.businessmatching._
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, TradingPremisesActivities}
 import models.flowmanagement._
-import org.scalatestplus.play.PlaySpec
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.pagerouters._
+import services.flowmanagement.pagerouters.addflow._
+import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -33,8 +35,26 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
   val model = AddServiceFlowModel(activity = Some(MoneyServiceBusiness))
 
   trait Fixture extends DependencyMocks {
-    val businessMatchingService = mock[BusinessMatchingService]
-    val router = new VariationAddServiceRouter(businessMatchingService)
+
+    val mockBusinessMatchingService = mock[BusinessMatchingService]
+
+    val router = new VariationAddServiceRouter(
+      businessMatchingService = mockBusinessMatchingService,
+      addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
+      businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
+      fitAndProperPageRouter = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
+      newServicesInformationPageRouter = new NewServicesInformationPageRouter(mockStatusService, mockBusinessMatchingService),
+      noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
+      selectActivitiesPageRouter = new SelectActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
+      subServicesPageRouter = new SubServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+      tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
+      changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+      updateServicesSummaryPageRouter = new UpdateServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+      whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
+      whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
+      whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService)
+
+    )
   }
 
   "In the Add MSB flow the getRoute method" must {
