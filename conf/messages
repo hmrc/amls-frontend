@@ -1170,6 +1170,7 @@ businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want 
 businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
 businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
 businessmatching.updateservice.removeactivities.summary = You must have at least 1 type of business registered. You can add another business before removing one.
+businessmatching.updateservice.removeactivities.list.heading = Choose at least one
 businessmatching.updateservice.removeactivities.button = Continue
 
 #   Add route Start  ###################################################################################################

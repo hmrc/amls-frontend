@@ -31,6 +31,7 @@
         heading = header
     ) {
         <p>@Messages("businessmatching.updateservice.removeactivities.summary")</p>
+        <p>@Messages("businessmatching.updateservice.removeactivities.list.heading")</p>
 
         @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.post()) {
 
@@ -44,7 +45,7 @@
                 @errorGroup(
                     field = f("businessActivities")
                 ) {
-                    @{activityValues map (value => radio(
+                    @{activityValues map (value => checkbox(
                         f = f("businessActivities[]"),
                         labelText = s"businessmatching.registerservices.servicename.lbl.$value",
                         value = value
