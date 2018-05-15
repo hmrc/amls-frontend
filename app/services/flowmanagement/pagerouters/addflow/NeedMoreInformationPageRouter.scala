@@ -30,8 +30,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class NewServicesInformationPageRouter @Inject()(val statusService: StatusService,
-                                                 val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class NeedMoreInformationPageRouter @Inject()(val statusService: StatusService,
+                                              val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
@@ -39,5 +39,3 @@ class NewServicesInformationPageRouter @Inject()(val statusService: StatusServic
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
   }
 }
-
-

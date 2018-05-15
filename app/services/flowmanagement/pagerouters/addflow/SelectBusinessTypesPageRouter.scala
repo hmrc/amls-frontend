@@ -32,8 +32,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class SelectActivitiesPageRouter @Inject()(val statusService: StatusService,
-                                           val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class SelectBusinessTypesPageRouter @Inject()(val statusService: StatusService,
+                                              val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {

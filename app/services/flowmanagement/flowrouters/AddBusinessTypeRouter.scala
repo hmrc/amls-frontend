@@ -30,16 +30,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService,
-                                      val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
+                                      val addMoreActivitiesPageRouter: AddMoreBusinessTypesPageRouter,
                                       val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
                                       val fitAndProperPageRouter: FitAndProperPageRouter,
-                                      val newServicesInformationPageRouter: NewServicesInformationPageRouter,
+                                      val newServicesInformationPageRouter: NeedMoreInformationPageRouter,
                                       val noPSRPageRouter: NoPSRPageRouter,
-                                      val selectActivitiesPageRouter: SelectActivitiesPageRouter,
-                                      val subServicesPageRouter: SubServicesPageRouter,
+                                      val selectActivitiesPageRouter: SelectBusinessTypesPageRouter,
+                                      val subServicesPageRouter: MsbServicesPageRouter,
                                       val tradingPremisesPageRouter: TradingPremisesPageRouter,
-                                      val changeServicesPageRouter: ChangeServicesPageRouter,
-                                      val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
+                                      val updateServicesSummaryPageRouter: AddBusinessTypeSummaryPageRouter,
                                       val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
                                       val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
                                       val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter
@@ -61,7 +60,6 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
       case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRoute(model, edit)
       case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRoute(model, edit)
       case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
-      case ChangeServicesPageId => changeServicesPageRouter.getPageRoute(model, edit)
     }
   }
 }
