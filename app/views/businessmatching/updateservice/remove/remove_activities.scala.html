@@ -19,7 +19,7 @@
 @import include.forms2._
 @import config.ApplicationConfig
 
-@(f: Form2[_], edit: Boolean, activityValues: Seq[String], existing: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, activityValues: Seq[String])(implicit request: Request[_],m:Messages, lang: Lang)
 
     @header = {
     @errorSummary(f)
@@ -30,9 +30,6 @@
         title = Messages("businessmatching.updateservice.removeactivities.title") + " - " + Messages("summary.updateservice"),
         heading = header
     ) {
-
-        @current_business_types(existing.toSet)
-
         <p>@Messages("businessmatching.updateservice.removeactivities.summary")</p>
 
         @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.post()) {

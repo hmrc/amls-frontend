@@ -32,7 +32,6 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
 
     override def view = remove_activities(EmptyForm,
       edit = true,
-      Seq.empty[String],
       Seq.empty[String]
     )
   }
@@ -53,17 +52,14 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
 
     "show the correct content" in new ViewFixture {
 
-      val addedActivities = Seq(AccountancyServices, BillPaymentServices)
       val submittedActivities = Seq(MoneyServiceBusiness)
 
 
       override def view = remove_activities(EmptyForm,
         edit = true,
-        addedActivities map BusinessActivities.getValue,
-        submittedActivities map (_.getMessage)
-      )
+        submittedActivities map BusinessActivities.getValue)
 
-      addedActivities foreach { a =>
+      submittedActivities foreach { a =>
         doc.body().text must include(Messages(a.getMessage))
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
@@ -82,7 +78,7 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.removeactivities") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = remove_activities(form2, edit = true, Seq.empty[String], Seq.empty[String])
+      override def view = remove_activities(form2, edit = true, Seq.empty[String])
 
       errorSummary.html() must include("not a message Key")
     }
