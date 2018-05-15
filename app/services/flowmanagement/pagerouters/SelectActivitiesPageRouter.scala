@@ -39,8 +39,9 @@ class SelectActivitiesPageRouter @Inject()(val statusService: StatusService,
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
     if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    } else {
+    Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+
+  } else {
       model.activity match {
         case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
         case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubServicesController.get()))

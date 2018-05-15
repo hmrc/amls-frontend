@@ -16,151 +16,71 @@
 
 package services.flowmanagement.flowrouters
 
-import cats.data.OptionT
-import cats.implicits._
-import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching._
-import models.flowmanagement._
+import models.flowmanagement.{UpdateAnyInformationPageId, _}
 import play.api.mvc.Result
-import play.api.mvc.Results.{InternalServerError, Redirect}
+import play.api.mvc.Results.InternalServerError
+import play.mvc.Controller
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
+import services.flowmanagement.pagerouters._
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class VariationAddServiceRouter @Inject()(val businessMatchingService: BusinessMatchingService) extends Router[AddServiceFlowModel] {
+class VariationAddServiceRouter @Inject()(
+                                                val businessMatchingService: BusinessMatchingService,
+                                                val addMoreActivitiesPageRouter: AddMoreActivitiesPageRouter,
+                                               val businessAppliedForPSRNumberPageRouter: BusinessAppliedForPsrNumberPageRouter,
+                                               val fitAndProperPageRouter: FitAndProperPageRouter,
+                                               val newServicesInformationPageRouter: NewServicesInformationPageRouter,
+                                               val noPSRPageRouter: NoPSRPageRouter,
+                                               val selectActivitiesPageRouter: SelectActivitiesPageRouter,
+                                               val subServicesPageRouter: SubServicesPageRouter,
+                                               val tradingPremisesPageRouter: TradingPremisesPageRouter,
+                                               val changeServicesPageRouter: ChangeServicesPageRouter,
+                                               val updateServicesSummaryPageRouter: UpdateServicesSummaryPageRouter,
+                                               val whatDoYouDoHerePageRouter: WhatDoYouDoHerePageRouter,
+                                               val whichFitAndProperPageRouter: WhichFitAndProperPageRouter,
+                                               val whichTradingPremisesPageRouter: WhichTradingPremisesPageRouter,
+                                               val updateAnyInformationPageRouter: UpdateAnyInformationPageRouter,
+                                               val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
+                                               val needToUpdatePageRouter: NeedToUpdatePageRouter,
+                                               val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
+                                               val unableToRemovePageRouter: UnableToRemovePageRouter,
+                                               val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
+                                              ) extends Router[AddServiceFlowModel] {
 
 
-
-  // scalastyle:off cyclomatic.complexity
-  // scalastyle:off method.length
   override def getRoute(pageId: PageId, model: AddServiceFlowModel, edit: Boolean = false)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
+                       (implicit  ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
+      case AddMoreAcivitiesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
+      case BusinessAppliedForPSRNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
+      case FitAndProperPageId => fitAndProperPageRouter.getPageRoute(model, edit)
+      case NewServiceInformationPageId => newServicesInformationPageRouter.getPageRoute(model, edit)
+      case NoPSRPageId => noPSRPageRouter.getPageRoute(model, edit)
+      case SelectActivitiesPageId => selectActivitiesPageRouter.getPageRoute(model, edit)
+      case SubServicesPageId => subServicesPageRouter.getPageRoute(model, edit)
+      case TradingPremisesPageId => tradingPremisesPageRouter.getPageRoute(model, edit)
+      case UpdateServiceSummaryPageId => updateServicesSummaryPageRouter.getPageRoute(model, edit)
+      case WhatDoYouDoHerePageId => whatDoYouDoHerePageRouter.getPageRoute(model, edit)
+      case WhichFitAndProperPageId => whichFitAndProperPageRouter.getPageRoute(model, edit)
+      case WhichTradingPremisesPageId => whichTradingPremisesPageRouter.getPageRoute(model, edit)
 
-      case SelectActivitiesPageId if edit && model.areNewActivitiesAtTradingPremises.isDefined =>
-        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case ChangeServicesPageId => changeServicesPageRouter.getPageRoute(model, edit)
+      case UpdateAnyInformationPageId => updateAnyInformationPageRouter.getPageRoute(model, edit)
 
-      case SelectActivitiesPageId => {
-        model.activity match {
-          case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
-          case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubServicesController.get()))
-          case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-        }
-      }
-
-      // Money Service Business
-      case SubServicesPageId =>
-        (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
-                edit,
-                model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
-                model.businessAppliedForPSRNumber.isDefined,
-                model.areNewActivitiesAtTradingPremises) match {
-          case (true, false, _, _, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (false, false, _, _, _) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-          case (true, true, false, false, _) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (true, true, false, true, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (false, true, false, _, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (_, true, _, _, Some(true)) => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-          case (true, true, _, false, Some(false)) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (_, true, _, _, Some(false)) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        }
-
-      //psr number pages
-      case BusinessAppliedForPSRNumberPageId =>
-        (edit, model.businessAppliedForPSRNumber) match {
-          case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
-          case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-          case (_, None) => Future.successful(error(BusinessAppliedForPSRNumberPageId))
-        }
-
-      case NoPSRPageId => {
-        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-      }
-
-      //fit and proper pages
-      case FitAndProperPageId if edit && model.responsiblePeople.isDefined =>
-        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-
-      case FitAndProperPageId =>
-        (model.fitAndProper, edit) match {
-          case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
-          case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-        }
-
-      case WhichFitAndProperPageId =>
-        edit match {
-          case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-          case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-        }
-
-      case WhichFitAndProperPageId =>
-        Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
-
-      //trading premises pages
-      case TradingPremisesPageId if edit && model.tradingPremisesActivities.isDefined =>
-        Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-
-      case TradingPremisesPageId =>
-        model.areNewActivitiesAtTradingPremises match {
-          case Some(true) =>
-            Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get(edit)))
-          case _ =>
-            Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        }
-
-      case WhichTradingPremisesPageId =>
-        model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1 match {
-          case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-          case false => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        }
-
-      case WhatDoYouDoHerePageId =>
-        (model.msbServices.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
-                model.businessAppliedForPSRNumber.isDefined) match {
-          case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-          case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-        }
-
-      //update service page
-      case UpdateServiceSummaryPageId =>
-        businessMatchingService.getRemainingBusinessActivities flatMap {
-          case set if set.nonEmpty =>
-            OptionT.some(Redirect(addRoutes.AddMoreActivitiesController.get()))
-          case _ =>
-            newServiceInformationRedirect
-        } getOrElse error(pageId)
-
-      case AddMoreAcivitiesPageId =>
-        model.addMoreActivities match {
-          case Some(true) =>
-            Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
-          case _ =>
-            newServiceInformationRedirect getOrElse error(pageId)
-        }
-
-      case NewServiceInformationPageId =>
-        Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+      // Remove service flow
+      case WhatServiceToRemovePageId => whatServicesToRemovePageRouter.getPageRoute(model, edit)
+      case NeedToUpdatePageId => needToUpdatePageRouter.getPageRoute(model, edit)
+      case RemoveServiceSummaryPageId => removeServicesSummaryPageRouter.getPageRoute(model, edit)
+      case UnableToRemovePageId => unableToRemovePageRouter.getPageRoute(model, edit)
+      case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
     }
   }
 
   private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
-
-  private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
-    businessMatchingService.getAdditionalBusinessActivities map { activities =>
-      if (!activities.forall {
-        case BillPaymentServices | TelephonePaymentService => true
-        case _ => false
-      }) {
-        Redirect(addRoutes.NewServiceInformationController.get())
-      } else {
-        Redirect(controllers.routes.RegistrationProgressController.get())
-      }
-    }
 }
