@@ -1164,14 +1164,18 @@ businessmatching.updateservice.changeservices.choice.add = Register another busi
 businessmatching.updateservice.changeservices.choice.remove = Remove a service
 
 #remove route
-businessmatching.updateservice.removeactivities.title = What do you need to remove?
-businessmatching.updateservice.removeactivities.header = What do you need to remove?
 
 businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
 businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
 businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
+
+businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
+businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
+businessmatching.updateservice.removeactivities.summary = You must have at least 1 type of business registered. You can add another business before removing one.
+businessmatching.updateservice.removeactivities.list.heading = Choose at least one
+businessmatching.updateservice.removeactivities.button = Continue
 
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which services does your business provide?
