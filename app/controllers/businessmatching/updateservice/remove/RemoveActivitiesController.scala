@@ -64,10 +64,10 @@ class RemoveActivitiesController @Inject()(
           model <- OptionT(dataCacheConnector.update[RemoveServiceFlowModel](RemoveServiceFlowModel.key)(model => edit match {
             case _ => model.getOrElse(RemoveServiceFlowModel())
           }))
-          (names, values) <- getFormData
+          (values) <- getFormData
         } yield {
           val form = model.activitiesToRemove.fold[Form2[Set[BusinessActivity]]](EmptyForm)(a => Form2(a))
-          Ok(remove_activities(form, edit, values, names))
+          Ok(remove_activities(form, edit, values))
         }) getOrElse InternalServerError("Get: Unable to show remove Activities page. Failed to retrieve data")
   }
 
@@ -76,8 +76,8 @@ class RemoveActivitiesController @Inject()(
       implicit request =>
         Form2[Set[BusinessActivity]](request.body) match {
           case f: InvalidForm => getFormData map {
-            case (names, values) =>
-              BadRequest(remove_activities(f, edit, values, names))
+            case (values) =>
+              BadRequest(remove_activities(f, edit, values))
           } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
 
           case ValidForm(_, data) =>
@@ -92,8 +92,6 @@ class RemoveActivitiesController @Inject()(
         }
   }
 
-
-
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
     model <- businessMatchingService.getModel
     activities <- OptionT.fromOption[Future](model.activities) map {
@@ -104,7 +102,7 @@ class RemoveActivitiesController @Inject()(
     val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
       _.getMessage
     }
-    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessActivities.getValue
-    (existingActivityNames, activityValues)
+    val activityValues = (activities).toSeq.sortBy(_.getMessage) map BusinessActivities.getValue
+    (existingActivityNames)
   }
 }
