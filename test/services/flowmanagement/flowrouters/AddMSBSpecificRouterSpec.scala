@@ -48,7 +48,6 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
       whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
@@ -66,7 +65,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute(SelectBusinessTypesPageId, model))
 
-          result mustBe Redirect(addRoutes.SubServicesController.get(false))
+          result mustBe Redirect(addRoutes.SubSectorsController.get(false))
         }
       }
     }
@@ -130,7 +129,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute(NoPSRPageId, model))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -201,7 +200,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
             val result = await(router.getRoute(TradingPremisesPageId, model))
 
-            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
           }
         }
       }
@@ -233,7 +232,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
             val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
-            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
           }
         }
       }
@@ -245,7 +244,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
         "MSB is the Business Activity" in new Fixture {
           val result = await(router.getRoute(WhatDoYouDoHerePageId, model))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -281,7 +280,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -313,7 +312,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -357,7 +356,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = None)
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -389,7 +388,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = None)
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -404,7 +403,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -417,7 +416,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))))
           val result = await(router.getRoute(SubSectorsPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -461,7 +460,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
           val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -503,7 +502,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             fitAndProper = Some(false))
           val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -518,7 +517,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -546,7 +545,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             areNewActivitiesAtTradingPremises = Some(false))
           val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -563,7 +562,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -591,7 +590,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           areNewActivitiesAtTradingPremises = Some(false))
         val result = await(router.getRoute(WhatDoYouDoHerePageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
 
       }
     }

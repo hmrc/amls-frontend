@@ -48,7 +48,6 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
       whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
@@ -137,7 +136,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
 
             val result = await(router.getRoute(TradingPremisesPageId, model))
 
-            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
           }
         }
       }
@@ -148,7 +147,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
         "TCSP is the Business Activity" in new Fixture {
           val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -180,7 +179,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             fitAndProper = Some(false))
           val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -195,7 +194,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -223,7 +222,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             areNewActivitiesAtTradingPremises = Some(false))
           val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -238,7 +237,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }

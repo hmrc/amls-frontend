@@ -32,12 +32,12 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
   }
 
   "getRoute" must {
-    "return the 'Activities selection' page (SelectActivitiesController)" when {
+    "return the 'Activitiea selection' page (SelectActivitiesController)" when {
       "given the 'register a service' model" in new Fixture {
 
         val result = router.getRoute(ChangeServicesPageId, Add)
 
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.SelectActivitiesController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.SelectBusinessTypeController.get().url)
 
       }
     }

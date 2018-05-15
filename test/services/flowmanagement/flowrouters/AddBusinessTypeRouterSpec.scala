@@ -49,7 +49,6 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
       updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
       whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
@@ -89,7 +88,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(TradingPremisesPageId, model))
 
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -102,7 +101,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(SelectBusinessTypesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -116,7 +115,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
 
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -141,7 +140,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
-        result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+        result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
       }
     }
 
@@ -157,7 +156,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(AddBusinessTypeSummaryPageId, model))
 
-        result mustBe Redirect(addRoutes.AddMoreActivitiesController.get())
+        result mustBe Redirect(addRoutes.AddMoreBusinessTypesController.get())
       }
     }
 
@@ -192,13 +191,13 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(AddBusinessTypeSummaryPageId, AddBusinessTypeFlowModel(Some(HighValueDealing))))
 
-        result mustBe Redirect(addRoutes.NewServiceInformationController.get())
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 
     "return the 'Activities selection' page (SelectActivitiesController)" when {
       "we're on the 'Do you want at add more activities' page " +
-        "and the use wants to add more activities" in new Fixture {
+        "and the user wants to add more activities" in new Fixture {
         val model = AddBusinessTypeFlowModel(
           activity = Some(HighValueDealing),
           areNewActivitiesAtTradingPremises = Some(true),
@@ -206,7 +205,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(AddMoreBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.SelectActivitiesController.get())
+        result mustBe Redirect(addRoutes.SelectBusinessTypeController.get())
       }
     }
 
@@ -226,7 +225,7 @@ class AddBusinessTypeRouterSpec extends AmlsSpec {
 
         val result = await(router.getRoute(AddMoreBusinessTypesPageId, model))
 
-        result mustBe Redirect(addRoutes.NewServiceInformationController.get())
+        result mustBe Redirect(addRoutes.NeedMoreInformationController.get())
       }
     }
 

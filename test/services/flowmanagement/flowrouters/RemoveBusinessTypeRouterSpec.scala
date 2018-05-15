@@ -68,12 +68,12 @@ class RemoveBusinessTypeRouterSpec extends PlaySpec {
             )
             val result = await(router.getRoute(ChangeServicesPageId, model))
 
-            result mustBe Redirect(removeRoutes.RemoveActivitiesController.get())
+            result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
           }
         }
       }
 
-      "return the 'Unable to remove' page (UnableToRemoveActivitiesController)" when {
+      "return the 'Unable to remove' page (UnableToRemoveBusinessTypesController)" when {
         "the user is on the 'What do you want to do' page (ChangeServicesPageId)" when {
           "there is less than two business type in the model" in new Fixture {
 
@@ -82,7 +82,7 @@ class RemoveBusinessTypeRouterSpec extends PlaySpec {
             )
             val result = await(router.getRoute(ChangeServicesPageId, model))
 
-            result mustBe Redirect(removeRoutes.UnableToRemoveActivitiesController.get())
+            result mustBe Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
           }
         }
       }
@@ -110,7 +110,7 @@ class RemoveBusinessTypeRouterSpec extends PlaySpec {
             )
             val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
 
-            result mustBe Redirect(removeRoutes.UpdateServiceDateOfChangeController.get())
+            result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
           }
         }
       }
