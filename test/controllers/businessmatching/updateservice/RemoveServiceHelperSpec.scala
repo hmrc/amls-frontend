@@ -270,43 +270,44 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity MSB (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+          val startResultTP = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
 
         "remove the TradingPremises MSB Services" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
+          val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, MoneyServiceBusiness))),
             msbServices = Some(TradingPremisesMsbServices(Set(CurrencyExchange))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             msbServices = None,
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -315,21 +316,22 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity EAB (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(EstateAgentBusinessService, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
+          val startResultTP = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -338,21 +340,22 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity TCSP (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TrustAndCompanyServices))),
+          val startResultTP = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TrustAndCompanyServices))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -361,21 +364,21 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity BP (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, BillPaymentServices))),
+          val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, BillPaymentServices))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -384,21 +387,21 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity TDI (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(TelephonePaymentService, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TelephonePaymentService))),
+          val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, TelephonePaymentService))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -407,21 +410,21 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity ASP (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(AccountancyServices, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))),
+          val startResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
 
@@ -430,21 +433,22 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
         "remove the TradingPremises Business Activity HVD (Type)" in new Fixture {
           val model = RemoveServiceFlowModel(activitiesToRemove = Some(Set(HighValueDealing, BillPaymentServices)))
 
-          val startResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
+          val startResultTP = Seq(TradingPremises(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing, EstateAgentBusinessService))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          val endResultTP = TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(EstateAgentBusinessService))),
+          val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(EstateAgentBusinessService))),
             hasAccepted = true,
-            hasChanged = true)
+            hasChanged = true))
 
-          mockCacheFetch[TradingPremises](
+          mockCacheFetch[Seq[TradingPremises]](
             Some(startResultTP),
             Some(TradingPremises.key))
 
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
-          helper.removeTradingPremisesBusinessActivities(model).returnsSome(endResultTP)
+          helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
         }
       }
     }

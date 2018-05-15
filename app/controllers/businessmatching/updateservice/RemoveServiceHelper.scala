@@ -67,23 +67,28 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
     } yield newBusinessMatching
   }
 
-  def removeTradingPremisesBusinessActivities(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, TradingPremises] = {
+  def removeTradingPremisesBusinessTypes(model: RemoveServiceFlowModel)
+                                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[TradingPremises]] = {
+
+    val setAccepted = (tp: TradingPremises) => tp.copy(hasAccepted = true)
 
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
-
-      currentTradingPremises <- OptionT(dataCacheConnector.fetch[TradingPremises](TradingPremises.key))
-      currentTradingPremisesActivities <- OptionT.fromOption[Future](currentTradingPremises.whatDoesYourBusinessDoAtThisAddress) orElse OptionT.some[Future, WhatDoesYourBusinessDo](WhatDoesYourBusinessDo(Set.empty[BMBusinessActivity]))
-
       newTradingPremises <- {
+        OptionT(dataCacheConnector.update[Seq[TradingPremises]](TradingPremises.key) {
+          case Some(tpList) => tpList map { tp =>
+            val currentBusinessTypes = tp.whatDoesYourBusinessDoAtThisAddress.getOrElse(WhatDoesYourBusinessDo(Set.empty))
+            val newBusinessTypes = currentBusinessTypes.copy(activities = currentBusinessTypes.activities -- activitiesToRemove)
+            val newPremises = tp.whatDoesYourBusinessDoAtThisAddress(newBusinessTypes)
 
-        OptionT(dataCacheConnector.update[TradingPremises](TradingPremises.key) {
-          case Some(tp) if activitiesToRemove.contains(MoneyServiceBusiness) =>
-            tp.whatDoesYourBusinessDoAtThisAddress(currentTradingPremisesActivities.copy(activities = currentTradingPremisesActivities.activities -- activitiesToRemove))
-              .msbServices(None)
-              .copy(hasAccepted = true)
-          case Some(tp) => tp.whatDoesYourBusinessDoAtThisAddress(currentTradingPremisesActivities.copy(activities = currentTradingPremisesActivities.activities -- activitiesToRemove))
-            .copy(hasAccepted = true)
+            if (activitiesToRemove.contains(MoneyServiceBusiness)) {
+              setAccepted(newPremises.msbServices(None))
+            } else {
+              setAccepted(newPremises)
+            }
+          }
+
+          case _ => throw new RuntimeException("No trading premises found")
         })
       }
     } yield newTradingPremises
@@ -110,6 +115,7 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
             rpList.map(_.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true))
           case Some(rpList) => rpList
+          case _ => throw new RuntimeException("No responsible people found")
         })
       }
     } yield newResponsiblePeople
