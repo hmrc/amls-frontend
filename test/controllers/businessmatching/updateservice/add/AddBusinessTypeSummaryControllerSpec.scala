@@ -24,7 +24,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{ServiceChangeRegister, TradingPremisesActivities}
-import models.flowmanagement.{AddBusinessTypeFlowModel, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.status.SubmissionDecisionApproved
 import models.supervision.Supervision
@@ -42,7 +42,7 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class UpdateServicesSummaryControllerSpec extends AmlsSpec
+class AddBusinessTypeSummaryControllerSpec extends AmlsSpec
   with MockitoSugar
   with TradingPremisesGenerator
   with BusinessMatchingGenerator {
@@ -56,7 +56,7 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    val controller = new UpdateServicesSummaryController(
+    val controller = new AddBusinessTypeSummaryController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       statusService = mockStatusService,
@@ -151,7 +151,7 @@ class UpdateServicesSummaryControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        controller.router.verify(UpdateServiceSummaryPageId, flowModel)
+        controller.router.verify(AddBusinessTypeSummaryPageId, flowModel)
       }
     }
   }

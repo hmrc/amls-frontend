@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddBusinessTypeFlowModel}
+import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -30,7 +30,7 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 
 import scala.concurrent.Future
 
-class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
+class AddMoreBusinessTypesControllerSpec extends AmlsSpec with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -39,7 +39,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    val controller = new AddMoreActivitiesController(
+    val controller = new AddMoreBusinessTypesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       router = createRouter[AddBusinessTypeFlowModel]
@@ -80,7 +80,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
             ))
 
             status(result) mustBe SEE_OTHER
-            controller.router.verify(AddMoreAcivitiesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
+            controller.router.verify(AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel(addMoreActivities = Some(true)))
           }
         }
 
@@ -95,7 +95,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
               ))
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify(AddMoreAcivitiesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router.verify(AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
 
@@ -109,7 +109,7 @@ class AddMoreActivitiesControllerSpec extends AmlsSpec with BusinessMatchingGene
               ))
 
               status(result) mustBe SEE_OTHER
-              controller.router.verify(AddMoreAcivitiesPageId, flowModel.copy(addMoreActivities = Some(false)))
+              controller.router.verify(AddMoreBusinessTypesPageId, flowModel.copy(addMoreActivities = Some(false)))
             }
           }
         }

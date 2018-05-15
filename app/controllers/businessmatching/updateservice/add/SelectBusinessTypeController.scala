@@ -26,7 +26,7 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Rule, Write}
 import models.FormTypes
 import models.businessmatching.{BusinessActivity, BusinessActivities => BusinessMatchingActivities}
-import models.flowmanagement.{AddBusinessTypeFlowModel, SelectActivitiesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SelectBusinessTypesPageId}
 import models.responsiblepeople.ResponsiblePerson
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -40,7 +40,7 @@ import services.ResponsiblePeopleService.ResponsiblePeopleListHelpers
 import scala.concurrent.Future
 
 @Singleton
-class SelectActivitiesController @Inject()(
+class SelectBusinessTypeController @Inject()(
                                             val authConnector: AuthConnector,
                                             implicit val dataCacheConnector: DataCacheConnector,
                                             val businessMatchingService: BusinessMatchingService,
@@ -91,7 +91,7 @@ class SelectActivitiesController @Inject()(
                   case m => m.activity(data)
                 }
             } flatMap {
-              case Some(model) => router.getRoute(SelectActivitiesPageId, model, edit)
+              case Some(model) => router.getRoute(SelectBusinessTypesPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SelectActivitiesController"))
             }
         }

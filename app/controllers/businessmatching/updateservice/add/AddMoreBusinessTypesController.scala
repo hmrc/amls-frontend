@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddBusinessTypeFlowModel}
+import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,7 +35,7 @@ import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
 @Singleton
-class AddMoreActivitiesController @Inject()(
+class AddMoreBusinessTypesController @Inject()(
                                              val authConnector: AuthConnector,
                                              implicit val dataCacheConnector: DataCacheConnector,
                                              val router: Router[AddBusinessTypeFlowModel]
@@ -67,7 +67,7 @@ class AddMoreActivitiesController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.copy(addMoreActivities = Some(data))
             } flatMap {
-              case Some(model) => router.getRoute(AddMoreAcivitiesPageId, model)
+              case Some(model) => router.getRoute(AddMoreBusinessTypesPageId, model)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: AddMoreActivitiesController"))
             }
         }

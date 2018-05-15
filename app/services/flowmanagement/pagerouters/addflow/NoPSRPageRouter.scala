@@ -39,7 +39,7 @@ class NoPSRPageRouter @Inject()(val statusService: StatusService,
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+    Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
   }
 }
 

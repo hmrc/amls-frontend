@@ -32,7 +32,7 @@ class ChangeBusinessTypeRouter @Inject() extends Router[ChangeBusinessType] {
   override def getRoute(pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
-    case Add => Future.successful(Redirect(addRoutes.SelectActivitiesController.get()))
+    case Add => Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get()))
     case Remove => ???
   }
 }

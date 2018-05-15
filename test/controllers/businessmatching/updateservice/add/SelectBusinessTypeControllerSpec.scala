@@ -34,7 +34,7 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SelectActivitiesControllerSpec extends AmlsSpec {
+class SelectBusinessTypeControllerSpec extends AmlsSpec {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks with ResponsiblePersonGenerator {
     self =>
@@ -43,7 +43,7 @@ class SelectActivitiesControllerSpec extends AmlsSpec {
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    val controller = new SelectActivitiesController(
+    val controller = new SelectBusinessTypeController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,

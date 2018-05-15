@@ -43,7 +43,7 @@ class WhatDoYouDoHerePageRouter @Inject()(val statusService: StatusService,
     (model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.contains(TransmittingMoney),
       model.businessAppliedForPSRNumber.isDefined) match {
       case (true, false) => Future.successful(Redirect(addRoutes.BusinessAppliedForPSRNumberController.get(edit)))
-      case (_, _) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case (_, _) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
     }
 
   }

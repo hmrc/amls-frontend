@@ -16,36 +16,32 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import cats.data.OptionT
-import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessActivity, BusinessMatching}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import jto.validation.forms.UrlFormEncoded
+import jto.validation.{Path, Rule, RuleLike}
+import models.FormTypes
+import models.businessmatching.{BusinessActivities, BusinessActivity}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
-
-import scala.concurrent.Future
 
 @Singleton
-class UnableToRemoveActivitiesController @Inject()(
+class RemoveBusinessTypesController @Inject()(
                                           val authConnector: AuthConnector,
                                           val dataCacheConnector: DataCacheConnector
                                           ) extends BaseController {
 
+  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
+    FormTypes.businessActivityRule("error.required.bm.remove.service")
+
   def get = Authorised.async{
     implicit authContext =>
-      implicit request =>
-      getBusinessActivity.map {
-        case activity => Ok(unable_to_remove_activity(activity.getMessage))
-      } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
+      implicit request => ???
   }
 
-  private def getBusinessActivity(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessActivity] = for {
-    model <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-    activities <- OptionT.fromOption[Future](model.activities)
-  } yield activities.businessActivities.head
+  def post = Authorised.async{
+    implicit authContext =>
+      implicit request => ???
+  }
 
 }

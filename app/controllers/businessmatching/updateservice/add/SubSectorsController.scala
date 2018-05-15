@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.flowmanagement.{AddBusinessTypeFlowModel, SubServicesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -33,7 +33,7 @@ import scala.concurrent.Future
 
 
 @Singleton
-class SubServicesController @Inject()(
+class SubSectorsController @Inject()(
                                        val authConnector: AuthConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val businessMatchingService: BusinessMatchingService,
@@ -68,7 +68,7 @@ class SubServicesController @Inject()(
                 model.msbServices(data)
               }
             } flatMap {
-              case Some(model) => router.getRoute(SubServicesPageId, model, edit)
+              case Some(model) => router.getRoute(SubSectorsPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: SubServicesController"))
             }
           }

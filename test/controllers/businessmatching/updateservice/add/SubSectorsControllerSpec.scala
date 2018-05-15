@@ -21,7 +21,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddBusinessTypeFlowModel, SubServicesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -34,7 +34,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   sealed trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -44,7 +44,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
-    val controller = new SubServicesController(
+    val controller = new SubSectorsController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
@@ -102,7 +102,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubServicesPageId,
+          controller.router.verify(SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
@@ -122,7 +122,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubServicesPageId,
+          controller.router.verify(SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -144,7 +144,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubServicesPageId,
+          controller.router.verify(SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,
@@ -166,7 +166,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubServicesPageId,
+          controller.router.verify(SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))),
@@ -188,7 +188,7 @@ class SubServicesControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDa
           ))
 
           status(result) mustBe SEE_OTHER
-          controller.router.verify(SubServicesPageId,
+          controller.router.verify(SubSectorsPageId,
             AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
               subSectors = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))),
               tradingPremisesMsbServices = None,

@@ -41,14 +41,12 @@ class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusS
 
                            ): Future[Result] = {
     (edit, model.businessAppliedForPSRNumber) match {
-      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
       case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
       case (_, None) => Future.successful(error(BusinessAppliedForPSRNumberPageId))
     }
   }
-
-  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }
 
 

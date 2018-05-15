@@ -16,30 +16,22 @@
 
 package controllers.businessmatching.updateservice.remove
 
-import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Path, Rule, RuleLike}
-import models.FormTypes
-import models.businessmatching.{BusinessActivities, BusinessActivity}
+import models.businessmatching.BusinessActivities
+import play.api.i18n.Messages
+import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 @Singleton
-class RemoveActivitiesController @Inject()(
-                                          val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector
-                                          ) extends BaseController {
+class NeedToUpdateController @Inject()(
+                                                     val authConnector: AuthConnector,
+                                                     val businessMatchingService: BusinessMatchingService
+                                                     ) extends BaseController {
 
-  implicit def formReads(implicit p: Path => RuleLike[UrlFormEncoded, Set[BusinessActivity]]): Rule[UrlFormEncoded, BusinessActivities] =
-    FormTypes.businessActivityRule("error.required.bm.remove.service")
-
-  def get = Authorised.async{
-    implicit authContext =>
-      implicit request => ???
-  }
-
-  def post = Authorised.async{
+  def get = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }

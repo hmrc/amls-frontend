@@ -23,7 +23,7 @@ import controllers.BaseController
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.flowmanagement.{AddBusinessTypeFlowModel, UpdateServiceSummaryPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, AddBusinessTypeSummaryPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.{StatusService, TradingPremisesService}
@@ -34,7 +34,7 @@ import views.html.businessmatching.updateservice.add.update_services_summary
 import scala.concurrent.Future
 
 @Singleton
-class UpdateServicesSummaryController @Inject()(
+class AddBusinessTypeSummaryController @Inject()(
                                                  val authConnector: AuthConnector,
                                                  implicit val dataCacheConnector: DataCacheConnector,
                                                  val statusService: StatusService,
@@ -66,7 +66,7 @@ class UpdateServicesSummaryController @Inject()(
                   _ <- helper.updateBusinessActivities(model)
                   _ <- helper.updateHasAcceptedFlag(model)
                   _ <- helper.clearFlowModel()
-          route <- OptionT.liftF(router.getRoute(UpdateServiceSummaryPageId, model))
+          route <- OptionT.liftF(router.getRoute(AddBusinessTypeSummaryPageId, model))
         } yield {
           route
         }) getOrElse InternalServerError("Could not fetch the flow model")

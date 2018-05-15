@@ -18,9 +18,10 @@ package controllers.businessmatching.updateservice.remove
 
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-class UpdateServiceDateOfChangeControllerSpec extends AmlsSpec {
+class RemoveBusinessTypesControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+
   }
 
 }

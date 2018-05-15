@@ -41,7 +41,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val bmService = mock[BusinessMatchingService]
 
-    val controller = new ChangeServicesController(
+    val controller = new ChangeBusinessTypesController(
       self.authConnector,
       mockCacheConnector,
       bmService,

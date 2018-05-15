@@ -22,14 +22,14 @@ import play.api.test.Helpers.{contentAsString, status}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 
-class UnableToRemoveActivitiesControllerSpec extends AmlsSpec {
+class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
 
-    val controller = new UnableToRemoveActivitiesController(
+    val controller = new UnableToRemoveBusinessTypesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector
     )

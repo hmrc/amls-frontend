@@ -20,7 +20,7 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
-import models.flowmanagement.{AddMoreAcivitiesPageId, AddBusinessTypeFlowModel, PageId}
+import models.flowmanagement.{AddMoreBusinessTypesPageId, AddBusinessTypeFlowModel, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -41,14 +41,11 @@ class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
 
     model.addMoreActivities match {
       case Some(true) =>
-        Future.successful(Redirect(addRoutes.SelectActivitiesController.get(edit)))
+        Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get(edit)))
       case _ =>
-        newServiceInformationRedirect getOrElse error(AddMoreAcivitiesPageId)
+        newServiceInformationRedirect getOrElse error(AddMoreBusinessTypesPageId)
     }
   }
-
-
-  private def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 
   private def newServiceInformationRedirect(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) =
     businessMatchingService.getAdditionalBusinessActivities map { activities =>
@@ -56,7 +53,7 @@ class AddMoreBusinessTypesPageRouter @Inject()(val statusService: StatusService,
         case BillPaymentServices | TelephonePaymentService => true
         case _ => false
       }) {
-        Redirect(addRoutes.NewServiceInformationController.get())
+        Redirect(addRoutes.NeedMoreInformationController.get())
       } else {
         Redirect(controllers.routes.RegistrationProgressController.get())
       }

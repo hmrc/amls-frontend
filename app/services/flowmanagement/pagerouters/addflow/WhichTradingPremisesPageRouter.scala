@@ -40,7 +40,7 @@ class WhichTradingPremisesPageRouter @Inject()(val statusService: StatusService,
 
     model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1 match {
       case true => Future.successful(Redirect(addRoutes.WhatDoYouDoHereController.get(edit)))
-      case false => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      case false => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
     }
   }
 }

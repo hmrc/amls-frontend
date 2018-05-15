@@ -34,7 +34,7 @@
 
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
-        editUrl = routes.SelectActivitiesController.get(edit = true).url,
+        editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
         idTag = "selectactivities-edit"
     ) {
         <p>@(flowModel.activityName.getOrElse(""))</p>
@@ -44,7 +44,7 @@
         @flowModel.subSectors.map { services =>
             @checkYourAnswers(
                 question = Messages("businessmatching.services.title"),
-                editUrl = routes.SubServicesController.get(true).toString,
+                editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
                 idTag="edit-msb-services"
             ) {
@@ -155,7 +155,7 @@
         }
     }
 
-    @form(f, controllers.businessmatching.updateservice.add.routes.UpdateServicesSummaryController.post()) {
+    @form(f, controllers.businessmatching.updateservice.add.routes.AddBusinessTypeSummaryController.post()) {
         @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))
     }
 

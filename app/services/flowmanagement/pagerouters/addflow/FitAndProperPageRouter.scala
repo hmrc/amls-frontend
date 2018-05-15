@@ -19,6 +19,7 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.AddBusinessTypeFlowModel
+import models.flowmanagement.{FitAndProperPageId, AddBusinessTypeSummaryPageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
 import services.StatusService
@@ -41,12 +42,13 @@ class FitAndProperPageRouter @Inject()(val statusService: StatusService,
                            ): Future[Result] = {
 
     if (edit && model.responsiblePeople.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+      Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
     } else {
       (model.fitAndProper, edit) match {
         case (Some(true), _) => Future.successful(Redirect(addRoutes.WhichFitAndProperController.get(edit)))
-        case (Some(false), true) => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+        case (Some(false), true) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
         case (Some(false), false) => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
+        case (None,_) => Future.successful(error(FitAndProperPageId))
       }
     }
   }

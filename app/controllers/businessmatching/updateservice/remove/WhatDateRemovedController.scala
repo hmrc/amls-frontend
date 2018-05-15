@@ -18,21 +18,25 @@ package controllers.businessmatching.updateservice.remove
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.RepeatingSection
 
-class RemoveServicesSummaryController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 val dataCacheConnector: DataCacheConnector
-                                               ) extends BaseController {
+@Singleton
+class WhatDateRemovedController @Inject()(
+                                                   val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector
+                                                   ) extends BaseController with RepeatingSection {
 
-  def get = Authorised.async{
+  def get = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }
 
-  def post = Authorised.async{
+
+  def post = Authorised.async {
     implicit authContext =>
       implicit request => ???
   }
+
 }

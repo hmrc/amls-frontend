@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
-import controllers.businessmatching.updateservice.add.UpdateServicesSummaryController
+import controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController
 import models.businessmatching.updateservice.UpdateService
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}

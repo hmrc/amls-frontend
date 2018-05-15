@@ -16,24 +16,23 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import connectors.DataCacheConnector
 import controllers.BaseController
-import javax.inject.{Inject, Singleton}
-import models.businessmatching.BusinessActivities
-import play.api.i18n.Messages
-import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import javax.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-@Singleton
-class RemoveActivitiesInformationController @Inject()(
-                                                     val authConnector: AuthConnector,
-                                                     val businessMatchingService: BusinessMatchingService
-                                                     ) extends BaseController {
+class RemoveBusinessTypesSummaryController @Inject()(
+                                                 val authConnector: AuthConnector,
+                                                 val dataCacheConnector: DataCacheConnector
+                                               ) extends BaseController {
 
-  def get = Authorised.async {
+  def get = Authorised.async{
     implicit authContext =>
       implicit request => ???
   }
 
+  def post = Authorised.async{
+    implicit authContext =>
+      implicit request => ???
+  }
 }

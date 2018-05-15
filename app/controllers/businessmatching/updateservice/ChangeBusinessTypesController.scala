@@ -36,7 +36,7 @@ import views.html.businessmatching.updateservice._
 import scala.collection.immutable.SortedSet
 import scala.concurrent.Future
 
-class ChangeServicesController @Inject()(
+class ChangeBusinessTypesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
                                           val businessMatchingService: BusinessMatchingService,
@@ -76,7 +76,6 @@ class ChangeServicesController @Inject()(
     val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
 
     (existingSorted, remainingActivitiesSorted)
-    //(existing, remainingActivities)
   }
 
 }

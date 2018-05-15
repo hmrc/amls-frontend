@@ -64,7 +64,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
         "TCSP is selected" in new Fixture {
 
-          val result = await(router.getRoute(SelectActivitiesPageId, model))
+          val result = await(router.getRoute(SelectBusinessTypesPageId, model))
 
           result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
