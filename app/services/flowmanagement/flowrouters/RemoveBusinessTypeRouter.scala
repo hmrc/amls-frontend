@@ -29,11 +29,11 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService,
-                                          val whatServicesToRemovePageRouter: WhatServicesToRemovePageRouter,
-                                          val needToUpdatePageRouter: NeedToUpdatePageRouter,
-                                          val removeServicesSummaryPageRouter: RemoveServicesSummaryPageRouter,
-                                          val unableToRemovePageRouter: UnableToRemovePageRouter,
-                                          val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
+                                         val whatServicesToRemovePageRouter: WhatBusinessTypesToRemovePageRouter,
+                                         val needToUpdatePageRouter: NeedToUpdatePageRouter,
+                                         val removeServicesSummaryPageRouter: RemoveBusinessTypesSummaryPageRouter,
+                                         val unableToRemovePageRouter: UnableToRemovePageRouter,
+                                         val whatDateToRemovePageRouter: WhatDateToRemovePageRouter
                                         ) extends Router[RemoveServiceFlowModel] {
 
 

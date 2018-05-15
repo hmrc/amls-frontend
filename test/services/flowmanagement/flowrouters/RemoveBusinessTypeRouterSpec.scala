@@ -29,9 +29,9 @@ class RemoveBusinessTypeRouterSpec extends PlaySpec {
 
     val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
-      whatServicesToRemovePageRouter = new WhatServicesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
+      whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
-      removeServicesSummaryPageRouter = new RemoveServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+      removeServicesSummaryPageRouter = new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
     )

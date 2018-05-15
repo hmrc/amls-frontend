@@ -28,8 +28,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class WhatServicesToRemovePageRouter @Inject()(val statusService: StatusService,
-                                               val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
+class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusService,
+                                                     val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveServiceFlowModel] {
 
   override def getPageRoute(model: RemoveServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
