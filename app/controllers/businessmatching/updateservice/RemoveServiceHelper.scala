@@ -43,25 +43,29 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
                                     implicit val dataCacheConnector: DataCacheConnector
                                    ) {
 
-  def removeBusinessMatchingBusinessActivities(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
+  def removeBusinessMatchingBusinessTypes(model: RemoveServiceFlowModel)
+                                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
+
+    val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
+    val setAccepted = (bm: BMBusinessMatching) => bm.copy(hasAccepted = true)
 
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
-
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
-      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some[Future, BMBusinessActivities](BMBusinessActivities(Set.empty[BMBusinessActivity]))
-
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(emptyActivities)
       newBusinessMatching <- {
-
         OptionT(dataCacheConnector.update[BMBusinessMatching](BMBusinessMatching.key) {
 
-          case Some(bm) if activitiesToRemove.contains(MoneyServiceBusiness) =>
-            bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities -- activitiesToRemove))
-              .msbServices(None)
-              .businessAppliedForPSRNumber(None)
-              .copy(hasAccepted = true)
+          case Some(bm) =>
+            val newBm = bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities -- activitiesToRemove))
 
-          case Some(bm) => bm.activities(currentActivities.copy(businessActivities = currentActivities.businessActivities -- activitiesToRemove)).copy(hasAccepted = true)
+            setAccepted {
+              if (activitiesToRemove.contains(MoneyServiceBusiness)) {
+                newBm.msbServices(None).businessAppliedForPSRNumber(None)
+              } else {
+                newBm
+              }
+            }
         })
       }
     } yield newBusinessMatching
@@ -81,10 +85,12 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
             val newBusinessTypes = currentBusinessTypes.copy(activities = currentBusinessTypes.activities -- activitiesToRemove)
             val newPremises = tp.whatDoesYourBusinessDoAtThisAddress(newBusinessTypes)
 
-            if (activitiesToRemove.contains(MoneyServiceBusiness)) {
-              setAccepted(newPremises.msbServices(None))
-            } else {
-              setAccepted(newPremises)
+            setAccepted {
+              if (activitiesToRemove.contains(MoneyServiceBusiness)) {
+                newPremises.msbServices(None)
+              } else {
+                newPremises
+              }
             }
           }
 

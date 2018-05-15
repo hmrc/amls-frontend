@@ -64,7 +64,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
 
         "remove the BusinessMatching MSB Services" in new Fixture {
@@ -86,7 +86,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
 
         "remove the BusinessMatching PSR" in new Fixture {
@@ -111,7 +111,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -135,7 +135,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -159,7 +159,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -183,7 +183,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -207,7 +207,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -231,7 +231,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
 
@@ -255,7 +255,7 @@ class RemoveServiceHelperSpec extends AmlsSpec with FutureAssertions with Mockit
 
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
 
-          helper.removeBusinessMatchingBusinessActivities(model).returnsSome(endResultMatching)
+          helper.removeBusinessMatchingBusinessTypes(model).returnsSome(endResultMatching)
         }
       }
     }
