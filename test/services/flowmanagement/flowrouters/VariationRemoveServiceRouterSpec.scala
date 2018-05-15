@@ -18,7 +18,6 @@ package services.flowmanagement.flowrouters
 
 import org.scalatestplus.play.PlaySpec
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.pagerouters.addflow._
 import services.flowmanagement.pagerouters.removeflow._
 import utils.DependencyMocks
 
@@ -40,16 +39,18 @@ class VariationRemoveServiceRouterSpec extends PlaySpec {
 
   "getRoute" must {
 
-    "return the 'xxxxxxxxxx' page (xxxxxxxxController)" when {
-      "given the 'xxxxxxx' model contains a single activity" in new Fixture {
-//        val model = AddServiceFlowModel(
-//          activity = Some(HighValueDealing))
-//        val result = await(router.getRoute(SelectActivitiesPageId, model))
+    "return the 'What do you want to remove' page (RemoveActivitiesController)" when {
+      "the user is on the 'What do you want to do' page (ChangeServicesPageId)" when {
+        "there is more than one businesstype in the model" in new Fixture {
 
-        //result mustBe Redirect(addRoutes.TradingPremisesController.get())
+          //        val model = AddServiceFlowModel(
+          //          activity = Some(HighValueDealing))
+          //        val result = await(router.getRoute(SelectActivitiesPageId, model))
+
+          //result mustBe Redirect(addRoutes.TradingPremisesController.get())
+        }
       }
     }
-
 
   }
 }
