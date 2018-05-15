@@ -16,13 +16,14 @@
 
 package views.confirmation
 
+import generators.PaymentGenerator
 import models.confirmation.Currency
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with MustMatchers {
+class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -31,7 +32,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with MustMatchers 
 
     val fee = 100
 
-    override def view = views.html.confirmation.confirmation_new("ref number", Currency(fee), Seq.empty, continueHref)
+    override def view = views.html.confirmation.confirmation_new(Some(paymentReferenceNumber), Currency(fee), None, continueHref)
   }
 
   "The amendment confirmation view" must {
@@ -57,7 +58,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with MustMatchers 
     }
 
     "show the correct reference" in new ViewFixture {
-      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe "ref number"
+      doc.select(".reg-online--pay-fee .heading-large").get(1).text mustBe paymentReferenceNumber
     }
 
     "continue button has the right text" in new ViewFixture {

@@ -34,7 +34,7 @@ import models.status.{RenewalSubmitted, SubmissionReadyForReview}
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{Country, ViewResponse}
+import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, ViewResponse}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -46,11 +46,12 @@ import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite with FutureAwaits with DefaultAwaitTimeout {
+class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
 
   object TestLandingService extends LandingService {
     override private[services] val cacheConnector = mock[DataCacheConnector]
@@ -59,10 +60,6 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
     override private[services] val statusService = mock[StatusService]
     override private[services] val businessMatchingConnector = mock[BusinessMatchingConnector]
   }
-
-  implicit val hc = mock[HeaderCarrier]
-  implicit val ac = mock[AuthContext]
-  implicit val ec = mock[ExecutionContext]
 
   "hasSavedFrom" must {
 
@@ -180,7 +177,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
       setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", None)) mustEqual cache
+      await(TestLandingService.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
 
       verify(TestLandingService.desConnector).view(any())(any(), any(), any(), any())
     }
@@ -203,7 +200,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
         setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-        await(TestLandingService.setAlCorrespondenceAddressWithRegNo("regNo", Some(cache)))
+        await(TestLandingService.setAltCorrespondenceAddress("regNo", Some(cache)))
 
         verify(TestLandingService.desConnector, never()).view(any())(any(), any(), any(), any())
       }
@@ -237,7 +234,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       } thenReturn Future.successful(result)
     }
 
-    "return a cachMap of the saved sections" in {
+    "return a cacheMap of the saved sections" in {
       when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
@@ -246,9 +243,20 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
       val user = mock[LoggedInUser]
 
-      when(ac.user).thenReturn(user)
+      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
+
+      val subscriptionResponse = mock[SubscriptionResponse]
+      val amendVariationResponse = mock[AmendVariationRenewalResponse]
+
+      when {
+        TestLandingService.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(subscriptionResponse))
+
+      when {
+        TestLandingService.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+      } thenReturn Future.successful(Some(amendVariationResponse))
 
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, ViewResponse.key, Some(viewResponse))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection.copy(hasAccepted = true))
@@ -264,10 +272,11 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
       setupCacheSave(TestLandingService.cacheConnector, cacheMap, Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, SubscriptionResponse.key, Some(SubscriptionResponse("345678", "456789", None)))
+      setupCacheSave(TestLandingService.cacheConnector, cacheMap, AmendVariationRenewalResponse.key, Some(mock[AmendVariationRenewalResponse]))
 
       await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
     }
-
   }
 
   "refreshCache when status is renewalSubmitted" must {
@@ -344,7 +353,7 @@ class LandingServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wi
 
       val user = mock[LoggedInUser]
 
-      when(ac.user).thenReturn(user)
+      when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
       when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
 

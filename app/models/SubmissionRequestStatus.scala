@@ -14,12 +14,14 @@
  * limitations under the License.
  */
 
-package models.confirmation
+package models
 
-case class SubmissionData(
-                           paymentReference: Option[String],
-                           total: Currency,
-                           breakdownRow: Seq[BreakdownRow],
-                           amlsRefNumber: Option[String],
-                           difference: Option[Currency]
-                         )
+import play.api.libs.json.Json
+
+case class SubmissionRequestStatus(hasSubmitted: Boolean)
+
+object SubmissionRequestStatus {
+  val key = "submission-request-status"
+
+  implicit val format = Json.format[SubmissionRequestStatus]
+}

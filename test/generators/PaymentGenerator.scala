@@ -18,7 +18,7 @@ package generators
 
 import java.time.LocalDateTime
 
-import models.payments.{CreateBacsPaymentRequest, Payment, PaymentStatus, PaymentStatusResult}
+import models.payments._
 import models.payments.PaymentStatuses._
 import org.scalacheck.Gen
 
@@ -73,6 +73,10 @@ trait PaymentGenerator extends BaseGenerator with AmlsReferenceNumberGenerator {
     amount <- numGen
   } yield CreateBacsPaymentRequest(amlsRef, payRef, safeId, amount)
 
-  lazy val paymentReferenceNumber: String = paymentRefGen.sample.get
+  val paymentResponseGen: Gen[CreatePaymentResponse] = for {
+    id <- Gen.listOfN(15, Gen.alphaNumChar)
+    url <- stringOfLengthGen(10)
+  } yield CreatePaymentResponse(PayApiLinks(s"/$url"), Some(id.mkString))
 
+  lazy val paymentReferenceNumber: String = paymentRefGen.sample.get
 }

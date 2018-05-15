@@ -43,7 +43,7 @@ class PaymentsServiceSpec extends AmlsSpec with ScalaFutures with PaymentGenerat
     val testPaymentService = new PaymentsService(
       mock[AmlsConnector],
       mock[PayApiConnector],
-      mock[SubmissionResponseService],
+      mock[ConfirmationService],
       mock[StatusService]
     )
 

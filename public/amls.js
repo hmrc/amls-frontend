@@ -256,23 +256,27 @@ $(function () {
     container.find('h2').remove();
     container.find('p').remove();
 
-    var reportActionField = $('#report-action');
-    var reportErrorField = $('#report-error');
-
     var css = {
         visibility: 'hidden',
         height: 0
     };
 
-    reportActionField
-        .val(partialDeskproForm.data('action-value'))
-        .closest('.form-group-compound')
-        .css(css);
 
-    reportErrorField
-        .val(partialDeskproForm.data('error-value'))
-        .closest('.form-group-compound')
-        .css(css);
+    if(partialDeskproForm.data('action-value') !== undefined) {
+        var reportActionField = $('#report-action');
+        reportActionField
+            .val(partialDeskproForm.data('action-value'))
+            .closest('.form-group-compound')
+            .css(css);
+    }
+
+    if(partialDeskproForm.data('error-value') !== undefined) {
+        var reportErrorField = $('#report-error');
+        reportErrorField
+            .val(partialDeskproForm.data('error-value'))
+            .closest('.form-group-compound')
+            .css(css);
+    }
 
     $(document.body).find('.report-error__content.js-hidden').removeClass('js-hidden');
   }

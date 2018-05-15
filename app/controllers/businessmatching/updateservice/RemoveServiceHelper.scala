@@ -20,13 +20,20 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
 import models.flowmanagement.RemoveServiceFlowModel
 import models.responsiblepeople.ResponsiblePeople
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import models.businessmatching.{
+  MoneyServiceBusiness,
+  TrustAndCompanyServices,
+  BusinessActivities => BMBusinessActivities,
+  BusinessActivity => BMBusinessActivity,
+  BusinessMatching => BMBusinessMatching
+}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -82,27 +89,27 @@ class RemoveServiceHelper @Inject()(val authConnector: AuthConnector,
     } yield newTradingPremises
   }
 
-  def removeFitAndProper(model: RemoveServiceFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, ResponsiblePeople] = {
+  def removeFitAndProper(model: RemoveServiceFlowModel)
+                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePeople]] = {
+
+    val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
+
+    val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
+      val hasTCSP = current.contains(TrustAndCompanyServices)
+      val hasMSB = current.contains(MoneyServiceBusiness)
+
+      (removing.contains(MoneyServiceBusiness) && !hasTCSP) || (removing.contains(TrustAndCompanyServices) && !hasMSB)
+    }
 
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
-
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
-      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some[Future, BMBusinessActivities](BMBusinessActivities(Set.empty[BMBusinessActivity]))
-
-      currentResponsiblePeople <- OptionT(dataCacheConnector.fetch[ResponsiblePeople](ResponsiblePeople.key))
-
+      currentActivities <- OptionT.fromOption[Future](currentBusinessMatching.activities) orElse OptionT.some(emptyActivities)
       newResponsiblePeople <- {
-
-        val hasTCSP: Boolean = currentActivities.businessActivities.contains(TrustAndCompanyServices)
-        val hasMSB: Boolean = currentActivities.businessActivities.contains(MoneyServiceBusiness)
-
-        OptionT(dataCacheConnector.update[ResponsiblePeople](ResponsiblePeople.key) {
-          case Some(rp) if (activitiesToRemove.contains(MoneyServiceBusiness) && !hasTCSP) ||
-            (activitiesToRemove.contains(TrustAndCompanyServices) && !hasMSB) =>
-            rp.hasAlreadyPassedFitAndProper(None)
-              .copy(hasAccepted = true)
-          case Some(rp) => rp
+        OptionT(dataCacheConnector.update[Seq[ResponsiblePeople]](ResponsiblePeople.key) {
+          case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
+            rpList.map(_.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true))
+          case Some(rpList) => rpList
         })
       }
     } yield newResponsiblePeople

@@ -18,7 +18,6 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import generators.AmlsReferenceNumberGenerator
 import generators.businesscustomer.ReviewDetailsGenerator
 import models.businessmatching._
@@ -26,27 +25,22 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal.{InvolvedInOtherNo, Renewal}
 import models.status._
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Matchers.any
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
 import play.api.http.Status.OK
 import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.{AuthEnrolmentsService, ProgressService, StatusService}
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-
-import scala.concurrent.{ExecutionContext, Future}
-import scala.concurrent.ExecutionContext.Implicits.global
+import services.{AuthEnrolmentsService, ProgressService}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
+import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.{ExecutionContext, Future}
 
 class RegistrationProgressControllerSpec extends AmlsSpec
-  with MustMatchers
-  with MockitoSugar
   with ReviewDetailsGenerator
   with AmlsReferenceNumberGenerator {
 

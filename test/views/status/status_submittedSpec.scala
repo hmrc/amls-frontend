@@ -53,7 +53,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
       val form2 = EmptyForm
 
-      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse))
 
       doc.title must be(Messages("status.submissionreadyforreview.heading") + pageTitleSuffix)
       heading.html must be(Messages("status.submissionreadyforreview.heading"))
@@ -80,15 +80,43 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
 
       doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
 
-      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description")).text() must be(
-        Messages("status.submissionreadyforreview.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.description.3"))
+      Option(doc.getElementById("submission-ready-pay-the-fee")) mustBe defined
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+    }
 
-      doc.getElementsMatchingOwnText(Messages("status.submissionreadyforreview.description2")).text() must be(
-        Messages("status.submissionreadyforreview.description2"))
+
+    "contain the no fee response content elements" in new ViewFixture {
+
+      def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), None)
+
+      doc.getElementsContainingOwnText("business Name").hasText must be(true)
+      doc.getElementsContainingOwnText(Messages("status.business")).hasText must be(true)
+
+      doc.getElementsByClass("heading-secondary").first().html() must include(Messages("summary.status"))
+      doc.getElementsByClass("panel-indent").first().child(0).html() must be(Messages("status.business"))
+
+      doc.getElementsByClass("list").first().child(0).html() must include(Messages("status.complete"))
+      doc.getElementsByClass("list").first().child(1).html() must include(Messages("status.submitted"))
+      doc.getElementsByClass("list").first().child(2).html() must include(Messages("status.underreview"))
+
+      for (index <- 0 to 1) {
+        doc.getElementsByClass("status-list").first().child(index).hasClass("status-list--complete") must be(true)
+      }
+
+      doc.getElementsByClass("status-list").first().child(2).hasClass("status-list--end") must be(true)
+
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description"))
+      doc.getAllElements().html() must include(Messages("status.submissionreadyforreview.nofee.description.3"))
+      Option(doc.getElementsByClass("partial-deskpro-form").first()) mustBe defined
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
     }
+
+
 
     "contain 'update/amend information' content and link" in new ViewFixture {
 
@@ -111,30 +139,11 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       "view input has feeData and submitted date" in new ViewFixture {
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse))
-
         val date = DateHelper.formatDate(feeResponse.createdAt.toLocalDate)
         doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
           be(Messages("status.submittedForReview.submitteddate.text", date))
-        doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.fee.link"))
       }
-      "view input has feeData and submitted date and is duplicate" in new ViewFixture {
 
-        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business name"), Some(feeResponse), true, true)
-
-        val date = DateHelper.formatDate(feeResponse.createdAt.toLocalDate)
-        doc.getElementsMatchingOwnText(Messages("status.submittedForReview.submitteddate.text")).text must
-          be(Messages("status.submittedForReview.submitteddate.text", date))
-        doc.getElementsByTag("details").first().child(0).html() must be(Messages("status.submissionreadyforreview.duplicate.link"))
-        doc.getElementsMatchingOwnText(Messages("fee.details.dup.heading")).text() must
-          be(Messages("fee.details.dup.heading"))
-      }
-      "the user has elected to pay by BACS" in new ViewFixture {
-        val form2 = EmptyForm
-
-        def view = views.html.status.status_submitted(amlsRegistrationNumber, Some("business Name"), Some(feeResponse), showBacsContent = true)
-
-        validateParagraphizedContent("status.submissionreadyforreview.bacs")
-      }
       "view input is none" in new ViewFixture {
 
         def view = views.html.status.status_submitted(amlsRegistrationNumber, None, None)

@@ -20,7 +20,7 @@
 @import config.ApplicationConfig
 @import views.html.confirmation.{breakdown => breakdown_display}
 
-@(mlrRegNo: String, total: Currency, breakdown: Seq[BreakdownRow], feeToPay: Option[Currency], paymentsUrl: String)(implicit request: Request[_],m:Messages)
+@(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages)
 
 @main(
     title = Messages("confirmation.amendment.header")
@@ -37,12 +37,16 @@
 
     <div class="reg-online--pay-fee">
         <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
-            <span class="heading-large">@feeToPay</span></p>
-        <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
-            <span class="heading-large">@Messages(mlrRegNo)</span></p>
+            <span class="heading-large">@amountToPay</span></p>
+        @paymentReference.map{ ref =>
+            <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
+                <span class="heading-large">@Messages(ref)</span></p>
+        }
     </div>
 
-    @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
+    @maybeBreakdown.map { breakdown =>
+        @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
+    }
 
     <p><a class="button" href="@paymentsUrl">@Messages("button.continue")</a></p>
 

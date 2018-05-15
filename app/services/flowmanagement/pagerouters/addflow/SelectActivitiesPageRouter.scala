@@ -14,10 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
+import models.businessmatching._
 import models.flowmanagement.AddServiceFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
@@ -31,22 +32,23 @@ import scala.concurrent.{ExecutionContext, Future}
 
 
 @Singleton
-class TradingPremisesPageRouter @Inject()(val statusService: StatusService,
-                                          val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
+class SelectActivitiesPageRouter @Inject()(val statusService: StatusService,
+                                           val businessMatchingService: BusinessMatchingService) extends PageRouter[AddServiceFlowModel] {
 
   override def getPageRoute(model: AddServiceFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-    if (edit && model.tradingPremisesActivities.isDefined) {
-      Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-    } else {
+    if (edit && model.areNewActivitiesAtTradingPremises.isDefined) {
+    Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
 
-      model.areNewActivitiesAtTradingPremises match {
-        case Some(true) =>
-          Future.successful(Redirect(addRoutes.WhichTradingPremisesController.get()))
-        case _ =>
-          Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
+  } else {
+      model.activity match {
+        case Some(TrustAndCompanyServices) => Future.successful(Redirect(addRoutes.FitAndProperController.get(edit)))
+        case Some(MoneyServiceBusiness) => Future.successful(Redirect(addRoutes.SubServicesController.get()))
+        case _ => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
       }
     }
   }
 }
+
+

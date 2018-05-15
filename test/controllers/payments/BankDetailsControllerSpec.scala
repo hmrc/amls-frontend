@@ -17,23 +17,24 @@
 package controllers.payments
 
 import generators.PaymentGenerator
-import models.confirmation.{Currency, SubmissionData}
-import models.status.SubmissionReadyForReview
+import models.FeeResponse
+import models.ResponseType.SubscriptionResponseType
+import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
-import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{StatusService, SubmissionResponseService}
+import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class BankDetailsControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator{
+class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
     val request = addToken(authRequest)
 
@@ -43,8 +44,9 @@ class BankDetailsControllerSpec extends PlaySpec with AmlsSpec with PaymentGener
 
     val controller = new BankDetailsController(
       authConnector = self.authConnector,
-      statusService = mock[StatusService],
-      submissionResponseService = mock[SubmissionResponseService]
+      authEnrolmentsService = mock[AuthEnrolmentsService],
+      feeResponseService = mock[FeeResponseService],
+      statusService = mockStatusService
     )
 
   }
@@ -54,15 +56,18 @@ class BankDetailsControllerSpec extends PlaySpec with AmlsSpec with PaymentGener
     "get is called" must {
       "return OK with view" in new Fixture {
 
-        val submissionSatus = SubmissionReadyForReview
+        mockApplicationStatus(SubmissionDecisionApproved)
 
         when {
-          controller.statusService.getStatus(any(),any(),any())
-        } thenReturn Future.successful(submissionSatus)
+          controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+        } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
         when {
-          controller.submissionResponseService.getSubmissionData(eqTo(submissionSatus))(any(),any(),any())
-        } thenReturn Future.successful(Some(SubmissionData(Some(paymentReferenceNumber), Currency(200), Seq.empty, None, Some(Currency(100)))))
+          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+        } thenReturn Future.successful(Some(FeeResponse(
+          SubscriptionResponseType,
+          amlsRegistrationNumber, 100, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
+        )
 
         val result = controller.get()(request)
 

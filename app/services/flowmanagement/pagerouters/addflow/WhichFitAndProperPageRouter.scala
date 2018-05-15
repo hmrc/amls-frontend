@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.pagerouters
+package services.flowmanagement.pagerouters.addflow
 
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
@@ -39,7 +39,7 @@ class WhichFitAndProperPageRouter @Inject()(val statusService: StatusService,
 
     edit match {
       case true => Future.successful(Redirect(addRoutes.UpdateServicesSummaryController.get()))
-      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get()))
+      case false => Future.successful(Redirect(addRoutes.TradingPremisesController.get(edit)))
     }
   }
 }
