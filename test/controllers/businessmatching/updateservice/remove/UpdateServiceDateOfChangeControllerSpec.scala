@@ -16,11 +16,54 @@
 
 package controllers.businessmatching.updateservice.remove
 
+
+
+import models.DateOfChange
+import models.flowmanagement.RemoveServiceFlowModel
+import org.joda.time.LocalDate
+import org.jsoup.Jsoup
+import play.api.i18n.Messages
+import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class UpdateServiceDateOfChangeControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
+    val request = addToken(authRequest)
+
+    val controller = new UpdateServiceDateOfChangeController(
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector
+    )
   }
+
+  "UpdateServiceDateOfChangeController" when {
+
+    "get is called" must {
+      "return OK with date_of_change view" in new Fixture {
+
+        mockCacheFetch[RemoveServiceFlowModel](Some(RemoveServiceFlowModel()))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
+      }
+
+      "display the date when it is already in the data cache" in new Fixture {
+        val today = LocalDate.now
+        mockCacheFetch[RemoveServiceFlowModel](Some(RemoveServiceFlowModel(dateOfChange = Some(DateOfChange(today)))), Some(RemoveServiceFlowModel.key))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-day").attr("value") mustBe today.getDayOfMonth.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-month").attr("value") mustBe today.getMonthOfYear.toString
+        Jsoup.parse(contentAsString(result)).getElementById("dateOfChange-year").attr("value") mustBe today.getYear.toString
+      }
+    }
+
+  }
+
 
 }
