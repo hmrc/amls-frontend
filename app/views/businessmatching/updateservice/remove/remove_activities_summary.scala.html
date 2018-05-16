@@ -18,28 +18,37 @@
 @import include.{heading, main}
 @import models.flowmanagement.RemoveBusinessTypeFlowModel
 @import controllers.businessmatching.updateservice.remove.routes
+@import utils.DateHelper
 
 @(model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_])
 
 @header = {
- @heading(
-  "title.cya",
-  "summary.updateinformation"
- )
+@heading(
+    "title.cya",
+    "summary.updateinformation"
+)
 }
 
 @main(
- title = s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}",
- heading = header
+    title = s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}",
+    heading = header
 ) {
 
-  @model.activitiesToRemove.map { activities =>
-   @checkYourAnswers(
-    question = Messages("businessmatching.updateservice.removeactivities.heading"),
-    editUrl = routes.RemoveBusinessTypesController.get().url
-   ) {
-    <p>@activities.map(_.getMessage).mkString(", ")</p>
-   }
-  }
+    @model.activitiesToRemove.map { activities =>
+        @checkYourAnswers(
+            question = Messages("businessmatching.updateservice.removeactivities.heading"),
+            editUrl = routes.RemoveBusinessTypesController.get().url
+        ) {
+            <p>@activities.map(_.getMessage).mkString(", ")</p>
+        }
+    }
 
+    @model.dateOfChange.map { doc =>
+        @checkYourAnswers(
+            question = Messages("dateofchange.title"),
+            editUrl = routes.WhatDateRemovedController.get().url
+        ) {
+            @DateHelper.formatDate(doc.dateOfChange)
+        }
+    }
 }

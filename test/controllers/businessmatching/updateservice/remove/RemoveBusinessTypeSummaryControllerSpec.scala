@@ -19,16 +19,18 @@ package controllers.businessmatching.updateservice.remove
 import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
+import models.DateOfChange
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DateHelper, DependencyMocks}
 import views.TitleValidator
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -53,9 +55,10 @@ class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidat
   }
 
   "A successful result is returned" when {
-    "the user visits the page" when {
-      "editing data that has no date of change" in new Fixture {
-        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)))))
+    "the user visits the page" which {
+      "contains the correct content" in new Fixture {
+        val now = new LocalDate(2014, 1, 1)
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)), Some(DateOfChange(now)))))
 
         val result = controller.get()(request)
 
@@ -66,6 +69,7 @@ class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidat
         validateTitle(s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}")(implicitly, doc)
         doc.getElementsByTag("h1").text must include(Messages("title.cya"))
         doc.getElementsByClass("check-your-answers").text must include(MoneyServiceBusiness.getMessage)
+        doc.getElementsByClass("check-your-answers").text must include(DateHelper.formatDate(now))
       }
     }
 
