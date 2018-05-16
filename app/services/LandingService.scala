@@ -19,7 +19,7 @@ package services
 import cats.data.OptionT
 import cats.implicits._
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
-import models.ViewResponse
+import models.{AmendVariationRenewalResponse, SubscriptionResponse, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -133,14 +133,10 @@ trait LandingService {
     case _ => model
   }
 
-  def setAlCorrespondenceAddressWithRegNo(amlsRefNumber: String, cacheMap: Option[CacheMap])
-                                         (implicit
-                                          authContext: AuthContext,
-                                          hc: HeaderCarrier,
-                                          ec: ExecutionContext
-                                         ): Future[CacheMap] = {
+  def setAltCorrespondenceAddress(amlsRefNumber: String, maybeCacheMap: Option[CacheMap])
+                                 (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val cachedModel = for {
-      cache <- OptionT.fromOption[Future](cacheMap)
+      cache <- OptionT.fromOption[Future](maybeCacheMap)
       entry <- OptionT.fromOption[Future](cache.getEntry[AboutTheBusiness](AboutTheBusiness.key))
     } yield entry
 
@@ -163,6 +159,8 @@ trait LandingService {
   def refreshCache(amlsRefNumber: String)
                   (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = for {
     viewResponse <- desConnector.view(amlsRefNumber)
+    subscriptionResponse <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
+    amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
     _ <- cacheConnector.remove(authContext.user.oid)
     _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
     _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
@@ -177,6 +175,8 @@ trait LandingService {
     _ <- cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
     _ <- cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
     _ <- cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+    _ <- cacheConnector.save[Option[SubscriptionResponse]](SubscriptionResponse.key, subscriptionResponse)
+    _ <- cacheConnector.save[Option[AmendVariationRenewalResponse]](AmendVariationRenewalResponse.key, amendVariationResponse)
     cache1 <- cacheConnector.save[Option[Seq[ResponsiblePerson]]](ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
     cache2 <- saveRenewalData(viewResponse, cache1)
   } yield cache2

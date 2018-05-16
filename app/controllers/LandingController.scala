@@ -18,7 +18,7 @@ package controllers
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{ AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.aboutthebusiness.AboutTheBusiness
@@ -34,7 +34,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, FormTypes, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, FormTypes, SubmissionRequestStatus, SubscriptionResponse}
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
@@ -45,6 +45,8 @@ import services.AuthService
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+
+import scala.util.{Success, Try}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -143,24 +145,21 @@ class LandingController @Inject()(val landingService: LandingService,
 
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
-        val fromDuplicate = cacheMap match {
-          case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
-            _.previouslySubmitted.contains(true)
+        Try {
+          val fromDuplicate = cacheMap match {
+            case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
+              _.previouslySubmitted.contains(true)
+            }
+            case _ => false
           }
-          case _ => false
+
+          Redirect(controllers.routes.StatusController.get(fromDuplicate))
         }
+      } match {
+        case Success(r) => r
+        case _ => Redirect(controllers.routes.StatusController.get())
 
-        Redirect(controllers.routes.StatusController.get(fromDuplicate))
       }
-    }
-
-  }
-
-  private def setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
-                                                   (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-
-    landingService.setAlCorrespondenceAddressWithRegNo(amlsRegistrationNumber, cacheMap) map {
-      _ => Redirect(controllers.routes.StatusController.get())
     }
   }
 
@@ -213,19 +212,18 @@ class LandingController @Inject()(val landingService: LandingService,
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
         case Some(c) =>
-          val fix = for {
-            c2 <- fixEmptyRecords[ResponsiblePerson](c, ResponsiblePerson.key)
+          lazy val fixEmpties = for {
+            c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
+            c2 <- fixEmptyRecords[ResponsiblePerson](c1, ResponsiblePerson.key)
           } yield c2
 
           //there is data in S4l
-          fix flatMap { cacheMap =>
+          fixEmpties flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
-              (cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key),
-                cacheMap.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)) match {
-                case (Some(_), _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case (_, Some(_)) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-                case _ => setAlCorrespondenceAddressAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-
+              cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
+                case SubmissionRequestStatus(true) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+              } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
+                Redirect(controllers.routes.StatusController.get())
               }
             } else {
               //DataHasNotChanged
@@ -245,7 +243,7 @@ class LandingController @Inject()(val landingService: LandingService,
       cache.getEntry[Seq[T]](key)
       Future.successful(cache)
     } catch {
-      case e: JsResultException =>
+      case _: JsResultException =>
         cacheConnector.save[Seq[T]](key, Seq.empty[T])
     }
   }

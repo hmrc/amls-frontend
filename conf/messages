@@ -1,4 +1,3 @@
-
 #
 # Conventions:-
 # err.
@@ -528,12 +527,17 @@ status.hassomethingchanged = Has something changed?
 status.submissionready.changelink1 = edit your application
 status.submissionready.buttontext = Submit application
 status.submissionreadyforreview.heading = Application pending
-status.submissionreadyforreview.description = Your application will be reviewed by HM Revenue and Customs.
-status.submissionreadyforreview.description2 = For new applications this can take up to 45 days. For renewals this can take longer. You’ll get an email when the decision has been made. You’ll need to sign in to this website to see the decision.
+status.submissionreadyforreview.description = HMRC will review your application after you have paid the relevant fees. Fees will need to be paid within 28 days. If you have not paid yet you can
+status.submissionreadyforreview.description.2 = now.
+status.submissionreadyforreview.description.3 = After you have applied your application can take up to 45 days. For renewals this can take longer. You will get an email when the decision has been made. You will need to sign into your anti-money laundering supervision account to see the decision
+status.submissionreadyforreview.description.link = pay the fee
+status.submissionreadyforreview.nofee.description = HMRC will review your application after you have paid the relevant fees. Fees will need to be paid within 28 days.
+status.submissionreadyforreview.nofee.description.2 = now.
+status.submissionreadyforreview.nofee.description.3 = After you have applied your application can take up to 45 days. For renewals this can take longer. You will get an email when the decision has been made. You will need to sign into your anti-money laundering supervision account to see the decision
+status.submissionreadyforreview.nofee.description.link = If you haven’t paid the fee
 status.submissionreadyforreview.duplicate.title = Something went wrong with your submission
 status.submissionreadyforreview.duplicate.description = We’ve definitely received your application, but we can’t tell if you paid your application fee.
 status.submissionreadyforreview.duplicate.description2 = If you’ve paid, there’s nothing to worry about. When HMRC deals with your application they’ll be able to match your payment to your submission.
-status.submissionreadyforreview.duplicate.link = If you haven’t paid the fee
 status.submissionreadyforreview.bacs = Your application will be reviewed when HM Revenue and Customs receives your payment.
 status.submissiondecisionapproved.heading = Application approved
 status.submissiondecisionsupervised.heading = Supervised
@@ -1160,14 +1164,18 @@ businessmatching.updateservice.changeservices.choice.add = Register another busi
 businessmatching.updateservice.changeservices.choice.remove = Remove a service
 
 #remove route
-businessmatching.updateservice.removeactivities.title = What do you need to remove?
-businessmatching.updateservice.removeactivities.header = What do you need to remove?
 
 businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
 businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
 businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
+
+businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
+businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
+businessmatching.updateservice.removeactivities.summary = You must have at least 1 type of business registered. You can add another business before removing one.
+businessmatching.updateservice.removeactivities.list.heading = Choose at least one
+businessmatching.updateservice.removeactivities.button = Continue
 
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which services does your business provide?

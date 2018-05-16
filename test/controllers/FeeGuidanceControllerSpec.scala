@@ -43,7 +43,6 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import scala.concurrent.Future
 
 class FeeGuidanceControllerSpec extends AmlsSpec
-  with MockitoSugar
   with PrivateMethodTester
   with ServicesConfig
   with ResponsiblePersonGenerator

@@ -19,7 +19,7 @@
 @import models.confirmation._
 @import config.ApplicationConfig
 
-@(paymentRef: String, total: Currency, breakdown: Seq[BreakdownRow], paymentsUrl: String)(implicit request: Request[_],m:Messages)
+@(paymentReference: Option[String], total: Currency, maybeBreakdownRows: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("confirmation.header", "submit.registration")
@@ -37,45 +37,49 @@
     <div class="reg-online--pay-fee">
         <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
             <span class="heading-large">@total</span></p>
-        <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
-            <span class="heading-large">@Messages(paymentRef)</span></p>
+        @paymentReference.map{ ref =>
+            <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
+                <span class="heading-large">@Messages(ref)</span></p>
+        }
     </div>
 
-    @detailsSummary(
-        summary = Messages("confirmation.breakdown.details")
-    ) {
+    @maybeBreakdownRows.map { rows =>
+        @detailsSummary(
+            summary = Messages("confirmation.breakdown.details")
+        ) {
+            <p>@Messages("confirmation.breakdown")</p>
 
-        <p>@Messages("confirmation.breakdown")</p>
-
-        <table>
-            <thead>
-                <tr>
-                    <th>&nbsp;</th>
-                    <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-                    <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-                    <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
-                </tr>
-            </thead>
-            <tbody>
-            @breakdown.map {
-                case BreakdownRow(label, quantity, perItem, total) => {
+            <table>
+                <thead>
                     <tr>
-                        <td>@Messages(label)</td>
-                        <td class="numeric">@quantity</td>
-                        <td class="numeric">@perItem</td>
+                        <th>&nbsp;</th>
+                        <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                        <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+                    </tr>
+                </thead>
+                <tbody>
+                
+                @rows.map {
+                    case BreakdownRow(label, quantity, perItem, totalFees) => {
+                        <tr>
+                            <td>@Messages(label)</td>
+                            <td class="numeric">@quantity</td>
+                            <td class="numeric">@perItem</td>
+                            <td class="numeric">@totalFees</td>
+                        </tr>
+                    }
+                }
+
+                </tbody>
+                <tfoot>
+                    <tr>
+                        <th colspan="3">@Messages("confirmation.registrationfee")</th>
                         <td class="numeric">@total</td>
                     </tr>
-                }
-            }
-            </tbody>
-            <tfoot>
-                <tr>
-                    <th colspan="3">@Messages("confirmation.registrationfee")</th>
-                    <td class="numeric">@total</td>
-                </tr>
-            </tfoot>
-        </table>
-
+                </tfoot>
+            </table>
+        }
     }
 
     <p><a id="payfee" class="button" href="@paymentsUrl">@Messages("button.payfee")</a></p>

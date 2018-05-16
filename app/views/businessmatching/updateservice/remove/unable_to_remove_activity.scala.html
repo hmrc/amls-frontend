@@ -31,9 +31,9 @@
   <p>@Messages("businessmatching.updateservice.removeactivitiesinformation.info.1")</p>
   <p>@Messages("businessmatching.updateservice.removeactivitiesinformation.info.2")</p>
 
-  <p>@anchor(
+  @anchor(
         attrRole = true,
         attrHref = controllers.routes.StatusController.get().url,
-        linkText = Messages("button.continue"))
-  </p>
+        linkText = Messages("button.continue"),
+        visuallyhidden = Messages("summary.updateinformation"))
 }

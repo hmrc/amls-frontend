@@ -16,11 +16,10 @@
 
 package typeclasses.confirmation
 
-import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
-import services.FeeCalculations
+import models.{AmendVariationRenewalResponse, SubmissionResponse}
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -35,15 +34,13 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
-  val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
-
 }
 
 object ResponsiblePeopleRowsInstances {
 
-  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] = {
+  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]) = {
+      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
@@ -66,14 +63,14 @@ object ResponsiblePeopleRowsInstances {
 
       }
     }
-  }
+
 
   implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
     new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
-                          people: Option[Seq[ResponsiblePerson]]) = {
+                          people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
         if (showBreakdown(value.getFpFee, activities)) {
 

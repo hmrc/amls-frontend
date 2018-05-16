@@ -54,6 +54,9 @@ case class AmendVariationRenewalResponse(
 object AmendVariationRenewalResponse {
 
   val key = "AmendVariationResponse"
+
   implicit val format = Json.format[AmendVariationRenewalResponse]
+  implicit val formatOption = Reads.optionWithNull[AmendVariationRenewalResponse]
+
 
 }

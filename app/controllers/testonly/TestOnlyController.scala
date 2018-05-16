@@ -51,7 +51,7 @@ trait TestOnlyController extends BaseController with Actions {
 
   def duplicateSubmission = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true, true)))
+      Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true)))
   }
 
   def wrongCredentials = Authorised.async {

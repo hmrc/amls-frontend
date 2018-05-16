@@ -34,7 +34,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{Country, SubscriptionFees, SubscriptionResponse}
+import models.{status => _, _}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -52,14 +52,13 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
-import models.ReturnLocation
 import play.api.libs.json.JsResultException
 import services.AuthService
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with MockitoSugar {
+class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
@@ -363,8 +362,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       .thenReturn(Future.successful(Some(testData)))
   }
 
-  def buildTestCacheMap(hasChanged: Boolean, includesResponse: Boolean, noTP: Boolean = false, noRP: Boolean = false): CacheMap = {
-    val result = mock[CacheMap]
+  //noinspection ScalaStyle
+  def buildTestCacheMap(hasChanged: Boolean,
+                        includesResponse: Boolean,
+                        noTP: Boolean = false,
+                        noRP: Boolean = false,
+                        includeSubmissionStatus: Boolean = false): CacheMap = {
+
+    val cacheMap = mock[CacheMap]
     val testASP = Asp(hasChanged = hasChanged)
     val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
     val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
@@ -379,29 +384,31 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     val testHvd = Hvd(hasChanged = hasChanged)
     val testRenewal = Renewal(hasChanged = hasChanged)
 
-    when(result.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
-    when(result.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
-    when(result.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
-    when(result.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
-    when(result.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-    when(result.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
-    when(result.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
-    when(result.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
-    when(result.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
-    when(result.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
-    when(result.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
-    when(result.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
+    when(cacheMap.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
+    when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
+    when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
+    when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
+    when(cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
+    when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
+    when(cacheMap.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
+    when(cacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
+    when(cacheMap.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
+    when(cacheMap.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
+
+    val submissionRequestStatus = if (includeSubmissionStatus) Some(SubmissionRequestStatus(true)) else None
+    when(cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key)).thenReturn(submissionRequestStatus)
 
     if (noTP) {
-      when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())) thenThrow new JsResultException(Seq.empty)
+      when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())) thenThrow new JsResultException(Seq.empty)
     } else {
-      when(result.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
+      when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
     }
 
     if (noRP) {
-      when(result.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())) thenThrow new JsResultException(Seq.empty)
+      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())) thenThrow new JsResultException(Seq.empty)
     } else {
-      when(result.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(testResponsiblePeople))
+      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(testResponsiblePeople))
     }
 
     if (includesResponse) {
@@ -418,12 +425,12 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         ))
       )
 
-      when(result.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+      when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
         .thenReturn(Some(testResponse))
 
     }
 
-    result
+    cacheMap
   }
 
   "show landing page without authorisation" in new Fixture {
@@ -444,7 +451,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
   "Landing Controller" when {
     "an enrolment exists and" when {
       "there is data in S4L and" when {
-        "The Save 4 Later data does not contain any sections" should {
+        "the Save 4 Later data does not contain any sections" when {
           "data has not changed" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
@@ -476,10 +483,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "data has changed and" when {
-          "there is a subscription response" should {
+          "the user has just submitted" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(true, true))
+              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
+                hasChanged = true,
+                includesResponse = false,
+                includeSubmissionStatus = true))
 
               val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
 
@@ -490,17 +500,15 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             }
           }
 
-          "there is no subscription response" should {
+          "the user has not just submitted" should {
             "redirect to status controller without refreshing API5" in new Fixture {
-
-              val testCacheMap = buildTestCacheMap(true, false)
-
-              when {
-                testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())
-              } thenReturn None
+              val testCacheMap = buildTestCacheMap(
+                hasChanged = true,
+                includesResponse = false
+              )
 
               when {
-                controller.landingService.setAlCorrespondenceAddressWithRegNo(any(), any())(any(),any(),any())
+                controller.landingService.setAltCorrespondenceAddress(any(), any())(any(),any(),any())
               } thenReturn Future.successful(testCacheMap)
 
               setUpMocksForAnEnrolmentExists(controller)
@@ -512,7 +520,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
 
               verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
-
             }
           }
         }

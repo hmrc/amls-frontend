@@ -16,28 +16,23 @@
 
 package controllers.payments
 
-import audit.BacsPaymentEvent
-import connectors.PayApiConnector
-import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
-import models.confirmation.{BreakdownRow, Currency, SubmissionData}
-import models.payments._
-import models.status.SubmissionReadyForReview
+import generators.PaymentGenerator
+import models.FeeResponse
+import models.ResponseType.SubscriptionResponseType
+import models.confirmation.Currency
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.{verify, when}
-import org.mockito.ArgumentCaptor
-import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, PaymentsService, StatusService, SubmissionResponseService}
-import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import services._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.audit.http.connector.AuditResult
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenerator {
 
@@ -52,27 +47,34 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
     val controller = new TypeOfBankController(
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
-      statusService = mock[StatusService],
-      submissionResponseService = mock[SubmissionResponseService],
       authEnrolmentsService = mock[AuthEnrolmentsService],
+      feeResponseService = mock[FeeResponseService],
       paymentsService = mock[PaymentsService]
     )
 
     val paymentRef = paymentRefGen.sample.get
 
     when {
+      controller.authEnrolmentsService.amlsRegistrationNumber(any(),any(),any())
+    } thenReturn Future.successful(Some(amlsRegistrationNumber))
+
+    when {
+      controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
+    } thenReturn Future.successful(Some(FeeResponse(
+      SubscriptionResponseType,
+      amlsRegistrationNumber,
+      100,
+      None,
+      0,
+      100,
+      Some(paymentReferenceNumber),
+      None,
+      DateTime.now()
+    )))
+
+    when {
       controller.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(mock[AuditResult])
-
-    when {
-      controller.statusService.getStatus(any(), any(), any())
-    } thenReturn Future.successful(SubmissionReadyForReview)
-
-    val submissionData = SubmissionData(Some(paymentRef), Currency.fromInt(100), Seq.empty[BreakdownRow], Some(amlsRegistrationNumber), None)
-
-    when {
-      controller.submissionResponseService.getSubmissionData(any())(any(), any(), any())
-    } thenReturn Future.successful(Some(submissionData))
 
     when {
       controller.paymentsService.amountFromSubmissionData(any())

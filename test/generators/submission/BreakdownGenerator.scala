@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice.remove
+package generators.submission
 
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import generators.BaseGenerator
+import models.confirmation.{BreakdownRow, Currency}
+import org.scalacheck.Gen
 
-class RemoveBusinessTypesControllerSpec extends AmlsSpec {
+//scalastyle:off magic.number
+trait BreakdownGenerator extends BaseGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
-
-  }
+  def breakdownRowGen: Gen[BreakdownRow] = for {
+    label <- stringOfLengthGen(10)
+    quantity <- Gen.choose(1, 10)
+  } yield BreakdownRow(label, quantity, Currency(100), Currency(quantity * 100))
 
 }

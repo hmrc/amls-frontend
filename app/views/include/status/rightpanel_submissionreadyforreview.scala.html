@@ -20,33 +20,35 @@
 @import models.FeeResponse
 @import config.{ApplicationConfig => appConfig, CachedStaticHtmlPartialProvider}
 
-@(feeResponse: Option[FeeResponse], showBacsInfo: Boolean = false)(implicit request: Request[_],m:Messages, lang: Lang)
+@(feeResponse: Option[FeeResponse])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @getHelpForm = {
     @config.CachedStaticHtmlPartialProvider.getPartialContent(appConfig.reportAProblemUrl)
 }
 
-@if(showBacsInfo) {
-    <p>@Messages("status.submissionreadyforreview.bacs")</p>
-} else {
-    <p>@Messages("status.submissionreadyforreview.description")</p>
-}
-
-<p>@Messages("status.submissionreadyforreview.description2")</p>
-
-@detailsSummary(summary = Messages("status.submissionreadyforreview.duplicate.link")) {
-    @feeResponse match {
-        case Some(fee) => {
-            @include.status.fee_details_dup(fee)
-        }
-        case None => {
+@feeResponse match {
+    case Some(fee) => {
+        <p>@Messages("status.submissionreadyforreview.description")
+        <a id="submission-ready-pay-the-fee" href="@controllers.routes.ConfirmationController.get() "> @Messages("status.submissionreadyforreview.description.link")</a>
+           @Messages("status.submissionreadyforreview.description.2") </p>
+        <p>@Messages("status.submissionreadyforreview.description.3")</p>
+    }
+    case None => {
+    <p>@Messages("status.submissionreadyforreview.nofee.description")</p>
+        @detailsSummary(summary = Messages("status.submissionreadyforreview.nofee.description.link")) {
             <p>@Messages("fee.details.dup_nofees.heading")</p>
-
-            <div class="partial-deskpro-form" data-action-value="Submit my application" data-error-value="Paying for my application">
+            <div class="partial-deskpro-form">
                 <div class="get-help-form">
                     @getHelpForm
                 </div>
             </div>
         }
+        <p>@Messages("status.submissionreadyforreview.nofee.description.3")</p>
     }
+
 }
+
+
+
+
+

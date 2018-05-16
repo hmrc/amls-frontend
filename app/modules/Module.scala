@@ -22,10 +22,12 @@ import connectors._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
 import services._
+import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.{ChangeBusinessTypeRouter, AddBusinessTypeRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 
 class Module extends AbstractModule {
 
@@ -43,7 +45,8 @@ class Module extends AbstractModule {
     bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
-    bind(classOf[FeeConnector]).toInstance(FeeConnector)
+    bind(classOf[CorePost]).toInstance(WSHttp)
+    bind(classOf[CoreGet]).toInstance(WSHttp)
     bind(classOf[LandingService]).toInstance(LandingService)
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
