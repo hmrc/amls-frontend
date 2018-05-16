@@ -100,7 +100,7 @@ class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidat
 
   "A failure is returned" when {
     "the user visits the page" when {
-      "there is no data to show" ignore new Fixture {
+      "there is no data to show" in new Fixture {
         mockCacheFetch(None)
 
         val result = controller.get()(request)

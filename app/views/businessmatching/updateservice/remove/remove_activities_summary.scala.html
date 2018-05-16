@@ -48,7 +48,7 @@
             question = Messages("dateofchange.title"),
             editUrl = routes.WhatDateRemovedController.get().url
         ) {
-            @DateHelper.formatDate(doc.dateOfChange)
+            <p>@DateHelper.formatDate(doc.dateOfChange)</p>
         }
     }
 }

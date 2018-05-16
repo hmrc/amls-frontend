@@ -45,7 +45,7 @@ class RemoveBusinessTypeSummaryController @Inject()(
         for {
           flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
         } yield Ok(remove_activities_summary(flow))
-      } getOrElse Ok(remove_activities_summary(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness, HighValueDealing)))))
+      } getOrElse InternalServerError("Unable to get the flow model")
   }
 
   def post = Authorised.async {
