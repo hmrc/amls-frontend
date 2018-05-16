@@ -35,7 +35,8 @@ class UpdateServiceDateOfChangeControllerSpec extends AmlsSpec {
 
     val controller = new UpdateServiceDateOfChangeController(
       authConnector = self.authConnector,
-      dataCacheConnector = mockCacheConnector
+      dataCacheConnector = mockCacheConnector,
+      router = createRouter[RemoveServiceFlowModel]
     )
   }
 
@@ -63,7 +64,31 @@ class UpdateServiceDateOfChangeControllerSpec extends AmlsSpec {
       }
     }
 
+
+    "post is called" must {
+      "redirect to next page" in new Fixture {
+        val today = LocalDate.now
+        mockCacheUpdate(Some(RemoveServiceFlowModel.key), RemoveServiceFlowModel(dateOfChange = Some(DateOfChange(today))))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> today.getDayOfMonth.toString,
+          "dateOfChange.month" -> today.getMonthOfYear.toString,
+          "dateOfChange.year" -> today.getYear.toString
+        ))
+
+        status(result) mustBe SEE_OTHER
+     }
+
+      "saves the data to the flow model" in new Fixture {
+      }
+
+
+      "on invalid request" must {
+        "return badRequest" in new Fixture {
+          val result = controller.post()(request)
+          status(result) mustBe BAD_REQUEST
+        }
+      }
+    }
   }
-
-
 }
