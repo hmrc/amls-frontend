@@ -16,8 +16,6 @@
 
 package controllers.businessmatching.updateservice.remove
 
-
-
 import models.DateOfChange
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import org.joda.time.LocalDate
@@ -35,7 +33,8 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
     val controller = new WhatDateRemovedController(
       authConnector = self.authConnector,
-      dataCacheConnector = mockCacheConnector
+      dataCacheConnector = mockCacheConnector,
+      router = createRouter[RemoveBusinessTypeFlowModel]
     )
   }
 
@@ -53,7 +52,10 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
 
       "display the date when it is already in the data cache" in new Fixture {
         val today = LocalDate.now
-        mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))), Some(RemoveBusinessTypeFlowModel.key))
+
+        mockCacheFetch[RemoveBusinessTypeFlowModel](
+          Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))),
+          Some(RemoveBusinessTypeFlowModel.key))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -63,7 +65,31 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
       }
     }
 
+
+    "post is called" must {
+      "redirect to next page" in new Fixture {
+        val today = LocalDate.now
+        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+          "dateOfChange.day" -> today.getDayOfMonth.toString,
+          "dateOfChange.month" -> today.getMonthOfYear.toString,
+          "dateOfChange.year" -> today.getYear.toString
+        ))
+
+        status(result) mustBe SEE_OTHER
+     }
+
+      "saves the data to the flow model" in new Fixture {
+      }
+
+
+      "on invalid request" must {
+        "return badRequest" in new Fixture {
+          val result = controller.post()(request)
+          status(result) mustBe BAD_REQUEST
+        }
+      }
+    }
   }
-
-
 }
