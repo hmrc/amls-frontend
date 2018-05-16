@@ -46,11 +46,11 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
 
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,
           Some(ResponsiblePersonAddressHistory(Some(currentAddress),_,_)),_,_,_,_,_,_,_,_,_,_,_, _))
           => Ok(current_address(Form2[ResponsiblePersonCurrentAddress](currentAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(current_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _
           => NotFound(notFoundView)
@@ -63,11 +63,11 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
         implicit request =>
           (Form2[ResponsiblePersonCurrentAddress](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map { rp =>
+              getData[ResponsiblePerson](index) map { rp =>
                 BadRequest(current_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
-              getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+              getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
                 val currentAddressWithTime = (for {
                   rp <- responsiblePerson
                   addressHistory <- rp.addressHistory
@@ -85,10 +85,10 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
     }
 
   private def updateAndRedirect
-  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, flow: Option[String], originalResponsiblePerson: Option[ResponsiblePeople],
+  (data: ResponsiblePersonCurrentAddress, index: Int, edit: Boolean, flow: Option[String], originalResponsiblePerson: Option[ResponsiblePerson],
    status: SubmissionStatus)
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) { res =>
+    updateDataStrict[ResponsiblePerson](index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) => a.currentAddress(data)

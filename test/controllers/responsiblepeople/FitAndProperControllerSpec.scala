@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
@@ -54,9 +54,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with OK" when {
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = testFitAndProper
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -70,9 +70,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(false)
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -86,9 +86,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = None
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -104,9 +104,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with NOT_FOUND" when {
         "there is no PersonName present" in new Fixture {
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             personName = None, hasAlreadyPassedFitAndProper = None
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -123,11 +123,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             hasAlreadyPassedFitAndProper = testFitAndProper
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
-          mockCacheSave[Seq[ResponsiblePeople]]
+          mockCacheSave[Seq[ResponsiblePerson]]
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -140,9 +140,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "hasAlreadyPassedFitAndProper" -> "invalid"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             hasAlreadyPassedFitAndProper = testFitAndProper
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -156,11 +156,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             hasAlreadyPassedFitAndProper = testFitAndProper
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
-          mockCacheSave[Seq[ResponsiblePeople]]
+          mockCacheSave[Seq[ResponsiblePerson]]
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -173,11 +173,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople(
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
             hasAlreadyPassedFitAndProper = testFitAndProper
-          ))), Some(ResponsiblePeople.key))
+          ))), Some(ResponsiblePerson.key))
 
-          mockCacheSave[Seq[ResponsiblePeople]]
+          mockCacheSave[Seq[ResponsiblePerson]]
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)

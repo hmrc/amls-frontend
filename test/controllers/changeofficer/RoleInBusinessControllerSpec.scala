@@ -50,12 +50,12 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
 
     lazy val controller = injector.instanceOf[RoleInBusinessController]
 
-    val nominatedOfficer = ResponsiblePeople(
+    val nominatedOfficer = ResponsiblePerson(
       personName = Some(PersonName("firstName", None, "lastName")),
       positions = Some(Positions(Set(NominatedOfficer),None))
     )
 
-    val otherResponsiblePerson = ResponsiblePeople(
+    val otherResponsiblePerson = ResponsiblePerson(
       personName = Some(PersonName("otherFirstName", None, "otherLastName")),
       positions = Some(Positions(Set(Director),None))
     )
@@ -67,7 +67,7 @@ class RoleInBusinessControllerSpec extends AmlsSpec {
       "XA123456789",
       None)
 
-    when(cache.fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any()))
+    when(cache.fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any()))
       .thenReturn(Future.successful(Some(Seq(nominatedOfficer, otherResponsiblePerson))))
 
     when {

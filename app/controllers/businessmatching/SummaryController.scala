@@ -58,7 +58,7 @@ class SummaryController @Inject()(
           val changeActivitiesUrl = if (isPreSubmission) {
             controllers.businessmatching.routes.RegisterServicesController.get().url
           } else {
-            controllers.businessmatching.updateservice.routes.ChangeServicesController.get().url
+            controllers.businessmatching.updateservice.routes.ChangeBusinessTypesController.get().url
           }
 
           Ok(summary(EmptyForm,

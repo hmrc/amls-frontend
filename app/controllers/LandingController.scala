@@ -30,7 +30,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -186,7 +186,7 @@ class LandingController @Inject()(val landingService: LandingService,
       cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold(false) {
         _.hasChanged
       },
-      cacheMap.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key).fold(false) {
+      cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).fold(false) {
         _.exists(_.hasChanged)
       },
       cacheMap.getEntry[Supervision](Supervision.key).fold(false) {
@@ -214,7 +214,7 @@ class LandingController @Inject()(val landingService: LandingService,
         case Some(c) =>
           lazy val fixEmpties = for {
             c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
-            c2 <- fixEmptyRecords[ResponsiblePeople](c1, ResponsiblePeople.key)
+            c2 <- fixEmptyRecords[ResponsiblePerson](c1, ResponsiblePerson.key)
           } yield c2
 
           //there is data in S4l

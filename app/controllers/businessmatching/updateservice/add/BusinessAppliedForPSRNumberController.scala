@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.flowmanagement.{AddServiceFlowModel, BusinessAppliedForPSRNumberPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, BusinessAppliedForPSRNumberPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
@@ -34,13 +34,13 @@ import scala.concurrent.Future
 class BusinessAppliedForPSRNumberController @Inject()(
                                                        val authConnector: AuthConnector,
                                                        implicit val dataCacheConnector: DataCacheConnector,
-                                                       val router: Router[AddServiceFlowModel]
+                                                       val router: Router[AddBusinessTypeFlowModel]
                                                      ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key)) map { case model =>
+        OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key)) map { case model =>
           val form = model.businessAppliedForPSRNumber map { v => Form2(v) } getOrElse EmptyForm
           Ok(business_applied_for_psr_number(form, edit))
         } getOrElse InternalServerError("Get: Unable to show Business Applied For PSR Number page")
@@ -54,7 +54,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
             Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
 
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.businessAppliedForPSRNumber(data)
             } flatMap {
               case Some(model) => router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)

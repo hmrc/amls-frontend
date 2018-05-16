@@ -58,7 +58,7 @@ class SummaryController @Inject()
           preSubmission <- OptionT.liftF(statusService.isPreSubmission)
           inNewFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(TrustAndCompanyServices))
         } yield (preSubmission, inNewFlow) match {
-          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
+          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }) getOrElse InternalServerError("Cannot update Tcsp")
   }

@@ -31,7 +31,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import models.renewal.{ReceiveCashPayments, _}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
@@ -177,7 +177,7 @@ trait LandingService {
     _ <- cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
     _ <- cacheConnector.save[Option[SubscriptionResponse]](SubscriptionResponse.key, subscriptionResponse)
     _ <- cacheConnector.save[Option[AmendVariationRenewalResponse]](AmendVariationRenewalResponse.key, amendVariationResponse)
-    cache1 <- cacheConnector.save[Option[Seq[ResponsiblePeople]]](ResponsiblePeople.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
+    cache1 <- cacheConnector.save[Option[Seq[ResponsiblePerson]]](ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
     cache2 <- saveRenewalData(viewResponse, cache1)
   } yield cache2
 
@@ -196,8 +196,8 @@ trait LandingService {
     )
   }
 
-  def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePeople]]): Option[Seq[ResponsiblePeople]] =
-    Some(viewResponse.fold(Seq.empty[ResponsiblePeople])(_.map(rp => rp.copy(hasAccepted = true))))
+  def responsiblePeopleSection(viewResponse: Option[Seq[ResponsiblePerson]]): Option[Seq[ResponsiblePerson]] =
+    Some(viewResponse.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))
 
   def tradingPremisesSection(viewResponse: Option[Seq[TradingPremises]]): Option[Seq[TradingPremises]] =
     Some(viewResponse.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))

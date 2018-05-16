@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{PersonName, PreviousName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, PreviousName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -49,7 +49,7 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the Person Registered page" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.get(1)(request)
@@ -64,8 +64,8 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the Person Registered page with a count of 0 when no responsible people have a name recorded" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(None,None), ResponsiblePeople(None,None)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(None,None), ResponsiblePerson(None,None)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -75,8 +75,8 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
       "load the Person Registered page with a count of 0 when the responsible person has a status of deleted" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(status = Some(StatusConstants.Deleted))))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(status = Some(StatusConstants.Deleted))))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -88,8 +88,8 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         val previousName = PreviousName(Some(true), Some("first1"), Some("middle1"), Some("last1"))
         val personName = PersonName("first2", Some("middle2"), "last2")
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName),None), ResponsiblePeople(Some(personName),None)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(personName),None), ResponsiblePerson(Some(personName),None)))))
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -104,10 +104,10 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody("registerAnotherPerson" -> "true")
 
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[ResponsiblePerson](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
@@ -118,10 +118,10 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       "successfully redirect to the page on selection of 'no'" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("registerAnotherPerson" -> "false")
 
-        when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[ResponsiblePerson](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
 
-        when(controller.dataCacheConnector.save[ResponsiblePeople](any(), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[ResponsiblePerson](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
         val result = controller.post(1)(newRequest)
@@ -133,7 +133,7 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
     "on post invalid data show error" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody()
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[ResponsiblePerson](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post(1)(newRequest)
@@ -146,7 +146,7 @@ class PersonRegisteredControllerSpec extends AmlsSpec with MockitoSugar {
       val newRequest = request.withFormUrlEncodedBody(
         "registerAnotherPerson" -> ""
       )
-      when(controller.dataCacheConnector.fetch[ResponsiblePeople](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[ResponsiblePerson](any())(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.post(1)(newRequest)

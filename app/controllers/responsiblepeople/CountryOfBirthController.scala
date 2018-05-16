@@ -22,7 +22,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.Country
-import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePeople}
+import models.responsiblepeople.{CountryOfBirth, PersonResidenceType, ResponsiblePerson}
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
@@ -46,8 +46,8 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,Some(personResidenceType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             personResidenceType.countryOfBirth match {
               case Some(country) =>
                 Ok(country_of_birth(
@@ -61,7 +61,7 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
               case _ =>
                 Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
             }
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(country_of_birth(EmptyForm, edit, index, flow, personName.titleName, autoCompleteService.getCountries))
           case _ => NotFound(notFoundView)
         }
@@ -80,12 +80,12 @@ class CountryOfBirthController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         Form2[CountryOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(country_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
           }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.personResidenceType(updateCountryOfBirth(rp.personResidenceType, data))
               }
             } yield edit match {

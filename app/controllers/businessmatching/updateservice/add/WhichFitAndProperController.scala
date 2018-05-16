@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
@@ -43,8 +43,8 @@ class WhichFitAndProperController @Inject()(
                                              val statusService: StatusService,
                                              val businessMatchingService: BusinessMatchingService,
                                              val responsiblePeopleService: ResponsiblePeopleService,
-                                             val helper: UpdateServiceHelper,
-                                             val router: Router[AddServiceFlowModel]
+                                             val helper: AddBusinessTypeHelper,
+                                             val router: Router[AddBusinessTypeFlowModel]
                                            ) extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -52,7 +52,7 @@ class WhichFitAndProperController @Inject()(
       implicit request =>
         (for {
           rp <- OptionT.liftF(responsiblePeopleService.getAll)
-          flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+          flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
         } yield {
           val indexedRp = rp.zipWithIndex.exceptInactive
           val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
@@ -69,7 +69,7 @@ class WhichFitAndProperController @Inject()(
             BadRequest(which_fit_and_proper(f, edit, rp.zipWithIndex.exceptInactive))
           }
           case ValidForm(_, data) => {
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.responsiblePeople(Some(data))
             } flatMap {
               case Some(model) => router.getRoute(WhichFitAndProperPageId, model, edit)

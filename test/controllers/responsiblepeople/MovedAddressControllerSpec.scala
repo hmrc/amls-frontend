@@ -48,7 +48,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
     val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
     val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
 
-    val rp = ResponsiblePeople (
+    val rp = ResponsiblePerson (
       personName = Some(personName),
       addressHistory = Some(history)
     )
@@ -61,7 +61,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "Load Moved address page successfully when address is supplied" in new Fixture {
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -75,7 +75,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "Load registration progress page successfully when no ResponsiblePeople model is supplied" in new Fixture {
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -91,7 +91,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val personName = PersonName("firstName", Some("middleName"), "lastName")
         val history = ResponsiblePersonAddressHistory(currentAddress = None)
 
-        val rp = ResponsiblePeople (
+        val rp = ResponsiblePerson (
           personName = Some(personName),
           addressHistory = Some(history)
         )
@@ -99,7 +99,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val responsiblePerson = Seq(rp)
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -118,7 +118,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
       val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
       val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
       val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-      val rp = ResponsiblePeople(addressHistory = Some(history))
+      val rp = ResponsiblePerson(addressHistory = Some(history))
 
       "successfully redirect to next page" when {
 
@@ -130,8 +130,8 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople())))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson())))
 
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -161,7 +161,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val personName = PersonName("firstName", Some("middleName"), "lastName")
         val history = ResponsiblePersonAddressHistory(currentAddress = None)
 
-        val rp = ResponsiblePeople (
+        val rp = ResponsiblePerson (
           personName = Some(personName),
           addressHistory = Some(history)
         )
@@ -169,7 +169,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val responsiblePerson = Seq(rp)
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -187,7 +187,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(None)
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -205,7 +205,7 @@ class MovedAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))

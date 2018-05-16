@@ -42,8 +42,8 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
   def get(index: Int) = Authorised.async {
       implicit authContext =>
         implicit request =>
-          getData[ResponsiblePeople](index) map {
-            case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          getData[ResponsiblePerson](index) map {
+            case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
             => Ok(responsiblepeople.new_home_address(Form2(DefaultAddressHistory), index, personName.titleName, autoCompleteService.getCountries))
             case _
             => NotFound(notFoundView)
@@ -56,13 +56,13 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
         implicit request =>
           (Form2[NewHomeAddress](request.body) match {
             case f: InvalidForm =>
-              getData[ResponsiblePeople](index) map { rp =>
+              getData[ResponsiblePerson](index) map { rp =>
                 BadRequest(responsiblepeople.new_home_address(f, index, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
               }
             case ValidForm(_, data) => {
               for {
                 moveDate <- dataCacheConnector.fetch[NewHomeDateOfChange](NewHomeDateOfChange.key)
-                _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+                _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                   rp.addressHistory(convertToCurrentAddress(data, moveDate, rp))
                 }
                 _ <- dataCacheConnector.save[NewHomeDateOfChange](NewHomeDateOfChange.key, NewHomeDateOfChange(None))
@@ -93,7 +93,7 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     currentAddress.fold[Option[ResponsiblePersonAddress]](None)(x => Some(ResponsiblePersonAddress(x.personAddress, x.timeAtAddress)))
   }
 
-  private def getUpdatedAddrAndExtraAddr(rp: ResponsiblePeople, currentTimeAtAddress: Option[TimeAtAddress]) = {
+  private def getUpdatedAddrAndExtraAddr(rp: ResponsiblePerson, currentTimeAtAddress: Option[TimeAtAddress]) = {
     currentTimeAtAddress match {
       case Some(ZeroToFiveMonths) | Some(SixToElevenMonths) => rp.addressHistory.fold[(Option[ResponsiblePersonAddress],
         Option[ResponsiblePersonAddress])]((None, None))(addrHistory => (pushCurrentAddress(addrHistory.currentAddress), addrHistory.additionalAddress))
@@ -101,7 +101,7 @@ class NewHomeAddressController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePeople) = {
+  private def convertToCurrentAddress(addr: NewHomeAddress, dateOfMove: Option[NewHomeDateOfChange], rp: ResponsiblePerson) = {
     val currentTimeAtAddress = getTimeAtAddress(dateOfMove)
     val (additionalAddress, extraAdditionalAddress) = getUpdatedAddrAndExtraAddr(rp, currentTimeAtAddress)
 

@@ -71,12 +71,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -100,12 +100,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -129,12 +129,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(OneToThreeYears))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -158,12 +158,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -187,12 +187,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(SixToElevenMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             addressHistory = Some(history),
             personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
             positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -213,12 +213,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(
+        val responsiblePeople = ResponsiblePerson(
           addressHistory = Some(history),
           personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
           positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
         when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
@@ -240,12 +240,12 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
         val UKAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
         val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, Some(ThreeYearsPlus), Some(DateOfChange(new LocalDate(2017,1,1))))
         val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-        val responsiblePeople = ResponsiblePeople(
+        val responsiblePeople = ResponsiblePerson(
           addressHistory = Some(history),
           personName = Some(PersonName("firstName", Some("middleName"), "LastName")),
           positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2017,1,1)))))
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
         when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
@@ -265,7 +265,7 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
           "dateOfChange.day" -> "01"
         )
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))

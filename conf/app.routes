@@ -288,16 +288,8 @@ POST        /declaration/add-person                                             
 
 GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
 
-GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.get()
-POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeServicesController.post()
-
-GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
-POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
-
-GET         /update-information/date-of-change/services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get()
-POST        /update-information/date-of-change/services                              @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post()
-
-GET         /update-information/activities-remove-information                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
+GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get()
+POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeBusinessTypesController.post()
 
 GET         /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.get()
 POST        /update-information/still-work                                            @controllers.changeofficer.StillEmployedController.post()
@@ -314,11 +306,11 @@ POST        /update-information/further-updates                                 
 GET         /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.get()
 POST        /update-information/remove-responsible-person                             @controllers.changeofficer.RemoveResponsiblePersonController.post()
 
-GET         /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.get()
-POST        /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreActivitiesController.post()
+GET         /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.get()
+POST        /update-service/add-more-activities                                       @controllers.businessmatching.updateservice.add.AddMoreBusinessTypesController.post()
 
-GET         /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectActivitiesController.get(edit: Boolean ?= false)
-POST        /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectActivitiesController.post(edit: Boolean ?= false)
+GET         /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.get(edit: Boolean ?= false)
+POST        /update-service/activities-select                                         @controllers.businessmatching.updateservice.add.SelectBusinessTypeController.post(edit: Boolean ?= false)
 
 GET         /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.get(edit: Boolean ?= false)
 POST        /update-service/trading-premises                                          @controllers.businessmatching.updateservice.add.TradingPremisesController.post(edit: Boolean ?= false)
@@ -332,17 +324,14 @@ POST        /update-service/fit-and-proper                                      
 GET         /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.get(edit: Boolean ?= false)
 POST        /update-service/which-fit-and-proper                                      @controllers.businessmatching.updateservice.add.WhichFitAndProperController.post(edit: Boolean ?= false)
 
-GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NewServiceInformationController.get()
-POST        /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NewServiceInformationController.post()
+GET         /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.get()
+POST        /update-service/new-service-information                                   @controllers.businessmatching.updateservice.add.NeedMoreInformationController.post()
 
-GET         /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.get()
-POST        /update-service/update-any-information                                    @controllers.businessmatching.updateservice.UpdateAnyInformationController.post()
+GET         /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.get()
+POST        /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.AddBusinessTypeSummaryController.post()
 
-GET         /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.get()
-POST        /update-service/check-your-answers                                        @controllers.businessmatching.updateservice.add.UpdateServicesSummaryController.post()
-
-GET         /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.get(edit: Boolean ?= false)
-POST        /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubServicesController.post(edit: Boolean ?= false)
+GET         /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.get(edit: Boolean ?= false)
+POST        /update-service/sub-services                                              @controllers.businessmatching.updateservice.add.SubSectorsController.post(edit: Boolean ?= false)
 
 GET         /update-service/psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.get(edit: Boolean ?= false)
 POST        /update-service/psr-registration                                          @controllers.businessmatching.updateservice.add.BusinessAppliedForPSRNumberController.post(edit: Boolean ?= false)
@@ -353,18 +342,21 @@ POST        /update-service/what-do-you-do-here                                 
 GET         /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.get()
 POST        /update-service/no-psr                                                    @controllers.businessmatching.updateservice.add.NoPsrController.post()
 
-GET         /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.get()
-POST        /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveActivitiesController.post()
+GET         /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.get()
+POST        /update-service/activities-remove                                         @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.post()
 
-GET         /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveActivitiesController.get()
+GET         /update-service/unable-to-remove                                          @controllers.businessmatching.updateservice.remove.UnableToRemoveBusinessTypesController.get()
 
-GET         /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.get()
-POST        /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.UpdateServiceDateOfChangeController.post()
+GET         /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.WhatDateRemovedController.get()
+POST        /update-service/date-change                                               @controllers.businessmatching.updateservice.remove.WhatDateRemovedController.post()
 
 GET         /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveActivitiesSummaryController.get()
 POST        /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveActivitiesSummaryController.post()
 
-GET         /update-service/ask-removed-business                                      @controllers.businessmatching.updateservice.remove.RemoveActivitiesInformationController.get()
+GET         /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.get()
+POST        /update-information/activities-remove                                     @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesController.post()
+
+GET         /update-service/ask-removed-business                                      @controllers.businessmatching.updateservice.remove.NeedToUpdateController.get()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 

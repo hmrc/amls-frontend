@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{KnownBy, LegalNameChangeDate, ResponsiblePeople}
+import models.responsiblepeople.{KnownBy, LegalNameChangeDate, ResponsiblePerson}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import utils.{ControllerHelper, RepeatingSection}
@@ -36,10 +36,10 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName), _, _, Some(otherName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName), _, _, Some(otherName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(known_by(Form2[KnownBy](otherName), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
+          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _))
           => Ok(known_by(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -51,17 +51,17 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
       implicit request => {
         Form2[KnownBy](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(views.html.responsiblepeople.known_by(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               _ <- {
                 data.hasOtherNames match {
-                  case Some(true) => updateDataStrict[ResponsiblePeople](index) { rp =>
+                  case Some(true) => updateDataStrict[ResponsiblePerson](index) { rp =>
                     rp.knownBy(data)
                   }
-                  case Some(false) => updateDataStrict[ResponsiblePeople](index) { rp =>
+                  case Some(false) => updateDataStrict[ResponsiblePerson](index) { rp =>
                     rp.knownBy(KnownBy(Some(false), None))
                   }
                 }

@@ -55,7 +55,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     val personName = PersonName("firstName", Some("middleName"), "lastName")
 
-    val rp = ResponsiblePeople (
+    val rp = ResponsiblePerson (
       personName = Some(personName)
     )
 
@@ -68,7 +68,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
       "Load Confirm address page successfully" in new Fixture {
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -86,8 +86,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
         "business matching model does not exist" in new Fixture {
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople())))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson())))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(None)
@@ -104,8 +104,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople())))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson())))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(bm.copy(reviewDetails = None)))
@@ -125,9 +125,9 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
@@ -148,7 +148,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
       val UKAddress = PersonAddressUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
       val currentAddress = ResponsiblePersonCurrentAddress(UKAddress, None)
       val history = ResponsiblePersonAddressHistory(currentAddress = Some(currentAddress))
-      val rp = ResponsiblePeople(addressHistory = Some(history))
+      val rp = ResponsiblePerson(addressHistory = Some(history))
 
       "successfully redirect to next page" when {
 
@@ -160,8 +160,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople())))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson())))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(bm))
@@ -173,7 +173,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1).url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](
             any(),
             meq(Seq(rp))
           )(any(), any(), any())
@@ -186,8 +186,8 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
           val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(addressHistory = Some(mock[ResponsiblePersonAddressHistory])))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(addressHistory = Some(mock[ResponsiblePersonAddressHistory])))))
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(bm))
@@ -199,9 +199,9 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](
             any(),
-            meq(Seq(ResponsiblePeople(addressHistory = None)))
+            meq(Seq(ResponsiblePerson(addressHistory = None)))
           )(any(), any(), any())
         }
       }
@@ -213,7 +213,7 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(responsiblePerson))
 
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))

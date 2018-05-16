@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePeople}
+import models.responsiblepeople.{LegalNameChangeDate, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -58,9 +58,9 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
           lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
         val result = controller.get(RecordId)(request)
 
@@ -73,12 +73,12 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
 
       "prepopulate the view with data" in new TestFixture {
 
-        val responsiblePeople = ResponsiblePeople(
+        val responsiblePeople = ResponsiblePerson(
           personName = Some(personName),
           legalNameChangeDate = Some(new LocalDate(2001,10,10))
         )
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
         val result = controller.get(RecordId)(request)
 
@@ -104,7 +104,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
               "date.year" -> "1990"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[LegalNameChangeDate]
 
             val result = controller.post(RecordId)(newRequest)
@@ -122,7 +122,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
               "date.year" -> "1990"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[LegalNameChangeDate]
 
             val result = controller.post(RecordId, true)(newRequest)
@@ -139,7 +139,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
             "date.day" -> "1"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[LegalNameChangeDate]
 
           val result = controller.post(RecordId)(NameMissingInRequest)
@@ -158,7 +158,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
             "date.year" -> "1990"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[LegalNameChangeDate]
 
           val result = controller.post(2)(newRequest)

@@ -19,8 +19,8 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching._
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{PersonName, ResponsiblePeople, TrainingNo, TrainingYes}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -64,8 +64,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     "get is called" must {
 
       "display the page with pre populated data (training is set to Yes)" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingYes("test")))))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingYes("test")))))))
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
@@ -76,8 +76,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "display the page with pre populated data (training is set to No)" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName, training = Some(TrainingNo))))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, training = Some(TrainingNo))))))
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
@@ -88,8 +88,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "display the page without pre populated data" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
         val result = controller.get(recordId)(request)
         status(result) must be(OK)
@@ -101,8 +101,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
       }
 
       "respond with NOT_FOUND when there is no personName" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = controller.get(recordId)(request)
         status(result) must be(NOT_FOUND)
@@ -120,8 +120,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         when(controller.dataCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople())))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+          .thenReturn(Some(Seq(ResponsiblePerson())))
 
         val result = controller.post(99)(newRequest)
         status(result) must be(NOT_FOUND)
@@ -176,8 +176,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               .thenReturn(Some(
                 BusinessMatching(activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing))))
               ))
-            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-              .thenReturn(Some(Seq(ResponsiblePeople())))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+              .thenReturn(Some(Seq(ResponsiblePerson())))
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -200,8 +200,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               .thenReturn(Some(
                 BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
               ))
-            when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any()))
-              .thenReturn(Some(Seq(ResponsiblePeople())))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+              .thenReturn(Some(Seq(ResponsiblePerson())))
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -232,8 +232,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         val newRequest = request.withFormUrlEncodedBody(
           "training" -> "not a boolean value"
         )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = personName)))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
         val result = controller.post(recordId)(newRequest)
         status(result) must be(BAD_REQUEST)

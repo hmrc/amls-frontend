@@ -19,14 +19,14 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 trait ResponsiblePeopleAddController extends BaseController with RepeatingSection {
   def get(displayGuidance: Boolean = true, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request => {
-      addData[ResponsiblePeople](ResponsiblePeople.default(None)).map {idx =>
+      addData[ResponsiblePerson](ResponsiblePerson.default(None)).map { idx =>
         Redirect {
           flow match {
             case Some(_) => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx, flow)

@@ -105,7 +105,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(postRequest)
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get().url)
+        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
       }
     }
 

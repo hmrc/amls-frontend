@@ -23,7 +23,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo}
 import org.scalacheck.Gen
@@ -84,7 +84,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
         override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> true)
 
         mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
-        mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
+        mockCacheGetEntry[Seq[ResponsiblePerson]](None, ResponsiblePerson.key)
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -92,7 +92,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
       "return notFound if show-fees toggle is off" in new Fixture {
         mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
-        mockCacheGetEntry[Seq[ResponsiblePeople]](None, ResponsiblePeople.key)
+        mockCacheGetEntry[Seq[ResponsiblePerson]](None, ResponsiblePerson.key)
 
         override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
@@ -121,13 +121,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             )
 
             val responsiblePeople = Seq(
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               )
             )
@@ -137,7 +137,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             )
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
-            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
             mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
@@ -165,13 +165,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             )
 
             val responsiblePeople = Seq(
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               ),
-              ResponsiblePeople(
+              ResponsiblePerson(
                 hasAlreadyPassedFitAndProper = Some(false)
               )
             )
@@ -181,7 +181,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             )
 
             mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
-            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
             mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
             mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
@@ -196,7 +196,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
       "filter out empty responsible people" in new Fixture {
         val people = Seq(
           responsiblePersonGen.sample.get,
-          ResponsiblePeople()
+          ResponsiblePerson()
         )
 
         val aboutTheBusiness = AboutTheBusiness(
@@ -211,7 +211,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           BreakdownRow(Messages("summary.responsiblepeople"), 1, Currency(peopleFee), Currency(peopleFee))
         )
 
-        mockCacheGetEntry(Some(people), ResponsiblePeople.key)
+        mockCacheGetEntry(Some(people), ResponsiblePerson.key)
         mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
         mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
         mockCacheGetEntry(Some(Seq.empty[TradingPremises]), TradingPremises.key)
@@ -245,7 +245,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           BreakdownRow(Messages("summary.tradingpremises"), 1, Currency(premisesFee), Currency(premisesFee))
         )
 
-        mockCacheGetEntry(Some(people), ResponsiblePeople.key)
+        mockCacheGetEntry(Some(people), ResponsiblePerson.key)
         mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
         mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
         mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
@@ -278,7 +278,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           )
 
           mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
-          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
           mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
@@ -311,13 +311,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           )
 
           val responsiblePeople = Seq(
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(true)
             ),
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(true)
             ),
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(true)
             )
           )
@@ -327,7 +327,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           )
 
           mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
-          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
           mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 
@@ -354,13 +354,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           )
 
           val responsiblePeople = Seq(
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(false)
             ),
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(false)
             ),
-            ResponsiblePeople(
+            ResponsiblePerson(
               hasAlreadyPassedFitAndProper = Some(false)
             )
           )
@@ -370,7 +370,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
           )
 
           mockCacheGetEntry(Some(tradingPremiseses), TradingPremises.key)
-          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePeople.key)
+          mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
           mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
           mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
 

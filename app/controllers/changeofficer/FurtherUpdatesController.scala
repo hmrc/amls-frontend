@@ -25,7 +25,7 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
-import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePeople}
+import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
@@ -48,12 +48,12 @@ class FurtherUpdatesController @Inject()(
         case ValidForm(_, data) => {
           (for {
             cache <- OptionT(dataCacheConnector.fetchAll)
-            responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+            responsiblePeople <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
             changeOfficer <- OptionT.fromOption[Future](cache.getEntry[ChangeOfficer](ChangeOfficer.key))
             oldOfficer <- OptionT.fromOption[Future](getOfficer(responsiblePeople.zipWithIndex))
             newOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer)
-            (_, index) <- OptionT.fromOption[Future](ResponsiblePeople.findResponsiblePersonByName(newOfficer.name, responsiblePeople))
-            _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, {
+            (_, index) <- OptionT.fromOption[Future](ResponsiblePerson.findResponsiblePersonByName(newOfficer.name, responsiblePeople))
+            _ <- OptionT.liftF(dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, {
               updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
             }))
           } yield {
@@ -68,27 +68,27 @@ class FurtherUpdatesController @Inject()(
       }
   }
 
-  private def updateNominatedOfficers(oldOfficer: (ResponsiblePeople, Int), roles: RoleInBusiness, responsiblePeople: Seq[ResponsiblePeople], index: Int) = {
+  private def updateNominatedOfficers(oldOfficer: (ResponsiblePerson, Int), roles: RoleInBusiness, responsiblePeople: Seq[ResponsiblePerson], index: Int) = {
     removeNominatedOfficers(responsiblePeople)
       .patch(oldOfficer._2 - 1, Seq(updateRoles(oldOfficer._1, roles)), 1)
       .patch(index, Seq(addNominatedOfficer(responsiblePeople(index))), 1)
       .map(_.copy(hasAccepted = true))
   }
 
-  private def updateRoles(oldOfficer: ResponsiblePeople, rolesInBusiness: RoleInBusiness): ResponsiblePeople = {
+  private def updateRoles(oldOfficer: ResponsiblePerson, rolesInBusiness: RoleInBusiness): ResponsiblePerson = {
     import models.changeofficer.RoleInBusiness._
     val positions = oldOfficer.positions.fold(Positions(Set.empty, None))(p => p)
     oldOfficer.positions(Positions(rolesInBusiness.roles, positions.startDate))
   }
 
-  private def addNominatedOfficer(responsiblePerson: ResponsiblePeople): ResponsiblePeople = {
+  private def addNominatedOfficer(responsiblePerson: ResponsiblePerson): ResponsiblePerson = {
     val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
     responsiblePerson.positions(
       Positions(positions.positions + NominatedOfficer, positions.startDate)
     )
   }
 
-  private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+  private def removeNominatedOfficers(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] = {
     responsiblePeople map { responsiblePerson =>
       val positions = responsiblePerson.positions.fold(Positions(Set.empty, None))(p => p)
       responsiblePerson.positions(

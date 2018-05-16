@@ -22,7 +22,7 @@ import cats.data.OptionT
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{DateOfBirth, ResponsiblePeople}
+import models.responsiblepeople.{DateOfBirth, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
@@ -39,10 +39,10 @@ class DateOfBirthController @Inject()(
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,Some(dateOfBirth),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,Some(dateOfBirth),_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(date_of_birth(Form2[DateOfBirth](dateOfBirth), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(date_of_birth(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -52,12 +52,12 @@ class DateOfBirthController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[DateOfBirth](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(date_of_birth(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.dateOfBirth(data)
               }
             } yield edit match {

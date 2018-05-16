@@ -36,10 +36,10 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_,_)) =>
+      getData[ResponsiblePerson](index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(ResponsiblePersonAddress(_, Some(additionalExtraAddress))))),_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(time_at_additional_extra_address(Form2[TimeAtAddress](additionalExtraAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(time_at_additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
         case _ => NotFound(notFoundView)
       }
@@ -49,11 +49,11 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
     implicit authContext => implicit request => {
       (Form2[TimeAtAddress](request.body) match {
         case f: InvalidForm =>
-          getData[ResponsiblePeople](index) map { rp =>
+          getData[ResponsiblePerson](index) map { rp =>
             BadRequest(time_at_additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
         case ValidForm(_, data) =>
-          getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+          getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
             (for {
               rp <- responsiblePerson
               addressHistory <- rp.addressHistory
@@ -74,7 +74,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
   private def updateAndRedirect
   (data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
   (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    updateDataStrict[ResponsiblePeople](index) { res =>
+    updateDataStrict[ResponsiblePerson](index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) => a.additionalExtraAddress(data)

@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ContactDetails, ResponsiblePeople}
+import models.responsiblepeople.{ContactDetails, ResponsiblePerson}
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.contact_details
 
@@ -32,10 +32,10 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_, Some(name),_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(Form2[ContactDetails](name), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(contact_details(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -47,12 +47,12 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
 
         Form2[ContactDetails](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(views.html.responsiblepeople.contact_details(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.contactDetails(data)
               }
             } yield edit match {

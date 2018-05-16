@@ -16,11 +16,11 @@
 
 package controllers.businessmatching.updateservice.add
 
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.tradingpremises.TradingPremisesGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.{TradingPremisesActivities, UpdateService}
-import models.flowmanagement.{AddServiceFlowModel, WhichTradingPremisesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
@@ -43,8 +43,8 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
     mockCacheSave[Seq[TradingPremises]]
     mockCacheSave[UpdateService]
-    mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel(Some(HighValueDealing), Some(true))), Some(AddServiceFlowModel.key))
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel(Some(HighValueDealing), Some(true))), Some(AddBusinessTypeFlowModel.key))
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
     val controller = new WhichTradingPremisesController(
@@ -53,7 +53,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
       statusService = mockStatusService,
       businessMatchingService = mockBusinessMatchingService,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
   }
 
@@ -75,7 +75,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
       "return INTERNAL_SERVER_ERROR" when {
         "activities cannot be retrieved" in new Fixture {
-          mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+          mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel()), Some(AddBusinessTypeFlowModel.key))
           mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
 
           val result = controller.get()(request)
@@ -90,7 +90,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
         "redirect away" when {
           "trading premises are selected" in new Fixture {
             mockCacheFetch[Seq[TradingPremises]](Some(tradingPremises), Some(TradingPremises.key))
-            mockCacheUpdate(Some(AddServiceFlowModel.key), AddServiceFlowModel())
+            mockCacheUpdate(Some(AddBusinessTypeFlowModel.key), AddBusinessTypeFlowModel())
 
             val result = controller.post()(request.withFormUrlEncodedBody(
               "tradingPremises[]" -> "1"
@@ -99,7 +99,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
             status(result) must be(SEE_OTHER)
 
             controller.router.verify(WhichTradingPremisesPageId,
-              AddServiceFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
+              AddBusinessTypeFlowModel(tradingPremisesActivities = Some(TradingPremisesActivities(Set(1))), hasChanged = true))
           }
         }
       }
@@ -116,7 +116,7 @@ class WhichTradingPremisesControllerSpec extends AmlsSpec
 
       "return INTERNAL_SERVER_ERROR" when {
         "activities cannot be retrieved" in new Fixture {
-          mockCacheFetch[AddServiceFlowModel](Some(AddServiceFlowModel()), Some(AddServiceFlowModel.key))
+          mockCacheFetch[AddBusinessTypeFlowModel](Some(AddBusinessTypeFlowModel()), Some(AddBusinessTypeFlowModel.key))
 
           val result = controller.post()(request)
 

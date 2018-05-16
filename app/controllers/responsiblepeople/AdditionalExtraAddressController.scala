@@ -49,10 +49,10 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(additionalExtraAddress))),_,_,_,_,_,_,_,_,_,_,_, _)) =>
+      getData[ResponsiblePerson](index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(_,_,Some(additionalExtraAddress))),_,_,_,_,_,_,_,_,_,_,_, _)) =>
           Ok(additional_extra_address(Form2[ResponsiblePersonAddress](additionalExtraAddress), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(additional_extra_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName, autoCompleteService.getCountries))
         case _ => NotFound(notFoundView)
       }
@@ -62,11 +62,11 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     implicit authContext => implicit request => {
       (Form2[ResponsiblePersonAddress](request.body) match {
         case f: InvalidForm =>
-          getData[ResponsiblePeople](index) map { rp =>
+          getData[ResponsiblePerson](index) map { rp =>
             BadRequest(additional_extra_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp), autoCompleteService.getCountries))
           }
         case ValidForm(_, data) => {
-          getData[ResponsiblePeople](index) flatMap { responsiblePerson =>
+          getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
             (for {
               rp <- responsiblePerson
               addressHistory <- rp.addressHistory
@@ -85,7 +85,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
 
   private def updateAndRedirect(data: ResponsiblePersonAddress, index: Int, edit: Boolean, flow: Option[String])
                                (implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    val doUpdate = () => updateDataStrict[ResponsiblePeople](index) { res =>
+    val doUpdate = () => updateDataStrict[ResponsiblePerson](index) { res =>
       res.addressHistory(
         res.addressHistory match {
           case Some(a) => a.additionalExtraAddress(data)
@@ -101,7 +101,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     }
 
     val block = for {
-      rp <- OptionT(getData[ResponsiblePeople](index))
+      rp <- OptionT(getData[ResponsiblePerson](index))
       result <- OptionT.liftF(doUpdate())
       _ <- OptionT.liftF(auditAddressChange(data.personAddress, rp, edit))
     } yield result
@@ -109,7 +109,7 @@ trait AdditionalExtraAddressController extends RepeatingSection with BaseControl
     block getOrElse NotFound(notFoundView)
   }
 
-  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePeople, edit: Boolean)
+  private def auditAddressChange(newAddress: PersonAddress, model: ResponsiblePerson, edit: Boolean)
                                 (implicit hc: HeaderCarrier, request: Request[_]): Future[AuditResult] = {
     if (edit) {
       val oldAddress = for {

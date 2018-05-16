@@ -16,17 +16,16 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
+import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
 import models._
 import models.businessmatching.BusinessMatching
 import models.confirmation.BreakdownRow
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.tradingpremises.TradingPremises
 import typeclasses.confirmation.BreakdownRowInstances._
@@ -53,7 +52,7 @@ class ConfirmationService @Inject()(
           cache <- maybeCache
           subscription <- cache.getEntry[SubscriptionResponse](SubscriptionResponse.key)
           premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-          people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
@@ -72,7 +71,7 @@ class ConfirmationService @Inject()(
         cache <- maybeCache
         amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-        people <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+        people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
         businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
         businessActivities <- businessMatching.activities
       } yield {

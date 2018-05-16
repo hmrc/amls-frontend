@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.{ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegistered}
+import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
@@ -32,10 +32,10 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-    getData[ResponsiblePeople](index) map {
-      case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(vat),_,_,_,_,_,_,_,_,_)) =>
+    getData[ResponsiblePerson](index) map {
+      case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,Some(vat),_,_,_,_,_,_,_,_,_)) =>
         Ok(vat_registered(Form2[VATRegistered](vat), edit, index, flow, personName.titleName))
-      case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+      case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
         Ok(vat_registered(EmptyForm, edit, index, flow, personName.titleName))
       case _ => NotFound(notFoundView)
         }
@@ -44,12 +44,12 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
         Form2[VATRegistered](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(vat_registered(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.vatRegistered(data)
               }
             } yield edit match {

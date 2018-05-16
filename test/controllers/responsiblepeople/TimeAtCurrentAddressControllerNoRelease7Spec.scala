@@ -61,9 +61,9 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
@@ -86,10 +86,10 @@ class TimeAtCurrentAddressControllerNoRelease7Spec extends AmlsSpec with Mockito
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(OneToThreeYears))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
-          val responsiblePeople = ResponsiblePeople(addressHistory = Some(history), lineId = Some(1))
+          val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
 
-          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(timeAtAddressController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(timeAtAddressController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))

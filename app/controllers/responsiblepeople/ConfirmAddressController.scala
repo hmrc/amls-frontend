@@ -62,7 +62,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
           optionalCache =>
             (for {
               cache <- optionalCache
-              rp <- getData[ResponsiblePeople](cache, index)
+              rp <- getData[ResponsiblePerson](cache, index)
               bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             } yield {
               rp.addressHistory.isDefined match {
@@ -88,7 +88,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
             optionalCache =>
               (for {
                 cache <- optionalCache
-                rp <- getData[ResponsiblePeople](cache, index)
+                rp <- getData[ResponsiblePerson](cache, index)
                 bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
               } yield {
                 getAddress(bm) match {
@@ -101,12 +101,12 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
         case ValidForm(_, data) =>
           data.confirmAddress match {
             case true => {
-              fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
+              fetchAllAndUpdateStrict[ResponsiblePerson](index) { (cache, rp) =>
                 rp.copy(addressHistory = updateAddressFromBM(cache.getEntry[BusinessMatching](BusinessMatching.key)))
               } map ( _ => Redirect(routes.TimeAtCurrentAddressController.get(index)))
             }
             case false => {
-              fetchAllAndUpdateStrict[ResponsiblePeople](index) { (cache, rp) =>
+              fetchAllAndUpdateStrict[ResponsiblePerson](index) { (cache, rp) =>
                 rp.copy(addressHistory = None)
               } map ( _ => Redirect(routes.CurrentAddressController.get(index)))
             }

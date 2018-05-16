@@ -32,7 +32,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
 import models.registrationprogress.Section
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -80,7 +80,7 @@ class ProgressService @Inject()(
       BusinessActivities.section,
       BankDetails.section,
       TradingPremises.section,
-      ResponsiblePeople.section
+      ResponsiblePerson.section
     )
 
 
@@ -107,7 +107,7 @@ class ProgressService @Inject()(
 
     val result: OptionT[Future, Option[Call]] = for {
       status <- OptionT.liftF(statusService.getStatus)
-      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      responsiblePeople <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       hasNominatedOfficer <- OptionT.liftF(ControllerHelper.hasNominatedOfficer(Future.successful(Some(responsiblePeople))))
       businessmatching <- OptionT(cacheConnector.fetch[BusinessMatching](BusinessMatching.key))
       reviewDetails <- OptionT.fromOption[Future](businessmatching.reviewDetails)

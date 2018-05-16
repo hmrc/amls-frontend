@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{FormHelpers, Form2, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import play.api.i18n.Messages
@@ -50,7 +50,7 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
   def post(index: Int, edit: Boolean) = Authorised.async {
     implicit authContext => implicit request =>
 
-      val extraInfo = getData[ResponsiblePeople](index) map { rpO =>
+      val extraInfo = getData[ResponsiblePerson](index) map { rpO =>
         for {
           rp <- rpO
           name <- rp.personName
@@ -105,7 +105,7 @@ trait CurrentAddressDateOfChangeController extends RepeatingSection with BaseCon
   (index: Int, date: DateOfChange)
   (implicit authContext: AuthContext, request: Request[AnyContent]) =
 
-    updateDataStrict[ResponsiblePeople](index) { res =>
+    updateDataStrict[ResponsiblePerson](index) { res =>
       (for {
         addressHist <- res.addressHistory
         rpCurrentAdd <- addressHist.currentAddress

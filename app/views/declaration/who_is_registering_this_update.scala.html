@@ -18,7 +18,7 @@
 @import models.responsiblepeople._
 @import forms2._
 
-@(f: forms.Form2[_], model : Seq[ResponsiblePeople])(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], model : Seq[ResponsiblePerson])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)

@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.responsiblepeople._
 import models.Country
 import models.autocomplete.{CountryDataProvider, NameValuePair}
-import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.ResponsiblePerson._
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -65,16 +65,16 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
   val personResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("Spain", "ES")), Some(Country("Spain", "ES")))
   val updtdPersonResidenceType = PersonResidenceType(UKResidence(nino), Some(Country("France", "FR")), Some(Country("Spain", "ES")))
   val updtdPersonResidenceTypeYes = PersonResidenceType(UKResidence(nino), Some(Country("United Kingdom", "GB")), Some(Country("Spain", "ES")))
-  val responsiblePeople = ResponsiblePeople(personName, personResidenceType = Some(personResidenceType))
+  val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(personResidenceType))
 
   "CountryOfBirthController" when {
 
     "get is called" must {
 
       "respond with NOT_FOUND when called with an index that is out of bounds" in new Fixture {
-        val responsiblePeople = ResponsiblePeople()
+        val responsiblePeople = ResponsiblePerson()
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(40)(request)
@@ -83,9 +83,9 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with empty form" in new Fixture {
 
-        val responsiblePeople = ResponsiblePeople(personName)
+        val responsiblePeople = ResponsiblePerson(personName)
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
@@ -95,7 +95,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with data from save4later" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controllers.get(RecordId)(request)
@@ -108,7 +108,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       "display the country of birth page successfully with data from save4later for the option 'Yes'" in new Fixture {
 
-        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))
 
         val result = controllers.get(RecordId)(request)
@@ -126,17 +126,17 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
             "bornInUk" -> "false",
             "country" -> "FR"
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.NationalityController.get(RecordId).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
             meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceType), hasChanged = true))))(any(), any(), any())
         }
       }
@@ -147,17 +147,17 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
           val requestWithParams = request.withFormUrlEncodedBody(
             "bornInUk" -> "true"
           )
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-          when(controllers.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())
+          when(controllers.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())
             (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
           val result = controllers.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
-          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePeople]](any(),
+          verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
             meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any(), any())
         }
       }
@@ -165,7 +165,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
       "respond with BAD_REQUEST" when {
 
         "bornInUk field is not supplied" in new Fixture {
-          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any(), any(), any()))
+          when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val line1MissingRequest = request.withFormUrlEncodedBody()

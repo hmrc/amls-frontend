@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
-import models.responsiblepeople.{PersonResidenceType, ResponsiblePeople, Training}
+import models.responsiblepeople.{PersonResidenceType, ResponsiblePerson, Training}
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{ControllerHelper, RepeatingSection}
@@ -35,10 +35,10 @@ trait TrainingController extends RepeatingSection with BaseController {
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,Some(training),_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(Form2[Training](training), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(views.html.responsiblepeople.training(EmptyForm, edit, index, flow, personName.titleName))
           case _
           => NotFound(notFoundView)
@@ -50,12 +50,12 @@ trait TrainingController extends RepeatingSection with BaseController {
       implicit authContext => implicit request => {
         Form2[Training](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map {rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(views.html.responsiblepeople.training(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
-              cacheMap <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+              cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 rp.training(data)
               }
             } yield identifyRoutingTarget(index, edit, cacheMap, flow)

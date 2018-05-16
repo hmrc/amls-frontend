@@ -22,7 +22,7 @@ import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
@@ -41,10 +41,10 @@ class FitAndProperController @Inject()(
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-      getData[ResponsiblePeople](index) map {
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
+      getData[ResponsiblePerson](index) map {
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
           Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, config.showFeesToggle))
-        case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
           Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, config.showFeesToggle))
         case _ => NotFound(notFoundView)
       }
@@ -55,12 +55,12 @@ class FitAndProperController @Inject()(
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), config.showFeesToggle))
             }
           case ValidForm(_, data) => {
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.hasAlreadyPassedFitAndProper(Some(data))
               }
             } yield edit match {

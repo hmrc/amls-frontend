@@ -36,10 +36,10 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,Some(residencyType),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(Form2[PersonResidenceType](residencyType), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(person_residence_type(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -50,13 +50,13 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
       implicit request =>
         Form2[PersonResidenceType](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(person_residence_type(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             val residency = data.isUKResidence
             (for {
-              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+              cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 val nationality = rp.personResidenceType.fold[Option[Country]](None)(x => x.nationality)
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
@@ -65,7 +65,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                   case NonUKResidence => rp.personResidenceType(updatedData)
                 }
               })
-              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+              rp <- OptionT.fromOption[Future](cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
             } yield {
               redirectGivenResidency(residency, rp, index, edit, flow)
             }) getOrElse NotFound(notFoundView)
@@ -77,7 +77,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
 
   private def redirectGivenResidency(
                                       isUKResidence: Residency,
-                                      rp: Seq[ResponsiblePeople],
+                                      rp: Seq[ResponsiblePerson],
                                       index: Int,
                                       edit: Boolean = false,
                                       flow: Option[String]

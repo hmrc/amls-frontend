@@ -18,7 +18,7 @@ package typeclasses.confirmation
 
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency, RowEntity}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import typeclasses.confirmation.ResponsiblePeopleRowsInstances._
@@ -28,7 +28,7 @@ trait ConfirmationBreakdownRows[A] extends FeeCalculations {
              value: A,
              businessActivities: Option[BusinessActivities],
              premises: Option[Seq[TradingPremises]],
-             people: Option[Seq[ResponsiblePeople]]
+             people: Option[Seq[ResponsiblePerson]]
            ): Seq[BreakdownRow]
 
 }
@@ -41,7 +41,7 @@ object BreakdownRowInstances {
                  subscription: SubmissionResponse,
                  businessActivities: Option[BusinessActivities],
                  premises: Option[Seq[TradingPremises]],
-                 people: Option[Seq[ResponsiblePeople]]
+                 people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
         businessActivities match {
@@ -70,7 +70,7 @@ object BreakdownRowInstances {
                           value: AmendVariationRenewalResponse,
                           businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
-                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+                          people: Option[Seq[ResponsiblePerson]]) = {
 
         businessActivities match {
           case Some(activities) =>
@@ -144,7 +144,7 @@ object BreakdownRows {
                                 value: A,
                                 businessActivities: Option[BusinessActivities],
                                 premises: Option[Seq[TradingPremises]],
-                                people: Option[Seq[ResponsiblePeople]]
+                                people: Option[Seq[ResponsiblePerson]]
                               )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = b(value, businessActivities, premises, people)
 
 }

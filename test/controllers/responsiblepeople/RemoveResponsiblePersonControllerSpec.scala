@@ -60,8 +60,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")))))))
 
           val result = controller.get(1, false)(request)
 
@@ -72,8 +72,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(100, false)(request)
 
@@ -87,8 +87,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(RenewalSubmitted(None)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -105,8 +105,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(ReadyForRenewal(None)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -122,8 +122,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
           val result = controller.get(1, false)(request)
 
@@ -137,8 +137,8 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(100, false)(request)
 
@@ -147,14 +147,14 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
         "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
 
-          val rp = ResponsiblePeople(
+          val rp = ResponsiblePerson(
             Some(PersonName("firstName", None, "lastName"))
           )
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
           val result = controller.get(1, false)(request)
@@ -167,14 +167,14 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
       "the submission status is SubmissionReadyForReview" must {
         "respond with OK without showing endDate form when RP does not have lineId" in new Fixture{
 
-          val rp = ResponsiblePeople(
+          val rp = ResponsiblePerson(
             Some(PersonName("firstName", None, "lastName"))
           )
 
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
           val result = controller.get(1, false)(request)
@@ -186,7 +186,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
         }
         "respond with OK without showing endDate form when RP does have lineId" in new Fixture{
 
-          val rp = ResponsiblePeople(
+          val rp = ResponsiblePerson(
             personName = Some(PersonName("firstName", None, "lastName")),
             lineId = Some(4444)
           )
@@ -194,7 +194,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
           val result = controller.get(1, false)(request)
@@ -213,9 +213,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
@@ -224,7 +224,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
@@ -234,9 +234,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -245,7 +245,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
@@ -255,9 +255,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
@@ -266,7 +266,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
@@ -276,9 +276,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           val emptyCache = CacheMap("", Map.empty)
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReadyForReview))
@@ -288,7 +288,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
@@ -304,9 +304,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> "2006"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -315,7 +315,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](any(), meq(Seq(
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true,
               endDate = Some(ResponsiblePersonEndDate(new LocalDate(2006, 1, 1)))),
             CompleteResponsiblePeople2,
@@ -332,10 +332,10 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             responsiblePersonGen.sample.get.copy(lineId = None, positions = Some(positionsGen.sample.get.copy(startDate = None)))
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(people)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.statusService.getStatus(any(), any(), any()))
@@ -346,10 +346,10 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SummaryController.get().url))
 
-          val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePeople]])
-          verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), captor.capture())(any(), any(), any())
+          val captor = ArgumentCaptor.forClass(classOf[Seq[ResponsiblePerson]])
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key), captor.capture())(any(), any(), any())
 
-          captor.getValue mustBe Seq.empty[ResponsiblePeople]
+          captor.getValue mustBe Seq.empty[ResponsiblePerson]
         }
 
         "removing a responsible person from an application with no date" in new Fixture {
@@ -361,9 +361,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> ""
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1.copy(lineId = None)))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -385,9 +385,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> ""
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -407,9 +407,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> "16"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -429,9 +429,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> "10166"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -451,9 +451,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> "2020"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -477,9 +477,9 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             "endDate.year" -> "1998"
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(peopleList)))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
@@ -517,7 +517,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   //scalastyle:off magic.number
   val positions = Positions(Set(BeneficialOwner, InternalAccountant),Some(new LocalDate(2005, 3, 15)))
 
-  val CompleteResponsiblePeople1 = ResponsiblePeople(
+  val CompleteResponsiblePeople1 = ResponsiblePerson(
     Some(personName),
     Some(legalName),
     Some(legalNameChangeDate),
@@ -539,7 +539,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
     Some(1),
     Some("test")
   )
-  val CompleteResponsiblePeople2 = ResponsiblePeople(
+  val CompleteResponsiblePeople2 = ResponsiblePerson(
     Some(personName),
     Some(legalName),
     Some(legalNameChangeDate),
@@ -561,7 +561,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
     Some(1),
     Some("test")
   )
-  val CompleteResponsiblePeople3 = ResponsiblePeople(
+  val CompleteResponsiblePeople3 = ResponsiblePerson(
     Some(personName),
     Some(legalName),
     Some(legalNameChangeDate),

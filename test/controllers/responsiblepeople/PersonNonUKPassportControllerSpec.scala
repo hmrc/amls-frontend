@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePeople._
-import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePeople}
+import models.responsiblepeople.ResponsiblePerson._
+import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -66,9 +66,9 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         "data is not present" in new Fixture {
 
-          val responsiblePeople = ResponsiblePeople(Some(personName))
+          val responsiblePeople = ResponsiblePerson(Some(personName))
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = controller.get(1)(request)
@@ -83,14 +83,14 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         "data is present" in new Fixture {
 
-          val responsiblePeople = ResponsiblePeople(
+          val responsiblePeople = ResponsiblePerson(
             personName = Some(personName),
             nonUKPassport = Some(
               NonUKPassportYes(passportNumber)
             )
           )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
           val result = controller.get(1)(request)
@@ -107,8 +107,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       "display Not Found" when {
         "a populated ResponsiblePeople model cannot be found" in new Fixture {
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -127,10 +127,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassportNumber" -> passportNumber
           )
 
-          val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePerson()
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName)))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName)))))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -150,10 +150,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassportNumber" -> passportNumber
           )
 
-          val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePerson()
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName),
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName),
               dateOfBirth = Some(DateOfBirth(new LocalDate(1990, 1,22)))))))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -173,10 +173,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassport" -> "true"
           )
 
-          val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePerson()
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName = Some(personName))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -191,10 +191,10 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassport" -> "false"
           )
 
-          val responsiblePeople = ResponsiblePeople()
+          val responsiblePeople = ResponsiblePerson()
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName = Some(personName)))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName)))))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))

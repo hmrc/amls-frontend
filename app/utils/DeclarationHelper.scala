@@ -17,7 +17,7 @@
 package utils
 
 import controllers.{declaration, routes}
-import models.responsiblepeople.{Partner, ResponsiblePeople}
+import models.responsiblepeople.{Partner, ResponsiblePerson}
 import models.status._
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -29,26 +29,26 @@ import scala.concurrent.Future
 
 object DeclarationHelper {
 
-  def currentPartnersNames(responsiblePeople: Seq[ResponsiblePeople]): Seq[String] = {
+  def currentPartnersNames(responsiblePeople: Seq[ResponsiblePerson]): Seq[String] = {
     nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect {
       case p if p.positions.get.positions.contains(Partner) => p.personName.get.fullName
     }
   }
 
-  def numberOfPartners(responsiblePeople: Seq[ResponsiblePeople]): Int = {
+  def numberOfPartners(responsiblePeople: Seq[ResponsiblePerson]): Int = {
 
     nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
       case p if p.positions.get.positions.contains(Partner) => p
     }).size
   }
 
-  def nonPartners(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+  def nonPartners(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] = {
     nonDeletedResponsiblePeopleWithPositions(responsiblePeople).collect({
       case p if !p.positions.get.positions.contains(Partner) => p
     })
   }
 
-  private def nonDeletedResponsiblePeopleWithPositions(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] = {
+  private def nonDeletedResponsiblePeopleWithPositions(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] = {
     responsiblePeople.collect {
       case p if p.positions.isDefined & p.status.isEmpty => p
     }

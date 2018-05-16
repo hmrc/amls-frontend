@@ -32,7 +32,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness}
 import models.renewal._
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -146,7 +146,7 @@ class SubmissionServiceSpec extends AmlsSpec
     mockCacheGetEntry[EstateAgentBusiness](Some(mock[EstateAgentBusiness]), EstateAgentBusiness.key)
     mockCacheGetEntry[AboutTheBusiness](Some(aboutTheBusiness), AboutTheBusiness.key)
     mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
-    mockCacheGetEntry[Seq[ResponsiblePeople]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePeople.key)
+    mockCacheGetEntry[Seq[ResponsiblePerson]](Some(Seq(responsiblePersonGen.sample.get)), ResponsiblePerson.key)
     mockCacheGetEntry[AmendVariationRenewalResponse](Some(amendmentResponse), AmendVariationRenewalResponse.key)
     mockCacheGetEntry[Seq[TradingPremises]](Gen.listOf(tradingPremisesGen).sample, TradingPremises.key)
 

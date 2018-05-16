@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePeople}
+import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo}
 import org.scalatest.concurrent.ScalaFutures
@@ -52,9 +52,9 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
           lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
         val result = controller.get(RecordId)(request)
 
@@ -78,9 +78,9 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
           otherNames = Some("otherName")
         )
 
-        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson), knownBy = Some(otherPerson))
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), knownBy = Some(otherPerson))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
         val result = controller.get(RecordId)(request)
 
@@ -103,7 +103,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
               "otherNames" -> "otherName"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]
 
             val result = controller.post(RecordId)(requestWithParams)
@@ -120,7 +120,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
               "otherNames" -> "otherName"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]
 
             val result = controller.post(RecordId, true)(requestWithParams)
@@ -136,7 +136,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
           "hasOtherNames" -> "false"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[KnownBy]
 
           val result = controller.post(RecordId, true)(requestWithParams)
@@ -154,7 +154,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
             "hasOtherNames" -> "true"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[KnownBy]
 
           val result = controller.post(RecordId)(NameMissingInRequest)
@@ -172,7 +172,7 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
             "otherNames" -> "otherName"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[KnownBy]
 
           val result = controller.post(2)(requestWithParams)

@@ -30,7 +30,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
@@ -377,7 +377,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
     val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
     val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
-    val testResponsiblePeople = Seq(ResponsiblePeople(hasChanged = hasChanged))
+    val testResponsiblePeople = Seq(ResponsiblePerson(hasChanged = hasChanged))
     val testSupervision = Supervision(hasChanged = hasChanged)
     val testTcsp = Tcsp(hasChanged = hasChanged)
     val testTradingPremises = Seq(TradingPremises(hasChanged = hasChanged))
@@ -406,9 +406,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     }
 
     if (noRP) {
-      when(cacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())) thenThrow new JsResultException(Seq.empty)
+      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())) thenThrow new JsResultException(Seq.empty)
     } else {
-      when(cacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())).thenReturn(Some(testResponsiblePeople))
+      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(testResponsiblePeople))
     }
 
     if (includesResponse) {
@@ -463,7 +463,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())).thenReturn(None)
+              when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
               when(emptyCacheMap.getEntry[Supervision](Supervision.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(None)
               when(emptyCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(None)
@@ -565,7 +565,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             } thenReturn Future.successful(fixedCacheMap)
 
             when {
-              controller.cacheConnector.save[ResponsiblePeople](meq(ResponsiblePeople.key), any())(any(), any(), any())
+              controller.cacheConnector.save[ResponsiblePerson](meq(ResponsiblePerson.key), any())(any(), any(), any())
             } thenReturn Future.successful(fixedCacheMap)
 
             val result = controller.get()(request)

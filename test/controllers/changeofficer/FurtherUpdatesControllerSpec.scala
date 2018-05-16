@@ -47,13 +47,13 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
       Some(NewOfficer("NewOfficer"))
     )
 
-    val newOfficer = ResponsiblePeople(
+    val newOfficer = ResponsiblePerson(
       personName = Some(PersonName("New", None, "Officer")),
       positions = Some(Positions(Set(
         DesignatedMember
       ), None)))
 
-    val oldOfficer = ResponsiblePeople(
+    val oldOfficer = ResponsiblePerson(
       personName = Some(PersonName("Old", None, "Officer")),
       positions = Some(Positions(Set(
         NominatedOfficer
@@ -74,7 +74,7 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any())
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
     } thenReturn Future.successful(Some(responsiblePeople))
 
     when {
@@ -82,11 +82,11 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     } thenReturn Some(changeOfficer)
 
     when {
-      cacheMap.getEntry[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key))(any())
+      cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())
     } thenReturn Some(responsiblePeople)
 
     when {
-      controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())
+      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())
     } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
@@ -132,7 +132,7 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     "addNominatedOfficer is called" must {
       "add NominatedOfficer to the positions of the given responsible person" in new TestFixture {
 
-        val addNominatedOfficer = PrivateMethod[ResponsiblePeople]('addNominatedOfficer)
+        val addNominatedOfficer = PrivateMethod[ResponsiblePerson]('addNominatedOfficer)
 
         val result = controller invokePrivate addNominatedOfficer(newOfficer)
 
@@ -147,7 +147,7 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     "removeNominatedOfficers is called" must {
       "remove NominatedOfficer from the positions of the given responsible person" in new TestFixture {
 
-        val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('removeNominatedOfficers)
+        val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePerson]]('removeNominatedOfficers)
 
         val result = controller invokePrivate removeNominatedOfficers(responsiblePeople)
 
@@ -163,7 +163,7 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     "updateNominatedOfficers is called" must {
       "return a collection of responsible people with updated nominated officers" in new TestFixture {
 
-        val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePeople]]('updateNominatedOfficers)
+        val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePerson]]('updateNominatedOfficers)
 
         val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople, 0)
 
@@ -200,7 +200,7 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
 
       status(result) mustBe SEE_OTHER
 
-      verify(controller.dataCacheConnector).save[Seq[ResponsiblePeople]](meq(ResponsiblePeople.key), meq(Seq(
+      verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key), meq(Seq(
         newOfficer.copy(
           positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
           hasChanged = true,

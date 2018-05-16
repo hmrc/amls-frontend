@@ -24,7 +24,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.renewal.Renewal
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
 import org.joda.time.{DateTime, LocalDate}
@@ -154,8 +154,8 @@ class ConfirmationServiceSpec extends PlaySpec
     } thenReturn Some(Seq(tradingPremisesGen.sample.get))
 
     when {
-      cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-    } thenReturn Some(Seq(ResponsiblePeople()))
+      cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+    } thenReturn Some(Seq(ResponsiblePerson()))
 
     when {
       TestConfirmationService.cacheConnector.fetchAll(any(), any())
@@ -167,8 +167,8 @@ class ConfirmationServiceSpec extends PlaySpec
       "submit amendment returning submission data" in new Fixture {
 
         when {
-          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-        } thenReturn Some(Seq(ResponsiblePeople()))
+          cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+        } thenReturn Some(Seq(ResponsiblePerson()))
 
         when {
           TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
@@ -208,7 +208,7 @@ class ConfirmationServiceSpec extends PlaySpec
         } thenReturn Some(amendmentResponseWithRate)
 
         when {
-          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
         } thenReturn Some(Seq(responsiblePersonGen.sample.get))
 
         val rows = Seq(
@@ -230,8 +230,8 @@ class ConfirmationServiceSpec extends PlaySpec
       "not show negative fees for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
-          ResponsiblePeople(Some(PersonName("Unfit", Some("and"), "Unproper")), hasAlreadyPassedFitAndProper = Some(false)),
-          ResponsiblePeople(Some(PersonName("Fit", Some("and"), "Proper")), hasAlreadyPassedFitAndProper = Some(true))
+          ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), hasAlreadyPassedFitAndProper = Some(false)),
+          ResponsiblePerson(Some(PersonName("Fit", Some("and"), "Proper")), hasAlreadyPassedFitAndProper = Some(true))
         )
 
         val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
@@ -245,7 +245,7 @@ class ConfirmationServiceSpec extends PlaySpec
         } thenReturn Some(amendResponseWithRPFees)
 
         when {
-          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+          cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
         } thenReturn Some(people)
 
         val result = await(TestConfirmationService.getAmendment)
@@ -276,7 +276,7 @@ class ConfirmationServiceSpec extends PlaySpec
           cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
         } thenReturn Some(amendmentResponse)
 
-        when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(Seq(ResponsiblePeople()))
+        when(cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())) thenReturn Some(Seq(ResponsiblePerson()))
 
         val result = await(TestConfirmationService.getAmendment)
 
@@ -294,8 +294,8 @@ class ConfirmationServiceSpec extends PlaySpec
         "they have been deleted" in new Fixture {
 
           val people = Seq(
-            ResponsiblePeople(Some(PersonName("Valid", None, "Person"))),
-            ResponsiblePeople(Some(PersonName("Deleted", None, "Person")), status = Some(StatusConstants.Deleted))
+            ResponsiblePerson(Some(PersonName("Valid", None, "Person"))),
+            ResponsiblePerson(Some(PersonName("Deleted", None, "Person")), status = Some(StatusConstants.Deleted))
           )
 
           val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
@@ -308,7 +308,7 @@ class ConfirmationServiceSpec extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(amendResponseWithRPFees)
 
-          when(cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())) thenReturn Some(people)
+          when(cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())) thenReturn Some(people)
 
           val result = await(TestConfirmationService.getAmendment)
 
@@ -329,8 +329,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           val result = await(TestConfirmationService.getAmendment)
 
@@ -356,8 +356,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           when {
             activities.businessActivities
@@ -385,8 +385,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           when {
             activities.businessActivities
@@ -418,8 +418,8 @@ class ConfirmationServiceSpec extends PlaySpec
         } thenReturn Some(Seq(TradingPremises()))
 
         when {
-          cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-        } thenReturn Some(Seq(ResponsiblePeople()))
+          cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+        } thenReturn Some(Seq(ResponsiblePerson()))
 
         val result = await(TestConfirmationService.getAmendment)
 
@@ -717,8 +717,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           val result = await(TestConfirmationService.getSubscription)
 
@@ -755,7 +755,7 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
           } thenReturn Some(Seq(responsiblePersonGen.sample.get, responsiblePersonGen.sample.get))
 
           val result = await(TestConfirmationService.getSubscription)
@@ -795,8 +795,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           when {
             activities.businessActivities
@@ -823,8 +823,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           when {
             activities.businessActivities
@@ -854,8 +854,8 @@ class ConfirmationServiceSpec extends PlaySpec
           } thenReturn Some(Seq(TradingPremises()))
 
           when {
-            cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-          } thenReturn Some(Seq(ResponsiblePeople()))
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
           val result = await(TestConfirmationService.getSubscription)
 
@@ -890,9 +890,9 @@ class ConfirmationServiceSpec extends PlaySpec
               cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
             } thenReturn Some(Seq(TradingPremises()))
 
-            when {
-              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-            } thenReturn Some(Seq(ResponsiblePeople()))
+          when {
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
             val result = TestConfirmationService.getBreakdownRows(
               SubmissionReady,
@@ -914,9 +914,9 @@ class ConfirmationServiceSpec extends PlaySpec
               cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
             } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-            when {
-              cache.getEntry[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any())
-            } thenReturn Some(Seq(ResponsiblePeople()))
+          when {
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
 
             val result = TestConfirmationService.getBreakdownRows(
               SubmissionReadyForReview,
