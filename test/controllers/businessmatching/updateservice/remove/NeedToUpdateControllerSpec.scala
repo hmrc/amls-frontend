@@ -16,12 +16,42 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import models.flowmanagement.RemoveBusinessTypeFlowModel
+import org.jsoup.Jsoup
+import play.api.i18n.Messages
+import play.api.test.Helpers.{OK, contentAsString, status}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class NeedToUpdateControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
+
+    val request = addToken(authRequest)
+
+    val controller = new WhatDateRemovedController(
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      router = createRouter[RemoveBusinessTypeFlowModel]
+    )
+  }
+
+  "NeedToUpdateController" when {
+
+    "get is called" must {
+
+      "return OK with need_to_update view" in new Fixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.updateotherinformation.title"))
+      }
+
+      "pass the url for the continue through to the page" in new Fixture {
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        Option(Jsoup.parse(contentAsString(result)).body().getElementById("continue-button").attr("href")) mustBe defined
+      }
+    }
   }
 
 }

@@ -1177,6 +1177,11 @@ businessmatching.updateservice.removeactivities.summary = You must have at least
 businessmatching.updateservice.removeactivities.list.heading = Choose at least one
 businessmatching.updateservice.removeactivities.button = Continue
 
+businessmatching.updateservice.updateotherinformation.title = We need you to update other information
+businessmatching.updateservice.updateotherinformation.hint = You've told us your business needs to remove accountancy service provider activities.
+businessmatching.updateservice.updateotherinformation.text = You might need to edit other sections based on any of the new information you provide.
+
+
 #   Add route Start  ###################################################################################################
 businessmatching.updateservice.msb.services.title = Which services does your business provide?
 businessmatching.updateservice.msb.services.heading = Which services does your business provide?
