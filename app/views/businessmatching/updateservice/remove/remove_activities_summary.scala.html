@@ -16,9 +16,10 @@
 
 @import include.forms2.checkYourAnswers
 @import include.{heading, main}
-@import models.flowmanagement.RemoveServiceFlowModel
+@import models.flowmanagement.RemoveBusinessTypeFlowModel
+@import controllers.businessmatching.updateservice.remove.routes
 
-@(model: RemoveServiceFlowModel)(implicit m: Messages, r: Request[_])
+@(model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_])
 
 @header = {
  @heading(
@@ -34,8 +35,8 @@
 
   @model.activitiesToRemove.map { activities =>
    @checkYourAnswers(
-    question = Messages("updateservice.removeactivities.header"),
-    editUrl = controllers.businessmatching.updateservice.remove.routes.RemoveActivitiesController.get().url
+    question = Messages("businessmatching.updateservice.removeactivities.heading"),
+    editUrl = routes.RemoveBusinessTypesController.get().url
    ) {
     <p>@activities.map(_.getMessage).mkString(", ")</p>
    }

@@ -1,4 +1,3 @@
-<<<<<<< HEAD:test/views/TitleValidator.scala
 /*
  * Copyright 2018 HM Revenue & Customs
  *
@@ -25,5 +24,3 @@ trait TitleValidator extends MustMatchers {
   def validateTitle(title: String)(implicit m: Messages, doc: Document) =
     doc.title mustBe s"${m(title)} - ${m("title.amls")} - ${m("title.gov")}"
 }
-=======
->>>>>>> origin/master:test/controllers/businessmatching/updateservice/remove/RemoveServicesSummaryControllerSpec.scala
