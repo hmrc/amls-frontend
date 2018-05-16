@@ -45,7 +45,7 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
           optionalCache =>
             (for {
               cache <- optionalCache
-              rp <- getData[ResponsiblePeople](cache, index)
+              rp <- getData[ResponsiblePerson](cache, index)
               addr <- rp.addressHistory
             } yield {
               addr.currentAddress match {
@@ -64,7 +64,7 @@ class MovedAddressController @Inject()(override val messagesApi: MessagesApi,
             optionalCache =>
               (for {
                 cache <- optionalCache
-                rp <- getData[ResponsiblePeople](cache, index)
+                rp <- getData[ResponsiblePerson](cache, index)
                 addr <- rp.addressHistory
               } yield {
                 addr.currentAddress match {

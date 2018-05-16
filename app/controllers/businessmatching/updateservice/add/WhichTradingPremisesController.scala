@@ -20,12 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivities
 import models.businessmatching.updateservice.TradingPremisesActivities
-import models.flowmanagement.{AddServiceFlowModel, WhichTradingPremisesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, WhichTradingPremisesPageId}
 import models.tradingpremises.TradingPremises
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -45,8 +45,8 @@ class WhichTradingPremisesController @Inject()(
                                                 implicit val dataCacheConnector: DataCacheConnector,
                                                 val statusService: StatusService,
                                                 val businessMatchingService: BusinessMatchingService,
-                                                val helper: UpdateServiceHelper,
-                                                val router: Router[AddServiceFlowModel]
+                                                val helper: AddBusinessTypeHelper,
+                                                val router: Router[AddBusinessTypeFlowModel]
                                               ) extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -61,7 +61,7 @@ class WhichTradingPremisesController @Inject()(
   }
 
   private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext) = for {
-    flowModel <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+    flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
     activity <- OptionT.fromOption[Future](flowModel.activity)
     tradingPremises <- OptionT.liftF(tradingPremises)
   } yield (flowModel, activity, tradingPremises)
@@ -82,7 +82,7 @@ class WhichTradingPremisesController @Inject()(
           } getOrElse InternalServerError("Cannot retrieve form data")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.tradingPremisesActivities(Some(data))
           } flatMap {
             case Some(model) => router.getRoute(WhichTradingPremisesPageId, model)

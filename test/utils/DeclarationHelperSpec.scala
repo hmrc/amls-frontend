@@ -61,7 +61,7 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
   "numberOfPartners" must {
     "return 0 when there are no partners" in {
 
-      numberOfPartners(Seq(ResponsiblePeople())) mustBe 0
+      numberOfPartners(Seq(ResponsiblePerson())) mustBe 0
 
     }
 
@@ -162,19 +162,19 @@ class DeclarationHelperSpec extends PlaySpec with MustMatchers with MockitoSugar
     }
   }
 
-  val partnerWithName = ResponsiblePeople(
+  val partnerWithName = ResponsiblePerson(
     personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Partner), None)),
     status = None
   )
 
-  val deletedPartner = ResponsiblePeople(
+  val deletedPartner = ResponsiblePerson(
     personName = Some(PersonName("FirstName2", None, "LastName2")),
     positions = Some(Positions(Set(Partner), None)),
     status = Some(StatusConstants.Deleted)
   )
 
-  val nonPartnerWithName = ResponsiblePeople(
+  val nonPartnerWithName = ResponsiblePerson(
     personName = Some(PersonName("FirstName1", None, "LastName1")),
     positions = Some(Positions(Set(Director), None)),
     status = None

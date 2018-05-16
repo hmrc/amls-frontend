@@ -53,7 +53,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {rp =>
+        getData[ResponsiblePerson](index) map { rp =>
           Ok(are_they_nominated_officer(Form2[Option[Boolean]](None), edit, index, flow, ControllerHelper.rpTitleName(rp)))
         }
     }
@@ -65,13 +65,13 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
       implicit authContext => implicit request =>
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
-            getData[ResponsiblePeople](index) map { rp =>
+            getData[ResponsiblePerson](index) map { rp =>
               BadRequest(are_they_nominated_officer(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
 
             for {
-              _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
 
                 rp.positions match {
                   case Some(pos) if (data & !rp.isNominatedOfficer) =>
@@ -79,7 +79,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
                   case _ => rp
                 }
               }
-              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+              rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
             } yield {
               redirectDependingOnEdit(index, edit, rpSeqOption, flow)(request)
             }
@@ -90,7 +90,7 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
         }
     }
 
-  private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePeople]],
+  private def redirectDependingOnEdit(index: Int, edit: Boolean, rpSeqOption: Option[Seq[ResponsiblePerson]],
                                       flow: Option[String])(implicit request: Request[AnyContent]) = {
     rpSeqOption match {
       case Some(rpSeq) => edit match {

@@ -22,7 +22,7 @@ import models.Country
 import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -59,7 +59,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
-    val responsiblePerson = ResponsiblePeople(
+    val responsiblePerson = ResponsiblePerson(
       hasAlreadyPassedFitAndProper = Some(true),
       lineId = Some(1)
     )
@@ -91,8 +91,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
         val businessMatching = BusinessMatching(Some(reviewDtls))
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-          .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+          .thenReturn(Some(Seq(ResponsiblePerson(personName))))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
         val result = controller.get(RecordId)(request)
@@ -109,13 +109,13 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       "Prepopulate form with a single saved data" in new Fixture {
 
         val positions = Positions(Set(BeneficialOwner), startDate)
-        val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
+        val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -141,14 +141,14 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       "Prepopulate form with multiple saved data" in new Fixture {
 
         val positions = Positions(Set(Director), startDate)
-        val responsiblePeople = ResponsiblePeople(personName = personName, positions = Some(positions))
+        val responsiblePeople = ResponsiblePerson(personName = personName, positions = Some(positions))
 
         val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
           Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
         val businessMatching = BusinessMatching(Some(reviewDtls))
 
         val mockCacheMap = mock[CacheMap]
-        when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any())).thenReturn(Some(Seq(responsiblePeople)))
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(businessMatching))
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -176,14 +176,14 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
           val mockCacheMap = mock[CacheMap]
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(mockBusinessMatching))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
@@ -203,8 +203,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
           val mockCacheMap = mock[CacheMap]
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(mockBusinessMatching))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -222,8 +222,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
           val mockCacheMap = mock[CacheMap]
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(mockBusinessMatching))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -243,8 +243,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           val mockBusinessMatching: BusinessMatching = mock[BusinessMatching]
 
           val mockCacheMap = mock[CacheMap]
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(mockBusinessMatching))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -263,8 +263,8 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           val businessMatching = BusinessMatching(Some(reviewDtls))
 
           val mockCacheMap = mock[CacheMap]
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePeople(personName))))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName))))
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(businessMatching))
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
@@ -287,12 +287,12 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
               "startDate.month" -> "2",
               "startDate.year" -> "1990")
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
 
             val mockCacheMap = mock[CacheMap]
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -302,7 +302,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           "another position is selected in addition to the nomindated Officer" in new Fixture {
 
             val positions = Positions(Set(Director, NominatedOfficer), startDate)
-            val responsiblePeople = ResponsiblePeople(positions = Some(positions))
+            val responsiblePeople = ResponsiblePerson(positions = Some(positions))
 
             val newRequest = request.withFormUrlEncodedBody(
               "positions" -> "06",
@@ -312,10 +312,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
               "startDate.year" -> "1990"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
             val mockCacheMap = mock[CacheMap]
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -334,10 +334,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
               "startDate.month" -> "2",
               "startDate.year" -> "1990")
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
             val mockCacheMap = mock[CacheMap]
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -354,10 +354,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
               "startDate.year" -> "1990"
             )
 
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
               .thenReturn(Future.successful(Some(Seq(hasNominatedOfficerButDeleted))))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
@@ -377,10 +377,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
           val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
@@ -394,10 +394,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             "startDate.month" -> "2",
             "startDate.year" -> "1990")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
           val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId, true)(newRequest)
           status(result) must be(SEE_OTHER)

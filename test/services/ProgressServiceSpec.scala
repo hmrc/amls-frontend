@@ -65,8 +65,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
       "business is a partnership and there are 2 partners and 1 nominated officer" in new Fixture {
 
         val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None,None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None,None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -80,7 +80,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReady)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -91,8 +91,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
       "business is not a prtnership and at least one of the person in responsible people is the nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -106,7 +106,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReady)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -118,8 +118,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
     "return register partners url" when {
       "business is a partnership and there are less than 2 partners" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -133,7 +133,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReady)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -145,8 +145,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
     "return who is registering url" when {
       "status is amendment and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -160,7 +160,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReadyForReview)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -170,8 +170,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
       "status is variation and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -185,7 +185,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -195,8 +195,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
       "status is renewal and there is a nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -210,7 +210,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(ReadyForRenewal(None))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -224,8 +224,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
           val businessMatching = BusinessMatching(reviewDetails = Some(
             ReviewDetails(
@@ -239,7 +239,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
           mockApplicationStatus(SubmissionReady)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
           whenReady(service.getSubmitRedirect) {
@@ -253,8 +253,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
           override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
 
           val positions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), Some(new LocalDate()))
-          val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-          val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+          val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
           val responsiblePeople = Seq(rp1, rp2)
           val businessMatching = BusinessMatching(reviewDetails = Some(
             ReviewDetails(
@@ -268,7 +268,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
           mockApplicationStatus(SubmissionReady)
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
           mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
           whenReady(service.getSubmitRedirect) {
@@ -282,8 +282,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
     "return Who is the business’s nominated officer? url" when {
       "there is no selected nominated officer" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -297,7 +297,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReady)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -307,8 +307,8 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
       "there is no selected nominated officer and status is amendment" in new Fixture {
         val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
-        val rp1 = ResponsiblePeople(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-        val rp2 = ResponsiblePeople(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
+        val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
         val responsiblePeople = Seq(rp1, rp2)
         val businessMatching = BusinessMatching(reviewDetails = Some(
           ReviewDetails(
@@ -322,7 +322,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionDecisionApproved)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(responsiblePeople), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(responsiblePeople), Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {
@@ -347,7 +347,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
 
         mockApplicationStatus(SubmissionReady)
 
-        mockCacheFetch[Seq[ResponsiblePeople]](None, Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](None, Some(ResponsiblePerson.key))
         mockCacheFetch[BusinessMatching](Some(businessMatching), Some(BusinessMatching.key))
 
         whenReady(service.getSubmitRedirect) {

@@ -65,17 +65,17 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
     val personName1 = PersonName("firstName1", Some("middleName1"), "lastName1")
     val positions = Positions(Set(BeneficialOwner, InternalAccountant), Some(new LocalDate()))
     val positions1 = Positions(Set(BeneficialOwner, InternalAccountant, Partner), Some(new LocalDate()))
-    val rp = ResponsiblePeople (
+    val rp = ResponsiblePerson (
       personName = Some(personName),
       positions = Some(positions),
       status = None
     )
-    val rp2 = ResponsiblePeople (
+    val rp2 = ResponsiblePerson (
       personName = Some(personName1),
       positions = Some(positions1),
       status = None
     )
-    val rp1 = ResponsiblePeople(
+    val rp1 = ResponsiblePerson(
       personName = Some(personName),
       positions = Some(positions),
       status = Some(StatusConstants.Deleted)
@@ -88,8 +88,8 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       "respond with OK" in new Fixture {
 
         when {
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(Seq(ResponsiblePeople())))
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(),any(),any())
+        } thenReturn Future.successful(Some(Seq(ResponsiblePerson())))
 
         when {
           statusService.getStatus(any(),any(),any())
@@ -108,7 +108,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody("value" -> "firstNamemiddleNamelastName")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
@@ -117,7 +117,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
           val updatedList = Seq(rp.copy(positions = Some(positions.copy(positions
             = Set(BeneficialOwner, InternalAccountant, Partner)))), rp2)
 
-          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePeople]]](any(), meq(Some(updatedList)))(any(), any(), any()))
+          when(controller.dataCacheConnector.save[Option[Seq[ResponsiblePerson]]](any(), meq(Some(updatedList)))(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
 
           when(controller.progressService.getSubmitRedirect(any(), any(), any()))
@@ -134,7 +134,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
       "fail validation" when {
         "no option is selected on the UI and status is submissionready" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
@@ -148,7 +148,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and status is SubmissionReadyForReview" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
@@ -162,7 +162,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and status is ReadyForRenewal" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(responsiblePeoples)))
 
           when(controller.statusService.getStatus(any(),any(),any()))
@@ -176,7 +176,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
         "no option is selected on the UI and no responsible people returned" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody()
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           when(controller.statusService.getStatus(any(),any(),any()))

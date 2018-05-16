@@ -23,7 +23,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.{NewHomeAddress, NewHomeDateOfChange, ResponsiblePeople}
+import models.responsiblepeople.{NewHomeAddress, NewHomeDateOfChange, ResponsiblePerson}
 import org.joda.time.LocalDate
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -46,7 +46,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
             cacheMap =>
               (for {
                 cache <- cacheMap
-                rp <- getData[ResponsiblePeople](cache, index)
+                rp <- getData[ResponsiblePerson](cache, index)
               } yield cache.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key) match {
                 case Some(dateOfChange) => Future.successful(Ok(new_home_date_of_change(Form2(dateOfChange),
                   index, rp.personName.fold[String]("")(_.fullName))))
@@ -58,7 +58,7 @@ class NewHomeAddressDateOfChangeController @Inject()(val dataCacheConnector: Dat
   }
 
   private def activityStartDateField(index: Int)(implicit authContext: AuthContext, request: Request[AnyContent]) = {
-    getData[ResponsiblePeople](index) map { x =>
+    getData[ResponsiblePerson](index) map { x =>
       val startDate = x.fold[Option[LocalDate]](None)(_.positions.fold[Option[LocalDate]](None)(_.startDate))
       val personName = ControllerHelper.rpTitleName(x)
       (startDate, personName)

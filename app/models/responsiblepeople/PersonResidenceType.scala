@@ -70,6 +70,6 @@ object PersonResidenceType {
       ) (unlift(PersonResidenceType.unapply))
   }
 
-  implicit def convert(s: PersonResidenceType): Option[ResponsiblePeople] =
-    Some(ResponsiblePeople(None, None, None, None, Some(s), None))
+  implicit def convert(s: PersonResidenceType): Option[ResponsiblePerson] =
+    Some(ResponsiblePerson(None, None, None, None, Some(s), None))
 }

@@ -19,7 +19,7 @@ package services
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -31,11 +31,11 @@ import scala.concurrent.{ExecutionContext, Future}
 class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnector) extends RepeatingSection {
 
   def getAll(implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext) =
-    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
       _.getOrElse(Seq.empty)
     }
 
-  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePeople], indices: Set[Int]): Seq[ResponsiblePeople] =
+  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int]): Seq[ResponsiblePerson] =
     responsiblePeople.zipWithIndex.map { case (rp, index) =>
       val updated = if (indices contains index) {
         rp.hasAlreadyPassedFitAndProper(Some(true))
@@ -49,16 +49,16 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
 
 object ResponsiblePeopleService {
 
-  def isActive(person: ResponsiblePeople) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
+  def isActive(person: ResponsiblePerson) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
 
-  implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePeople, Int)]) {
+  implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePerson, Int)]) {
     def exceptInactive = people filter {
       case (person, _) if isActive(person) => true
       case _ => false
     }
   }
 
-  implicit class ResponsiblePeopleListHelpers(people: Seq[ResponsiblePeople]) {
+  implicit class ResponsiblePeopleListHelpers(people: Seq[ResponsiblePerson]) {
     def exceptInactive = people filter {
       case person if isActive(person) => true
       case _ => false

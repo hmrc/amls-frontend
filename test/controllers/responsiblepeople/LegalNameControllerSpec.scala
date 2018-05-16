@@ -53,10 +53,10 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
           lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson))
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson))
 
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
 
         val result = controller.get(RecordId)(request)
@@ -84,9 +84,9 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
           lastName = Some("lastPrevious")
         )
 
-        val responsiblePeople = ResponsiblePeople(personName = Some(addPerson), legalName = Some(previousPerson))
+        val responsiblePeople = ResponsiblePerson(personName = Some(addPerson), legalName = Some(previousPerson))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePeople)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePeople)), Some(ResponsiblePerson.key))
 
 
         val result = controller.get(RecordId)(request)
@@ -114,7 +114,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
               "lastName" -> "last"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId)(requestWithParams)
@@ -133,7 +133,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
               "lastName" -> "last"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId, true)(requestWithParams)
@@ -146,7 +146,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
               "hasPreviousName" -> "false"
             )
 
-            mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[PreviousName]
 
             val result = controller.post(RecordId, true)(requestWithParams)
@@ -162,7 +162,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
             "hasPreviousName" -> "true"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
 
           val result = controller.post(RecordId)(NameMissingInRequest)
@@ -181,7 +181,7 @@ class LegalNameControllerSpec extends AmlsSpec with ScalaFutures {
             "lastName" -> "last"
           )
 
-          mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(ResponsiblePeople())))
+          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
           mockCacheSave[PreviousName]
 
           val result = controller.post(2)(requestWithParams)

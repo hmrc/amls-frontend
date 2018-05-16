@@ -32,24 +32,23 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class AddTCSPSpecificRouterSpec extends AmlsSpec {
 
-  val model = AddServiceFlowModel(activity = Some(TrustAndCompanyServices))
+  val model = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
 
   trait Fixture extends DependencyMocks {
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
-    val router = new VariationAddServiceRouter(
+    val router = new AddBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
-      addMoreActivitiesPageRouter = new AddMoreActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
+      addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
       fitAndProperPageRouter = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      newServicesInformationPageRouter = new NewServicesInformationPageRouter(mockStatusService, mockBusinessMatchingService),
+      newServicesInformationPageRouter = new NeedMoreInformationPageRouter(mockStatusService, mockBusinessMatchingService),
       noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
-      selectActivitiesPageRouter = new SelectActivitiesPageRouter(mockStatusService, mockBusinessMatchingService),
-      subServicesPageRouter = new SubServicesPageRouter(mockStatusService, mockBusinessMatchingService),
+      selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
+      subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
       tradingPremisesPageRouter = new TradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService),
-      changeServicesPageRouter = new ChangeServicesPageRouter(mockStatusService, mockBusinessMatchingService),
-      updateServicesSummaryPageRouter = new UpdateServicesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+      updateServicesSummaryPageRouter = new AddBusinessTypeSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       whatDoYouDoHerePageRouter = new WhatDoYouDoHerePageRouter(mockStatusService, mockBusinessMatchingService),
       whichFitAndProperPageRouter = new WhichFitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
       whichTradingPremisesPageRouter = new WhichTradingPremisesPageRouter(mockStatusService, mockBusinessMatchingService)
@@ -64,7 +63,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'What Type of business ....' page (SelectActivitiesPageId)" when {
         "TCSP is selected" in new Fixture {
 
-          val result = await(router.getRoute(SelectActivitiesPageId, model))
+          val result = await(router.getRoute(SelectBusinessTypesPageId, model))
 
           result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
@@ -75,7 +74,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'Fit and proper' page (FitAndProperPageId)" when {
         "TCSP is the Business Activity" when {
           "the answer is yes" in new Fixture {
-            val model = AddServiceFlowModel(
+            val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               fitAndProper = Some(true))
             val result = await(router.getRoute(FitAndProperPageId, model))
@@ -90,7 +89,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'Fit and Proper' page (FitAndProperPageId)" when {
         "TCSP is the Business Activity" when {
           "the answer is no" in new Fixture {
-            val model = AddServiceFlowModel(
+            val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               fitAndProper = Some(false))
             val result = await(router.getRoute(FitAndProperPageId, model))
@@ -115,7 +114,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'Trading Premises' page (TradingPremisesPageId)" when {
         "TCSP is the Business Activity" when {
           "the answer is yes" in new Fixture {
-            val model = AddServiceFlowModel(
+            val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               areNewActivitiesAtTradingPremises = Some(true))
 
@@ -131,13 +130,13 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       "the user is on the 'Which Trading Premises' page (TradingPremisesPageId)" when {
         "TCSP is the Business Activity" when {
           "the answer is no" in new Fixture {
-            val model = AddServiceFlowModel(
+            val model = AddBusinessTypeFlowModel(
               activity = Some(TrustAndCompanyServices),
               areNewActivitiesAtTradingPremises = Some(false))
 
             val result = await(router.getRoute(TradingPremisesPageId, model))
 
-            result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+            result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
           }
         }
       }
@@ -148,7 +147,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
         "TCSP is the Business Activity" in new Fixture {
           val result = await(router.getRoute(WhichTradingPremisesPageId, model))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -161,7 +160,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'which-fit-and-proper' page (WhichFitAndProperController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
         "and the answer is yes" in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(true))
           val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
@@ -175,12 +174,12 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Fit and Proper' page (FitAndProperPageId)" when {
         " and the answer is no " in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(false))
           val result = await(router.getRoute(FitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -189,13 +188,13 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Which Fit and Proper' page (WhichFitAndProperPageId)" when {
         "responsible people have been selected" in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             fitAndProper = Some(true),
             responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichFitAndProperPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -204,7 +203,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'which-trading-premises' page (WhichTradingPremisesController)" when {
       "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         "and the answer is yes" in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(true))
           val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
@@ -218,12 +217,12 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Trading Premises' page (TradingPremisesPageId)" when {
         " and the answer is no " in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(false))
           val result = await(router.getRoute(TradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }
@@ -232,13 +231,13 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
     "return the 'Check your answers' page (UpdateServicesSummaryController)" when {
       "editing the 'Which Trading Premises' page (WhichTradingPremisesPageId)" when {
         "trading premises have been selected" in new Fixture {
-          val model = AddServiceFlowModel(
+          val model = AddBusinessTypeFlowModel(
             activity = Some(TrustAndCompanyServices),
             areNewActivitiesAtTradingPremises = Some(true),
             tradingPremisesActivities = Some(TradingPremisesActivities(Set(0, 1, 2, 3))))
           val result = await(router.getRoute(WhichTradingPremisesPageId, model, edit = true))
 
-          result mustBe Redirect(addRoutes.UpdateServicesSummaryController.get())
+          result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
       }
     }

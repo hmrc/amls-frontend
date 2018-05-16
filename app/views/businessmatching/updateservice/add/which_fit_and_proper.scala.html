@@ -17,9 +17,9 @@
 @import include._
 @import forms2._
 @import utils.HtmlElementHelpers._
-@import models.responsiblepeople.ResponsiblePeople
+@import models.responsiblepeople.ResponsiblePerson
 
-@(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePeople, Int)])(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m:Messages)
 
     @header = {
         @errorSummary(f)

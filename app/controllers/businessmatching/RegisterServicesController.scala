@@ -24,7 +24,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -89,7 +89,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
             } yield savedModel) flatMap { savedActivities =>
-              getData[ResponsiblePeople] flatMap { responsiblePeople =>
+              getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
                   if(promptFitAndProper(responsiblePeople)){
                     updateResponsiblePeople(resetHasAccepted(responsiblePeople)) map { _ =>
@@ -196,17 +196,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePeople]) =
+  private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
     responsiblePeople.foldLeft(true){ (x, rp) =>
       x & rp.hasAlreadyPassedFitAndProper.isEmpty
     }
 
-  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
+  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
       rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
     }
 
-  private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePeople]): Seq[ResponsiblePeople] =
+  private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
       rp.hasAlreadyPassedFitAndProper match {
         case None => rp.copy(hasAccepted = false)
@@ -214,6 +214,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePeople])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    dataCacheConnector.save[Seq[ResponsiblePeople]](ResponsiblePeople.key, responsiblePeople)
+  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
 }

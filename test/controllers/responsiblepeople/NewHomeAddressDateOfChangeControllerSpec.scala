@@ -50,7 +50,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
   "NewHomeAddressDateOfChangeController" must {
 
-    val responsiblePeople = ResponsiblePeople(personName = Some(PersonName("FirstName",
+    val responsiblePeople = ResponsiblePerson(personName = Some(PersonName("FirstName",
       None, "lastName")),
       positions = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2009,1,1)))))
 
@@ -58,7 +58,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
       "successfully load when the person moved to new address page" when {
         "date of change model exists in save4later" in new Fixture {
 
-          when(cacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(Some(NewHomeDateOfChange(Some(LocalDate.now()))))
           when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
@@ -70,7 +70,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
         "date of change model in not persisted in save4later" in new Fixture {
 
-          when(cacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
           when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
@@ -80,7 +80,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         }
 
         "load NotFound view when index is not in range" in new Fixture {
-          when(cacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(None)
           when(cacheMap.getEntry[NewHomeDateOfChange](NewHomeDateOfChange.key)).thenReturn(None)
           when(controller.dataCacheConnector.fetchAll(any(), any())).thenReturn(Future.successful(Some(cacheMap)))
@@ -98,7 +98,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.month" -> "5",
           "dateOfChange.year" -> "2014"
         )
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())
@@ -114,7 +114,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
           "dateOfChange.day" -> "01"
         )
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
           when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(cacheMap))
@@ -133,7 +133,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         )
 
         val position = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2011,1,1))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(positions = position)))))
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(cacheMap))
@@ -151,7 +151,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
         )
 
         val position = Some(Positions(Set(BeneficialOwner),Some(new LocalDate(2011,1,1))))
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(None))
         when(controller.dataCacheConnector.save[NewHomeDateOfChange](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(cacheMap))

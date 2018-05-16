@@ -16,7 +16,9 @@
 
 package services.flowmanagement
 
+import models.flowmanagement.PageId
 import play.api.mvc.Result
+import play.api.mvc.Results.InternalServerError
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -27,5 +29,8 @@ trait PageRouter[A] {
                                                               hc: HeaderCarrier,
                                                               ec: ExecutionContext
   ): Future[Result]
+
+
+  def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }
 

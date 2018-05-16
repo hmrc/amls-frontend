@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.Country
 import models.autocomplete.NameValuePair
-import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -64,9 +64,9 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "load nationality page" in new Fixture {
 
-      val responsiblePeople = ResponsiblePeople(personName)
+      val responsiblePeople = ResponsiblePerson(personName)
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = controller.get(1)(request)
@@ -82,9 +82,9 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     "load Not found page" when {
       "get throws not found exception" in new Fixture {
 
-        val responsiblePeople = ResponsiblePeople()
+        val responsiblePeople = ResponsiblePerson()
 
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = controller.get(3)(request)
@@ -99,9 +99,9 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
     "load nationality page when nationality is none" in new Fixture {
 
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
-      val responsiblePeople = ResponsiblePeople(personName, personResidenceType = Some(pResidenceType))
+      val responsiblePeople = ResponsiblePerson(personName, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val result = controller.get(1)(request)
@@ -116,8 +116,8 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
     "pre-populate UI with data from sav4later" in new Fixture {
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(
           personName,
           personResidenceType = Some(PersonResidenceType(
             NonUKResidence,
@@ -136,10 +136,10 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
 
       val newRequest = request.withFormUrlEncodedBody()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-        .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(personName)))))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+        .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -154,12 +154,12 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         "nationality" -> "01"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -174,12 +174,12 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         "otherCountry" -> "GB"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1)(newRequest)
@@ -195,18 +195,18 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
       )
 
       val pResidenceType = PersonResidenceType(UKResidence(Nino(nextNino)), Some(Country("United Kingdom", "GB")), None)
-      val responsiblePeople = ResponsiblePeople(None, personResidenceType = Some(pResidenceType))
+      val responsiblePeople = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
       val prt = pResidenceType.copy(nationality = Some(Country("France", "FR")))
-      val responsiblePeople1 = ResponsiblePeople(None, personResidenceType = Some(pResidenceType))
+      val responsiblePeople1 = ResponsiblePerson(None, personResidenceType = Some(pResidenceType))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), meq(Seq(responsiblePeople1)))(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople1)))(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
@@ -220,12 +220,12 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
         "nationality" -> "01"
       )
 
-      val responsiblePeople = ResponsiblePeople()
+      val responsiblePeople = ResponsiblePerson()
 
-      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+      when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
-      when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(10, true)(newRequest)

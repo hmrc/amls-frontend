@@ -20,7 +20,7 @@ import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.{PersonRegistered, VATRegistered, ResponsiblePeople}
+import models.responsiblepeople.{PersonRegistered, VATRegistered, ResponsiblePerson}
 import utils.{StatusConstants, RepeatingSection}
 import views.html.responsiblepeople._
 
@@ -32,7 +32,7 @@ trait PersonRegisteredController extends BaseController {
 
   def get(index: Int, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
-        dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) map {
+        dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
           case Some(data) =>
             val count = data.count(x => {
               !x.status.contains(StatusConstants.Deleted) &&

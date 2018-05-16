@@ -20,11 +20,11 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.UpdateServiceHelper
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessActivity}
-import models.flowmanagement.{AddServiceFlowModel, TradingPremisesPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, TradingPremisesPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -42,8 +42,8 @@ class TradingPremisesController @Inject()(
                                            implicit val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService,
                                            val businessMatchingService: BusinessMatchingService,
-                                           val helper: UpdateServiceHelper,
-                                           val router: Router[AddServiceFlowModel]
+                                           val helper: AddBusinessTypeHelper,
+                                           val router: Router[AddBusinessTypeFlowModel]
                                          ) extends BaseController {
 
   val fieldName = "tradingPremisesNewActivities"
@@ -59,8 +59,8 @@ class TradingPremisesController @Inject()(
         } getOrElse InternalServerError("Unable to show the view")
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddServiceFlowModel, BusinessActivity)] = for {
-    model <- OptionT(dataCacheConnector.fetch[AddServiceFlowModel](AddServiceFlowModel.key))
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (AddBusinessTypeFlowModel, BusinessActivity)] = for {
+    model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
     activity <- OptionT.fromOption[Future](model.activity)
   } yield (model, activity)
 
@@ -73,7 +73,7 @@ class TradingPremisesController @Inject()(
           } getOrElse InternalServerError("Unable to show the view")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[AddServiceFlowModel](AddServiceFlowModel.key) {
+            dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) =>model.isActivityAtTradingPremises(Some(data))
                 .tradingPremisesActivities(if (data) model.tradingPremisesActivities else None)
             } flatMap {

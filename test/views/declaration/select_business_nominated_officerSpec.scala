@@ -19,7 +19,7 @@ package views.declaration
 import cats.implicits._
 import forms.{EmptyForm, Form2}
 import models.declaration.BusinessNominatedOfficer
-import models.responsiblepeople.{PersonName, ResponsiblePeople}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -31,15 +31,15 @@ class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
     implicit val requestWithToken = addToken(request)
 
     val people = Seq(
-      ResponsiblePeople(PersonName("Test", None, "Person1").some),
-      ResponsiblePeople(PersonName("Test", None, "Person2").some)
+      ResponsiblePerson(PersonName("Test", None, "Person1").some),
+      ResponsiblePerson(PersonName("Test", None, "Person2").some)
     )
   }
 
   "select_business_nominated_officer view" must {
     "have correct title, headings and content" in new ViewFixture {
 
-      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
+      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
 
       doc.title mustBe s"${Messages("declaration.who.is.business.nominated.officer")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.business.nominated.officer"))
@@ -77,7 +77,7 @@ class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
     }
 
     "show the 'register someone else' radio button" in new ViewFixture {
-      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePeople])
+      def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, Seq.empty[ResponsiblePerson])
 
       Option(doc.select("input[type=radio][id=value--1]")) must be(defined)
       doc.select("label[for=value--1]").text() must include(Messages("lbl.register.some.one.else"))

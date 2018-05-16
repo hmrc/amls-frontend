@@ -19,7 +19,7 @@ package controllers.responsiblepeople
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -57,7 +57,7 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
 
   def post(index: Int, fromYourAnswers: Boolean, flow: Option[String] = None) = Authorised.async{
     implicit authContext => implicit request =>
-      updateDataStrict[ResponsiblePeople](index){ rp =>
+      updateDataStrict[ResponsiblePerson](index){ rp =>
         rp.copy(hasAccepted = true)
       } map { _ =>
         Redirect((fromYourAnswers, flow) match {
@@ -68,7 +68,7 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
   }
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
-    dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+    dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
 }
 

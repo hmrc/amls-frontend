@@ -25,7 +25,7 @@ import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer._
-import models.responsiblepeople.{ResponsiblePeople, ResponsiblePersonEndDate}
+import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 
@@ -51,7 +51,7 @@ class RemoveResponsiblePersonController @Inject()(
           case ValidForm(_, data) => {
             (for {
               (_, index) <- getNominatedOfficerWithIndex
-              _ <- OptionT.liftF(updateDataStrict[ResponsiblePeople](index){ responsiblePerson =>
+              _ <- OptionT.liftF(updateDataStrict[ResponsiblePerson](index){ responsiblePerson =>
                 responsiblePerson.status(StatusConstants.Deleted).copy(endDate = Some(ResponsiblePersonEndDate(data.date)))
               })
             } yield Redirect(routes.NewOfficerController.get())) getOrElse InternalServerError("Cannot update responsible person")

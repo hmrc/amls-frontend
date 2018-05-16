@@ -18,29 +18,29 @@ package typeclasses.confirmation
 
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
              value: A,
              activities: Set[BusinessActivity],
-             people: Option[Seq[ResponsiblePeople]]
+             people: Option[Seq[ResponsiblePerson]]
            ): Seq[BreakdownRow]
 
   val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
     fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
 
-  val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePeople]) =>
-    ResponsiblePeople.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
+  val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
+    ResponsiblePerson.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
 
 }
 
 object ResponsiblePeopleRowsInstances {
 
-  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] = {
+  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
         people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
@@ -63,14 +63,14 @@ object ResponsiblePeopleRowsInstances {
 
       }
     }
-  }
+
 
   implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
     new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
-                          people: Option[Seq[ResponsiblePeople]]): Seq[BreakdownRow] = {
+                          people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
         if (showBreakdown(value.getFpFee, activities)) {
 
@@ -103,5 +103,5 @@ object ResponsiblePeopleRows {
   def apply[A](
                 value: A,
                 activities: Set[BusinessActivity],
-                people: Option[Seq[ResponsiblePeople]])(implicit r: ResponsiblePeopleRows[A]): Seq[BreakdownRow] = r(value, activities, people)
+                people: Option[Seq[ResponsiblePerson]])(implicit r: ResponsiblePeopleRows[A]): Seq[BreakdownRow] = r(value, activities, people)
 }

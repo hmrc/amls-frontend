@@ -53,7 +53,7 @@ class SummaryController @Inject()(dataCache: DataCacheConnector, serviceFlow: Se
           preSubmission <- statusService.isPreSubmission
           inNewServiceFlow <- serviceFlow.inNewServiceFlow(AccountancyServices)
         } yield (preSubmission, inNewServiceFlow) match {
-          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NewServiceInformationController.get())
+          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
         }
   }

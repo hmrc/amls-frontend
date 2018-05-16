@@ -17,7 +17,7 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
-import models.flowmanagement.AddServiceFlowModel
+import models.flowmanagement.AddBusinessTypeFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -30,7 +30,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = update_services_summary(EmptyForm, AddServiceFlowModel())
+    def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
   }
 
   "The update_services_summary view" must {

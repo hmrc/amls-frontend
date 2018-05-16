@@ -58,8 +58,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
       "display the persons page with blank fields" in new Fixture {
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
         val result = personNameController.get(RecordId)(request)
         status(result) must be(OK)
@@ -78,9 +78,9 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
           lastName = "last"
         )
 
-        val responsiblePeople = ResponsiblePeople(Some(addPerson))
+        val responsiblePeople = ResponsiblePerson(Some(addPerson))
 
-        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+        when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
 
         val result = personNameController.get(RecordId)(request)
@@ -95,7 +95,7 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
 
       "display Not Found" when {
         "ResponsiblePeople model cannot be found" in new Fixture {
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(None))
 
           val result = personNameController.get(RecordId)(request)
@@ -116,8 +116,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
             when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -136,8 +136,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
               "lastName" -> "last"
             )
 
-            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+            when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
             when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
               .thenReturn(Future.successful(emptyCache))
@@ -173,8 +173,8 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
             "lastName" -> "last"
           )
 
-          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePeople()))))
+          when(personNameController.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           when(personNameController.dataCacheConnector.save[PersonName](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))

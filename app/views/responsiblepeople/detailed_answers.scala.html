@@ -22,7 +22,7 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(model: Option[ResponsiblePeople], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePerson], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",

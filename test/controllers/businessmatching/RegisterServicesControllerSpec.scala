@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.responsiblepeople.ResponsiblePeople
+import models.responsiblepeople.ResponsiblePerson
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -99,8 +99,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
     )
 
-    mockCacheFetch[Seq[ResponsiblePeople]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePeople.key))
-    mockCacheSave[Seq[ResponsiblePeople]]
+    mockCacheFetch[Seq[ResponsiblePerson]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePerson.key))
+    mockCacheSave[Seq[ResponsiblePerson]]
 
     mockCacheFetch[BusinessActivities](Some(BusinessActivities()), Some(BusinessActivities.key))
     mockCacheSave[BusinessActivities]
@@ -485,8 +485,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
-          eqTo(ResponsiblePeople.key),
+        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
+          eqTo(ResponsiblePerson.key),
           eqTo(Seq(responsiblePersonChanged, responsiblePersonChanged))
         )(any(),any(),any())
 
@@ -501,7 +501,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           controller.businessMatchingService.getModel(any(),any(),any())
         } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(None, Some(BMBusinessActivities(Set(HighValueDealing)))))
 
-        mockCacheFetch[Seq[ResponsiblePeople]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePeople.key))
+        mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(responsiblePerson, responsiblePerson)), Some(ResponsiblePerson.key))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[0]" -> BMBusinessActivities.getValue(TrustAndCompanyServices)
@@ -509,8 +509,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).save[Seq[ResponsiblePeople]](
-          eqTo(ResponsiblePeople.key),
+        verify(mockCacheConnector).save[Seq[ResponsiblePerson]](
+          eqTo(ResponsiblePerson.key),
           eqTo(Seq(responsiblePersonNotAccepted, responsiblePersonNotAccepted))
         )(any(),any(),any())
 
@@ -529,7 +529,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         status(result) must be(SEE_OTHER)
 
-        verify(mockCacheConnector).fetch[Seq[ResponsiblePeople]](eqTo(ResponsiblePeople.key))(any(), any(), any())
+        verify(mockCacheConnector).fetch[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any(), any(), any())
 
       }
     }

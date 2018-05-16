@@ -71,13 +71,13 @@ class detailed_answersSpec extends AmlsSpec
   "summary view" must {
 
     "have correct title" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
       doc.title must startWith(Messages("responsiblepeople.detailed_answers.title") + " - " + Messages("summary.responsiblepeople"))
     }
 
     "have correct headings" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople()), 1, true)
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
       heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -258,7 +258,7 @@ class detailed_answersSpec extends AmlsSpec
     }
 
     "display address on separate lines" in new ViewFixture {
-      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePeople(addressHistory = Some(addressHistory))), 1, true)
+      def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson(addressHistory = Some(addressHistory))), 1, true)
 
       def checkElementHasAttribute(el: Element, keys: String*) = {
         val t = el.text()
@@ -288,7 +288,7 @@ class detailed_answersSpec extends AmlsSpec
 
     "display timeAtAddress for corresponding addresses" in new ViewFixture {
 
-      val responsiblePeople = ResponsiblePeople(personName = Some(personName), addressHistory = Some(addressHistory))
+      val responsiblePeople = ResponsiblePerson(personName = Some(personName), addressHistory = Some(addressHistory))
 
       def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, true, false, personName.fullName)
 
@@ -404,7 +404,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     startDate = Some(new LocalDate(1990, 2, 24))
   )
 
-  val responsiblePeopleModel = ResponsiblePeople(
+  val responsiblePeopleModel = ResponsiblePerson(
     personName = Some(personName),
     personResidenceType = Some(residenceType),
     contactDetails = Some(ContactDetails("098765", "e@mail.com")),

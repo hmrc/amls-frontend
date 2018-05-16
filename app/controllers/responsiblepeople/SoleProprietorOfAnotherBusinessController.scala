@@ -21,7 +21,7 @@ import javax.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ResponsiblePeople, SoleProprietorOfAnotherBusiness, VATRegistered}
+import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.sole_proprietor
@@ -34,16 +34,16 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
           => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
     }
 
-  def getVatRegData(rp: ResponsiblePeople, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
+  def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
     data.soleProprietorOfAnotherBusiness match {
       case true => rp.vatRegistered
       case false => None
@@ -53,12 +53,12 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[SoleProprietorOfAnotherBusiness](request.body) match {
-        case f: InvalidForm => getData[ResponsiblePeople](index) flatMap { rp =>
+        case f: InvalidForm => getData[ResponsiblePerson](index) flatMap { rp =>
           Future.successful(BadRequest(sole_proprietor(f, edit, index, flow, ControllerHelper.rpTitleName(rp))))
         }
         case ValidForm(_, data) => {
           for {
-            _ <- updateDataStrict[ResponsiblePeople](index) { rp =>
+            _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
               rp.copy(soleProprietorOfAnotherBusiness = Some(data), vatRegistered = getVatRegData(rp, data))
             }
           } yield if(data.soleProprietorOfAnotherBusiness equals true) {

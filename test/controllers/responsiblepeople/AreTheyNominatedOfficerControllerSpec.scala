@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
-import models.responsiblepeople.ResponsiblePeople._
+import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -51,15 +51,15 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
-    val responsiblePerson = ResponsiblePeople(
+    val responsiblePerson = ResponsiblePerson(
       hasAlreadyPassedFitAndProper = Some(true),
       lineId = Some(1),
       status = Some("")
     )
     val personName = PersonName("firstname", None, "lastname")
     val noNominatedOfficer = responsiblePerson.copy(Some(personName), positions = Some(DefaultValues.noNominatedOfficerPositions))
-    val hasNominatedOfficer = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions))
-    val withPartnerShip = ResponsiblePeople(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)))
+    val hasNominatedOfficer = ResponsiblePerson(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions))
+    val withPartnerShip = ResponsiblePerson(Some(personName), positions = Some(DefaultValues.hasNominatedOfficerPositions.copy(positions = DefaultValues.hasNominatedOfficerPositions.positions + Partner)))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -77,8 +77,8 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
     "get is called" must {
 
       "display nominated officer fields" in new Fixture {
-        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName))))))
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(personName))))))
         val result = controller.get(RecordId)(request)
 
         status(result) must be(OK)
@@ -97,11 +97,11 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
         "redirect to the detailed answers controller" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(hasNominatedOfficer)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(hasNominatedOfficer))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId,true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
@@ -112,11 +112,11 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
         "redirect to the vat registered controller when partnership is selected" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(withPartnerShip)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -126,11 +126,11 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
         "redirect to the vat registered controller when another type is selected" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(noNominatedOfficer)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(noNominatedOfficer))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -143,8 +143,8 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePeople(Some(personName))))))
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
+            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(personName))))))
 
           val result = controller.post(RecordId)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -160,7 +160,7 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(None))
 
           val result = controller.post(RecordId)(newRequest)
@@ -172,7 +172,7 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
 
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.failed(new IndexOutOfBoundsException))
 
           val result = controller.post(RecordId)(newRequest)
@@ -183,11 +183,11 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
         "return not found" in new Fixture {
           val mockCacheMap = mock[CacheMap]
           val newRequest = request.withFormUrlEncodedBody("isNominatedOfficer" -> "true")
-          when(mockCacheMap.getEntry[Seq[ResponsiblePeople]](any())(any()))
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(withPartnerShip)))
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePeople]](any())
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
             (any(), any(), any())).thenReturn(Future.successful(Some(Seq(withPartnerShip))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePeople]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(0)(newRequest)
           status(result) must be(NOT_FOUND)

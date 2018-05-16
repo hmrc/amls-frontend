@@ -19,12 +19,12 @@ package modules
 import com.google.inject.{AbstractModule, TypeLiteral}
 import config.{AMLSAuditConnector, WSHttp}
 import connectors._
-import models.businessmatching.updateservice.ChangeServices
-import models.flowmanagement.{AddServiceFlowModel, RemoveServiceFlowModel}
+import models.businessmatching.updateservice.ChangeBusinessType
+import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
 import services._
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import services.flowmanagement.Router
-import services.flowmanagement.flowrouters.{ChangeServicesRouter, VariationAddServiceRouter, VariationRemoveServiceRouter}
+import services.flowmanagement.flowrouters.{ChangeBusinessTypeRouter, AddBusinessTypeRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http.{HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
@@ -48,8 +48,8 @@ class Module extends AbstractModule {
     bind(classOf[CorePost]).toInstance(WSHttp)
     bind(classOf[CoreGet]).toInstance(WSHttp)
     bind(classOf[LandingService]).toInstance(LandingService)
-    bind(new TypeLiteral[Router[AddServiceFlowModel]] {}).to(classOf[VariationAddServiceRouter])
-    bind(new TypeLiteral[Router[ChangeServices]] {}).to(classOf[ChangeServicesRouter])
-    bind(new TypeLiteral[Router[RemoveServiceFlowModel]] {}).to(classOf[VariationRemoveServiceRouter])
+    bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
+    bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
+    bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
   }
 }

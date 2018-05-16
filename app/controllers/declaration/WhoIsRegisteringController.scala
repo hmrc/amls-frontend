@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.renewal.Renewal
-import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePeople}
+import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
 import play.api.Play
 import play.api.mvc.{Action, AnyContent, Request, Result}
@@ -50,8 +50,8 @@ trait WhoIsRegisteringController extends BaseController {
         optionalCache =>
           (for {
             cache <- optionalCache
-            responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
-          } yield whoIsRegisteringView(Ok, EmptyForm, ResponsiblePeople.filter(responsiblePeople))
+            responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+          } yield whoIsRegisteringView(Ok, EmptyForm, ResponsiblePerson.filter(responsiblePeople))
           ) getOrElse whoIsRegisteringView(Ok, EmptyForm, Seq.empty)
       }
   }
@@ -60,8 +60,8 @@ trait WhoIsRegisteringController extends BaseController {
     implicit authContext => implicit request => {
       Form2[WhoIsRegistering](request.body) match {
         case f: InvalidForm =>
-          dataCacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key) flatMap {
-            case Some(data) => whoIsRegisteringView(BadRequest, f, ResponsiblePeople.filter(data))
+          dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) flatMap {
+            case Some(data) => whoIsRegisteringView(BadRequest, f, ResponsiblePerson.filter(data))
             case None => whoIsRegisteringView(BadRequest, f, Seq.empty)
           }
         case ValidForm(_, data) =>
@@ -69,13 +69,13 @@ trait WhoIsRegisteringController extends BaseController {
             optionalCache =>
               (for {
                 cache <- optionalCache
-                responsiblePeople <- cache.getEntry[Seq[ResponsiblePeople]](ResponsiblePeople.key)
+                responsiblePeople <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
               } yield {
                 data.person match {
                   case "-1" =>
                     redirectToAddPersonPage
                   case _ =>
-                    getAddPerson(data, ResponsiblePeople.filter(responsiblePeople)) map { addPerson =>
+                    getAddPerson(data, ResponsiblePerson.filter(responsiblePeople)) map { addPerson =>
                       dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
                     }
                     redirectToDeclarationPage
@@ -86,7 +86,7 @@ trait WhoIsRegisteringController extends BaseController {
     }
   }
 
-  private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePeople])
+  private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus flatMap {
       case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) if AmendmentsToggle.feature =>
@@ -110,7 +110,7 @@ trait WhoIsRegisteringController extends BaseController {
       case _ => Redirect(routes.AddPersonController.get())
     }
 
-  private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePeople]): Option[AddPerson] = {
+  private def getAddPerson(whoIsRegistering: WhoIsRegistering, responsiblePeople: Seq[ResponsiblePerson]): Option[AddPerson] = {
     for {
       selectedIndex <- whoIsRegistering.indexValue
       selectedPerson <- responsiblePeople.zipWithIndex.collect {

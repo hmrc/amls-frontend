@@ -21,7 +21,7 @@ import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{NonUKPassport, ResponsiblePeople}
+import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -42,10 +42,10 @@ class PersonNonUKPassportController @Inject()(
   def get(index:Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[ResponsiblePeople](index) map {
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,Some(nonUKPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,Some(nonUKPassport),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_non_uk_passport(Form2[NonUKPassport](nonUKPassport), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePeople(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
             Ok(person_non_uk_passport(EmptyForm, edit, index, flow, personName.titleName))
           case _ => NotFound(notFoundView)
         }
@@ -55,7 +55,7 @@ class PersonNonUKPassportController @Inject()(
                          edit: Boolean, flow: Option[String] )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
     (for {
       cache <- result
-      rp <- getData[ResponsiblePeople](cache, index)
+      rp <- getData[ResponsiblePerson](cache, index)
     } yield rp.dateOfBirth.isDefined && edit match {
       case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
       case false => Redirect(routes.DateOfBirthController.get(index, edit, flow))
@@ -67,12 +67,12 @@ class PersonNonUKPassportController @Inject()(
     implicit authContext =>
       implicit request =>
         Form2[NonUKPassport](request.body) match {
-          case f: InvalidForm => getData[ResponsiblePeople](index) map { rp =>
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(person_non_uk_passport(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
           case ValidForm(_, data) => {
             for {
-              result <- fetchAllAndUpdateStrict[ResponsiblePeople](index) { (_, rp) =>
+              result <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 rp.nonUKPassport(data)
               }
             } yield redirectToNextPage(result, index, edit, flow)

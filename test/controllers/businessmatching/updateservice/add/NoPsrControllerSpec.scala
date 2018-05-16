@@ -17,8 +17,8 @@
 package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
-import controllers.businessmatching.updateservice.UpdateServiceHelper
-import models.flowmanagement.{AddServiceFlowModel, NoPSRPageId}
+import controllers.businessmatching.updateservice.AddBusinessTypeHelper
+import models.flowmanagement.{AddBusinessTypeFlowModel, NoPSRPageId}
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -35,13 +35,13 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
 
     val request = addToken(authRequest)
 
-    val mockUpdateServiceHelper = mock[UpdateServiceHelper]
+    val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
     val controller = new NoPsrController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       helper = mockUpdateServiceHelper,
-      router = createRouter[AddServiceFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel]
     )
   }
 
@@ -64,12 +64,12 @@ class NoPsrControllerSpec extends AmlsSpec with ScalaFutures {
     "clear the flow model" in new Fixture {
       when {
         mockUpdateServiceHelper.clearFlowModel()(any(), any())
-      } thenReturn OptionT[Future, AddServiceFlowModel](Future.successful(Some(AddServiceFlowModel())))
+      } thenReturn OptionT[Future, AddBusinessTypeFlowModel](Future.successful(Some(AddBusinessTypeFlowModel())))
 
       val result = controller.post()(request.withFormUrlEncodedBody())
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(NoPSRPageId, AddServiceFlowModel())
+      controller.router.verify(NoPSRPageId, AddBusinessTypeFlowModel())
     }
   }
 }

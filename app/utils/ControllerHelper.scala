@@ -19,7 +19,7 @@ package utils
 import cats.implicits._
 import models.businessmatching._
 import models.renewal.CustomersOutsideUK
-import models.responsiblepeople.{NonUKResidence, ResponsiblePeople}
+import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import play.api.Play.current
 import play.api.i18n.Messages
@@ -109,27 +109,27 @@ object ControllerHelper {
     case _ => false
   }
 
-  def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePeople]]]): Future[Boolean] = {
+  def hasNominatedOfficer(eventualMaybePeoples: Future[Option[Seq[ResponsiblePerson]]]): Future[Boolean] = {
     eventualMaybePeoples map {
-      case Some(rps) => ResponsiblePeople.filter(rps).exists(_.isNominatedOfficer)
+      case Some(rps) => ResponsiblePerson.filter(rps).exists(_.isNominatedOfficer)
       case _ => false
     }
   }
 
-  def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePeople]): Option[ResponsiblePeople] = {
-    ResponsiblePeople.filter(responsiblePeople).filter(_.isNominatedOfficer) match {
+  def getNominatedOfficer(responsiblePeople: Seq[ResponsiblePerson]): Option[ResponsiblePerson] = {
+    ResponsiblePerson.filter(responsiblePeople).filter(_.isNominatedOfficer) match {
       case rps@_::_ => Some(rps.head)
       case _ => None
     }
   }
 
-  def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePeople]]): Option[String] = {
+  def nominatedOfficerTitleName(responsiblePeople: Option[Seq[ResponsiblePerson]]): Option[String] = {
     responsiblePeople map { rps =>
       rpTitleName(getNominatedOfficer(rps))
     }
   }
 
-  def hasNonUkResident(rp: Option[Seq[ResponsiblePeople]]): Boolean = {
+  def hasNonUkResident(rp: Option[Seq[ResponsiblePerson]]): Boolean = {
     rp match {
       case Some(rps) => rps.exists(_.personResidenceType.fold(false)(_.isUKResidence match {
         case NonUKResidence => true
@@ -139,7 +139,7 @@ object ControllerHelper {
     }
   }
 
-  def rpTitleName(rp:Option[ResponsiblePeople]):String = rp.fold("")(_.personName.fold("")(_.titleName))
+  def rpTitleName(rp:Option[ResponsiblePerson]):String = rp.fold("")(_.personName.fold("")(_.titleName))
 
   def notFoundView(implicit request: Request[_]) = {
     views.html.error(Messages("error.not-found.title"),

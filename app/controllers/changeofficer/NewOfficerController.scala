@@ -23,8 +23,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
-import models.responsiblepeople.ResponsiblePeople
-import models.responsiblepeople.ResponsiblePeople.flowChangeOfficer
+import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -77,7 +77,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
 
   def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
     for {
-      people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePeople]](ResponsiblePeople.key))
+      people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
     } yield (selectedOfficer, people.filter(p => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)))
