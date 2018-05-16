@@ -50,7 +50,7 @@ class WhatDateRemovedController @Inject()(
       )
     }
 
-  def get() = Authorised.async {
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       getFormData map { case model =>
         val form = model.dateOfChange map { v => Form2(v) } getOrElse EmptyForm

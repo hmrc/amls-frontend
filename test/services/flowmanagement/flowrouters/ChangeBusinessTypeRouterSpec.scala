@@ -22,7 +22,7 @@ import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, Remove}
-import models.flowmanagement.ChangeServicesPageId
+import models.flowmanagement.ChangeBusinesTypesPageId
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
@@ -52,7 +52,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'BusinessTypes selection' page (SelectBusinessTypeController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId) and selects Add" in new Fixture {
 
-        val result = router.getRoute(ChangeServicesPageId, Add)
+        val result = router.getRoute(ChangeBusinesTypesPageId, Add)
 
         redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
 
@@ -63,7 +63,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has more than one Business Type" in new Fixture {
 
-        val result = await(router.getRoute(ChangeServicesPageId, Remove))
+        val result = await(router.getRoute(ChangeBusinesTypesPageId, Remove))
 
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesController.get())
       }
@@ -79,7 +79,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         ))
 
-        val result = await(router.getRoute(ChangeServicesPageId, Remove))
+        val result = await(router.getRoute(ChangeBusinesTypesPageId, Remove))
 
         result mustBe Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
       }

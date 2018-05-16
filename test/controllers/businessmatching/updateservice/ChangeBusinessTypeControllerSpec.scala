@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
 import models.businessmatching.updateservice.{ChangeBusinessType, Add}
-import models.flowmanagement.ChangeServicesPageId
+import models.flowmanagement.ChangeBusinesTypesPageId
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -94,7 +94,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeServicesPageId, Add)
+          controller.router.verify(ChangeBusinesTypesPageId, Add)
         }
       }
 
