@@ -58,7 +58,6 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(BillPaymentServices))
 
     mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel(Some(Set(BillPaymentServices)))), Some(RemoveBusinessTypeFlowModel.key))
-    mockCacheUpdate[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel())
   }
 
   "RemoveActivitiesController" when {
