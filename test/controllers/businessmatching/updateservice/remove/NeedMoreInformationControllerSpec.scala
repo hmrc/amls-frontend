@@ -16,13 +16,14 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import play.api.test.Helpers._
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
 import play.api.test.Helpers.{OK, contentAsString, status}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-class NeedToUpdateControllerSpec extends AmlsSpec {
+class NeedMoreInformationControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
