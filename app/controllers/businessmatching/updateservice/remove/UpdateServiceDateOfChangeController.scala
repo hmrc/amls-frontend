@@ -43,7 +43,7 @@ class UpdateServiceDateOfChangeController @Inject()(
                                                    val authConnector: AuthConnector,
                                                    val dataCacheConnector: DataCacheConnector,
                                                     val router: Router[RemoveServiceFlowModel]
-                                                   ) extends BaseController with RepeatingSection {
+                                                   ) extends BaseController {
 
   implicit val dateWrites: Write[DateOfChange, UrlFormEncoded] =
     Write {
@@ -56,7 +56,7 @@ class UpdateServiceDateOfChangeController @Inject()(
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      getFormData map { case (model) =>
+      getFormData map { case model =>
         val form = model.dateOfChange map { v => Form2(v) } getOrElse EmptyForm
         println(form)
         Ok(date_of_change(form, "summary.updateservice", routes.UpdateServiceDateOfChangeController.post()))
@@ -79,9 +79,8 @@ class UpdateServiceDateOfChangeController @Inject()(
         }
   }
 
-  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, (RemoveServiceFlowModel)] = for {
+  private def getFormData(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, RemoveServiceFlowModel] = for {
     model <- OptionT(dataCacheConnector.fetch[RemoveServiceFlowModel](RemoveServiceFlowModel.key))
-  } yield (model)
-
+  } yield model
 
 }
