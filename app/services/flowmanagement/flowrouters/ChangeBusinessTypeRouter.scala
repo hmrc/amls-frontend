@@ -56,8 +56,6 @@ class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
         }
         desiredResult
       }
-    } getOrElse InternalServerError("Could not do the thing")
-
+    } getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
   }
-
 }

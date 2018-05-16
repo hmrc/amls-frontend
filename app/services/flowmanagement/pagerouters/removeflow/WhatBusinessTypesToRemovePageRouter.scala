@@ -20,6 +20,7 @@ import javax.inject.{Inject, Singleton}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -38,7 +39,7 @@ class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusSer
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    ???
+    Future.successful(Redirect(removeRoutes.WhatDateRemovedController.get()))
   }
 }
 

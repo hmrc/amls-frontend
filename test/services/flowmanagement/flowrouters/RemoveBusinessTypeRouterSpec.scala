@@ -122,15 +122,15 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'Need to update Answers' page (NeedToUpdateController)" when {
-      "the user is on the 'Need to update Answers' page (NeedMoreInformationPageId)" when {
+    "return the 'progress' page (RegistrationProgressController)" when {
+      "the user is on the 'Need to update Answers' page (NeedToUpdatePageId)" when {
         "there is an ASP business type in the model" in new Fixture {
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
-          val result = await(router.getRoute(NeedMoreInformationPageId, model))
+          val result = await(router.getRoute(NeedToUpdatePageId, model))
 
           result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
         }
