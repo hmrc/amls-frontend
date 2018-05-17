@@ -42,7 +42,7 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
                            ): Future[Result] = {
     model.activitiesToRemove map { m =>
       if(m.contains(AccountancyServices)) {
-        Future.successful(Redirect(removeRoutes.NeedToUpdateController.get()))
+        Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get()))
       } else {
         Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }

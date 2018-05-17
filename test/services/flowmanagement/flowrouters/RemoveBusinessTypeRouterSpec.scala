@@ -112,7 +112,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
           )
           val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
 
-          result mustBe Redirect(removeRoutes.NeedToUpdateController.get())
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
         }
       }
     }
