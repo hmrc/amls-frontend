@@ -48,10 +48,17 @@
                     @radio(
                         f = f("changeServices"),
                         labelText = "businessmatching.updateservice.changeservices.choice.add",
-                        spaced = true,
-                        value = "add"
+                        value = "add",
+                        inline = true
                     )
                 }
+
+                @radio(
+                    f = f("changeServices"),
+                    labelText = "businessmatching.updateservice.changeservices.choice.remove",
+                    value = "remove",
+                    inline = true
+                )
             }
         }
 

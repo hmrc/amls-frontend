@@ -26,8 +26,12 @@ import models.flowmanagement.ChangeBusinesTypesPageId
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.mvc.Results.Redirect
+import models.businessmatching.updateservice.{Add, Remove}
+import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import utils.{AmlsSpec, DependencyMocks}
 import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -51,8 +55,9 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
   "getRoute" must {
 
     //what do you want to do (3 options - option 1)
-    "return the 'BusinessTypes selection' page (SelectBusinessTypeController)" when {
-      "the user is on the 'What do you want to do' page (ChangeServicesPageId) and selects Add" in new Fixture {
+    "return the 'Business Types selection' page (SelectBusinessTypeController)" when {
+      "the user is on the 'What do you want to do' page (ChangeServicesPageId) and " +
+        "ChangeBusinessType is Add" in new Fixture {
 
         val result = router.getRoute(ChangeBusinesTypesPageId, Add)
 
@@ -73,9 +78,9 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
     }
 
     //what do you want to do (3 options - option 3)
-    "return the 'Unable to remove' page (UnableToRemoveBusinessTypesController)" when {
+    "return the 'unable to remove' page (UnableToRemoveBusinessTypesController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
-        " and selects Remove but has only one Business Type" in new Fixture {
+        " and selects Remove and has only one Business Type" in new Fixture {
 
         when {
           mockBusinessMatchingService.getModel(any(), any(), any())
@@ -83,9 +88,9 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
           activities = Some(BusinessActivities(Set(BillPaymentServices)))
         ))
 
-        val result = await(router.getRoute(ChangeBusinesTypesPageId, Remove))
+        val result = router.getRoute(ChangeBusinesTypesPageId, Remove)
 
-        result mustBe Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
+        redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
       }
     }
   }

@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
+import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
 import models.businessmatching.updateservice.{ChangeBusinessType, Add}
 import models.flowmanagement.ChangeBusinesTypesPageId
 import org.jsoup.Jsoup
@@ -28,7 +29,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -88,13 +89,23 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "post is called" must {
-      "redirect to RegisterServicesController" when {
+      "verify the router is called correctly" when {
         "request is add" in new Fixture {
 
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
           controller.router.verify(ChangeBusinesTypesPageId, Add)
+        }
+      }
+
+      "verify the router is called correctly" when {
+        "request is remove" in new Fixture {
+
+          val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
+
+          status(result) must be(SEE_OTHER)
+          controller.router.verify(ChangeBusinesTypesPageId, Remove)
         }
       }
 
