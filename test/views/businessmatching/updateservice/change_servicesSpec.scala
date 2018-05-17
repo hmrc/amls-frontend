@@ -30,12 +30,12 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne"), allowAdd, allowRemove)
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne"), allowAdd)
   }
 
   trait MultipleViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd, allowRemove)
+    def view = views.html.businessmatching.updateservice.change_services(EmptyForm, Set("ServiceOne", "ServiceTwo"), allowAdd)
   }
 
   "The change_services view" must {
@@ -71,7 +71,7 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq((Path \ "businessmatching.updateservice.changeServices") -> Seq(ValidationError("not a message Key"))))
 
-      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String], allowAdd, allowRemove)
+      override def view = views.html.businessmatching.updateservice.change_services(form2, Set.empty[String], allowAdd)
 
       errorSummary.html() must include("not a message Key")
     }
