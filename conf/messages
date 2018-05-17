@@ -1161,7 +1161,7 @@ businessmatching.updateservice.changeservices.heading = What do you want to do?
 businessmatching.updateservice.changeservices.existing.multiple = You’ve told us your business types are
 businessmatching.updateservice.changeservices.existing.single = You’ve told us your business type is
 businessmatching.updateservice.changeservices.choice.add = Register another business type
-businessmatching.updateservice.changeservices.choice.remove = Remove a services
+businessmatching.updateservice.changeservices.choice.remove = Remove business types
 
 #remove route
 

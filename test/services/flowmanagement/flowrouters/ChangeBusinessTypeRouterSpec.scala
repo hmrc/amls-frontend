@@ -82,6 +82,12 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has only one Business Type" in new Fixture {
 
+        when {
+          mockBusinessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(BillPaymentServices)))
+        ))
+
         val result = router.getRoute(ChangeBusinesTypesPageId, Remove)
 
         redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
