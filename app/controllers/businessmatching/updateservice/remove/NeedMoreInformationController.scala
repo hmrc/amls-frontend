@@ -17,16 +17,15 @@
 package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessActivity
-import models.flowmanagement.RemoveBusinessTypeFlowModel
-import services.businessmatching.BusinessMatchingService
+import models.flowmanagement.{NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.remove.need_more_information
-import cats.implicits._
 
 import scala.concurrent.Future
 
@@ -45,11 +44,15 @@ class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
         } yield {
           val activityNames = activities map { _.getMessage }
           Ok(need_more_information(activityNames))
-         })getOrElse(InternalServerError(""))
+         })getOrElse(InternalServerError("Cannot retrieve information from cache"))
   }
 
-
-
-
-
+  def post() = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        (for {
+          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
+          route <- OptionT.liftF(router.getRoute(NeedToUpdatePageId, model))
+        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NewServiceInformationController")
+  }
 }
