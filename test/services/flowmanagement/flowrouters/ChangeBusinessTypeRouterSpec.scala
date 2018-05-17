@@ -49,6 +49,8 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
   }
 
   "getRoute" must {
+
+    //what do you want to do (3 options - option 1)
     "return the 'BusinessTypes selection' page (SelectBusinessTypeController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId) and selects Add" in new Fixture {
 
@@ -59,6 +61,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       }
     }
 
+    //what do you want to do (3 options - option 2)
     "return the 'What do you want to remove' page (RemoveBusinessTypesController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove and has more than one Business Type" in new Fixture {
@@ -69,6 +72,7 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
       }
     }
 
+    //what do you want to do (3 options - option 3)
     "return the 'Unable to remove' page (UnableToRemoveBusinessTypesController)" when {
       "the user is on the 'What do you want to do' page (ChangeServicesPageId)" +
         " and selects Remove but has only one Business Type" in new Fixture {
