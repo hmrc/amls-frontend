@@ -48,7 +48,7 @@ class ChangeBusinessTypesController @Inject()(
       implicit request =>
         (for {
           (existingActivities, remainingActivities) <- getFormData
-        } yield Ok(change_services(EmptyForm, existingActivities, remainingActivities.nonEmpty)))
+        } yield Ok(change_services(EmptyForm, existingActivities, remainingActivities.nonEmpty, existingActivities.size > 1)))
           .getOrElse(InternalServerError("Unable to show the page"))
   }
 
@@ -58,7 +58,7 @@ class ChangeBusinessTypesController @Inject()(
         Form2[ChangeBusinessType](request.body) match {
           case f: InvalidForm =>
             getFormData map { case (existing, remaining) =>
-              BadRequest(change_services(f, existing, remaining.nonEmpty))
+              BadRequest(change_services(f, existing, remaining.nonEmpty, existing.size > 1))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
                 router.getRoute(ChangeServicesPageId, data)

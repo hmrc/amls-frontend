@@ -18,7 +18,7 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], existing: Set[String], allowAdd: Boolean)(implicit request: Request[_], m:Messages)
+@(f: forms.Form2[_], existing: Set[String], allowAdd: Boolean, allowRemove: Boolean)(implicit request: Request[_], m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -52,10 +52,18 @@
                         value = "add"
                     )
                 }
+                @if(allowRemove) {
+                    @radio(
+                        f = f("changeServices"),
+                        labelText = "businessmatching.updateservice.changeservices.choice.remove",
+                        spaced = true,
+                        value = "remove"
+                    )
+                }
             }
         }
 
-        @if(allowAdd) {
+        @if(allowAdd || allowRemove) {
             @submit(buttonMessageKey = Some("button.continue"))
         } else {
             <p class="return-link">

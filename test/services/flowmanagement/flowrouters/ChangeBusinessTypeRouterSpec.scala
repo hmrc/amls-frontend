@@ -16,10 +16,12 @@
 
 package services.flowmanagement.flowrouters
 
-import models.businessmatching.updateservice.Add
+import models.businessmatching.updateservice.{Add, Remove}
 import models.flowmanagement.ChangeServicesPageId
+import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import play.api.test.Helpers._
-import utils.{DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -32,12 +34,34 @@ class ChangeBusinessTypeRouterSpec extends AmlsSpec {
   }
 
   "getRoute" must {
-    "return the 'Activitiea selection' page (SelectActivitiesController)" when {
-      "given the 'register a service' model" in new Fixture {
+    "return the 'Activities selection' page (SelectActivitiesController)" when {
+      "ChangeBusinessType is Add" +
+        " and there is more than 1 business type" in new Fixture {
 
         val result = router.getRoute(ChangeServicesPageId, Add)
 
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.SelectBusinessTypeController.get().url)
+        redirectLocation(result) mustBe Some(addRoutes.SelectBusinessTypeController.get().url)
+
+      }
+    }
+
+    "return the 'Which types to remove' page (RemoveBusinessTypesController)" when {
+      "ChangeBusinessType is Remove" in new Fixture {
+
+        val result = router.getRoute(ChangeServicesPageId, Remove)
+
+        redirectLocation(result) mustBe Some(removeRoutes.RemoveBusinessTypesController.get().url)
+
+      }
+    }
+
+    "return the 'unable to remove' page (UnableToRemoveBusinessTypesController)" when {
+      "ChangeBusinessType is Remove" +
+        " and there is only 1 business type" in new Fixture {
+
+        val result = router.getRoute(ChangeServicesPageId, Remove)
+
+        redirectLocation(result) mustBe Some(removeRoutes.UnableToRemoveBusinessTypesController.get().url)
 
       }
     }
