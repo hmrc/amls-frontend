@@ -17,7 +17,7 @@
 package controllers.businessmatching.updateservice.remove
 
 import models.DateOfChange
-import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatDateRemovedPageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
@@ -38,7 +38,7 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
     )
   }
 
-  "UpdateServiceDateOfChangeController" when {
+  "WhatDateRemovedController" when {
 
     "get is called" must {
       "return OK with date_of_change view" in new Fixture {
@@ -80,12 +80,25 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
         status(result) mustBe SEE_OTHER
      }
 
-      "saves the data to the flow model" in new Fixture {
+      "save the data to the flow model" in new Fixture {
+        val today = LocalDate.now
+        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today.minusDays(10)))))
+
+
+        val result = await {
+          controller.post()(request.withFormUrlEncodedBody(
+            "dateOfChange.day" -> today.getDayOfMonth.toString,
+            "dateOfChange.month" -> today.getMonthOfYear.toString,
+            "dateOfChange.year" -> today.getYear.toString
+          ))
+        }
+
+        controller.router.verify(WhatDateRemovedPageId, RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today))))
       }
 
 
-      "on invalid request" must {
-        "return badRequest" in new Fixture {
+      "return badRequest" must {
+        "on invalid request" in new Fixture {
           val result = controller.post()(request)
           status(result) mustBe BAD_REQUEST
         }
