@@ -32,7 +32,7 @@ import views.html.businessmatching.updateservice.remove.remove_activities_summar
 
 import scala.concurrent.Future
 
-class RemoveBusinessTypeSummaryController @Inject()(
+class RemoveBusinessTypesSummaryController @Inject()(
                                                    val authConnector: AuthConnector,
                                                    val dataCacheConnector: DataCacheConnector,
                                                    val helper: RemoveBusinessTypeHelper,

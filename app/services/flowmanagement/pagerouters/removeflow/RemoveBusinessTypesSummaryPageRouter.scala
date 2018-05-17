@@ -19,7 +19,9 @@ package services.flowmanagement.pagerouters.removeflow
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import models.businessmatching.AccountancyServices
 import play.api.mvc.Result
+import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -38,7 +40,13 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    ???
+    model.activitiesToRemove map { m =>
+      if(m.contains(AccountancyServices)) {
+        Future.successful(Redirect(removeRoutes.NeedToUpdateController.get()))
+      } else {
+        Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+      }
+    }  getOrElse Future.successful(InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter"))
   }
 }
 

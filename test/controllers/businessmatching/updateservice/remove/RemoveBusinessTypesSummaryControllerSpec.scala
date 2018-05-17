@@ -36,7 +36,7 @@ import views.TitleValidator
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidator {
+class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValidator {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
@@ -46,7 +46,7 @@ class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidat
     val removeServiceHelper = mock[RemoveBusinessTypeHelper]
     val router = createRouter[RemoveBusinessTypeFlowModel]
 
-    val controller = new RemoveBusinessTypeSummaryController(
+    val controller = new RemoveBusinessTypesSummaryController(
       self.authConnector,
       mockCacheConnector,
       removeServiceHelper,

@@ -16,23 +16,45 @@
 
 package services.flowmanagement.flowrouters
 
+import cats.data.OptionT
+import cats.implicits._
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
-import javax.inject.Inject
-import models.businessmatching.updateservice.{ChangeBusinessType, Add, Remove}
+import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
 import models.flowmanagement.PageId
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
+import play.api.mvc.Results.{InternalServerError, Redirect}
+import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeBusinessTypeRouter @Inject() extends Router[ChangeBusinessType] {
+@Singleton
+class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatchingService
+                                        ) extends Router[ChangeBusinessType] {
+
   override def getRoute(pageId: PageId, model: ChangeBusinessType, edit: Boolean = false)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = model match {
 
     case Add => Future.successful(Redirect(addRoutes.SelectBusinessTypeController.get()))
-    case Remove => ???
+    case Remove => {
+      for {
+        model <- businessMatchingService.getModel
+        activities <- OptionT.fromOption[Future](model.activities) map {
+          _.businessActivities
+        }
+
+      } yield {
+
+        if (activities.size < 2) {
+          Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
+        } else {
+          Redirect(removeRoutes.RemoveBusinessTypesController.get())
+        }
+      }
+    } getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
   }
 }
