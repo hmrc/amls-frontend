@@ -45,7 +45,7 @@ class RemoveBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
       case RemoveBusinessTypesSummaryPageId => removeServicesSummaryPageRouter.getPageRoute(model, edit)
       case UnableToRemovePageId => unableToRemovePageRouter.getPageRoute(model, edit)
       case WhatDateRemovedPageId => whatDateToRemovePageRouter.getPageRoute(model, edit)
-      case _ => throw new Exception("PagId not in removeflow")
+      case _ => throw new Exception("PagId not in remove flow")
     }
   }
 }
