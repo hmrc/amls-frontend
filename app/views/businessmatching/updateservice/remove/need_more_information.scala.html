@@ -21,11 +21,11 @@
 @(activities: Set[String])(implicit request: Request[_], messages: Messages)
 
 @header = {
-    @heading("businessmatching.updateservice.newserviceinformation.heading", "summary.updateservice")
+    @heading("businessmatching.updateservice.updateotherinformation.heading", "summary.updateservice")
 }
 
 @main(
-    title = messages("businessmatching.updateservice.newserviceinformation.title") + " - " + Messages("summary.updateservice"),
+    title = messages("businessmatching.updateservice.updateotherinformation.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
 
@@ -34,14 +34,14 @@
         wide = true,
         jsHidden = false
     ) {
-        <p>@messages("businessmatching.updateservice.newserviceinformation.info.1")</p>
+        <p>@messages("businessmatching.updateservice.updateotherinformation.hint")</p>
         <p>@bulletedList(activities)</p>
     }
 
-    <p>@messages("businessmatching.updateservice.newserviceinformation.info.2")</p>
+    <p>@messages("businessmatching.updateservice.updateotherinformation.text")</p>
 
 
     @form(EmptyForm, controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.post()) {
-        @submit(false, Some("Continue"), false, buttonId = Some("newserviceinfo-submit"))
+        @submit(false, Some("Continue"), false, buttonId = Some("removeserviceinfo-submit"))
     }
 }

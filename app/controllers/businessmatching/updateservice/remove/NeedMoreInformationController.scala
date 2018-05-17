@@ -32,10 +32,9 @@ import scala.concurrent.Future
 
 @Singleton
 class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
-                                                     val businessMatchingService: BusinessMatchingService,
-                                                      implicit val dataCacheConnector: DataCacheConnector,
-                                                      val router: Router[RemoveBusinessTypeFlowModel]
-                                                     ) extends BaseController {
+                                              implicit val dataCacheConnector: DataCacheConnector,
+                                              val router: Router[RemoveBusinessTypeFlowModel]
+                                               ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext =>
