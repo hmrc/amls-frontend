@@ -14,14 +14,13 @@
  * limitations under the License.
  */
 
-package controllers.businessmatching.updateservice.remove
+package views
 
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import org.jsoup.nodes.Document
+import org.scalatest.matchers.MustMatchers
+import play.api.i18n.Messages
 
-class NeedToUpdateControllerSpec extends AmlsSpec {
-
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self =>
-  }
-
+trait TitleValidator extends MustMatchers {
+  def validateTitle(title: String)(implicit m: Messages, doc: Document) =
+    doc.title mustBe s"${m(title)} - ${m("title.amls")} - ${m("title.gov")}"
 }
