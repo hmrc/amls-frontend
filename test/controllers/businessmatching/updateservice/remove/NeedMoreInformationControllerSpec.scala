@@ -16,13 +16,13 @@
 
 package controllers.businessmatching.updateservice.remove
 
+import models.DateOfChange
 import models.businessmatching.HighValueDealing
-import models.businessmatching.updateservice.ServiceChangeRegister
-import play.api.test.Helpers._
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
-import play.api.test.Helpers.{OK, contentAsString, status}
+import play.api.test.Helpers.{OK, contentAsString, status, _}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class NeedMoreInformationControllerSpec extends AmlsSpec {
@@ -51,12 +51,17 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         status(result) must be(OK)
         Jsoup.parse(contentAsString(result)).title() must include(Messages("businessmatching.updateservice.updateotherinformation.title"))
       }
+    }
 
-//      "pass the url for the continue through to the page" in new Fixture {
-//        val result = controller.get()(request)
-//        status(result) must be(OK)
-//        Option(Jsoup.parse(contentAsString(result)).body().getElementById("continue-button").attr("href")) mustBe defined
-//      }
+    "post is called" must {
+      "redirect to next page" in new Fixture {
+        val today = LocalDate.now
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe SEE_OTHER
+      }
     }
   }
 
