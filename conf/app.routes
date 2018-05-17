@@ -356,8 +356,6 @@ POST        /update-service/date-change                                         
 GET         /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesSummaryController.get()
 POST        /update-service/check-your-answers-remove                                 @controllers.businessmatching.updateservice.remove.RemoveBusinessTypesSummaryController.post()
 
-GET         /update-service/ask-removed-business                                      @controllers.businessmatching.updateservice.remove.NeedToUpdateController.get()
-
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
 GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
