@@ -14,13 +14,13 @@
  * limitations under the License.
  *@
 
-@import include.forms2.checkYourAnswers
+@import include.forms2.{form, submit, checkYourAnswers}
 @import include.{heading, main}
 @import models.flowmanagement.RemoveBusinessTypeFlowModel
 @import controllers.businessmatching.updateservice.remove.routes
 @import utils.DateHelper
 
-@(model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_])
+@(f: forms.Form2[_], model: RemoveBusinessTypeFlowModel)(implicit m: Messages, r: Request[_])
 
 @header = {
 @heading(
@@ -51,4 +51,9 @@
             <p>@DateHelper.formatDate(doc.dateOfChange)</p>
         }
     }
+
+    @form(f, controllers.businessmatching.updateservice.remove.routes.RemoveBusinessTypeSummaryController.post()) {
+        @submit(edit = false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false, buttonId = Some("updatesummary-submit"))
+    }
+
 }

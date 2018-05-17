@@ -57,6 +57,7 @@ class RemoveBusinessTypeSummaryControllerSpec extends AmlsSpec with TitleValidat
   "A successful result is returned" when {
     "the user visits the page" which {
       "contains the correct content" in new Fixture {
+        // scalastyle:off magic.number
         val now = new LocalDate(2014, 1, 1)
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)), Some(DateOfChange(now)))))
 

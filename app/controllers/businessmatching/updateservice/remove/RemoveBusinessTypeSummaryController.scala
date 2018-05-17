@@ -21,8 +21,8 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
+import forms.EmptyForm
 import javax.inject.Inject
-import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,7 +44,7 @@ class RemoveBusinessTypeSummaryController @Inject()(
       implicit request => {
         for {
           flow <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
-        } yield Ok(remove_activities_summary(flow))
+        } yield Ok(remove_activities_summary(EmptyForm, flow))
       } getOrElse InternalServerError("Unable to get the flow model")
   }
 
