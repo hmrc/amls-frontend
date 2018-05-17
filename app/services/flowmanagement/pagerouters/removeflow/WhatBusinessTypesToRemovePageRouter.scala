@@ -39,12 +39,7 @@ class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusSer
                             ec: ExecutionContext
 
                            ): Future[Result] = {
-    if (edit) {
       Future.successful(Redirect(removeRoutes.WhatDateRemovedController.get()))
-    } else {
-
-    }
-
   }
 }
 
