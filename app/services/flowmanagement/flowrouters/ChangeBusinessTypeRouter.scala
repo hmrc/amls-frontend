@@ -46,15 +46,14 @@ class ChangeBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMa
         activities <- OptionT.fromOption[Future](model.activities) map {
           _.businessActivities
         }
+
       } yield {
-        val desiredResult: Result = {
-          if (activities.size < 2) {
-            Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
-          } else {
-            Redirect(removeRoutes.RemoveBusinessTypesController.get())
-          }
+
+        if (activities.size < 2) {
+          Redirect(removeRoutes.UnableToRemoveBusinessTypesController.get())
+        } else {
+          Redirect(removeRoutes.RemoveBusinessTypesController.get())
         }
-        desiredResult
       }
     } getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
   }

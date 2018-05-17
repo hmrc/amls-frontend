@@ -43,7 +43,7 @@ class ChangeBusinessTypesController @Inject()(
                                           val router: Router[ChangeBusinessType]
                                         ) extends BaseController with RepeatingSection {
 
-  def get(edit: Boolean = false) = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
@@ -52,7 +52,7 @@ class ChangeBusinessTypesController @Inject()(
           .getOrElse(InternalServerError("Unable to show the page"))
   }
 
-  def post(edit: Boolean = false) = Authorised.async {
+  def post() = Authorised.async {
     implicit authContext =>
       implicit request => {
         Form2[ChangeBusinessType](request.body) match {
