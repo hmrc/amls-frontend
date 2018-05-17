@@ -24,7 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.updateservice.ChangeBusinessType
-import models.flowmanagement.ChangeServicesPageId
+import models.flowmanagement.ChangeBusinesTypesPageId
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -43,7 +43,7 @@ class ChangeBusinessTypesController @Inject()(
                                           val router: Router[ChangeBusinessType]
                                         ) extends BaseController with RepeatingSection {
 
-  def get = Authorised.async {
+  def get() = Authorised.async {
     implicit authContext =>
       implicit request =>
         (for {
@@ -61,7 +61,7 @@ class ChangeBusinessTypesController @Inject()(
               BadRequest(change_services(f, existing, remaining.nonEmpty))
             } getOrElse InternalServerError("Unable to show the page")
           case ValidForm(_, data) =>
-                router.getRoute(ChangeServicesPageId, data)
+                router.getRoute(ChangeBusinesTypesPageId, data)
         }
       }
   }

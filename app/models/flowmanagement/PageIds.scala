@@ -32,7 +32,7 @@ case object WhatDoYouDoHerePageId extends PageId
 case object WhichFitAndProperPageId extends PageId
 case object WhichTradingPremisesPageId extends PageId
 
-case object ChangeServicesPageId extends PageId
+case object ChangeBusinesTypesPageId extends PageId
 
 // Remove service flow
 case object WhatBusinessTypesToRemovePageId extends PageId
