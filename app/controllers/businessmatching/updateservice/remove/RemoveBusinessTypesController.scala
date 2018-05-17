@@ -47,8 +47,6 @@ class RemoveBusinessTypesController @Inject()(
 
 ) extends BaseController {
 
-
-
   implicit def businessActivityRule = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))
   }
@@ -61,10 +59,9 @@ class RemoveBusinessTypesController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.update[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key)(model => edit match {
-            case _ => model.getOrElse(RemoveBusinessTypeFlowModel())
-          }))
-          (names, values) <- getFormData
+          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
+            .orElse(OptionT.some(RemoveBusinessTypeFlowModel()))
+          (_, values) <- getFormData
         } yield {
           val form = model.activitiesToRemove.fold[Form2[Set[BusinessActivity]]](EmptyForm)(a => Form2(a))
           Ok(remove_activities(form, edit, values))
@@ -76,23 +73,21 @@ class RemoveBusinessTypesController @Inject()(
       implicit request =>
         Form2[Set[BusinessActivity]](request.body) match {
           case f: InvalidForm => getFormData map {
-            case (names, values) =>
+            case (_, values) =>
               BadRequest(remove_activities(f, edit, values))
           } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
 
           case ValidForm(_, data) =>
             dataCacheConnector.update[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key) {
-              case Some(model) => {
+              case Some(model) =>
                 model.copy(activitiesToRemove = Some(data))
-              }
+              case _ => RemoveBusinessTypeFlowModel(Some(data))
             } flatMap {
               case Some(model) => router.getRoute(WhatBusinessTypesToRemovePageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController"))
             }
         }
   }
-
-
 
   private def getFormData(implicit ac: AuthContext, hc: HeaderCarrier) = for {
     model <- businessMatchingService.getModel
@@ -103,7 +98,9 @@ class RemoveBusinessTypesController @Inject()(
     val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
       _.getMessage
     }
-    val activityValues = (activities).toSeq.sortBy(_.getMessage) map BusinessActivities.getValue
+
+    val activityValues = activities.toSeq.sortBy(_.getMessage) map BusinessActivities.getValue
+
     (existingActivityNames, activityValues)
   }
 }
