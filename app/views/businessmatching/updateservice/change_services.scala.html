@@ -62,13 +62,8 @@
             }
         }
 
-        @if(allowAdd) {
-            @submit(buttonMessageKey = Some("button.continue"))
-        } else {
-            <p class="return-link">
-                <a href="@controllers.routes.RegistrationProgressController.get().url">@Messages("link.return.registration.progress")</a>
-            </p>
-        }
+        @submit(buttonMessageKey = Some("button.continue"), returnLink = allowAdd, buttonId = Some("button-continue"))
+
     }
 
 }
