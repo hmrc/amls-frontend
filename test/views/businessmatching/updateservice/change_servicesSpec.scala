@@ -56,8 +56,7 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
       doc.body().html() must include("changeServices-add")
       doc.body().text() must include(Messages("link.return.registration.progress"))
-      //doc.html() must include(doc.getElementById("button.continue").text())
-      Option(doc.getElementById("button-continue")).isDefined must be(true)
+      Option(doc.getElementById("button-continue")).isDefined mustBe true
     }
 
     "show the correct business type text for only one existing service" in new ViewFixture {
