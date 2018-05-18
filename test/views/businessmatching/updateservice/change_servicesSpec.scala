@@ -56,6 +56,8 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))
       doc.body().html() must include("changeServices-add")
       doc.body().text() must include(Messages("link.return.registration.progress"))
+      //doc.html() must include(doc.getElementById("button.continue").text())
+      Option(doc.getElementById("button-continue")).isDefined must be(true)
     }
 
     "show the correct business type text for only one existing service" in new ViewFixture {
@@ -65,6 +67,7 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
     "show the correct business type text for more than one existing service" in new MultipleViewFixture {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.existing.multiple"))
     }
+
 
     "show errors in the correct locations" in new ViewFixture {
 
