@@ -20,20 +20,20 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.asp.Asp
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
+import models.estateagentbusiness.EstateAgentBusiness
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.ResponsiblePerson
+import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
+import play.api.libs.json.{Format, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import models.businessmatching.{
-  MoneyServiceBusiness,
-  TrustAndCompanyServices,
-  BusinessActivities => BMBusinessActivities,
-  BusinessActivity => BMBusinessActivity,
-  BusinessMatching => BMBusinessMatching
-}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -42,6 +42,16 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
+  def removeSectionData(types: Set[BMBusinessActivity])
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Any] = {
+    Future.sequence((types collect {
+      case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
+      case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
+      case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
+      case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
+      case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+    }).toSeq)
+  }
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)
                                          (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
