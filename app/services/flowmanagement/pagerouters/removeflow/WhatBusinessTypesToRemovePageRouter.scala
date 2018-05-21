@@ -16,11 +16,12 @@
 
 package services.flowmanagement.pagerouters.removeflow
 
-import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import play.api.mvc.Result
-import play.api.mvc.Results.Redirect
+import play.api.mvc.Results._
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
@@ -28,10 +29,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
+import cats.implicits._
 
 @Singleton
 class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusService,
-                                                    val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveBusinessTypeFlowModel] {
+                                                    val businessMatchingService: BusinessMatchingService,
+                                                    val removeBusinessTypeHelper: RemoveBusinessTypeHelper) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
   override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
@@ -39,11 +42,11 @@ class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusSer
                             ec: ExecutionContext
                            ): Future[Result] = {
 
-    if (edit) {
-      Future.successful(Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get()))
-    } else {
-      Future.successful(Redirect(removeRoutes.WhatDateRemovedController.get()))
-    }
+
+    removeBusinessTypeHelper.dateOfChangeApplicable(model) map {
+      case true => Redirect(removeRoutes.WhatDateRemovedController.get())
+      case false => Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
+    } getOrElse InternalServerError("Unable to determine route from the WhatBusinessTypesToRemovePage")
   }
 }
 
