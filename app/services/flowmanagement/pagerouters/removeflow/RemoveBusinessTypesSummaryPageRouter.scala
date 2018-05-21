@@ -16,10 +16,12 @@
 
 package services.flowmanagement.pagerouters.removeflow
 
+import connectors.DataCacheConnector
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.AccountancyServices
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.tradingpremises.TradingPremises
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -32,23 +34,27 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusService,
-                                                     val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveBusinessTypeFlowModel] {
+                                                     val businessMatchingService: BusinessMatchingService,
+                                                     val dataCacheConnector: DataCacheConnector) extends PageRouter[RemoveBusinessTypeFlowModel] {
 
   override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
                            (implicit ac: AuthContext,
                             hc: HeaderCarrier,
                             ec: ExecutionContext
-
                            ): Future[Result] = {
-    model.activitiesToRemove map { m =>
-      if(m.contains(AccountancyServices)) {
-        Future.successful(Redirect(removeRoutes.NeedMoreInformationController.get()))
-      } else {
-        Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
-      }
-    }  getOrElse Future.successful(InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter"))
+
+    val allTpComplete = (tp: Seq[TradingPremises]) => tp.forall(_.isComplete)
+
+    dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
+      case Some(tp) =>
+        model.activitiesToRemove map { m =>
+          if(m.contains(AccountancyServices) || !allTpComplete(tp)) {
+            Redirect(removeRoutes.NeedMoreInformationController.get())
+          } else {
+            Redirect(controllers.routes.RegistrationProgressController.get())
+          }
+        }  getOrElse InternalServerError("Could not do the get the route for RemoveBusinessTypesSummaryPageRouter")
+    }
+
   }
 }
-
-
-
