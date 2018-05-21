@@ -59,18 +59,18 @@ class select_activitiesSpec extends AmlsSpec with MustMatchers {
       override def view = select_activities(EmptyForm,
         edit = true,
         addedActivities map BusinessActivities.getValue,
-        submittedActivities map (_.getMessage)
+        submittedActivities map (_.getMessage())
       )
 
       doc.body().text() must not include Messages("link.return.registration.progress")
 
       addedActivities foreach { a =>
-        doc.body().text must include(Messages(a.getMessage))
+        doc.body().text must include(Messages(a.getMessage()))
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
 
       submittedActivities foreach { a =>
-        doc.body().text() must include(Messages(a.getMessage))
+        doc.body().text() must include(Messages(a.getMessage()))
       }
 
     }

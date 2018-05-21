@@ -23,6 +23,7 @@ import javax.inject.{Inject, Singleton}
 import models.asp.Asp
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
 import models.estateagentbusiness.EstateAgentBusiness
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
@@ -134,5 +135,15 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
         })
       }
     } yield newResponsiblePeople
+  }
+
+  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+    for {
+      activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
+      recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
+      addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
+    } yield {
+      (addedActivities -- activitiesToRemove).nonEmpty
+    }
   }
 }

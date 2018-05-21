@@ -42,7 +42,7 @@ class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
           model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
           activities <- OptionT.fromOption[Future](model.activitiesToRemove) orElse OptionT.some[Future, Set[BusinessActivity]](Set.empty)
         } yield {
-          val activityNames = activities map { _.getMessage }
+          val activityNames = activities map { _.getMessage() }
           Ok(need_more_information(activityNames))
          })getOrElse(InternalServerError("Cannot retrieve information from cache"))
   }

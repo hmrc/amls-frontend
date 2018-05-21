@@ -47,7 +47,7 @@ class NeedMoreInformationController @Inject()(
             case BillPaymentServices | TelephonePaymentService => true
             case _ => false
           } map {
-            _.getMessage
+            _.getMessage()
           }
 
           Ok(new_service_information(activityNames))

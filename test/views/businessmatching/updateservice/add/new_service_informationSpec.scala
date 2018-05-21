@@ -29,7 +29,7 @@ class new_service_informationSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = new_service_information(Set(AccountancyServices.getMessage))
+    def view = new_service_information(Set(AccountancyServices.getMessage()))
   }
 
   "The new_service_information view" must {

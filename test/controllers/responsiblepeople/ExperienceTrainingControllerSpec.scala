@@ -90,9 +90,9 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
         val RecordId = 1
         val result = controller.get(RecordId)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(AccountancyServices.getMessage)
-        contentAsString(result) must include(BillPaymentServices.getMessage)
-        contentAsString(result) must include(EstateAgentBusinessService.getMessage)
+        contentAsString(result) must include(AccountancyServices.getMessage())
+        contentAsString(result) must include(BillPaymentServices.getMessage())
+        contentAsString(result) must include(EstateAgentBusinessService.getMessage())
         contentAsString(result) must include(Messages("responsiblepeople.experiencetraining.title"))
       }
     }
