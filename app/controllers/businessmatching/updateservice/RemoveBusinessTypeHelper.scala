@@ -99,8 +99,8 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
             val newBusinessActivities = currentActivities.businessActivities -- activitiesToRemove
 
             val newActivities = (newTPActivities, newBusinessActivities) match {
-              case (x, y) if x.isEmpty && y.size == 1 => y
-              case (x, _) => x
+              case (tpActivities, busActivities) if tpActivities.isEmpty && busActivities.size == 1 => busActivities
+              case (tpActivities, _) => tpActivities
             }
 
             val newBusinessTypes = currentBusinessTypes.copy(activities = newActivities)
