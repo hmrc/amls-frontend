@@ -588,7 +588,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing MSB" in new Fixture {
         mockCacheSave[MoneyServiceBusinessSection]
 
-        val result = await(helper.removeSectionData(Set(MoneyServiceBusiness)))
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)))).value)
 
         verify(mockCacheConnector).save[MoneyServiceBusinessSection](
           eqTo(MoneyServiceBusinessSection.key),
@@ -598,7 +598,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing HVD" in new Fixture {
         mockCacheSave[Hvd]
 
-        val result = await(helper.removeSectionData(Set(HighValueDealing)))
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing)))).value)
 
         verify(mockCacheConnector).save[Hvd](
           eqTo(Hvd.key),
@@ -608,7 +608,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing TCSP" in new Fixture {
         mockCacheSave[Tcsp]
 
-        val result = await(helper.removeSectionData(Set(TrustAndCompanyServices)))
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(TrustAndCompanyServices)))).value)
 
         verify(mockCacheConnector).save[Tcsp](
           eqTo(Tcsp.key),
@@ -618,7 +618,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing ASP" in new Fixture {
         mockCacheSave[Asp]
 
-        val result = await(helper.removeSectionData(Set(AccountancyServices)))
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))).value)
 
         verify(mockCacheConnector).save[Asp](
           eqTo(Asp.key),
@@ -628,7 +628,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       "removing EAB" in new Fixture {
         mockCacheSave[EstateAgentBusiness]
 
-        val result = await(helper.removeSectionData(Set(EstateAgentBusinessService)))
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService)))).value)
 
         verify(mockCacheConnector).save[EstateAgentBusiness](
           eqTo(EstateAgentBusiness.key),
@@ -639,7 +639,8 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         mockCacheSave[EstateAgentBusiness]
         mockCacheSave[Tcsp]
 
-        val result = await(helper.removeSectionData(Set(EstateAgentBusinessService, TrustAndCompanyServices)))
+        val result = await(helper.removeSectionData(
+          RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService, TrustAndCompanyServices)))).value)
 
         verify(mockCacheConnector).save[EstateAgentBusiness](
           eqTo(EstateAgentBusiness.key),

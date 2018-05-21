@@ -29,7 +29,6 @@ import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.ResponsiblePerson
 import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
-import play.api.libs.json.{Format, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -42,15 +41,15 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
-  def removeSectionData(types: Set[BMBusinessActivity])
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Any] = {
-    Future.sequence((types collect {
+  def removeSectionData(model: RemoveBusinessTypeFlowModel)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+    OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
       case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
       case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
       case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
       case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
       case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
-    }).toSeq)
+    }).toSeq))
   }
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)
