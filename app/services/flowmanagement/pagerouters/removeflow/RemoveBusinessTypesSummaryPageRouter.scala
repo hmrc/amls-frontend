@@ -16,10 +16,10 @@
 
 package services.flowmanagement.pagerouters.removeflow
 
-import javax.inject.{Inject, Singleton}
-import models.flowmanagement.RemoveBusinessTypeFlowModel
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.AccountancyServices
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService

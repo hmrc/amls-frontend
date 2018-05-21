@@ -50,7 +50,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
     mockCacheFetch[AddBusinessTypeFlowModel](Some(flowModel), Some(AddBusinessTypeFlowModel.key))
   }
 
-  "NewServiceInformationController" when {
+  "NeedMoreInformationControllerSpec  (Add)" when {
 
     "get is called" must {
       "return OK with new_service_information view" in new Fixture {
@@ -70,7 +70,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec with MockitoSugar with 
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      controller.router.verify(NeedMoreInformationPageId, flowModel)
+      controller.router.verify(NeedMoreInformationPageId, new AddBusinessTypeFlowModel())
     }
   }
 }

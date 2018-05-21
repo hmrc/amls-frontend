@@ -18,7 +18,7 @@ package controllers.businessmatching.updateservice.remove
 
 import models.DateOfChange
 import models.businessmatching.HighValueDealing
-import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId, NeedToUpdatePageId, RemoveBusinessTypeFlowModel}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
@@ -40,7 +40,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
   }
 
 
-  "NeedToUpdateController" when {
+  "NeedToUpdateController (Remove)" when {
 
     "get is called" must {
 
@@ -61,6 +61,7 @@ class NeedMoreInformationControllerSpec extends AmlsSpec {
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
+        controller.router.verify(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel())
       }
     }
   }
