@@ -30,7 +30,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
 import play.api.test.Helpers._
-import org.mockito.Mockito.{verify, never}
+import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -47,6 +47,9 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       self.authConnector,
       mockCacheConnector
     )
+
+    val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, HighValueDealing, TrustAndCompanyServices))))
+    mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
   }
 
   "removing BusinessMatching business types" when {
@@ -458,6 +461,35 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           mockCacheUpdate(Some(TradingPremises.key), startResultTP)
 
           helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
+        }
+      }
+
+      "removing all of the services" should {
+        "pre-populate the 'what does your business do question" when {
+          "the business itself only has one remaining registered service" in new Fixture {
+            override val businessMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(MoneyServiceBusiness, HighValueDealing))))
+
+            mockCacheFetch(Some(businessMatching), Some(BusinessMatching.key))
+
+            val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)))
+
+            val startResultTP = Seq(TradingPremises(
+              whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+              hasAccepted = true,
+              hasChanged = true))
+
+            val endResultTP = Seq(TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+              hasAccepted = true,
+              hasChanged = true))
+
+            mockCacheFetch[Seq[TradingPremises]](
+              Some(startResultTP),
+              Some(TradingPremises.key))
+
+            mockCacheUpdate(Some(TradingPremises.key), startResultTP)
+
+            helper.removeTradingPremisesBusinessTypes(model).returnsSome(endResultTP)
+          }
         }
       }
     }

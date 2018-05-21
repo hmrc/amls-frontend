@@ -87,12 +87,23 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     val setAccepted = (tp: TradingPremises) => tp.copy(hasAccepted = true)
 
     for {
+      businessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
+      currentActivities <- OptionT.fromOption[Future](businessMatching.activities)
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
       newTradingPremises <- {
         OptionT(dataCacheConnector.update[Seq[TradingPremises]](TradingPremises.key) {
           case Some(tpList) => tpList map { tp =>
             val currentBusinessTypes = tp.whatDoesYourBusinessDoAtThisAddress.getOrElse(WhatDoesYourBusinessDo(Set.empty))
-            val newBusinessTypes = currentBusinessTypes.copy(activities = currentBusinessTypes.activities -- activitiesToRemove)
+
+            val newTPActivities = currentBusinessTypes.activities -- activitiesToRemove
+            val newBusinessActivities = currentActivities.businessActivities -- activitiesToRemove
+
+            val newActivities = (newTPActivities, newBusinessActivities) match {
+              case (tpActivities, busActivities) if tpActivities.isEmpty && busActivities.size == 1 => busActivities
+              case (tpActivities, _) => tpActivities
+            }
+
+            val newBusinessTypes = currentBusinessTypes.copy(activities = newActivities)
             val newPremises = tp.whatDoesYourBusinessDoAtThisAddress(newBusinessTypes)
 
             setAccepted {

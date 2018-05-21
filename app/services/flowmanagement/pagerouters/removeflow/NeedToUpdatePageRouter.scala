@@ -16,13 +16,10 @@
 
 package services.flowmanagement.pagerouters.removeflow
 
-import javax.inject.{Inject, Singleton}
-import models.flowmanagement.RemoveBusinessTypeFlowModel
-import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import javax.inject.Singleton
+import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
 import play.api.mvc.Result
 import play.api.mvc.Results.Redirect
-import services.StatusService
-import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -30,16 +27,13 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class NeedToUpdatePageRouter @Inject()(val statusService: StatusService,
-                                       val businessMatchingService: BusinessMatchingService) extends PageRouter[RemoveBusinessTypeFlowModel] {
+class NeedToUpdatePageRouter extends PageRouter[RemoveBusinessTypeFlowModel] {
 
-  override def getPageRoute(model: RemoveBusinessTypeFlowModel, edit: Boolean = false)
-                           (implicit ac: AuthContext,
-                            hc: HeaderCarrier,
-                            ec: ExecutionContext
+  override def getPageRoute(model: RemoveBusinessTypeFlowModel  = new RemoveBusinessTypeFlowModel(), edit: Boolean = false)
+                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext ): Future[Result] = {
 
-                           ): Future[Result] = {
     Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
+
   }
 }
 

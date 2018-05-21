@@ -101,7 +101,8 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
 error.required.bm.register.service.single = Select the type of business you need to register
-error.required.bm.remove.service = Select one or more options to show what you need to remove
+error.required.bm.remove.service = You must have at least one business type selected.
+error.required.bm.remove.leave.one = You must leave at least one business type unselected.
 error.required.bm.registration.number = Enter a valid company registration number
 error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
@@ -1179,8 +1180,8 @@ businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
 businessmatching.updateservice.updateotherinformation.title = We need you to update other information
-businessmatching.updateservice.updateotherinformation.hint = You’ve told us your business needs to remove for:
-businessmatching.updateservice.updateotherinformation.text = You might need to update other sections based on any of the new information you provide.
+businessmatching.updateservice.updateotherinformation.hint = You have removed:
+businessmatching.updateservice.updateotherinformation.text = As a result some sections of your application need to be updated.
 
 
 #   Add route Start  ###################################################################################################

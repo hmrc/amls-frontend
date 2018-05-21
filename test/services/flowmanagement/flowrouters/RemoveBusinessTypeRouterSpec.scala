@@ -19,11 +19,14 @@ package services.flowmanagement.flowrouters
 
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import controllers.businessmatching.updateservice.remove.{routes => removeRoutes}
+import generators.tradingpremises.TradingPremisesGenerator
 import models.DateOfChange
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement._
+import models.tradingpremises.TradingPremises
 import org.joda.time.LocalDate
+import org.scalacheck.Gen
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
@@ -33,7 +36,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import scala.concurrent.ExecutionContext.Implicits.global
 
 
-class RemoveBusinessTypeRouterSpec extends AmlsSpec {
+class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerator {
 
   trait Fixture extends DependencyMocks with AuthorisedFixture {
     self =>
@@ -47,9 +50,9 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
 
     val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
-      whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(mockStatusService, mockBusinessMatchingService, removeBusinessTypeHelper),
-      needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
-      removeServicesSummaryPageRouter = new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
+      whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(mockStatusService, mockBusinessMatchingService, removeBusinessTypeHelper = removeBusinessTypeHelper),
+      needToUpdatePageRouter = new NeedToUpdatePageRouter(),
+      removeServicesSummaryPageRouter = new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService, mockCacheConnector),
       unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)
     )
@@ -96,6 +99,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
 
           result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
         }
+
         "some of the business types have not been submitted and in edit mode" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
@@ -133,6 +137,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'progress' page (RegistrationProgressController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is no ASP business type in the model" in new Fixture {
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesGen).sample.get))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
@@ -149,11 +154,26 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is an ASP business type in the model" in new Fixture {
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesGen).sample.get))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
+          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
+        }
+
+        "there are incomplete trading premises in the data" in new Fixture {
+
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(4, tradingPremisesGen).sample.get map { tp => tp.copy(hasAccepted = false) }))
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing)),
+            dateOfChange = Some(DateOfChange(LocalDate.now()))
+          )
+
           val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
 
           result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())

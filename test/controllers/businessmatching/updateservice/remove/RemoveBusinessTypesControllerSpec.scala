@@ -25,6 +25,7 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId, WhatDateRemovedPageId}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
@@ -88,11 +89,18 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "return the next page in the flow when valid data has been posted" in new Fixture {
+
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
+
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
 
         when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
 
-        mockCacheSave(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing))))
+        mockCacheSave[RemoveBusinessTypeFlowModel]
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[]" -> "04"
@@ -102,6 +110,12 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "save the list of business activites to the data cache" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
+
         val today = LocalDate.now
 
         val flowModel = RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))
@@ -120,6 +134,11 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "wipe the date of change if its not required" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
@@ -135,6 +154,11 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
@@ -150,6 +174,11 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "leave the date of change if the services to remove have not been changed" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
 
         mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
 
@@ -162,7 +191,48 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         )))
 
         controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
+      }
 
+      "throw an error message when trying to select all business types the users has" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            TelephonePaymentService)))
+        ))
+
+
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel()))
+
+        mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices,
+          BillPaymentServices,
+          EstateAgentBusinessService,
+          HighValueDealing,
+          MoneyServiceBusiness,
+          TrustAndCompanyServices,
+          TelephonePaymentService))),
+          Some(RemoveBusinessTypeFlowModel.key))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+
+        "businessActivities[]" -> "01",
+        "businessActivities[]" -> "02",
+        "businessActivities[]" -> "03",
+        "businessActivities[]" -> "04",
+        "businessActivities[]" -> "05",
+        "businessActivities[]" -> "06",
+        "businessActivities[]" -> "07"
+        ))
+
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("validation-summary-message").text() must include(Messages("error.required.bm.remove.leave.one"))
       }
     }
   }

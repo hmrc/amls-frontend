@@ -51,8 +51,7 @@ class NeedMoreInformationController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key))
-          route <- OptionT.liftF(router.getRoute(NeedToUpdatePageId, model))
-        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NewServiceInformationController")
+            route <- OptionT.liftF(router.getRoute(NeedToUpdatePageId, new RemoveBusinessTypeFlowModel()))
+        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Remove : NewServiceInformationController")
   }
 }
