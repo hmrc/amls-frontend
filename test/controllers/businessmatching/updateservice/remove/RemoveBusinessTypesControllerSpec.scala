@@ -116,7 +116,7 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
           "businessActivities[]" -> "04"
         )))
 
-        controller.router.verify(WhatBusinessTypesToRemovePageId, flowModel.copy(activitiesToRemove = Some(Set(HighValueDealing))))
+        controller.router.verify(WhatBusinessTypesToRemovePageId, flowModel.copy(dateOfChange = None, activitiesToRemove = Some(Set(HighValueDealing))))
       }
 
       "wipe the date of change if its not required" in new Fixture {
@@ -132,6 +132,37 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         )))
 
         controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+      }
+
+      "wipe the date of change if the services to remove have been edited and changed" in new Fixture {
+
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+
+        mockCacheSave[RemoveBusinessTypeFlowModel]
+
+        val result = await(controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[]" -> "04"
+        )))
+
+        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
+      }
+
+      "leave the date of change if the services to remove have not been changed" in new Fixture {
+
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+
+        mockCacheSave[RemoveBusinessTypeFlowModel]
+
+        val result = await(controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[]" -> "04"
+        )))
+
+        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing)), dateOfChange = Some(DateOfChange(LocalDate.now))))
+
       }
     }
   }

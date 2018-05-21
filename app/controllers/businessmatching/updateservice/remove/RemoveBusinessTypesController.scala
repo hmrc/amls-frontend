@@ -82,9 +82,10 @@ class RemoveBusinessTypesController @Inject()(
           case ValidForm(_, data) =>
             (for {
               model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
-              dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(model)
+              dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(data)
+              servicesChanged <- OptionT.some[Future, Boolean](model.activitiesToRemove.getOrElse(Set.empty) != data)
               newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
-                model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable) None else model.dateOfChange)
+                model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable || servicesChanged) None else model.dateOfChange)
               )
               _ <- OptionT.liftF(dataCacheConnector.save(RemoveBusinessTypeFlowModel.key, newModel))
 

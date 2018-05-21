@@ -208,5 +208,19 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
         result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
       }
     }
+
+    "return the 'Check your answers' page (RemoveBusinessTypesSummaryController)" when {
+      "editing the 'what business types to remove' page (WhatDateRemovedPageId) and the date of change exists" in new Fixture {
+
+        val model = RemoveBusinessTypeFlowModel(
+          activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
+          dateOfChange = Some(DateOfChange(LocalDate.now()))
+        )
+
+        val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model, edit = true))
+
+        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
+      }
+    }
   }
 }
