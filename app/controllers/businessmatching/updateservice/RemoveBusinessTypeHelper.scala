@@ -20,14 +20,20 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.asp.Asp
+import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
+import models.estateagentbusiness.EstateAgentBusiness
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
 import models.responsiblepeople.ResponsiblePerson
+import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -35,7 +41,17 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
-                                        ) {
+                                   ) {
+  def removeSectionData(model: RemoveBusinessTypeFlowModel)
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+    OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
+      case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
+      case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
+      case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
+      case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
+      case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+    }).toSeq))
+  }
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)
                                          (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
@@ -121,7 +137,8 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newResponsiblePeople
   }
 
-  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)
+                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
@@ -129,5 +146,11 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield {
       (addedActivities -- activitiesToRemove).nonEmpty
     }
+  }
+
+  def removeFlowData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
+    val emptyModel = RemoveBusinessTypeFlowModel()
+
+    OptionT.liftF(dataCacheConnector.save(RemoveBusinessTypeFlowModel.key, RemoveBusinessTypeFlowModel())) map { _ => emptyModel }
   }
 }

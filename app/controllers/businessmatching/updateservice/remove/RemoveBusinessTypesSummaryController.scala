@@ -64,5 +64,6 @@ class RemoveBusinessTypesSummaryController @Inject()(
     _ <- helper.removeFitAndProper(model)
     _ <- helper.removeBusinessMatchingBusinessTypes(model)
     _ <- helper.removeTradingPremisesBusinessTypes(model)
+    _ <- helper.removeSectionData(model)
   } yield model
 }

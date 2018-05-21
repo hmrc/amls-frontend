@@ -20,8 +20,8 @@ import cats.data.OptionT
 import cats.implicits._
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
-import models.businessmatching.updateservice.{ChangeBusinessType, Add}
-import models.flowmanagement.ChangeBusinesTypesPageId
+import models.businessmatching.updateservice.{Add, ChangeBusinessType}
+import models.flowmanagement.{ChangeBusinesTypesPageId, RemoveBusinessTypeFlowModel}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -46,7 +46,8 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
       self.authConnector,
       mockCacheConnector,
       bmService,
-      createRouter[ChangeBusinessType]
+      createRouter[ChangeBusinessType],
+      mock[RemoveBusinessTypeHelper]
     )
 
     val businessActivitiesModel = BusinessActivities(Set(MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
@@ -58,6 +59,11 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       bmService.getRemainingBusinessActivities(any(), any(), any())
     } thenReturn OptionT.some[Future, Set[BusinessActivity]](Set(HighValueDealing))
+
+    when {
+      controller.helper.removeFlowData(any(), any(), any())
+    } thenReturn OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel())
+
   }
 
   "ChangeServicesController" when {

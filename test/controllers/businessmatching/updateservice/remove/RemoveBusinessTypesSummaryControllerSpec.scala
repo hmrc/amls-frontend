@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import models.DateOfChange
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, RemoveBusinessTypesSummaryPageId}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
@@ -30,6 +30,7 @@ import org.mockito.Mockito.when
 import org.mockito.Matchers.{any, eq => eqTo}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DateHelper, DependencyMocks}
 import views.TitleValidator
 
@@ -89,6 +90,12 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         when(removeServiceHelper.removeTradingPremisesBusinessTypes(eqTo(flowModel))(any(), any(), any()))
           .thenReturn(OptionT.some[Future, Seq[TradingPremises]](Seq.empty))
+
+        when(removeServiceHelper.removeSectionData(eqTo(flowModel))(any(), any(), any()))
+          .thenReturn(OptionT.some[Future, Seq[CacheMap]](Seq.empty))
+
+        when(removeServiceHelper.removeFlowData(any(), any(), any()))
+          .thenReturn(OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel()))
 
         val result = controller.post()(request.withFormUrlEncodedBody())
 
