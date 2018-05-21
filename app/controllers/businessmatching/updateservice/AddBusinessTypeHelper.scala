@@ -99,7 +99,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
 
   def tradingPremisesData(implicit hc: HeaderCarrier, ac: AuthContext): Future[Seq[TradingPremises]] =
     getData[TradingPremises].map {
-      _.filterNot(tp => tp.status.contains(StatusConstants.Deleted) | !tp.isComplete)
+      _.filterNot(tp => tp.status.contains(StatusConstants.Deleted))
     }
 
   def updateBusinessMatching(model: AddBusinessTypeFlowModel)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, BusinessMatching] = {
