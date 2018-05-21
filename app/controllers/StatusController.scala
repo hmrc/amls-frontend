@@ -153,7 +153,7 @@ class StatusController @Inject()(val landingService: LandingService,
     statusInfo match {
       case (SubmissionDecisionApproved, statusDtls) => {
         val endDate = statusDtls.fold[Option[LocalDate]](None)(_.currentRegYearEndDate)
-        val activities = maybeActivities.map(_.businessActivities.map(_.getMessage)) getOrElse Set.empty
+        val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
         Ok {
           //noinspection ScalaStyle
@@ -190,7 +190,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                 (implicit request: Request[AnyContent],
                                  authContext: AuthContext) = {
 
-    val activities = maybeActivities.map(_.businessActivities.map(_.getMessage)) getOrElse Set.empty
+    val activities = maybeActivities.map(_.businessActivities.map(_.getMessage())) getOrElse Set.empty
 
     statusInfo match {
       case (RenewalSubmitted(renewalDate), _) =>

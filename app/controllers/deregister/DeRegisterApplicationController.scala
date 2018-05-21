@@ -50,7 +50,7 @@ class DeRegisterApplicationController @Inject()
             ba <- OptionT.fromOption[Future](bm.activities)
           } yield {
             val activities = ba.businessActivities map {
-              _.getMessage
+              _.getMessage()
             }
 
             Ok(deregister_application(details.businessName, activities, amlsRegNumber))

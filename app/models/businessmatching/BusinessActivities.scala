@@ -38,16 +38,17 @@ case class BusinessActivities(businessActivities: Set[BusinessActivity],
 
 sealed trait BusinessActivity {
 
-  def getMessage(implicit lang: Lang): String = {
-    val message = "businessmatching.registerservices.servicename.lbl."
+  def getMessage(usePhrased:Boolean = false)(implicit lang: Lang): String = {
+    val phrasedString = if(usePhrased) ".phrased" else ""
+    val message = s"businessmatching.registerservices.servicename.lbl."
     this match {
-      case AccountancyServices => Messages(s"${message}01")
-      case BillPaymentServices => Messages(s"${message}02")
-      case EstateAgentBusinessService => Messages(s"${message}03")
-      case HighValueDealing => Messages(s"${message}04")
-      case MoneyServiceBusiness => Messages(s"${message}05")
-      case TrustAndCompanyServices => Messages(s"${message}06")
-      case TelephonePaymentService => Messages(s"${message}07")
+      case AccountancyServices => Messages(s"${message}01${phrasedString}")
+      case BillPaymentServices => Messages(s"${message}02${phrasedString}")
+      case EstateAgentBusinessService => Messages(s"${message}03${phrasedString}")
+      case HighValueDealing => Messages(s"${message}04${phrasedString}")
+      case MoneyServiceBusiness => Messages(s"${message}05${phrasedString}")
+      case TrustAndCompanyServices => Messages(s"${message}06${phrasedString}")
+      case TelephonePaymentService => Messages(s"${message}07${phrasedString}")
     }
   }
 }

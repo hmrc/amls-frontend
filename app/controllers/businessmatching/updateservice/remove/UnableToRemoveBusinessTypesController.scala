@@ -39,7 +39,7 @@ class UnableToRemoveBusinessTypesController @Inject()(
     implicit authContext =>
       implicit request =>
       getBusinessActivity.map {
-        case activity => Ok(unable_to_remove_activity(activity.getMessage))
+        case activity => Ok(unable_to_remove_activity(activity.getMessage(true)))
       } getOrElse (InternalServerError("Get: Unable to show Unable to Remove Activities page"))
   }
 

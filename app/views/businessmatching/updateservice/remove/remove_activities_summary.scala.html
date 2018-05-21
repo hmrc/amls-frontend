@@ -39,7 +39,7 @@
             question = Messages("businessmatching.updateservice.removeactivities.heading"),
             editUrl = routes.RemoveBusinessTypesController.get(edit = true).url
         ) {
-            <p>@activities.map(_.getMessage).mkString(", ")</p>
+            <p>@activities.map(_.getMessage()).mkString(", ")</p>
         }
     }
 

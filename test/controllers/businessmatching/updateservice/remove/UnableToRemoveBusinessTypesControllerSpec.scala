@@ -49,7 +49,7 @@ class UnableToRemoveBusinessTypesControllerSpec extends AmlsSpec {
           val result = controller.get()(request)
 
           status(result) mustBe OK
-          contentAsString(result) must include(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", Messages("businessmatching.registerservices.servicename.lbl.05")))
+          contentAsString(result) must include(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
         }
       }
     }

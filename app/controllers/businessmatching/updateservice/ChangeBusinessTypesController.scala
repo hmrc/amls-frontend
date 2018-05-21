@@ -71,7 +71,7 @@ class ChangeBusinessTypesController @Inject()(
     businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
     remainingActivities <- businessMatchingService.getRemainingBusinessActivities
   } yield {
-    val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+    val existing = businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage()))
     val existingSorted = SortedSet[String]() ++ existing
     val remainingActivitiesSorted = SortedSet[String]() ++ remainingActivities
 

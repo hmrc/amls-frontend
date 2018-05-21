@@ -95,11 +95,11 @@ class RemoveBusinessTypesController @Inject()(
       _.businessActivities
     }
   } yield {
-    val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
-      _.getMessage
+    val existingActivityNames = activities.toSeq.sortBy(_.getMessage()) map {
+      _.getMessage()
     }
 
-    val activityValues = activities.toSeq.sortBy(_.getMessage) map BusinessActivities.getValue
+    val activityValues = activities.toSeq.sortBy(_.getMessage()) map BusinessActivities.getValue
 
     (existingActivityNames, activityValues)
   }

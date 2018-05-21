@@ -69,7 +69,7 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
 
         validateTitle(s"${Messages("title.cya")} - ${Messages("summary.updateinformation")}")(implicitly, doc)
         doc.getElementsByTag("h1").text must include(Messages("title.cya"))
-        doc.getElementsByClass("check-your-answers").text must include(MoneyServiceBusiness.getMessage)
+        doc.getElementsByClass("check-your-answers").text must include(MoneyServiceBusiness.getMessage())
         doc.getElementsByClass("check-your-answers").text must include(DateHelper.formatDate(now))
       }
     }

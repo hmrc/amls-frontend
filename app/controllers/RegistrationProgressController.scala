@@ -68,7 +68,7 @@ class RegistrationProgressController @Inject()(
                 val sections = progressService.sections(cacheMap)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady).contains(status)
-                val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage).toSeq)
+                val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)
 
                 completePreApp match {
                   case true => Ok(registration_amendment(
