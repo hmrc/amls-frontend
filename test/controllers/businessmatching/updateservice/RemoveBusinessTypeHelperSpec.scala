@@ -586,7 +586,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   "date of change" should {
 
-    "be applicable" when {
+    "not be applicable" when {
 
 
       "there is one service to remove and it hasn't been submitted" in new Fixture {
@@ -613,6 +613,10 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       }
 
+    }
+
+    "be applicable" when {
+
       "there are multiple services to remove which have not been submitted" in new Fixture {
 
         val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
@@ -622,17 +626,14 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           Some(justAdded),
           Some(ServiceChangeRegister.key))
 
-        helper.dateOfChangeApplicable(justRemoved).returnsSome(false)
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(true)
 
       }
-    }
 
-    "not be applicable" when {
+      "there are multiple services to remove which have all been submitted" in new Fixture {
 
-      "the services to remove are not newly added" in new Fixture{
-
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
-        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
+        val justAdded = ServiceChangeRegister(None)
 
         mockCacheFetch[ServiceChangeRegister](
           Some(justAdded),
