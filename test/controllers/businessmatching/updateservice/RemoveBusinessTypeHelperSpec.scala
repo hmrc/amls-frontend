@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
@@ -571,6 +572,79 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           helper.removeFitAndProper(model).returnsSome(startResultRP)
         }
+      }
+    }
+  }
+
+  "date of change" should {
+
+    "be applicable" when {
+
+
+      "there is one service to remove and it hasn't been submitted" in new Fixture {
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices)))
+        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(BillPaymentServices)))
+
+        mockCacheFetch[ServiceChangeRegister](
+          Some(justAdded),
+          Some(ServiceChangeRegister.key))
+
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(false)
+
+      }
+
+      "there are multiple services to remove and none of them have been submitted" in new Fixture {
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness)))
+        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+        mockCacheFetch[ServiceChangeRegister](
+          Some(justAdded),
+          Some(ServiceChangeRegister.key))
+
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(false)
+
+      }
+
+      "there are multiple services to remove which have not been submitted" in new Fixture {
+
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
+        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+        mockCacheFetch[ServiceChangeRegister](
+          Some(justAdded),
+          Some(ServiceChangeRegister.key))
+
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(false)
+
+      }
+    }
+
+    "not be applicable" when {
+
+      "the services to remove are not newly added" in new Fixture{
+
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
+        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+
+        mockCacheFetch[ServiceChangeRegister](
+          Some(justAdded),
+          Some(ServiceChangeRegister.key))
+
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(true)
+
+      }
+
+      "the services to remove are not newly added and are different" in new Fixture{
+
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
+
+        mockCacheFetch[ServiceChangeRegister](
+          Some(justAdded),
+          Some(ServiceChangeRegister.key))
+
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(true)
+
       }
     }
   }
