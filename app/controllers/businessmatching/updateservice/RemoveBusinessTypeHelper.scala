@@ -141,10 +141,10 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                             (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
-      recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
+      recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
       addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
     } yield {
-      (addedActivities -- activitiesToRemove).nonEmpty
+      (activitiesToRemove -- addedActivities).nonEmpty
     }
   }
 
