@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.Rules._
@@ -40,19 +41,20 @@ import scala.concurrent.Future
 
 @Singleton
 class RemoveBusinessTypesController @Inject()(
-                                          val authConnector: AuthConnector,
-                                          val dataCacheConnector: DataCacheConnector,
-                                          val businessMatchingService: BusinessMatchingService,
-                                          val router: Router[RemoveBusinessTypeFlowModel]
+                                               val authConnector: AuthConnector,
+                                               val dataCacheConnector: DataCacheConnector,
+                                               val businessMatchingService: BusinessMatchingService,
+                                               val removeBusinessTypeHelper: RemoveBusinessTypeHelper,
+                                               val router: Router[RemoveBusinessTypeFlowModel]
 
-) extends BaseController {
+                                             ) extends BaseController {
 
   implicit def businessActivityRule = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))
   }
 
   implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
-    Map("businessActivities[]" ->  activities.toSeq.map { a => BusinessActivities.getValue(a) })
+    Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
   }
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -78,14 +80,16 @@ class RemoveBusinessTypesController @Inject()(
           } getOrElse InternalServerError("Post: Invalid form on Remove Activities page")
 
           case ValidForm(_, data) =>
-            dataCacheConnector.update[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key) {
-              case Some(model) =>
-                model.copy(activitiesToRemove = Some(data))
-              case _ => RemoveBusinessTypeFlowModel(Some(data))
-            } flatMap {
-              case Some(model) => router.getRoute(WhatBusinessTypesToRemovePageId, model, edit)
-              case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController"))
-            }
+            (for {
+              model <- OptionT(dataCacheConnector.fetch[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel.key)) orElse OptionT.some(RemoveBusinessTypeFlowModel())
+              dateApplicable <- removeBusinessTypeHelper.dateOfChangeApplicable(model)
+              newModel <- OptionT.some[Future, RemoveBusinessTypeFlowModel](
+                model.copy(activitiesToRemove = Some(data), dateOfChange = if (!dateApplicable) None else model.dateOfChange)
+              )
+              _ <- OptionT.liftF(dataCacheConnector.save(RemoveBusinessTypeFlowModel.key, newModel))
+
+              route <- OptionT.liftF(router.getRoute(WhatBusinessTypesToRemovePageId, newModel, edit))
+            } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: RemoveActivitiesController")
         }
   }
 

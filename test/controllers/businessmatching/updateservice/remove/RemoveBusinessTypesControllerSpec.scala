@@ -18,8 +18,12 @@ package controllers.businessmatching.updateservice.remove
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.businessmatching.updateservice.RemoveBusinessTypeHelper
+import models.DateOfChange
 import models.businessmatching._
-import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId, WhatDateRemovedPageId}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
@@ -40,10 +44,14 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
     val request = addToken(authRequest)
     val mockBusinessMatchingService = mock[BusinessMatchingService]
 
+    val mockRemoveBusinessTypeHelper = mock[RemoveBusinessTypeHelper]
+
+
     val controller = new RemoveBusinessTypesController(
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
+      removeBusinessTypeHelper = mockRemoveBusinessTypeHelper,
       router = createRouter[RemoveBusinessTypeFlowModel]
     )
 
@@ -80,14 +88,50 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "return the next page in the flow when valid data has been posted" in new Fixture {
-        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel())
-        mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing))), Some(RemoveBusinessTypeFlowModel.key))
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel()), Some(RemoveBusinessTypeFlowModel.key))
+
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+
+        mockCacheSave(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing))))
 
         val result = controller.post()(request.withFormUrlEncodedBody(
           "businessActivities[]" -> "04"
         ))
 
         status(result) mustBe SEE_OTHER
+      }
+
+      "save the list of business activites to the data cache" in new Fixture {
+        val today = LocalDate.now
+
+        val flowModel = RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(today)))
+
+        mockCacheFetch(Some(flowModel), Some(RemoveBusinessTypeFlowModel.key))
+
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](true))
+
+        mockCacheSave[RemoveBusinessTypeFlowModel]
+
+        val result = await(controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[]" -> "04"
+        )))
+
+        controller.router.verify(WhatBusinessTypesToRemovePageId, flowModel.copy(activitiesToRemove = Some(Set(HighValueDealing))))
+      }
+
+      "wipe the date of change if its not required" in new Fixture {
+
+        mockCacheFetch(Some(RemoveBusinessTypeFlowModel(dateOfChange = Some(DateOfChange(LocalDate.now)))), Some(RemoveBusinessTypeFlowModel.key))
+
+        when(mockRemoveBusinessTypeHelper.dateOfChangeApplicable(any())(any(), any(), any())).thenReturn(OptionT.some[Future, Boolean](false))
+
+        mockCacheSave[RemoveBusinessTypeFlowModel]
+
+        val result = await(controller.post()(request.withFormUrlEncodedBody(
+          "businessActivities[]" -> "04"
+        )))
+
+        controller.router.verify(WhatBusinessTypesToRemovePageId, RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(HighValueDealing))))
       }
     }
   }
