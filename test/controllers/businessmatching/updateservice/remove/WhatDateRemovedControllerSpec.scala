@@ -50,6 +50,14 @@ class WhatDateRemovedControllerSpec extends AmlsSpec {
         Jsoup.parse(contentAsString(result)).title() must include(Messages("dateofchange.title"))
       }
 
+      "Not display the return link" in new Fixture {
+        mockCacheFetch[RemoveBusinessTypeFlowModel](Some(RemoveBusinessTypeFlowModel()))
+
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        Jsoup.parse(contentAsString(result)).title() mustNot include(Messages("link.return.registration.progress"))
+      }
+
       "display the date when it is already in the data cache" in new Fixture {
         val today = LocalDate.now
 

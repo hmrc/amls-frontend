@@ -54,7 +54,7 @@ class WhatDateRemovedController @Inject()(
     implicit authContext => implicit request =>
       getFormData map { case model =>
         val form = model.dateOfChange map { v => Form2(v) } getOrElse EmptyForm
-        Ok(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit)))
+        Ok(date_of_change(form, "summary.updateservice", routes.WhatDateRemovedController.post(edit), false))
       } getOrElse  InternalServerError("Get: Unable to show date_of_change Activities page. Failed to retrieve data")
     }
 
