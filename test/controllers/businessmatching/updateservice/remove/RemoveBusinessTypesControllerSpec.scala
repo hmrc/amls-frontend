@@ -21,6 +21,7 @@ import cats.implicits._
 import models.businessmatching._
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.any
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
@@ -80,6 +81,13 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
       }
 
       "return the next page in the flow when valid data has been posted" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+        ))
+
+
         mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel())
         mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing))), Some(RemoveBusinessTypeFlowModel.key))
 
@@ -88,6 +96,47 @@ class RemoveBusinessTypesControllerSpec extends AmlsSpec {
         ))
 
         status(result) mustBe SEE_OTHER
+      }
+
+      "throw an error message when trying to select all business types the users has" in new Fixture {
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](BusinessMatching(
+          activities = Some(BusinessActivities(Set(AccountancyServices,
+            BillPaymentServices,
+            EstateAgentBusinessService,
+            HighValueDealing,
+            MoneyServiceBusiness,
+            TrustAndCompanyServices,
+            TelephonePaymentService)))
+        ))
+
+
+        mockCacheUpdate(Some(RemoveBusinessTypeFlowModel.key), RemoveBusinessTypeFlowModel())
+        mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices,
+          BillPaymentServices,
+          EstateAgentBusinessService,
+          HighValueDealing,
+          MoneyServiceBusiness,
+          TrustAndCompanyServices,
+          TelephonePaymentService))),
+          Some(RemoveBusinessTypeFlowModel.key))
+
+        val result = controller.post()(request.withFormUrlEncodedBody(
+
+        "businessActivities[]" -> "01",
+        "businessActivities[]" -> "02",
+        "businessActivities[]" -> "03",
+        "businessActivities[]" -> "04",
+        "businessActivities[]" -> "05",
+        "businessActivities[]" -> "06",
+        "businessActivities[]" -> "07"
+        ))
+
+        status(result) must be(BAD_REQUEST)
+
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.getElementsByClass("validation-summary-message").text() must include(Messages("error.required.bm.remove.leave.one"))
       }
     }
   }
