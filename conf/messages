@@ -1180,8 +1180,8 @@ businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
 businessmatching.updateservice.updateotherinformation.title = We need you to update other information
-businessmatching.updateservice.updateotherinformation.hint = You’ve told us your business needs to remove for:
-businessmatching.updateservice.updateotherinformation.text = You might need to update other sections based on any of the new information you provide.
+businessmatching.updateservice.updateotherinformation.hint = You have removed:
+businessmatching.updateservice.updateotherinformation.text = As a result some sections of your application need to be updated.
 
 
 #   Add route Start  ###################################################################################################
