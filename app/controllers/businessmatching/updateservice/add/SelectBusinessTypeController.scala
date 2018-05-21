@@ -104,10 +104,10 @@ class SelectBusinessTypeController @Inject()(
     }
   } yield {
     val allActivities = BusinessMatchingActivities.all
-    val existingActivityNames = activities.toSeq.sortBy(_.getMessage) map {
-      _.getMessage
+    val existingActivityNames = activities.toSeq.sortBy(_.getMessage()) map {
+      _.getMessage()
     }
-    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage) map BusinessMatchingActivities.getValue
+    val activityValues = (allActivities diff activities).toSeq.sortBy(_.getMessage()) map BusinessMatchingActivities.getValue
 
     (existingActivityNames, activityValues)
   }

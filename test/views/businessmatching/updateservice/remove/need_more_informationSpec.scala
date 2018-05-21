@@ -28,7 +28,7 @@ class need_more_informationSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = need_more_information(Set(AccountancyServices.getMessage))
+    def view = need_more_information(Set(AccountancyServices.getMessage()))
   }
 
   "The need_more_information view" must {

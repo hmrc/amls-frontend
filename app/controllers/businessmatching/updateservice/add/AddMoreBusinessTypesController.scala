@@ -79,7 +79,7 @@ class AddMoreBusinessTypesController @Inject()(
         for {
           cache <- optionalCache
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        } yield SortedSet[String]() ++ businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage))
+        } yield SortedSet[String]() ++ businessMatching.activities.fold(Set.empty[String])(_.businessActivities.map(_.getMessage()))
     }
   }
 }

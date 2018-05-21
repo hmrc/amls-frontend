@@ -140,7 +140,7 @@ case class AddBusinessTypeFlowModel(
     case _ => true
   }
 
-  def activityName = this.activity map { _.getMessage }
+  def activityName = this.activity map { _.getMessage() }
 
 }
 

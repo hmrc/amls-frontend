@@ -60,7 +60,7 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
         submittedActivities map BusinessActivities.getValue)
 
       submittedActivities foreach { a =>
-        doc.body().text must include(Messages(a.getMessage))
+        doc.body().text must include(Messages(a.getMessage()))
         doc.body().html() must include(BusinessActivities.getValue(a))
       }
 
