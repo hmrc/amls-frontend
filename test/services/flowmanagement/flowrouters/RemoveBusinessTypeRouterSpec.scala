@@ -35,10 +35,11 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveBusinessTypeRouterSpec extends AmlsSpec {
 
-  trait Fixture extends DependencyMocks with AuthorisedFixture { self =>
+  trait Fixture extends DependencyMocks with AuthorisedFixture {
+    self =>
 
     val mockBusinessMatchingService = mock[BusinessMatchingService]
-    
+
     val removeBusinessTypeHelper = new RemoveBusinessTypeHelper(
       self.authConnector,
       mockCacheConnector
@@ -60,156 +61,152 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
     "return the 'Date of change' page (WhatDateRemovedController)" when {
       "the user is on the 'What do you want to remove' page (WhatBusinessTypesToRemovePageId)" when {
 
-        "all of the business types have not been submitted" should {
-          "redirect to the summary page" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
-            )
-
-            val justAdded = ServiceChangeRegister(addedActivities = Some(Set(HighValueDealing, MoneyServiceBusiness)))
-
-            mockCacheFetch[ServiceChangeRegister](
-              Some(justAdded),
-              Some(ServiceChangeRegister.key))
-
-            val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
-
-            result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
-          }
-        }
-
-          "some of the business types have not been submitted" should {
-            "redirect to the date of change page" in new Fixture {
-
-              val model = RemoveBusinessTypeFlowModel(
-                activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
-              )
-
-              val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
-
-              mockCacheFetch[ServiceChangeRegister](
-                Some(justAdded),
-                Some(ServiceChangeRegister.key))
-              val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
-
-              result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
-            }
-          }
-        }
-      }
-
-      //Date of change
-      "return the 'check your answers' page (RemoveBusinessTypesSummaryController)" when {
-        "the user is on the 'Date of change' page (WhatDateRemovedPageId)" when {
-          "there is more than one business type in the model" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
-              dateOfChange = Some(DateOfChange(LocalDate.now()))
-            )
-            val result = await(router.getRoute(WhatDateRemovedPageId, model))
-
-            result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
-          }
-        }
-      }
-
-      //check your answers (2 options - option 1)
-      "return the 'progress' page (RegistrationProgressController)" when {
-        "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
-          "there is no ASP business type in the model" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
-              dateOfChange = Some(DateOfChange(LocalDate.now()))
-            )
-            val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
-
-            result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        }
-      }
-
-      //check your answers (2 options - option 2)
-      "return the 'Need to update Answers' page (NeedToUpdateController)" when {
-        "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
-          "there is an ASP business type in the model" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
-              dateOfChange = Some(DateOfChange(LocalDate.now()))
-            )
-            val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
-
-            result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
-          }
-        }
-      }
-
-      //Need to update answers
-      "return the 'progress' page (RegistrationProgressController)" when {
-        "the user is on the 'Need to update Answers' page (NeedToUpdatePageId)" when {
-          "there is an ASP business type in the model" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
-              dateOfChange = Some(DateOfChange(LocalDate.now()))
-            )
-            val result = await(router.getRoute(NeedToUpdatePageId, model))
-
-            result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
-          }
-        }
-      }
-
-      //Unable to remove
-      "return the 'status' page (StatusController)" when {
-        "the user is on the 'Unable to remove' page (UnableToRemovePageId)" when {
-          "there is less than two business type in the model" in new Fixture {
-
-            val model = RemoveBusinessTypeFlowModel(
-              activitiesToRemove = Some(Set(HighValueDealing))
-            )
-            val result = await(router.getRoute(UnableToRemovePageId, model))
-
-            result mustBe Redirect(controllers.routes.StatusController.get())
-          }
-        }
-      }
-
-      //***********************************    Edit tests  *******************************************************************
-
-      //edit What do you want to remove
-      "return the 'date of change' page (WhatDateRemovedController)" when {
-        "editing the 'What do you want to remove' page (WhatBusinessTypesToRemovePageId)" +
-          " and more than 1 business type remains" in new Fixture {
+        "all of the business types to remove have not been submitted" in new Fixture {
 
           val model = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
-            dateOfChange = Some(DateOfChange(LocalDate.now()))
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
           )
 
-          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model, edit = true))
+          val justAdded = ServiceChangeRegister(addedActivities = Some(Set(HighValueDealing, MoneyServiceBusiness)))
 
-          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
-        }
-      }
+          mockCacheFetch[ServiceChangeRegister](
+            Some(justAdded),
+            Some(ServiceChangeRegister.key))
 
-      //edit Date of change
-      "return the 'Check your answers' page (RemoveBusinessTypesSummaryController)" when {
-        "editing the 'date of change' page (WhatDateRemovedPageId)" in new Fixture {
-
-          val model = RemoveBusinessTypeFlowModel(
-            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
-            dateOfChange = Some(DateOfChange(LocalDate.now()))
-          )
-
-          val result = await(router.getRoute(WhatDateRemovedPageId, model, edit = true))
+          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
 
           result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
         }
       }
     }
-  }
 
+    "return the 'check your answers' page (RemoveBusinessTypesSummaryController)" when {
+      "the user is on the 'What do you want to remove' page (WhatBusinessTypesToRemovePageId)" when {
+        "some of the business types have not been submitted" in new Fixture {
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
+          )
+
+          val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
+
+          mockCacheFetch[ServiceChangeRegister](
+            Some(justAdded),
+            Some(ServiceChangeRegister.key))
+          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model))
+
+          result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
+        }
+        "some of the business types have not been submitted and in edit mode" in new Fixture {
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness))
+          )
+
+          val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
+
+          mockCacheFetch[ServiceChangeRegister](
+            Some(justAdded),
+            Some(ServiceChangeRegister.key))
+          val result = await(router.getRoute(WhatBusinessTypesToRemovePageId, model, true))
+
+          result mustBe Redirect(removeRoutes.WhatDateRemovedController.get())
+        }
+      }
+    }
+
+    //Date of change
+    "return the 'check your answers' page (RemoveBusinessTypesSummaryController)" when {
+      "the user is on the 'Date of change' page (WhatDateRemovedPageId)" when {
+        "there is more than one business type in the model" in new Fixture {
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
+            dateOfChange = Some(DateOfChange(LocalDate.now()))
+          )
+          val result = await(router.getRoute(WhatDateRemovedPageId, model))
+
+          result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
+        }
+      }
+    }
+
+    //check your answers (2 options - option 1)
+    "return the 'progress' page (RegistrationProgressController)" when {
+      "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
+        "there is no ASP business type in the model" in new Fixture {
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
+            dateOfChange = Some(DateOfChange(LocalDate.now()))
+          )
+          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+
+          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+        }
+      }
+    }
+
+    //check your answers (2 options - option 2)
+    "return the 'Need to update Answers' page (NeedToUpdateController)" when {
+      "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
+        "there is an ASP business type in the model" in new Fixture {
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
+            dateOfChange = Some(DateOfChange(LocalDate.now()))
+          )
+          val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
+
+          result mustBe Redirect(removeRoutes.NeedMoreInformationController.get())
+        }
+      }
+    }
+
+    //Need to update answers
+    "return the 'progress' page (RegistrationProgressController)" when {
+      "the user is on the 'Need to update Answers' page (NeedToUpdatePageId)" when {
+        "there is an ASP business type in the model" in new Fixture {
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
+            dateOfChange = Some(DateOfChange(LocalDate.now()))
+          )
+          val result = await(router.getRoute(NeedToUpdatePageId, model))
+
+          result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
+        }
+      }
+    }
+
+    //Unable to remove
+    "return the 'status' page (StatusController)" when {
+      "the user is on the 'Unable to remove' page (UnableToRemovePageId)" when {
+        "there is less than two business type in the model" in new Fixture {
+
+          val model = RemoveBusinessTypeFlowModel(
+            activitiesToRemove = Some(Set(HighValueDealing))
+          )
+          val result = await(router.getRoute(UnableToRemovePageId, model))
+
+          result mustBe Redirect(controllers.routes.StatusController.get())
+        }
+      }
+    }
+
+    //***********************************    Edit tests  *******************************************************************
+
+    //edit Date of change
+    "return the 'Check your answers' page (RemoveBusinessTypesSummaryController)" when {
+      "editing the 'date of change' page (WhatDateRemovedPageId)" in new Fixture {
+
+        val model = RemoveBusinessTypeFlowModel(
+          activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
+          dateOfChange = Some(DateOfChange(LocalDate.now()))
+        )
+
+        val result = await(router.getRoute(WhatDateRemovedPageId, model, edit = true))
+
+        result mustBe Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
+      }
+    }
+  }
+}
