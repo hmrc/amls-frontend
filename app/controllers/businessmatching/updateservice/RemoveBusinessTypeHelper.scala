@@ -127,7 +127,6 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)) orElse OptionT.some(ServiceChangeRegister())
       addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
     } yield {
-      println(activitiesToRemove -- addedActivities)
       (activitiesToRemove -- addedActivities).nonEmpty
     }
   }
