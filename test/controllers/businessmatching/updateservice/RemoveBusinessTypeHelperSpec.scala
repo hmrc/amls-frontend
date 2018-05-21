@@ -622,7 +622,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
 
       "there is one service to remove and it hasn't been submitted" in new Fixture {
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices)))
+        val justRemoved = Set[BusinessActivity](BillPaymentServices)
         val justAdded = ServiceChangeRegister(addedActivities = Some(Set(BillPaymentServices)))
 
         mockCacheFetch[ServiceChangeRegister](
@@ -634,7 +634,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       }
 
       "there are multiple services to remove and none of them have been submitted" in new Fixture {
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness)))
+        val justRemoved = Set[BusinessActivity](BillPaymentServices, MoneyServiceBusiness)
         val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
         mockCacheFetch[ServiceChangeRegister](
@@ -651,7 +651,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       "there are multiple services to remove which have not been submitted" in new Fixture {
 
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
+        val justRemoved = Set[BusinessActivity](BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)
         val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
         mockCacheFetch[ServiceChangeRegister](
@@ -664,7 +664,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       "there are multiple services to remove which have all been submitted" in new Fixture {
 
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
+        val justRemoved = Set[BusinessActivity](BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)
         val justAdded = ServiceChangeRegister(None)
 
         mockCacheFetch[ServiceChangeRegister](
@@ -677,7 +677,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       "the services to remove are not newly added and are different" in new Fixture{
 
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+        val justRemoved = Set[BusinessActivity](MoneyServiceBusiness, BillPaymentServices)
         val justAdded = ServiceChangeRegister(addedActivities = Some(Set(TrustAndCompanyServices)))
 
         mockCacheFetch[ServiceChangeRegister](

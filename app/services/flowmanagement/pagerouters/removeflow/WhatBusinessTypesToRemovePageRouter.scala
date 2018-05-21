@@ -42,11 +42,14 @@ class WhatBusinessTypesToRemovePageRouter @Inject()(val statusService: StatusSer
                             ec: ExecutionContext
                            ): Future[Result] = {
 
-
-    removeBusinessTypeHelper.dateOfChangeApplicable(model) map {
-      case true => Redirect(removeRoutes.WhatDateRemovedController.get())
-      case false => Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
-    } getOrElse InternalServerError("Unable to determine route from the WhatBusinessTypesToRemovePage")
+    if (edit && model.dateOfChange.isDefined) {
+      Future.successful(Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get()))
+    } else {
+      removeBusinessTypeHelper.dateOfChangeApplicable(model.activitiesToRemove.getOrElse(Set.empty)) map {
+        case true => Redirect(removeRoutes.WhatDateRemovedController.get())
+        case false => Redirect(removeRoutes.RemoveBusinessTypesSummaryController.get())
+      } getOrElse InternalServerError("Unable to determine route from the WhatBusinessTypesToRemovePage")
+    }
   }
 }
 
