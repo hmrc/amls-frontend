@@ -17,7 +17,7 @@
 package views
 
 import forms.EmptyForm
-import models.registrationprogress.{Completed, Section}
+import models.registrationprogress.{Completed, Section, Started}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.mvc.Call
@@ -47,7 +47,24 @@ class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressG
       subHeading.html must include(Messages("summary.status"))
 
       doc.select("h2.heading-small").first().ownText() must be("progress.section1.name")
+    }
 
+    "display the correct visual content for incomplete sections" when {
+      "making an amendment" in new ViewFixture {
+        def view =
+          views.html.registrationamendment.registration_amendment(
+            Seq(Section("section1", Completed, true, mock[Call]),
+              Section("section2", Started, true, mock[Call])),
+            true,
+            addressGen.sample.get,
+            Seq.empty,
+            true
+          )
+
+        doc.select("#section1-status").text mustBe Messages("progress.visuallyhidden.view.amend")
+        doc.select("#section2-status").text mustBe Messages("progress.visuallyhidden.view.started")
+
+      }
     }
 
   }
