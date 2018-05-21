@@ -50,7 +50,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec {
     val router = new RemoveBusinessTypeRouter(
       businessMatchingService = mockBusinessMatchingService,
       whatServicesToRemovePageRouter = new WhatBusinessTypesToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
-      needToUpdatePageRouter = new NeedToUpdatePageRouter(mockStatusService, mockBusinessMatchingService),
+      needToUpdatePageRouter = new NeedToUpdatePageRouter(),
       removeServicesSummaryPageRouter = new RemoveBusinessTypesSummaryPageRouter(mockStatusService, mockBusinessMatchingService),
       unableToRemovePageRouter = new UnableToRemovePageRouter(mockStatusService, mockBusinessMatchingService),
       whatDateToRemovePageRouter = new WhatDateToRemovePageRouter(mockStatusService, mockBusinessMatchingService)

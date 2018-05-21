@@ -20,7 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BillPaymentServices, TelephonePaymentService}
 import models.flowmanagement.{AddBusinessTypeFlowModel, NeedMoreInformationPageId}
@@ -30,10 +30,10 @@ import views.html.businessmatching.updateservice.add.new_service_information
 
 import scala.concurrent.Future
 
-class NeedMoreInformationController @Inject()(
-                                                 val authConnector: AuthConnector,
-                                                 implicit val dataCacheConnector: DataCacheConnector,
-                                                 val router: Router[AddBusinessTypeFlowModel]
+@Singleton
+class NeedMoreInformationController @Inject()( val authConnector: AuthConnector,
+                                               implicit val dataCacheConnector: DataCacheConnector,
+                                               val router: Router[AddBusinessTypeFlowModel]
                                                ) extends BaseController {
 
   def get() = Authorised.async {
@@ -58,8 +58,8 @@ class NeedMoreInformationController @Inject()(
     implicit authContext =>
       implicit request =>
         (for {
-          model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
-          route <- OptionT.liftF(router.getRoute(NeedMoreInformationPageId, model))
-        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: NewServiceInformationController")
+          //model <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
+          route <- OptionT.liftF(router.getRoute(NeedMoreInformationPageId, new AddBusinessTypeFlowModel))
+        } yield route) getOrElse InternalServerError("Post: Cannot retrieve data: Add : NewServiceInformationController")
   }
 }
