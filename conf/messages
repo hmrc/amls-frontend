@@ -1173,8 +1173,8 @@ businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want 
 
 businessmatching.updateservice.removeactivities.title = What type of business do you need to remove?
 businessmatching.updateservice.removeactivities.heading = What type of business do you need to remove?
-businessmatching.updateservice.removeactivities.summary = You must have at least 1 type of business registered. You can add another business before removing one.
-businessmatching.updateservice.removeactivities.list.heading = Choose at least one
+businessmatching.updateservice.removeactivities.summary = You can remove one (or more) of your business types here.
+businessmatching.updateservice.removeactivities.list.heading = Leave at least one business type though. For anti-money laundering supervision one business type (or more) must be registered with us.
 businessmatching.updateservice.removeactivities.button = Continue
 
 businessmatching.updateservice.updateotherinformation.heading = We need you to update other information
