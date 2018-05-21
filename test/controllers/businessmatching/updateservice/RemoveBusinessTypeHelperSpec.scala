@@ -29,7 +29,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
 import play.api.test.Helpers._
-import org.mockito.Mockito.verify
+import org.mockito.Mockito.{verify, never}
 import org.mockito.Matchers.{any, eq => eqTo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -633,6 +633,25 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         verify(mockCacheConnector).save[EstateAgentBusiness](
           eqTo(EstateAgentBusiness.key),
           eqTo(EstateAgentBusiness()))(any(), any(), any())
+      }
+
+      "removing multiple services" in new Fixture {
+        mockCacheSave[EstateAgentBusiness]
+        mockCacheSave[Tcsp]
+
+        val result = await(helper.removeSectionData(Set(EstateAgentBusinessService, TrustAndCompanyServices)))
+
+        verify(mockCacheConnector).save[EstateAgentBusiness](
+          eqTo(EstateAgentBusiness.key),
+          eqTo(EstateAgentBusiness()))(any(), any(), any())
+
+        verify(mockCacheConnector).save[Tcsp](
+          eqTo(Tcsp.key),
+          eqTo(Tcsp()))(any(), any(), any())
+
+        verify(mockCacheConnector, never).save[MoneyServiceBusinessSection](eqTo(MoneyServiceBusinessSection.key), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
       }
     }
   }
