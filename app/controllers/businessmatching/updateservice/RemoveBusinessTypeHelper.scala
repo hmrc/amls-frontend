@@ -20,20 +20,14 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
-import models.businessmatching.{
-  MoneyServiceBusiness,
-  TrustAndCompanyServices,
-  BusinessActivities => BMBusinessActivities,
-  BusinessActivity => BMBusinessActivity,
-  BusinessMatching => BMBusinessMatching
-}
+import models.businessmatching.{MoneyServiceBusiness, TrustAndCompanyServices, BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
@@ -41,7 +35,7 @@ import scala.concurrent.{ExecutionContext, Future}
 @Singleton
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
-                                   ) {
+                                        ) {
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)
                                          (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, BMBusinessMatching] = {
@@ -125,5 +119,15 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
         })
       }
     } yield newResponsiblePeople
+  }
+
+  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+    for {
+      activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
+      recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
+      addedActivities <- OptionT.fromOption[Future](recentlyAdded.addedActivities) orElse OptionT.some(Set.empty)
+    } yield {
+      (addedActivities -- activitiesToRemove).nonEmpty
+    }
   }
 }
