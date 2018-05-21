@@ -16,14 +16,22 @@
 
 package controllers.businessmatching.updateservice
 
+import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.estateagentbusiness.EstateAgentBusiness
+import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness => MoneyServiceBusinessSection}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
+import models.hvd.Hvd
 import models.responsiblepeople.ResponsiblePerson
+import models.tcsp.Tcsp
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils._
+import play.api.test.Helpers._
+import org.mockito.Mockito.{verify, never}
+import org.mockito.Matchers.{any, eq => eqTo}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -578,7 +586,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   "date of change" should {
 
-    "be applicable" when {
+    "not be applicable" when {
 
 
       "there is one service to remove and it hasn't been submitted" in new Fixture {
@@ -605,6 +613,10 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       }
 
+    }
+
+    "be applicable" when {
+
       "there are multiple services to remove which have not been submitted" in new Fixture {
 
         val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
@@ -614,17 +626,14 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           Some(justAdded),
           Some(ServiceChangeRegister.key))
 
-        helper.dateOfChangeApplicable(justRemoved).returnsSome(false)
+        helper.dateOfChangeApplicable(justRemoved).returnsSome(true)
 
       }
-    }
 
-    "not be applicable" when {
+      "there are multiple services to remove which have all been submitted" in new Fixture {
 
-      "the services to remove are not newly added" in new Fixture{
-
-        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
-        val justAdded = ServiceChangeRegister(addedActivities = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+        val justRemoved = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(BillPaymentServices, MoneyServiceBusiness, TrustAndCompanyServices)))
+        val justAdded = ServiceChangeRegister(None)
 
         mockCacheFetch[ServiceChangeRegister](
           Some(justAdded),
@@ -648,6 +657,86 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       }
     }
   }
+
+  "Removing the section data" should {
+    "clear the data from the cache" when {
+      "removing MSB" in new Fixture {
+        mockCacheSave[MoneyServiceBusinessSection]
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)))).value)
+
+        verify(mockCacheConnector).save[MoneyServiceBusinessSection](
+          eqTo(MoneyServiceBusinessSection.key),
+          eqTo(MoneyServiceBusinessSection()))(any(), any(), any())
+      }
+
+      "removing HVD" in new Fixture {
+        mockCacheSave[Hvd]
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing)))).value)
+
+        verify(mockCacheConnector).save[Hvd](
+          eqTo(Hvd.key),
+          eqTo(Hvd()))(any(), any(), any())
+      }
+
+      "removing TCSP" in new Fixture {
+        mockCacheSave[Tcsp]
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(TrustAndCompanyServices)))).value)
+
+        verify(mockCacheConnector).save[Tcsp](
+          eqTo(Tcsp.key),
+          eqTo(Tcsp()))(any(), any(), any())
+      }
+
+      "removing ASP" in new Fixture {
+        mockCacheSave[Asp]
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))).value)
+
+        verify(mockCacheConnector).save[Asp](
+          eqTo(Asp.key),
+          eqTo(Asp()))(any(), any(), any())
+      }
+
+      "removing EAB" in new Fixture {
+        mockCacheSave[EstateAgentBusiness]
+
+        val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService)))).value)
+
+        verify(mockCacheConnector).save[EstateAgentBusiness](
+          eqTo(EstateAgentBusiness.key),
+          eqTo(EstateAgentBusiness()))(any(), any(), any())
+      }
+
+      "removing multiple services" in new Fixture {
+        mockCacheSave[EstateAgentBusiness]
+        mockCacheSave[Tcsp]
+
+        val result = await(helper.removeSectionData(
+          RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService, TrustAndCompanyServices)))).value)
+
+        verify(mockCacheConnector).save[EstateAgentBusiness](
+          eqTo(EstateAgentBusiness.key),
+          eqTo(EstateAgentBusiness()))(any(), any(), any())
+
+        verify(mockCacheConnector).save[Tcsp](
+          eqTo(Tcsp.key),
+          eqTo(Tcsp()))(any(), any(), any())
+
+        verify(mockCacheConnector, never).save[MoneyServiceBusinessSection](eqTo(MoneyServiceBusinessSection.key), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
+        verify(mockCacheConnector, never).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+      }
+    }
+  }
+
+  "Removing the flow model data" should {
+    "empty the data model from the cache" in new Fixture {
+      mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(), Some(RemoveBusinessTypeFlowModel.key))
+
+      helper.removeFlowData returnsSome RemoveBusinessTypeFlowModel()
+    }
+  }
 }
-
-
