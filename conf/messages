@@ -101,7 +101,8 @@ error.submission.wrong_credentials.content = Your account doesn’t have enough 
 ####  Business Matching ####
 error.required.bm.register.service = Select one or more options to show what you need to register
 error.required.bm.register.service.single = Select the type of business you need to register
-error.required.bm.remove.service = Select one or more options to show what you need to remove
+error.required.bm.remove.service = You must have at least one business type selected.
+error.required.bm.remove.leave.one = You must leave at least one business type unselected.
 error.required.bm.registration.number = Enter a valid company registration number
 error.invalid.bm.registration.number = Enter a valid company registration number
 error.required.bm.businesstype.type = Enter your type of business, such as association, charity, or trust
