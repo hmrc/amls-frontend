@@ -137,7 +137,8 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield newResponsiblePeople
   }
 
-  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
+  def dateOfChangeApplicable(model: RemoveBusinessTypeFlowModel)
+                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Boolean] = {
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
       recentlyAdded <- OptionT(dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key))
@@ -145,5 +146,11 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     } yield {
       (addedActivities -- activitiesToRemove).nonEmpty
     }
+  }
+
+  def removeFlowData(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, RemoveBusinessTypeFlowModel] = {
+    val emptyModel = RemoveBusinessTypeFlowModel()
+
+    OptionT.liftF(dataCacheConnector.save(RemoveBusinessTypeFlowModel.key, RemoveBusinessTypeFlowModel())) map { _ => emptyModel }
   }
 }

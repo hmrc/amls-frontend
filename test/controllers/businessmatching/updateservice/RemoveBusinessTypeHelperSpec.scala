@@ -730,4 +730,12 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
       }
     }
   }
+
+  "Removing the flow model data" should {
+    "empty the data model from the cache" in new Fixture {
+      mockCacheSave[RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel(), Some(RemoveBusinessTypeFlowModel.key))
+
+      helper.removeFlowData returnsSome RemoveBusinessTypeFlowModel()
+    }
+  }
 }
