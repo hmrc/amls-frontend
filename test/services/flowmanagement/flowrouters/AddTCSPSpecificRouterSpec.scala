@@ -43,7 +43,7 @@ class AddTCSPSpecificRouterSpec extends AmlsSpec {
       addMoreActivitiesPageRouter = new AddMoreBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       businessAppliedForPSRNumberPageRouter = new BusinessAppliedForPsrNumberPageRouter(mockStatusService, mockBusinessMatchingService),
       fitAndProperPageRouter = new FitAndProperPageRouter(mockStatusService, mockBusinessMatchingService),
-      newServicesInformationPageRouter = new NeedMoreInformationPageRouter(mockStatusService, mockBusinessMatchingService),
+      newServicesInformationPageRouter = new NeedMoreInformationPageRouter(),
       noPSRPageRouter = new NoPSRPageRouter(mockStatusService, mockBusinessMatchingService),
       selectActivitiesPageRouter = new SelectBusinessTypesPageRouter(mockStatusService, mockBusinessMatchingService),
       subServicesPageRouter = new SubSectorsPageRouter(mockStatusService, mockBusinessMatchingService),
