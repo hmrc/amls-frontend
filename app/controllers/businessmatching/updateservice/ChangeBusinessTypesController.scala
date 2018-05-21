@@ -40,7 +40,8 @@ class ChangeBusinessTypesController @Inject()(
                                           val authConnector: AuthConnector,
                                           implicit val dataCacheConnector: DataCacheConnector,
                                           val businessMatchingService: BusinessMatchingService,
-                                          val router: Router[ChangeBusinessType]
+                                          val router: Router[ChangeBusinessType],
+                                          val helper: RemoveBusinessTypeHelper
                                         ) extends BaseController with RepeatingSection {
 
   def get() = Authorised.async {
@@ -60,8 +61,12 @@ class ChangeBusinessTypesController @Inject()(
             getFormData map { case (existing, remaining) =>
               BadRequest(change_services(f, existing, remaining.nonEmpty))
             } getOrElse InternalServerError("Unable to show the page")
-          case ValidForm(_, data) =>
-                router.getRoute(ChangeBusinesTypesPageId, data)
+          case ValidForm(_, data) => {
+            for {
+              _ <- helper.removeFlowData
+              route <- OptionT.liftF(router.getRoute(ChangeBusinesTypesPageId, data))
+            } yield route
+          } getOrElse InternalServerError("Could not remove the flow data")
         }
       }
   }

@@ -94,6 +94,9 @@ class RemoveBusinessTypesSummaryControllerSpec extends AmlsSpec with TitleValida
         when(removeServiceHelper.removeSectionData(eqTo(flowModel))(any(), any(), any()))
           .thenReturn(OptionT.some[Future, Seq[CacheMap]](Seq.empty))
 
+        when(removeServiceHelper.removeFlowData(any(), any(), any()))
+          .thenReturn(OptionT.some[Future, RemoveBusinessTypeFlowModel](RemoveBusinessTypeFlowModel()))
+
         val result = controller.post()(request.withFormUrlEncodedBody())
 
         status(result) mustBe SEE_OTHER
