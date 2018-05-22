@@ -37,7 +37,8 @@
     @model.activitiesToRemove.map { activities =>
         @checkYourAnswers(
             question = Messages("businessmatching.updateservice.removeactivities.heading"),
-            editUrl = routes.RemoveBusinessTypesController.get(edit = true).url
+            editUrl = routes.RemoveBusinessTypesController.get(edit = true).url,
+            idTag="removeactivities-edit"
         ) {
             <p>@activities.map(_.getMessage()).mkString(", ")</p>
         }
@@ -46,7 +47,8 @@
     @model.dateOfChange.map { doc =>
         @checkYourAnswers(
             question = Messages("dateofchange.title"),
-            editUrl = routes.WhatDateRemovedController.get(edit = true).url
+            editUrl = routes.WhatDateRemovedController.get(edit = true).url,
+            idTag="dateofchange-edit"
         ) {
             <p>@DateHelper.formatDate(doc.dateOfChange)</p>
         }
