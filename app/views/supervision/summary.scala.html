@@ -33,6 +33,7 @@
 
     @checkYourAnswers(
         question = Messages("supervision.another_body.title"),
+        editLinkTag = "supervisionanotherbody-edit",
         editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
     ) {
         @model.anotherBody.map {
@@ -65,6 +66,7 @@
 
     @checkYourAnswers(
         question = Messages("supervision.memberofprofessionalbody.title"),
+        editLinkTag = "supervisionmemberofbody-edit",
         editUrl = controllers.supervision.routes.ProfessionalBodyMemberController.get(true).toString
     ) {
         @model.professionalBodyMember.map {
@@ -77,6 +79,7 @@
 
         @checkYourAnswers(
             question = Messages("supervision.whichprofessionalbody.title"),
+            editLinkTag = "supervisionwhichbody-edit",
             editUrl = controllers.supervision.routes.WhichProfessionalBodyController.get(true).toString
         ) {
 
@@ -106,6 +109,7 @@
 
     @checkYourAnswers(
         question = Messages("supervision.penalisedbyprofessional.title"),
+        editLinkTag = "supervisionpenalised-edit",
         editUrl = controllers.supervision.routes.PenalisedByProfessionalController.get(true).toString
     ) {
         <p>@model.professionalBody.map {

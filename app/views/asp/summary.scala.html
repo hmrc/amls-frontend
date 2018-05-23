@@ -33,7 +33,8 @@
     @model.services.map { a =>
         @checkYourAnswers(
             question = Messages("asp.services.title"),
-            editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString
+            editUrl = controllers.asp.routes.ServicesOfBusinessController.get(true).toString,
+            editLinkTag = "aspservices-edit"
         ) {
             <ul class="list list--comma">
             @a.services.map { line =>
@@ -51,7 +52,8 @@
 
     @checkYourAnswers(
         question = Messages("asp.other.business.tax.matters.title"),
-        editUrl = controllers.asp.routes.OtherBusinessTaxMattersController.get(true).toString
+        editUrl = controllers.asp.routes.OtherBusinessTaxMattersController.get(true).toString,
+        editLinkTag = "aspotherbusinesstaxmatters-edit"
     ) {
         <p>@model.otherBusinessTaxMatters.map {
             case OtherBusinessTaxMattersNo => { @Messages("lbl.no") }

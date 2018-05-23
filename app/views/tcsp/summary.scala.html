@@ -33,6 +33,7 @@
 
     @checkYourAnswers(
         question = Messages("tcsp.kind.of.service.provider.title"),
+        editLinkTag = "tcspkindserviceprovider-edit",
         editUrl = controllers.tcsp.routes.TcspTypesController.get(true).toString
     ) {
         @model.tcspTypes.map { v =>
@@ -81,6 +82,7 @@
         @if(v.serviceProviders.contains(RegisteredOfficeEtc)) {
             @checkYourAnswers(
                 question = Messages("tcsp.provided_services.title"),
+                editLinkTag = "tcsptypes-edit",
                 editUrl = controllers.tcsp.routes.ProvidedServicesController.get(true).toString
             ) {
                 <ul class="list list--comma">
@@ -96,6 +98,7 @@
 
     @checkYourAnswers(
         question = Messages("tcsp.servicesOfAnotherTcsp.title"),
+        editLinkTag = "servicesofanothertcsp-edit",
         editUrl = controllers.tcsp.routes.ServicesOfAnotherTCSPController.get(true).toString
     ) {
         <p>@model.doesServicesOfAnotherTCSP.map {
@@ -108,6 +111,7 @@
 
         @checkYourAnswers(
             question = Messages("tcsp.anothertcspsupervision.title"),
+            editLinkTag = "servicesofanothertcsp-edit",
             editUrl = controllers.tcsp.routes.AnotherTCSPSupervisionController.get(true).toString
         ) {
             <p>

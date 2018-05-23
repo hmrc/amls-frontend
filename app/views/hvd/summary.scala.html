@@ -35,7 +35,8 @@
     @model.products.map { p =>
         @checkYourAnswers(
             question = Messages("hvd.products.title"),
-            editUrl = controllers.hvd.routes.ProductsController.get(true).toString
+            editUrl = controllers.hvd.routes.ProductsController.get(true).toString,
+            editLinkTag = "hvdproducts-edit"
         ) {
             <ul class="list list--comma">
                 @p.items.map { i =>
@@ -61,7 +62,8 @@
             @model.exciseGoods.map { eg =>
                 @checkYourAnswers(
                     question = Messages("hvd.excise.goods.title"),
-                    editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString
+                    editUrl = controllers.hvd.routes.ExciseGoodsController.get(true).toString,
+                    editLinkTag = "hvdexcisegoods-edit"
                 ) {
                     <p>@if(eg.exciseGoods) {
                         @Messages("lbl.yes")
@@ -76,7 +78,8 @@
     @model.howWillYouSellGoods.map { goods =>
         @checkYourAnswers(
             question = Messages("hvd.how-will-you-sell-goods.title"),
-            editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString
+            editUrl = controllers.hvd.routes.HowWillYouSellGoodsController.get(true).toString,
+            editLinkTag = "hvdsellgoods-edit"
         ) {
             <ul class="list list--comma">
                 @goods.channels.map { i =>
@@ -93,7 +96,8 @@
     @model.cashPayment.map { cp =>
         @checkYourAnswers(
             question = Messages("hvd.cash.payment.title"),
-            editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString
+            editUrl = controllers.hvd.routes.CashPaymentController.get(true).toString,
+            editLinkTag = "hvdcashpayment-edit"
         ) {
             @cp match {
                 case CashPaymentYes(date) => {
@@ -114,7 +118,8 @@
     @model.linkedCashPayment.map { p =>
         @checkYourAnswers(
             question = Messages("hvd.identify.linked.cash.payment.title"),
-            editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString
+            editUrl = controllers.hvd.routes.LinkedCashPaymentsController.get(true).toString,
+            editLinkTag = "hvdlinkedcashpayments-edit"
         ) {
             <p>@if(p.linkedCashPayments) {
                 @Messages("lbl.yes")
@@ -127,6 +132,7 @@
     @model.receiveCashPayments.map { rcp =>
         @checkYourAnswers(
             question = Messages("hvd.receiving.title"),
+            editLinkTag = "hvdreceivecashpayments-edit",
             editUrl = if(isEditable){controllers.hvd.routes.ReceiveCashPaymentsController.get(true).toString} else ""
         ) {
             @if(rcp){
@@ -140,6 +146,7 @@
     @model.cashPaymentMethods.map { pm =>
         @checkYourAnswers(
             question = Messages("hvd.receiving.expect.to.receive"),
+            editLinkTag = "hvdcashpaymentmethods-edit",
             editUrl = if(isEditable){controllers.hvd.routes.ExpectToReceiveCashPaymentsController.get(true).toString} else ""
         ) {
             <ul class="list list--comma">
@@ -161,6 +168,7 @@
     @model.percentageOfCashPaymentOver15000.map { p =>
         @checkYourAnswers(
             question = Messages("hvd.percentage.title"),
+            editLinkTag = "hvdpercentcashpayment-edit",
             editUrl = if(isEditable){controllers.hvd.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString} else ""
         ) {
             <p>@p match {
