@@ -21,10 +21,11 @@
  buttonMessageKey : Option[String] = None,
  returnLink : Boolean = true,
  returnLocation : Option[String] = None,
- buttonId : Option[String] = None
+ buttonId : Option[String] = None,
+ gaTag : Option[String] = None
  )(implicit lang:Lang,  m: Messages)
 <div class="form-group-footer">
-    <button type="submit" name="submit" class="button" id="@buttonId.getOrElse("")">
+    <button type="submit" name="submit" class="button" @if(gaTag.isDefined) {data-journey = "@gaTag"} id="@buttonId.getOrElse("")">
         @Messages(buttonMessageKey.getOrElse("button.saveandcontinue"))
     </button>
     @if(ApplicationConfig.returnLinkToggle) {

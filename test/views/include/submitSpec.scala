@@ -33,7 +33,7 @@ class submitSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
-  "sumbit" must {
+  "submit" must {
     "show the submit button" in {
 
       val t = submit()
@@ -70,6 +70,22 @@ class submitSpec extends AmlsSpec with MustMatchers {
       val doc = Jsoup.parse(contentAsString(t))
 
       doc.select(".return-link a").isEmpty must be (true)
+    }
+
+    "If gaTag is provided add to submit element" in {
+      val t = submit(returnLink = false, gaTag = Some("add tag"), buttonId = Some("AnID"))
+
+      val doc = Jsoup.parse(contentAsString(t))
+
+      doc.getElementById("AnID").attr("data-journey") must be ("add tag")
+    }
+
+    "If gaTag is not provided submit element should not include tag" in {
+      val t = submit(returnLink = false, buttonId = Some("AnID"))
+
+      val doc = Jsoup.parse(contentAsString(t))
+
+      doc.getElementById("AnID").hasAttr("data-journey") must be (false)
     }
 
 
