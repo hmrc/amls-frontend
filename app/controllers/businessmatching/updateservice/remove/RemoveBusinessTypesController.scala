@@ -26,7 +26,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{From, Rule, ValidationError, Write}
+import jto.validation.{From, Path, Rule, ValidationError, Write}
 import models.ValidationRule
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import models.flowmanagement.{RemoveBusinessTypeFlowModel, WhatBusinessTypesToRemovePageId}
@@ -51,7 +51,7 @@ class RemoveBusinessTypesController @Inject()(
 
                                              ) extends BaseController {
 
-  def formReader: Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
+  def formReaderminLengthR: Rule[UrlFormEncoded, Set[BusinessActivity]] = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage("error.required.bm.remove.service"))
   }
 
@@ -60,7 +60,8 @@ class RemoveBusinessTypesController @Inject()(
     case s => Valid(s)
   }
 
-  def activitySetReader(count: Int) = formReader andThen maxLengthValidator(count)
+  def combinedReader(count: Int) = formReaderminLengthR andThen maxLengthValidator(count).repath(_ => Path \ "businessActivities")
+
 
   implicit def activitySetWrites(implicit w: Write[BusinessActivity, String]) = Write[Set[BusinessActivity], UrlFormEncoded] { activities =>
     Map("businessActivities[]" -> activities.toSeq.map { a => BusinessActivities.getValue(a) })
@@ -84,7 +85,7 @@ class RemoveBusinessTypesController @Inject()(
       implicit request =>
         getFormData.value flatMap {
           case Some((names, values)) =>
-        Form2[Set[BusinessActivity]](request.body)(activitySetReader(names.size)) match {
+        Form2[Set[BusinessActivity]](request.body)(combinedReader(names.size)) match {
           case f: InvalidForm => getFormData map {
             case (_, values) =>
               BadRequest(remove_activities(f, edit, values))
