@@ -38,7 +38,7 @@
         @checkYourAnswers(
             question = Messages("businessmatching.updateservice.removeactivities.heading"),
             editUrl = routes.RemoveBusinessTypesController.get(edit = true).url,
-            idTag="removeactivities-edit"
+            editLinkTag="removeactivities-edit"
         ) {
             <p>@activities.map(_.getMessage()).mkString(", ")</p>
         }
@@ -48,7 +48,7 @@
         @checkYourAnswers(
             question = Messages("dateofchange.title"),
             editUrl = routes.WhatDateRemovedController.get(edit = true).url,
-            idTag="dateofchange-edit"
+            editLinkTag="dateofchange-edit"
         ) {
             <p>@DateHelper.formatDate(doc.dateOfChange)</p>
         }

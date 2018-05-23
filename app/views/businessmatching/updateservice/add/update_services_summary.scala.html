@@ -35,7 +35,7 @@
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.selectactivities.title"),
         editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
-        idTag = "selectactivities-edit"
+        editLinkTag = "selectactivities-edit"
     ) {
         <p>@(flowModel.activityName.getOrElse(""))</p>
     }
@@ -46,7 +46,7 @@
                 question = Messages("businessmatching.services.title"),
                 editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
-                idTag="edit-msb-services"
+                editLinkTag="edit-msb-services"
             ) {
                 <ul class="list list--comma">
                     @services.msbServices.map { svc =>
@@ -82,7 +82,7 @@
         @checkYourAnswers(
                 question = Messages("businessmatching.updateservice.fitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.FitAndProperController.get(edit = true).url,
-                idTag = "fitandproper-edit"
+                editLinkTag = "fitandproper-edit"
             ) {
             <p>@(flowModel.fitAndProper map {
                     case true => Messages("lbl.yes")
@@ -94,7 +94,7 @@
             @checkYourAnswers(
                 question = Messages("businessmatching.updateservice.whichfitandproper.heading", flowModel.activityName.getOrElse("").toLowerCase),
                 editUrl = routes.WhichFitAndProperController.get(edit = true).url,
-                idTag = "whichfitandproper-edit"
+                editLinkTag = "whichfitandproper-edit"
             ) {
             <p>
                 @(flowModel.responsiblePeople map { tp =>
@@ -112,7 +112,7 @@
     @checkYourAnswers(
         question = Messages("businessmatching.updateservice.tradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
         editUrl = routes.TradingPremisesController.get(edit = true).url,
-        idTag = "tradingpremises-edit"
+        editLinkTag = "tradingpremises-edit"
     ) {
         <p>@(flowModel.areNewActivitiesAtTradingPremises map {
             case true => Messages("lbl.yes")
@@ -124,7 +124,7 @@
         @checkYourAnswers(
             question = Messages("businessmatching.updateservice.whichtradingpremises.summary", flowModel.activityName.getOrElse("").toLowerCase),
             editUrl = routes.WhichTradingPremisesController.get().url,
-            idTag = "whichtradingpremises-edit"
+            editLinkTag = "whichtradingpremises-edit"
         ) {
             <p>
                 @(flowModel.tradingPremisesActivities map { tp =>
@@ -138,7 +138,7 @@
                     question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
                     editUrl = routes.WhatDoYouDoHereController.get(true).url,
                     allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
-                    idTag = "WhatDoYouDoHere-edit"
+                    editLinkTag = "WhatDoYouDoHere-edit"
                 ) {
                     <ul class="list list--comma">
                         @tpMsbServices.msbServices.map { service =>

@@ -84,7 +84,7 @@
             editUrl = changeActivitiesUrl,
             allowEdit = !isPending,
             classes = Seq("register-services"),
-            idTag = "edit-business-activities"
+            editLinkTag = "edit-business-activities"
         ) {
             <ul class="list list--comma">
                 @activity.businessActivities.map { line =>
@@ -107,7 +107,7 @@
                     question = Messages("businessmatching.services.title"),
                     editUrl = controllers.businessmatching.routes.ServicesController.get(true).toString,
                     allowEdit = isPreSubmission,
-                    idTag="edit-msb-services"
+                    editLinkTag="edit-msb-services"
                 ) {
                     <ul class="list list--comma">
                     @services.msbServices.map { svc =>

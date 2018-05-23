@@ -35,6 +35,7 @@
 
         @checkYourAnswers(
             question = Messages("tradingpremises.summary.address"),
+            editLinkTag = "tradingpremisedsummaryaddress-edit",
             editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
         ) {
             <p>@yta.tradingPremisesAddress.toLines.map { l =>
@@ -45,6 +46,7 @@
         @yta.startDate.map {startDate =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.tradingstartdate"),
+                editLinkTag = "tradingprmisedsummarystartdate-edit",
                 editUrl = controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).toString
             ) {
                 <p>@DateHelper.formatDate(startDate)</p>
@@ -53,6 +55,7 @@
         @yta.isResidential.map {residential =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.residential"),
+                editLinkTag = "tradingpremisessummaryresidential-edit",
                 editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
             ) {
                 <p>@residential match {
@@ -65,6 +68,7 @@
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.summary.services"),
+                editLinkTag = "tradingpremisedsummaryservices-edit",
                 editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
                 <ul class="list list--comma">
@@ -78,6 +82,7 @@
         @model.msbServices.map { msb =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.msb.services.title"),
+                editLinkTag = "tradingpremisesmsbservices-edit",
                 editUrl = if(!hasOneMsbService){controllers.tradingpremises.routes.MSBServicesController.get(index, true).toString} else ""
             ) {
 
@@ -99,6 +104,7 @@
             @model.registeringAgentPremises.map { agentPremises =>
                 @checkYourAnswers(
                     question = Messages("tradingpremises.summary.who-uses"),
+                    editLinkTag = "tradingpremisessummarywho-edit",
                     editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
                 ) {
                     @if(agentPremises.agentPremises) {
@@ -113,6 +119,7 @@
         @model.businessStructure.map { x =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.businessStructure.title"),
+                editLinkTag = "tradingpremisesbusinessstructure-edit",
                 editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
             ) {
                 <p>@Messages(x.message)</p>
@@ -122,6 +129,7 @@
         @model.agentName.map { x =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.agentname.title"),
+                editLinkTag = "tradingpremisesagentnametitle-edit",
                 editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
             ) {
 
@@ -138,6 +146,7 @@
         @model.agentPartnership.map { x =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.agentpartnership.title"),
+                editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
                 editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
             ) {
                 <p>@x.agentPartnership</p>
@@ -147,6 +156,7 @@
         @model.agentCompanyDetails.map { x =>
             @checkYourAnswers(
                 question = Messages("tradingpremises.agentcompanyname.title"),
+                editLinkTag = "tradingpremisesagentcompanyname-edit",
                 editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
             ) {
                 <p>@x.agentCompanyName</p>
@@ -157,6 +167,7 @@
             @x.companyRegistrationNumber.map { crn =>
                 @checkYourAnswers(
                     question = Messages("tradingpremises.youragent.crn"),
+                    editLinkTag = "tradingpremisesyouragentcrn-edit",
                     editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
                 ) {
                     <p>@crn</p>
