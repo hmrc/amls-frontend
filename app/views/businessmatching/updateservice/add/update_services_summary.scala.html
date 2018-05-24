@@ -46,7 +46,7 @@
                 question = Messages("businessmatching.services.title"),
                 editUrl = routes.SubSectorsController.get(true).toString,
                 allowEdit = true,
-                editLinkTag="edit-msb-services"
+                editLinkTag="msbservices-edit"
             ) {
                 <ul class="list list--comma">
                     @services.msbServices.map { svc =>
@@ -138,7 +138,7 @@
                     question = Messages("businessmatching.updateservice.whatdoyoudohere.heading", flowModel.activityName.getOrElse("").toLowerCase),
                     editUrl = routes.WhatDoYouDoHereController.get(true).url,
                     allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
-                    editLinkTag = "WhatDoYouDoHere-edit"
+                    editLinkTag = "whatdoyoudohere-edit"
                 ) {
                     <ul class="list list--comma">
                         @tpMsbServices.msbServices.map { service =>
