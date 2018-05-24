@@ -42,7 +42,7 @@ class status_revokedSpec extends AmlsSpec with MustMatchers {
       subHeading.html must include(Messages("summary.status"))
     }
 
-    "contain the expected content elements" in new ViewFixture {
+    "contain the expected content elements, new application button enabled" in new ViewFixture {
       def view =  views.html.status.status_revoked("XAML00000000000", Some("business Name"))
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description")).text must be(
@@ -53,6 +53,24 @@ class status_revokedSpec extends AmlsSpec with MustMatchers {
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
+      doc.getElementById("new.application.button").html() must be (Messages("status.newsubmission.btn"))
+      doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
+
+    }
+
+    "contain the expected content elements, new application button disabled" in new ViewFixture {
+      def view =  views.html.status.status_revoked("XAML00000000000", Some("business Name"), false)
+
+      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description")).text must be(
+        Messages("status.submissiondecisionrevoked.description"))
+      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description2")).text must be(
+        Messages("status.submissiondecisionrevoked.description2"))
+
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
+      doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
+
+
+      Option(doc.getElementById("new.application.button")) must not be defined
     }
 
   }

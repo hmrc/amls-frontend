@@ -137,7 +137,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     "return the 'progress' page (RegistrationProgressController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is no ASP business type in the model" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesGen).sample.get))
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)) // map { tp => tp.copy(hasChanged = true).copy(hasAccepted = true) }))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
@@ -154,7 +154,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is an ASP business type in the model" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesGen).sample.get))
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)) // map { tp => tp.copy(hasAccepted = true) }))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),
