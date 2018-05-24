@@ -48,8 +48,6 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
     dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
 
       case Some(tp) =>
-        println(">>>>>>>>>>>>>>>>>>>>>>>>>   tp =  " + tp)
-        println("&&&&&&&&&&&&&&&&&&&&&&&&&   m =  " + model.activitiesToRemove)
         model.activitiesToRemove map { m =>
           if(m.contains(AccountancyServices) || !allTpComplete(tp)) {
             Redirect(removeRoutes.NeedMoreInformationController.get())
