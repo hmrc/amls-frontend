@@ -64,6 +64,7 @@ class status_revokedSpec extends AmlsSpec with MustMatchers {
         Messages("status.submissiondecisionrevoked.description"))
       doc.getElementById("revoked.p2").text must be (Messages("status.submissiondecisionrevoked.description2"))
 
+
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
 
