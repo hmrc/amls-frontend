@@ -47,8 +47,7 @@ class status_revokedSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description")).text must be(
         Messages("status.submissiondecisionrevoked.description"))
-      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description2")).text must be(
-        Messages("status.submissiondecisionrevoked.description2"))
+      doc.getElementById("revoked.p2").text must be (Messages("status.submissiondecisionrevoked.description2"))
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
@@ -63,8 +62,8 @@ class status_revokedSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description")).text must be(
         Messages("status.submissiondecisionrevoked.description"))
-      doc.getElementsMatchingOwnText(Messages("status.submissiondecisionrevoked.description2")).text must be(
-        Messages("status.submissiondecisionrevoked.description2"))
+      doc.getElementById("revoked.p2").text must be (Messages("status.submissiondecisionrevoked.description2"))
+
 
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).hasAttr("href") must be(true)
       doc.getElementsMatchingOwnText(Messages("notifications.youHaveMessages")).attr("href") mustBe controllers.routes.NotificationController.getMessages().url
