@@ -17,11 +17,10 @@
 package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessmatching.BusinessMatching
+import models.businessmatching.{AccountancyServices, BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import models.renewal.{AMLSTurnover, Renewal}
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -65,9 +64,16 @@ class AMLSTurnoverController @Inject()(
             for {
               renewal <- renewalService.getRenewal
               _ <- renewalService.updateRenewal(renewal.turnover(data))
-            } yield edit match {
-              case true => Redirect(routes.SummaryController.get())
-              case false => Redirect(routes.CustomersOutsideUKController.get())
+              businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+            } yield (edit, businessMatching) match {
+              case (true, _) => Redirect(routes.SummaryController.get())
+              case (false, Some(bm)) if bm.activities.isDefined => bm.activities.get.businessActivities match {
+                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
+                case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+                case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+                case _ => Redirect(routes.SummaryController.get())
+              case _ => InternalServerError("Unable to redirect from Turnover page")
+              }
             }
         }
       }

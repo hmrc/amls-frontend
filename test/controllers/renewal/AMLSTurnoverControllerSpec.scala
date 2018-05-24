@@ -17,8 +17,10 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import models.DateOfChange
 import models.businessactivities._
 import models.businessmatching.{BusinessActivities => Activities, _}
+import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.renewal.Renewal
 import models.renewal.AMLSTurnover.First
 import org.jsoup.Jsoup
@@ -30,22 +32,20 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
 
-    lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
 
-    val mockCacheMap = mock[CacheMap]
-
     val controller = new AMLSTurnoverController(
-      dataCacheConnector = mockDataCacheConnector,
+      dataCacheConnector = mockCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService
     )
@@ -56,7 +56,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     def testRenewal: Option[Renewal] = None
 
-    when(mockDataCacheConnector.fetchAll(any(), any()))
+    when(mockCacheConnector.fetchAll(any(), any()))
       .thenReturn(Future.successful(Some(mockCacheMap)))
 
     when(mockCacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
@@ -102,12 +102,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.01"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
 
       }
 
@@ -123,12 +123,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.02"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
 
       }
 
@@ -144,12 +144,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.03"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
 
       }
 
@@ -165,12 +165,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.04"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
 
       }
 
@@ -186,12 +186,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.05"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
 
       }
 
@@ -207,12 +207,12 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.06"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
 
       }
 
@@ -228,72 +228,152 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
           .thenReturn(Some(bMatching))
 
-        when(mockDataCacheConnector.fetchAll(any(), any()))
+        when(mockCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include (Messages("businessmatching.registerservices.servicename.lbl.07"))
+        contentAsString(result) must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
 
       }
 
     }
 
-    "on post" must {
+    "on post" when {
 
-      "valid data go to renewal CustomerOutsideUK" in new Fixture {
+      "given valid data" must {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "turnover" -> "01"
-        )
+        "go to renewal Summary" when {
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          "in edit mode" in new Fixture {
 
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+            val newRequest = request.withFormUrlEncodedBody(
+              "turnover" -> "01"
+            )
 
-        when(mockRenewalService.getRenewal(any(),any(),any()))
-          .thenReturn(Future.successful(None))
-        when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
-          .thenReturn(Future.successful(mockCacheMap))
+            val bMatching = BusinessMatching(
+              activities = Some(Activities(Set(BillPaymentServices)))
+            )
 
-        val result = controller.post()(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+            when(mockRenewalService.getRenewal(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+
+            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            mockCacheFetch[BusinessMatching](Some(bMatching), Some(BusinessMatching.key))
+
+            val result = controller.post(true)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+          }
+
+          "it does not have business type of APS, HVD or MSB" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "turnover" -> "01"
+            )
+
+            val bMatching = BusinessMatching(
+              activities = Some(Activities(Set(BillPaymentServices)))
+            )
+
+            mockCacheFetch(Some(bMatching))
+
+            when(mockRenewalService.getRenewal(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+          }
+        }
+
+        "go to renewal CustomerOutsideUK" when {
+
+          "it has business type of ASP" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "turnover" -> "01"
+            )
+
+            val bMatching = BusinessMatching(
+              activities = Some(Activities(Set(AccountancyServices)))
+            )
+
+            mockCacheFetch(Some(bMatching))
+
+            when(mockRenewalService.getRenewal(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+          }
+
+          "it has business type of HVD" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "turnover" -> "01"
+            )
+
+            val bMatching = BusinessMatching(
+              activities = Some(Activities(Set(HighValueDealing)))
+            )
+
+            mockCacheFetch(Some(bMatching))
+
+            when(mockRenewalService.getRenewal(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+          }
+        }
+
+        "go to the renewal TotalThroughput page" when {
+
+          "it has a business type of MSB but not ASP or HVD" in new Fixture {
+            val newRequest = request.withFormUrlEncodedBody(
+              "turnover" -> "01"
+            )
+
+            val bMatching = BusinessMatching(
+              activities = Some(Activities(Set(MoneyServiceBusiness)))
+            )
+
+            mockCacheFetch(Some(bMatching))
+
+            when(mockRenewalService.getRenewal(any(), any(), any()))
+              .thenReturn(Future.successful(None))
+            when(mockRenewalService.updateRenewal(any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
+            val result = controller.post()(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(controllers.renewal.routes.TotalThroughputController.get().url))
+          }
+
+        }
+
       }
 
-      "valid data in edit mode go to renewal Summary" in new Fixture {
+      "given invalid data" must {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "turnover" -> "01"
-        )
+        "show BAD_REQUEST" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          when(mockCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
+            .thenReturn(Future.successful(Some(businessMatching)))
 
-        when(mockDataCacheConnector.save[BusinessActivities](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
+          val result = controller.post(true)(request)
+          val document = Jsoup.parse(contentAsString(result))
 
-        when(mockRenewalService.getRenewal(any(),any(),any()))
-          .thenReturn(Future.successful(None))
-        when(mockRenewalService.updateRenewal(any())(any(),any(),any()))
-          .thenReturn(Future.successful(mockCacheMap))
-
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-      }
-
-      "invalid data show BAD_REQUEST" in new Fixture {
-
-        when(mockDataCacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any()))
-          .thenReturn(Future.successful(Some(businessMatching)))
-
-        val result = controller.post(true)(request)
-        val document = Jsoup.parse(contentAsString(result))
-
-        status(result) mustBe BAD_REQUEST
+          status(result) mustBe BAD_REQUEST
+        }
       }
 
     }
