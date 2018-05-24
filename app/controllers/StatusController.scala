@@ -169,7 +169,7 @@ class StatusController @Inject()(val landingService: LandingService,
       }
 
       case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterToggle))
-      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterRevokeToggle))
       case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionWithdrawn, _) => Ok(status_withdrawn(businessNameOption))
       case (DeRegistered, _) =>

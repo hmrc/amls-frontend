@@ -44,9 +44,24 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     activities <- businessActivitiesListGen
   } yield WhatDoesYourBusinessDo(activities.toSet, None)
 
+  val whatBusinessTypesAtLeastOneGen: Gen[WhatDoesYourBusinessDo] = for {
+    activities <- businessActivitiesListGen
+    activity <- singleBusinessTypeGen
+  } yield WhatDoesYourBusinessDo(activities.toSet union Set(activity), None)
+
   val tradingPremisesGen: Gen[TradingPremises] = for {
     ytp <- yourTradingPremisesGen
     activities <- whatBusinessActivitiesGen
+  } yield TradingPremises(
+    yourTradingPremises = Some(ytp),
+    whatDoesYourBusinessDoAtThisAddress = Some(activities),
+    hasAccepted = true,
+    hasChanged = true
+  )
+
+  val tradingPremisesWithAtLeastOneBusinessTypeGen: Gen[TradingPremises] = for {
+    ytp <- yourTradingPremisesGen
+    activities <- whatBusinessTypesAtLeastOneGen
   } yield TradingPremises(
     yourTradingPremises = Some(ytp),
     whatDoesYourBusinessDoAtThisAddress = Some(activities),

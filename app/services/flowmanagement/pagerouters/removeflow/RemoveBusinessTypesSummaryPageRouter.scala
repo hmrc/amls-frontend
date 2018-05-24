@@ -46,6 +46,7 @@ class RemoveBusinessTypesSummaryPageRouter @Inject()(val statusService: StatusSe
     val allTpComplete = (tp: Seq[TradingPremises]) => tp.forall(_.isComplete)
 
     dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key) map {
+
       case Some(tp) =>
         model.activitiesToRemove map { m =>
           if(m.contains(AccountancyServices) || !allTpComplete(tp)) {

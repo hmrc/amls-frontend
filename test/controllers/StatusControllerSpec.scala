@@ -299,7 +299,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         Option(html.getElementById("new.application.button")) mustBe defined
       }
 
-      "application status is SubmissionDecisionRevoked" in new Fixture {
+      "application status is SubmissionDecisionRevoked and the submit button is allowed" in new Fixture {
 
         when(controller.landingService.cacheMap(any(), any(), any()))
           .thenReturn(Future.successful(Some(cacheMap)))
@@ -320,6 +320,9 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         status(result) must be(OK)
 
         contentAsString(result) must include(Messages("status.submissiondecision.not.supervised.heading"))
+
+        val html = Jsoup.parse(contentAsString(result))
+        Option(html.getElementById("new.application.button")) mustBe defined
 
       }
 

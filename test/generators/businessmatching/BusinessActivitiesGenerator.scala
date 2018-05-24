@@ -32,9 +32,19 @@ trait BusinessActivitiesGenerator extends BaseGenerator {
     TelephonePaymentService
   )
 
+  val singleBusinessTypeGen: Gen[BusinessActivity] = Gen.oneOf(Seq(
+    AccountancyServices,
+    BillPaymentServices,
+    EstateAgentBusinessService,
+    HighValueDealing,
+    MoneyServiceBusiness,
+    TrustAndCompanyServices,
+    TelephonePaymentService)
+  )
+
   val businessActivitiesGen: Gen[BusinessActivities] =
     businessActivitiesListGen map { a =>
       BusinessActivities(a.toSet, None, None, None)
     }
-  
+
 }

@@ -40,6 +40,8 @@ trait ApplicationConfig {
   def hasAcceptedToggle: Boolean
 
   def allowReregisterToggle: Boolean
+
+  def allowReregisterRevokeToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -110,6 +112,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 
   override def allowReregisterToggle: Boolean = getConfBool("feature-toggle.allow-reregister", false)
+
+  override def allowReregisterRevokeToggle: Boolean = getConfBool("feature-toggle.allow-reregister", false)
 
 }
 
