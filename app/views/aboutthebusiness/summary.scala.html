@@ -34,6 +34,7 @@
     @if(showRegisteredForMLR) {
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredformlr.title"),
+            editLinkTag = "aboutthebusinessregform-edit",
             editUrl = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true).toString
         ) {
             <p>@model.previouslyRegistered.map {
@@ -46,6 +47,7 @@
     @model.activityStartDate.map { activityStartDate =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.activity.start.date.title"),
+            editLinkTag = "aboutthebusinessactivitystartdate-edit",
             editUrl = controllers.aboutthebusiness.routes.ActivityStartDateController.get(true).toString
         ) {
             <p>@Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)</p>
@@ -55,6 +57,7 @@
     @model.vatRegistered.map { vatRegistered =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredforvat.title"),
+            editLinkTag = "aboutthebusinessregisteredvat-edit",
             editUrl = controllers.aboutthebusiness.routes.VATRegisteredController.get(true).toString
         ) {
             <p>@vatRegistered match {
@@ -67,6 +70,7 @@
     @model.registeredOffice.map { a =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredoffice.title"),
+            editLinkTag = "aboutthebusinessregoffice-edit",
             editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true).toString
         ) {
             <p>@a.toLines.map { line =>
@@ -80,6 +84,7 @@
 
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.email.title"),
+            editLinkTag = "aboutthebusinesscontactyou-edit",
             editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
@@ -89,6 +94,7 @@
 
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.phone.title"),
+            editLinkTag = "aboutthebusinesscontactphone-edit",
             editUrl = controllers.aboutthebusiness.routes.ContactingYouPhoneController.get(true).toString
         ) {
             <ul class="list">
@@ -100,6 +106,7 @@
     @model.altCorrespondenceAddress.map { aca =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.lettersaddress.title"),
+            editLinkTag = "aboutthebusinesslettersaddress-edit",
             editUrl = controllers.aboutthebusiness.routes.LettersAddressController.get(true).toString
         ) {
             @model.registeredOffice.map { a =>
@@ -118,6 +125,7 @@
     @model.correspondenceAddress.map { ca =>
         @checkYourAnswers(
             question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
+            editLinkTag = "aboutthebusinesscorraddress-edit",
             classes = Seq("check-your-answers__last"),
             editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
         ) {

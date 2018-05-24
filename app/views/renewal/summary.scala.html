@@ -34,6 +34,7 @@
     @model.involvedInOtherActivities.map{ inv =>
         @checkYourAnswers(
             question = Messages("renewal.involvedinother.title"),
+            editLinkTag = "involvedinotheractivities-edit",
             editUrl = controllers.renewal.routes.InvolvedInOtherController.get(true).toString
         ) {
             <p>@model.involvedInOtherActivities.map {
@@ -46,6 +47,7 @@
     @model.businessTurnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("renewal.business-turnover.title"),
+            editLinkTag = "businessturnover-edit",
             editUrl = controllers.renewal.routes.BusinessTurnoverController.get(true).toString
         ) {
             <p>@turnover match {
@@ -63,6 +65,7 @@
     @model.turnover.map { turnover =>
         @checkYourAnswers(
             question = Messages("renewal.turnover.title"),
+            editLinkTag = "turnover-edit",
             editUrl = controllers.renewal.routes.AMLSTurnoverController.get(true).toString
         ) {
             <ul class="list list-bullet">
@@ -89,6 +92,7 @@
     @model.customersOutsideUK.map { boa =>
         @checkYourAnswers(
             question = Messages("renewal.customer.outside.uk.title"),
+            editLinkTag = "customersoutsideuk-edit",
             editUrl = controllers.renewal.routes.CustomersOutsideUKController.get(true).toString
         ) {
             @boa.countries.fold {
@@ -108,6 +112,7 @@
         @model.totalThroughput.map { m =>
             @checkYourAnswers(
                 question = messages("renewal.msb.throughput.header"),
+                editLinkTag = "msbtotalthroughput-edit",
                 editUrl = controllers.renewal.routes.TotalThroughputController.get(edit = true).url
             ) {
                 <p>@TotalThroughput.labelFor(m)</p>
@@ -117,6 +122,7 @@
         @model.transactionsInLast12Months.map { m =>
             @checkYourAnswers(
                 question = messages("renewal.msb.transfers.header"),
+                editLinkTag = "msbtransfers-edit",
                 editUrl = controllers.renewal.routes.TransactionsInLast12MonthsController.get(edit = true).url
             ) {
                 <p>@m.transfers</p>
@@ -131,6 +137,7 @@
             @model.sendMoneyToOtherCountry.map { oc =>
                 @checkYourAnswers(
                 question = Messages("renewal.msb.send.money.title"),
+                editLinkTag = "msbsendmoney-edit",
                 editUrl = controllers.renewal.routes.SendMoneyToOtherCountryController.get(edit = true).url
             )   {
                     <p>@oc.money match {
@@ -143,6 +150,7 @@
             @model.sendTheLargestAmountsOfMoney.map { lom =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.largest.amounts.title"),
+                    editLinkTag = "msblargestamounts-edit",
                     editUrl = controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(edit = true).toString
                 ) {
                 <ul class="list list--comma">
@@ -156,6 +164,7 @@
             @model.mostTransactions.map { mt =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.most.transactions.title"),
+                    editLinkTag = "msbmostransactions-edit",
                     editUrl = controllers.renewal.routes.MostTransactionsController.get(edit = true).url
                 ) {
                     <ul class="list list--comma">
@@ -172,6 +181,7 @@
             @model.ceTransactionsInLast12Months.map{ trans =>
                 @checkYourAnswers(
                     question = Messages("renewals.msb.ce.transactions.expected.title"),
+                    editLinkTag = "msbcetransactionsexpected-edit",
                     editUrl = controllers.renewal.routes.CETransactionsInLast12MonthsController.get(edit = true).toString
                 ) {
                     <p>@trans.ceTransaction</p>
@@ -181,6 +191,7 @@
             @model.whichCurrencies.map { wc =>
                 @checkYourAnswers(
                     question = Messages("renewal.msb.whichcurrencies.header"),
+                    editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
                 <ul class="list list--comma">
@@ -215,6 +226,7 @@
     @model.percentageOfCashPaymentOver15000.map { p =>
         @checkYourAnswers(
             question = Messages("renewal.hvd.percentage.title"),
+            editLinkTag = "hvdpercentage-edit",
             editUrl = controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get(true).toString
         ) {
             <p>@p match {
@@ -230,6 +242,7 @@
         @model.receiveCashPayments.map { rcp =>
             @checkYourAnswers(
                 question = Messages("renewal.receiving.title"),
+                editLinkTag = "receivecashpayments-edit",
                 editUrl = controllers.renewal.routes.ReceiveCashPaymentsController.get(true).toString
             ) {
                 @rcp.paymentMethods match {
@@ -274,7 +287,7 @@
         @wc.wholesalerMoneySource.map { wms =>
         <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
         }
-        @if(wc.customerMoneySource) {
+        @if(wc.customerMoneySource.isDefined) {
         <li>@Messages("msb.which_currencies.source.customers")</li>
         }
     </ul>

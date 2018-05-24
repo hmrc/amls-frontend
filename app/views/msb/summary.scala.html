@@ -37,6 +37,7 @@
         @model.throughput.map{ throughput =>
             @checkYourAnswers(
                 question = Messages("msb.throughput.title"),
+                editLinkTag = "msbthroughput-edit",
                 editUrl = if(isEditable){controllers.msb.routes.ExpectedThroughputController.get(true).toString} else ""
             ) {
                 <p>@throughput match {
@@ -54,6 +55,7 @@
         @model.branchesOrAgents.map { boa =>
             @checkYourAnswers(
                 question = Messages("msb.branchesoragents.title"),
+                editLinkTag = "msbbranchesoragents-edit",
                 editUrl = controllers.msb.routes.BranchesOrAgentsController.get(true).toString
             ) {
                 @boa.branches.fold {
@@ -71,6 +73,7 @@
         @model.identifyLinkedTransactions.map { ilt =>
             @checkYourAnswers(
                 question = Messages("msb.linked.txn.title"),
+                editLinkTag = "msblinkedtransactions-edit",
                 editUrl = controllers.msb.routes.IdentifyLinkedTransactionsController.get(true).toString
             ) {
                 <p>@ilt.linkedTxn match {
@@ -84,6 +87,7 @@
             @model.businessUseAnIPSP.map { ipsp =>
                 @checkYourAnswers(
                     question = Messages("msb.ipsp.title"),
+                    editLinkTag = "msbipsp-edit",
                     editUrl = controllers.msb.routes.BusinessUseAnIPSPController.get(true).toString
                 ) {
                     @ipsp match {
@@ -101,6 +105,7 @@
             @model.fundsTransfer.map { ft =>
                 @checkYourAnswers(
                     question = Messages("msb.fundstransfer.title"),
+                    editLinkTag = "msbfundstransfer-edit",
                     editUrl = controllers.msb.routes.FundsTransferController.get(true).toString
                 ) {
                     <p>@ft.transferWithoutFormalSystems match {
@@ -113,6 +118,7 @@
             @model.transactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
                     question = Messages("msb.transactions.expected.title"),
+                    editLinkTag = "msbtransactionsexpected-edit",
                     editUrl = if(isEditable){controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString} else ""
                 ) {
                     <p>@trans.txnAmount</p>
@@ -122,6 +128,7 @@
             @model.sendMoneyToOtherCountry.map{ otherCountries =>
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
+                    editLinkTag = "msbsendmoneytoothercountries-edit",
                     editUrl = if(isEditable) { controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString } else ""
                 ) {
                     <p>@otherCountries.money match {
@@ -134,6 +141,7 @@
                     @model.sendTheLargestAmountsOfMoney.map { lom =>
                         @checkYourAnswers(
                             question = Messages("msb.send.the.largest.amounts.of.money.title"),
+                            editLinkTag = "msbsendlargestamounts-edit",
                             editUrl = if(isEditable){controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString} else ""
                         ) {
                             <ul class="list list--comma">
@@ -147,6 +155,7 @@
                     @model.mostTransactions.map { mt =>
                         @checkYourAnswers(
                             question = Messages("msb.most.transactions.title"),
+                            editLinkTag = "msbmosttransactions-edit",
                             editUrl = if(isEditable){controllers.msb.routes.MostTransactionsController.get(true).toString} else ""
                         ) {
                             <ul class="list list--comma">
@@ -164,6 +173,7 @@
             @model.ceTransactionsInNext12Months.map{ trans =>
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
+                    editLinkTag = "msbcetransactionsexpected-edit",
                     editUrl = if(isEditable){controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString} else ""
                 ) {
                     <p>@trans.ceTransaction</p>
@@ -173,6 +183,7 @@
             @model.whichCurrencies.map { wc =>
                 @checkYourAnswers(
                     question = Messages("msb.which_currencies.title"),
+                    editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = if(isEditable){controllers.msb.routes.WhichCurrenciesController.get(true).toString} else ""
                 ) {
                     <ul class="list list--comma">
@@ -228,7 +239,7 @@
             @wc.wholesalerMoneySource.map { wms =>
             <li>@Messages("msb.which_currencies.source.wholesalers"): @wms.wholesalerNames</li>
             }
-            @if(wc.customerMoneySource) {
+            @if(wc.customerMoneySource.isDefined) {
             <li>@Messages("msb.which_currencies.source.customers")</li>
             }
         </ul>

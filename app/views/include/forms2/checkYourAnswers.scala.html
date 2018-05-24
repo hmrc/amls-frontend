@@ -19,7 +19,7 @@
     editUrl: String = "",
     removeUrl: String = "",
     allowEdit: Boolean = true,
-    idTag: String = ""
+    editLinkTag: String = ""
 )(content: Html)(implicit lang: Lang, m: Messages)
 
 <section class="check-your-answers @classes.mkString(" ")">
@@ -31,7 +31,7 @@
     @if(editUrl.nonEmpty && allowEdit) {
         <footer class="group">
             <p>
-                <a @if(idTag.nonEmpty) {id="@idTag"} href="@editUrl" class="change-answer"><span aria-hidden="true">@Messages("button.edit")</span> <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a>
+                <a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="change-answer"><span aria-hidden="true">@Messages("button.edit")</span> <span class="visuallyhidden">@Messages("button.edit") @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a>
             </p>
         </footer>
     }
