@@ -165,8 +165,8 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       "given valid data" must {
 
         "redirect to the summary page" when {
-          "business is not an hvd" in new FormSubmissionFixture {
-            post() { result =>
+          "business is an asp and not an hvd or an msb" in new FormSubmissionFixture {
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
             }
@@ -174,7 +174,7 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is an hvd" in new FormSubmissionFixture {
+          "business is an hvd but not an msb" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
@@ -191,41 +191,10 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
           }
         }
 
-        "redirect to SendTheLargestAmountsOfMoneyController" when {
-          "edit is true" when {
-            "business is an msb including Transmitting Money services" when {
-              "CustomersOutsideUK is edited from no to yes" in new FormSubmissionFixture {
-
-                val data = request.withFormUrlEncodedBody(
-                  "isOutside" -> "true",
-                  "countries[0]" -> "US")
-
-                val renewal = Renewal(
-                  customersOutsideUK = Some(CustomersOutsideUK(None))
-                )
-
-                val businessMatching = BusinessMatching(
-                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                )
-
-                post(
-                  edit = true,
-                  data = Some(data),
-                  businessMatching = businessMatching,
-                  renewal = Some(renewal)
-                ) { result =>
-                  result.header.status mustBe SEE_OTHER
-                  result.header.headers.get("Location") mustBe Some(routes.SendTheLargestAmountsOfMoneyController.get().url)
-                }
-              }
-            }
-          }
-        }
-
       }
 
-      "respond with BAD_REQUEST" when {
-        "given invalid data" in new FormSubmissionFixture {
+      "given invalid data" must {
+        "respond with BAD_REQUEST" in new FormSubmissionFixture {
           post(data = Some(request.withFormUrlEncodedBody("isOutside" -> "abc"))) { result =>
             result.header.status mustBe BAD_REQUEST
           }
@@ -233,48 +202,5 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       }
     }
 
-  }
-
-  it must {
-    "remove data from SendTheLargestAmountsOfMoney and MostTransactions" when {
-      "CustomersOutsideUK is edited from yes to no" in new FormSubmissionFixture {
-
-        post(edit = true) { result =>
-          result.header.status mustBe SEE_OTHER
-
-          verify(renewalService)
-            .updateRenewal(eqTo(Renewal(
-              customersOutsideUK = Some(CustomersOutsideUK(None)),
-              sendTheLargestAmountsOfMoney = None,
-              mostTransactions = None,
-              hasChanged = true,
-              hasAccepted = false
-            )))(any(), any(), any())
-        }
-
-      }
-    }
-    "keep data from SendTheLargestAmountsOfMoney and MostTransactions" when {
-      "only countries are changed in the update of renewal" in new FormSubmissionFixture {
-
-        val data = request.withFormUrlEncodedBody(
-          "isOutside" -> "true",
-          "countries[0]" -> "US")
-
-        post(edit = true, data = Some(data)) { result =>
-          result.header.status mustBe SEE_OTHER
-
-          verify(renewalService)
-            .updateRenewal(eqTo(Renewal(
-              customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United States","US"))))),
-              sendTheLargestAmountsOfMoney = Some(sendTheLargestAmountsOfMoney),
-              mostTransactions = Some(mostTransactions),
-              hasChanged = true,
-              hasAccepted = false
-            )))(any(), any(), any())
-        }
-
-      }
-    }
   }
 }

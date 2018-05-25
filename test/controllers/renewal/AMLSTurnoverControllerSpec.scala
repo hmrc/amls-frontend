@@ -268,7 +268,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
           }
 
-          "it does not have business type of APS, HVD or MSB" in new Fixture {
+          "it does not have business type of ASP, HVD or MSB" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"
             )
