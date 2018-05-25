@@ -690,7 +690,7 @@ progress.update.registration = Update registration
 #### Amendment page ####
 amendment.title = Update or view your information
 amendment.section-heading = Your registration
-amendment.text.1 = If something has changed in your business which is relevant to Money Laundering Regulations, you must amend and re-submit your application for anti-money laudering supervision.
+amendment.text.1 = If something has changed in your business which is relevant to Money Laundering Regulations, you must amend and re-submit your application for anti-money laundering supervision.
 amendment.text.2 = There will be an additional fee to pay if you increase the number of responsible people or trading premises.
 amendment.sidebar.heading = Submit amended application
 amendment.sidebar.text = You don’t need to re-submit your application until you’ve made changes to it.
