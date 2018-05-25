@@ -52,12 +52,7 @@ class  IsResidentialController @Inject()(
               case _ => EmptyForm
             }
 
-            val address = for {
-              bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-              address <- getAddress(bm) if isFirstTradingPremises(tradingPremises, index)
-            } yield address
-
-            Ok(is_residential(form, Some(tp.yourTradingPremises.get.tradingPremisesAddress.toBCAddress), index, edit))
+            Ok(is_residential(form, tp.yourTradingPremises.map(_.tradingPremisesAddress.toBCAddress), index, edit))
           }) getOrElse NotFound(notFoundView)
         }
   }
