@@ -77,7 +77,7 @@ class submitSpec extends AmlsSpec with MustMatchers {
 
       val doc = Jsoup.parse(contentAsString(t))
 
-      doc.getElementById("AnID").attr("data-journey") must be ("add tag")
+      doc.getElementById("AnID").attr("data-journey-click") must be ("add tag")
     }
 
     "If gaTag is not provided submit element should not include tag" in {
@@ -85,7 +85,7 @@ class submitSpec extends AmlsSpec with MustMatchers {
 
       val doc = Jsoup.parse(contentAsString(t))
 
-      doc.getElementById("AnID").hasAttr("data-journey") must be (false)
+      doc.getElementById("AnID").hasAttr("data-journey-click") must be (false)
     }
 
 
