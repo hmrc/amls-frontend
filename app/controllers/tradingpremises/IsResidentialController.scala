@@ -57,7 +57,7 @@ class  IsResidentialController @Inject()(
               address <- getAddress(bm) if isFirstTradingPremises(tradingPremises, index)
             } yield address
 
-            Ok(is_residential(form, address, index, edit))
+            Ok(is_residential(form, Some(tp.yourTradingPremises.get.tradingPremisesAddress.toBCAddress), index, edit))
           }) getOrElse NotFound(notFoundView)
         }
   }
