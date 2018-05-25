@@ -16,10 +16,11 @@
 
 package models.tradingpremises
 
-import models.DateOfChange
+import models.{Country, DateOfChange}
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, To, Write}
 import play.api.libs.json.{Json, Reads, Writes}
+import models.businesscustomer.{Address => BCAddress}
 
 case class Address(
                   addressLine1: String,
@@ -37,6 +38,8 @@ case class Address(
     addressLine4,
     Some(postcode)
   ).flatten
+
+  def toBCAddress: BCAddress = BCAddress(addressLine1, addressLine2, addressLine3, addressLine4, Some(postcode), Country("",""))
 }
 
 object Address {
