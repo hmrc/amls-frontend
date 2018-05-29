@@ -37,10 +37,6 @@ import scala.concurrent.Future
 
 class DeregistrationReasonControllerSpec extends AmlsSpec with OneAppPerSuite {
 
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
-    .build()
-
   trait TestFixture extends AuthorisedFixture {
     self =>
 

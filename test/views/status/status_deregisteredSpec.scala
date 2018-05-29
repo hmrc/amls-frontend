@@ -59,11 +59,5 @@ class status_deregisteredSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("new.application.button").html() must be (Messages("status.newsubmission.btn"))
       doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
     }
-
-    "hide the 'new submission' form when specified" in new ViewFixture {
-      def view =  views.html.status.status_deregistered(Some("business Name"), Some(deregistrationDate), showReregisterButton = false)
-
-      Option(doc.getElementById("new.application.button")) must not be defined
-    }
   }
 }

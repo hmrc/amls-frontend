@@ -168,8 +168,8 @@ class StatusController @Inject()(val landingService: LandingService,
         }
       }
 
-      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterToggle))
-      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption, ApplicationConfig.allowReregisterRevokeToggle))
+      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
       case (SubmissionWithdrawn, _) => Ok(status_withdrawn(businessNameOption))
       case (DeRegistered, _) =>
@@ -178,7 +178,7 @@ class StatusController @Inject()(val landingService: LandingService,
           date <- info.deRegistrationDate
         } yield date
 
-        Ok(status_deregistered(businessNameOption, deregistrationDate, ApplicationConfig.allowReregisterToggle))
+        Ok(status_deregistered(businessNameOption, deregistrationDate))
     }
   }
 
