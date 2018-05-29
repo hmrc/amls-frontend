@@ -39,10 +39,6 @@ import scala.concurrent.Future
 
 class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers with OneAppPerSuite {
 
-  implicit override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.allow-deregister" -> true)
-    .build()
-
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
 
