@@ -197,6 +197,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
 
                   when(dataCache.fetchAll(any(), any()))

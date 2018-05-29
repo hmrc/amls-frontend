@@ -65,15 +65,12 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
     val isComplete = for {
       cache <- OptionT(dataCache.fetchAll)
-      bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-      ba <- OptionT.fromOption[Future](bm.activities)
+      businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      activities <- OptionT.fromOption[Future](businessMatching.activities)
     } yield {
 
-      val activities = ba.businessActivities
-      val msbServices = bm.msbServices
-
-      activities collect {
-        case MoneyServiceBusiness => checkCompletionOfMsb(renewal, msbServices)
+      activities.businessActivities collect {
+        case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
         case HighValueDealing => checkCompletionOfHvd(renewal)
       } match {
         case s if s.nonEmpty => s.forall(identity)
@@ -92,8 +89,8 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
 
-    val maybeCountry = renewal.customersOutsideUK.flatMap {
-      case CustomersOutsideUK(Some(country)) => Some(country)
+    val maybeCountries = renewal.customersOutsideUK.flatMap {
+      case CustomersOutsideUK(Some(countries)) => Some(countries)
       case _ => None
     }
 
@@ -169,7 +166,8 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   }
 
   def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
-    !renewalSection.status.equals(Started) && ((renewalSection.status == Completed && renewalSection.hasChanged) | amendmentDeclarationAvailable(variationSections))
+    !renewalSection.status.equals(Started) &&
+      ((renewalSection.status == Completed && renewalSection.hasChanged) || amendmentDeclarationAvailable(variationSections))
   }
 
 }
