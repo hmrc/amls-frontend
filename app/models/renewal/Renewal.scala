@@ -92,11 +92,10 @@ case class Renewal(
 
 object Renewal {
   val key = "renewal"
+  val sectionKey = "renewal"
 
   implicit val formats = Json.format[Renewal]
 
   implicit def default(renewal: Option[Renewal]): Renewal =
     renewal.getOrElse(Renewal())
-
-
 }

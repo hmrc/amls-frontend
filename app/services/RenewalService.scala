@@ -37,17 +37,17 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
   def getSection(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, ec: ExecutionContext) = {
 
-    val notStarted = Section("renewal", NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+    val notStarted = Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
     this.getRenewal flatMap {
       case Some(model) =>
         isRenewalComplete(model) flatMap { x =>
           if (x) {
-            Future.successful(Section("renewal", Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
+            Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
           } else {
             model match {
               case Renewal(None, None, None, None, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
-              case _ => Future.successful(Section("renewal", Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get()))
+              case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get()))
             }
           }
         }
@@ -72,83 +72,22 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       val activities = ba.businessActivities
       val msbServices = bm.msbServices
 
-      if (activities.contains(MoneyServiceBusiness) && activities.contains(HighValueDealing)) {
-        checkCompletionOfMsbAndHvd(renewal, msbServices)
-      } else if (activities.contains(MoneyServiceBusiness)) {
-        checkCompletionOfMsb(renewal, msbServices)
-      } else if (activities.contains(HighValueDealing)) {
-        checkCompletionOfHvd(renewal)
-      } else {
-        renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, _, _, true) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _, _, _, _, _, _, _, _, true) => true
-          case _ => false
-        }
+      activities collect {
+        case MoneyServiceBusiness => checkCompletionOfMsb(renewal, msbServices)
+        case HighValueDealing => checkCompletionOfHvd(renewal)
+      } match {
+        case s if s.nonEmpty => s.forall(identity)
 
+        case _ =>
+          renewal match {
+            case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, _, _, true) => true
+            case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), _, _, _, _, _, _, _, _, _, _, true) => true
+            case _ => false
+          }
       }
     }
 
     isComplete.getOrElse(false)
-  }
-
-  private def checkCompletionOfMsbAndHvd(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {
-
-    val maybeCountry = renewal.customersOutsideUK.flatMap {
-      case CustomersOutsideUK(Some(country)) => Some(country)
-      case _ => None
-    }
-
-    val sendsMoneyToOtherCountry = renewal.sendMoneyToOtherCountry match {
-      case Some(x) if x.money => true
-      case _ => false
-    }
-
-    msbServices match {
-      case Some(x) if x.msbServices.contains(CurrencyExchange) & x.msbServices.contains(TransmittingMoney) => {
-        sendsMoneyToOtherCountry match {
-          case true =>
-            renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), true) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), true) => true
-              case _ => false
-            }
-          case false =>
-            renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, Some(_), _, _, true) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, Some(_), _, _, true) => true
-              case _ => false
-            }
-        }
-      }
-      case Some(x) if x.msbServices.contains(CurrencyExchange) =>
-        renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), _, _, true) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, Some(_), _, _, true) => true
-          case _ => false
-        }
-      case Some(x) if x.msbServices.contains(TransmittingMoney) => {
-        sendsMoneyToOtherCountry match {
-          case true =>
-            renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), _, _, Some(_), true) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), Some(_), Some(_), _, _, Some(_), true) => true
-              case _ => false
-            }
-          case false =>
-            renewal match {
-              case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), _, _, _, _, _, true) => true
-              case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, Some(_), _, _, _, _, _, true) => true
-              case _ => false
-            }
-        }
-      }
-      case _ =>
-        renewal match {
-          case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, true) => true
-          case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, true) => true
-          case _ => false
-        }
-    }
   }
 
   private def checkCompletionOfMsb(renewal: Renewal, msbServices: Option[BusinessMatchingMsbServices]) = {

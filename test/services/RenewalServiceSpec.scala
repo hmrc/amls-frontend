@@ -87,7 +87,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         val section = await(service.getSection)
 
-        section mustBe Section("renewal", NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
       }
 
@@ -95,7 +95,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         when(dataCache.fetchAll(any(),any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
-        
+
         when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
           .thenReturn(Some(BusinessMatching(
             activities = Some(BusinessActivities(Set(
@@ -112,7 +112,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         val section = await(service.getSection)
 
         await(service.isRenewalComplete(completeModel)) mustBe true
-        section mustBe Section("renewal", Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
+        section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
 
       }
 
@@ -132,7 +132,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         val section = await(service.getSection)
 
-        section mustBe Section("renewal", Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
 
       }
 
@@ -150,7 +150,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
         val section = await(service.getSection)
 
-        section mustBe Section("renewal", NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
+        section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
       }
 
     }
