@@ -72,6 +72,16 @@ trait MappingUtils {
   import play.api.libs.json.{Reads, JsSuccess, JsError}
 
   def constant[A](a: A): Reads[A] = Reads(_ => JsSuccess(a))
+
+  /**
+    * Compiles a sequence of validation rules for type A into one validation rule
+    */
+  def compile[A](a: Seq[RuleLike[A, A]]): RuleLike[A, A] = a.foldLeft(Rule.zero[A]) { (acc, rule) => acc andThen rule }
+
+  /**
+    * Compiles a sequence of optional validation rules for type A into one validation rule, ignoring None cases
+    */
+  def compileOpt[A](a: Seq[Option[RuleLike[A, A]]]): RuleLike[A, A] = compile(a collect { case Some(rule) => rule })
   
   /**
     * This is an overloaded version of `writeM` from the validation library which instead of serializing
