@@ -1268,6 +1268,7 @@ bankdetails.whatyouneed.requiredinfo.heading = In this section, you’ll be aske
 bankdetails.whatyouneed.line_1 = what kind of bank accounts your business uses
 bankdetails.whatyouneed.line_2 = if they’re UK bank accounts
 bankdetails.whatyouneed.line_3 = sort codes and account numbers
+bankdetails.whatyouneed.enter_details_hint = Enter the details of all your accounts, one at a time.
 bankdetails.accounttype.title = What kind of bank account does your business use?
 bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
