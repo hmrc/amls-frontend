@@ -205,7 +205,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[Supervision]
 
 
-        await(updateSave4LaterService.update("afile.json"))
+        await(updateSave4LaterService.update(updateSave4LaterResponse))
 
         Mockito.verify(mockCacheConnector).save[ViewResponse](eqTo(ViewResponse.key), any())(any(), any(), any())
         Mockito.verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
