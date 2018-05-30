@@ -106,8 +106,7 @@ object Renewal {
 
     val basicPropertyRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.involvedInOtherActivities.isDefined &&
-        r.turnover.isDefined &&
-        r.customersOutsideUK.isDefined => Valid(r)
+        r.turnover.isDefined => Valid(r)
 
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Renewal model doesn't pass basic state validation"))))
     }
@@ -135,6 +134,12 @@ object Renewal {
         r.mostTransactions.isEmpty => Valid(r)
 
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money transmitting"))))
+    }
+
+    val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.percentageOfCashPaymentOver15000.isDefined && r.receiveCashPayments.isDefined &&
+        r.customersOutsideUK.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
     }
 
     val hasAcceptedRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {

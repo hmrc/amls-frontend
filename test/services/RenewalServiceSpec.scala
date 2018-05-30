@@ -40,6 +40,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
+
 class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   implicit val hc = HeaderCarrier()
@@ -159,6 +160,72 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
   "isRenewalComplete" must {
     "be true" when {
+      "it is an HVD and customers outside the UK is set" in new Fixture {
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              HighValueDealing
+            ))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+          )))
+
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          hasChanged = true,
+          None
+        )
+
+        await(service.isRenewalComplete(model)) mustBe true
+      }
+
+      "it is an ASP and customers outside the UK is set" in new Fixture {
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              AccountancyServices
+            ))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+          )))
+
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          hasChanged = true,
+          None
+        )
+
+        await(service.isRenewalComplete(model)) mustBe true
+      }
+
       "it is an MSB" when {
         "it is an HVD" when {
           "it is a CurrencyExchange" when {
@@ -1127,6 +1194,72 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     }
 
     "be false" when {
+      "it is an HVD and customers outside the UK is not set" in new Fixture {
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              HighValueDealing
+            ))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+          )))
+
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          None,
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          hasChanged = true,
+          None
+        )
+
+        await(service.isRenewalComplete(model)) mustBe false
+      }
+
+      "it is an ASP and customers outside the UK is set" in new Fixture {
+        when(dataCache.fetchAll(any(),any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+          .thenReturn(Some(BusinessMatching(
+            activities = Some(BusinessActivities(Set(
+              AccountancyServices
+            ))),
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+          )))
+
+
+        val model = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          None,
+          hasChanged = true,
+          None
+        )
+
+        await(service.isRenewalComplete(model)) mustBe false
+      }
+
       "it is an MSB" when {
         "it is an HVD" when {
           "it is a CurrencyExchange" when {

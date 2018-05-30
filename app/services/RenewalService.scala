@@ -71,6 +71,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       activities.businessActivities collect {
         case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
         case HighValueDealing => checkCompletionOfHvd(renewal)
+        case AccountancyServices => renewal.customersOutsideUK.isDefined
       } match {
         case s if s.nonEmpty => s.forall(identity)
 
@@ -102,10 +103,18 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
   }
 
   private def checkCompletionOfHvd(renewal: Renewal) = {
-    renewal match {
-      case Renewal(Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, true) => true
-      case Renewal(Some(InvolvedInOtherNo), None, Some(_), Some(_), Some(_), Some(_), _, _, _, _, _, _, _, _, true) => true
-      case _ => false
+
+    val validationRule = compileOpt {
+      Seq(
+        Some(hvdRule),
+        Some(standardRule)
+      )
+    }
+
+    // Validate the renewal object using the composed chain of validation rules
+    validationRule.validate(renewal) match {
+      case Valid(_) => true
+      case r => false
     }
   }
 
