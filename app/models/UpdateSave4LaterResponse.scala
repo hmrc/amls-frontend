@@ -34,24 +34,24 @@ import play.api.libs.json._
 import scala.collection.Seq
 
 
-case class AMLS(view:Option[ViewResponse],
-                businessMatching: Option[BusinessMatching],
-                estageAgencyBusiness: Option[EstateAgentBusiness],
-                tradingPremises: Option[Seq[TradingPremises]],
-                  aboutTheBusinessSection: Option[AboutTheBusiness],
-                  bankDetails: Option[Seq[BankDetails]],
-                  aboutYouSection: Option[AddPerson],
-                  businessActivities: Option[BusinessActivities],
-                  responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                  tcspSection: Option[Tcsp],
-                  aspSection: Option[Asp],
-                  msbSection: Option[MoneyServiceBusiness],
-                  hvdSection: Option[Hvd],
-                  supervisionSection: Option[Supervision])  {
+case class UpdateSave4LaterResponse(view:Option[ViewResponse],
+                                    businessMatching: Option[BusinessMatching],
+                                    estageAgencyBusiness: Option[EstateAgentBusiness],
+                                    tradingPremises: Option[Seq[TradingPremises]],
+                                    aboutTheBusinessSection: Option[AboutTheBusiness],
+                                    bankDetails: Option[Seq[BankDetails]],
+                                    aboutYouSection: Option[AddPerson],
+                                    businessActivities: Option[BusinessActivities],
+                                    responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
+                                    tcspSection: Option[Tcsp],
+                                    aspSection: Option[Asp],
+                                    msbSection: Option[MoneyServiceBusiness],
+                                    hvdSection: Option[Hvd],
+                                    supervisionSection: Option[Supervision])  {
              }
 
-object AMLS {
-     implicit val format = Json.format[AMLS]
+object UpdateSave4LaterResponse {
+     implicit val format = Json.format[UpdateSave4LaterResponse]
  }
 
 
