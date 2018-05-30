@@ -10,6 +10,7 @@
 # Failing to follow this rule may result in test routes deployed in production.
 
 GET        /anti-money-laundering/test-only/drop-save4later                      controllers.testonly.TestOnlyController.dropSave4Later
+GET        /anti-money-laundering/test-only/update-save4later/:filename          controllers.testonly.TestOnlyController.updateSave4Later(filename)
 
 GET        /anti-money-laundering/test-only/duplicate-enrolment                  controllers.testonly.TestOnlyController.duplicateEnrolment
 GET        /anti-money-laundering/test-only/duplicate-submission                 controllers.testonly.TestOnlyController.duplicateSubmission
