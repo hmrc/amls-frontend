@@ -17,40 +17,34 @@
 package services
 
 
-
-import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.aboutthebusiness._
 import models.asp.{Accountancy, Asp, OtherBusinessTaxMattersNo, ServicesOfBusiness}
-import models.{Country, DateOfChange, UpdateSave4LaterResponse, ViewResponse}
-import models.autocomplete.{CountryDataProvider, NameValuePair}
-import models.bankdetails.{BankAccountType, BankDetails, PersonalAccount, UKAccount}
+import models.bankdetails.{BankDetails, PersonalAccount, UKAccount}
 import models.businessactivities._
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.{BeneficialShareholder, RoleWithinBusinessRelease7}
-import models.estateagentbusiness._
+import models.estateagentbusiness.{ProfessionalBodyNo => EABProfessionalBodyNo, _}
 import models.hvd._
 import models.moneyservicebusiness._
 import models.responsiblepeople.ResponsiblePerson
-import models.supervision.{ProfessionalBodyNo => _, _}
+import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
 import models.tcsp.{Other, _}
 import models.tradingpremises.TradingPremises
+import models.{Country, DateOfChange, UpdateSave4LaterResponse, ViewResponse}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.any
-import org.mockito.Mockito.when
-import services.UpdateSave4LaterService
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import sun.management.jmxremote.ConnectorBootstrap.DefaultValues
-import utils.AmlsSpec
-import views.Fixture
+import play.api.test.Helpers._
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.collection.Seq
-import scala.concurrent.Future
-
+import scala.concurrent.ExecutionContext.Implicits.global
 
 class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures
@@ -58,9 +52,10 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
   with TradingPremisesGenerator
   with ResponsiblePersonGenerator {
 
-  trait Fixture {
-    val cacheConnector = mock[DataCacheConnector]
-    val updateSave4LaterService = new UpdateSave4LaterService(cacheConnector)
+  trait Fixture extends DependencyMocks {
+
+    val updateSave4LaterService = new UpdateSave4LaterService(mockCacheConnector)
+
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
       businessMatchingSection = BusinessMatching(),
@@ -68,7 +63,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       tradingPremisesSection = None,
       aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
-      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
+      aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))),
       businessActivitiesSection = None,
       responsiblePeopleSection = None,
       tcspSection = None,
@@ -79,7 +74,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
     )
 
     val businessMatching = businessMatchingGen.sample.get
-    val estateAgentBusiness = new EstateAgentBusiness(Some(Services(Set(Commercial))), Some(ThePropertyOmbudsman), Some(ProfessionalBodyNo), Some(PenalisedUnderEstateAgentsActNo), false, false)
+    val estateAgentBusiness = new EstateAgentBusiness(Some(Services(Set(Commercial))), Some(ThePropertyOmbudsman), Some(EABProfessionalBodyNo), Some(PenalisedUnderEstateAgentsActNo), false, false)
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
     val aboutTheBusiness = AboutTheBusiness(
       previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
@@ -110,7 +105,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       ncaRegistered = Some(NCARegistered(true)),
       accountantForAMLSRegulations = Some(AccountantForAMLSRegulations(true)),
       riskAssessmentPolicy = Some(RiskAssessmentPolicyYes(Set(PaperBased))),
-      howManyEmployees = Some(HowManyEmployees(Some("5"),Some("4"))),
+      howManyEmployees = Some(HowManyEmployees(Some("5"), Some("4"))),
       identifySuspiciousActivity = Some(IdentifySuspiciousActivity(true)),
       whoIsYourAccountant = Some(WhoIsYourAccountant("Accountant's name", Some("Accountant's trading name"),
         UkAccountantsAddress("address1", "address2", Some("address3"), Some("address4"), "POSTCODE"))),
@@ -131,7 +126,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       hasAccepted = true
     )
 
-    val asp = Asp(Some(ServicesOfBusiness(Set(Accountancy))), Some(OtherBusinessTaxMattersNo),false,false)
+    val asp = Asp(Some(ServicesOfBusiness(Set(Accountancy))), Some(OtherBusinessTaxMattersNo), false, false)
 
     val msb = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),
@@ -166,10 +161,10 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       Some(DateOfChange(new LocalDate("2016-02-24"))))
 
     val supervision = Supervision(
-      Some(AnotherBodyNo()),
+      Some(AnotherBodyNo),
       Some(ProfessionalBodyMemberYes),
       Some(ProfessionalBodies(Set(AccountingTechnicians))),
-      Some(ProfessionalBodyYes("details")),
+      Some(SupervisionProfessionalBodyYes("details")),
       hasAccepted = true
     )
 
@@ -196,12 +191,34 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
     "update is called" must {
       "retrieve the specified file from stubs and update save for later with the contents" in new Fixture {
 
-        val updateSave4LaterMock = mock[UpdateSave4LaterService]
+        mockCacheSave[ViewResponse]
+        mockCacheSave[BusinessMatching]
+        mockCacheSave[Seq[TradingPremises]]
+        mockCacheSave[Seq[BankDetails]]
+        mockCacheSave[AddPerson]
+        mockCacheSave[BusinessActivities]
+        mockCacheSave[Tcsp]
+        mockCacheSave[Seq[ResponsiblePerson]]
+        mockCacheSave[Asp]
+        mockCacheSave[MoneyServiceBusiness]
+        mockCacheSave[Hvd]
+        mockCacheSave[Supervision]
 
-        when {
-          updateSave4LaterMock.getDataFromStubs("afile.json")
-        } thenReturn
 
+        await(updateSave4LaterService.update("afile.json"))
+
+        Mockito.verify(mockCacheConnector).save[ViewResponse](eqTo(ViewResponse.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Seq[TradingPremises]](eqTo(TradingPremises.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Seq[BankDetails]](eqTo(BankDetails.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[AddPerson](eqTo(AddPerson.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[BusinessActivities](eqTo(BusinessActivities.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Tcsp](eqTo(Tcsp.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Asp](eqTo(Asp.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
       }
     }
 
