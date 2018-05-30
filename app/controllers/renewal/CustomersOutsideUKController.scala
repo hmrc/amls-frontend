@@ -62,49 +62,19 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                 businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
                 renewal <- cache.getEntry[Renewal](Renewal.key)
               } yield {
-                renewalService.updateRenewal({
-                  if (ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK) && !ControllerHelper.hasCustomersOutsideUK(Some(data))) {
-                    renewal.customersOutsideUK(data).copy(sendTheLargestAmountsOfMoney = None, mostTransactions = None)
-                  } else {
-                    renewal.customersOutsideUK(data)
+                renewalService.updateRenewal(renewal.customersOutsideUK(data)) map {
+                  _ => businessMatching match {
+                    case bm if bm.activities.isDefined => bm.activities.get.businessActivities match {
+                      case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+                      case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+                      case _ => Redirect(routes.SummaryController.get())
+                    }
                   }
-                }) map { _ =>
-                  redirect(edit, data, renewal, businessMatching)
                 }
-              }) getOrElse Future.successful(Redirect(routes.SummaryController.get()))
+              }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))
             }
           }
         }
-  }
-
-  private def redirect(edit: Boolean, data: CustomersOutsideUK, renewal: Renewal, businessMatching: BusinessMatching) = {
-    edit match {
-      case true => if (
-        msbServicesContainsTransmittingMoney(businessMatching.msbServices) &&
-          !ControllerHelper.hasCustomersOutsideUK(renewal.customersOutsideUK) &&
-          ControllerHelper.hasCustomersOutsideUK(Some(data))
-      ) {
-        Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
-      } else {
-        Redirect(routes.SummaryController.get())
-      }
-      case false => redirectDependingOnActivities(businessMatching)
-    }
-  }
-
-  private def redirectDependingOnActivities(businessMatching: BusinessMatching) = {
-    ControllerHelper.getBusinessActivity(Some(businessMatching)) match {
-      case Some(activities) if activities.businessActivities contains MoneyServiceBusiness => Redirect(routes.TotalThroughputController.get())
-      case Some(activities) if activities.businessActivities contains HighValueDealing => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-      case _ => Redirect(routes.SummaryController.get())
-    }
-  }
-
-  private def msbServicesContainsTransmittingMoney(msbServices: Option[BusinessMatchingMsbServices]): Boolean = {
-    msbServices match {
-      case Some(services) => services.msbServices.contains(TransmittingMoney)
-      case _ => false
-    }
   }
 
 }

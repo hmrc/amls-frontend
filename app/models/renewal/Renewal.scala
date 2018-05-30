@@ -16,6 +16,9 @@
 
 package models.renewal
 
+import cats.data.Validated.{Invalid, Valid}
+import jto.validation.{Path, Rule, ValidationError}
+import models.ValidationRule
 import play.api.libs.json.{Json, Reads}
 
 case class Renewal(
@@ -92,11 +95,58 @@ case class Renewal(
 
 object Renewal {
   val key = "renewal"
+  val sectionKey = "renewal"
 
   implicit val formats = Json.format[Renewal]
 
   implicit def default(renewal: Option[Renewal]): Renewal =
     renewal.getOrElse(Renewal())
 
+  object ValidationRules {
 
+    val basicPropertyRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.involvedInOtherActivities.isDefined &&
+        r.turnover.isDefined => Valid(r)
+
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Renewal model doesn't pass basic state validation"))))
+    }
+
+    val involvedInOtherRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.involvedInOtherActivities.exists(_.isInstanceOf[InvolvedInOtherYes]) && r.businessTurnover.isDefined => Valid(r)
+      case r if r.involvedInOtherActivities.contains(InvolvedInOtherNo) && r.businessTurnover.isEmpty => Valid(r)
+      case _ => Invalid(Seq(Path \ "involvedInOtherActivities" -> Seq(ValidationError("Invalid state"))))
+    }
+
+    val currencyExchangeRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.whichCurrencies.isDefined && r.ceTransactionsInLast12Months.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for currency exchange"))))
+    }
+
+    val moneyTransmitterRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.sendMoneyToOtherCountry.exists(_.money == true) &&
+        r.transactionsInLast12Months.isDefined &&
+        r.mostTransactions.isDefined &&
+        r.sendTheLargestAmountsOfMoney.isDefined => Valid(r)
+
+      case r if (r.sendMoneyToOtherCountry.isEmpty || r.sendMoneyToOtherCountry.exists(_.money == false)) &&
+        r.transactionsInLast12Months.isDefined &&
+        r.mostTransactions.isEmpty &&
+        r.mostTransactions.isEmpty => Valid(r)
+
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money transmitting"))))
+    }
+
+    val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.percentageOfCashPaymentOver15000.isDefined && r.receiveCashPayments.isDefined &&
+        r.customersOutsideUK.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for high value dealing"))))
+    }
+
+    val hasAcceptedRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.hasAccepted => Valid(r)
+      case _ => Invalid(Seq(Path \ "hasAccepted" -> Seq(ValidationError("model must be accepted"))))
+    }
+
+    val standardRule = basicPropertyRule andThen involvedInOtherRule andThen hasAcceptedRule
+  }
 }
