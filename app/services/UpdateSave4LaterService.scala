@@ -45,7 +45,6 @@ class UpdateSave4LaterService @Inject()(val cacheConnector: DataCacheConnector) 
 
   def update(response: UpdateSave4LaterResponse)
             (implicit hc: HeaderCarrier, authContext: AuthContext, ex: ExecutionContext): Future[Any] = {
-//    val updateSave4LaterResponse = getDataFromStubs(filename)
 
     Future.sequence(Seq(
       fn(ViewResponse.key, response.view),
@@ -71,25 +70,7 @@ class UpdateSave4LaterService @Inject()(val cacheConnector: DataCacheConnector) 
     case _ => Future.successful(CacheMap("", Map.empty))
   }
 
-//  def getDataFromStubs(filename: String): UpdateSave4LaterResponse = {
-//    val x = UpdateSave4LaterResponse(
-//      Some(ViewResponse("test", BusinessMatching(), None, None, AboutTheBusiness(), Seq.empty, AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty)), BusinessActivities(), None, None, None, None, None, None)),
-//      Some(BusinessMatching(None, None, None, None, None, None, false, false, false)),
-//      None,
-//      Some(Seq(TradingPremises(None, None, None, None, None, None, None, None, false, None, None, None, None, None, false))),
-//      None,
-//      Some(Seq(BankDetails(None, None, None, false, false, None, false))),
-//      Some(AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))),
-//      Some(BusinessActivities(None, None, None, None, None, None, None, None, None, None, None, None, None, None, false, false)),
-//      Some(Seq(ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, false, false, None, None, None, None))),
-//      Some(Tcsp(None, None, None, None, false, false)),
-//      Some(Asp(None, None, false, false)),
-//      Some(MoneyServiceBusiness(None, None, None, None, None, None, None, None, None, None, None, false, false)),
-//      Some(Hvd(None, None, None, None, None, None, None, None, None, false, false)),
-//      Some(Supervision(None, None, None, None, false, false)))
-//    x
-//
-////    val model = Json.parse(JsonBody).as[UpdateSave4LaterResponse]
-//  }
+//    val model = Json.parse(JsonBody).as[UpdateSave4LaterResponse]
+
 
 }
