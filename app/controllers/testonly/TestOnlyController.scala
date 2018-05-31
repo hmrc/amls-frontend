@@ -60,8 +60,8 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
           case Some(data) => {
             removeCacheData flatMap { _ =>
               stubsService.update(data) map { _ =>
-//                Ok(controllers.routes.LandingController.get())
-                Ok
+                Redirect(controllers.routes.LandingController.get())
+
               }
             }
           }

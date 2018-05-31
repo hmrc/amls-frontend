@@ -49,7 +49,7 @@ case class UpdateSave4LaterResponse(view:Option[ViewResponse],
                                     hvd: Option[Hvd],
                                     supervision: Option[Supervision])  {
   // Subscription ??
-             }
+ }
 
 object UpdateSave4LaterResponse {
      implicit val format = Json.format[UpdateSave4LaterResponse]
