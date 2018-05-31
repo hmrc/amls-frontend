@@ -17,13 +17,12 @@
 package controllers.renewal
 
 import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessActivity, BusinessMatching, HighValueDealing, BusinessMatchingMsbService}
+import models.businessmatching._
 import models.renewal.{Renewal, WhichCurrencies}
 import play.api.mvc.Result
 import services.RenewalService
@@ -73,11 +72,10 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
-    if ((businessActivities contains HighValueDealing) && !edit ) {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
-    }
-    else {
-      Redirect(routes.SummaryController.get())
+    (businessActivities, edit) match {
+      case (x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+      case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+      case _ => Redirect(routes.SummaryController.get())
     }
 
 }
