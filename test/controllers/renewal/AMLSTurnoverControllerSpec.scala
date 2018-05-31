@@ -298,7 +298,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             )
 
             val bMatching = BusinessMatching(
-              activities = Some(Activities(Set(AccountancyServices)))
+              activities = Some(Activities(Set(AccountancyServices, MoneyServiceBusiness)))
             )
 
             mockCacheFetch(Some(bMatching))
@@ -313,7 +313,7 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
             redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
           }
 
-          "it has business type of HVD" in new Fixture {
+          "it has business type of HVD and not (ASP or MSB)" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"
             )
@@ -337,13 +337,13 @@ class AMLSTurnoverControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "go to the renewal TotalThroughput page" when {
 
-          "it has a business type of MSB but not ASP or HVD" in new Fixture {
+          "it has a business type of MSB but not ASP" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
               "turnover" -> "01"
             )
 
             val bMatching = BusinessMatching(
-              activities = Some(Activities(Set(MoneyServiceBusiness)))
+              activities = Some(Activities(Set(MoneyServiceBusiness, HighValueDealing)))
             )
 
             mockCacheFetch(Some(bMatching))

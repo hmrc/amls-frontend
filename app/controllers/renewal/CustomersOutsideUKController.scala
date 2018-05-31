@@ -63,13 +63,15 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
                 renewal <- cache.getEntry[Renewal](Renewal.key)
               } yield {
                 renewalService.updateRenewal(renewal.customersOutsideUK(data)) map {
-                  _ => businessMatching match {
-                    case bm if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                      case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
-                      case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-                      case _ => Redirect(routes.SummaryController.get())
+                  _ =>
+                    (edit, businessMatching) match {
+                      case (true, _) => Redirect(routes.SummaryController.get())
+                      case (false, bm) if bm.activities.isDefined => bm.activities.get.businessActivities match {
+                        case x if x.contains(MoneyServiceBusiness) && x.contains(AccountancyServices) => Redirect(routes.TotalThroughputController.get())
+                        case x if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+                        case _ => Redirect(routes.SummaryController.get())
+                      }
                     }
-                  }
                 }
               }) getOrElse Future.successful(InternalServerError("Unable to get data from the cache"))
             }

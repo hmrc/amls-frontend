@@ -34,7 +34,8 @@ class AMLSTurnoverController @Inject()(
                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         dataCacheConnector.fetchAll map {
           optionalCache =>
             (for {
@@ -54,7 +55,8 @@ class AMLSTurnoverController @Inject()(
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
+    implicit authContext =>
+      implicit request => {
         Form2[AMLSTurnover](request.body) match {
           case f: InvalidForm =>
             for {
@@ -68,12 +70,12 @@ class AMLSTurnoverController @Inject()(
             } yield (edit, businessMatching) match {
               case (true, _) => Redirect(routes.SummaryController.get())
               case (false, Some(bm)) if bm.activities.isDefined => bm.activities.get.businessActivities match {
-                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
                 case x if x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
                 case x if x.contains(MoneyServiceBusiness) => Redirect(routes.TotalThroughputController.get())
+                case x if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
                 case _ => Redirect(routes.SummaryController.get())
-              case _ => InternalServerError("Unable to redirect from Turnover page")
               }
+              case _ => InternalServerError("Unable to redirect from Turnover page")
             }
         }
       }

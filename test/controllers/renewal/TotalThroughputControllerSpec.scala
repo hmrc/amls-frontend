@@ -217,7 +217,52 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to PercentageOfCashPaymentOver15000Controller if HVD" in new FormSubmissionFixture {
+      "redirect to PercentageOfCashPaymentOver15000Controller if HVD and ASP" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          BusinessMatchingMsbServices(
+            Set(
+              ChequeCashingScrapMetal
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing, AccountancyServices))
+        )
+
+
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "throughput" -> "01"
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+          .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
+        }
+      }
+
+      "redirect to CustomersOutsideUK if HVD and NOT ASP" in new FormSubmissionFixture {
         val incomingModel = Renewal()
 
         val msbServices = Some(
@@ -258,7 +303,7 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
-          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url)
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CustomersOutsideUKController.get().url)
         }
       }
     }

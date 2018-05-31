@@ -81,7 +81,10 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
       Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
     }
     else if ((businessActivities contains HighValueDealing) && !edit ) {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+      if (businessActivities contains AccountancyServices)
+        Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+      else
+        Redirect(routes.CustomersOutsideUKController.get(edit))
     }
     else {
       Redirect(routes.SummaryController.get())
