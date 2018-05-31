@@ -36,18 +36,19 @@ import scala.collection.Seq
 
 case class UpdateSave4LaterResponse(view:Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
-                                    estageAgencyBusiness: Option[EstateAgentBusiness],
+                                    estateAgencyBusiness: Option[EstateAgentBusiness],
                                     tradingPremises: Option[Seq[TradingPremises]],
-                                    aboutTheBusinessSection: Option[AboutTheBusiness],
+                                    aboutTheBusiness: Option[AboutTheBusiness],
                                     bankDetails: Option[Seq[BankDetails]],
-                                    aboutYouSection: Option[AddPerson],
+                                    addPerson: Option[AddPerson],
                                     businessActivities: Option[BusinessActivities],
-                                    responsiblePeopleSection: Option[Seq[ResponsiblePerson]],
-                                    tcspSection: Option[Tcsp],
-                                    aspSection: Option[Asp],
-                                    msbSection: Option[MoneyServiceBusiness],
-                                    hvdSection: Option[Hvd],
-                                    supervisionSection: Option[Supervision])  {
+                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
+                                    tcsp: Option[Tcsp],
+                                    asp: Option[Asp],
+                                    msb: Option[MoneyServiceBusiness],
+                                    hvd: Option[Hvd],
+                                    supervision: Option[Supervision])  {
+  // Subscription ??
              }
 
 object UpdateSave4LaterResponse {

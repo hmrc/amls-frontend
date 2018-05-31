@@ -17,6 +17,7 @@
 package services
 
 
+import config.WSHttp
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -35,6 +36,7 @@ import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes
 import models.tcsp.{Other, _}
 import models.tradingpremises.TradingPremises
 import models.{Country, DateOfChange, UpdateSave4LaterResponse, ViewResponse}
+import org.apache.http.client.methods.HttpGet
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito
@@ -54,7 +56,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
 
   trait Fixture extends DependencyMocks {
 
-    val updateSave4LaterService = new UpdateSave4LaterService(mockCacheConnector)
+    val http = mock[WSHttp]
+    val updateSave4LaterService = new UpdateSave4LaterService(http, mockCacheConnector)
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -203,6 +206,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[MoneyServiceBusiness]
         mockCacheSave[Hvd]
         mockCacheSave[Supervision]
+        mockCacheSave[AboutTheBusiness]
+        mockCacheSave[EstateAgentBusiness]
 
 
         await(updateSave4LaterService.update(updateSave4LaterResponse))
@@ -219,6 +224,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         Mockito.verify(mockCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any())
         Mockito.verify(mockCacheConnector).save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
         Mockito.verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[EstateAgentBusiness](eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
       }
     }
 

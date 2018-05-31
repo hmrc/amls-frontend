@@ -25,6 +25,8 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
 import models.declaration.release7.RoleWithinBusinessRelease7
+import models.enrolment.GovernmentGatewayEnrolment
+import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
@@ -34,31 +36,33 @@ import models.tradingpremises.TradingPremises
 import models.{UpdateSave4LaterResponse, ViewResponse}
 import play.api.libs.json.{Format, Json}
 import play.api.mvc.Results.Ok
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpResponse, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateSave4LaterService @Inject()(val cacheConnector: DataCacheConnector) {
+class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataCacheConnector) {
 
   def update(response: UpdateSave4LaterResponse)
             (implicit hc: HeaderCarrier, authContext: AuthContext, ex: ExecutionContext): Future[Any] = {
 
     Future.sequence(Seq(
       fn(ViewResponse.key, response.view),
-      fn(BusinessMatching.key, response.businessMatching),
+      fn(BusinessMatching.key, response.businessMatching map{x => x.copy(hasChanged = true)}),
       fn(TradingPremises.key, response.tradingPremises),
       fn(BusinessActivities.key, response.businessActivities),
-      fn(Tcsp.key, response.tcspSection),
+      fn(Tcsp.key, response.tcsp),
       fn(BankDetails.key, response.bankDetails),
-      fn(AddPerson.key, response.aboutYouSection),
-      fn(ResponsiblePerson.key, response.responsiblePeopleSection),
-      fn(Asp.key, response.aspSection),
-      fn(MoneyServiceBusiness.key, response.msbSection),
-      fn(Hvd.key, response.hvdSection),
-      fn(Supervision.key, response.supervisionSection)
+      fn(AddPerson.key, response.addPerson),
+      fn(ResponsiblePerson.key, response.responsiblePeople),
+      fn(Asp.key, response.asp),
+      fn(MoneyServiceBusiness.key, response.msb),
+      fn(Hvd.key, response.hvd),
+      fn(Supervision.key, response.supervision),
+      fn(AboutTheBusiness.key, response.aboutTheBusiness),
+      fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
     )
     ) map { _ =>
       Ok
@@ -70,7 +74,13 @@ class UpdateSave4LaterService @Inject()(val cacheConnector: DataCacheConnector) 
     case _ => Future.successful(CacheMap("", Map.empty))
   }
 
-//    val model = Json.parse(JsonBody).as[UpdateSave4LaterResponse]
-
-
+  def getSaveForLaterData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateSave4LaterResponse]] = {
+    val requestUrl = s"http://localhost:8941/anti-money-laundering/saveforlater/getfile/${fileName}"
+    http.GET[UpdateSave4LaterResponse](requestUrl)
+      .map {Some(_)}
+        .recover {
+          case _:NotFoundException => None
+        }
+  }
 }
+
