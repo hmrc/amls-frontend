@@ -76,8 +76,7 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
   }
 
   def getSaveForLaterData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateSave4LaterResponse]] = {
-
-    val requestUrl = s"${ApplicationConfig.stubsS4LaterUpdateUrl}${fileName}"
+    val requestUrl = s"${ApplicationConfig.save4LaterUpdateUrl}$fileName"
 
     http.GET[UpdateSave4LaterResponse](requestUrl)
       .map {Some(_)}
