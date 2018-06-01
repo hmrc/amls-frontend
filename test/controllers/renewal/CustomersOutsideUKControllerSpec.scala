@@ -165,6 +165,14 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
       "given valid data" must {
 
         "redirect to the summary page" when {
+
+          "in edit mode" in new FormSubmissionFixture {
+            post(edit = true, businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustBe Some(routes.SummaryController.get().url)
+            }
+          }
+
           "business is an asp and not an hvd or an msb" in new FormSubmissionFixture {
             post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
@@ -174,17 +182,17 @@ class CustomersOutsideUKControllerSpec extends AmlsSpec {
         }
 
         "redirect to the PercentageOfCashPaymentOver15000Controller" when {
-          "business is an hvd but not an msb" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))) { result =>
+          "business is an hvd but not an asp" in new FormSubmissionFixture {
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing, MoneyServiceBusiness))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
             }
           }
         }
 
-        "redirect to the Msb Turnover page" when {
-          "business is an msb" in new FormSubmissionFixture {
-            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness))))) { result =>
+        "redirect to the Msb Throughput page" when {
+          "business is an msb and asp" in new FormSubmissionFixture {
+            post(businessMatching = BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness, AccountancyServices))))) { result =>
               result.header.status mustBe SEE_OTHER
               result.header.headers.get("Location") mustBe Some(routes.TotalThroughputController.get().url)
             }

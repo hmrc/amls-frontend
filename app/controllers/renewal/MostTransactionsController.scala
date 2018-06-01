@@ -47,17 +47,6 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: BusinessActivities, edit: Boolean): Result =
-    if (edit) {
-      Redirect(routes.SummaryController.get())
-    } else if ((services contains CurrencyExchange) && !edit) {
-      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
-    } else if(businessActivities.businessActivities contains HighValueDealing) {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
-    } else {
-      Redirect(routes.SummaryController.get())
-    }
-
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -75,10 +64,21 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                   ba <- bm.activities
                   services <- bm.msbServices
                 } yield renewalService.updateRenewal(renewal.mostTransactions(data)) map { _ =>
-                  redirectTo(services.msbServices, ba, edit)
+                  redirectTo(services.msbServices, ba.businessActivities, edit)
                 }
                 result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
   }
+
+  private def redirectTo(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result = {
+    (edit, services, businessActivities) match {
+      case (true, _, _) => Redirect(routes.SummaryController.get())
+      case (_, x, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
+      case (_, _, x) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+      case (_, _, x) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get(edit))
+      case _ => Redirect(routes.SummaryController.get())
+    }
+  }
+
 }

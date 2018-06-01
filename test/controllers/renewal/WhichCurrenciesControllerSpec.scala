@@ -25,12 +25,13 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -48,6 +49,9 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       renewalService.getRenewal(any(), any(), any())
     } thenReturn Future.successful(Renewal().some)
+
+    when(dataCacheConnector.fetchAll(any(), any()))
+      .thenReturn(Future.successful(Some(cacheMap)))
   }
 
   trait FormSubmissionFixture extends Fixture {
@@ -66,6 +70,49 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       renewalService.updateRenewal(any())(any(), any(), any())
     } thenReturn Future.successful(mock[CacheMap])
+  }
+
+  trait RoutingFixture extends FormSubmissionFixture {
+    val renewal = Renewal()
+
+    val msbServices = Some(
+      BusinessMatchingMsbServices(
+        Set(
+          TransmittingMoney
+        )
+      )
+    )
+
+    val businessActivities = Some(
+      BusinessActivities(Set(HighValueDealing,  AccountancyServices))
+    )
+
+    val whichCurrencies = WhichCurrencies(
+      Seq("USD"),
+      usesForeignCurrencies = Some(true),
+      None,
+      None,
+      Some(true))
+
+
+    val expectedRenewal = renewal.copy(
+      whichCurrencies = Some(whichCurrencies), hasChanged = true
+    )
+
+    when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+      .thenReturn(Some(renewal))
+
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+    when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(expectedRenewal))(any(), any(), any()))
+      .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]): Unit = {
+      when {
+        cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+      } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+    }
   }
 
   "Calling the GET action" must {
@@ -106,95 +153,40 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
   "Calling the POST action" when {
     "posting valid data" must {
-      "redirect to the percentage of cash payments over 15000 page if business is HVD" in new FormSubmissionFixture {
+      "redirect to PercentageOfCashPaymentOver15000Controller" when {
+        "the business is HVD and ASP" in new RoutingFixture {
 
-        val incomingModel = Renewal()
+          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
 
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              TransmittingMoney
-            )
-          )
-        )
+          val result = controller.post()(validFormRequest)
 
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-        val currentModel = WhichCurrencies(
-          Seq("USD"),
-          usesForeignCurrencies = Some(true),
-          None,
-          None,
-          Some(true))
-
-
-        val outgoingModel = incomingModel.copy(
-          whichCurrencies = Some(currentModel), hasChanged = true
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-        val result = controller.post()(validFormRequest)
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+        }
       }
 
-      "redirect to the summary page when edit = true" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
+      "redirect to CustomersOutsideTheUKController" when {
+        "the business is HVD and not an ASP" in new RoutingFixture {
 
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              TransmittingMoney
-            )
-          )
-        )
+          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
+          val result = controller.post()(validFormRequest)
 
-        val currentModel = WhichCurrencies(
-          Seq("USD"),
-          usesForeignCurrencies = Some(true),
-          None,
-          None,
-          Some(true))
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.CustomersOutsideUKController.get().url.some
+        }
+      }
 
+      "redirect to the summary page" when {
+        "editing" in new RoutingFixture {
 
-        val outgoingModel = incomingModel.copy(
-          whichCurrencies = Some(currentModel), hasChanged = true
-        )
+          setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
+          val result = controller.post(edit = true)(validFormRequest)
 
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-
-        val result = controller.post(edit = true)(validFormRequest)
-
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.SummaryController.get().url.some
+        }
       }
 
       "save the model data into the renewal object" in new FormSubmissionFixture {
@@ -248,6 +240,7 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         ))
       }
     }
+
     "return a bad request" when {
       "the form fails validation" in new FormSubmissionFixture {
         val result = controller.post()(request)

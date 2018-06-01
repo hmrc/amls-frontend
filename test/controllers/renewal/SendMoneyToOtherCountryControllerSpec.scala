@@ -38,7 +38,8 @@ import scala.concurrent.Future
 class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
     val cacheMap = mock[CacheMap]
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
@@ -63,6 +64,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       mockDataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cacheMap))
+
+    when {
+      cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any())
+    } thenReturn(Some(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -117,156 +122,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
     }
 
-    "on valid post where the value is true" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "true"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-          activities = Some(BusinessActivities(Set(HighValueDealing)))
-        )))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get().url))
-    }
-
-    "on valid post where the value is false (CE)" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal()))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-          activities = Some(BusinessActivities(Set(HighValueDealing)))
-        )))
-
-
-      val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url))
-    }
-
-    "on valid post where the value is false (Non-CE)" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
-        )))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-        )))
-
-
-      val result = controller.post(false)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-    }
-
-    "on valid post where the value is true in edit mode" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "true"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))
-        )))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-        )))
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).url))
-    }
-
-    "on valid post where the value is false in edit mode (CE)" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
-        )))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-        )))
-
-
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-    }
-
-    "on valid post where the value is false in edit mode (Non-CE)" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(Renewal(
-          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
-        )))
-
-      when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-        .thenReturn(Some(BusinessMatching(
-          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-          activities = Some(BusinessActivities(Set(MoneyServiceBusiness)))
-        )))
-
-
-      val result = controller.post(true)(newRequest)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
-    }
-
     "throw exception when Msb services in Business Matching returns none" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
@@ -288,6 +143,114 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       a[Exception] must be thrownBy {
         ScalaFutures.whenReady(controller.post(true)(newRequest)) { x => x }
+      }
+    }
+  }
+
+  "posting valid data" must {
+    "redirect to the SendTheLargestAmountOfMoneyController" when {
+      "post yes" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "true"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get().url))
+      }
+    }
+
+    "redirect to the CETransactionsInLast12MonthsController" when {
+      "post no and has currency exchange" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url))
+      }
+    }
+
+    "redirect to the PercentageOfCashPaymentOver15000Controller" when {
+      "post no and has HVD and ASP and NOT CE" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
+          )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url))
+      }
+    }
+
+    "redirect to the CustomersOutsideTheUKController" when {
+      "post no and has HVD and NOT ASP or CE" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+      }
+    }
+
+    "redirect to the summary" when {
+      "in edit mode" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )))
+
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+
+      }
+      "not CE and not HVD" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+          .thenReturn(Some(BusinessMatching(
+            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
+            activities = Some(BusinessActivities(Set(AccountancyServices)))
+          )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
       }
     }
   }

@@ -32,9 +32,9 @@ import views.html.renewal.send_money_to_other_country
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryController @Inject()(
-                                                      val authConnector: AuthConnector,
-                                                      val dataCacheConnector: DataCacheConnector,
-                                                      renewalService: RenewalService) extends BaseController {
+                                                   val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   renewalService: RenewalService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -68,11 +68,11 @@ class SendMoneyToOtherCountryController @Inject()(
                       mostTransactions = None, sendTheLargestAmountsOfMoney = None)
                     case true => renewal.sendMoneyToOtherCountry(model)
                   }) map { _ =>
-
-                    redirectTo(
+                    redirect(
                       model.money,
                       services.msbServices,
-                      activities.businessActivities, edit
+                      activities.businessActivities,
+                      edit
                     )
                   }
                 }) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
@@ -80,17 +80,14 @@ class SendMoneyToOtherCountryController @Inject()(
         }
   }
 
-  private def redirectTo(sendMoneyToOtherCountry: Boolean, services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) =
-    if (!sendMoneyToOtherCountry && edit) {
-      Redirect(routes.SummaryController.get())
-    } else if (sendMoneyToOtherCountry) {
-      Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
-    } else if ((services contains CurrencyExchange) && !edit) {
-      Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
-    } else if ((activities contains HighValueDealing) && !edit) {
-      Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
-    } else {
-      Redirect(routes.SummaryController.get())
+  private def redirect(sendMoneyToOtherCountry: Boolean, services: Set[BusinessMatchingMsbService], activities: Set[BusinessActivity], edit: Boolean) = {
+    (sendMoneyToOtherCountry, edit, services, activities) match {
+      case (true, _, _, _) => Redirect(routes.SendTheLargestAmountsOfMoneyController.get(edit))
+      case (_, false, x, _) if x.contains(CurrencyExchange) =>  Redirect(routes.CETransactionsInLast12MonthsController.get(edit))
+      case (_, false, _, x) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get(edit))
+      case (_, false, _, x) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get(edit))
+      case _ => Redirect(routes.SummaryController.get())
     }
+  }
 
 }

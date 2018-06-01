@@ -162,7 +162,49 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
         "go to PercentageOfCashPaymentOver15000Controller" when {
-          "activities include hvd" in new FormSubmissionFixture {
+          "activities include hvd and asp" in new FormSubmissionFixture {
+            val incomingModel = Renewal()
+
+            val msbServices = Some(BusinessMatchingMsbServices(Set.empty))
+
+            val outgoingModel = incomingModel.copy(
+              mostTransactions = Some(
+                MostTransactions(
+                  Seq(Country("United Kingdom", "GB"))
+                )
+              ), hasChanged = true
+            )
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "mostTransactionsCountries[]" -> "GB"
+            )
+
+            when(cache.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(cacheMap)))
+
+            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+              .thenReturn(Some(incomingModel))
+
+            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(
+                msbServices = msbServices,
+                activities = Some(BusinessActivities(Set(
+                  HighValueDealing,
+                  AccountancyServices
+                )))
+              )))
+
+            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustEqual routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+            }
+          }
+        }
+        "go to the CustomersOutsideUKController" when {
+          "activities include hvd and NOT asp" in new FormSubmissionFixture {
             val incomingModel = Renewal()
 
             val msbServices = Some(BusinessMatchingMsbServices(Set.empty))
@@ -198,9 +240,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
             post() { result =>
               result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.PercentageOfCashPaymentOver15000Controller.get().url.some
+              result.header.headers.get("Location") mustEqual routes.CustomersOutsideUKController.get().url.some
             }
           }
+
         }
         "go to SummaryController" when {
           "msb does not include CE" in new FormSubmissionFixture {
