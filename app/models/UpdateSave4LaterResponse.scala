@@ -47,8 +47,11 @@ case class UpdateSave4LaterResponse(view:Option[ViewResponse],
                                     asp: Option[Asp],
                                     msb: Option[MoneyServiceBusiness],
                                     hvd: Option[Hvd],
-                                    supervision: Option[Supervision])  {
-  // Subscription ??
+                                    supervision: Option[Supervision],
+                                    Subscription: Option[SubscriptionResponse],
+                                    AmendVariationResponse: Option[AmendVariationRenewalResponse]
+                                    ) {
+
  }
 
 object UpdateSave4LaterResponse {

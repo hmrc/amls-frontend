@@ -35,8 +35,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.{ProfessionalBodyYes => SupervisionProfessionalBodyYes, _}
 import models.tcsp.{Other, _}
 import models.tradingpremises.TradingPremises
-import models.{Country, DateOfChange, UpdateSave4LaterResponse, ViewResponse}
-import org.apache.http.client.methods.HttpGet
+import models._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito
@@ -171,6 +170,26 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       hasAccepted = true
     )
 
+    val subscription = SubscriptionResponse(
+      "bundle",
+      "XDML00000000000",
+      None,
+      Some(true)
+    )
+
+    val amendVariationRenewalRespone = AmendVariationRenewalResponse(
+      "update",
+      "12345",
+      115.0,
+      Some(125.0),
+      Some(115.0),
+      0,
+      None,
+      240.0,
+      Some("ref"),
+      None
+    )
+
     val updateSave4LaterResponse = UpdateSave4LaterResponse(
       Some(viewResponse),
       Some(businessMatching),
@@ -185,7 +204,9 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       Some(asp),
       Some(msb),
       Some(hvd),
-      Some(supervision))
+      Some(supervision),
+      Some(subscription),
+      Some(amendVariationRenewalRespone))
 
   }
 
@@ -208,6 +229,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[Supervision]
         mockCacheSave[AboutTheBusiness]
         mockCacheSave[EstateAgentBusiness]
+        mockCacheSave[SubscriptionResponse]
+        mockCacheSave[AmendVariationRenewalResponse]
 
 
         await(updateSave4LaterService.update(updateSave4LaterResponse))
@@ -226,6 +249,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         Mockito.verify(mockCacheConnector).save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
         Mockito.verify(mockCacheConnector).save[AboutTheBusiness](eqTo(AboutTheBusiness.key), any())(any(), any(), any())
         Mockito.verify(mockCacheConnector).save[EstateAgentBusiness](eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[SubscriptionResponse](eqTo(SubscriptionResponse.key), any())(any(), any(), any())
+        Mockito.verify(mockCacheConnector).save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
       }
     }
 

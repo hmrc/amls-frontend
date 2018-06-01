@@ -31,8 +31,8 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{UpdateSave4LaterResponse, ViewResponse}
-import play.api.libs.json.{Format}
+import models.{AmendVariationRenewalResponse, SubscriptionResponse, UpdateSave4LaterResponse, ViewResponse}
+import play.api.libs.json.Format
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -60,7 +60,9 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
       fn(Hvd.key, response.hvd),
       fn(Supervision.key, response.supervision),
       fn(AboutTheBusiness.key, response.aboutTheBusiness),
-      fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
+      fn(EstateAgentBusiness.key, response.estateAgencyBusiness),
+      fn(SubscriptionResponse.key, response.Subscription),
+      fn(AmendVariationRenewalResponse.key, response.AmendVariationResponse)
     )
     ) map { _ =>
       Ok
