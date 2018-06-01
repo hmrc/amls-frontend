@@ -33,8 +33,6 @@ trait ApplicationConfig {
 
   def refreshProfileToggle: Boolean
 
-  def returnLinkToggle: Boolean
-
   def frontendBaseUrl: String
 
   def hasAcceptedToggle: Boolean
@@ -102,8 +100,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
     s"$scheme://$host"
   }
-
-  override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 }
