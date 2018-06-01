@@ -16,6 +16,7 @@
 
 package services
 
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.aboutthebusiness.AboutTheBusiness
@@ -75,7 +76,9 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
   }
 
   def getSaveForLaterData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateSave4LaterResponse]] = {
-    val requestUrl = s"http://localhost:8941/anti-money-laundering/saveforlater/getfile/${fileName}"
+
+    val requestUrl = s"${ApplicationConfig.stubsS4LaterUpdateUrl}${fileName}"
+
     http.GET[UpdateSave4LaterResponse](requestUrl)
       .map {Some(_)}
         .recover {

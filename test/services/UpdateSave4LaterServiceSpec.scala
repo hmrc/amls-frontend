@@ -253,12 +253,5 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         Mockito.verify(mockCacheConnector).save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
       }
     }
-
-    "getDataFromStubs is called" must {
-      "return the specified file contents from stubs" in new Fixture {
-
-
-      }
-    }
   }
 }
