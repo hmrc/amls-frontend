@@ -55,12 +55,5 @@ class status_rejectedSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("new.application.button").html() must be (Messages("status.newsubmission.btn"))
       doc.getElementsByTag("form").attr("action") mustBe controllers.routes.StatusController.newSubmission().url
     }
-
-    "hide the 'new submission' form when specified" in new ViewFixture {
-      def view =  views.html.status.status_rejected("XAML00000000000", Some("business Name"), showReregisterButton = false)
-
-      Option(doc.getElementById("new.application.button")) must not be defined
-    }
-
   }
 }

@@ -38,10 +38,6 @@ trait ApplicationConfig {
   def frontendBaseUrl: String
 
   def hasAcceptedToggle: Boolean
-
-  def allowReregisterToggle: Boolean
-
-  def allowReregisterRevokeToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -110,11 +106,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def returnLinkToggle = getConfBool("feature-toggle.return-link", false)
 
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
-
-  override def allowReregisterToggle: Boolean = getConfBool("feature-toggle.allow-reregister", false)
-
-  override def allowReregisterRevokeToggle: Boolean = getConfBool("feature-toggle.allow-reregister", false)
-
 }
 
 class AppConfig @Inject()(val config: iServicesConfig) {

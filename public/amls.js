@@ -87,6 +87,7 @@ $(function () {
       };
 
       input = $('<input>')
+          .attr('id', 'input-'+ _this.element.attr('id'))
         .insertAfter(this.element)
         .val(value)
         .addClass('form-control')
