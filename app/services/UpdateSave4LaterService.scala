@@ -24,8 +24,6 @@ import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
 import models.businessmatching.BusinessMatching
 import models.declaration.AddPerson
-import models.declaration.release7.RoleWithinBusinessRelease7
-import models.enrolment.GovernmentGatewayEnrolment
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
@@ -34,11 +32,11 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{UpdateSave4LaterResponse, ViewResponse}
-import play.api.libs.json.{Format, Json}
+import play.api.libs.json.{Format}
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, HttpResponse, NotFoundException}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, NotFoundException}
 
 import scala.concurrent.{ExecutionContext, Future}
 

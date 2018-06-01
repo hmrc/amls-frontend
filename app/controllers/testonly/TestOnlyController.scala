@@ -20,7 +20,6 @@ import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import models.UpdateSave4LaterResponse
 import play.api.libs.json.Json
 import services.UpdateSave4LaterService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -35,8 +34,6 @@ import scala.concurrent.Future
 class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val dataCacheConnector: DataCacheConnector,
                                    val stubsService: UpdateSave4LaterService) extends BaseController {
-//  override protected def authConnector: AuthConnector = AMLSAuthConnector
-//  val stubsService: UpdateSave4LaterService = UpdateSave4LaterService
 
 
   def dropSave4Later = Authorised.async {
@@ -61,7 +58,6 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
             removeCacheData flatMap { _ =>
               stubsService.update(data) map { _ =>
                 Redirect(controllers.routes.LandingController.get())
-
               }
             }
           }
