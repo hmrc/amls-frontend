@@ -9,18 +9,19 @@
 # !!!WARNING!!! Every route defined in this file MUST be prefixed with "/test-only/". This is because NGINX is blocking every uri containing the string "test-only" in production.
 # Failing to follow this rule may result in test routes deployed in production.
 
-GET        /anti-money-laundering/test-only/drop-save4later                      controllers.testonly.TestOnlyController.dropSave4Later
+GET        /anti-money-laundering/test-only/drop-save4later                      @controllers.testonly.TestOnlyController.dropSave4Later
+GET        /anti-money-laundering/test-only/update-save4later/:filename          @controllers.testonly.TestOnlyController.updateSave4Later(filename)
 
-GET        /anti-money-laundering/test-only/duplicate-enrolment                  controllers.testonly.TestOnlyController.duplicateEnrolment
-GET        /anti-money-laundering/test-only/duplicate-submission                 controllers.testonly.TestOnlyController.duplicateSubmission
-GET        /anti-money-laundering/test-only/invalid-enrolment-credentials        controllers.testonly.TestOnlyController.wrongCredentials
-GET        /anti-money-laundering/test-only/payment/failure                      controllers.testonly.TestOnlyController.paymentFailure
-GET        /anti-money-laundering/test-only/payment/confirmation                 controllers.testonly.TestOnlyController.paymentSuccessful
-GET        /anti-money-laundering/test-only/payment/confirmation/tr              controllers.testonly.TestOnlyController.paymentSuccessfulTransitionalRenewal
-GET        /anti-money-laundering/test-only/payment/:ref                         controllers.testonly.TestOnlyController.getPayment(ref)
-GET        /anti-money-laundering/test-only/companyname                          controllers.testonly.TestOnlyController.companyName
-GET        /anti-money-laundering/test-only/payment/bacs/nontr                   controllers.testonly.TestOnlyController.confirmationBacs
-GET        /anti-money-laundering/test-only/payment/bacs/tr                      controllers.testonly.TestOnlyController.confirmationBacsTransitionalRenewal
+GET        /anti-money-laundering/test-only/duplicate-enrolment                  @controllers.testonly.TestOnlyController.duplicateEnrolment
+GET        /anti-money-laundering/test-only/duplicate-submission                 @controllers.testonly.TestOnlyController.duplicateSubmission
+GET        /anti-money-laundering/test-only/invalid-enrolment-credentials        @controllers.testonly.TestOnlyController.wrongCredentials
+GET        /anti-money-laundering/test-only/payment/failure                      @controllers.testonly.TestOnlyController.paymentFailure
+GET        /anti-money-laundering/test-only/payment/confirmation                 @controllers.testonly.TestOnlyController.paymentSuccessful
+GET        /anti-money-laundering/test-only/payment/confirmation/tr              @controllers.testonly.TestOnlyController.paymentSuccessfulTransitionalRenewal
+GET        /anti-money-laundering/test-only/payment/:ref                         @controllers.testonly.TestOnlyController.getPayment(ref)
+GET        /anti-money-laundering/test-only/companyname                          @controllers.testonly.TestOnlyController.companyName
+GET        /anti-money-laundering/test-only/payment/bacs/nontr                   @controllers.testonly.TestOnlyController.confirmationBacs
+GET        /anti-money-laundering/test-only/payment/bacs/tr                      @controllers.testonly.TestOnlyController.confirmationBacsTransitionalRenewal
 
 # Add all the application routes to the prod.routes file
 ->         /                                                                     prod.Routes

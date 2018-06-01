@@ -16,33 +16,55 @@
 
 package controllers.testonly
 
-import config.{AMLSAuthConnector, AmlsShortLivedCache, BusinessCustomerSessionCache}
-import connectors.AmlsConnector
+import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
+import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
-import uk.gov.hmrc.play.frontend.auth.Actions
+import services.UpdateSave4LaterService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.status.status_submitted
-import jto.validation.{Path, ValidationError}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-object TestOnlyController extends TestOnlyController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-}
+@Singleton
+class TestOnlyController @Inject()(val authConnector: AuthConnector,
+                                   implicit val dataCacheConnector: DataCacheConnector,
+                                   val stubsService: UpdateSave4LaterService) extends BaseController {
 
-trait TestOnlyController extends BaseController with Actions {
 
   def dropSave4Later = Authorised.async {
     implicit user =>
       implicit request =>
-        BusinessCustomerSessionCache.remove()
-        AmlsShortLivedCache.remove(user.user.oid).map { x =>
+        removeCacheData map { _ =>
           Ok("Cache successfully cleared")
         }
   }
+
+  def removeCacheData(implicit user: AuthContext,  hc: HeaderCarrier) = {
+    BusinessCustomerSessionCache.remove()
+    AmlsShortLivedCache.remove(user.user.oid)
+  }
+
+  def updateSave4Later(fileName:String)  = Authorised.async {
+    implicit user =>
+      implicit request =>
+
+        stubsService.getSaveForLaterData(fileName) flatMap {
+          case Some(data) => {
+            removeCacheData flatMap { _ =>
+              stubsService.update(data) map { _ =>
+                Redirect(controllers.routes.LandingController.get())
+              }
+            }
+          }
+          case _ => Future.successful(BadRequest)
+        }
+  }
+
 
   def duplicateEnrolment = Authorised.async {
     implicit user => implicit request =>
