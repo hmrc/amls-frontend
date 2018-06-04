@@ -565,10 +565,10 @@ POST        /money-service-business/largest-amounts                             
 GET         /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/what-you-need                                          controllers.hvd.WhatYouNeedController.get()
+GET         /high-value-dealer/what-you-need                                          @controllers.hvd.WhatYouNeedController.get()
 
-GET         /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/cash-payments                                          controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/cash-payments                                          @controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/cash-payments                                          @controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.get()
 POST        /high-value-dealer/check-your-answers                                     @controllers.hvd.SummaryController.post()
@@ -579,8 +579,8 @@ POST        /high-value-dealer/how-will-you-sell                                
 GET         /high-value-dealer/selling                                                @controllers.hvd.ProductsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/selling                                                @controllers.hvd.ProductsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/linked-cash-payments                                   controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
-POST        /high-value-dealer/linked-cash-payments                                   controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
+GET         /high-value-dealer/linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
+POST        /high-value-dealer/linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/excise-goods                                           @controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/excise-goods                                           @controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
@@ -595,8 +595,8 @@ POST        /high-value-dealer/receiving                                        
 GET         /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.get
-POST        /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.post
+GET         /high-value-dealer/date-change                                            @controllers.hvd.HvdDateOfChangeController.get
+POST        /high-value-dealer/date-change                                            @controllers.hvd.HvdDateOfChangeController.post
 
 GET         /renewal/progress                                                         @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                                         @controllers.renewal.RenewalProgressController.post()

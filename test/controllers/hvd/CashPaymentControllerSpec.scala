@@ -36,10 +36,11 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new CashPaymentController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+
+    val dataCacheConnector = mock[DataCacheConnector]
+
+    val controller = new CashPaymentController(dataCacheConnector, authConnector = self.authConnector)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)

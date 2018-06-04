@@ -33,10 +33,10 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new LinkedCashPaymentsController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    
+    val controller = new LinkedCashPaymentsController (dataCacheConnector = mock[DataCacheConnector],
+                                                       authConnector = self.authConnector)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
