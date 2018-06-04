@@ -24,7 +24,8 @@ import views.html.hvd.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject() (val authConnector: AuthConnector = AMLSAuthConnector) extends BaseController {
+
+class WhatYouNeedController @Inject() (val authConnector: AuthConnector) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>

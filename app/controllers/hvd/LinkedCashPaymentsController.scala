@@ -27,9 +27,9 @@ import views.html.hvd.linked_cash_payments
 
 import scala.concurrent.Future
 
-class LinkedCashPaymentsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                              val authConnector: AuthConnector = AMLSAuthConnector
-                                              ) extends BaseController {
+class LinkedCashPaymentsController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                               val authConnector: AuthConnector
+                                             ) extends BaseController {
 
   def get(edit: Boolean = false) =
     Authorised.async {

@@ -16,24 +16,24 @@
 
 package controllers.hvd
 
+import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, PaymentMethods}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import services.businessmatching.ServiceFlow
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import models.businessmatching.HighValueDealing
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController(mockCacheConnector, mockServiceFlow, mockStatusService, self.authConnector)
+    val controller = new ReceiveCashPaymentsController( mockCacheConnector,
+                                                        mockServiceFlow,
+                                                        mockStatusService,
+                                                        self.authConnector)
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
