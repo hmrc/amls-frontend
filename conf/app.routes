@@ -595,8 +595,8 @@ POST        /high-value-dealer/receiving                                        
 GET         /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
 POST        /high-value-dealer/expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
 
-GET         /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.get
-POST        /high-value-dealer/date-change                                            controllers.hvd.HvdDateOfChangeController.post
+GET         /high-value-dealer/date-change                                            @controllers.hvd.HvdDateOfChangeController.get
+POST        /high-value-dealer/date-change                                            @controllers.hvd.HvdDateOfChangeController.post
 
 GET         /renewal/progress                                                         @controllers.renewal.RenewalProgressController.get()
 POST        /renewal/progress                                                         @controllers.renewal.RenewalProgressController.post()

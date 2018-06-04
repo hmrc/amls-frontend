@@ -40,10 +40,9 @@ class HvdDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new HvdDateOfChangeController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val dataCacheConnector = mock[DataCacheConnector]
+    val controller = new HvdDateOfChangeController(dataCacheConnector, authConnector = self.authConnector)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
