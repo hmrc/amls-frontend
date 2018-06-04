@@ -16,20 +16,16 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
