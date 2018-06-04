@@ -524,8 +524,8 @@ POST        /supervision/which-professional-body                                
 GET         /supervision/penalised                                                    @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /supervision/penalised                                                    @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /supervision/check-your-answers                                           controllers.supervision.SummaryController.get()
-POST        /supervision/check-your-answers                                           controllers.supervision.SummaryController.post()
+GET         /supervision/check-your-answers                                           @controllers.supervision.SummaryController.get()
+POST        /supervision/check-your-answers                                           @controllers.supervision.SummaryController.post()
 
 GET         /money-service-business/what-you-need                                     @controllers.msb.WhatYouNeedController.get()
 
