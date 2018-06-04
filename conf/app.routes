@@ -512,8 +512,8 @@ POST        /trust-company-service-provider/check-your-answers                  
 
 GET         /supervision/what-you-need                                                controllers.supervision.WhatYouNeedController.get()
 
-GET         /supervision/supervised                                                   controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
-POST        /supervision/supervised                                                   controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+GET         /supervision/supervised                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /supervision/supervised                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
 GET         /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
 POST        /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
