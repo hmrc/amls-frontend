@@ -541,17 +541,17 @@ POST        /money-service-business/currency                                    
 GET         /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
 POST        /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/transactions                                      controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
-POST        /money-service-business/transactions                                      controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)
+GET         /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
+POST        /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/send-money                                        controllers.msb.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
-POST        /money-service-business/send-money                                        controllers.msb.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
+GET         /money-service-business/send-money                                        @controllers.msb.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
+POST        /money-service-business/send-money                                        @controllers.msb.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/funds-transfer                                    controllers.msb.FundsTransferController.get(edit: Boolean ?= false)
-POST        /money-service-business/funds-transfer                                    controllers.msb.FundsTransferController.post(edit: Boolean ?= false)
+GET         /money-service-business/funds-transfer                                    @controllers.msb.FundsTransferController.get(edit: Boolean ?= false)
+POST        /money-service-business/funds-transfer                                    @controllers.msb.FundsTransferController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/branches-or-agents                                controllers.msb.BranchesOrAgentsController.get(edit: Boolean ?= false)
-POST        /money-service-business/branches-or-agents                                controllers.msb.BranchesOrAgentsController.post(edit: Boolean ?= false)
+GET         /money-service-business/branches-or-agents                                @controllers.msb.BranchesOrAgentsController.get(edit: Boolean ?= false)
+POST        /money-service-business/branches-or-agents                                @controllers.msb.BranchesOrAgentsController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/most-transactions                                 @controllers.msb.MostTransactionsController.get(edit: Boolean ?= false)
 POST        /money-service-business/most-transactions                                 @controllers.msb.MostTransactionsController.post(edit: Boolean ?= false)

@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.moneyservicebusiness._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -25,28 +24,26 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import  utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new FundsTransferController {
-      val dataCache: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new FundsTransferController(mockCacheConnector, authConnector = self.authConnector)
   }
+
   val emptyCache = CacheMap("", Map.empty)
+
   "FundsTransferControllerSpec" should {
 
     "on get, display the 'Do you transfer money without using formal banking systems?' page" in new Fixture {
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any())
           (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
@@ -55,7 +52,7 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
     "on get, display the 'Do you transfer money without using formal banking systems?' page with pre populated data" in new Fixture {
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(fundsTransfer = Some(FundsTransfer(true))))))
       val result = controller.get()(request)
 
@@ -84,10 +81,10 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "transferWithoutFormalSystems" -> "true"
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -101,10 +98,10 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "transferWithoutFormalSystems" -> "false"
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](any())
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
-      when(controller.dataCache.save[MoneyServiceBusiness](any(), any())
+      when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post()(newRequest)
@@ -130,10 +127,10 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         ), hasChanged = true
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(controller.dataCache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)
@@ -155,10 +152,10 @@ class FundsTransferControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         ), hasChanged = true
       )
 
-      when(controller.dataCache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
         (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
 
-      when(controller.dataCache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
       val result = controller.post(true)(newRequest)

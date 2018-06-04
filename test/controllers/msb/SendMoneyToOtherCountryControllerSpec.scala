@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.moneyservicebusiness._
@@ -25,24 +24,21 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
 class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
+
     val cacheMap = mock[CacheMap]
-    val controller = new SendMoneyToOtherCountryController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+
+    val controller = new SendMoneyToOtherCountryController (mockCacheConnector, authConnector = self.authConnector)
   }
 
   val emptyCache = CacheMap("", Map.empty)

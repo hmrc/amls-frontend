@@ -25,27 +25,22 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
 import play.api.test.Helpers._
 
 import scala.concurrent.Future
 
 class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSugar  {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
-    val cacheMap = mock[CacheMap]
-
-    val controller = new IdentifyLinkedTransactionsController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
+    trait Fixture extends AuthorisedFixture with DependencyMocks{
+      self => val request = addToken(authRequest)
+      val controller = new IdentifyLinkedTransactionsController(mockCacheConnector, authConnector = self.authConnector)
     }
-  }
+
+  val cacheMap = mock[CacheMap]
 
   val completedMT = Some(BusinessUseAnIPSPNo)
   val completedCE = Some(CETransactionsInNext12Months("10"))
