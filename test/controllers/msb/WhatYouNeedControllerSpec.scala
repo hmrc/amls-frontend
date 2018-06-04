@@ -18,19 +18,16 @@ package controllers.msb
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController {
-      override val authConnector = self.authConnector
-    }
+    val controller = new WhatYouNeedController(authConnector = self.authConnector)
   }
 
   "WhatYouNeedController" must {

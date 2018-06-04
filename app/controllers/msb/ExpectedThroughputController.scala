@@ -16,25 +16,26 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import services.StatusService
+import services.businessmatching.ServiceFlow
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.msb.expected_throughput
-import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
-import play.api.Play
-import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-trait ExpectedThroughputController extends BaseController {
+class ExpectedThroughputController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector,
+                                              implicit val statusService: StatusService,
+                                              implicit val serviceFlow: ServiceFlow
+                                             ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
-  implicit val serviceFlow: ServiceFlow
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -68,12 +69,4 @@ trait ExpectedThroughputController extends BaseController {
       }
     }
   }
-}
-
-object ExpectedThroughputController extends ExpectedThroughputController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService: StatusService = StatusService
-  override lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

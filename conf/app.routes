@@ -527,19 +527,19 @@ POST        /supervision/penalised                                              
 GET         /supervision/check-your-answers                                           controllers.supervision.SummaryController.get()
 POST        /supervision/check-your-answers                                           controllers.supervision.SummaryController.post()
 
-GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
+GET         /money-service-business/what-you-need                                     @controllers.msb.WhatYouNeedController.get()
 
 GET         /money-service-business/check-your-answers                                @controllers.msb.SummaryController.get()
 POST        /money-service-business/check-your-answers                                @controllers.msb.SummaryController.post()
 
-GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
-POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
+GET         /money-service-business/anticipated-totals                                @controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
+POST        /money-service-business/anticipated-totals                                @controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/currency                                          controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
-POST        /money-service-business/currency                                          controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
+GET         /money-service-business/currency                                          @controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /money-service-business/currency                                          @controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
-POST        /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
+GET         /money-service-business/payment-service-provider                          @controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
+POST        /money-service-business/payment-service-provider                          @controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)

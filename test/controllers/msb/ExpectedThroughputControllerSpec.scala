@@ -38,12 +38,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new ExpectedThroughputController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mockServiceFlow
-    }
+    val controller = new ExpectedThroughputController ( dataCacheConnector = mockCacheConnector,
+                                                        authConnector = self.authConnector,
+                                                        statusService = mockStatusService,
+                                                        serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
   }

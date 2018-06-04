@@ -16,18 +16,20 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.moneyservicebusiness._
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.business_use_an_ipsp
 
 import scala.concurrent.Future
 
-trait BusinessUseAnIPSPController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class BusinessUseAnIPSPController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector
+                                            ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -60,10 +62,4 @@ trait BusinessUseAnIPSPController extends BaseController {
       }
     }
   }
-}
-
-object BusinessUseAnIPSPController extends BusinessUseAnIPSPController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

@@ -49,20 +49,18 @@ class WhichCurrencyControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val cache: DataCacheConnector = mock[DataCacheConnector]
+    //val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+    when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
       .thenReturn(Future.successful(None))
 
-    when(cache.save[MoneyServiceBusiness](any(), any())(any(),any(),any()))
+    when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(),any(),any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
-    val controller = new WhichCurrenciesController {
-      override def cache: DataCacheConnector = self.cache
-      override protected def authConnector: AuthConnector = self.authConnector
-      override implicit val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mockServiceFlow
-    }
+    val controller = new WhichCurrenciesController ( dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService,
+      serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
   }
@@ -101,7 +99,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(NotCompleted))
 
-        when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+        when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
           .thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
         val result = controller.get()(request)
@@ -181,7 +179,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
 
           val currentModel = WhichCurrencies(Seq("USD"), usesForeignCurrencies = Some(true), Some(mock[BankMoneySource]), Some(mock[WholesalerMoneySource]), Some(true))
 
-          when(controller.cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
+          when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any())).
             thenReturn(Future.successful(Some(MoneyServiceBusiness(whichCurrencies = Some(currentModel)))))
 
           val expectedModel = WhichCurrencies(Seq("USD", "GBP", "BOB"), usesForeignCurrencies = Some(false), None, None, None)
@@ -191,7 +189,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
 
           val captor = ArgumentCaptor.forClass(classOf[MoneyServiceBusiness])
 
-          verify(controller.cache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
+          verify(controller.dataCacheConnector).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), captor.capture())(any(), any(), any())
 
           captor.getValue match {
             case result: MoneyServiceBusiness => result.whichCurrencies must be(Some(expectedModel))
