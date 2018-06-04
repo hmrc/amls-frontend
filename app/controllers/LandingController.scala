@@ -41,6 +41,7 @@ import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import services.AuthService
+import play.api.Logger
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -142,7 +143,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
                                 (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-
+    Logger.debug("refreshAndRedirect Triggered")
     landingService.refreshCache(amlsRegistrationNumber) map {
       _ => {
         Try {
@@ -152,12 +153,15 @@ class LandingController @Inject()(val landingService: LandingService,
             }
             case _ => false
           }
-
+          Logger.debug("refreshAndRedirect from duplicate Triggered")
           Redirect(controllers.routes.StatusController.get(fromDuplicate))
         }
       } match {
         case Success(r) => r
-        case _ => Redirect(controllers.routes.StatusController.get())
+        case _ => {
+          Logger.debug("refreshAndRedirect from without duplicate Triggered")
+          Redirect(controllers.routes.StatusController.get())
+        }
 
       }
     }
@@ -220,6 +224,7 @@ class LandingController @Inject()(val landingService: LandingService,
           //there is data in S4l
           fixEmpties flatMap { cacheMap =>
             if (dataHasChanged(cacheMap)) {
+              Logger.debug("Data has changed in getWithAmendments()")
               cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
                 case SubmissionRequestStatus(true) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
               } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
@@ -227,13 +232,20 @@ class LandingController @Inject()(val landingService: LandingService,
               }
             } else {
               //DataHasNotChanged
+              Logger.debug("Data has not changed route in getWithAmendments()")
               refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
             }
           }
-        case _ => refreshAndRedirect(amlsRegistrationNumber, None)
+        case _ => {
+          Logger.debug("Data with amlsRegistration number route in getWithAmendments()")
+          refreshAndRedirect(amlsRegistrationNumber, None)
+        }
       }
 
-      case _ => getWithoutAmendments //no enrolment exists
+      case _ => {
+        Logger.debug("No Enrolement exists getWithAmendments()")
+        getWithoutAmendments
+      } //no enrolment exists
     }
   }
 
