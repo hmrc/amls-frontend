@@ -16,7 +16,6 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
 import models.hvd.{CashPaymentNo, CashPaymentYes, Hvd}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
