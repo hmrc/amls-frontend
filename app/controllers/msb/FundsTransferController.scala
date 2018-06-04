@@ -20,18 +20,20 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.Inject
 import models.moneyservicebusiness.{FundsTransfer, MoneyServiceBusiness}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb._
 
 import scala.concurrent.Future
 
-trait FundsTransferController extends BaseController {
-
-  def dataCache: DataCacheConnector
+class FundsTransferController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector
+                                        ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
           val form: Form2[FundsTransfer] = (for {
             moneyServiceBusiness <- response
@@ -48,8 +50,8 @@ trait FundsTransferController extends BaseController {
           Future.successful(BadRequest(funds_transfer(f, edit)))
         case ValidForm(_, data) =>
           for {
-            moneyServiceBusiness <- dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            moneyServiceBusiness <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               moneyServiceBusiness.fundsTransfer(data))
           } yield edit match {
             case true if moneyServiceBusiness.transactionsInNext12Months.isDefined =>
@@ -58,11 +60,4 @@ trait FundsTransferController extends BaseController {
           }
       }
   }
-}
-
-
-object FundsTransferController extends FundsTransferController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
