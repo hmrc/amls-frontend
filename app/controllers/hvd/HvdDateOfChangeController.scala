@@ -17,6 +17,7 @@
 package controllers.hvd
 
 
+
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -31,7 +32,6 @@ import utils.RepeatingSection
 import views.html.date_of_change
 
 import scala.concurrent.Future
-
 
 class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             val authConnector: AuthConnector

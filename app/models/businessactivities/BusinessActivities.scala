@@ -21,6 +21,7 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import models.businessactivities.TransactionTypes._
 import models.businessmatching.{AccountancyServices, BusinessMatching, BusinessActivities => BusinessMatchingActivities}
+import play.api.Logger
 import utils.ControllerHelper
 
 case class BusinessActivities(
@@ -168,6 +169,9 @@ object BusinessActivities {
 
   implicit val writes: Writes[BusinessActivities] = Writes[BusinessActivities] {
     model =>
+      if(!model.accountantForAMLSRegulations.isDefined) {
+        Logger.debug("accountantForAMLSRegulations is not defined()")
+      }
       Seq(
         Json.toJson(model.involvedInOther).asOpt[JsObject],
         Json.toJson(model.expectedBusinessTurnover).asOpt[JsObject],

@@ -16,12 +16,14 @@
 
 package controllers.hvd
 
+import config.AMLSAuthConnector
 import controllers.BaseController
 import javax.inject.Inject
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.hvd.what_you_need
 
 import scala.concurrent.Future
+
 
 class WhatYouNeedController @Inject() (val authConnector: AuthConnector) extends BaseController {
 
