@@ -16,25 +16,16 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
-import models.hvd.{Alcohol, Hvd, Products, Tobacco}
 import models.businessmatching.HighValueDealing
+import models.hvd.{Alcohol, Hvd, Products, Tobacco}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneServerPerSuite, PlaySpec}
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, ServiceFlowMocks}
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -43,12 +34,11 @@ class ProductsControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new ProductsController(
-      mockCacheConnector,
-      mockStatusService,
-      self.authConnector,
-      mockServiceFlow
-    )
+    val controller = new ProductsController(mockCacheConnector,
+                                            mockStatusService,
+                                            self.authConnector,
+                                            mockServiceFlow
+                                          )
 
     mockIsNewActivity(false)
     mockCacheSave[Hvd]

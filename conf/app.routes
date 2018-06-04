@@ -562,8 +562,8 @@ POST        /money-service-business/transfers                                   
 GET         /money-service-business/largest-amounts                                   @controllers.msb.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
 POST        /money-service-business/largest-amounts                                   @controllers.msb.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
-POST        /money-service-business/transfers-b                                       controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
+GET         /money-service-business/transfers-b                                       @controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
+POST        /money-service-business/transfers-b                                       @controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
 
 GET         /high-value-dealer/what-you-need                                          @controllers.hvd.WhatYouNeedController.get()
 

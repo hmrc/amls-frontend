@@ -16,11 +16,10 @@
 
 package controllers.hvd
 
-import javax.inject.Inject
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching.HighValueDealing
 import models.hvd.{Alcohol, Hvd, Products, Tobacco}
 import services.StatusService
@@ -31,13 +30,11 @@ import views.html.hvd.products
 
 import scala.concurrent.Future
 
-class ProductsController @Inject()
-(
-  val dataCacheConnector: DataCacheConnector,
-  val statusService: StatusService,
-  val authConnector: AuthConnector,
-  val serviceFlow: ServiceFlow
-) extends BaseController with DateOfChangeHelper {
+class ProductsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                    val statusService: StatusService,
+                                    val authConnector: AuthConnector,
+                                    val serviceFlow: ServiceFlow
+                                  ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>

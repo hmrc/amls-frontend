@@ -16,25 +16,25 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.msb.ce_transaction_in_next_12_months
-import play.api.Play
-import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
+
 import scala.concurrent.Future
 
-trait CETransactionsInNext12MonthsController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
-  implicit val serviceFlow: ServiceFlow
+class CETransactionsInNext12MonthsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                        val authConnector: AuthConnector,
+                                                        implicit val statusService: StatusService,
+                                                        implicit val serviceFlow: ServiceFlow
+                                                       ) extends BaseController {
 
   def get(edit:Boolean = false) = Authorised.async {
    implicit authContext => implicit request =>
@@ -71,12 +71,4 @@ trait CETransactionsInNext12MonthsController extends BaseController {
       }
     }
   }
-}
-
-object CETransactionsInNext12MonthsController extends CETransactionsInNext12MonthsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
-  override lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

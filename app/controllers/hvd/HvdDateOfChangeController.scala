@@ -17,7 +17,6 @@
 package controllers.hvd
 
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -25,20 +24,18 @@ import javax.inject.Inject
 import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.hvd.Hvd
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.date_of_change
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 
-class HvdDateOfChangeController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector = AMLSAuthConnector
+class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector
                                           ) extends RepeatingSection with BaseController {
-
-
 
   def get = Authorised.async {
       implicit authContext => implicit request =>

@@ -16,39 +16,37 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
 import models.businessmatching.HighValueDealing
 import models.hvd._
-import models.moneyservicebusiness.MoneyServiceBusiness
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, ServiceFlowMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import org.mockito.ArgumentCaptor
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import play.api.mvc.Results.Redirect
-import services.businessmatching.ServiceFlow
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture with ServiceFlowMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    lazy val controller = new SummaryController(mock[DataCacheConnector], self.authConnector, mock[StatusService], mockServiceFlow)
+    lazy val controller = new SummaryController(mockCacheConnector,
+                                                self.authConnector,
+                                                mockStatusService,
+                                                mockServiceFlow)
 
     val day = 15
     val month = 2
