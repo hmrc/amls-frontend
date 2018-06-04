@@ -20,6 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.moneyservicebusiness.{MoneyServiceBusiness, TransactionsInNext12Months}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -31,11 +32,13 @@ import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-trait TransactionsInNext12MonthsController extends BaseController {
+class TransactionsInNext12MonthsController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                                       val authConnector: AuthConnector,
+                                                       implicit val statusService: StatusService,
+                                                       implicit val serviceFlow: ServiceFlow
+                                                     ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
-  implicit val serviceFlow: ServiceFlow
+
 
   def get(edit:Boolean = false) = Authorised.async {
    implicit authContext => implicit request =>
@@ -70,12 +73,4 @@ trait TransactionsInNext12MonthsController extends BaseController {
       }
     }
   }
-}
-
-object TransactionsInNext12MonthsController extends TransactionsInNext12MonthsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
-  override lazy val serviceFlow = Play.current.injector.instanceOf[ServiceFlow]
 }

@@ -16,6 +16,7 @@
 
 package controllers.hvd
 
+import connectors.DataCacheConnector
 import models.hvd.{CashPaymentNo, CashPaymentYes, Hvd}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
@@ -35,14 +36,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-<<<<<<< HEAD
     val controller = new CashPaymentController(mockCacheConnector, authConnector = self.authConnector)
-=======
-    val dataCacheConnector = mock[DataCacheConnector]
-
-    val controller = new CashPaymentController(dataCacheConnector, authConnector = self.authConnector)
->>>>>>> 28b45c0797f1b1591fa908cc5f2d3b8fd13134ff
-
   }
 
   val emptyCache = CacheMap("", Map.empty)
