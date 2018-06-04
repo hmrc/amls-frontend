@@ -32,9 +32,7 @@ import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-@Singleton
-class SendTheLargestAmountsOfMoneyController @Inject()(
-                                                        val authConnector: AuthConnector = AMLSAuthConnector,
+class SendTheLargestAmountsOfMoneyController @Inject()( val authConnector: AuthConnector = AMLSAuthConnector,
                                                         val cacheConnector: DataCacheConnector,
                                                         implicit val statusService: StatusService,
                                                         implicit val serviceFlow: ServiceFlow

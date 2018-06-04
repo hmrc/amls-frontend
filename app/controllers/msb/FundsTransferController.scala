@@ -27,8 +27,8 @@ import views.html.msb._
 
 import scala.concurrent.Future
 
-class FundsTransferController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector
+class FundsTransferController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                          val authConnector: AuthConnector
                                         ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {

@@ -16,11 +16,11 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbService}
+import javax.inject.Inject
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -28,9 +28,9 @@ import views.html.msb.send_money_to_other_country
 
 import scala.concurrent.Future
 
-trait SendMoneyToOtherCountryController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class SendMoneyToOtherCountryController  @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                    val authConnector: AuthConnector
+                                                   ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -95,10 +95,4 @@ trait SendMoneyToOtherCountryController extends BaseController {
       }
     }
   }
-}
-
-object SendMoneyToOtherCountryController extends SendMoneyToOtherCountryController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }

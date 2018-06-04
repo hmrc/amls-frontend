@@ -20,7 +20,8 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{TransmittingMoney, CurrencyExchange, BusinessMatchingMsbService, BusinessMatching}
+import javax.inject.Inject
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, TransmittingMoney}
 import models.moneyservicebusiness._
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -28,9 +29,9 @@ import views.html.msb.identify_linked_transactions
 
 import scala.concurrent.Future
 
-trait IdentifyLinkedTransactionsController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                      val authConnector: AuthConnector
+                                                     ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -108,10 +109,4 @@ trait IdentifyLinkedTransactionsController extends BaseController {
       }
     }
   }
-}
-
-object IdentifyLinkedTransactionsController extends IdentifyLinkedTransactionsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
