@@ -16,12 +16,11 @@
 
 package controllers.msb
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import javax.inject.Inject
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService

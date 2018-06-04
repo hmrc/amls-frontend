@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
@@ -27,10 +26,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.ServiceFlow
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 

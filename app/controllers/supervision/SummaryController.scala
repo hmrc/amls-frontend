@@ -18,20 +18,21 @@ package controllers.supervision
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import javax.inject.Inject
 import models.supervision.Supervision
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.summary
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
+class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
+                                    val authConnector: AuthConnector
+                                   ) extends BaseController {
 
   def get() = Authorised.async {
     implicit authContext => implicit request =>
-      dataCache.fetch[Supervision](Supervision.key) map {
+      dataCacheConnector.fetch[Supervision](Supervision.key) map {
         case Some(data) =>
           Ok(summary(EmptyForm, data))
         case _ =>
@@ -41,14 +42,8 @@ trait SummaryController extends BaseController {
 
   def post = Authorised.async {
     implicit authContext => implicit request => (for {
-      supervision <- OptionT(dataCache.fetch[Supervision](Supervision.key))
-      _ <- OptionT.liftF(dataCache.save[Supervision](Supervision.key, supervision.copy(hasAccepted = true)))
+      supervision <- OptionT(dataCacheConnector.fetch[Supervision](Supervision.key))
+      _ <- OptionT.liftF(dataCacheConnector.save[Supervision](Supervision.key, supervision.copy(hasAccepted = true)))
     } yield Redirect(controllers.routes.RegistrationProgressController.get)) getOrElse InternalServerError("Could not update supervision")
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

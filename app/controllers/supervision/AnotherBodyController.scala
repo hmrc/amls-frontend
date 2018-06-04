@@ -16,18 +16,19 @@
 
 package controllers.supervision
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.supervision.{Supervision, AnotherBody}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.supervision.{AnotherBody, Supervision}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.another_body
 
 import scala.concurrent.Future
 
-trait AnotherBodyController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                       val authConnector: AuthConnector
+                                      ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -58,10 +59,4 @@ trait AnotherBodyController extends BaseController {
           }
       }
   }
-}
-
-object AnotherBodyController extends AnotherBodyController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

@@ -16,13 +16,12 @@
 
 package controllers.msb
 
-import javax.inject.{Inject, Singleton}
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbService, MoneyServiceBusiness => MsbActivity}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import services.StatusService

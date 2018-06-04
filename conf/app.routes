@@ -510,10 +510,10 @@ POST        /trust-company-service-provider/other-trust-provider-supervision    
 GET         /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.get()
 POST        /trust-company-service-provider/check-your-answers                        @controllers.tcsp.SummaryController.post()
 
-GET         /supervision/what-you-need                                                controllers.supervision.WhatYouNeedController.get()
+GET         /supervision/what-you-need                                                @controllers.supervision.WhatYouNeedController.get()
 
-GET         /supervision/supervised                                                   controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
-POST        /supervision/supervised                                                   controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+GET         /supervision/supervised                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /supervision/supervised                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
 GET         /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
 POST        /supervision/professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
@@ -524,22 +524,22 @@ POST        /supervision/which-professional-body                                
 GET         /supervision/penalised                                                    @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
 POST        /supervision/penalised                                                    @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /supervision/check-your-answers                                           controllers.supervision.SummaryController.get()
-POST        /supervision/check-your-answers                                           controllers.supervision.SummaryController.post()
+GET         /supervision/check-your-answers                                           @controllers.supervision.SummaryController.get()
+POST        /supervision/check-your-answers                                           @controllers.supervision.SummaryController.post()
 
-GET         /money-service-business/what-you-need                                     controllers.msb.WhatYouNeedController.get()
+GET         /money-service-business/what-you-need                                     @controllers.msb.WhatYouNeedController.get()
 
 GET         /money-service-business/check-your-answers                                @controllers.msb.SummaryController.get()
 POST        /money-service-business/check-your-answers                                @controllers.msb.SummaryController.post()
 
-GET         /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
-POST        /money-service-business/anticipated-totals                                controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
+GET         /money-service-business/anticipated-totals                                @controllers.msb.ExpectedThroughputController.get(edit: Boolean ?= false)
+POST        /money-service-business/anticipated-totals                                @controllers.msb.ExpectedThroughputController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/currency                                          controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
-POST        /money-service-business/currency                                          controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
+GET         /money-service-business/currency                                          @controllers.msb.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /money-service-business/currency                                          @controllers.msb.WhichCurrenciesController.post(edit: Boolean ?= false)
 
-GET         /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
-POST        /money-service-business/payment-service-provider                          controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
+GET         /money-service-business/payment-service-provider                          @controllers.msb.BusinessUseAnIPSPController.get(edit: Boolean ?= false)
+POST        /money-service-business/payment-service-provider                          @controllers.msb.BusinessUseAnIPSPController.post(edit: Boolean ?= false)
 
 GET         /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.get(edit: Boolean ?= false)
 POST        /money-service-business/transactions                                      @controllers.msb.IdentifyLinkedTransactionsController.post(edit: Boolean ?= false)

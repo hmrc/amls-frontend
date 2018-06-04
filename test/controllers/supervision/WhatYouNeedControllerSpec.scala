@@ -16,28 +16,20 @@
 
 package controllers.supervision
 
-import config.AMLSAuthConnector
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController {
-      override val authConnector = self.authConnector
-    }
+    val controller = new WhatYouNeedController(authConnector = self.authConnector)
   }
 
   "WhatYouNeedController" must {
-
-    "use correct services" in new Fixture {
-      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-    }
 
     "get" must {
       "load the page" in new Fixture {

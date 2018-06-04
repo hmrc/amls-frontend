@@ -16,7 +16,7 @@
 
 package controllers.msb
 
-import connectors.DataCacheConnector
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -24,13 +24,11 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
 import scala.concurrent.Future
 
 class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
@@ -38,12 +36,10 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new ExpectedThroughputController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mockServiceFlow
-    }
+    val controller = new ExpectedThroughputController ( dataCacheConnector = mockCacheConnector,
+                                                        authConnector = self.authConnector,
+                                                        statusService = mockStatusService,
+                                                        serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
   }

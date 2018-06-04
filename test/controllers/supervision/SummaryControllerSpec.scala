@@ -16,30 +16,24 @@
 
 package controllers.supervision
 
-import connectors.DataCacheConnector
 import models.asp.Asp
-import models.hvd.Hvd
 import models.supervision.Supervision
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new SummaryController(mockCacheConnector, authConnector = self.authConnector)
 
     val model = Supervision(None)
   }
@@ -50,7 +44,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
 
 
-      when(controller.dataCache.fetch[Supervision](any())
+      when(controller.dataCacheConnector.fetch[Supervision](any())
         (any(), any(), any())).thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -59,7 +53,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to the main summary page when section data is unavailable" in new Fixture {
 
-      when(controller.dataCache.fetch[Asp](any())
+      when(controller.dataCacheConnector.fetch[Asp](any())
         (any(), any(), any())).thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -72,11 +66,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val cache = mock[CacheMap]
 
       when {
-        controller.dataCache.fetch[Supervision](any())(any(), any(), any())
+        controller.dataCacheConnector.fetch[Supervision](any())(any(), any(), any())
       } thenReturn Future.successful(Some(model.copy(hasAccepted = false)))
 
       when {
-        controller.dataCache.save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
+        controller.dataCacheConnector.save[Supervision](eqTo(Supervision.key), any())(any(), any(), any())
       } thenReturn Future.successful(cache)
 
       val result = controller.post()(request)
@@ -85,7 +79,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Supervision])
-      verify(controller.dataCache).save[Supervision](eqTo(Supervision.key), captor.capture())(any(), any(), any())
+      verify(controller.dataCacheConnector).save[Supervision](eqTo(Supervision.key), captor.capture())(any(), any(), any())
       captor.getValue.hasAccepted mustBe true
     }
   }
