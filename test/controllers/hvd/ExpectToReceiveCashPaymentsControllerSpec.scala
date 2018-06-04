@@ -16,18 +16,14 @@
 
 package controllers.hvd
 
+import models.businessmatching.HighValueDealing
 import models.hvd.Hvd
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.businessmatching.ServiceFlow
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import models.businessmatching.HighValueDealing
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 

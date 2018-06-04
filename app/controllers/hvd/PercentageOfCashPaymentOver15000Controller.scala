@@ -16,30 +16,25 @@
 
 package controllers.hvd
 
-import javax.inject.Inject
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.Inject
 import models.businessmatching.HighValueDealing
-import models.hvd.{Hvd, PercentageOfCashPaymentOver15000, ReceiveCashPayments}
-import play.api.Play
+import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
-import views.html.hvd.{percentage, receiving}
+import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000Controller @Inject()
-(
-  val dataCacheConnector: DataCacheConnector,
-  implicit val serviceFlow: ServiceFlow,
-  implicit val statusService: StatusService,
-  val authConnector: AuthConnector
-) extends BaseController {
+class PercentageOfCashPaymentOver15000Controller @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                                            implicit val serviceFlow: ServiceFlow,
+                                                            implicit val statusService: StatusService,
+                                                            val authConnector: AuthConnector
+                                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>

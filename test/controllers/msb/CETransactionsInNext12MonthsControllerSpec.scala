@@ -38,12 +38,11 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new CETransactionsInNext12MonthsController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-      override implicit val statusService: StatusService = mock[StatusService]
-      override val serviceFlow = mockServiceFlow
-    }
+    val controller = new CETransactionsInNext12MonthsController ( dataCacheConnector = mockCacheConnector,
+                                                                  authConnector = self.authConnector,
+                                                                  statusService = mockStatusService,
+                                                                  serviceFlow = mockServiceFlow)
+
 
     mockIsNewActivity(false)
   }

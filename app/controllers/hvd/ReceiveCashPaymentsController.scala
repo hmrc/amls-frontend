@@ -16,24 +16,21 @@
 
 package controllers.hvd
 
-import javax.inject.Inject
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching.HighValueDealing
-import models.hvd.{Hvd, ReceiveCashPayments}
+import models.hvd.Hvd
 import services.StatusService
+import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.hvd.receiving
-import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject()(
-                                               val cacheConnector: DataCacheConnector,
+class ReceiveCashPaymentsController @Inject() (val cacheConnector: DataCacheConnector,
                                                implicit val serviceFlow: ServiceFlow,
                                                implicit val statusService: StatusService,
                                                val authConnector: AuthConnector) extends BaseController {

@@ -16,30 +16,25 @@
 
 package controllers.hvd
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
+import javax.inject.Inject
+import models.businessmatching.HighValueDealing
 import models.hvd.Hvd
 import services.StatusService
-import utils.ControllerHelper
-import views.html.hvd.summary
-import forms.EmptyForm
-import models.businessmatching.HighValueDealing
-import play.api.Play
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
+import views.html.hvd.summary
 
-class SummaryController @Inject()
-(
-  val dataCache: DataCacheConnector,
-  val authConnector: AuthConnector,
-  implicit val statusService: StatusService,
-  implicit val serviceFlow: ServiceFlow
-) extends BaseController {
+class SummaryController @Inject() ( val dataCache: DataCacheConnector,
+                                    val authConnector: AuthConnector,
+                                    implicit val statusService: StatusService,
+                                    implicit val serviceFlow: ServiceFlow
+                                  ) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext =>

@@ -16,21 +16,15 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
+import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.test.FakeApplication
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
-import models.businessmatching.HighValueDealing
-
-import scala.concurrent.Future
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ExciseGoodsControllerSpec extends AmlsSpec {
 

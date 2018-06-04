@@ -16,25 +16,28 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
-import models.hvd.{LinkedCashPayments, Hvd}
+import models.hvd.{Hvd, LinkedCashPayments}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class LinkedCashPaymentsControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
+<<<<<<< HEAD
+
+    val controller = new LinkedCashPaymentsController (mockCacheConnector,
+=======
     
     val controller = new LinkedCashPaymentsController (dataCacheConnector = mock[DataCacheConnector],
+>>>>>>> 28b45c0797f1b1591fa908cc5f2d3b8fd13134ff
                                                        authConnector = self.authConnector)
 
   }

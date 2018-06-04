@@ -16,21 +16,18 @@
 
 package controllers.hvd
 
-import connectors.DataCacheConnector
+import models.businessmatching.HighValueDealing
+import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
-import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.businessmatching.HighValueDealing
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -39,9 +36,11 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new PercentageOfCashPaymentOver15000Controller(
-      mock[DataCacheConnector], mockServiceFlow, mock[StatusService], self.authConnector
-    )
+    val controller = new PercentageOfCashPaymentOver15000Controller(mockCacheConnector,
+                                                                    mockServiceFlow,
+                                                                    mockStatusService,
+                                                                    self.authConnector
+                                                                  )
 
     mockIsNewActivity(false)
   }

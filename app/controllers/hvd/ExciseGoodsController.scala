@@ -16,15 +16,12 @@
 
 package controllers.hvd
 
-import javax.inject.Inject
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching.HighValueDealing
 import models.hvd.{ExciseGoods, Hvd}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -33,13 +30,11 @@ import views.html.hvd.excise_goods
 
 import scala.concurrent.Future
 
-class ExciseGoodsController @Inject()
-(
-  dataCacheConnector: DataCacheConnector,
-  statusService: StatusService,
-  val authConnector: AuthConnector,
-  serviceFlow: ServiceFlow
-) extends BaseController with DateOfChangeHelper {
+class ExciseGoodsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                       val statusService: StatusService,
+                                       val authConnector: AuthConnector,
+                                       val serviceFlow: ServiceFlow
+                                      ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) =
     Authorised.async {

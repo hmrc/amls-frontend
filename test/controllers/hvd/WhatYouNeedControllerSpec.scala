@@ -18,10 +18,9 @@ package controllers.hvd
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
