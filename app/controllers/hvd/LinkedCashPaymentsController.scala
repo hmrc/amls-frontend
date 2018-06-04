@@ -19,15 +19,17 @@ package controllers.hvd
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{InvalidForm, ValidForm, EmptyForm, Form2}
-import models.hvd.{LinkedCashPayments, Hvd}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.hvd.{Hvd, LinkedCashPayments}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.hvd.linked_cash_payments
 
 import scala.concurrent.Future
 
-trait LinkedCashPaymentsController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class LinkedCashPaymentsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector = AMLSAuthConnector
+                                              ) extends BaseController {
 
   def get(edit: Boolean = false) =
     Authorised.async {
@@ -61,10 +63,4 @@ trait LinkedCashPaymentsController extends BaseController {
         }
       }
     }
-}
-
-object LinkedCashPaymentsController extends LinkedCashPaymentsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 class CashPaymentController @Inject() (val dataCacheConnector: DataCacheConnector,
                                         val authConnector: AuthConnector = AMLSAuthConnector
-                                        )extends BaseController {
+                                        ) extends BaseController {
 
   def get(edit: Boolean = false) =
     Authorised.async {
