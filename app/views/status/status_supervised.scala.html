@@ -83,7 +83,7 @@
             <div class="hide-if-mobile">
                 <div class="govuk-box-highlight messaging">
                         <!-- <i class="icon icon-information"></i>  -->
-                    <a href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
+                    <a id="view-message" href="@controllers.routes.NotificationController.getMessages()">@Messages("notifications.youHaveMessages")</a>
                 </div>
                 <p class="heading-small">@Messages("status.referenceno.short")</p><p id="registration-no">@regNo</p>
                 <p>@change_officer(name)</p>
