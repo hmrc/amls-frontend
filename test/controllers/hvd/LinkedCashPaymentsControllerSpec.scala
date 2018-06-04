@@ -16,7 +16,10 @@
 
 package controllers.hvd
 
+<<<<<<< HEAD
 import connectors.DataCacheConnector
+=======
+>>>>>>> f1fa4c5ba37fe54a69648385fcba9fc9985a377c
 import models.hvd.{Hvd, LinkedCashPayments}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -34,7 +37,6 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
     self => val request = addToken(authRequest)
 
     val controller = new LinkedCashPaymentsController (mockCacheConnector, authConnector = self.authConnector)
-
   }
 
   val emptyCache = CacheMap("", Map.empty)

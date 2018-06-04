@@ -37,6 +37,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar {
     self => val request = addToken(authRequest)
 
     val controller = new CashPaymentController(mockCacheConnector, authConnector = self.authConnector)
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
