@@ -17,6 +17,7 @@
 package controllers.msb
 
 import connectors.DataCacheConnector
+import controllers.hvd.CashPaymentController
 import models.Country
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
 import org.jsoup.Jsoup
@@ -27,28 +28,23 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val cache: DataCacheConnector = mock[DataCacheConnector]
-
-    val controller = new BranchesOrAgentsController {
-      override def cache: DataCacheConnector = self.cache
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new BranchesOrAgentsController(mockCacheConnector, authConnector = self.authConnector)
   }
 
   "BranchesOrAgentsController" must {
 
     "show an empty form on get with no data in store" in new Fixture {
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
       val result = controller.get()(request)
@@ -68,7 +64,7 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(Some(model)))
 
       val result = controller.get()(request)
@@ -104,10 +100,10 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
         "hasCountries" -> "false"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -129,10 +125,10 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
         "countries" -> "GB"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = false)(newRequest)
@@ -152,10 +148,10 @@ class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
         "hasCountries" -> "false"
       )
 
-      when(cache.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
+      when(mockCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any(), any(), any()))
         .thenReturn(Future.successful(None))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
+      when(mockCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(model))(any(), any(), any()))
         .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
       val result = controller.post(edit = true)(newRequest)

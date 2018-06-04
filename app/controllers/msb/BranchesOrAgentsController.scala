@@ -16,24 +16,22 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
-import jto.validation.Write
-import jto.validation.forms.UrlFormEncoded
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait BranchesOrAgentsController extends BaseController {
-
-  def cache: DataCacheConnector
+class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector
+                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
         response =>
 
           val form = (for {
@@ -52,8 +50,8 @@ trait BranchesOrAgentsController extends BaseController {
           Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
         case ValidForm(_, data) =>
           for {
-            msb <- cache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
-            _ <- cache.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
+            msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.branchesOrAgents(data)
             )
           } yield edit match {
@@ -64,10 +62,4 @@ trait BranchesOrAgentsController extends BaseController {
           }
       }
   }
-}
-
-object BranchesOrAgentsController extends BranchesOrAgentsController {
-  // $COVERAGE-OFF$
-  override val cache: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
