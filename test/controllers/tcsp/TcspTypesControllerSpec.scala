@@ -16,30 +16,23 @@
 
 package controllers.tcsp
 
-import connectors.DataCacheConnector
 import models.tcsp._
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import play.api.i18n.Messages
-import play.api.test.Helpers._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
 
-    val controller = new TcspTypesController {
-      override val dataCacheConnector:DataCacheConnector = mock[DataCacheConnector]
-      override protected def authConnector :AuthConnector =  self.authConnector
-    }
+    val controller = new TcspTypesController(mockCacheConnector, authConnector = self.authConnector)
   }
 
   val cacheMap = CacheMap("", Map.empty)

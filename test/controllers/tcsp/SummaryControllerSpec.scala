@@ -16,15 +16,12 @@
 
 package controllers.tcsp
 
-import connectors.DataCacheConnector
 import models.tcsp._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import play.api.test.Helpers._
-import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 

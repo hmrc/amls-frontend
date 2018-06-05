@@ -16,21 +16,19 @@
 
 package controllers.tcsp
 
-import javax.inject.Inject
-
-import cats.implicits._
 import cats.data.OptionT
-import config.AMLSAuthConnector
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import javax.inject.Inject
 import models.businessmatching.TrustAndCompanyServices
 import models.tcsp.Tcsp
 import services.StatusService
 import services.businessmatching.ServiceFlow
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import views.html.tcsp.summary
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.tcsp.summary
 
 class SummaryController @Inject()
 (

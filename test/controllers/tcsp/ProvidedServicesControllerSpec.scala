@@ -16,29 +16,25 @@
 
 package controllers.tcsp
 
-import connectors.DataCacheConnector
 import models.tcsp.{Other, ProvidedServices, Tcsp}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
-import org.mockito.Mockito._
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
 class ProvidedServicesControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture  with DependencyMocks{
     self => val request = addToken(authRequest)
-    val controller = new ProvidedServicesController {
-      override val authConnector = self.authConnector
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-    }
+
+    val controller = new ProvidedServicesController(mockCacheConnector, authConnector = self.authConnector)
   }
 
   "ProvidedServicesController" must {

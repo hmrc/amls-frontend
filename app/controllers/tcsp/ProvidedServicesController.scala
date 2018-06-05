@@ -16,52 +16,49 @@
 
 package controllers.tcsp
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.Inject
 import models.tcsp.{ProvidedServices, Tcsp}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.provided_services
 
 import scala.concurrent.Future
 
-trait ProvidedServicesController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class ProvidedServicesController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector
+                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
-        response =>
-          val form: Form2[ProvidedServices] = (for {
-            tcsp <- response
-            providedServices <- tcsp.providedServices
-          } yield Form2[ProvidedServices](providedServices)).getOrElse(EmptyForm)
-          Ok(provided_services(form, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[Tcsp](Tcsp.key) map {
+          response =>
+            val form: Form2[ProvidedServices] = (for {
+              tcsp <- response
+              providedServices <- tcsp.providedServices
+            } yield Form2[ProvidedServices](providedServices)).getOrElse(EmptyForm)
+            Ok(provided_services(form, edit))
+        }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[ProvidedServices](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(provided_services(f, edit)))
-        case ValidForm(_, data) =>
-          for {
-            tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
-            _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
-              tcsp.providedServices(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
-          }
-      }
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        Form2[ProvidedServices](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(provided_services(f, edit)))
+          case ValidForm(_, data) =>
+            for {
+              tcsp <- dataCacheConnector.fetch[Tcsp](Tcsp.key)
+              _ <- dataCacheConnector.save[Tcsp](Tcsp.key,
+                tcsp.providedServices(data)
+              )
+            } yield edit match {
+              case true => Redirect(routes.SummaryController.get())
+              case false => Redirect(routes.ServicesOfAnotherTCSPController.get())
+            }
+        }
   }
-}
-
-object ProvidedServicesController extends ProvidedServicesController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

@@ -493,13 +493,13 @@ POST        /accountancy-service-provider/date-change                           
 GET         /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.get()
 POST        /accountancy-service-provider/check-your-answers                          @controllers.asp.SummaryController.post()
 
-GET         /trust-company-service-provider/what-you-need                             controllers.tcsp.WhatYouNeedController.get()
+GET         /trust-company-service-provider/what-you-need                             @controllers.tcsp.WhatYouNeedController.get()
 
-GET         /trust-company-service-provider/services                                  controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/services                                  controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/services                                  @controllers.tcsp.ProvidedServicesController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/services                                  @controllers.tcsp.ProvidedServicesController.post(edit: Boolean ?= false)
 
-GET         /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
-POST        /trust-company-service-provider/service-type                              controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
+GET         /trust-company-service-provider/service-type                              @controllers.tcsp.TcspTypesController.get(edit: Boolean ?= false)
+POST        /trust-company-service-provider/service-type                              @controllers.tcsp.TcspTypesController.post(edit: Boolean ?= false)
 
 GET         /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.get(edit: Boolean ?= false)
 POST        /trust-company-service-provider/other-trust-provider                      @controllers.tcsp.ServicesOfAnotherTCSPController.post(edit: Boolean ?= false)
