@@ -34,7 +34,7 @@ class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
       Some(paymentReferenceNumber),
       Currency(100),
       Seq.empty,
-      Some(Currency(150)),
+      Currency(150),
       continueHref
     )
   }

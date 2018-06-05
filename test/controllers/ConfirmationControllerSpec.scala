@@ -28,7 +28,7 @@ import models.payments.PaymentStatuses.{Cancelled, Created, Failed}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.renewal.{InvolvedInOtherNo, Renewal}
-import models.status._
+import models.status.{SubmissionDecisionApproved, _}
 import models.{status => _, _}
 import org.joda.time.{DateTime, LocalDate, LocalDateTime}
 import org.jsoup.Jsoup
@@ -125,7 +125,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       100,
       None,
       0,
-      100,
+      200,
       Some(paymentReferenceNumber),
       None,
       DateTime.now
@@ -328,6 +328,27 @@ class ConfirmationControllerSpec extends AmlsSpec
           doc.title must include(Messages("confirmation.amendment.header"))
           contentAsString(result) must include(Messages("confirmation.amendment.info"))
         }
+      }
+
+      "submitting a renewal" in new Fixture {
+        setupStatus(RenewalSubmitted(None))
+
+        when {
+          controller.confirmationService.isRenewalDefined(any(), any(), any())
+        } thenReturn Future.successful(true)
+
+        when {
+          controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(), any(), any())
+        } thenReturn Future.successful(Some(feeResponse(AmendOrVariationResponseType)))
+
+        val result = controller.get()(request)
+        status(result) mustBe OK
+
+        val doc = Jsoup.parse(contentAsString(result))
+
+        doc.title must include(Messages("confirmation.renewal.title"))
+        contentAsString(result) must include(Messages("confirmation.renewal.header"))
+        doc.select("#fee").text must include(Currency(200d).toString)
       }
     }
 
