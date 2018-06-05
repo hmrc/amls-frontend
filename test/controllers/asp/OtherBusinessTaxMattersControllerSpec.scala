@@ -16,31 +16,30 @@
 
 package controllers.asp
 
-import connectors.DataCacheConnector
-import models.asp.{OtherBusinessTaxMattersYes, Asp}
+import models.asp.{Asp, OtherBusinessTaxMattersYes}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
 import scala.concurrent.Future
 
 
 class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  val emptyCache = CacheMap("", Map.empty)
 
-    val controller = new OtherBusinessTaxMattersController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
+
+    val controller = new OtherBusinessTaxMattersController(mockCacheConnector, authConnector = self.authConnector)
 
     when(controller.dataCacheConnector.fetch[Asp](any())
       (any(), any(), any())).thenReturn(Future.successful(None))
@@ -48,13 +47,10 @@ class OtherBusinessTaxMattersControllerSpec extends AmlsSpec with MockitoSugar w
     when(controller.dataCacheConnector.save[Asp](any(), any())
       (any(), any(), any())).thenReturn(Future.successful(emptyCache))
 
-  val newRequest = request.withFormUrlEncodedBody(
-    "otherBusinessTaxMatters" -> "true"
-  )
+    val newRequest = request.withFormUrlEncodedBody(
+      "otherBusinessTaxMatters" -> "true"
+    )
   }
-
-  val emptyCache = CacheMap("", Map.empty)
-
 
 
   "OtherBusinessTaxMattersController" when {

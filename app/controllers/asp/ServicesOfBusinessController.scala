@@ -16,11 +16,10 @@
 
 package controllers.asp
 
-import javax.inject.Inject
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.asp.{Asp, ServicesOfBusiness}
 import models.businessmatching.AccountancyServices
 import services.StatusService
@@ -31,51 +30,51 @@ import views.html.asp._
 
 import scala.concurrent.Future
 
-class ServicesOfBusinessController @Inject()
-(
-  dataCacheConnector: DataCacheConnector,
-  statusService: StatusService,
-  val authConnector: AuthConnector,
-  serviceFlow: ServiceFlow
-) extends BaseController with DateOfChangeHelper {
+class ServicesOfBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                             val statusService: StatusService,
+                                             val authConnector: AuthConnector,
+                                             val serviceFlow: ServiceFlow
+                                            ) extends BaseController with DateOfChangeHelper {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Asp](Asp.key) map {
-        response =>
-          val form = (for {
-            business <- response
-            setOfServices <- business.services
-          } yield Form2[ServicesOfBusiness](setOfServices)).getOrElse(EmptyForm)
-          Ok(services_of_business(form, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[Asp](Asp.key) map {
+          response =>
+            val form = (for {
+              business <- response
+              setOfServices <- business.services
+            } yield Form2[ServicesOfBusiness](setOfServices)).getOrElse(EmptyForm)
+            Ok(services_of_business(form, edit))
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
     import jto.validation.forms.Rules._
-    implicit authContext => implicit request =>
-      Form2[ServicesOfBusiness](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(services_of_business(f, edit)))
-        case ValidForm(_, data) =>
+    implicit authContext =>
+      implicit request =>
+        Form2[ServicesOfBusiness](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(services_of_business(f, edit)))
+          case ValidForm(_, data) =>
 
-          for {
-            businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
-            _ <- dataCacheConnector.save[Asp](Asp.key,
-              businessServices.services(data))
-            status <- statusService.getStatus
-            isNewActivity <- serviceFlow.isNewActivity(AccountancyServices)
-          } yield {
-            if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
-              Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
-            } else {
-              edit match {
-                case true => Redirect(routes.SummaryController.get())
-                case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
+            for {
+              businessServices <- dataCacheConnector.fetch[Asp](Asp.key)
+              _ <- dataCacheConnector.save[Asp](Asp.key,
+                businessServices.services(data))
+              status <- statusService.getStatus
+              isNewActivity <- serviceFlow.isNewActivity(AccountancyServices)
+            } yield {
+              if (!isNewActivity && redirectToDateOfChange[ServicesOfBusiness](status, businessServices.services, data)) {
+                Redirect(routes.ServicesOfBusinessDateOfChangeController.get())
+              } else {
+                edit match {
+                  case true => Redirect(routes.SummaryController.get())
+                  case false => Redirect(routes.OtherBusinessTaxMattersController.get(edit))
+                }
               }
             }
-          }
-      }
+        }
   }
 }
 

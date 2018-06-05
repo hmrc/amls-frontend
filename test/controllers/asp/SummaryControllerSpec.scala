@@ -16,29 +16,23 @@
 
 package controllers.asp
 
-import cats.data.OptionT
-import cats.implicits._
-import connectors.DataCacheConnector
 import models.asp.Asp
-import models.businessmatching.TrustAndCompanyServices
-import models.status.{NotCompleted, SubmissionDecisionApproved}
+import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
 import play.api.test.Helpers._
-import services.businessmatching.{NextService, ServiceFlow}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val serviceFlow = mock[ServiceFlow]
-    val controller = new SummaryController(mockCacheConnector, serviceFlow, mockStatusService, self.authConnector)
+    val controller = new SummaryController(mockCacheConnector, mockServiceFlow, mockStatusService, self.authConnector)
 
     mockCacheSave[Asp]
 
@@ -47,7 +41,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     } thenReturn Future.successful(true)
 
     when {
-      serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+      mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
     } thenReturn Future.successful(false)
   }
 
@@ -97,7 +91,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         } thenReturn Future.successful(false)
 
         when {
-          serviceFlow.inNewServiceFlow(any())(any(), any(), any())
+          mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
         } thenReturn Future.successful(true)
 
         val model = Asp(None, None)
