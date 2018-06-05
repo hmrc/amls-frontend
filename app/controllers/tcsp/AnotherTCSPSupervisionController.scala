@@ -16,11 +16,10 @@
 
 package controllers.tcsp
 
-import javax.inject.Inject
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.tcsp.{ServicesOfAnotherTCSP, Tcsp}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 

@@ -16,18 +16,19 @@
 
 package controllers.tcsp
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, EmptyForm, Form2}
-import models.tcsp.{RegisteredOfficeEtc, TcspTypes, Tcsp}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.tcsp.{RegisteredOfficeEtc, Tcsp, TcspTypes}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.tcsp.service_provider_types
 
 import scala.concurrent.Future
 
-trait TcspTypesController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class TcspTypesController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                     val authConnector: AuthConnector
+                                    ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -63,10 +64,4 @@ trait TcspTypesController extends BaseController {
         }
       }
   }
-}
-
-object TcspTypesController extends TcspTypesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }
