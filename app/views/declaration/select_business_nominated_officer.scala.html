@@ -45,9 +45,9 @@
             legendHidden = true,
             panel = false
         ) {
-            @model.map { people =>
-                @people.personName.map { obj =>
-                    @radio(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace)
+            @model.zipWithIndex.map { people =>
+                @people._1.personName.map { obj =>
+                    @radioWithIndex(f("value"), obj.firstName+" "+obj.lastName, obj.fullNameWithoutSpace, people._2)
                 }
             }
             <p class="form-block">@Messages("lbl.or")</p>

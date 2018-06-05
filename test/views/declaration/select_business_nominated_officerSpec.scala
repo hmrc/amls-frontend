@@ -53,17 +53,18 @@ class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.declaration.select_business_nominated_officer("subheading", EmptyForm, people)
 
-      people map(_.personName.get) foreach { n =>
-        val id = s"value-${n.fullNameWithoutSpace}"
-        val e = doc.getElementById(id)
+      people.zipWithIndex.map { n =>
+        n._1.personName.map { obj =>
+          val id = s"value-${n._2}"
+          val e = doc.getElementById(id)
 
-        Option(e) must be(defined)
-        e.`val` mustBe s"${n.firstName}${n.lastName}"
+          Option(e) must be(defined)
+          e.`val` mustBe s"${obj.firstName}${obj.lastName}"
 
-        val label = doc.select(s"label[for=$id]")
-        label.text() must include(n.fullName)
+          val label = doc.select(s"label[for=$id]")
+          label.text() must include(obj.fullName)
+        }
       }
-
     }
 
     "prepopulate the selected nominated officer" in new ViewFixture {
@@ -72,7 +73,7 @@ class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.declaration.select_business_nominated_officer("subheading", f, people)
 
-      doc.select("input[type=radio][id=value-TestPerson1").hasAttr("checked") mustBe true
+      doc.select("input[type=radio][id=value-0").hasAttr("checked") mustBe true
 
     }
 
