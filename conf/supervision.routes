@@ -1,0 +1,16 @@
+GET         /what-you-need                                                @controllers.supervision.WhatYouNeedController.get()
+
+GET         /supervised                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
+POST        /supervised                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
+
+GET         /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
+POST        /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
+
+GET         /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.get(edit: Boolean ?= false)
+POST        /which-professional-body                                      @controllers.supervision.WhichProfessionalBodyController.post(edit: Boolean ?= false)
+
+GET         /penalised                                                    @controllers.supervision.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /penalised                                                    @controllers.supervision.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                           @controllers.supervision.SummaryController.get()
+POST        /check-your-answers                                           @controllers.supervision.SummaryController.post()

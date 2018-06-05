@@ -1,0 +1,19 @@
+GET         /what-you-need                                              controllers.estateagentbusiness.WhatYouNeedController.get()
+
+GET         /penalised-body                                             controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /penalised-body                                             controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+
+GET         /penalised-act                                              controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /penalised-act                                              controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
+
+GET         /services                                                   @controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
+POST        /services                                                   @controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
+
+GET         /date-change                                                controllers.estateagentbusiness.ServicesDateOfChangeController.get
+POST        /date-change                                                controllers.estateagentbusiness.ServicesDateOfChangeController.post
+
+GET         /redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.get(edit: Boolean ?= false)
+POST        /redress-scheme                                             controllers.estateagentbusiness.ResidentialRedressSchemeController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                         @controllers.estateagentbusiness.SummaryController.get()
+POST        /check-your-answers                                         @controllers.estateagentbusiness.SummaryController.post()
