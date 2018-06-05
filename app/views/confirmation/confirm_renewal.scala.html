@@ -20,7 +20,7 @@
 @import config.ApplicationConfig
 @import views.html.confirmation.{breakdown => breakdown_display}
 
-@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], difference: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages)
+@(paymentReference: Option[String], total: Currency, breakdown: Seq[BreakdownRow], amountToPay: Currency, paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
 @main(
     title = Messages("confirmation.renewal.title")
@@ -37,7 +37,7 @@
 
     <div class="reg-online--pay-fee">
         <p>@Messages("confirmation.fee") <span class="visuallyhidden">is</span>
-            <span id="fee" class="heading-large">@difference</span></p>
+            <span id="fee" class="heading-large">@amountToPay</span></p>
         @paymentReference.map{ ref =>
             <p>@Messages("confirmation.sidebar.code") <span class="visuallyhidden">is</span>
                 <span class="heading-large">@Messages(ref)</span></p>
