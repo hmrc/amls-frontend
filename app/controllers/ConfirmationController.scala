@@ -163,9 +163,9 @@ class ConfirmationController @Inject()(
 
     confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
-        case maybeRows@Some(rows) if fees.totalFees > 0 =>
+        case maybeRows@Some(rows) if fees.differenceOrTotalAmount > 0 =>
           if (isRenewalDefined) {
-            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.difference, controllers.payments.routes.WaysToPayController.get().url)).some
+            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.differenceOrTotalAmount, controllers.payments.routes.WaysToPayController.get().url)).some
           } else {
             Ok(confirm_amendvariation(fees.paymentReference,
               fees.totalFees,
