@@ -16,53 +16,55 @@
 
 package controllers.asp
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.DateOfChange
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.RepeatingSection
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.date_of_change
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                        val authConnector: AuthConnector
+                                                       ) extends BaseController {
 
   def get = Authorised.async {
-      implicit authContext => implicit request =>
+    implicit authContext =>
+      implicit request =>
         Future.successful(Ok(date_of_change(EmptyForm, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
   }
 
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-    getModelWithDateMap() flatMap {
-      case (asp, startDate) =>
-      Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
-        case f: InvalidForm =>
-      Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
-        case ValidForm(_, data) => {
-          for {
-          _ <- dataCacheConnector.save[Asp](Asp.key,
-          asp.services match {
-            case Some(service) => {
-              val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
-              a
+    implicit authContext =>
+      implicit request =>
+        getModelWithDateMap() flatMap {
+          case (asp, startDate) =>
+            Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ startDate) match {
+              case f: InvalidForm =>
+                Future.successful(BadRequest(date_of_change(f, "summary.asp", routes.ServicesOfBusinessDateOfChangeController.post())))
+              case ValidForm(_, data) => {
+                for {
+                  _ <- dataCacheConnector.save[Asp](Asp.key,
+                    asp.services match {
+                      case Some(service) => {
+                        val a = asp.copy(services = Some(service.copy(dateOfChange = Some(data))))
+                        a
+                      }
+                      case None => asp
+                    })
+                } yield {
+                  Redirect(routes.SummaryController.get())
+                }
+              }
             }
-            case None => asp
-          })
-          } yield {
-            Redirect(routes.SummaryController.get())
-          }
         }
-      }
-    }
   }
 
   private def getModelWithDateMap()(implicit authContext: AuthContext, hc: HeaderCarrier): Future[(Asp, Map[_ <: String, Seq[String]])] = {
@@ -75,15 +77,9 @@ trait ServiceOfBusinessDateOfChangeController extends RepeatingSection with Base
         } yield (asp, aboutTheBusiness.activityStartDate)) match {
           case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
           case Some((asp, _)) => (asp, Map())
-          case _ =>(Asp(), Map())
+          case _ => (Asp(), Map())
         }
     }
   }
-}
-
-object ServicesOfBusinessDateOfChangeController extends ServiceOfBusinessDateOfChangeController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override def dataCacheConnector = DataCacheConnector
 }
 
