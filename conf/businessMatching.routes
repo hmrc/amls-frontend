@@ -22,4 +22,4 @@ POST        /psr-registration                                       @controllers
 GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
 
-GET         /no-psr                                                 controllers.businessmatching.NoPsrController.get()
+GET         /no-psr                                                 @controllers.businessmatching.NoPsrController.get()
