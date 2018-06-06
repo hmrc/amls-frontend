@@ -36,7 +36,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 
 import scala.concurrent.Future
 
-class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -44,7 +44,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new ServicesController {
+    val controller = new MsbSubSectorsController {
       override def dataCacheConnector: DataCacheConnector = self.cache
       override lazy val businessMatchingService = mock[BusinessMatchingService]
       override protected def authConnector: AuthConnector = self.authConnector
@@ -61,7 +61,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
 
-    def setupModel(model: Option[BusinessMatching]) = when {
+    def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn (model match {
       case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)

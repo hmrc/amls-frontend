@@ -34,7 +34,7 @@ import play.api.mvc.Result
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait ServicesController extends BaseController {
+trait MsbSubSectorsController extends BaseController {
 
   def dataCacheConnector: DataCacheConnector
   def businessMatchingService: BusinessMatchingService
@@ -118,7 +118,7 @@ trait ServicesController extends BaseController {
 
 }
 
-object ServicesController extends ServicesController {
+object MsbSubSectorsController$ extends MsbSubSectorsController$ {
   // $COVERAGE-OFF$
   override protected def authConnector: AuthConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector
