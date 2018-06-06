@@ -70,7 +70,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
       }
     }
 
-    "return the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberController)" when {
+    "return the 'psr_number' page (BusinessAppliedForPSRNumberController)" when {
       "the user is on the 'msb_subservice' page (SubServicePageId)" when {
         "MSB is the Business Activity and subservices contains TransmittingMoney" in new Fixture {
           val model = AddBusinessTypeFlowModel(
@@ -97,7 +97,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     }
 
     "return the 'no-psr' page (NoPsrController)" when {
-      "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
+      "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is no and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
@@ -111,7 +111,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
     }
 
     "return the 'FitAndProper' page (FitAndProperController)" when {
-      "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
+      "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes and MSB is the Business Activity" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
@@ -467,7 +467,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
 
 //edit Business Applied For PSR Number false
     "return the 'no-psr' page (NoPsrController)" when {
-      "the user is on the 'business_applied_for_psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
+      "the user is on the 'psr_number' page (BusinessAppliedForPSRNumberPageId)" when {
         "the answer is yes" in new Fixture {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),

@@ -32,7 +32,7 @@ class business_applied_for_psr_numberSpec extends AmlsSpec {
     def view = business_applied_for_psr_number(EmptyForm, edit = false)
   }
 
-  "The business_applied_for_psr_number view" must {
+  "The psr_number view" must {
 
     "have correct title" in new ViewFixture {
 

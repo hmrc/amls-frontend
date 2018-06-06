@@ -16,29 +16,25 @@
 
 package views.businessmatching
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.businessmatching.{BusinessAppliedForPSRNumberYes, BusinessAppliedForPSRNumber}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
-
-class business_applied_for_psr_numberSpec extends AmlsSpec with MustMatchers  {
+class PsrNumberViewSpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-
-  "business_applied_for_psr_number view" must {
+  "psr_number view" must {
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
+      def view = views.html.businessmatching.psr_number(form2, edit = true)
 
       doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.psr.number.title"))
@@ -54,7 +50,7 @@ class business_applied_for_psr_numberSpec extends AmlsSpec with MustMatchers  {
           (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true)
+      def view = views.html.businessmatching.psr_number(form2, edit = true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -70,7 +66,7 @@ class business_applied_for_psr_numberSpec extends AmlsSpec with MustMatchers  {
     "hide the return to progress link"in new ViewFixture {
       val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.business_applied_for_psr_number(form2, edit = true, showReturnLink = false)
+      def view = views.html.businessmatching.psr_number(form2, edit = true, showReturnLink = false)
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
   }
