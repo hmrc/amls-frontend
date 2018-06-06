@@ -29,7 +29,7 @@ import cats.implicits._
 
 import scala.concurrent.Future
 
-trait BusinessAppliedForPSRNumberController extends BaseController {
+trait PSRNumberController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
   val businessMatchingService: BusinessMatchingService
@@ -69,7 +69,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
   }
 }
 
-object BusinessAppliedForPSRNumberController extends BusinessAppliedForPSRNumberController {
+object PSRNumberController extends PSRNumberController {
   // $COVERAGE-OFF$
   override val authConnector = AMLSAuthConnector
   override val dataCacheConnector = DataCacheConnector

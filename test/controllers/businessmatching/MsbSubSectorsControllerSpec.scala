@@ -137,7 +137,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
+      redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)
     }
 
     "redirect to the Psr Number page when adding 'Transmitting Money' as a service during edit" in new Fixture {
@@ -172,7 +172,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+      redirectLocation(result) mustBe Some(routes.PSRNumberController.get(true).url)
     }
 
     "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -231,7 +231,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+          redirectLocation(result) mustBe Some(routes.PSRNumberController.get(true).url)
       }
     }
   }

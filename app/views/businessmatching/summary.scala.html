@@ -15,7 +15,7 @@
  *@
 
 @import include._
-@import forms2._
+@import include.forms2._
 @import models.businessmatching._
 @import config.{ApplicationConfig => appConfig}
 
@@ -125,7 +125,7 @@
                     @model.businessAppliedForPSRNumber.map { psr =>
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
-                            editUrl = controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                            editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
                             allowEdit = isPreSubmission
                         ) {
                             <p>@psr match {

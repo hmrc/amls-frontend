@@ -27,16 +27,17 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
+class PSRNumberControllerSpec extends AmlsSpec
   with MockitoSugar
   with ScalaFutures
   with BusinessMatchingGenerator {
@@ -44,7 +45,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BusinessAppliedForPSRNumberController {
+    val controller = new PSRNumberController {
       override val dataCacheConnector = mockCacheConnector
       override val authConnector = self.authConnector
       override val businessMatchingService = mock[BusinessMatchingService]
@@ -103,7 +104,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
           "regNumber" -> "123789"
         )
 
-        val result = controller.post(false)(newRequest)
+        val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))

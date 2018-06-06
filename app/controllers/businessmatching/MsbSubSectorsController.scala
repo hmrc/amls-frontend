@@ -70,7 +70,7 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             } yield cache
 
             lazy val redirectResult = OptionT.some[Future, Result](if (data.msbServices.contains(TransmittingMoney)) {
-              Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
+              Redirect(routes.PSRNumberController.get(edit))
             } else {
               Redirect(routes.SummaryController.get())
             })
