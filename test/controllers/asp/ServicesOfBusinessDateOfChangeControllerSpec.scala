@@ -16,37 +16,31 @@
 
 package controllers.asp
 
-import connectors.DataCacheConnector
-import models.aboutthebusiness.{ActivityStartDate, AboutTheBusiness}
+import models.aboutthebusiness.{AboutTheBusiness, ActivityStartDate}
 import models.asp._
 import org.joda.time.LocalDate
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
-    val controller = new ServiceOfBusinessDateOfChangeController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
-  }
-
   val emptyCache = CacheMap("", Map.empty)
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
+
+    val controller = new ServicesOfBusinessDateOfChangeController(mockCacheConnector, authConnector = self.authConnector)
+  }
 
   "ServicesDateOfChangeController" must {
 
@@ -64,7 +58,6 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1990"
       )
 
-      val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
@@ -90,7 +83,6 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "199000"
       )
 
-      val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
@@ -116,7 +108,6 @@ class ServicesOfBusinessDateOfChangeControllerSpec extends AmlsSpec with Mockito
         "dateOfChange.year" -> "1980"
       )
 
-      val mockCacheMap = mock[CacheMap]
       when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
         .thenReturn(Some(AboutTheBusiness(activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))))))
 
