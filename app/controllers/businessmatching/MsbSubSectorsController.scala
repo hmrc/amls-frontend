@@ -22,6 +22,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
 import play.api.Play
@@ -34,10 +35,9 @@ import play.api.mvc.Result
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait MsbSubSectorsController extends BaseController {
-
-  def dataCacheConnector: DataCacheConnector
-  def businessMatchingService: BusinessMatchingService
+class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
+                                        val dataCacheConnector: DataCacheConnector,
+                                        val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -115,12 +115,4 @@ trait MsbSubSectorsController extends BaseController {
 
     }
   }
-
-}
-
-object MsbSubSectorsController$ extends MsbSubSectorsController$ {
-  // $COVERAGE-OFF$
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override lazy val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }
