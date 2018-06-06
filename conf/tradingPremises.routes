@@ -1,0 +1,62 @@
+GET         /what-you-need/:index                                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
+
+GET         /add                                                     @controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
+
+GET         /premises/:index                                         @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
+POST        /premises/:index                                         @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
+
+GET         /premises-details/:index                                 controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /premises-details/:index                                 controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+
+GET         /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
+POST        /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
+
+GET         /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
+POST        /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
+
+GET         /premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
+POST        /premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
+
+GET         /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
+POST        /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
+
+GET         /crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.get(index: Int, edit: Boolean ?= false)
+POST        /crn-number/:index                                       @controllers.tradingpremises.AgentCompanyDetailsController.post(index: Int, edit: Boolean ?= false)
+
+GET         /agent-name/:index                                       @controllers.tradingpremises.AgentNameController.get(index: Int, edit: Boolean ?= false)
+POST        /agent-name/:index                                       @controllers.tradingpremises.AgentNameController.post(index: Int, edit: Boolean ?= false)
+GET         /agent-name/date-of-change/:index                        @controllers.tradingpremises.AgentNameController.dateOfChange(index: Int)
+POST        /agent-name/date-of-change/:index                        @controllers.tradingpremises.AgentNameController.saveDateOfChange(index: Int)
+
+GET         /partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
+POST        /partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
+
+GET         /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
+POST        /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
+
+GET         /msb-activities/:index                                   controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
+POST        /msb-activities/:index                                   controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
+
+GET         /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
+POST        /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
+
+GET         /check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
+POST        /check-your-answers                                      controllers.tradingpremises.SummaryController.post()
+
+GET         /your-answers                                            controllers.tradingpremises.SummaryController.answers()
+GET         /trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+
+GET         /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
+POST        /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
+
+GET         /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
+
+GET         /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
+POST        /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
+
+GET         /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
+POST        /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
+
+GET         /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
+POST        /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
