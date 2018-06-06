@@ -18,20 +18,19 @@ package controllers.businessmatching
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
-import play.api.Play
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
 
 import scala.concurrent.Future
 
-trait PSRNumberController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  val businessMatchingService: BusinessMatchingService
+class PSRNumberController @Inject()(val authConnector: AuthConnector,
+                                    val dataCacheConnector: DataCacheConnector,
+                                    val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -66,11 +65,4 @@ trait PSRNumberController extends BaseController {
         }
       }
   }
-}
-
-object PSRNumberController extends PSRNumberController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override lazy val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }

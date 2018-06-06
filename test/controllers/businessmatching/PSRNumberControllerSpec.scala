@@ -18,21 +18,19 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,14 +40,15 @@ class PSRNumberControllerSpec extends AmlsSpec
   with ScalaFutures
   with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
 
-    val controller = new PSRNumberController {
-      override val dataCacheConnector = mockCacheConnector
-      override val authConnector = self.authConnector
-      override val businessMatchingService = mock[BusinessMatchingService]
-    }
+    val request = addToken(authRequest)
+
+    val controller = new PSRNumberController(
+      self.authConnector,
+      mockCacheConnector,
+      mock[BusinessMatchingService]
+    )
 
     val businessMatching = businessMatchingGen.sample.get
 

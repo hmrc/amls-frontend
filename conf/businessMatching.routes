@@ -16,8 +16,8 @@ POST        /registration-number                                    controllers.
 GET         /services                                               @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
 POST        /services                                               @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
 
-GET         /psr-registration                                       controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
-POST        /psr-registration                                       controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false)
+GET         /psr-registration                                       @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
+POST        /psr-registration                                       @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false)
 
 GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
 POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
