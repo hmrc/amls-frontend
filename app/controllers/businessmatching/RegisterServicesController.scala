@@ -129,7 +129,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def redirectTo(businessActivities: Set[BusinessActivity]) = if (businessActivities.contains(MoneyServiceBusiness)) {
-    Redirect(routes.ServicesController.get())
+    Redirect(routes.MsbSubSectorsController.get())
   } else {
     Redirect(routes.SummaryController.get())
   }
