@@ -18,22 +18,20 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.Play
+import play.api.mvc.Result
 import services.businessmatching.BusinessMatchingService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import play.api.mvc.Result
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
@@ -43,12 +41,12 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         businessMatchingService.getModel.value map { maybeBM =>
-            val form = (for {
-              bm <- maybeBM
-              services <- bm.msbServices
-            } yield Form2[BusinessMatchingMsbServices](services)).getOrElse(EmptyForm)
+          val form = (for {
+            bm <- maybeBM
+            services <- bm.msbServices
+          } yield Form2[BusinessMatchingMsbServices](services)).getOrElse(EmptyForm)
 
-            Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
+          Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
         }
   }
 
@@ -59,20 +57,22 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
-          case ValidForm(_, data) =>
 
+          case ValidForm(_, data) =>
             lazy val updateModel = for {
               bm <- businessMatchingService.getModel
-              cache <- businessMatchingService.updateModel(data.msbServices.contains(TransmittingMoney) match {
-                case true => bm.msbServices(Some(data))
-                case false => bm.msbServices(Some(data)).clearPSRNumber
+              cache <- businessMatchingService.updateModel(if (data.msbServices.contains(TransmittingMoney)) {
+                bm.msbServices(Some(data))
+              } else {
+                bm.msbServices(Some(data)).clearPSRNumber
               })
               _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
             } yield cache
 
-            lazy val redirectResult = OptionT.some[Future, Result](data.msbServices.contains(TransmittingMoney) match {
-              case true => Redirect(routes.BusinessAppliedForPSRNumberController.get(edit))
-              case false => Redirect(routes.SummaryController.get())
+            lazy val redirectResult = OptionT.some[Future, Result](if (data.msbServices.contains(TransmittingMoney)) {
+              Redirect(routes.PSRNumberController.get(edit))
+            } else {
+              Redirect(routes.SummaryController.get())
             })
 
             updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
@@ -82,37 +82,36 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
   private def updateMsb(existingServices: Option[BusinessMatchingMsbServices], updatedServices: Set[BusinessMatchingMsbService], cache: CacheMap)
                        (implicit ac: AuthContext, hc: HeaderCarrier) = {
 
-    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
-
-      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { msbServices =>
-
-        def updateCurrencyExchange = {
-          if (msbServices.msbServices.contains(CurrencyExchange) && !updatedServices.contains(CurrencyExchange)) {
-            msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
-          } else {
-            msb
-          }
-        }
-
-        def updateTransmittingMoney(msb: MoneyServiceBusiness) = {
-          if (msbServices.msbServices.contains(TransmittingMoney) && !updatedServices.contains(TransmittingMoney)) {
-            msb.copy(
-              businessUseAnIPSP = None,
-              fundsTransfer = None,
-              transactionsInNext12Months = None,
-              sendMoneyToOtherCountry = None,
-              sendTheLargestAmountsOfMoney = None,
-              mostTransactions = None
-            )
-          } else {
-            msb
-          }
-        }
-
-        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updateTransmittingMoney(updateCurrencyExchange))
-
+    val updateCE = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
+      if (subSectorDiff.contains(CurrencyExchange)) {
+        msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
+      } else {
+        msb
       }
+    }
 
+    val updateMT = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
+      if (subSectorDiff.contains(TransmittingMoney)) {
+        msb.copy(
+          businessUseAnIPSP = None,
+          fundsTransfer = None,
+          transactionsInNext12Months = None,
+          sendMoneyToOtherCountry = None,
+          sendTheLargestAmountsOfMoney = None,
+          mostTransactions = None
+        )
+      } else {
+        msb
+      }
+    }
+
+    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
+      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { _ =>
+        val sectorDiff = existingServices.fold(Set.empty[BusinessMatchingMsbService])(_.msbServices) diff updatedServices
+        val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
+
+        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb)
+      }
     }
   }
 }
