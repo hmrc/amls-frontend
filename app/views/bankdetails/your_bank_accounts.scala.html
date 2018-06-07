@@ -21,7 +21,7 @@
 @import models.status._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean, hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")
@@ -31,32 +31,16 @@
     title = Messages("bankdetails.bankaccount.accountname.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
-
-    @if(!hasBankAccount) {
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
-        ) {
-            <p>@Messages("bankdetails.summary.nobank.account")</p>
-            @anchor(
-                attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
-                linkText = Messages("bankdetails.summary.nobank.add.account")
-            )
-        }
-    }
-
-    @if(hasBankAccount) {
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
-        ) {
-            @anchor(
-                attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
-                linkText = Messages("bankdetails.summary.nobank.add.account")
-            )
-        }
+    @panel(
+        jsHidden = false,
+        wide = true,
+        gutter = true
+    ) {
+        @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.summary.nobank.account")</p> }
+        @anchor(
+            attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
+            linkText = Messages("bankdetails.summary.nobank.add.account")
+        )
     }
 
     @if(hasIncompleteAccounts) {
@@ -66,12 +50,12 @@
             <li class="group grid-layout">
                 <div class="grid-layout__column grid-layout__column--3-4">
                     <div class="grid-layout__column grid-layout--2-3">
-                        @bankDetail._1.accountName.getOrElse("hello")<br/>
+                        @bankDetail._1.accountName.getOrElse(Messages("bankdetails.summary.noaccountname"))<br/>
                         A uk business account belonging to this business<br/>
                         Account number: 12345678<br/>
                         Sort code: 12-34-56<br/>
                     </div>
-                    <div class="grid-layout__column grid-layout--1-3 XXXXXXXX">
+                    <div class="grid-layout__column grid-layout--1-3">
                         edit or remove
                     </div>
                 </div>
@@ -82,9 +66,23 @@
 
 
     @if(hasCompletedAccounts) {
-        @if(!hasIncompleteAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
+        @if(hasCompletedAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
         <ul class="list">
-
+            @completedModel.map { bankDetail =>
+                <li class="group grid-layout">
+                    <div class="grid-layout__column grid-layout__column--3-4">
+                        <div class="grid-layout__column grid-layout--2-3">
+                            @bankDetail._1.accountName.getOrElse(Messages("bankdetails.summary.noaccountname"))<br/>
+                                A uk business account belonging to this business<br/>
+                                Account number: 12345678<br/>
+                                Sort code: 12-34-56<br/>
+                        </div>
+                        <div class="grid-layout__column grid-layout--1-3">
+                            edit or remove
+                        </div>
+                    </div>
+                </li>
+            }
         </ul>
     }
 

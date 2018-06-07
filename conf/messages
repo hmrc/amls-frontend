@@ -1308,7 +1308,7 @@ bankdetails.remove.bank.account.text = This will permanently remove {0} from you
 bankdetails.remove.bank.account.btn = Remove bank account
 bankdetails.summary.incomplete = Incomplete
 bankdetails.summary.complete = Complete
-bankdetails.summary.noaccountname = No account name provided
+bankdetails.summary.noaccountname = ZZZZZZZZZZZZZZ Missing ACCOUNT NAME ZZZZZZZZZZZ
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 businessactivities.whatyouneed.line_1 = your anticipated net profit

@@ -47,25 +47,27 @@ class YourBankAccountsController @Inject()(
             case NotCompleted | SubmissionReady => true
             case _ => false
           }
-          val filteredBankDetails = data.zipWithIndex.
-            filterNot(_._1.status.contains(StatusConstants.Deleted))
+          val filteredBankDetails = data.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted))
 
           val inCompleteBankDetails = filteredBankDetails.filterNot(_._1.isComplete)
           val completedBankDetails = filteredBankDetails.filter(_._1.isComplete)
           val hasInCompleteAccounts = !inCompleteBankDetails.filter(_._1 != BankDetails(None,None)).isEmpty
-          val hasCompletedAccounts = !completedBankDetails.filter(_._1 != BankDetails(None,None)).isEmpty
+          val hasCompletedAccounts =  !completedBankDetails.isEmpty
 
           import utils.Strings._
-          println("@@@@@@@@@@@@@@@@@@@@@@@@" in Console.YELLOW_B)
-          println(inCompleteBankDetails)
-          println("@@@@@@@@@@@@@@@@@@@@@@@@" in Console.YELLOW_B)
+          println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+          println("hasIncomplete:" + hasInCompleteAccounts in Console.YELLOW_B)
+          println("hasComplete:" + hasCompletedAccounts in Console.YELLOW_B)
+          println("InCompletedBankDetails:" + inCompleteBankDetails in Console.YELLOW_B)
+          println("completedBankDetails:" + completedBankDetails in Console.YELLOW_B)
+          println("@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@")
+
           Ok(views.html.bankdetails.your_bank_accounts(
             EmptyForm,
             inCompleteBankDetails,
             hasInCompleteAccounts,
             completedBankDetails,
             hasCompletedAccounts,
-            inCompleteBankDetails.isEmpty & completedBankDetails.isEmpty ,
             canEdit,
             status))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
