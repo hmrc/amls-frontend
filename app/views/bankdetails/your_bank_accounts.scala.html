@@ -21,7 +21,7 @@
 @import models.status._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")
@@ -66,7 +66,7 @@
 
 
     @if(hasCompletedAccounts) {
-        @if(hasCompletedAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
+        @if(hasIncompleteAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
         <ul class="list">
             @completedModel.map { bankDetail =>
                 <li class="group grid-layout">
