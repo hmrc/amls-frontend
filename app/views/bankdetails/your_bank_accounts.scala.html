@@ -21,7 +21,7 @@
 @import models.status._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)], hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean, hasBankAccount: Boolean, canEdit: Boolean, status: SubmissionStatus)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.bankdetails")
@@ -59,7 +59,7 @@
         }
     }
 
-    @if(!inCompleteModel.isEmpty) {
+    @if(hasIncompleteAccounts) {
         <h3>@Messages("bankdetails.summary.incomplete")</h3>
         <ul class="list">
         @inCompleteModel.map { bankDetail =>
@@ -81,8 +81,8 @@
     }
 
 
-    @if(!completedModel.isEmpty) {
-        @if(!inCompleteModel.isEmpty) { <h3>@Messages("bankdetails.summary.complete")</h3> }
+    @if(hasCompletedAccounts) {
+        @if(!hasIncompleteAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
         <ul class="list">
 
         </ul>

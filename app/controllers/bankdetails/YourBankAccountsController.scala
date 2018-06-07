@@ -50,22 +50,25 @@ class YourBankAccountsController @Inject()(
           val filteredBankDetails = data.zipWithIndex.
             filterNot(_._1.status.contains(StatusConstants.Deleted))
 
-          val inCompletedBankDetails = filteredBankDetails.filterNot(_._1.isComplete)
-          val CompletedBankDetails = filteredBankDetails.filter(_._1.isComplete)
+          val inCompleteBankDetails = filteredBankDetails.filterNot(_._1.isComplete)
+          val completedBankDetails = filteredBankDetails.filter(_._1.isComplete)
+          val hasInCompleteAccounts = !inCompleteBankDetails.filter(_._1 != BankDetails(None,None)).isEmpty
+          val hasCompletedAccounts = !completedBankDetails.filter(_._1 != BankDetails(None,None)).isEmpty
 
           import utils.Strings._
           println("@@@@@@@@@@@@@@@@@@@@@@@@" in Console.YELLOW_B)
-          println(inCompletedBankDetails)
+          println(inCompleteBankDetails)
           println("@@@@@@@@@@@@@@@@@@@@@@@@" in Console.YELLOW_B)
           Ok(views.html.bankdetails.your_bank_accounts(
             EmptyForm,
-            inCompletedBankDetails,
-            CompletedBankDetails,
-            inCompletedBankDetails.isEmpty & CompletedBankDetails.isEmpty ,
+            inCompleteBankDetails,
+            hasInCompleteAccounts,
+            completedBankDetails,
+            hasCompletedAccounts,
+            inCompleteBankDetails.isEmpty & completedBankDetails.isEmpty ,
             canEdit,
             status))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
-
 }
