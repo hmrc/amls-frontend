@@ -32,7 +32,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, SubscriptionResponse, UpdateSave4LaterResponse, ViewResponse}
+import models._
 import play.api.libs.json.Format
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -49,7 +49,7 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
 
     Future.sequence(Seq(
       fn(ViewResponse.key, response.view),
-      fn(BusinessMatching.key, response.businessMatching map{x => x.copy(hasChanged = true)}),
+      fn(BusinessMatching.key, response.businessMatching.map(_.copy(hasChanged = true))),
       fn(TradingPremises.key, response.tradingPremises),
       fn(BusinessActivities.key, response.businessActivities),
       fn(Tcsp.key, response.tcsp),
@@ -63,7 +63,8 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
       fn(AboutTheBusiness.key, response.aboutTheBusiness),
       fn(EstateAgentBusiness.key, response.estateAgencyBusiness),
       fn(SubscriptionResponse.key, response.Subscription),
-      fn(AmendVariationRenewalResponse.key, response.AmendVariationResponse)
+      fn(AmendVariationRenewalResponse.key, response.amendVariationResponse),
+      fn(DataImport.key, response.dataImport)
     )
     ) map { _ =>
       Ok
@@ -79,10 +80,10 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
     val requestUrl = s"${ApplicationConfig.save4LaterUpdateUrl}$fileName"
 
     http.GET[UpdateSave4LaterResponse](requestUrl)
-      .map {Some(_)}
-        .recover {
-          case _:NotFoundException => None
-        }
+      .map(r => Some(r.copy(dataImport = Some(DataImport(fileName)))))
+      .recover {
+        case _: NotFoundException => None
+      }
   }
 }
 
