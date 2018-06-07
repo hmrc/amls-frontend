@@ -14,10 +14,8 @@ POST        /account-name/:index                                         @contro
 GET         /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
 POST        /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
 
-GET         /your-answers                                                @controllers.bankdetails.SummaryController.get(complete: Boolean = true)
-
-GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(complete: Boolean = false)
-POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post()
+GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(index:Int)
+POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post(index:Int)
 
 GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
 POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)

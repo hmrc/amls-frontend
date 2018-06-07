@@ -171,7 +171,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             val result = controller.post(1, false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {

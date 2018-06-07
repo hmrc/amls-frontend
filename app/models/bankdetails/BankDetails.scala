@@ -78,10 +78,10 @@ object BankDetails {
         Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
       } else {
         bds match {
-          case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
+          case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(-1))
           case model if model forall {
             _.isComplete
-          } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(true))
+          } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(-1))
           case model => {
             val index = model.indexWhere {
               case bdModel if !bdModel.isComplete => true

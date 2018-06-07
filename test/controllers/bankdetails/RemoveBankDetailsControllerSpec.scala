@@ -92,7 +92,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.remove(1)(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.bankdetails.routes.SummaryController.get(false).url))
+      redirectLocation(result) must be (Some(controllers.bankdetails.routes.SummaryController.get(1).url))
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](
         any(),
