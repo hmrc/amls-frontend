@@ -42,16 +42,19 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
         true,
         Seq((BankDetails(None,None), 1)),
         true)
-      doc.title must be(Messages("bankdetails.summary.title"))
+      doc.title must include(Messages("bankdetails.yourbankaccounts.title"))
     }
 
-//    "have correct headings" in new ViewFixture {
-//      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
-//        Seq((BankDetails(None,None), 1)),
-//        true,
-//        Seq((BankDetails(None,None), 1)),
-//        true)
-//    }
+    "have correct headings" in new ViewFixture {
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+        Seq((BankDetails(None,None), 1)),
+        true,
+        Seq((BankDetails(None,None), 1)),
+        true)
+
+      heading.html must be(Messages("bankdetails.yourbankaccounts.title"))
+      subHeading.html must include(Messages("summary.bankdetails"))
+    }
 
 //    "have a accept and complete section button, and return to application progress link if all are complete" in new ViewFixture {
 //      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
@@ -69,21 +72,24 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
 //        true)
 //    }
 
-//    "have lead in text" in new ViewFixture {
-//      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
-//        Seq((BankDetails(None,None), 1)),
-//        true,
-//        Seq((BankDetails(None,None), 1)),
-//        true)
-//    }
-//
-//    "have an add link" in new ViewFixture {
-//      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
-//        Seq((BankDetails(None,None), 1)),
-//        true,
-//        Seq((BankDetails(None,None), 1)),
-//        true)
-//    }
+    "have lead in text" in new ViewFixture {
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+        Seq((BankDetails(None,None), 1)),
+        true,
+        Seq((BankDetails(None,None), 1)),
+        true)
+      doc.html must include(Messages("bankdetails.yourbankaccount.intro"))
+    }
+
+    "have an add link with the correct text and going to the correct place" in new ViewFixture {
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,
+        Seq((BankDetails(None,None), 1)),
+        true,
+        Seq((BankDetails(None,None), 1)),
+        true)
+      doc.getElementById("add-account").text must be(Messages("bankdetails.yourbankaccount.add.account"))
+      doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.YourBankAccountsController.get.url)
+    }
 
 //    "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
 //      def view = views.html.bankdetails.your_bank_accounts(EmptyForm,

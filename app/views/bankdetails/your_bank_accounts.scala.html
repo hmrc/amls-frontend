@@ -24,11 +24,11 @@
 @(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
-    @heading("title.cya", "summary.bankdetails")
+    @heading("bankdetails.yourbankaccounts.title", "summary.bankdetails")
 }
 
 @main(
-    title = Messages("bankdetails.bankaccount.accountname.title") + " - " + Messages("summary.bankdetails"),
+    title = Messages("bankdetails.yourbankaccounts.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
     @panel(
@@ -36,12 +36,17 @@
         wide = true,
         gutter = true
     ) {
-        @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
+        <p>@Messages("bankdetails.yourbankaccount.intro")</p>
         @anchor(
-            attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
-            linkText = Messages("bankdetails.summary.nobank.add.account")
+            attrHref = controllers.bankdetails.routes.YourBankAccountsController.get.url,
+            linkText = Messages("bankdetails.yourbankaccount.add.account"),
+            id=Some("add-account")
         )
     }
+
+
+    @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
+
 
     @if(hasIncompleteAccounts) {
         <h3>@Messages("bankdetails.yourbankaccounts.incomplete")</h3>

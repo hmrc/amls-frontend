@@ -1311,6 +1311,9 @@ bankdetails.yourbankaccounts.complete = Complete
 bankdetails.yourbankaccounts.noaccountname = ZZZZZZZZZZZZZZ Missing ACCOUNT NAME ZZZZZZZZZZZ
 bankdetails.yourbankaccounts.title = Your bank accounts
 bankdetails.yourbankaccounts.nobank.account = You currently have no bank accounts registered
+bankdetails.yourbankaccount.intro = You need to give us the details of all bank accounts you use in your business. 
+bankdetails.yourbankaccount.add.account = Add a bank account
+
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 businessactivities.whatyouneed.line_1 = your anticipated net profit
