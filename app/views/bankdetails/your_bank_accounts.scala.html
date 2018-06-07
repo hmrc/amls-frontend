@@ -36,7 +36,7 @@
         wide = true,
         gutter = true
     ) {
-        @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.summary.nobank.account")</p> }
+        @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
         @anchor(
             attrHref = controllers.bankdetails.routes.BankAccountAddController.get(false).toString,
             linkText = Messages("bankdetails.summary.nobank.add.account")
@@ -44,13 +44,13 @@
     }
 
     @if(hasIncompleteAccounts) {
-        <h3>@Messages("bankdetails.summary.incomplete")</h3>
+        <h3>@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
         <ul class="list">
         @inCompleteModel.map { bankDetail =>
             <li class="group grid-layout">
                 <div class="grid-layout__column grid-layout__column--3-4">
                     <div class="grid-layout__column grid-layout--2-3">
-                        @bankDetail._1.accountName.getOrElse(Messages("bankdetails.summary.noaccountname"))<br/>
+                        @bankDetail._1.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
                         A uk business account belonging to this business<br/>
                         Account number: 12345678<br/>
                         Sort code: 12-34-56<br/>
@@ -66,13 +66,13 @@
 
 
     @if(hasCompletedAccounts) {
-        @if(hasIncompleteAccounts) { <h3>@Messages("bankdetails.summary.complete")</h3> }
+        @if(hasIncompleteAccounts) { <h3>@Messages("bankdetails.yourbankaccounts.complete")</h3> }
         <ul class="list">
             @completedModel.map { bankDetail =>
                 <li class="group grid-layout">
                     <div class="grid-layout__column grid-layout__column--3-4">
                         <div class="grid-layout__column grid-layout--2-3">
-                            @bankDetail._1.accountName.getOrElse(Messages("bankdetails.summary.noaccountname"))<br/>
+                            @bankDetail._1.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
                                 A uk business account belonging to this business<br/>
                                 Account number: 12345678<br/>
                                 Sort code: 12-34-56<br/>

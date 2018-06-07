@@ -27,8 +27,6 @@ import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.StatusConstants
 
-import scala.concurrent.Future
-
 @Singleton
 class YourBankAccountsController @Inject()(
                                    val dataCacheConnector: DataCacheConnector,
