@@ -1306,6 +1306,9 @@ bankdetails.want.to.register.another.account = Do you want to register another b
 bankdetails.remove.bank.account.title = Remove bank account
 bankdetails.remove.bank.account.text = This will permanently remove {0} from your list of bank accounts.
 bankdetails.remove.bank.account.btn = Remove bank account
+bankdetails.summary.incomplete = Incomplete
+bankdetails.summary.complete = Complete
+bankdetails.summary.noaccountname = No account name provided
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 businessactivities.whatyouneed.line_1 = your anticipated net profit
