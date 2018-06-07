@@ -49,7 +49,7 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
 
     Future.sequence(Seq(
       fn(ViewResponse.key, response.view),
-      fn(BusinessMatching.key, response.businessMatching.map(_.copy(hasChanged = true))),
+      fn(BusinessMatching.key, response.businessMatching),
       fn(TradingPremises.key, response.tradingPremises),
       fn(BusinessActivities.key, response.businessActivities),
       fn(Tcsp.key, response.tcsp),
