@@ -31,13 +31,8 @@
 
     @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
 
-        @panel(
-            wide = true,
-            jsHidden = false
-        ) {
             <p>@Messages("bankdetails.remove.bank.account.text", accountName)</p>
-        }
 
-        @submit(false, Some(Messages("bankdetails.remove.bank.account.btn")))
+        @submit(buttonMessageKey=Some(Messages("bankdetails.remove.bank.account.btn")), buttonId=Some("remove-bank-account"))
     }
 }
