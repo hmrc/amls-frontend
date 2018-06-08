@@ -32,18 +32,6 @@ class SummaryController @Inject()(
                                    val authConnector: AuthConnector = AMLSAuthConnector
                                  ) extends BaseController with RepeatingSection {
 
-  private def updateBankDetails(bankDetails: Option[Seq[BankDetails]], index: Int) : Future[Option[Seq[BankDetails]]] = {
-    bankDetails match {
-      case Some(bdSeq) => {
-        val updatedList = bdSeq.zipWithIndex.map {
-          case (bank, i) => if (i == index -1) bank.copy(hasAccepted = true) else bank
-        }
-        Future.successful(Some(updatedList))
-      }
-      case _ => Future.successful(bankDetails)
-    }
-  }
-
   def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       for {
@@ -58,9 +46,7 @@ class SummaryController @Inject()(
   def post(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       (for {
-        bd <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
-        bdnew <- updateBankDetails(bd, index)
-        _ <- dataCacheConnector.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
+        _ <- updateDataStrict[BankDetails](index) { bd => bd.copy(hasAccepted = true) }
       } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }

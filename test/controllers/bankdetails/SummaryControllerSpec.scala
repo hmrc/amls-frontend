@@ -87,7 +87,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
 
-      mockCacheFetch[Seq[BankDetails]](None)
       mockCacheSave[Seq[BankDetails]]
 
       val result = controller.post(2)(request)
