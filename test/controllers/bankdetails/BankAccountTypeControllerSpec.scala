@@ -57,7 +57,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
   "BankAccountTypeController" when {
     "get:" must {
       "respond with OK and display the blank 'bank account type' page" when {
-        "there is no bank account type information yet" in new Fixture {
+        "there is any number of bank accounts" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(
               BankDetails(None, None, status = Some(StatusConstants.Deleted)),
@@ -66,7 +66,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
-
+  
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
           val document = Jsoup.parse(contentAsString(result))
@@ -75,25 +75,6 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType]").size() must be(3)
-        }
-
-        "load bank account type UI with out the option 'user does not have bank account'" when {
-          "user already added an account" in new Fixture {
-
-            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
-            mockApplicationStatus(SubmissionReady)
-
-            val result = controller.get(2, false)(request)
-
-            status(result) must be(OK)
-            contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
-            val document = Jsoup.parse(contentAsString(result))
-
-            document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(true)
-            document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
-            document.select("input[type=radio][name=bankAccountType]").size() must be(3)
-
-          }
         }
 
         "there is already a bank account type" in new Fixture {
