@@ -34,4 +34,31 @@ class DoYouHaveABankAccountControllerSpec extends AmlsSpec {
     }
   }
 
+  "The POST action" should {
+    "redirect to the 'bank name' page" when {
+      "'yes' is selected" in new Fixture {
+        val formData = "hasBankAccount" -> "true"
+        val result = controller.post()(request.withFormUrlEncodedBody(formData))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
+      }
+
+      "'no' is selected" in new Fixture {
+        val formData = "hasBankAccount" -> "false"
+        val result = controller.post()(request.withFormUrlEncodedBody(formData))
+
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
+      }
+
+      "nothing is selected" in new Fixture {
+        val result = controller.post()(request)
+
+        status(result) mustBe BAD_REQUEST
+      }
+    }
+
+  }
+
 }

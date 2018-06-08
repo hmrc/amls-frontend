@@ -17,16 +17,37 @@
 package controllers.bankdetails
 
 import controllers.BaseController
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
+import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.BooleanFormReadWrite
 import views.html.bankdetails._
 
 import scala.concurrent.Future
 
 class DoYouHaveABankAccountController @Inject()(val authConnector: AuthConnector) extends BaseController {
 
+  val router: Boolean => Call = {
+    case true => routes.BankAccountNameController.get(1)
+    case _ => routes.YourBankAccountsController.get()
+  }
+
+  def view(implicit request: Request[_]) = do_you_have_bank_account.apply _
+
+  implicit val formReads = BooleanFormReadWrite.formRule("hasBankAccount", "bankdetails.hasbankaccount.validation")
+
   def get = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(do_you_have_bank_account()))
+      Future.successful(Ok(view(request)(EmptyForm)))
+  }
+
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      Form2[Boolean](request.body) match {
+        case ValidForm(_, data) => Future.successful(Redirect(router(data)))
+
+        case f: InvalidForm => Future.successful(BadRequest(view(request)(f)))
+      }
   }
 }
