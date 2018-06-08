@@ -1,4 +1,4 @@
-GET         /what-you-need/:index                                        controllers.bankdetails.WhatYouNeedController.get(index: Int)
+GET         /what-you-need                                              @controllers.bankdetails.WhatYouNeedController.get
 
 GET         /add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
 

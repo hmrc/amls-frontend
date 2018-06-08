@@ -87,7 +87,7 @@ object BankDetails {
               case bdModel if !bdModel.isComplete => true
               case _ => false
             }
-            Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
+            Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get)
           }
         }
       }

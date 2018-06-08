@@ -51,7 +51,7 @@ class BankAccountAddControllerSpec extends AmlsSpec
           val result = controller.get()(request)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.WhatYouNeedController.get(2).url))
+          redirectLocation(result) must be(Some(routes.WhatYouNeedController.get().url))
         }
 
         "display guidance is false" in new Fixture {

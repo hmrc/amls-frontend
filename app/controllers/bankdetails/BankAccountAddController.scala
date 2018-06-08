@@ -34,7 +34,7 @@ class BankAccountAddController @Inject()(
     implicit authContext => implicit request =>
       addData[BankDetails](None).map { idx =>
         if (displayGuidance) {
-          Redirect(routes.WhatYouNeedController.get(idx))
+          Redirect(routes.WhatYouNeedController.get())
         } else {
           Redirect(routes.BankAccountTypeController.get(idx))
         }

@@ -30,20 +30,20 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.bankdetails.what_you_need(0)
+      def view = views.html.bankdetails.what_you_need()
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture {
-      def view = views.html.bankdetails.what_you_need(0)
+      def view = views.html.bankdetails.what_you_need()
 
       heading.html must be(Messages("title.wyn"))
       subHeading.html must include(Messages("summary.bankdetails"))
     }
 
     "contain the expected content elements" in new ViewFixture {
-      def view = views.html.bankdetails.what_you_need(0)
+      def view = views.html.bankdetails.what_you_need()
 
       html must include(Messages("bankdetails.whatyouneed.line_1"))
       html must include(Messages("bankdetails.whatyouneed.line_2"))
@@ -51,7 +51,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
     }
 
     "provide the expected hint" in new ViewFixture {
-      def view = views.html.bankdetails.what_you_need(0)
+      def view = views.html.bankdetails.what_you_need()
 
       html must include(Messages("bankdetails.whatyouneed.enter_details_hint"))
     }

@@ -16,23 +16,18 @@
 
 package controllers.bankdetails
 
-import connectors.DataCacheConnector
+import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
+import views.TitleValidator
 
-class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+class WhatYouNeedControllerSpec extends AmlsSpec with ScalaFutures with TitleValidator {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
-    val controller = new WhatYouNeedController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+  trait Fixture extends AuthorisedFixture { self =>
+    val request = addToken(authRequest)
+    val controller = new WhatYouNeedController(self.authConnector)
   }
 
   "WhatYouNeedController" when {
@@ -41,15 +36,13 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
       "respond with SEE_OTHER and redirect to the 'what you need' page" in new Fixture {
 
-        val result = controller.get(1)(request)
+        val result = controller.get()(request)
 
         status(result) must be(OK)
 
-        val pageTitle = Messages("title.wyn") + " - " +
-          Messages("summary.bankdetails") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
+        implicit val doc = Jsoup.parse(contentAsString(result))
+        validateTitle(s"${Messages("title.wyn")} - ${Messages("summary.bankdetails")}")
 
-        contentAsString(result) must include(pageTitle)
         contentAsString(result) must include(Messages("button.continue"))
       }
     }
