@@ -63,7 +63,7 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
       def view = views.html.bankdetails.summary(model, 1)
 
-      doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandaddbankaccount"))
+      doc.getElementsByClass("button").html must include(Messages("button.checkyouranswers.acceptandaddbankaccount"))
     }
 
 
@@ -73,20 +73,29 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
       def view = views.html.bankdetails.summary(model, 1)
 
-      view.body must contain("My Personal Account")
+      view.body must include("My Personal Account")
+      view.body must include("123456789")
+      view.body must include("11-11-11")
     }
 
     "include the provided data for a NonUKAccountNumber" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(NonUKAccountNumber("123456789")))
 
       def view = views.html.bankdetails.summary(model, 1)
+
+      view.body must include("My Personal Account")
+      view.body must include("123456789")
 
     }
 
     "include the provided data for a NonUKIBANNumber" in new ViewFixture {
-      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model = BankDetails(Some(BelongsToOtherBusiness), Some("Other Business Account"), Some(NonUKIBANNumber("NL26RABO0163975856")))
 
       def view = views.html.bankdetails.summary(model, 1)
+
+      view.body must include("Other Business Account")
+      view.body must include("NL26RABO0163975856")
+      view.body must include("A business account belonging to another business")
     }
   }
 }

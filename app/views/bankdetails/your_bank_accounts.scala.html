@@ -93,14 +93,5 @@
 
 
 
-    @if(true) {
-            @form(f, controllers.bankdetails.routes.SummaryController.post()) {
-                @submit(false, Some(Messages("button.confirmandcontinue")), returnLink = false)
-            }
-        } else {
-            @form(f, controllers.bankdetails.routes.SummaryController.post()) {
-                @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
-            }
-        }
 
 }

@@ -61,7 +61,7 @@ class SummaryController @Inject()(
         bd <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
         bdnew <- updateBankDetails(bd, index)
         _ <- dataCacheConnector.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
