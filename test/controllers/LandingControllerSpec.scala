@@ -476,10 +476,11 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "data has just been imported" should {
-          "redirect to the status page without refreshing the cache" in new Fixture {
+
+          def runImportTest(hasChanged: Boolean): Unit = new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
             setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
-              hasChanged = true,
+              hasChanged = hasChanged,
               includesResponse = false,
               includeSubmissionStatus = true,
               includeDataImport = true))
@@ -489,6 +490,16 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             status(result) mustBe SEE_OTHER
             redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
             verify(controller.landingService, never).refreshCache(any())(any(), any(), any())
+          }
+
+          "redirect to the status page without refreshing the cache" when {
+            "hasChanged is false" in {
+              runImportTest(hasChanged = false)
+            }
+
+            "hasChanged is true" in new Fixture {
+              runImportTest(hasChanged = true)
+            }
           }
         }
 
