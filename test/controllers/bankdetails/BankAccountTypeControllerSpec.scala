@@ -66,7 +66,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
-  
+
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
           val document = Jsoup.parse(contentAsString(result))

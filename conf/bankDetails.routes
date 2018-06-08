@@ -2,9 +2,6 @@ GET         /what-you-need/:index                                        control
 
 GET         /add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
 
-GET         /account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.get(index:Int)
-POST        /account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.post(index:Int)
-
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
