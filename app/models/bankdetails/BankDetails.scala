@@ -18,6 +18,8 @@ package models.bankdetails
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.Logger
+import play.api.i18n.Messages
+import play.api.i18n.Messages.Implicits._
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
@@ -65,6 +67,18 @@ object BankDetails {
 
   def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged || x.status.contains(StatusConstants.Deleted) }
 
+  def getBankAccountDescription(bankDetails:BankDetails)(implicit messages: Messages):String  = {
+    (bankDetails.bankAccountType, bankDetails.bankAccount) match {
+      case (Some(baType), Some(UKAccount(_,_))) =>
+          messages("bankdetails.accounttype.uk.lbl." + baType.getBankAccountTypeID)
+      case (Some(baType), Some(NonUKAccountNumber(_))) =>
+          messages("bankdetails.accounttype.nonuk.lbl." + baType.getBankAccountTypeID)
+      case (Some(baType), None) =>
+          messages("bankdetails.accounttype.lbl." + baType.getBankAccountTypeID)
+      case _ => ""
+    }
+  }
+
   def section(implicit cache: CacheMap): Section = {
     Logger.debug(s"[BankDetails][section] $cache")
 
@@ -92,7 +106,6 @@ object BankDetails {
         }
       }
     }
-
   }
 
   val key = "bank-details"
