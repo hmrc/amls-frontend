@@ -113,9 +113,9 @@ class summarySpec extends AmlsSpec
           "businessmatching.services.list.lbl.02",
           "businessmatching.services.list.lbl.03",
           "businessmatching.services.list.lbl.04")),
-          controllers.businessmatching.routes.ServicesController.get(true).toString),
+          controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString),
         ("businessmatching.psr.number.title", checkElementTextIncludes(_, "123456"),
-          controllers.businessmatching.routes.BusinessAppliedForPSRNumberController.get(true).toString)
+          controllers.businessmatching.routes.PSRNumberController.get(true).toString)
       )
 
       html must not include Messages("businessmatching.typeofbusiness.title")

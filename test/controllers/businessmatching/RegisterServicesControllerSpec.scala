@@ -194,7 +194,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.ServicesController.get(false).url))
+            redirectLocation(result) must be(Some(routes.MsbSubSectorsController.get(false).url))
           }
         }
       }

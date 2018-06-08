@@ -17,22 +17,20 @@
 package controllers.businessmatching
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching}
-import play.api.Play
+import javax.inject.Inject
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import services.businessmatching.BusinessMatchingService
-import views.html.businessmatching.business_applied_for_psr_number
-import cats.data.OptionT
-import cats.implicits._
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import views.html.businessmatching.psr_number
 
 import scala.concurrent.Future
 
-trait BusinessAppliedForPSRNumberController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  val businessMatchingService: BusinessMatchingService
+class PSRNumberController @Inject()(val authConnector: AuthConnector,
+                                    val dataCacheConnector: DataCacheConnector,
+                                    val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -42,7 +40,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
             bm <- maybeBm
             number <- bm.businessAppliedForPSRNumber
           } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
-          Ok(business_applied_for_psr_number(form, edit, maybeBm.fold(false)(_.preAppComplete)))
+          Ok(psr_number(form, edit, maybeBm.fold(false)(_.preAppComplete)))
         }
   }
 
@@ -51,7 +49,7 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
       implicit request => {
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(business_applied_for_psr_number(f, edit)))
+            Future.successful(BadRequest(psr_number(f, edit)))
           case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
             (for {
               bm <- businessMatchingService.getModel
@@ -67,11 +65,4 @@ trait BusinessAppliedForPSRNumberController extends BaseController {
         }
       }
   }
-}
-
-object BusinessAppliedForPSRNumberController extends BusinessAppliedForPSRNumberController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override lazy val businessMatchingService = Play.current.injector.instanceOf[BusinessMatchingService]
 }

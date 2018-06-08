@@ -16,14 +16,13 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
 import controllers.BaseController
+import javax.inject.Inject
 import models.status.{NotCompleted, SubmissionReady}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait NoPsrController extends BaseController {
-  protected[businessmatching] val statusService: StatusService
-
+class NoPsrController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
   def get = Authorised.async {
     implicit authContext => implicit request =>
       statusService.getStatus map {
@@ -31,10 +30,4 @@ trait NoPsrController extends BaseController {
         case _ => Ok(views.html.businessmatching.cannot_add_services())
       }
   }
-}
-
-object NoPsrController extends NoPsrController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override lazy val statusService = StatusService
 }
