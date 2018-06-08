@@ -153,8 +153,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "load the 'your bank accounts screen with empty lists" in new Fixture {
-      val model = BankDetails(None, None)
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq.empty))
       mockApplicationStatus(SubmissionReady)
       val result = controller.get()(request)
       status(result) must be(OK)

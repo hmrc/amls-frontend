@@ -21,7 +21,7 @@
 @import models.status._
 @import config.ApplicationConfig
 
-@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], hasIncompleteAccounts:Boolean, completedModel: Seq[(BankDetails, Int)], hasCompletedAccounts:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_], inCompleteModel: Seq[(BankDetails, Int)], completedModel: Seq[(BankDetails, Int)])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("bankdetails.yourbankaccounts.title", "summary.bankdetails")
@@ -45,10 +45,10 @@
     }
 
 
-    @if(!hasCompletedAccounts && !hasIncompleteAccounts) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
+    @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
 
 
-    @if(hasIncompleteAccounts) {
+    @if(!inCompleteModel.isEmpty) {
         <h3>@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
         <ul class="list">
         @inCompleteModel.map { bankDetail =>
@@ -70,8 +70,8 @@
     }
 
 
-    @if(hasCompletedAccounts) {
-        @if(hasIncompleteAccounts) { <h3>@Messages("bankdetails.yourbankaccounts.complete")</h3> }
+    @if(!completedModel.isEmpty) {
+        @if(!inCompleteModel.isEmpty) { <h3>@Messages("bankdetails.yourbankaccounts.complete")</h3> }
         <ul class="list">
             @completedModel.map { bankDetail =>
                 <li class="group grid-layout">
