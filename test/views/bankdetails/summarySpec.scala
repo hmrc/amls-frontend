@@ -40,267 +40,62 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
   }
 
-  "summary view" when {
-    "section is incomplete" must {
-      "have correct title" in new ViewFixture {
+  "summary view" must {
+    "have correct title" in new ViewFixture {
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
 
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
+      def view = views.html.bankdetails.summary(model, 1)
 
-        doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
-      }
-
-      "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
-
-        heading.html must be(Messages("title.cya"))
-        subHeading.html must include(Messages("summary.bankdetails"))
-      }
-
-      "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), false, true, true, SubmissionReady)
-
-        doc.getElementsByClass("button").html must include(Messages("button.summary.acceptandcomplete"))
-      }
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.bankdetails"))
     }
 
-    "section is complete" must {
-      "have correct title" in new ViewFixture {
+    "have correct headings" in new ViewFixture {
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
 
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
+      def view = views.html.bankdetails.summary(model, 1)
 
-        doc.title must startWith(Messages("title.ya") + " - " + Messages("summary.bankdetails"))
-      }
-
-      "have correct headings" in new ViewFixture {
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
-
-        heading.html must be(Messages("title.ya"))
-        subHeading.html must include(Messages("summary.bankdetails"))
-      }
-
-      "have correct button text" in new ViewFixture {
-        def view = views.html.bankdetails.summary(EmptyForm, Seq(BankDetails()), true, true, true, SubmissionReady)
-
-        doc.getElementsByClass("button").html must include(Messages("button.confirmandcontinue"))
-      }
+      heading.html must be(Messages("title.cya"))
+      subHeading.html must include(Messages("summary.bankdetails"))
     }
-  }
 
-  def checkListContainsItems(parent: Element, keysToFind: List[String]) = {
-    parent.select("li").toList.map((el: Element) => el.text()).tail must be(keysToFind.map(k => Messages(k)))
-    true
-  }
+    "have correct button text" in new ViewFixture {
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
 
-  it must {
+      def view = views.html.bankdetails.summary(model, 1)
+
+      doc.getElementsByClass("button").html must include(Messages("button.checkyouranswers.acceptandaddbankaccount"))
+    }
+
 
     "include the provided data for a UKAccount" in new ViewFixture {
 
-      private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
-        Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.yes"),
-        Messages("bankdetails.bankaccount.sortcode") + ": 00-00-00",
-        Messages("bankdetails.bankaccount.accountnumber") + ": 1234567890"
-      )
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
 
-      private val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
-        ("title key", "check"),
-        (accountName, checkElementTextIncludes(_,
-          "00-00-00",
-          "1234567890",
-          "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.yes",
-          "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-        ), (accountName, checkListContainsItems(_, bankDetailsSet))
-      )
+      def view = views.html.bankdetails.summary(model, 1)
 
-      def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(UKAccount("1234567890", "000000"))))
-
-        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
-      }
-
-      forAll(sectionCheckstestUKBankDetails) { (_, check) => {
-        val hTwos = doc.select("li.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == accountName)
-
-        hTwo must not be None
-        val section = hTwo.get.parents().select("li").first()
-        check(section) must be(true)
-      }
-      }
+      view.body must include("My Personal Account")
+      view.body must include("123456789")
+      view.body must include("11-11-11")
     }
 
     "include the provided data for a NonUKAccountNumber" in new ViewFixture {
+      val model = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(NonUKAccountNumber("123456789")))
 
-      private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
-        Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
-        Messages("bankdetails.bankaccount.accountnumber") + ": 56789"
+      def view = views.html.bankdetails.summary(model, 1)
 
-      )
+      view.body must include("My Personal Account")
+      view.body must include("123456789")
 
-      val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
-        ("title key", "check"),
-        (accountName, checkElementTextIncludes(_,
-          "56789",
-          "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.no",
-          "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-        ), (accountName, checkListContainsItems(_, bankDetailsSet))
-      )
-
-      def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(NonUKAccountNumber("56789"))))
-
-        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
-      }
-
-      forAll(sectionCheckstestUKBankDetails) { (key, check) => {
-        val hTwos = doc.select("li.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == accountName)
-
-        hTwo must not be None
-        val section = hTwo.get.parents().select("li").first()
-        check(section) must be(true)
-      }
-      }
     }
 
     "include the provided data for a NonUKIBANNumber" in new ViewFixture {
+      val model = BankDetails(Some(BelongsToOtherBusiness), Some("Other Business Account"), Some(NonUKIBANNumber("NL26RABO0163975856")))
 
-      private val bankDetailsSet = List(
-        Messages("bankdetails.bankaccount.accounttype.lbl") + ": " + Messages("bankdetails.summary.accounttype.lbl.01"),
-        Messages("bankdetails.bankaccount.accounttype.uk.lbl") + ": " + Messages("lbl.no"),
-        Messages("bankdetails.bankaccount.iban") + ": 000000000"
-      )
+      def view = views.html.bankdetails.summary(model, 1)
 
-      val sectionCheckstestUKBankDetails = Table[String, Element => Boolean](
-        ("title key", "check"),
-        (accountName, checkElementTextIncludes(_,
-          "000000000",
-          "bankdetails.bankaccount.accounttype.uk.lbl", "lbl.no",
-          "bankdetails.bankaccount.accounttype.lbl", "bankdetails.summary.accounttype.lbl.01")
-        ), (accountName, checkListContainsItems(_, bankDetailsSet))
-      )
-
-      def view = {
-        val testdata = Seq(BankDetails(Some(PersonalAccount), Some("Account Name"), Some(NonUKIBANNumber("000000000"))))
-
-        views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReady)
-      }
-
-      forAll(sectionCheckstestUKBankDetails) { (key, check) => {
-        val hTwos = doc.select("li.check-your-answers h2")
-        val hTwo = hTwos.toList.find(e => e.text() == accountName)
-
-        hTwo must not be None
-        val section = hTwo.get.parents().select("li").first()
-        check(section) must be(true)
-      }
-      }
+      view.body must include("Other Business Account")
+      view.body must include("NL26RABO0163975856")
+      view.body must include("A business account belonging to another business")
     }
-
-    "hide the first six numbers of a UKAccount number" when {
-
-      val sortCodeLength = 6
-      val accountNumberLength = Account.maxUKBankAccountNumberLength
-
-      val genUKAccount: Gen[UKAccount] = for {
-        sortCode <- Gen.listOfN[Char](sortCodeLength, Gen.numChar).map(_.mkString(""))
-        accountNumber <- Gen.listOfN[Char](accountNumberLength, Gen.numChar).map(_.mkString(""))
-      } yield {
-        UKAccount(accountNumber, sortCode)
-      }
-
-      val genAccountName: Gen[String] = Gen.listOfN[Char](accountNumberLength, Gen.alphaChar).map(_.mkString(""))
-
-      "showing My Answers" when {
-        "bank account has not just been added" when {
-          "user is making an amendment" in {
-
-            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-              whenever(
-                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-              ) {
-                new ViewFixture {
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some("My Account"), Some(uk)))
-
-                  def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionReadyForReview)
-
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
-
-                  accountNumberField.takeRight(accountNumberLength).take(toHide) must be("******")
-                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
-                }
-              }
-            }
-
-          }
-          "user is making a variation" in {
-
-            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-              whenever(
-                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-              ) {
-                new ViewFixture {
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(accountName), Some(uk)))
-
-                  def view = views.html.bankdetails.summary(EmptyForm, testdata, true, true, true, SubmissionDecisionApproved)
-
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
-
-                  accountNumberField.takeRight(accountNumberLength).take(toHide) must be("******")
-                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
-                }
-              }
-            }
-
-          }
-        }
-      }
-
-      "showing Check My Answers" when {
-        "bank account has not just been added" when {
-          "user is making an amendment" in {
-
-            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-              whenever(
-                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-              ) {
-                new ViewFixture {
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(accountName), Some(uk), status = Some(StatusConstants.Updated)))
-
-                  def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionReadyForReview)
-
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
-
-                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
-                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
-                }
-              }
-            }
-
-          }
-          "user is making a variation" in {
-
-            forAll(genAccountName, genUKAccount) { (accountName: String, uk: UKAccount) =>
-              whenever(
-                accountName.length == accountNumberLength && uk.sortCode.length == sortCodeLength && uk.accountNumber.length == accountNumberLength
-              ) {
-                new ViewFixture {
-                  val testdata = Seq(BankDetails(Some(PersonalAccount), Some(accountName), Some(uk), status = Some(StatusConstants.Updated)))
-
-                  def view = views.html.bankdetails.summary(EmptyForm, testdata, false, true, true, SubmissionDecisionApproved)
-
-                  private val accountNumberField = doc.select("li.check-your-answers ul").first().select("li").eq(3).first().text()
-
-                  accountNumberField.takeRight(accountNumberLength).take(6) must be("******")
-                  accountNumberField.takeRight(2) must be(uk.accountNumber.takeRight(2))
-                }
-              }
-            }
-          }
-        }
-      }
-    }
-
   }
 }

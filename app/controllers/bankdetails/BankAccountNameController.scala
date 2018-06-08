@@ -76,7 +76,7 @@ class BankAccountNameController @Inject()(
               )
             } map { _ =>
               if (edit) {
-                Redirect(routes.SummaryController.get(false))
+                Redirect(routes.SummaryController.get(index))
               } else {
                 Redirect(routes.BankAccountIsUKController.get(index))
               }

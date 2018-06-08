@@ -57,7 +57,7 @@ trait BankAccountRegisteredController extends BaseController {
             case ValidForm(_, data) =>
                data.registerAnotherBank match {
                 case true => Future.successful(Redirect(routes.BankAccountAddController.get(false)))
-                case false => Future.successful(Redirect(routes.SummaryController.get(false)))
+                case false => Future.successful(Redirect(routes.SummaryController.get(index)))
               }
           }
       }
