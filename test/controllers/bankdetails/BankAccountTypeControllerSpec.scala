@@ -74,8 +74,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           document.select("input[type=radio][name=bankAccountType][value=01]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType][value=02]").hasAttr("checked") must be(false)
           document.select("input[type=radio][name=bankAccountType][value=03]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=bankAccountType][value=04]").hasAttr("checked") must be(false)
-          document.select("input[type=radio][name=bankAccountType]").size() must be(4)
+          document.select("input[type=radio][name=bankAccountType]").size() must be(3)
         }
 
         "load bank account type UI with out the option 'user does not have bank account'" when {
