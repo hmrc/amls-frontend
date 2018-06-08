@@ -21,7 +21,8 @@ import play.api.test.Helpers._
 
 class DoYouHaveABankAccountControllerSpec extends AmlsSpec {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
 
     val request = addToken(authRequest)
     val controller = new DoYouHaveABankAccountController(self.authConnector)
@@ -51,14 +52,14 @@ class DoYouHaveABankAccountControllerSpec extends AmlsSpec {
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
       }
+    }
 
+    "return the view with a Bad Request status" when {
       "nothing is selected" in new Fixture {
         val result = controller.post()(request)
 
         status(result) mustBe BAD_REQUEST
       }
     }
-
   }
-
 }

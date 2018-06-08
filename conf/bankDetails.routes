@@ -2,6 +2,9 @@ GET         /what-you-need/:index                                        control
 
 GET         /add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
 
+GET         /has-bank-account                                            @controllers.bankdetails.DoYouHaveABankAccountController.get()
+POST        /has-bank-account                                            @controllers.bankdetails.DoYouHaveABankAccountController.post()
+
 GET         /account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.get(index:Int)
 POST        /account-registered/:index                                   controllers.bankdetails.BankAccountRegisteredController.post(index:Int)
 

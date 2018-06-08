@@ -33,21 +33,23 @@ class DoYouHaveABankAccountController @Inject()(val authConnector: AuthConnector
     case _ => routes.YourBankAccountsController.get()
   }
 
-  def view(implicit request: Request[_]) = do_you_have_bank_account.apply _
+  def view(implicit request: Request[_]) = has_bank_account.apply _
 
   implicit val formReads = BooleanFormReadWrite.formRule("hasBankAccount", "bankdetails.hasbankaccount.validation")
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(view(request)(EmptyForm)))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(view(request)(EmptyForm)))
   }
 
   def post = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[Boolean](request.body) match {
-        case ValidForm(_, data) => Future.successful(Redirect(router(data)))
+    implicit authContext =>
+      implicit request =>
+        Form2[Boolean](request.body) match {
+          case ValidForm(_, data) => Future.successful(Redirect(router(data)))
 
-        case f: InvalidForm => Future.successful(BadRequest(view(request)(f)))
-      }
+          case f: InvalidForm => Future.successful(BadRequest(view(request)(f)))
+        }
   }
 }
