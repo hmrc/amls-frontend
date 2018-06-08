@@ -67,7 +67,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
   "BusinessAppliedForPSRNumberController" when {
 
     "get is called" must {
-      "return OK with the business_applied_for_psr_number view" in new Fixture {
+      "return OK with the psr_number view" in new Fixture {
 
         val result = controller.get()(request)
 
@@ -76,7 +76,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
 
       }
 
-      "return OK and display business_applied_for_psr_number view with pre populated data" in new Fixture {
+      "return OK and display psr_number view with pre populated data" in new Fixture {
         override val businessMatching = businessMatchingWithPsrGen.sample.get
 
         mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),

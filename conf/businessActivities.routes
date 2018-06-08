@@ -1,0 +1,46 @@
+GET         /what-you-need                                        @controllers.businessactivities.WhatYouNeedController.get()
+
+GET         /franchise                                            controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
+POST        /franchise                                            controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
+
+GET         /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+
+GET         /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
+POST        /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
+
+GET         /turnover                                             controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover                                             controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+
+GET         /business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
+
+GET         /records                                              @controllers.businessactivities.TransactionRecordController.get(edit: Boolean ?= false)
+POST        /records                                              @controllers.businessactivities.TransactionRecordController.post(edit: Boolean ?= false)
+
+GET         /record-transactions                                  @controllers.businessactivities.TransactionTypesController.get(edit: Boolean ?= false)
+POST        /record-transactions                                  @controllers.businessactivities.TransactionTypesController.post(edit: Boolean ?= false)
+
+GET         /crime-agency                                         controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
+POST        /crime-agency                                         controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
+
+GET         /accountant                                           controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
+POST        /accountant                                           controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
+
+GET         /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
+POST        /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
+
+GET         /employees                                            controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
+POST        /employees                                            controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
+
+GET         /employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
+POST        /employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
+
+GET         /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+
+GET         /tax-matters                                          controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
+POST        /tax-matters                                          controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                   controllers.businessactivities.SummaryController.get()
+POST        /check-your-answers                                   controllers.businessactivities.SummaryController.post()

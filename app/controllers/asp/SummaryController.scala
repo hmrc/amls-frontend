@@ -16,23 +16,21 @@
 
 package controllers.asp
 
-import javax.inject.Inject
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.asp.Asp
-import views.html.asp.summary
 import forms._
-import play.api.Play
+import javax.inject.Inject
+import models.asp.Asp
+import models.businessmatching.AccountancyServices
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import models.businessmatching.AccountancyServices
-import cats.implicits._
-import cats.data.OptionT
+import views.html.asp.summary
 
-class SummaryController @Inject()(dataCache: DataCacheConnector, serviceFlow: ServiceFlow, statusService: StatusService, val authConnector: AuthConnector) extends BaseController {
+class SummaryController @Inject()(val dataCache: DataCacheConnector,
+                                  val serviceFlow: ServiceFlow,
+                                  val statusService: StatusService,
+                                  val authConnector: AuthConnector) extends BaseController {
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>

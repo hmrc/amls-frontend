@@ -1,0 +1,37 @@
+GET         /contacting-you                                        controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
+POST        /contacting-you                                        controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
+
+GET         /contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
+POST        /contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
+
+GET         /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+
+GET         /vat                                                   controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
+POST        /vat                                                   controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
+
+GET         /corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
+POST        /corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
+
+GET         /confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+
+GET         /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
+
+GET         /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
+POST        /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
+
+GET         /address-for-letters                                   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
+POST        /address-for-letters                                   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
+
+GET         /activities                                            controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
+POST        /activities                                            controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)
+
+GET         /letters-address                                       controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
+POST        /letters-address                                       controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
+
+GET         /what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
+
+GET         /check-your-answers                                    controllers.aboutthebusiness.SummaryController.get()
+POST        /check-your-answers                                    controllers.aboutthebusiness.SummaryController.post()

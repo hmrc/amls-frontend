@@ -16,4 +16,4 @@
 
 @()(implicit request: Request[_],m:Messages)
 <p>@Messages("status.incomplete.description")</p>
-<a href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>
+<a id="return-to-saved-application" href="@controllers.routes.RegistrationProgressController.get()" class="button" type="submit">@Messages("status.incomplete.buttontext")</a>

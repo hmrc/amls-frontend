@@ -1,0 +1,25 @@
+GET         /business-type                                          controllers.businessmatching.BusinessTypeController.get()
+POST        /business-type                                          controllers.businessmatching.BusinessTypeController.post()
+
+GET         /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.get()
+POST        /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.post()
+
+GET         /type-of-business                                       controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
+POST        /type-of-business                                       controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
+
+GET         /activities                                             @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
+POST        /activities                                             @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
+
+GET         /registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
+POST        /registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
+
+GET         /services                                               @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
+POST        /services                                               @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
+
+GET         /psr-registration                                       @controllers.businessmatching.PSRNumberController.get(edit: Boolean ?= false)
+POST        /psr-registration                                       @controllers.businessmatching.PSRNumberController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                     @controllers.businessmatching.SummaryController.get()
+POST        /check-your-answers                                     @controllers.businessmatching.SummaryController.post()
+
+GET         /no-psr                                                 @controllers.businessmatching.NoPsrController.get()

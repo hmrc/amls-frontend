@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
@@ -30,44 +29,35 @@ import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
-import scala.concurrent.ExecutionContext.Implicits.global
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
+class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyServiceBusinessTestData with BusinessMatchingGenerator {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
     val request = addToken(authRequest)
 
-    val cache: DataCacheConnector = mock[DataCacheConnector]
+    val controller = new MsbSubSectorsController(
+      self.authConnector,
+      mockCacheConnector,
+      mock[BusinessMatchingService]
+    )
 
-    val controller = new ServicesController {
-      override def dataCacheConnector: DataCacheConnector = self.cache
-      override lazy val businessMatchingService = mock[BusinessMatchingService]
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
-
-    val mockCacheMap = mock[CacheMap]
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
-
-    when {
-      controller.dataCacheConnector.fetchAll(any(), any())
-    } thenReturn Future.successful(Some(mockCacheMap))
 
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
 
-    def setupModel(model: Option[BusinessMatching]) = when {
+    def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any(), any(), any())
     } thenReturn (model match {
       case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
       case _ => OptionT.none[Future, BusinessMatching]
     })
-
   }
 
   "ServicesController" must {
@@ -141,13 +131,13 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(completeMsb))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get().url)
+      redirectLocation(result) mustBe Some(routes.PSRNumberController.get().url)
     }
 
     "redirect to the Psr Number page when adding 'Transmitting Money' as a service during edit" in new Fixture {
@@ -176,13 +166,13 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(completeMsb))
 
-      when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+      redirectLocation(result) mustBe Some(routes.PSRNumberController.get(true).url)
     }
 
     "redirect to the summary page when adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -204,7 +194,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(edit = true)(newRequest)
@@ -217,7 +207,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
     "redirect to the 'Psr Number' page when adding 'Cheque Cashing' as a service during edit" in new Fixture {
 
       Seq[String]("03", "04") foreach {
-        case (id) =>
+        case id =>
 
           val currentModel = BusinessMatching(
             msbServices = Some(BusinessMatchingMsbServices(
@@ -235,13 +225,13 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
           when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
             .thenReturn(Some(completeMsb))
 
-          when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+          when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(edit = true)(newRequest)
 
           status(result) mustBe SEE_OTHER
-          redirectLocation(result) mustBe Some(routes.BusinessAppliedForPSRNumberController.get(true).url)
+          redirectLocation(result) mustBe Some(routes.PSRNumberController.get(true).url)
       }
     }
   }
@@ -272,7 +262,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(edit = true)(newRequest)
@@ -310,7 +300,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(edit = true)(newRequest)
@@ -344,7 +334,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(edit = true)(newRequest)
@@ -374,7 +364,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(Some(completeMsb))
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(edit = true)(newRequest)
@@ -405,7 +395,7 @@ class ServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoSuga
         when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
           .thenReturn(None)
 
-        when(cache.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
+        when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), any())(any(), any(), any()))
           .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post()(newRequest)

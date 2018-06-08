@@ -1,0 +1,31 @@
+GET         /what-you-need                                          @controllers.hvd.WhatYouNeedController.get()
+
+GET         /cash-payments                                          @controllers.hvd.CashPaymentController.get(edit: Boolean ?= false)
+POST        /cash-payments                                          @controllers.hvd.CashPaymentController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                     @controllers.hvd.SummaryController.get()
+POST        /check-your-answers                                     @controllers.hvd.SummaryController.post()
+
+GET         /how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.get(edit: Boolean ?= false)
+POST        /how-will-you-sell                                      @controllers.hvd.HowWillYouSellGoodsController.post(edit: Boolean ?= false)
+
+GET         /selling                                                @controllers.hvd.ProductsController.get(edit: Boolean ?= false)
+POST        /selling                                                @controllers.hvd.ProductsController.post(edit: Boolean ?= false)
+
+GET         /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.get(edit: Boolean ?= false)
+POST        /linked-cash-payments                                   @controllers.hvd.LinkedCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /excise-goods                                           @controllers.hvd.ExciseGoodsController.get(edit: Boolean ?= false)
+POST        /excise-goods                                           @controllers.hvd.ExciseGoodsController.post(edit: Boolean ?= false)
+
+GET         /percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /percentage                                             @controllers.hvd.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
+GET         /receiving                                              @controllers.hvd.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /receiving                                              @controllers.hvd.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /expect-to-receive                                      @controllers.hvd.ExpectToReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /date-change                                            @controllers.hvd.HvdDateOfChangeController.get
+POST        /date-change                                            @controllers.hvd.HvdDateOfChangeController.post

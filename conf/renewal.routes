@@ -1,0 +1,49 @@
+GET         /progress                                                         @controllers.renewal.RenewalProgressController.get()
+POST        /progress                                                         @controllers.renewal.RenewalProgressController.post()
+
+GET         /what-you-need                                                    @controllers.renewal.WhatYouNeedController.get()
+
+GET         /confirm-activities                                               @controllers.renewal.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /confirm-activities                                               @controllers.renewal.InvolvedInOtherController.post(edit: Boolean ?= false)
+
+GET         /business-turnover                                                @controllers.renewal.BusinessTurnoverController.get(edit: Boolean ?= false)
+POST        /business-turnover                                                @controllers.renewal.BusinessTurnoverController.post(edit: Boolean ?= false)
+
+GET         /turnover                                                         @controllers.renewal.AMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover                                                         @controllers.renewal.AMLSTurnoverController.post(edit: Boolean ?= false)
+
+GET         /employment                                                       @controllers.renewal.CustomersOutsideUKController.get(edit: Boolean ?= false)
+POST        /employment                                                       @controllers.renewal.CustomersOutsideUKController.post(edit: Boolean ?= false)
+
+GET         /anticipated-totals                                               @controllers.renewal.TotalThroughputController.get(edit: Boolean ?= false)
+POST        /anticipated-totals                                               @controllers.renewal.TotalThroughputController.post(edit: Boolean ?= false)
+
+GET         /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /transfers                                                        @controllers.renewal.TransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+
+GET         /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.get(edit: Boolean ?= false)
+POST        /send-money                                                       @controllers.renewal.SendMoneyToOtherCountryController.post(edit: Boolean ?= false)
+
+GET         /largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.get(edit: Boolean ?= false)
+POST        /largest-amounts                                                  @controllers.renewal.SendTheLargestAmountsOfMoneyController.post(edit: Boolean ?= false)
+
+GET         /most-transactions                                                @controllers.renewal.MostTransactionsController.get(edit: Boolean ?= false)
+POST        /most-transactions                                                @controllers.renewal.MostTransactionsController.post(edit: Boolean ?= false)
+
+GET         /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+
+GET         /currency                                                         @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
+POST        /currency                                                         @controllers.renewal.WhichCurrenciesController.post(edit: Boolean ?= false)
+
+GET         /percentage                                                       @controllers.renewal.PercentageOfCashPaymentOver15000Controller.get(edit: Boolean ?= false)
+POST        /percentage                                                       @controllers.renewal.PercentageOfCashPaymentOver15000Controller.post(edit: Boolean ?= false)
+
+GET         /receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.get(edit: Boolean ?= false)
+POST        /receiving                                                        @controllers.renewal.ReceiveCashPaymentsController.post(edit: Boolean ?= false)
+
+GET         /check-your-answers                                               @controllers.renewal.SummaryController.get()
+POST        /check-your-answers                                               @controllers.renewal.SummaryController.post()
+
+GET         /update-any-information                                           @controllers.renewal.UpdateAnyInformationController.get()
+POST        /update-any-information                                           @controllers.renewal.UpdateAnyInformationController.post()

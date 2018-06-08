@@ -16,18 +16,18 @@
 
 package controllers.asp
 
-import config.AMLSAuthConnector
 import controllers.BaseController
+import javax.inject.Inject
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.asp._
+
 import scala.concurrent.Future
 
-trait WhatYouNeedController extends BaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector
+                                     ) extends BaseController {
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(what_you_need()))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(what_you_need()))
   }
-}
-
-object WhatYouNeedController extends WhatYouNeedController {
-  override val authConnector = AMLSAuthConnector
 }
