@@ -16,9 +16,11 @@
 
 package controllers.bankdetails
 
+import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
+import models.bankdetails.BankDetails
 import play.api.mvc.{Call, Request}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BooleanFormReadWrite
@@ -26,7 +28,8 @@ import views.html.bankdetails._
 
 import scala.concurrent.Future
 
-class HasBankAccountController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class HasBankAccountController @Inject()(val authConnector: AuthConnector,
+                                         cacheConnector: DataCacheConnector) extends BaseController {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.get(1)
@@ -47,7 +50,11 @@ class HasBankAccountController @Inject()(val authConnector: AuthConnector) exten
     implicit authContext =>
       implicit request =>
         Form2[Boolean](request.body) match {
-          case ValidForm(_, data) => Future.successful(Redirect(router(data)))
+          case ValidForm(_, data) if data =>
+            Future.successful(Redirect(router(data)))
+
+          case ValidForm(_, data) =>
+            cacheConnector.save(BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
 
           case f: InvalidForm => Future.successful(BadRequest(view(request)(f)))
         }

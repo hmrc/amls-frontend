@@ -16,6 +16,7 @@
 
 package controllers.bankdetails
 
+import models.bankdetails.BankDetails
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 
@@ -25,7 +26,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new HasBankAccountController(self.authConnector)
+    val controller = new HasBankAccountController(self.authConnector, mockCacheConnector)
 
   }
 
@@ -45,12 +46,16 @@ class HasBankAccountControllerSpec extends AmlsSpec {
         redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
       }
 
-      "'no' is selected" in new Fixture {
-        val formData = "hasBankAccount" -> "false"
-        val result = controller.post()(request.withFormUrlEncodedBody(formData))
+      "'no' is selected" which {
+        "also saves an empty list of bank details into the cache" in new Fixture {
+          mockCacheSave(Seq.empty[BankDetails], Some(BankDetails.key))
 
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
+          val formData = "hasBankAccount" -> "false"
+          val result = controller.post()(request.withFormUrlEncodedBody(formData))
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe Some(controllers.bankdetails.routes.YourBankAccountsController.get().url)
+        }
       }
     }
 
