@@ -29,7 +29,7 @@
     title = s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}",
     heading = header
 ) {
-    @form(f, controllers.bankdetails.routes.DoYouHaveABankAccountController.post()) {
+    @form(f, controllers.bankdetails.routes.HasBankAccountController.post()) {
         @fieldset(
             f = f("hasBankAccount-fieldset"),
             legend = "bankdetails.hasbankaccount.legend",

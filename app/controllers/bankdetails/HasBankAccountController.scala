@@ -26,7 +26,7 @@ import views.html.bankdetails._
 
 import scala.concurrent.Future
 
-class DoYouHaveABankAccountController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class HasBankAccountController @Inject()(val authConnector: AuthConnector) extends BaseController {
 
   val router: Boolean => Call = {
     case true => routes.BankAccountNameController.get(1)

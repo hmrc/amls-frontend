@@ -19,13 +19,13 @@ package controllers.bankdetails
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
 
-class DoYouHaveABankAccountControllerSpec extends AmlsSpec {
+class HasBankAccountControllerSpec extends AmlsSpec {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
 
     val request = addToken(authRequest)
-    val controller = new DoYouHaveABankAccountController(self.authConnector)
+    val controller = new HasBankAccountController(self.authConnector)
 
   }
 
