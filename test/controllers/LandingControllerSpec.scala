@@ -296,9 +296,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
     "microservice.services.feature-toggle.amendments" -> true
   ))
 
-  trait Fixture extends AuthorisedFixture {
-    self =>
+  trait Fixture extends AuthorisedFixture { self =>
+
     val request = addToken(authRequest)
+
     val controller = new LandingController(
       enrolmentsService = mock[AuthEnrolmentsService],
       landingService = mock[LandingService],
@@ -306,7 +307,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector]
-    ){
+    ) {
       override val shortLivedCache = mock[ShortLivedCache]
     }
 
@@ -322,115 +323,123 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
 
     val completeATB = mock[AboutTheBusiness]
-  }
 
-  def setUpMocksForNoEnrolment(controller: LandingController) = {
-    when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future.successful(None))
-  }
+    val emptyCacheMap = CacheMap("test", Map.empty)
 
-  def setUpMocksForAnEnrolmentExists(controller: LandingController) = {
-    when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
-      .thenReturn(Future.successful(Some("TESTREGNO")))
-  }
-
-  def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
-    when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
-      .thenReturn(Future.successful(None))
-  }
-
-  def setUpMocksForDataExistsInKeystore(controller: LandingController) = {
-    val reviewDetails = ReviewDetails(
-      "Business Name",
-      None,
-      Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
-      "testSafeId")
-
-    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
-      .thenReturn(Future.successful(Some(reviewDetails)))
-
-    reviewDetails
-  }
-
-  def setUpMocksForNoDataInKeyStore(controller: LandingController) = {
-    when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
-      .thenReturn(Future.successful(None))
-  }
-
-  def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: CacheMap = mock[CacheMap]) = {
-    when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
-      .thenReturn(Future.successful(Some(testData)))
-  }
-
-  //noinspection ScalaStyle
-  def buildTestCacheMap(hasChanged: Boolean,
-                        includesResponse: Boolean,
-                        noTP: Boolean = false,
-                        noRP: Boolean = false,
-                        includeSubmissionStatus: Boolean = false): CacheMap = {
-
-    val cacheMap = mock[CacheMap]
-    val testASP = Asp(hasChanged = hasChanged)
-    val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
-    val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
-    val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
-    val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
-    val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
-    val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
-    val testResponsiblePeople = Seq(ResponsiblePerson(hasChanged = hasChanged))
-    val testSupervision = Supervision(hasChanged = hasChanged)
-    val testTcsp = Tcsp(hasChanged = hasChanged)
-    val testTradingPremises = Seq(TradingPremises(hasChanged = hasChanged))
-    val testHvd = Hvd(hasChanged = hasChanged)
-    val testRenewal = Renewal(hasChanged = hasChanged)
-
-    when(cacheMap.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
-    when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
-    when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
-    when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
-    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-    when(cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
-    when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
-    when(cacheMap.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
-    when(cacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
-    when(cacheMap.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
-    when(cacheMap.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
-
-    val submissionRequestStatus = if (includeSubmissionStatus) Some(SubmissionRequestStatus(true)) else None
-    when(cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key)).thenReturn(submissionRequestStatus)
-
-    if (noTP) {
-      when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())) thenThrow new JsResultException(Seq.empty)
-    } else {
-      when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
+    def setUpMocksForNoEnrolment(controller: LandingController) = {
+      when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+        .thenReturn(Future.successful(None))
     }
 
-    if (noRP) {
-      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())) thenThrow new JsResultException(Seq.empty)
-    } else {
-      when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(testResponsiblePeople))
+    def setUpMocksForAnEnrolmentExists(controller: LandingController) = {
+      when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
+        .thenReturn(Future.successful(Some("TESTREGNO")))
     }
 
-    if (includesResponse) {
-      val testResponse = SubscriptionResponse(
-        "TESTFORMBUNDLENUMBER",
-        "TESTAMLSREFNNO", Some(SubscriptionFees(
-          "TESTPAYMENTREF",
-          100.45,
-          None,
-          None,
-          123.78,
-          None,
-          17623.76
-        ))
-      )
-
-      when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-        .thenReturn(Some(testResponse))
-
+    def setUpMocksForNoDataInSaveForLater(controller: LandingController) = {
+      when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
+        .thenReturn(Future.successful(None))
     }
 
-    cacheMap
+    def setUpMocksForDataExistsInKeystore(controller: LandingController) = {
+      val reviewDetails = ReviewDetails(
+        "Business Name",
+        None,
+        Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
+        "testSafeId")
+
+      when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
+        .thenReturn(Future.successful(Some(reviewDetails)))
+
+      reviewDetails
+    }
+
+    def setUpMocksForNoDataInKeyStore(controller: LandingController) = {
+      when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
+        .thenReturn(Future.successful(None))
+    }
+
+    def setUpMocksForDataExistsInSaveForLater(controller: LandingController, testData: CacheMap = mock[CacheMap]) = {
+      when(controller.landingService.cacheMap(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
+        .thenReturn(Future.successful(Some(testData)))
+    }
+
+    //noinspection ScalaStyle
+    def buildTestCacheMap(hasChanged: Boolean,
+                          includesResponse: Boolean,
+                          noTP: Boolean = false,
+                          noRP: Boolean = false,
+                          includeSubmissionStatus: Boolean = false,
+                          includeDataImport: Boolean = false,
+                          cacheMap: CacheMap = mock[CacheMap]): CacheMap = {
+
+      val testASP = Asp(hasChanged = hasChanged)
+      val testAboutTheBusiness = AboutTheBusiness(hasChanged = hasChanged)
+      val testBankDetails = Seq(BankDetails(hasChanged = hasChanged))
+      val testBusinessActivities = BusinessActivities(hasChanged = hasChanged)
+      val testBusinessMatching = BusinessMatching(hasChanged = hasChanged)
+      val testEstateAgentBusiness = EstateAgentBusiness(hasChanged = hasChanged)
+      val testMoneyServiceBusiness = MoneyServiceBusiness(hasChanged = hasChanged)
+      val testResponsiblePeople = Seq(ResponsiblePerson(hasChanged = hasChanged))
+      val testSupervision = Supervision(hasChanged = hasChanged)
+      val testTcsp = Tcsp(hasChanged = hasChanged)
+      val testTradingPremises = Seq(TradingPremises(hasChanged = hasChanged))
+      val testHvd = Hvd(hasChanged = hasChanged)
+      val testRenewal = Renewal(hasChanged = hasChanged)
+
+      when(cacheMap.getEntry[Asp](Asp.key)).thenReturn(Some(testASP))
+      when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(testAboutTheBusiness))
+      when(cacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(Some(testBankDetails))
+      when(cacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(Some(testBusinessActivities))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
+      when(cacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(Some(testEstateAgentBusiness))
+      when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(Some(testMoneyServiceBusiness))
+      when(cacheMap.getEntry[Supervision](Supervision.key)).thenReturn(Some(testSupervision))
+      when(cacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(Some(testTcsp))
+      when(cacheMap.getEntry[Hvd](Hvd.key)).thenReturn(Some(testHvd))
+      when(cacheMap.getEntry[Renewal](Renewal.key)).thenReturn(Some(testRenewal))
+
+      when(cacheMap.getEntry[DataImport](DataImport.key)).thenReturn(if (includeDataImport)
+        Some(DataImport("test.json"))
+      else
+        None)
+
+      val submissionRequestStatus = if (includeSubmissionStatus) Some(SubmissionRequestStatus(true)) else None
+      when(cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key)).thenReturn(submissionRequestStatus)
+
+      if (noTP) {
+        when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())) thenThrow new JsResultException(Seq.empty)
+      } else {
+        when(cacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(Some(testTradingPremises))
+      }
+
+      if (noRP) {
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())) thenThrow new JsResultException(Seq.empty)
+      } else {
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(testResponsiblePeople))
+      }
+
+      if (includesResponse) {
+        val testResponse = SubscriptionResponse(
+          "TESTFORMBUNDLENUMBER",
+          "TESTAMLSREFNNO", Some(SubscriptionFees(
+            "TESTPAYMENTREF",
+            100.45,
+            None,
+            None,
+            123.78,
+            None,
+            17623.76
+          ))
+        )
+
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(testResponse))
+
+      }
+
+      cacheMap
+    }
   }
 
   "show landing page without authorisation" in new Fixture {
@@ -455,22 +464,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "data has not changed" should {
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
-              val emptyCacheMap = mock[CacheMap]
-              when(emptyCacheMap.getEntry[Asp](Asp.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Seq[BankDetails]](meq(BankDetails.key))(any())).thenReturn(None)
-              when(emptyCacheMap.getEntry[BusinessActivities](BusinessActivities.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
-              when(emptyCacheMap.getEntry[Supervision](Supervision.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Tcsp](Tcsp.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any())).thenReturn(None)
-              when(emptyCacheMap.getEntry[Hvd](Hvd.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[Renewal](Renewal.key)).thenReturn(None)
-              when(emptyCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(None)
-
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
               val result = controller.get()(request)
@@ -478,6 +471,34 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               status(result) must be(SEE_OTHER)
               redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
               verify(controller.landingService, atLeastOnce()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+            }
+          }
+        }
+
+        "data has just been imported" should {
+
+          def runImportTest(hasChanged: Boolean): Unit = new Fixture {
+            setUpMocksForAnEnrolmentExists(controller)
+            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
+              hasChanged = hasChanged,
+              includesResponse = false,
+              includeSubmissionStatus = true,
+              includeDataImport = true))
+
+            val result = controller.get()(request)
+
+            status(result) mustBe SEE_OTHER
+            redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+            verify(controller.landingService, never).refreshCache(any())(any(), any(), any())
+          }
+
+          "redirect to the status page without refreshing the cache" when {
+            "hasChanged is false" in {
+              runImportTest(hasChanged = false)
+            }
+
+            "hasChanged is true" in new Fixture {
+              runImportTest(hasChanged = true)
             }
           }
         }
@@ -596,15 +617,15 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       "there is data in S4L " should {
         "not refresh API5 and redirect to status controller" in new Fixture {
 
-          val complete = mock[BusinessMatching]
-          val emptyCacheMap = mock[CacheMap]
+          val businessMatching = mock[BusinessMatching]
+          val cacheMap = mock[CacheMap]
 
           setUpMocksForNoEnrolment(controller)
 
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(emptyCacheMap))
-          when(complete.isComplete) thenReturn true
-          when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-          when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+          when(businessMatching.isComplete) thenReturn true
+          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
+          when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           val result = controller.get()(request)
 

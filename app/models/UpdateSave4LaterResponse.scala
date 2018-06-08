@@ -29,12 +29,12 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import models.DataImport
 import play.api.libs.json._
-
 import scala.collection.Seq
 
-
-case class UpdateSave4LaterResponse(view:Option[ViewResponse],
+case class UpdateSave4LaterResponse(dataImport: Option[DataImport],
+                                    view:Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
                                     estateAgencyBusiness: Option[EstateAgentBusiness],
                                     tradingPremises: Option[Seq[TradingPremises]],
@@ -49,10 +49,8 @@ case class UpdateSave4LaterResponse(view:Option[ViewResponse],
                                     hvd: Option[Hvd],
                                     supervision: Option[Supervision],
                                     Subscription: Option[SubscriptionResponse],
-                                    AmendVariationResponse: Option[AmendVariationRenewalResponse]
-                                    ) {
-
- }
+                                    amendVariationResponse: Option[AmendVariationRenewalResponse]
+                                    )
 
 object UpdateSave4LaterResponse {
      implicit val format = Json.format[UpdateSave4LaterResponse]
