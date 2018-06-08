@@ -33,6 +33,53 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+
+    val completeModel1 = BankDetails(
+      Some(PersonalAccount),
+      Some("Completed First Account Name"),
+      Some(UKAccount("12341234", "000000")),
+      false,
+      false,
+      None,
+      true)
+    val completeModel2 = BankDetails(
+      Some(BelongsToBusiness),
+      Some("Completed Second Account Name"),
+      Some(UKAccount("12341234", "000000")),
+      false,
+      false,
+      None,
+      true)
+
+    val completeModel3 = BankDetails(
+      Some(BelongsToOtherBusiness),
+      Some("Completed Third Account Name"),
+      Some(UKAccount("12341234", "000000")),
+      false,
+      false,
+      None,
+      true
+    )
+
+    val inCompleteModel1 = BankDetails(
+      Some(PersonalAccount),
+      None,
+      Some(UKAccount("12341234", "000000"))
+    )
+    val inCompleteModel2 = BankDetails(
+      Some(BelongsToBusiness),
+      Some("Incomplete Second Account Name"))
+
+    val inCompleteModel3 = BankDetails(
+      None,
+      Some("Incomplete Third Account Name"),
+      Some(UKAccount("12341234", "000000"))
+    )
+
+
+
+
+
   }
 
   "The your bank accounts view " must {
@@ -70,14 +117,19 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.YourBankAccountsController.get.url)
     }
 
-    //    "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
-    //    }
+//      "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
+//
+//        val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3))
+//        val completeModel = Seq.empty[(BankDetails, Int)]
+//        def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
+//      }
+
     //
     //    "Not have an incomplete section, or a complete header if there are no incomplete elements" in new ViewFixture {
     //    }
 
 
-    //    "have an complete section with correct data and edit / remove links - if there are complete elements" in new ViewFixture {
+    //    "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {
     //    }
     //
     //    "Not have an complete section if there are no incomplete elements" in new ViewFixture {
