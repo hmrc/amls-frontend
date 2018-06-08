@@ -16,6 +16,8 @@ POST        /uk-account/:index                                           @contro
 
 GET         /your-answers                                                @controllers.bankdetails.SummaryController.get(complete: Boolean = true)
 
+GET         /your-bank-accounts                                          @controllers.bankdetails.YourBankAccountsController.get()
+
 GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(complete: Boolean = false)
 POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post()
 
