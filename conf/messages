@@ -1321,8 +1321,9 @@ bankdetails.yourbankaccounts.title = Your bank accounts
 bankdetails.yourbankaccounts.nobank.account = You currently have no bank accounts registered
 bankdetails.yourbankaccount.intro = You need to give us the details of all bank accounts you use in your business. 
 bankdetails.yourbankaccount.add.account = Add a bank account
-bankdetails.yourbankaccount.accountnumber = Account number:
-bankdetails.yourbankaccount.sortcode = Sort code:
+bankdetails.yourbankaccount.accountnumber = Account number
+bankdetails.yourbankaccount.sortcode = Sort code
+bankdetails.yourbankaccount.iban = IBAN
 
 
 

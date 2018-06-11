@@ -824,6 +824,13 @@ fieldset .panel-indent {
   word-break: break-word;
 }
 
+.summary__listing {
+  border-bottom: 1px solid #bfc1c3;
+  padding-top:15px;
+  padding-bottom:15px;
+}
+
+
 
 /* class for older browsers; pseudo-class for modern browsers */
 

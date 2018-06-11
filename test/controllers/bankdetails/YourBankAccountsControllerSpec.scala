@@ -78,10 +78,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     val inCompleteModel3 = BankDetails(
       None,
-      Some("Incomplete Third Account Name"),
-      Some(UKAccount("12341234", "000000"))
-    )
-
+      Some("Incomplete Third Account Name"))
 
     val deletedInCompleteModel4 = inCompleteModel3.copy(
       status = Some(StatusConstants.Deleted),

@@ -34,7 +34,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    val completeModel1 = BankDetails(
+    val completedModel1 = BankDetails(
       Some(PersonalAccount),
       Some("Completed First Account Name"),
       Some(UKAccount("12341234", "000000")),
@@ -42,7 +42,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       false,
       None,
       true)
-    val completeModel2 = BankDetails(
+    val completedModel2 = BankDetails(
       Some(BelongsToBusiness),
       Some("Completed Second Account Name"),
       Some(UKAccount("12341234", "000000")),
@@ -51,10 +51,20 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       None,
       true)
 
-    val completeModel3 = BankDetails(
+    val completedModel3 = BankDetails(
       Some(BelongsToOtherBusiness),
       Some("Completed Third Account Name"),
       Some(UKAccount("12341234", "000000")),
+      false,
+      false,
+      None,
+      true
+    )
+
+    val completedModel4 = BankDetails(
+      Some(BelongsToOtherBusiness),
+      Some("Completed Third Account Name"),
+      Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")),
       false,
       false,
       None,
@@ -67,20 +77,19 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       Some(UKAccount("12341234", "000000"))
     )
     val inCompleteModel2 = BankDetails(
-      Some(BelongsToBusiness),
-      Some("Incomplete Second Account Name"))
+    Some(BelongsToBusiness),
+    Some("Incomplete Second Account Name"))
 
     val inCompleteModel3 = BankDetails(
-      None,
-      Some("Incomplete Third Account Name"),
-      Some(UKAccount("12341234", "000000"))
-    )
-
-
-
-
-
+    None,
+    Some("Incomplete Third Account Name"))
   }
+
+  val inCompleteModel4 = BankDetails(
+    Some(PersonalAccount),
+    None,
+    Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
+  )
 
   "The your bank accounts view " must {
     "have correct title" in new ViewFixture {
@@ -117,16 +126,45 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.YourBankAccountsController.get.url)
     }
 
-//      "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
-//
-//        val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3))
-//        val completeModel = Seq.empty[(BankDetails, Int)]
-//        def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
-//      }
+    "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
+      val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3), (inCompleteModel4, 4))
+      val completeModel = Seq.empty[(BankDetails, Int)]
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
 
-    //
-    //    "Not have an incomplete section, or a complete header if there are no incomplete elements" in new ViewFixture {
-    //    }
+      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " 12341234" )
+//      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
+      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.accounttype.uk.lbl.01"))
+      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
+
+      doc.getElementById("incomplete-detail-2").text mustNot include(Messages("bankdetails.yourbankaccount.accountnumber"))
+      doc.getElementById("incomplete-detail-2").text must include(Messages("bankdetails.accounttype.lbl.02"))
+      doc.getElementById("incomplete-detail-2").text mustNot include(Messages("bankdetails.yourbankaccount.sortcode"))
+      doc.getElementById("incomplete-detail-2").text must include("Incomplete Second Account Name")
+
+      doc.getElementById("incomplete-detail-3").text mustNot include(Messages("bankdetails.yourbankaccount.accountnumber"))
+      doc.getElementById("incomplete-detail-3").text mustNot include("UK")
+      doc.getElementById("incomplete-detail-3").text mustNot include(Messages("bankdetails.yourbankaccount.sortcode"))
+      doc.getElementById("incomplete-detail-3").text must include("Incomplete Third Account Name")
+
+      doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccount.iban") + " ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")
+      doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.01"))
+      doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
+    }
+
+
+
+//        "have only a complete header and section, if there are no incomplete elements" in new ViewFixture {
+//          val completeModel = Seq((completedModel1,1))
+//          val incompleteModel = Seq.empty[(BankDetails, Int)]
+//          def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
+//          doc.getElementById("completed-header").text must include(Messages("bankdetails.yourbankaccounts.complete"))
+//          Option(doc.getElementById("incomplete-header")).isDefined must be()
+//          //Option(doc.getElementById("incomplete-header")).isDefined must be(false)
+//
+//
+//
+//
+//        }
 
 
     //    "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {

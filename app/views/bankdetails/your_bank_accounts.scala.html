@@ -33,35 +33,42 @@
 ) {
     @panel(
         jsHidden = false,
-        wide = true,
-        gutter = true
+        wide = false,
+        panel=false
     ) {
         <p>@Messages("bankdetails.yourbankaccount.intro")</p>
-        @anchor(
+        <p>@anchor(
             attrHref = controllers.bankdetails.routes.YourBankAccountsController.get.url,
             linkText = Messages("bankdetails.yourbankaccount.add.account"),
             id=Some("add-account")
-        )
+        )</p>
     }
-
 
     @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
 
-
     @if(!inCompleteModel.isEmpty) {
-        <h3>@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
+        <h3 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
         <ul class="list">
         @inCompleteModel.map { bankDetail =>
-            <li class="group grid-layout">
-                <div class="grid-layout__column grid-layout__column--3-4">
-                    <div class="grid-layout__column grid-layout--2-3">
+            <li class="group summary__listing">
+                <div>
+                    <div id="incomplete-detail-@bankDetail._2" class="grid-layout__column grid-layout--2-3">
                         @bankDetail._1.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
-                        A uk business account belonging to this business<br/>
-                        Account number: 12345678<br/>
-                        Sort code: 12-34-56<br/>
+                        @(bankDetail._1.bankAccount match {
+                            case Some(UKAccount(accountNumber, sortCode)) => {
+                                    <div>{BankDetails.getBankAccountDescription(bankDetail._1)}<br/>
+                                    {Messages("bankdetails.yourbankaccount.accountnumber")}  {accountNumber}<br/>
+                                    {Messages("bankdetails.yourbankaccount.sortcode")} {}<br/></div> }
+                            case Some(NonUKAccountNumber(ibanNumber)) =>
+                            { <div>{BankDetails.getBankAccountDescription(bankDetail._1)}<br/>
+                            {Messages("bankdetails.yourbankaccount.iban")}  {ibanNumber}<br/></div> }
+                            case _ => {
+                                <div>{bankDetail._1.bankAccountType.map(x=> Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
+                            }
+                        })
                     </div>
                     <div class="grid-layout__column grid-layout--1-3">
-                        edit or remove
+                        remove
                     </div>
                 </div>
             </li>
@@ -69,29 +76,35 @@
         </ul>
     }
 
-
     @if(!completedModel.isEmpty) {
-        @if(!inCompleteModel.isEmpty) { <h3>@Messages("bankdetails.yourbankaccounts.complete")</h3> }
+        @if(!inCompleteModel.isEmpty) { <h3 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h3> }
         <ul class="list">
-            @completedModel.map { bankDetail =>
-                <li class="group grid-layout">
-                    <div class="grid-layout__column grid-layout__column--3-4">
-                        <div class="grid-layout__column grid-layout--2-3">
-                            @bankDetail._1.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
-                                A uk business account belonging to this business<br/>
-                                Account number: 12345678<br/>
-                                Sort code: 12-34-56<br/>
-                        </div>
-                        <div class="grid-layout__column grid-layout--1-3">
-                            edit or remove
-                        </div>
+        @completedModel.map { bankDetail =>
+            <li class="group summary__listing">
+                <div>
+                    <div id="completed-detail-@bankDetail._2" class="grid-layout__column grid-layout--2-3">
+                        @bankDetail._1.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
+                        @(bankDetail._1.bankAccount match {
+                            case Some(UKAccount(accountNumber, sortCode)) => {
+                                <div>{BankDetails.getBankAccountDescription(bankDetail._1)}<br/>
+                                {Messages("bankdetails.yourbankaccount.accountnumber")}  {accountNumber}<br/>
+                                {Messages("bankdetails.yourbankaccount.sortcode")} {sortCode}<br/></div> }
+                            case Some(NonUKAccountNumber(ibanNumber)) =>
+                                { <div>{BankDetails.getBankAccountDescription(bankDetail._1)}<br/>
+                                {Messages("bankdetails.yourbankaccount.iban")}  {ibanNumber}<br/></div> }
+                            case _ => {
+                                <div>{bankDetail._1.bankAccountType.map(x=> Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
+                            }
+                        })
                     </div>
-                </li>
-            }
+                    <div class="grid-layout__column grid-layout--1-3">
+                        remove
+                    </div>
+                </div>
+            </li>
+        }
         </ul>
     }
-
-
 
     @if(true) {
             @form(f, controllers.bankdetails.routes.SummaryController.post()) {
