@@ -34,7 +34,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models.{AmendVariationRenewalResponse, FormTypes, SubmissionRequestStatus, SubscriptionResponse}
+import models._
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
@@ -141,29 +141,31 @@ class LandingController @Inject()(val landingService: LandingService,
     } getOrElse Future.successful(Redirect(controllers.routes.LandingController.get()))
   }
 
-  private def refreshAndRedirect(amlsRegistrationNumber: String, cacheMap: Option[CacheMap])
-                                (implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-    Logger.debug("refreshAndRedirect Triggered")
-    landingService.refreshCache(amlsRegistrationNumber) map {
-      _ => {
-        Try {
-          val fromDuplicate = cacheMap match {
-            case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
-              _.previouslySubmitted.contains(true)
-            }
-            case _ => false
-          }
-          Logger.debug("refreshAndRedirect from duplicate Triggered")
-          Redirect(controllers.routes.StatusController.get(fromDuplicate))
-        }
-      } match {
-        case Success(r) => r
-        case _ => {
-          Logger.debug("refreshAndRedirect from without duplicate Triggered")
-          Redirect(controllers.routes.StatusController.get())
-        }
+  private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap])
+                                (implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
+    maybeCacheMap match {
+      case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        Future.successful(Redirect(controllers.routes.StatusController.get()))
 
-      }
+      case _ =>
+        landingService.refreshCache(amlsRegistrationNumber) map {
+          _ => {
+            Try {
+              val fromDuplicate = maybeCacheMap match {
+                case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
+                  _.previouslySubmitted.contains(true)
+                }
+                case _ => false
+              }
+
+              Redirect(controllers.routes.StatusController.get(fromDuplicate))
+            }
+          } match {
+            case Success(r) => r
+            case _ =>
+              Redirect(controllers.routes.StatusController.get())
+          }
+        }
     }
   }
 

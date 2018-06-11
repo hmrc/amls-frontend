@@ -164,7 +164,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
     "return a Completed Section" when {
       "model is complete and has not changed" in {
         val complete = Seq(completeModel)
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(true))
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(-1))
 
         mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
 
@@ -174,7 +174,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
       "model is complete and has changed" in {
         val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
 
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(-1))
 
         mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
 
@@ -183,7 +183,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
       "model is complete with No bankaccount option selected" in {
         val noBankAccount = Seq(BankDetails(None, None, None, true, false, None, true))
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(true))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(-1))
 
         mockCacheGetEntry[Seq[BankDetails]](Some(noBankAccount), BankDetails.key)
 
@@ -260,7 +260,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
         }
 
         "the section is complete with all the bank details unchanged" in {
@@ -271,7 +271,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
           section.hasChanged must be(false)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
         }
 
         "the section is complete with all the bank details being modified" in {
@@ -282,7 +282,7 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(true))
+          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
         }
 
       }

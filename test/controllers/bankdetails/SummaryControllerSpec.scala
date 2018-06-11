@@ -31,277 +31,88 @@ import scala.collection.JavaConversions._
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new SummaryController(
       dataCacheConnector = mockCacheConnector,
-      authConnector = self.authConnector,
-      statusService = mockStatusService
+      authConnector = self.authConnector
     )
   }
 
   "Get" must {
 
-    "load the summary page with the correct link text when the section is incomplete" in new Fixture {
+    "load the summary page with the correct text when UK" in new Fixture {
 
-      val model = BankDetails(None, None)
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get()(request)
+      val result = controller.get(1)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("Accept and complete section")
-      contentAsString(result) mustNot include("Confirm and continue")
+      contentAsString(result) must include("My Personal Account")
+      contentAsString(result) must include("11-11-11")
+      contentAsString(result) must include("123456789")
+      contentAsString(result) must include(Messages("bankdetails.bankaccount.sortcode"))
+      contentAsString(result) mustNot include("My IBAN Account")
     }
 
 
-    "load the summary page with the correct link text when the section is complete" in new Fixture {
+    "load the summary page with correct text when IBAN" in new Fixture {
 
-      val model = BankDetails(None, None, hasAccepted = true)
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
       mockApplicationStatus(SubmissionReady)
 
-      val result = controller.get(true)(request)
+      val result = controller.get(2)(request)
 
       status(result) must be(OK)
-      contentAsString(result) must include("Confirm and continue")
-    }
-
-    "redirect to the main amls summary page when section data is unavailable" in new Fixture {
-
-      mockCacheFetch[Seq[BankDetails]](None)
-      mockApplicationStatus(SubmissionReady)
-
-      val result = controller.get()(request)
-
-      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
-      status(result) must be(SEE_OTHER)
-    }
-
-    "show bank account details on the Check your Answers page" in new Fixture {
-
-      val model = BankDetails(
-        Some(PersonalAccount),
-        Some("Account Name"),
-        Some(UKAccount("12341234","000000"))
-      )
-
-      mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-      mockApplicationStatus(SubmissionReady)
-
-      val result = controller.get()(request)
-
-      val contentString = contentAsString(result)
-
-      val document = Jsoup.parse(contentString)
-
-      val pageTitle = Messages("title.cya") + " - " +
-        Messages("summary.bankdetails") + " - " +
-        Messages("title.amls") + " - " + Messages("title.gov")
-
-      document.title() mustBe pageTitle
-
-      contentString must include("Account Name")
-      contentString must include("Account number: 12341234")
-      contentString must include("Sort code: 00-00-00")
-      contentString must include("UK Bank Account")
-      contentString must include("A personal bank account")
-    }
-
-    "show no bank account text" when {
-      "no bank account is selected" in new Fixture {
-
-        val model = BankDetails(None,None)
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-        mockApplicationStatus(SubmissionReady)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-        contentAsString(result) must include (Messages("bankdetails.summary.nobank.account"))
-      }
-    }
-
-    "not show edit links" when {
-      "on check-your-answers page in amendments" in new Fixture {
-
-        val model = BankDetails(
-          Some(PersonalAccount),
-          Some("Account Name"),
-          Some(UKAccount("12341234","000000"))
-        )
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-        mockApplicationStatus(SubmissionReadyForReview)
-
-        val result = controller.get()(request)
-
-        val contentString = contentAsString(result)
-
-        val document = Jsoup.parse(contentString)
-
-        val pageTitle = Messages("title.cya") + " - " +
-          Messages("summary.bankdetails") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        document.title() mustBe pageTitle
-
-        for(element <- document.getElementsByAttribute("href")){
-          element.text must not be "Edit"
-        }
-
-        status(result) must be(OK)
-      }
-      "on check-your-answers page in variations" in new Fixture {
-
-        val model = BankDetails(
-          Some(PersonalAccount),
-          Some("Account Name"),
-          Some(UKAccount("12341234","000000"))
-        )
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        val result = controller.get()(request)
-
-        val contentString = contentAsString(result)
-
-        val document = Jsoup.parse(contentString)
-
-        val pageTitle = Messages("title.cya") + " - " +
-          Messages("summary.bankdetails") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        document.title() mustBe pageTitle
-
-        for(element <- document.getElementsByAttribute("href")){
-          element.text must not be "Edit"
-        }
-
-        status(result) must be(OK)
-      }
-      "on your-answers page in amendments" in new Fixture {
-
-        val model = BankDetails(
-          Some(PersonalAccount),
-          Some("Account Name"),
-          Some(UKAccount("12341234","000000"))
-        )
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-        mockApplicationStatus(SubmissionReadyForReview)
-
-        val result = controller.get(true)(request)
-
-        val contentString = contentAsString(result)
-
-        val document = Jsoup.parse(contentString)
-        val pageTitle = Messages("title.ya") + " - " +
-          Messages("summary.bankdetails") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        document.title() mustBe pageTitle
-
-        for(element <- document.getElementsByAttribute("href")){
-          element.text must not be "Edit"
-        }
-
-        status(result) must be(OK)
-      }
-      "on your-answers page in variations" in new Fixture {
-
-        val model = BankDetails(
-          Some(PersonalAccount),
-          Some("Account Name"),
-          Some(UKAccount("12341234","000000"))
-        )
-
-        mockCacheFetch[Seq[BankDetails]](Some(Seq(model)))
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        val result = controller.get(true)(request)
-
-        val contentString = contentAsString(result)
-
-        val document = Jsoup.parse(contentString)
-        val pageTitle = Messages("title.ya") + " - " +
-          Messages("summary.bankdetails") + " - " +
-          Messages("title.amls") + " - " + Messages("title.gov")
-
-        document.title() mustBe pageTitle
-
-        for(element <- document.getElementsByAttribute("href")){
-          element.text must not be "Edit"
-        }
-
-        status(result) must be(OK)
-      }
-
+      contentAsString(result) must include("My IBAN Account")
+      contentAsString(result) must include("DE89370400440532013000")
+      contentAsString(result) must include(Messages("bankdetails.bankaccount.iban"))
+      contentAsString(result) mustNot include("My Personal Account")
     }
   }
 
   "post is called" must {
-    "respond with OK and redirect to the bank account details page" when {
+    "respond with OK and redirect to the bank account details page" in new Fixture {
 
-      "all questions are complete" in new Fixture {
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")))
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
-        val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(model1, model2)))
 
-        mockCacheFetch[Seq[BankDetails]](None)
-        mockCacheSave[Seq[BankDetails]]
+      mockCacheSave[Seq[BankDetails]]
 
-        val result = controller.post()(newRequest)
+      val result = controller.post(2)(request)
 
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
-      }
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
+    }
 
-      "when there are bank accounts" when {
+    "update the accepted flag" in new Fixture {
+      val model1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")), hasAccepted = true)
+      val model2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")))
 
-        "update the accepted flag" in new Fixture {
-          val accountType1 = PersonalAccount
-          val bankAccount1 = UKAccount("111111", "11-11-11")
+      val completeModel1 = BankDetails(Some(PersonalAccount), Some("My Personal Account"), Some(UKAccount("123456789", "111111")), hasAccepted = true)
+      val completeModel2 = BankDetails(Some(BelongsToBusiness), Some("My IBAN Account"), Some(NonUKIBANNumber("DE89370400440532013000")), hasAccepted = true)
 
-          val accountType2 = PersonalAccount
-          val bankAccount2 = UKAccount("222222", "22-22-22")
+      val bankAccounts = Seq(model1, model2)
 
-          val accountType3 = PersonalAccount
-          val bankAccount3 = UKAccount("333333", "33-33-33")
+      mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
+      mockCacheSave[Seq[BankDetails]]
 
-          val accountType4 = PersonalAccount
-          val bankAccount4 = UKAccount("444444", "44-44-44")
+      val result = controller.post(2)(request)
 
-          val Model1 = BankDetails(Some(accountType1), None, Some(bankAccount1))
-          val Model2 = BankDetails(Some(accountType2), None, Some(bankAccount2))
-          val Model3 = BankDetails(Some(accountType3), None, Some(bankAccount3))
-          val Model4 = BankDetails(Some(accountType4), None, Some(bankAccount4))
+      status(result) must be(SEE_OTHER)
 
-          val completeModel1 = BankDetails(Some(accountType1), None, Some(bankAccount1), hasAccepted = true)
-          val completeModel2 = BankDetails(Some(accountType2), None, Some(bankAccount2), hasAccepted = true)
-          val completeModel3 = BankDetails(Some(accountType3), None, Some(bankAccount3), hasAccepted = true)
-          val completeModel4 = BankDetails(Some(accountType4), None, Some(bankAccount4), hasAccepted = true)
-
-          val bankAccounts = Seq(Model1,Model2,Model3,Model4)
-
-          val newRequest = request.withFormUrlEncodedBody("hasAccepted" -> "true")
-
-          mockCacheFetch[Seq[BankDetails]](Some(bankAccounts))
-          mockCacheSave[Seq[BankDetails]]
-
-          val result = controller.post()(newRequest)
-
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
-
-          verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
-            meq(Seq(completeModel1, completeModel2,completeModel3,completeModel4)))(any(), any(), any())
-        }
-
-      }
+      verify(controller.dataCacheConnector).save[Seq[BankDetails]](any(),
+        meq(Seq(completeModel1, completeModel2)))(any(), any(), any())
     }
   }
 }
