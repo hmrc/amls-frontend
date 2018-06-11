@@ -113,7 +113,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
     "return a NotStarted Section" when {
       "there is no data at all" in {
-        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get(-1))
+        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
 
         mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
 
@@ -244,7 +244,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
           section.hasChanged must be(false)
           section.status must be(NotStarted)
-          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get(-1))
+          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get())
         }
       }
 
