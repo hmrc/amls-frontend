@@ -70,10 +70,6 @@ class BankAccountNameController @Inject()(
             Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
           case ValidForm(_, data) =>
             val newBankDetails = BankDetails(accountName = Some(data))
-            val result: Future[CacheMap] = dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
-              val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails)
-              dataCacheConnector.save(BankDetails.key, newList)
-            }
             index match {
               case Some(i) => updateDataStrict[BankDetails](i) { bd =>
                 bd.copy(
@@ -91,7 +87,10 @@ class BankAccountNameController @Inject()(
                   Redirect(routes.BankAccountTypeController.get(i))
                 }
               }
-              case _ => result map { _ => Redirect(routes.BankAccountTypeController.get(index.get)) }
+              case _ => dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
+                val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails)
+                dataCacheConnector.save(BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(index.get)) }
+              }
             }
         }
       } recoverWith {
