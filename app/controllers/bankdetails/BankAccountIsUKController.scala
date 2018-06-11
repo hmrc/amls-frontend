@@ -81,7 +81,7 @@ class BankAccountIsUKController @Inject()(
               if (edit) {
                 Future.successful(Redirect(routes.SummaryController.get(index)))
               } else {
-                lazy val redirect = Redirect(routes.BankAccountRegisteredController.get(index))
+                lazy val redirect = Redirect(routes.YourBankAccountsController.get())
                 (sendAudit map { _ =>
                   redirect
                 }) getOrElse redirect

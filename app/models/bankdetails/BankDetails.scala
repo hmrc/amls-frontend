@@ -63,36 +63,22 @@ object BankDetails {
 
   implicit def maybeBankAccount(account: Account): Option[Account] = Some(account)
 
-  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged || x.status.contains(StatusConstants.Deleted) }
+  def anyChanged(newModel: Seq[BankDetails]): Boolean = newModel exists { x => x.hasChanged }
 
   def section(implicit cache: CacheMap): Section = {
     Logger.debug(s"[BankDetails][section] $cache")
 
-    def filter(bds: Seq[BankDetails]) = bds.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_.equals(BankDetails()))
-
     val msgKey = "bankdetails"
-    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get())
+    val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
 
-    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection) { bds =>
-      if (filter(bds).equals(Nil)) {
-        Section(msgKey, NotStarted, anyChanged(bds), controllers.bankdetails.routes.BankAccountAddController.get())
-      } else {
-        bds match {
-          case model if model.isEmpty => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(-1))
-          case model if model forall {
-            _.isComplete
-          } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.SummaryController.get(-1))
-          case model => {
-            val index = model.indexWhere {
-              case bdModel if !bdModel.isComplete => true
-              case _ => false
-            }
-            Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.WhatYouNeedController.get(index + 1))
-          }
-        }
-      }
+    cache.getEntry[Seq[BankDetails]](key).fold(defaultSection) {
+      case model if model.isEmpty => Section(msgKey, Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+      case bds@model if model forall {
+        _.isComplete
+      } => Section(msgKey, Completed, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get())
+      case bds@_ =>
+        Section(msgKey, Started, anyChanged(bds), controllers.bankdetails.routes.YourBankAccountsController.get())
     }
-
   }
 
   val key = "bank-details"
