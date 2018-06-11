@@ -1275,6 +1275,14 @@ bankdetails.accounttype.lbl.01 = A personal bank account
 bankdetails.accounttype.lbl.02 = A business account belonging to this business
 bankdetails.accounttype.lbl.03 = A business account belonging to another business
 bankdetails.accounttype.lbl.04 = The business doesn’t use a bank account
+bankdetails.accounttype.uk.lbl.01 = A UK personal bank account
+bankdetails.accounttype.uk.lbl.02 = A UK business account belonging to this business
+bankdetails.accounttype.uk.lbl.03 = A UK business account belonging to another business
+bankdetails.accounttype.uk.lbl.04 = The business doesn’t use a bank account
+bankdetails.accounttype.nonuk.lbl.01 = A non UK personal bank account
+bankdetails.accounttype.nonuk.lbl.02 = A non UK business account belonging to this business
+bankdetails.accounttype.nonuk.lbl.03 = A non UK business account belonging to another business
+bankdetails.accounttype.nonuk.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account does your business use?
 bankdetails.bankaccount.accountname.title = Give this bank account a name
 bankdetails.bankaccount.accountname = Give this bank account a name
@@ -1309,13 +1317,19 @@ bankdetails.remove.bank.account.text = This will permanently remove {0} from you
 bankdetails.remove.bank.account.btn = Remove bank account
 bankdetails.yourbankaccounts.incomplete = Incomplete
 bankdetails.yourbankaccounts.complete = Complete
-bankdetails.yourbankaccounts.noaccountname = ZZZZZZZZZZZZZZ Missing ACCOUNT NAME ZZZZZZZZZZZ
+bankdetails.yourbankaccounts.noaccountname = Unnamed bank account
 bankdetails.yourbankaccounts.title = Your bank accounts
 bankdetails.yourbankaccounts.nobank.account = You currently have no bank accounts registered
 bankdetails.yourbankaccount.intro = You need to give us the details of all bank accounts you use in your business. 
 bankdetails.yourbankaccount.add.account = Add a bank account
-bankdetails.hasbankaccount.title = Does your business have a bank account?
-bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
+bankdetails.yourbankaccount.accountnumber = Account number
+bankdetails.yourbankaccount.sortcode = Sort code
+bankdetails.yourbankaccount.iban = IBAN
+bankdetails.yourbankaccount.edit = Edit
+bankdetails.yourbankaccount.or = or
+bankdetails.yourbankaccount.remove = Remove
+button.bankdetails.yourbankaccount.acceptandcomplete = Accept and complete section
+
 
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:

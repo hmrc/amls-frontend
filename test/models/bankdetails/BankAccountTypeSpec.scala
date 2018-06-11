@@ -26,7 +26,7 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
 
   "Bank account types form" must {
     "fail to validate" when {
-      "an invalid selectiion is made for the type of bank account the business uses" in {
+      "an invalid selection is made for the type of bank account the business uses" in {
         val urlFormEncoded = Map(
           "bankAccountType" -> Seq("")
         )
@@ -52,6 +52,13 @@ class BankAccountTypeSpec extends PlaySpec with MockitoSugar {
   }
 
   "BankAccountType" must {
+
+    "return the correct type id" in {
+      PersonalAccount.getBankAccountTypeID must be("01")
+      BelongsToBusiness.getBankAccountTypeID must be("02")
+      BelongsToOtherBusiness.getBankAccountTypeID must be("03")
+      NoBankAccountUsed.getBankAccountTypeID must be("04")
+    }
 
     "successfully validate form Read" in {
       BankAccountType.formReads.validate(Map("bankAccountType" -> Seq("01"))) must be (Valid(Some(PersonalAccount)))

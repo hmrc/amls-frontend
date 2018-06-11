@@ -23,9 +23,9 @@ import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import utils.{DependencyMocks, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 
-class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with OneAppPerSuite with DependencyMocks with BankDetailsModels {
+class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite with DependencyMocks with BankDetailsModels {
 
   val emptyBankDetails: Option[BankDetails] = None
 
@@ -108,6 +108,46 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     }
 
   }
+
+  "getBankAccountDescription" must {
+    "return the correct uk account descriptions" when {
+
+      val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(UKAccount("05108289", "523011")))
+      val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+      val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
+      val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+
+      BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.uk.lbl.01"))
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.uk.lbl.02"))
+      BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.uk.lbl.03"))
+      BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.uk.lbl.04"))
+   }
+  "return the correct non-uk account descriptions" when {
+
+    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")))
+    val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+    val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
+    val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+
+    BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.nonuk.lbl.01"))
+    BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.nonuk.lbl.02"))
+    BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.nonuk.lbl.03"))
+    BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.nonuk.lbl.04"))
+ }
+
+  "return the correct description wheere there are no account numbers present" when {
+
+    val bankDetailsPersonal = BankDetails(Some(PersonalAccount), None, None)
+    val bankDetailsBelongstoBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToBusiness))
+    val bankDetailsBelongstoOtherBusiness = bankDetailsPersonal.copy(bankAccountType = Some(BelongsToOtherBusiness))
+    val bankDetailsNoBankAccountUsed = bankDetailsPersonal.copy(bankAccountType = Some(NoBankAccountUsed))
+
+    BankDetails.getBankAccountDescription(bankDetailsPersonal) must be(messages("bankdetails.accounttype.lbl.01"))
+    BankDetails.getBankAccountDescription(bankDetailsBelongstoBusiness) must be(messages("bankdetails.accounttype.lbl.02"))
+    BankDetails.getBankAccountDescription(bankDetailsBelongstoOtherBusiness) must be(messages("bankdetails.accounttype.lbl.03"))
+    BankDetails.getBankAccountDescription(bankDetailsNoBankAccountUsed) must be(messages("bankdetails.accounttype.lbl.04"))
+ }
+}
 
   "Section" must {
 

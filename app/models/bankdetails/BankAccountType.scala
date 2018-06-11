@@ -21,12 +21,20 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json._
 
-sealed trait BankAccountType
+sealed trait BankAccountType {
+  def getBankAccountTypeID:String = {
+    this match {
+      case PersonalAccount => "01"
+      case BelongsToBusiness => "02"
+      case BelongsToOtherBusiness => "03"
+      case NoBankAccountUsed => "04"
+    }
+  }
+}
 
 case object PersonalAccount extends BankAccountType
 case object BelongsToBusiness extends BankAccountType
 case object BelongsToOtherBusiness extends BankAccountType
-case class SomeOtherAccountType(t: String) extends BankAccountType
 case object NoBankAccountUsed extends BankAccountType
 
 object BankAccountType {
