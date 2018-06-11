@@ -1,7 +1,5 @@
 GET         /what-you-need                                              @controllers.bankdetails.WhatYouNeedController.get
 
-GET         /add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
-
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
@@ -11,12 +9,13 @@ POST        /account-name/:index                                         @contro
 GET         /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
 POST        /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
 
-GET         /your-answers                                                @controllers.bankdetails.SummaryController.get(complete: Boolean = true)
-
 GET         /your-bank-accounts                                          @controllers.bankdetails.YourBankAccountsController.get()
 
-GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(complete: Boolean = false)
-POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post()
+GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(index:Int)
+POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post(index:Int)
 
 GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
 POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)
+
+GET         /has-bank-account                                            @controllers.bankdetails.HasBankAccountController.get()
+POST        /has-bank-account                                            @controllers.bankdetails.HasBankAccountController.post()
