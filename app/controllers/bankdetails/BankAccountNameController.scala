@@ -58,7 +58,7 @@ class BankAccountNameController @Inject()(
               case Some(_) =>
                 Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, Some(i)))
             }
-          case _ => Future.successful(NotFound(notFoundView))
+          case _ => Future.successful(Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, None)))
         }
   }
 

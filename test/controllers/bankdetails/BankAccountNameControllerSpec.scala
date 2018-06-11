@@ -60,7 +60,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
   "BankAccountController" when {
     "get is called" must {
       "respond with OK" when {
-        "given a name" in new Fixture {
+        "without a name" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
@@ -74,20 +74,21 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
             document.select(s"input[name=$field]").`val` must be(empty)
         }
 
-        "without a name" in new Fixture {
+        "with a name" in new Fixture {
 
           val ukBankAccount = UKAccount("12345678", "000000")
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("my bank account"), Some(ukBankAccount)))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(Some(1), true)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
           status(result) must be(OK)
+          for (field <- fieldElements)
+            document.select(s"input[name=$field]").`val` must include("my bank account")
         }
-      }
-
-      "respond with NOT_FOUND" when {
+        
         "there is no bank account information at all" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
@@ -95,8 +96,10 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(None, false)(request)
-
-          status(result) must be(NOT_FOUND)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          status(result) must be(OK)
+          for (field <- fieldElements)
+            document.select(s"input[name=$field]").`val` must be(empty)
         }
       }
     }
