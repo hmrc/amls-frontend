@@ -31,9 +31,9 @@
     @if(returnLink) {
         <p class="return-link">
             @if(returnLocation == Some("renewal")) {
-                <a href="@controllers.renewal.routes.RenewalProgressController.get().url">@Messages("link.return.renewal.progress")</a>
+                <a id="return-to-application-renewal" href="@controllers.renewal.routes.RenewalProgressController.get().url">@Messages("link.return.renewal.progress")</a>
             } else {
-                <a href="@controllers.routes.RegistrationProgressController.get().url">@Messages("link.return.registration.progress")</a>
+                <a id="return-to-application" href="@controllers.routes.RegistrationProgressController.get().url">@Messages("link.return.registration.progress")</a>
             }
         </p>
     }
