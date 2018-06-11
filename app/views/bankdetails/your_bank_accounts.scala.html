@@ -38,7 +38,7 @@
     ) {
         <p>@Messages("bankdetails.yourbankaccount.intro")</p>
         <p>@anchor(
-            attrHref = controllers.bankdetails.routes.WhatYouNeedController.get(0).url,
+            attrHref = controllers.bankdetails.routes.WhatYouNeedController.get(-1).url,
             linkText = Messages("bankdetails.yourbankaccount.add.account"),
             id=Some("add-account")
         )</p>

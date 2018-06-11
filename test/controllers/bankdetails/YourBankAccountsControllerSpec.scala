@@ -101,7 +101,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) must include("<h3>" + Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
       contentAsString(result) must include("Completed First Account Name")
       contentAsString(result) must include("Completed Second Account Name")
       contentAsString(result) must include("Completed Third Account Name")
@@ -120,7 +120,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include("<h3>" + Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
       contentAsString(result) mustNot include("Completed First Account Name")
       contentAsString(result) mustNot include("Completed Second Account Name")
       contentAsString(result) mustNot include("Completed Third Account Name")
@@ -138,7 +138,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include("<h3>" + Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
       contentAsString(result) must include("Completed First Account Name")
       contentAsString(result) must include("Completed Second Account Name")
       contentAsString(result) must include("Completed Third Account Name")
@@ -156,7 +156,7 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(OK)
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include("<h3>" + Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
     }
   }
 }
