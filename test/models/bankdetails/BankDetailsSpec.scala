@@ -113,7 +113,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
     "return a NotStarted Section" when {
       "there is no data at all" in {
-        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.BankAccountAddController.get(true))
+        val notStartedSection = Section("bankdetails", NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
 
         mockCacheGetEntry[Seq[BankDetails]](None, BankDetails.key)
 
@@ -124,7 +124,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
     "return a Completed Section" when {
       "model is complete and has not changed" in {
         val complete = Seq(completeModel)
-        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.SummaryController.get(-1))
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
 
         mockCacheGetEntry[Seq[BankDetails]](Some(complete), BankDetails.key)
 
@@ -134,7 +134,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
       "model is complete and has changed" in {
         val completeChangedModel = BankDetails(Some(accountType), Some("name"), Some(bankAccount), true, hasAccepted = true)
 
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(-1))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get())
 
         mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeChangedModel)), BankDetails.key)
 
@@ -142,10 +142,33 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
       }
 
       "model is complete with No bankaccount option selected" in {
-        val noBankAccount = Seq(BankDetails(None, None, None, true, false, None, true))
-        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.SummaryController.get(-1))
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
 
-        mockCacheGetEntry[Seq[BankDetails]](Some(noBankAccount), BankDetails.key)
+        mockCacheGetEntry[Seq[BankDetails]](Some(Seq.empty), BankDetails.key)
+
+        val section = BankDetails.section(mockCacheMap)
+        section.hasChanged must be(false)
+        section.status must be(Completed)
+        BankDetails.section(mockCacheMap) must be(completedSection)
+      }
+
+      "model is complete with only deleted bankaccounts that have not changed" in {
+        val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted)))
+        val completedSection = Section("bankdetails", Completed, false, controllers.bankdetails.routes.YourBankAccountsController.get())
+
+        mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
+
+        val section = BankDetails.section(mockCacheMap)
+        section.hasChanged must be(false)
+        section.status must be(Completed)
+        BankDetails.section(mockCacheMap) must be(completedSection)
+      }
+
+      "model is complete with only deleted bankaccounts that have changed" in {
+        val deleted = Seq(completeModel.copy(status = Some(StatusConstants.Deleted), hasChanged = true, hasAccepted = true))
+        val completedSection = Section("bankdetails", Completed, true, controllers.bankdetails.routes.YourBankAccountsController.get())
+
+        mockCacheGetEntry[Seq[BankDetails]](Some(deleted), BankDetails.key)
 
         val section = BankDetails.section(mockCacheMap)
         section.hasChanged must be(true)
@@ -156,47 +179,11 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
     "return a Started Section when model is incomplete" in {
       val incomplete = Seq(accountTypePartialModel)
-      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.WhatYouNeedController.get())
+      val startedSection = Section("bankdetails", Started, false, controllers.bankdetails.routes.YourBankAccountsController.get())
 
       mockCacheGetEntry[Seq[BankDetails]](Some(incomplete), BankDetails.key)
 
       BankDetails.section(mockCacheMap) must be(startedSection)
-    }
-
-    "return a result indicating NotStarted" when {
-      "the section consists of just 1 empty Bank details" in {
-
-        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(BankDetails())), BankDetails.key)
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.NotStarted)
-      }
-    }
-
-    "return a result indicating partial completeness" when {
-      "the section consists of a partially complete model followed by a completely empty one" in {
-
-        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(incompleteModel, BankDetails())), BankDetails.key)
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Started)
-      }
-    }
-
-    "return a result indicating completeness" when {
-      "the section consists of a complete model followed by an empty one" in {
-
-        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModel, BankDetails(hasAccepted = true))), BankDetails.key)
-
-        BankDetails.section(mockCacheMap).status must be(models.registrationprogress.Completed)
-      }
-    }
-
-    "return the correct index of the section" when {
-      "the section has a completed model, an empty one and an incomplete one" in {
-
-        mockCacheGetEntry[Seq[BankDetails]](Some(Seq(completeModel, BankDetails(), incompleteModel)), BankDetails.key)
-
-        BankDetails.section(mockCacheMap).call.url must be(controllers.bankdetails.routes.WhatYouNeedController.get().url)
-      }
     }
 
     "set hasChanged and hasAccepted when updating bankAccountType set to None" in {
@@ -209,7 +196,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
     "Amendment and Variation flow" must {
 
-      "redirect to Check Your Answers" when {
+      "redirect to Your Bank Accounts page" when {
         "the section is complete with one of the bank details object being removed" in {
 
           mockCacheGetEntry[Seq[BankDetails]](Some(Seq(
@@ -220,7 +207,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
         }
 
         "the section is complete with all the bank details unchanged" in {
@@ -231,7 +218,7 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
           section.hasChanged must be(false)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
         }
 
         "the section is complete with all the bank details being modified" in {
@@ -242,40 +229,23 @@ class BankDetailsSpec extends PlaySpec with MockitoSugar with CharacterSets with
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.bankdetails.routes.SummaryController.get(-1))
+          section.call must be(controllers.bankdetails.routes.YourBankAccountsController.get())
         }
 
       }
 
       "redirect to What You Need" when {
-        "the section is complete with all the bank details being removed" in {
+        "there is no bank account data" in {
 
-          mockCacheGetEntry(Some(Seq(
-            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true),
-            BankDetails(status = Some(StatusConstants.Deleted), hasChanged = true))),
+          mockCacheGetEntry(None,
             BankDetails.key)
 
           val section = BankDetails.section(mockCacheMap)
 
-          section.hasChanged must be(true)
+          section.hasChanged must be(false)
           section.status must be(NotStarted)
-          section.call must be(controllers.bankdetails.routes.BankAccountAddController.get(true))
+          section.call must be(controllers.bankdetails.routes.WhatYouNeedController.get())
         }
-      }
-
-      "exclude Nobank account and deleted bank accounts before sending to ETMP" in {
-
-        val completeModel = BankDetails(Some(accountType), None, Some(bankAccount), status = Some(StatusConstants.Deleted))
-        val completeModelChanged = BankDetails(Some(accountType), None, Some(bankAccount), true)
-        val NoBankAccount = BankDetails(None,None,None, true)
-
-        val bankAccts = Seq(completeModel, completeModelChanged, NoBankAccount)
-        val bankDtls = bankAccts.filterNot(x => x.status.contains(StatusConstants.Deleted) || x.bankAccountType.isEmpty)
-        val test = bankDtls.nonEmpty match {
-          case true => Some(bankDtls)
-          case false => Some(Seq.empty)
-        }
-        test must be(Some(Seq(completeModelChanged)))
       }
 
     }
