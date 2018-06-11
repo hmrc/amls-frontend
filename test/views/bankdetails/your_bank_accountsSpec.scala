@@ -63,7 +63,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
 
     val completedModel4 = BankDetails(
       Some(BelongsToOtherBusiness),
-      Some("Completed Third Account Name"),
+      Some("Completed Fourth Account Name"),
       Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")),
       false,
       false,
@@ -128,11 +128,13 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
 
     "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
       val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3), (inCompleteModel4, 4))
-      val completeModel = Seq.empty[(BankDetails, Int)]
-      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
+      val completedModel = Seq.empty[(BankDetails, Int)]
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+
+      doc.getElementById("incomplete-header").text must include(Messages("bankdetails.yourbankaccounts.incomplete"))
 
       doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " 12341234" )
-//      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
+      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
       doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.accounttype.uk.lbl.01"))
       doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
@@ -149,42 +151,96 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccount.iban") + " ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.01"))
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
+
+      doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
+      doc.getElementById("incomplete-detail-edit-1").text must be(Messages("bankdetails.yourbankaccount.edit"))
+      doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(1,false).url)
+      doc.getElementById("incomplete-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
+      doc.getElementById("incomplete-action-panel").text must include(Messages("bankdetails.yourbankaccount.or"))
+    }
+
+    "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {
+      val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
+      val incompleteModel = Seq.empty[(BankDetails, Int)]
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+
+      Option(doc.getElementById("incomplete-header")).isDefined must be(false)
+      Option(doc.getElementById("completed-header")).isDefined must be(false)
+
+      doc.getElementById("completed-detail-1").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " 12341234" )
+      doc.getElementById("completed-detail-1").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
+      doc.getElementById("completed-detail-1").text must include(Messages("bankdetails.accounttype.uk.lbl.01"))
+      doc.getElementById("completed-detail-1").text must include("Completed First Account Name")
+
+      doc.getElementById("completed-detail-2").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " 12341234" )
+      doc.getElementById("completed-detail-2").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
+      doc.getElementById("completed-detail-2").text must include(Messages("bankdetails.accounttype.uk.lbl.02"))
+      doc.getElementById("completed-detail-2").text must include("Completed Second Account Name")
+
+      doc.getElementById("completed-detail-3").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " 12341234" )
+      doc.getElementById("completed-detail-3").text must include(Messages("bankdetails.yourbankaccount.sortcode") + " 00-00-00" )
+      doc.getElementById("completed-detail-3").text must include(Messages("bankdetails.accounttype.uk.lbl.03"))
+      doc.getElementById("completed-detail-3").text must include("Completed Third Account Name")
+
+      doc.getElementById("completed-detail-4").text must include(Messages("bankdetails.yourbankaccount.iban") + " ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")
+      doc.getElementById("completed-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.03"))
+      doc.getElementById("completed-detail-4").text must include("Completed Fourth Account Name")
+
+      Option(doc.getElementById("completed-detail-edit-1")).isDefined must be(false)
+      doc.getElementById("completed-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(1,false).url)
+      doc.getElementById("completed-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
     }
 
 
+    "have an both and incomplete and complete section if there are complete and incomplete elements" in new ViewFixture {
+      val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
+      val incompleteModel = Seq((inCompleteModel1,1), (inCompleteModel2,2), (inCompleteModel3,3), (inCompleteModel4, 4))
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
 
-//        "have only a complete header and section, if there are no incomplete elements" in new ViewFixture {
-//          val completeModel = Seq((completedModel1,1))
-//          val incompleteModel = Seq.empty[(BankDetails, Int)]
-//          def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completeModel)
-//          doc.getElementById("completed-header").text must include(Messages("bankdetails.yourbankaccounts.complete"))
-//          Option(doc.getElementById("incomplete-header")).isDefined must be()
-//          //Option(doc.getElementById("incomplete-header")).isDefined must be(false)
-//
-//
-//
-//
-//        }
+      doc.getElementById("completed-header").text must include(Messages("bankdetails.yourbankaccounts.complete"))
 
+      doc.getElementById("completed-detail-1").text must include("Completed First Account Name")
+      doc.getElementById("completed-detail-2").text must include("Completed Second Account Name")
+      doc.getElementById("completed-detail-3").text must include("Completed Third Account Name")
+      doc.getElementById("completed-detail-4").text must include("Completed Fourth Account Name")
+      Option(doc.getElementById("completed-detail-edit-1")).isDefined must be(false)
+      Option(doc.getElementById("completed-detail-remove-1")).isDefined must be(true)
 
-    //    "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {
-    //    }
-    //
-    //    "Not have an complete section if there are no incomplete elements" in new ViewFixture {
-    //    }
-    //
-    //    "have an both and incomplete and complete section if there are complete and incomplete elements" in new ViewFixture {
-    //    }
-    //
-    //    "have no complete or incomplete sections and a no bank accounts narrative if there are no accounts provided" in new ViewFixture {
-    //    }
+      doc.getElementById("incomplete-header").text must include(Messages("bankdetails.yourbankaccounts.incomplete"))
 
+      doc.getElementById("incomplete-detail-1").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
+      doc.getElementById("incomplete-detail-2").text must include("Incomplete Second Account Name")
+      doc.getElementById("incomplete-detail-3").text must include("Incomplete Third Account Name")
+      doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
-    //    "have a accept and complete section button, and return to application progress link if all are complete" in new ViewFixture {
-    //    }
-    //
-    //    "have a return to application progress button and no accept and complete link if there are no incomplete items" in new ViewFixture {
-    //  }
+      Option(doc.getElementById("incomplete-detail-edit-1")).isDefined must be(true)
+      Option(doc.getElementById("incomplete-detail-remove-1")).isDefined must be(true)
+    }
+
+    "have no complete or incomplete sections if there are no accounts provided" in new ViewFixture {
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, Seq.empty, Seq.empty)
+      doc.body.html() must include(Messages("bankdetails.yourbankaccounts.nobank.account"))
+      Option(doc.getElementById("incomplete-header")).isDefined must be(false)
+      Option(doc.getElementById("completed-header")).isDefined must be(false)
+    }
+
+    "have a accept and complete section button, and return to application progress link if all are complete" in new ViewFixture {
+      val completedModel = Seq((completedModel1,1), (completedModel2,2), (completedModel3,3), (completedModel4, 4))
+      val incompleteModel = Seq.empty[(BankDetails, Int)]
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+      Option(doc.getElementById("accept-and-complete")).isDefined must be(true)
+      Option(doc.getElementById("return-to-application")).isDefined must be(true)
+    }
+
+    "have a return to application progress button and no accept and complete link if there are no incomplete items" in new ViewFixture {
+      val incompleteModel = Seq((inCompleteModel1, 1), (inCompleteModel2, 2), (inCompleteModel3, 3), (inCompleteModel4, 4))
+      val completedModel = Seq.empty[(BankDetails, Int)]
+
+      def view = views.html.bankdetails.your_bank_accounts(EmptyForm, incompleteModel, completedModel)
+
+      Option(doc.getElementById("accept-and-complete")).isDefined must be(false)
+      Option(doc.getElementById("return-to-application")).isDefined must be(true)
+    }
   }
 }
 

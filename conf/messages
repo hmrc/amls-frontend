@@ -1324,6 +1324,10 @@ bankdetails.yourbankaccount.add.account = Add a bank account
 bankdetails.yourbankaccount.accountnumber = Account number
 bankdetails.yourbankaccount.sortcode = Sort code
 bankdetails.yourbankaccount.iban = IBAN
+bankdetails.yourbankaccount.edit = Edit
+bankdetails.yourbankaccount.or = or
+bankdetail.yourbankaccount.remove = Remove
+button.bankdetail.yourbankaccount.acceptandcomplete = Accept and complete section
 
 
 
