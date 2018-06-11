@@ -123,7 +123,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
         Seq((BankDetails(None, None), 1)))
 
       doc.getElementById("add-account").text must be(Messages("bankdetails.yourbankaccount.add.account"))
-      doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.YourBankAccountsController.get.url)
+      doc.getElementById("add-account").attr("href") must be(controllers.bankdetails.routes.WhatYouNeedController.get(0).url)
     }
 
     "have an incomplete section with correct data and edit / remove links - if there are incomplete elements" in new ViewFixture {
@@ -152,9 +152,9 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.01"))
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
-      doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
+      doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.get(2).url)
       doc.getElementById("incomplete-detail-edit-1").text must be(Messages("bankdetails.yourbankaccount.edit"))
-      doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(1,false).url)
+      doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2,false).url)
       doc.getElementById("incomplete-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
       doc.getElementById("incomplete-action-panel").text must include(Messages("bankdetails.yourbankaccount.or"))
     }
@@ -187,7 +187,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("completed-detail-4").text must include("Completed Fourth Account Name")
 
       Option(doc.getElementById("completed-detail-edit-1")).isDefined must be(false)
-      doc.getElementById("completed-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(1,false).url)
+      doc.getElementById("completed-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2,false).url)
       doc.getElementById("completed-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
     }
 
