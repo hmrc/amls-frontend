@@ -136,7 +136,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, false)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(1, false).url))
+          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(Some(1), false).url))
         }
 
           "not editing and there is no bank account" in new Fixture {
@@ -165,7 +165,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(Some(1), true).url))
         }
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
@@ -184,7 +184,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.BankAccountNameController.get(Some(1), true).url))
         }
       }
 

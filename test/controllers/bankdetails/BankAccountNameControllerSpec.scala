@@ -66,7 +66,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(Some(1), false)(request)
           val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
@@ -82,7 +82,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, true)(request)
+          val result = controller.get(Some(1), true)(request)
           status(result) must be(OK)
         }
       }
@@ -94,7 +94,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(None, false)(request)
 
           status(result) must be(NOT_FOUND)
         }
@@ -113,7 +113,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result = controller.post(Some(1), true)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
@@ -129,10 +129,10 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1)(newRequest)
+          val result = controller.post(Some(1))(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountTypeController.get(1).url))
         }
 
       }
@@ -148,7 +148,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(50, true)(newRequest)
+          val result = controller.post(Some(50), true)(newRequest)
 
           status(result) must be(NOT_FOUND)
         }
@@ -164,7 +164,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result = controller.post(Some(1), true)(newRequest)
 
           status(result) must be(BAD_REQUEST)
         }
