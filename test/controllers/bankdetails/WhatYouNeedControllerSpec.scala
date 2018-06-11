@@ -24,7 +24,7 @@ import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 import views.TitleValidator
 
 class WhatYouNeedControllerSpec
@@ -61,6 +61,18 @@ class WhatYouNeedControllerSpec
       "should link to the 'has bank accounts' page" when {
         "there are no bank accounts currently in the system" in new Fixture {
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
+
+          val result = controller.get()(request)
+
+          implicit val doc = Jsoup.parse(contentAsString(result))
+
+          assertHref(controllers.bankdetails.routes.HasBankAccountController.get().url)
+        }
+
+        "when there are bank accounts, but they've all been deleted" in new Fixture {
+          mockCacheFetch[Seq[BankDetails]](Gen.listOfN(3, bankDetailsGen).sample map {
+            _.map(_.copy(status = Some(StatusConstants.Deleted)))
+          })
 
           val result = controller.get()(request)
 
