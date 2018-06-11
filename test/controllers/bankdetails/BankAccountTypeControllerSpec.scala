@@ -66,7 +66,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           mockApplicationStatus(SubmissionReady)
 
           val result = controller.get(1, false)(request)
-
+  
           status(result) must be(OK)
           contentAsString(result) must include(Messages("bankdetails.accounttype.title"))
           val document = Jsoup.parse(contentAsString(result))
@@ -151,7 +151,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
             val result = controller.post(1, false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
+            redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "editing and there is valid account type but no account details" in new Fixture {

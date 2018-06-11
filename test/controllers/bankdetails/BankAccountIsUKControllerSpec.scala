@@ -142,7 +142,7 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.get(false).url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
 
           verify(controller.auditConnector, never()).sendEvent(any())(any(), any())
         }

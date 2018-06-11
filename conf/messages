@@ -866,6 +866,7 @@ summary.checkyouranswers.agentspremises.section1 = Premises
 summary.checkyouranswers.agentspremises.section2 = Trading activities
 summary.checkyouranswers.agentspremises.section3 = Agents’ details
 button.checkyouranswers.acceptandcomplete = Accept and complete section
+button.checkyouranswers.acceptandaddbankaccount = Accept and add this bank account
 button.checkyouranswers.acceptandcontinue = Accept and continue
 button.summary.acceptandcomplete = Accept and complete section
 summary.linetext = Please check all the information you have provided.
@@ -1313,6 +1314,8 @@ bankdetails.yourbankaccounts.title = Your bank accounts
 bankdetails.yourbankaccounts.nobank.account = You currently have no bank accounts registered
 bankdetails.yourbankaccount.intro = You need to give us the details of all bank accounts you use in your business. 
 bankdetails.yourbankaccount.add.account = Add a bank account
+bankdetails.hasbankaccount.title = Does your business have a bank account?
+bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:

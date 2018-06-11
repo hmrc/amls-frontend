@@ -16,63 +16,38 @@
 
 package controllers.bankdetails
 
-import javax.inject.{Inject, Singleton}
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import models.status.{NotCompleted, SubmissionReady}
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
                                    val dataCacheConnector: DataCacheConnector,
-                                   val authConnector: AuthConnector = AMLSAuthConnector,
-                                   val statusService: StatusService
-                                 ) extends BaseController {
+                                   val authConnector: AuthConnector = AMLSAuthConnector
+                                 ) extends BaseController with RepeatingSection {
 
-  private def updateBankDetails(bankDetails: Option[Seq[BankDetails]]) : Future[Option[Seq[BankDetails]]] = {
-    bankDetails match {
-      case Some(bdSeq) => {
-        val updatedList = bdSeq.map { bank =>
-          bank.copy(hasAccepted = true)
-        }
-        Future.successful(Some(updatedList))
-      }
-      case _ => Future.successful(bankDetails)
-    }
-  }
-
-  def get(complete: Boolean = false) = Authorised.async {
+  def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
-        status <- statusService.getStatus
+        bankDetails <- getData[BankDetails](index)
       } yield bankDetails match {
         case Some(data) =>
-          val canEdit = status match {
-            case NotCompleted | SubmissionReady => true
-            case _ => false
-          }
-          val bankDetails = data.filterNot(_.status.contains(StatusConstants.Deleted))
-          Ok(views.html.bankdetails.summary(EmptyForm, data, complete, hasBankAccount(bankDetails), canEdit, status))
+          Ok(views.html.bankdetails.summary(data, index))
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
-  def post = Authorised.async {
+  def post(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
       (for {
-        bd <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
-        bdnew <- updateBankDetails(bd)
-        _ <- dataCacheConnector.save[Seq[BankDetails]](BankDetails.key, bdnew.getOrElse(Seq.empty))
-      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+        _ <- updateDataStrict[BankDetails](index) { bd => bd.copy(hasAccepted = true) }
+      } yield Redirect(controllers.bankdetails.routes.YourBankAccountsController.get())) recoverWith {
         case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
       }
   }
