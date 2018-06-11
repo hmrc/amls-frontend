@@ -16,34 +16,69 @@
 
 package controllers.bankdetails
 
+import generators.bankdetails.BankDetailsGenerator
+import models.bankdetails.BankDetails
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
+import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import views.TitleValidator
 
-class WhatYouNeedControllerSpec extends AmlsSpec with ScalaFutures with TitleValidator {
+class WhatYouNeedControllerSpec
+  extends AmlsSpec
+    with ScalaFutures
+    with TitleValidator
+    with BankDetailsGenerator {
 
-  trait Fixture extends AuthorisedFixture { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     val request = addToken(authRequest)
-    val controller = new WhatYouNeedController(self.authConnector)
+    val controller = new WhatYouNeedController(self.authConnector, mockCacheConnector)
+
+    def assertHref(url: String)(implicit doc: Document) = {
+      doc.getElementById("bankwhatyouneed-button").attr("href") mustBe url
+    }
   }
 
-  "WhatYouNeedController" when {
+  "The GET action" must {
+    "respond with SEE_OTHER and show the 'what you need' page" in new Fixture {
+      mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
 
-    "get is called" must {
+      val result = controller.get()(request)
 
-      "respond with SEE_OTHER and redirect to the 'what you need' page" in new Fixture {
+      status(result) must be(OK)
 
-        val result = controller.get()(request)
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateTitle(s"${Messages("title.wyn")} - ${Messages("summary.bankdetails")}")
 
-        status(result) must be(OK)
+      contentAsString(result) must include(Messages("button.continue"))
+    }
 
-        implicit val doc = Jsoup.parse(contentAsString(result))
-        validateTitle(s"${Messages("title.wyn")} - ${Messages("summary.bankdetails")}")
+    "configure the link href correctly," which {
+      "should link to the 'has bank accounts' page" when {
+        "there are no bank accounts currently in the system" in new Fixture {
+          mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
 
-        contentAsString(result) must include(Messages("button.continue"))
+          val result = controller.get()(request)
+
+          implicit val doc = Jsoup.parse(contentAsString(result))
+
+          assertHref(controllers.bankdetails.routes.HasBankAccountController.get().url)
+        }
+      }
+
+      "should link to the 'bank name' page" when {
+        "there are already bank accounts in the system" in new Fixture {
+          mockCacheFetch(Gen.listOfN(3, bankDetailsGen).sample, Some(BankDetails.key))
+
+          val result = controller.get()(request)
+          implicit val doc = Jsoup.parse(contentAsString(result))
+
+          assertHref(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
+        }
       }
     }
   }

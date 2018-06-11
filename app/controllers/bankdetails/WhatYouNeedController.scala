@@ -16,17 +16,34 @@
 
 package controllers.bankdetails
 
+import cats.data.OptionT
+import cats.implicits._
+import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.bankdetails.BankDetails
+import play.api.mvc.Call
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.bankdetails._
 
-import scala.concurrent.Future
-
-class WhatYouNeedController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+                                      dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(what_you_need()))
+    implicit authContext =>
+      implicit request =>
+        val view = what_you_need.apply(_: Call)(request, implicitly)
+
+        {
+          for {
+            bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key))
+          } yield {
+            if (bankDetails.nonEmpty) {
+              Ok(view(routes.BankAccountNameController.get(1)))
+            } else {
+              Ok(view(routes.HasBankAccountController.get()))
+            }
+          }
+        } getOrElse Ok(view(routes.HasBankAccountController.get()))
   }
 }

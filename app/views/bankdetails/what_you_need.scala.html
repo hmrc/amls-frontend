@@ -16,7 +16,7 @@
 
 @import include._
 @import forms2._
-@()(implicit request: Request[_],m:Messages)
+@(nextUrl: Call)(implicit request: Request[_], m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.bankdetails")
@@ -39,12 +39,12 @@
     <p>@Messages("bankdetails.whatyouneed.enter_details_hint")</p>
 
     @anchor(
-        attrHref = controllers.bankdetails.routes.BankAccountTypeController.get(1).toString,
+        attrHref = nextUrl.url,
         attrRole = true,
         linkText = Messages("button.continue"),
         visuallyhidden = Messages("summary.bankdetails"),
         returnLink = true,
-        id=Some("bankwhatyouneed-button")
+        id = Some("bankwhatyouneed-button")
     )
 }
 
