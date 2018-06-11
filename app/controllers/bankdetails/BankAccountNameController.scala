@@ -17,7 +17,6 @@
 package controllers.bankdetails
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -27,6 +26,7 @@ import jto.validation.{From, Write}
 import models.FormTypes
 import models.bankdetails.BankDetails
 import services.StatusService
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 
@@ -39,47 +39,59 @@ class BankAccountNameController @Inject()(
                                            implicit val statusService: StatusService
                                          ) extends RepeatingSection with BaseController {
 
-  implicit def write: Write[String, UrlFormEncoded] = Write{ data =>
+  implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))
   }
+
   implicit val read = From[UrlFormEncoded] { __ =>
     (__ \ "accountName").read(FormTypes.accountNameType)
   }
 
-  def get(index: Int, edit: Boolean = false) = Authorised.async {
+  def get(index: Option[Int] = None, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        getData[BankDetails](index) map {
-          case Some(BankDetails(_, Some(data), _, _, _, _, _)) =>
-            Ok(views.html.bankdetails.bank_account_name(Form2[String](data), edit, index))
-          case Some(_) =>
-            Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, index))
-          case _ => NotFound(notFoundView)
-      }
+        index match {
+          case Some(i) =>
+            getData[BankDetails](i) map {
+              case Some(BankDetails(_, Some(data), _, _, _, _, _)) =>
+                Ok(views.html.bankdetails.bank_account_name(Form2[String](data), edit, Some(i)))
+              case Some(_) =>
+                Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, Some(i)))
+            }
+          case _ => Future.successful(NotFound(notFoundView))
+        }
   }
 
-  def post(index: Int, edit: Boolean = false) = Authorised.async {
+  def post(index: Option[Int] = None, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
         Form2[String](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
           case ValidForm(_, data) =>
-            updateDataStrict[BankDetails](index) { bd =>
-              bd.copy(
-                accountName = Some(data),
-                status = Some(if (edit) {
-                  StatusConstants.Updated
+            val newBankDetails = BankDetails(accountName = Some(data))
+            val result: Future[CacheMap] = dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
+              val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails)
+              dataCacheConnector.save(BankDetails.key, newList)
+            }
+            index match {
+              case Some(i) => updateDataStrict[BankDetails](i) { bd =>
+                bd.copy(
+                  accountName = Some(data),
+                  status = Some(if (edit) {
+                    StatusConstants.Updated
+                  } else {
+                    StatusConstants.Added
+                  })
+                )
+              } map { _ =>
+                if (edit) {
+                  Redirect(routes.SummaryController.get(i))
                 } else {
-                  StatusConstants.Added
-                })
-              )
-            } map { _ =>
-              if (edit) {
-                Redirect(routes.SummaryController.get(index))
-              } else {
-                Redirect(routes.BankAccountIsUKController.get(index))
+                  Redirect(routes.BankAccountTypeController.get(i))
+                }
               }
+              case _ => result map { _ => Redirect(routes.BankAccountTypeController.get(index.get)) }
             }
         }
       } recoverWith {
