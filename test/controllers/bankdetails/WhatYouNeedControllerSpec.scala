@@ -77,7 +77,7 @@ class WhatYouNeedControllerSpec
           val result = controller.get()(request)
           implicit val doc = Jsoup.parse(contentAsString(result))
 
-          assertHref(controllers.bankdetails.routes.BankAccountNameController.get(1).url)
+          assertHref(controllers.bankdetails.routes.BankAccountNameController.get(Some(1)).url)
         }
       }
     }

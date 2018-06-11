@@ -39,7 +39,7 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key))
           } yield {
             if (bankDetails.nonEmpty) {
-              Ok(view(routes.BankAccountNameController.get(1)))
+              Ok(view(routes.BankAccountNameController.get(Some(1))))
             } else {
               Ok(view(routes.HasBankAccountController.get()))
             }
