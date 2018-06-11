@@ -1,7 +1,5 @@
 GET         /what-you-need                                              @controllers.bankdetails.WhatYouNeedController.get
 
-GET         /add                                                         @controllers.bankdetails.BankAccountAddController.get(displayGuidance : Boolean ?= true)
-
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
