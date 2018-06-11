@@ -1314,6 +1314,8 @@ bankdetails.yourbankaccounts.title = Your bank accounts
 bankdetails.yourbankaccounts.nobank.account = You currently have no bank accounts registered
 bankdetails.yourbankaccount.intro = You need to give us the details of all bank accounts you use in your business. 
 bankdetails.yourbankaccount.add.account = Add a bank account
+bankdetails.hasbankaccount.title = Does your business have a bank account?
+bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:

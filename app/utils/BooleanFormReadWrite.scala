@@ -22,9 +22,9 @@ import utils.MappingUtils.Implicits._
 import jto.validation.forms.Rules._
 
 object BooleanFormReadWrite {
-   def formWrites(fieldName:String) : Write[Boolean, UrlFormEncoded] = Write{data : Boolean => Map(fieldName -> Seq(data.toString))}
+  def formWrites(fieldName: String): Write[Boolean, UrlFormEncoded] = Write { data: Boolean => Map(fieldName -> Seq(data.toString)) }
 
-   def formRule(fieldName:String, msg: String) : Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
-      (__ \ fieldName).read[Boolean].withMessage(msg)
-   }
+  def formRule(fieldName: String, msg: String): Rule[UrlFormEncoded, Boolean] = From[UrlFormEncoded] { __ =>
+    (__ \ fieldName).read[Boolean].withMessage(msg)
+  }
 }
