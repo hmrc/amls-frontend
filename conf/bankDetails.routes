@@ -16,8 +16,8 @@ GET         /your-bank-accounts                                          @contro
 GET         /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.get(index:Int)
 POST        /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.post(index:Int)
 
-GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
-POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)
+GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int)
+POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int)
 
 GET         /has-bank-account                                            @controllers.bankdetails.HasBankAccountController.get()
 POST        /has-bank-account                                            @controllers.bankdetails.HasBankAccountController.post()

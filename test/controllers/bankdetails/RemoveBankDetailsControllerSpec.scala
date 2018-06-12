@@ -43,7 +43,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))))
 
-      val result = controller.get(1,false)(request)
+      val result = controller.get(1)(request)
 
       status(result) must be(NOT_FOUND)
     }
@@ -52,7 +52,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("Account Name"), Some(NonUKAccountNumber("12345678"))))))
 
-      val result = controller.get(1,true) (request)
+      val result = controller.get(1) (request)
 
       val contentString = contentAsString(result)
 

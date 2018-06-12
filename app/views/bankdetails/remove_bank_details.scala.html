@@ -18,7 +18,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: forms.Form2[_],index: Int, accountName:String, complete:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, accountName:String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("bankdetails.remove.bank.account.title", "summary.bankdetails")
@@ -29,7 +29,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index, complete)) {
+    @form(f, controllers.bankdetails.routes.RemoveBankDetailsController.remove(index)) {
 
                 <p>@Messages("bankdetails.remove.bank.account.text", accountName)</p>
 

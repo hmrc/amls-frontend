@@ -35,14 +35,14 @@ class remove_bank_DetailsSpec extends AmlsSpec with MustMatchers  {
   "remove_bank_Details view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName", true)
+      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
 
       doc.title must startWith(Messages("bankdetails.remove.bank.account.title") + " - " + Messages("summary.bankdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName", true)
+      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
 
       heading.html must be(Messages("bankdetails.remove.bank.account.title"))
       subHeading.html must include(Messages("summary.bankdetails"))

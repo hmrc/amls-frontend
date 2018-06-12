@@ -32,17 +32,17 @@ class RemoveBankDetailsController @Inject()(
                                              val dataCacheConnector: DataCacheConnector
                                            ) extends RepeatingSection with BaseController {
 
-  def get(index: Int, complete: Boolean = false) = Authorised.async {
+  def get(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
         getData[BankDetails](index) map {
           case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
-            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name, complete))
+            Ok(views.html.bankdetails.remove_bank_details(EmptyForm, index, name))
           case _ => NotFound(notFoundView)
         }
   }
 
-  def remove(index: Int, complete: Boolean = false) = Authorised.async {
+  def remove(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request => {
         for {
