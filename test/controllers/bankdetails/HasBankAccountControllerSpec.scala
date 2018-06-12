@@ -43,7 +43,7 @@ class HasBankAccountControllerSpec extends AmlsSpec {
         val result = controller.post()(request.withFormUrlEncodedBody(formData))
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.get(Some(1)).url)
+        redirectLocation(result) mustBe Some(controllers.bankdetails.routes.BankAccountNameController.getNoIndex.url)
       }
 
       "'no' is selected" which {

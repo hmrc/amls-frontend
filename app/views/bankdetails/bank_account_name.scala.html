@@ -29,9 +29,11 @@
     title = Messages("bankdetails.bankaccount.accountname.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
-
-    @form(f, controllers.bankdetails.routes.BankAccountNameController.post(index, edit)) {
-
+    @form(f, if(index.isDefined) {
+     controllers.bankdetails.routes.BankAccountNameController.postIndex(index.get, edit)
+    } else {
+        controllers.bankdetails.routes.BankAccountNameController.postNoIndex()
+    }) {
         @input(
             field = f("accountName"),
             labelText = "bankdetails.bankaccount.accountname",
