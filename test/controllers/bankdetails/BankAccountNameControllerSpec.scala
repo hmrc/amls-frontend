@@ -88,7 +88,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           for (field <- fieldElements)
             document.select(s"input[name=$field]").`val` must include("my bank account")
         }
-        
+
         "there is no bank account information at all" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
