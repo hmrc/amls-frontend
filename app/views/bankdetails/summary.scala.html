@@ -20,6 +20,7 @@
 @import utils.StatusConstants
 @import models.status._
 @import config.ApplicationConfig
+@import forms.EmptyForm
 
 @(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -100,10 +101,8 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
         }
     }
 
-    @anchor(
-        attrRole = true,
-        attrHref = controllers.bankdetails.routes.SummaryController.post(index).url,
-        linkText = Messages("button.checkyouranswers.acceptandaddbankaccount"),
-        visuallyhidden = Messages("summary.bankdetails"))
+    @form(EmptyForm, controllers.bankdetails.routes.SummaryController.post(index)) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false)
+    }
 
 }
