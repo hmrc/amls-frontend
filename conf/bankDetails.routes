@@ -3,8 +3,8 @@ GET         /what-you-need                                              @control
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
-GET         /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.get(index:Int, edit: Boolean ?= false)
-POST        /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.post(index:Int, edit: Boolean ?= false)
+GET         /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.get(index:Option[Int], edit: Boolean ?= false)
+POST        /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.post(index:Option[Int], edit: Boolean ?= false)
 
 GET         /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
 POST        /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)

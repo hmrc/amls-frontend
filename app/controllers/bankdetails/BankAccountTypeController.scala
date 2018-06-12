@@ -72,7 +72,7 @@ class BankAccountTypeController @Inject()(
             } yield {
               data match {
                 case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))
-                case Some(_) => Redirect(routes.BankAccountNameController.get(index, edit))
+                case Some(_) => Redirect(routes.BankAccountNameController.get(Some(index), edit))
                 case _ => Redirect(routes.SummaryController.get(index))
               }
             }

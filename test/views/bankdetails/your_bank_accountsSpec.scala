@@ -152,7 +152,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.01"))
       doc.getElementById("incomplete-detail-4").text must include(Messages("bankdetails.yourbankaccounts.noaccountname"))
 
-      doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.get(2).url)
+      doc.getElementById("incomplete-detail-edit-1").attr("href") must be(controllers.bankdetails.routes.BankAccountNameController.get(Some(2)).url)
       doc.getElementById("incomplete-detail-edit-1").text must be(Messages("bankdetails.yourbankaccount.edit"))
       doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2,false).url)
       doc.getElementById("incomplete-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
