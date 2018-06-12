@@ -34,9 +34,15 @@
     </div>
 }
 
-@nonUkAccount(details: BankDetails, account: NonUKAccountNumber) = {
+@nonUkAccountNumber(details: BankDetails, account: NonUKAccountNumber) = {
     <div>@BankDetails.getBankAccountDescription(details)<br/>
-        @Messages("bankdetails.yourbankaccount.iban") @account.accountNumber<br/>
+        @Messages("bankdetails.yourbankaccount.accountnumber") @account.accountNumber<br/>
+    </div>
+}
+
+@nonUKIBANNumber(details: BankDetails, account: NonUKIBANNumber) = {
+    <div>@BankDetails.getBankAccountDescription(details)<br/>
+        @Messages("bankdetails.yourbankaccount.iban") @account.IBANNumber<br/>
     </div>
 }
 
@@ -45,9 +51,9 @@
 
     @(bankDetail.bankAccount match {
         case Some(account: UKAccount) => ukAccount(bankDetail, account)
-        case Some(account: NonUKAccountNumber) => nonUkAccount(bankDetail, account)
-        case _ =>
-            <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
+        case Some(account: NonUKAccountNumber) => nonUkAccountNumber(bankDetail, account)
+        case Some(account: NonUKIBANNumber) => nonUKIBANNumber(bankDetail, account)
+        case _ => <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
     })
 }
 

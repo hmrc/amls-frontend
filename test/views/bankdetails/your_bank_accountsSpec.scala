@@ -88,7 +88,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
   val inCompleteModel4 = BankDetails(
     Some(PersonalAccount),
     None,
-    Some(NonUKAccountNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
+    Some(NonUKIBANNumber("ABCDEFGHIJKLMNOPQRSTUVWXYZABCD"))
   )
 
   "The your bank accounts view " must {
@@ -182,7 +182,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("completed-detail-3").text must include(Messages("bankdetails.accounttype.uk.lbl.03"))
       doc.getElementById("completed-detail-3").text must include("Completed Third Account Name")
 
-      doc.getElementById("completed-detail-4").text must include(Messages("bankdetails.yourbankaccount.iban") + " ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")
+      doc.getElementById("completed-detail-4").text must include(Messages("bankdetails.yourbankaccount.accountnumber") + " ABCDEFGHIJKLMNOPQRSTUVWXYZABCD")
       doc.getElementById("completed-detail-4").text must include(Messages("bankdetails.accounttype.nonuk.lbl.03"))
       doc.getElementById("completed-detail-4").text must include("Completed Fourth Account Name")
 
