@@ -60,13 +60,13 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
   "BankAccountController" when {
     "get is called" must {
       "respond with OK" when {
-        "given a name" in new Fixture {
+        "without a name" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(Some(1), false)(request)
           val document: Document = Jsoup.parse(contentAsString(result))
 
           status(result) must be(OK)
@@ -74,29 +74,32 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
             document.select(s"input[name=$field]").`val` must be(empty)
         }
 
-        "without a name" in new Fixture {
+        "with a name" in new Fixture {
 
           val ukBankAccount = UKAccount("12345678", "000000")
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, Some("my bank account"), Some(ukBankAccount)))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, true)(request)
+          val result = controller.get(Some(1), true)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
           status(result) must be(OK)
+          for (field <- fieldElements)
+            document.select(s"input[name=$field]").`val` must include("my bank account")
         }
-      }
-
-      "respond with NOT_FOUND" when {
+        
         "there is no bank account information at all" in new Fixture {
 
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReady)
 
-          val result = controller.get(1, false)(request)
-
-          status(result) must be(NOT_FOUND)
+          val result = controller.get(None, false)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
+          status(result) must be(OK)
+          for (field <- fieldElements)
+            document.select(s"input[name=$field]").`val` must be(empty)
         }
       }
     }
@@ -113,7 +116,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result = controller.post(Some(1), true)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
@@ -129,10 +132,10 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1)(newRequest)
+          val result = controller.post(Some(1))(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1).url))
+          redirectLocation(result) must be(Some(routes.BankAccountTypeController.get(1).url))
         }
 
       }
@@ -148,7 +151,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
 
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(50, true)(newRequest)
+          val result = controller.post(Some(50), true)(newRequest)
 
           status(result) must be(NOT_FOUND)
         }
@@ -164,7 +167,7 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           mockCacheFetch[Seq[BankDetails]](None, Some(BankDetails.key))
           mockCacheSave[Seq[BankDetails]]
 
-          val result = controller.post(1, true)(newRequest)
+          val result = controller.post(Some(1), true)(newRequest)
 
           status(result) must be(BAD_REQUEST)
         }
