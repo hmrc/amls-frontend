@@ -40,7 +40,7 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key))
           } yield {
             if (bankDetails.exists(deletedFilter)) {
-              Ok(view(routes.BankAccountNameController.get(Some(1))))
+              Ok(view(routes.BankAccountNameController.getNoIndex()))
             } else {
               Ok(view(routes.HasBankAccountController.get()))
             }

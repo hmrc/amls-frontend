@@ -32,7 +32,7 @@ class HasBankAccountController @Inject()(val authConnector: AuthConnector,
                                          cacheConnector: DataCacheConnector) extends BaseController {
 
   val router: Boolean => Call = {
-    case true => routes.BankAccountNameController.get(Some(1))
+    case true => routes.BankAccountNameController.getNoIndex()
     case _ => routes.YourBankAccountsController.get()
   }
 

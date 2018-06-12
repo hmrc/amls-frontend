@@ -34,7 +34,7 @@
 
 @bankDetails.accountName.map { accountName =>
 @checkYourAnswers(question = Messages("bankdetails.bankaccount.accountname.title"),
-editUrl = controllers.bankdetails.routes.BankAccountNameController.get(Some(index), true).toString
+editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(index, true).toString
 ) {
 @accountName
 }
