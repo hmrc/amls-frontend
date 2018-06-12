@@ -27,14 +27,37 @@
     @heading("bankdetails.yourbankaccounts.title", "summary.bankdetails")
 }
 
+@ukAccount(details: BankDetails, account: UKAccount) = {
+    <div>@BankDetails.getBankAccountDescription(details)<br/>
+        @Messages("bankdetails.yourbankaccount.accountnumber") @account.accountNumber<br/>
+        @Messages("bankdetails.yourbankaccount.sortcode") @account.displaySortCode<br/>
+    </div>
+}
+
+@nonUkAccount(details: BankDetails, account: NonUKAccountNumber) = {
+    <div>@BankDetails.getBankAccountDescription(details)<br/>
+        @Messages("bankdetails.yourbankaccount.iban") @account.accountNumber<br/>
+    </div>
+}
+
+@bankAccount(bankDetail: BankDetails) = {
+    @bankDetail.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
+
+    @(bankDetail.bankAccount match {
+        case Some(account: UKAccount) => ukAccount(bankDetail, account)
+        case Some(account: NonUKAccountNumber) => nonUkAccount(bankDetail, account)
+        case _ =>
+            <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
+    })
+}
+
 @main(
     title = Messages("bankdetails.yourbankaccounts.title") + " - " + Messages("summary.bankdetails"),
     heading = header
 ) {
     @panel(
         jsHidden = false,
-        wide = false,
-        panel=false
+        panel = false
     ) {
         <p>@Messages("bankdetails.yourbankaccount.intro")</p>
         <p>@anchor(
@@ -46,31 +69,25 @@
 
     @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
 
-    @if(!inCompleteModel.isEmpty) {
+    @if(inCompleteModel.nonEmpty) {
         <h3 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
         <ul class="list">
         @inCompleteModel.map { case(bankDetail, index) =>
             <li class="group summary__listing">
                 <div>
                     <div id="incomplete-detail-@index" class="grid-layout__column grid-layout--2-3">
-                        @bankDetail.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
-                        @(bankDetail.bankAccount match {
-                            case Some(x@UKAccount(accountNumber, sortCode)) => {
-                                    <div>{BankDetails.getBankAccountDescription(bankDetail)}<br/>
-                                    {Messages("bankdetails.yourbankaccount.accountnumber")}  {accountNumber}<br/>
-                                    {Messages("bankdetails.yourbankaccount.sortcode")} {x.displaySortCode}<br/></div> }
-                            case Some(NonUKAccountNumber(ibanNumber)) =>
-                            { <div>{BankDetails.getBankAccountDescription(bankDetail)}<br/>
-                            {Messages("bankdetails.yourbankaccount.iban")}  {ibanNumber}<br/></div> }
-                            case _ => {
-                                <div>{bankDetail.bankAccountType.map(x=> Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
-                            }
-                        })
+                        @bankAccount(bankDetail)
                     </div>
                     <div id="incomplete-action-panel" class="grid-layout__column grid-layout--1-3">
-                        <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.get(index + 1).url">@Messages("bankdetails.yourbankaccount.edit")</a>
+                        <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.get(index + 1).url">
+                            @Messages("bankdetails.yourbankaccount.edit")
+                        </a>
+
                         @Messages("bankdetails.yourbankaccount.or")
-                        <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1,false).url">@Messages("bankdetails.yourbankaccount.remove")</a>
+
+                        <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1,false).url">
+                            @Messages("bankdetails.yourbankaccount.remove")
+                        </a>
                     </div>
                 </div>
             </li>
@@ -78,26 +95,14 @@
         </ul>
     }
 
-    @if(!completedModel.isEmpty) {
-        @if(!inCompleteModel.isEmpty) { <h3 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h3> }
+    @if(completedModel.nonEmpty) {
+        @if(inCompleteModel.nonEmpty) { <h3 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h3> }
         <ul class="list">
         @completedModel.map { case(bankDetail, index) =>
             <li class="group summary__listing">
                 <div>
                     <div id="completed-detail-@index" class="grid-layout__column grid-layout--2-3">
-                        @bankDetail.accountName.getOrElse(Messages("bankdetails.yourbankaccounts.noaccountname"))<br/>
-                        @(bankDetail.bankAccount match {
-                            case Some(x@UKAccount(accountNumber, sortCode)) => {
-                                <div>{BankDetails.getBankAccountDescription(bankDetail)}<br/>
-                                {Messages("bankdetails.yourbankaccount.accountnumber")}  {accountNumber}<br/>
-                                {Messages("bankdetails.yourbankaccount.sortcode")} {x.displaySortCode}<br/></div> }
-                            case Some(NonUKAccountNumber(ibanNumber)) =>
-                                { <div>{BankDetails.getBankAccountDescription(bankDetail)}<br/>
-                                {Messages("bankdetails.yourbankaccount.iban")}  {ibanNumber}<br/></div> }
-                            case _ => {
-                                <div>{bankDetail.bankAccountType.map(x=> Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
-                            }
-                        })
+                        @bankAccount(bankDetail)
                     </div>
                     <div id="completed-action-panel" class="grid-layout__column grid-layout--1-3">
                         <a id="completed-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1,false).url">
@@ -111,7 +116,7 @@
 
     @if(inCompleteModel.isEmpty) {
             @form(f, controllers.routes.RegistrationProgressController.get()) {
-                @submit(false, Some(Messages("button.bankdetails.yourbankaccount.acceptandcomplete")), returnLink = true, buttonId = Some("accept-and-complete"))
+                @submit(false, Some(Messages("button.bankdetails.yourbankaccount.acceptandcomplete")), buttonId = Some("accept-and-complete"))
             }
         } else {
             @form(f, controllers.routes.RegistrationProgressController.get()) {
