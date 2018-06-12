@@ -34,7 +34,7 @@ class BankAccountTypeController @Inject()(
                                            val authConnector: AuthConnector = AMLSAuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService
-                                         ) extends RepeatingSection with BaseController {
+                                         ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -44,11 +44,11 @@ class BankAccountTypeController @Inject()(
         for {
           bankDetail <- getData[BankDetails](index)
           count <- getData[BankDetails].map(details => details.filterNot(filter).size)
-          allowedToEdit <- ControllerHelper.allowedToEdit(edit)
+          status <- statusService.getStatus
         } yield bankDetail match {
-          case Some(BankDetails(Some(data), _, _, _, _, _, _)) if allowedToEdit =>
+          case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
             Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
-          case Some(_) if allowedToEdit =>
+          case Some(details) if details.canEdit(status) =>
             Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
           case _ => NotFound(notFoundView)
         }
@@ -72,7 +72,7 @@ class BankAccountTypeController @Inject()(
             } yield {
               data match {
                 case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))
-                case Some(_) => Redirect(routes.BankAccountIsUKController.get(index, edit))
+                case Some(_) if !edit => Redirect(routes.BankAccountIsUKController.get(index))
                 case _ => Redirect(routes.SummaryController.get(index))
               }
             }

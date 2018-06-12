@@ -28,12 +28,13 @@ import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
 
 class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
 
     val controller = new RemoveBankDetailsController (
       dataCacheConnector =  mockCacheConnector,
-      authConnector = self.authConnector
+      authConnector = self.authConnector,
+      statusService = mockStatusService
     )
   }
 

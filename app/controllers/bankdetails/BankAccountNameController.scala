@@ -37,7 +37,7 @@ class BankAccountNameController @Inject()(
                                            val authConnector: AuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService
-                                         ) extends RepeatingSection with BaseController {
+                                         ) extends BankDetailsController {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>
     Map("accountName" -> Seq(data))
@@ -70,7 +70,7 @@ class BankAccountNameController @Inject()(
         }
   }
 
-  def postNoIndex:Action[AnyContent] = Authorised.async {
+  def postNoIndex: Action[AnyContent] = Authorised.async {
       return postMaybeIndex(None)
   }
 

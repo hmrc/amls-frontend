@@ -28,23 +28,26 @@ import utils.StatusConstants
 
 @Singleton
 class YourBankAccountsController @Inject()(
-                                   val dataCacheConnector: DataCacheConnector,
-                                   val authConnector: AuthConnector = AMLSAuthConnector,
-                                   val statusService: StatusService
-                                 ) extends BaseController {
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val authConnector: AuthConnector = AMLSAuthConnector,
+                                            val statusService: StatusService
+                                          ) extends BankDetailsController {
   def get(complete: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      for {
-        bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
-      } yield bankDetails match {
-        case Some(data) =>
-          val filteredBankDetails = data.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted))
-          Ok(views.html.bankdetails.your_bank_accounts(
-            EmptyForm,
-            filteredBankDetails.filterNot(_._1.isComplete),
-            filteredBankDetails.filter(_._1.isComplete)
-          ))
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }
+    implicit authContext =>
+      implicit request =>
+        for {
+          bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
+        } yield bankDetails match {
+          case Some(data) =>
+            val filteredBankDetails = data.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted))
+
+            Ok(views.html.bankdetails.your_bank_accounts(
+              EmptyForm,
+              filteredBankDetails.filterNot(_._1.isComplete),
+              filteredBankDetails.filter(_._1.isComplete)
+            ))
+
+          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
+        }
   }
 }

@@ -84,6 +84,22 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.get(1, true)(request)
           status(result) must be(OK)
         }
+
+        "when editing a bank account" which {
+          "hasn't been accepted and completed yet" in new Fixture {
+            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
+
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            val result = controller.get(1, edit = true)(request)
+            val document: Document = Jsoup.parse(contentAsString(result))
+
+            status(result) must be(OK)
+
+            for (field <- fieldElements)
+              document.select(s"input[name=$field]").`val` must be(empty)
+          }
+        }
       }
 
       "respond with NOT_FOUND" when {
@@ -97,11 +113,13 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
 
           status(result) must be(NOT_FOUND)
         }
+
         "editing an amendment" in new Fixture {
 
           val ukBankAccount = UKAccount("12345678", "000000")
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(
+            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionReadyForReview)
 
@@ -110,11 +128,13 @@ class BankAccountIsUKControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(NOT_FOUND)
 
         }
+
         "editing a variation" in new Fixture {
 
           val ukBankAccount = UKAccount("12345678", "000000")
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, Some(ukBankAccount)))), Some(BankDetails.key))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(
+            BankDetails(None, None, Some(ukBankAccount), hasAccepted = true))), Some(BankDetails.key))
 
           mockApplicationStatus(SubmissionDecisionApproved)
 
