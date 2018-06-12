@@ -55,7 +55,7 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
-                        allowEdit = isPreSubmission
+                        allowEdit = !isPending
                     ) {
                         <p>@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
@@ -126,7 +126,7 @@
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
                             editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
-                            allowEdit = isPreSubmission
+                            allowEdit = !isPending
                         ) {
                             <p>@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
