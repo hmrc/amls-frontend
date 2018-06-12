@@ -104,7 +104,7 @@ class BankAccountNameController @Inject()(
               }
             }
             case _ => dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
-              val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails)
+              val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails.copy(status = Some(StatusConstants.Added)))
               dataCacheConnector.save(BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
             }
           }
