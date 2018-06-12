@@ -79,9 +79,12 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
+        val model = BusinessMatching(
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
+        )
         when {
           controller.businessMatchingService.getModel(any(), any(), any())
-        } thenReturn OptionT.none[Future, BusinessMatching]
+        } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
         status(result) must be(OK)
