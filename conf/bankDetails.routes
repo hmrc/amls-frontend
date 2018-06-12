@@ -13,8 +13,8 @@ POST        /uk-account/:index                                           @contro
 
 GET         /your-bank-accounts                                          @controllers.bankdetails.YourBankAccountsController.get()
 
-GET         /check-your-answers                                          @controllers.bankdetails.SummaryController.get(index:Int)
-POST        /check-your-answers                                          @controllers.bankdetails.SummaryController.post(index:Int)
+GET         /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.get(index:Int)
+POST        /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.post(index:Int)
 
 GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int, complete: Boolean)
 POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int, complete: Boolean)

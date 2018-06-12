@@ -71,7 +71,7 @@ object BankDetails {
     (bankDetails.bankAccountType, bankDetails.bankAccount) match {
       case (Some(baType), Some(UKAccount(_,_))) =>
           messages("bankdetails.accounttype.uk.lbl." + baType.getBankAccountTypeID)
-      case (Some(baType), Some(NonUKAccountNumber(_))) =>
+      case (Some(baType), Some(_)) =>
           messages("bankdetails.accounttype.nonuk.lbl." + baType.getBankAccountTypeID)
       case (Some(baType), None) =>
           messages("bankdetails.accounttype.lbl." + baType.getBankAccountTypeID)
