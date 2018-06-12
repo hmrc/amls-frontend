@@ -38,18 +38,18 @@ class BankAccountIsUKController @Inject()(
                                            val authConnector: AuthConnector = AMLSAuthConnector,
                                            val auditConnector: AuditConnector = AMLSAuditConnector,
                                            implicit val statusService: StatusService
-                                         ) extends BaseController with RepeatingSection{
+                                         ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async{
     implicit authContext =>
       implicit request =>
         for {
           bankDetails <- getData[BankDetails](index)
-          allowedToEdit <- ControllerHelper.allowedToEdit(edit)
+          status <- statusService.getStatus
         } yield bankDetails match {
-          case Some(BankDetails(_, _, Some(data), _, _, _, _)) if allowedToEdit =>
+          case Some(x@BankDetails(_, _, Some(data), _, _, _, _)) if x.canEdit(status) =>
             Ok(views.html.bankdetails.bank_account_is_uk(Form2[Account](data), edit, index))
-          case Some(_) if allowedToEdit =>
+          case Some(x) if x.canEdit(status) =>
             Ok(views.html.bankdetails.bank_account_is_uk(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }

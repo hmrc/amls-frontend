@@ -50,6 +50,7 @@ case class BankDetails(
   }
 
   def isComplete: Boolean = this match {
+    case details if details.status.contains(StatusConstants.Deleted) => true
     case BankDetails(Some(NoBankAccountUsed), _, None, _, _, _, accepted) => accepted
     case BankDetails(Some(_), Some(_), Some(_), _, _, _, accepted) => accepted
     case BankDetails(None, _, None, _, _, _, accepted) => accepted

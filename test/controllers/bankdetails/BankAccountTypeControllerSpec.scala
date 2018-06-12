@@ -88,6 +88,19 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(OK)
           document must be(true)
         }
+
+        "editing a bank account" which {
+          "hasn't been accepted or completed yet" in new Fixture {
+            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount), None))))
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            val result = controller.get(1, edit = true)(request)
+            val document = Jsoup.parse(contentAsString(result)).select("input[value=01]").hasAttr("checked")
+
+            status(result) must be(OK)
+            document must be(true)
+          }
+        }
       }
 
       "respond with NOT_FOUND" when {
@@ -102,16 +115,25 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
         }
         "editing an amendment" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(
+            BankDetails(Some(PersonalAccount), hasAccepted = true),
+            BankDetails(Some(PersonalAccount), hasAccepted = true)
+          )))
+
           mockApplicationStatus(SubmissionReadyForReview)
 
           val result = controller.get(1, true)(request)
 
           status(result) must be(NOT_FOUND)
         }
+
         "editing an variation" in new Fixture {
 
-          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(Some(PersonalAccount)), BankDetails(Some(PersonalAccount)))))
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(
+            BankDetails(Some(PersonalAccount), hasAccepted = true),
+            BankDetails(Some(PersonalAccount), hasAccepted = true)
+          )))
+
           mockApplicationStatus(SubmissionDecisionApproved)
 
           val result = controller.get(1, true)(request)
@@ -165,7 +187,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
 
         "editing and there is both a valid account type and valid account details" in new Fixture {
@@ -184,7 +206,7 @@ class BankAccountTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.BankAccountIsUKController.get(1, true).url))
+          redirectLocation(result) must be(Some(routes.SummaryController.get(1).url))
         }
       }
 
