@@ -20,6 +20,7 @@
 @import utils.StatusConstants
 @import models.status._
 @import config.ApplicationConfig
+@import forms.EmptyForm
 
 @(bankDetails: BankDetails, index: Integer)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -98,6 +99,10 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
                 }
             }
         }
+    }
+
+    @form(EmptyForm, controllers.bankdetails.routes.SummaryController.post(index)) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false)
     }
 
     @anchor(
