@@ -22,6 +22,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
@@ -30,6 +31,7 @@ import scala.concurrent.Future
 
 class PSRNumberController @Inject()(val authConnector: AuthConnector,
                                     val dataCacheConnector: DataCacheConnector,
+                                    val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {

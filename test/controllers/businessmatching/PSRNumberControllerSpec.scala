@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -47,8 +48,19 @@ class PSRNumberControllerSpec extends AmlsSpec
     val controller = new PSRNumberController(
       self.authConnector,
       mockCacheConnector,
+      statusService = mockStatusService,
       mock[BusinessMatchingService]
     )
+
+    when {
+      mockStatusService.isPreSubmission(any())
+    } thenReturn true
+
+    when {
+      mockStatusService.isPending(any())
+    } thenReturn false
+
+    mockApplicationStatus(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
 
