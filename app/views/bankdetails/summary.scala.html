@@ -105,10 +105,4 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
         @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false)
     }
 
-    @anchor(
-        attrRole = true,
-        attrHref = controllers.bankdetails.routes.SummaryController.post(index).url,
-        linkText = Messages("button.checkyouranswers.acceptandaddbankaccount"),
-        visuallyhidden = Messages("summary.bankdetails"))
-
 }
