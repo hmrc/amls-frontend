@@ -1329,7 +1329,8 @@ bankdetails.yourbankaccount.edit = Edit
 bankdetails.yourbankaccount.or = or
 bankdetails.yourbankaccount.remove = Remove
 button.bankdetails.yourbankaccount.acceptandcomplete = Accept and complete section
-
+bankdetails.hasbankaccount.title = Does your business have a bank account?
+bankdetails.hasbankaccount.validation = Select yes if your business has a bank account
 
 
 businessactivities.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
