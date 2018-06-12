@@ -53,7 +53,7 @@
         case Some(account: UKAccount) => ukAccount(bankDetail, account)
         case Some(account: NonUKAccountNumber) => nonUkAccountNumber(bankDetail, account)
         case Some(account: NonUKIBANNumber) => nonUKIBANNumber(bankDetail, account)
-        case _ => <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}"))}</div>
+        case _ => <div>{bankDetail.bankAccountType.map(x => Messages(s"bankdetails.summary.accounttype.lbl.${x.getBankAccountTypeID}")).getOrElse("")}</div>
     })
 }
 
@@ -76,7 +76,7 @@
     @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
 
     @if(inCompleteModel.nonEmpty) {
-        <h3 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h3>
+        <h2 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h2>
         <ul class="list">
         @inCompleteModel.map { case(bankDetail, index) =>
             <li class="group summary__listing">
@@ -96,12 +96,12 @@
     }
 
     @if(completedModel.nonEmpty) {
-        @if(inCompleteModel.nonEmpty) { <h3 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h3> }
+        @if(inCompleteModel.nonEmpty) { <h2 id="completed-header">@Messages("bankdetails.yourbankaccounts.complete")</h2> }
         <ul class="list">
         @completedModel.map { case(bankDetail, index) =>
             <li class="group summary__listing">
                 <div>
-                    <div id="completed-detail-@index" class="grid-layout__column grid-layout--2-3">
+                    <div id="completed-detail-@index" class="grid-layout    __column grid-layout--2-3">
                         @bankAccount(bankDetail)
                     </div>
                     <div id="completed-action-panel" class="grid-layout__column grid-layout--1-3">
