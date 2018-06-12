@@ -64,7 +64,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
       document.title() mustBe pageTitle
     }
 
-    "remove bank account from summary" in new Fixture {
+    "remove bank account from YourBankAccounts" in new Fixture {
 
       val emptyCache = CacheMap("", Map.empty)
 
@@ -92,7 +92,7 @@ class RemoveBankDetailsControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.remove(1)(request)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be (Some(controllers.bankdetails.routes.SummaryController.get(1).url))
+      redirectLocation(result) must be (Some(controllers.bankdetails.routes.YourBankAccountsController.get().url))
 
       verify(controller.dataCacheConnector).save[Seq[BankDetails]](
         any(),

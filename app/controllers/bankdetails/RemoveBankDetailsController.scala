@@ -49,7 +49,7 @@ class RemoveBankDetailsController @Inject()(
           _ <- updateDataStrict[BankDetails](index) { ba =>
             ba.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
-        } yield Redirect(routes.SummaryController.get(index))
+        } yield Redirect(routes.YourBankAccountsController.get())
       }
   }
 }
