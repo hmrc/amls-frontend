@@ -3,9 +3,9 @@ GET         /what-you-need                                              @control
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
 POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
 
-GET         /account-name/                                               @controllers.bankdetails.BankAccountNameController.getNoIndex
+GET         /account-name                                                @controllers.bankdetails.BankAccountNameController.getNoIndex
 GET         /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.getIndex(index:Int, edit: Boolean ?= false)
-POST        /account-name/                                               @controllers.bankdetails.BankAccountNameController.postNoIndex
+POST        /account-name                                                @controllers.bankdetails.BankAccountNameController.postNoIndex
 POST        /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.postIndex(index:Int, edit: Boolean ?= false)
 
 GET         /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)

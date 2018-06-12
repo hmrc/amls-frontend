@@ -101,7 +101,33 @@ class BankAccountNameControllerSpec extends AmlsSpec with MockitoSugar {
           for (field <- fieldElements)
             document.select(s"input[name=$field]").`val` must be(empty)
         }
+
+        "editing a bank account" which {
+          "hasn't been accepted or completed yet" in new Fixture {
+            mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None))), Some(BankDetails.key))
+
+            mockApplicationStatus(SubmissionDecisionApproved)
+
+            val result = controller.getIndex(1, edit = true)(request)
+
+            status(result) must be(OK)
+          }
+        }
       }
+
+      "respond with NOT_FOUND" when {
+        "editing a bank account that has been accepted and completed" in new Fixture {
+          mockCacheFetch[Seq[BankDetails]](Some(Seq(BankDetails(None, None, hasAccepted = true))), Some(BankDetails.key))
+
+          mockApplicationStatus(SubmissionDecisionApproved)
+
+          val result = controller.getIndex(1, false)(request)
+          val document: Document = Jsoup.parse(contentAsString(result))
+
+          status(result) mustBe NOT_FOUND
+        }
+      }
+
     }
 
     "post is called" must {

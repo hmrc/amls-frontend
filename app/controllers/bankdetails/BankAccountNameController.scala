@@ -47,11 +47,11 @@ class BankAccountNameController @Inject()(
     (__ \ "accountName").read(FormTypes.accountNameType)
   }
 
-  def getNoIndex:Action[AnyContent] = Authorised.async {
+  def getNoIndex: Action[AnyContent] = Authorised.async {
     return getMaybeIndex(None)
   }
 
-  def getIndex(index:Int, edit: Boolean = false):Action[AnyContent] = Authorised.async {
+  def getIndex(index: Int, edit: Boolean = false): Action[AnyContent] = Authorised.async {
     return getMaybeIndex(Some(index), edit)
   }
 
@@ -59,58 +59,62 @@ class BankAccountNameController @Inject()(
     implicit authContext =>
       implicit request =>
         index match {
-          case Some(i) =>
-            getData[BankDetails](i) map {
-              case Some(BankDetails(_, Some(data), _, _, _, _, _)) =>
-                Ok(views.html.bankdetails.bank_account_name(Form2[String](data), edit, Some(i)))
-              case Some(_) =>
-                Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, Some(i)))
-            }
+          case Some(i) => for {
+            status <- statusService.getStatus
+            data <- getData[BankDetails](i)
+          } yield data match {
+            case Some(x) if !x.canEdit(status) => NotFound(notFoundView)
+            case Some(BankDetails(_, Some(name), _, _, _, _, _)) =>
+              Ok(views.html.bankdetails.bank_account_name(Form2[String](name), edit, Some(i)))
+            case Some(_) =>
+              Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, Some(i)))
+          }
+
           case _ => Future.successful(Ok(views.html.bankdetails.bank_account_name(EmptyForm, edit, None)))
         }
   }
 
   def postNoIndex: Action[AnyContent] = Authorised.async {
-      return postMaybeIndex(None)
+    return postMaybeIndex(None)
   }
 
-  def postIndex(index:Int, edit: Boolean = false):Action[AnyContent] = Authorised.async {
-      return postMaybeIndex(Some(index), edit)
+  def postIndex(index: Int, edit: Boolean = false): Action[AnyContent] = Authorised.async {
+    return postMaybeIndex(Some(index), edit)
   }
 
   def postMaybeIndex(index: Option[Int] = None, edit: Boolean = false) = Authorised.async {
-  implicit authContext =>
-    implicit request => {
-      Form2[String](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
-        case ValidForm(_, data) =>
-          val newBankDetails = BankDetails(accountName = Some(data))
-          index match {
-            case Some(i) => updateDataStrict[BankDetails](i) { bd =>
-              bd.copy(
-                accountName = Some(data),
-                status = Some(if (edit) {
-                  StatusConstants.Updated
+    implicit authContext =>
+      implicit request => {
+        Form2[String](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(views.html.bankdetails.bank_account_name(f, edit, index)))
+          case ValidForm(_, data) =>
+            val newBankDetails = BankDetails(accountName = Some(data))
+            index match {
+              case Some(i) => updateDataStrict[BankDetails](i) { bd =>
+                bd.copy(
+                  accountName = Some(data),
+                  status = Some(if (edit) {
+                    StatusConstants.Updated
+                  } else {
+                    StatusConstants.Added
+                  })
+                )
+              } map { _ =>
+                if (edit) {
+                  Redirect(routes.SummaryController.get(i))
                 } else {
-                  StatusConstants.Added
-                })
-              )
-            } map { _ =>
-              if (edit) {
-                Redirect(routes.SummaryController.get(i))
-              } else {
-                Redirect(routes.BankAccountTypeController.get(i))
+                  Redirect(routes.BankAccountTypeController.get(i))
+                }
+              }
+              case _ => dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
+                val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails.copy(status = Some(StatusConstants.Added)))
+                dataCacheConnector.save(BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
               }
             }
-            case _ => dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key) flatMap { maybeBankDetails =>
-              val newList = maybeBankDetails.getOrElse(Seq.empty) ++ Seq(newBankDetails.copy(status = Some(StatusConstants.Added)))
-              dataCacheConnector.save(BankDetails.key, newList) map { _ => Redirect(routes.BankAccountTypeController.get(newList.size)) }
-            }
-          }
+        }
+      } recoverWith {
+        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
       }
-    } recoverWith {
-      case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-    }
   }
 }
