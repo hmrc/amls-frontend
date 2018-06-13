@@ -102,7 +102,7 @@ editUrl = controllers.bankdetails.routes.BankAccountNameController.getIndex(inde
     }
 
     @form(EmptyForm, controllers.bankdetails.routes.SummaryController.post(index)) {
-        @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false)
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandaddbankaccount")), false, buttonId = Some("accept-and-add"))
     }
 
 }
