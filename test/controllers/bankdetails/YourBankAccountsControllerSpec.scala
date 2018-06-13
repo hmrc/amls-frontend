@@ -96,12 +96,16 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
     "load the 'your bank accounts' screen with a list of complete and incomplete items" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(completeModel1, completeModel2, completeModel3, deletedCompleteModel4,
         inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
+
       mockApplicationStatus(SubmissionReady)
+
       val result = controller.get()(request)
+
       status(result) must be(OK)
+
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.complete") + "</h2>")
       contentAsString(result) must include("Completed First Account Name")
       contentAsString(result) must include("Completed Second Account Name")
       contentAsString(result) must include("Completed Third Account Name")
@@ -115,12 +119,16 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the 'your bank accounts' screen with a list of incomplete items only" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(inCompleteModel1, inCompleteModel2, inCompleteModel3, deletedInCompleteModel4)))
+
       mockApplicationStatus(SubmissionReady)
+
       val result = controller.get()(request)
+
       status(result) must be(OK)
+
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h2>")
       contentAsString(result) mustNot include("Completed First Account Name")
       contentAsString(result) mustNot include("Completed Second Account Name")
       contentAsString(result) mustNot include("Completed Third Account Name")
@@ -133,12 +141,16 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the 'your bank accounts screen with a list of complete items only" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq(completeModel1, completeModel2, completeModel3, deletedCompleteModel4)))
+
       mockApplicationStatus(SubmissionReady)
+
       val result = controller.get()(request)
+
       status(result) must be(OK)
+
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h2>")
       contentAsString(result) must include("Completed First Account Name")
       contentAsString(result) must include("Completed Second Account Name")
       contentAsString(result) must include("Completed Third Account Name")
@@ -151,12 +163,16 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "load the 'your bank accounts screen with empty lists" in new Fixture {
       mockCacheFetch[Seq[BankDetails]](Some(Seq.empty))
+
       mockApplicationStatus(SubmissionReady)
+
       val result = controller.get()(request)
+
       status(result) must be(OK)
+
       contentAsString(result) must include(Messages("bankdetails.yourbankaccounts.nobank.account"))
       contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.incomplete"))
-      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h3>")
+      contentAsString(result) mustNot include(Messages("bankdetails.yourbankaccounts.complete") + "</h2>")
     }
   }
 }
