@@ -30,6 +30,7 @@ import org.scalacheck.Gen
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.flowrouters
+package services.flowmanagement.flowrouters.businessmatching
 
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement._

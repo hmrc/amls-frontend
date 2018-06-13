@@ -22,12 +22,10 @@ import connectors._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
 import services._
-import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 import services.flowmanagement.Router
-import services.flowmanagement.flowrouters.{ChangeBusinessTypeRouter, AddBusinessTypeRouter, RemoveBusinessTypeRouter}
-import uk.gov.hmrc.http.{HttpGet, HttpPost}
+import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, RemoveBusinessTypeRouter}
+import uk.gov.hmrc.http.{CoreGet, CorePost, HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.http.{CoreGet, CorePost, HttpPost}
 
 class Module extends AbstractModule {
 
