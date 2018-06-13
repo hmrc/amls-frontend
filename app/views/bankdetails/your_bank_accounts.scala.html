@@ -81,10 +81,10 @@
         @inCompleteModel.map { case(bankDetail, index) =>
             <li class="summary__listing">
                 <div>
-                    <div id="incomplete-detail-@index" class="">
+                    <div id="incomplete-detail-@index">
                         @bankAccount(bankDetail)
                     </div>
-                    <div id="incomplete-action-panel" class="">
+                    <div id="incomplete-action-panel-@index">
                         <a id="incomplete-detail-edit-@index" href="@controllers.bankdetails.routes.BankAccountNameController.getIndex(index + 1).url">@Messages("bankdetails.yourbankaccount.edit")</a>
                         @Messages("bankdetails.yourbankaccount.or")
                         <a id="incomplete-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">@Messages("bankdetails.yourbankaccount.remove")</a>
@@ -101,10 +101,10 @@
         @completedModel.map { case(bankDetail, index) =>
             <li class="group summary__listing">
                 <div>
-                    <div id="completed-detail-@index" class="">
+                    <div id="completed-detail-@index">
                         @bankAccount(bankDetail)
                     </div>
-                    <div id="completed-action-panel" class="">
+                    <div id="completed-action-panel-@index">
                         <a id="completed-detail-remove-@index" href="@controllers.bankdetails.routes.RemoveBankDetailsController.get(index + 1).url">
                         @Messages("bankdetails.yourbankaccount.remove")</a>
                     </div>
