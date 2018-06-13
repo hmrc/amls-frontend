@@ -40,3 +40,6 @@ case object NeedToUpdatePageId extends PageId
 case object RemoveBusinessTypesSummaryPageId extends PageId
 case object UnableToRemovePageId extends PageId
 case object WhatDateRemovedPageId extends PageId
+
+// Change MSB sub sector flow
+case object ChangeMsbSubSectorPageId extends PageId

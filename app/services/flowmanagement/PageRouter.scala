@@ -17,11 +17,11 @@
 package services.flowmanagement
 
 import models.flowmanagement.PageId
-import play.api.mvc.Result
+import play.api.mvc.{Call, Result}
 import play.api.mvc.Results.InternalServerError
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-
+import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 
 trait PageRouter[A] {
@@ -30,6 +30,7 @@ trait PageRouter[A] {
                                                               ec: ExecutionContext
   ): Future[Result]
 
+  implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
 
   def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }
