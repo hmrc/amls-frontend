@@ -24,7 +24,6 @@
     @errorSummary(f)
     @heading("bankdetails.hasbankaccount.title", "summary.bankdetails")
 }
-    §
 @main(
     title = s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}",
     heading = header
@@ -32,7 +31,7 @@
     @form(f, controllers.bankdetails.routes.HasBankAccountController.post()) {
         @fieldset(
             f = f("hasBankAccount-fieldset"),
-            legend = "bankdetails.hasbankaccount.legend",
+            legend = "bankdetails.hasbankaccount.title",
             panel = false,
             legendHidden = true,
             classes = Seq("inline")
