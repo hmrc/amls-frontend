@@ -832,6 +832,7 @@ fieldset .panel-indent {
 
 .summary__listing > div > div:nth-child(1) {
     display:inline-block;
+    width: 66.66%;
 }
 
 .summary__listing > div > div:nth-child(2) {
