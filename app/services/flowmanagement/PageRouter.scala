@@ -31,6 +31,7 @@ trait PageRouter[A] {
   ): Future[Result]
 
   implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
+  implicit def toFuture(result: Result): Future[Result] = Future.successful(result)
 
   def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
 }

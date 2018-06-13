@@ -28,9 +28,7 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class MsbSubSectorsPageRouterSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture {
-
     val router = new MsbSubSectorsPageRouter
-
   }
 
   "Getting the next route" must {

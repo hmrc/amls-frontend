@@ -17,25 +17,23 @@
 package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
-import models.businessmatching.TransmittingMoney
-import models.flowmanagement.{ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel}
+import models.businessmatching.BusinessAppliedForPSRNumberYes
+import models.flowmanagement.{BusinessAppliedForPSRNumberPageId, ChangeSubSectorFlowModel}
 import play.api.mvc.Result
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-
+import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 
-class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
+class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
   override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
                            (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    val result = model.subSectors map {
-      case sectors if sectors.contains(TransmittingMoney) =>
-        routes.PSRNumberController.get(edit)
-      case _ => routes.SummaryController.get()
+    val call = model.psrNumber map {
+      case BusinessAppliedForPSRNumberYes(_) => routes.SummaryController.get()
+      case _ => routes.NoPsrController.get()
     }
 
-    result.fold(error(ChangeMsbSubSectorPageId))(Redirect)
+    call.fold(error(BusinessAppliedForPSRNumberPageId))(Redirect)
   }
 }

@@ -16,6 +16,8 @@
 
 package models.flowmanagement
 
-import models.businessmatching.BusinessMatchingMsbService
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessMatchingMsbService}
 
-case class ChangeSubSectorFlowModel(subSectors: Option[Set[BusinessMatchingMsbService]] = None)
+case class ChangeSubSectorFlowModel(subSectors: Option[Set[BusinessMatchingMsbService]] = None,
+                                    psrNumber: Option[BusinessAppliedForPSRNumber] = None
+                                   )
