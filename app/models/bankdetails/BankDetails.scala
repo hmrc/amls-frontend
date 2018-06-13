@@ -126,4 +126,17 @@ object BankDetails {
 
   implicit def default(details: Option[BankDetails]): BankDetails =
     details.getOrElse(BankDetails())
+
+  object Filters {
+    val deletedFilter = (bd: BankDetails) => bd.status.contains(StatusConstants.Deleted)
+    val completeFilter = (bd: BankDetails) => bd.isComplete
+    val noBankAccountFilter = (bd: BankDetails) => bd.bankAccountType.contains(NoBankAccountUsed)
+    val visibleAccountsFilter = (bd: BankDetails) => !deletedFilter(bd) && !noBankAccountFilter(bd)
+
+    implicit class ZippedSyntax(zipped: Seq[(BankDetails, Int)]) {
+      def visibleAccounts = zipped filter { case (bd, _) => visibleAccountsFilter(bd) }
+      def completeAccounts = zipped filter { case (bd, _) => completeFilter(bd) }
+      def incompleteAccounts = zipped filterNot { case (bd, _) => completeFilter(bd) }
+    }
+  }
 }

@@ -22,9 +22,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
 import models.bankdetails.BankDetails
+import models.bankdetails.BankDetails.Filters._
 import play.api.mvc.Call
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
 import views.html.bankdetails._
 
 class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
@@ -34,12 +34,11 @@ class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request =>
         val view = what_you_need.apply(_: Call)(request, implicitly)
-        val deletedFilter = (details: BankDetails) => !details.status.contains(StatusConstants.Deleted)
 
         val result = for {
             bankDetails <- OptionT(dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key))
           } yield {
-            if (bankDetails.exists(deletedFilter)) {
+            if (bankDetails.exists(visibleAccountsFilter)) {
               Ok(view(routes.BankAccountNameController.getNoIndex()))
             } else {
               Ok(view(routes.HasBankAccountController.get()))

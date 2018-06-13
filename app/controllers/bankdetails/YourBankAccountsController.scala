@@ -18,15 +18,13 @@ package controllers.bankdetails
 
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
 import forms.EmptyForm
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import models.bankdetails.BankDetails
+import models.bankdetails.BankDetails.Filters._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
 
-@Singleton
 class YourBankAccountsController @Inject()(
                                             val dataCacheConnector: DataCacheConnector,
                                             val authConnector: AuthConnector = AMLSAuthConnector,
@@ -39,12 +37,12 @@ class YourBankAccountsController @Inject()(
           bankDetails <- dataCacheConnector.fetch[Seq[BankDetails]](BankDetails.key)
         } yield bankDetails match {
           case Some(data) =>
-            val filteredBankDetails = data.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted))
+            val filteredBankDetails = data.zipWithIndex.visibleAccounts
 
             Ok(views.html.bankdetails.your_bank_accounts(
               EmptyForm,
-              filteredBankDetails.filterNot(_._1.isComplete),
-              filteredBankDetails.filter(_._1.isComplete)
+              filteredBankDetails.incompleteAccounts,
+              filteredBankDetails.completeAccounts
             ))
 
           case _ => Redirect(controllers.routes.RegistrationProgressController.get())
