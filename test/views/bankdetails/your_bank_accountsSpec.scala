@@ -18,16 +18,11 @@ package views.bankdetails
 
 import forms.EmptyForm
 import models.bankdetails._
-import models.status._
-import org.jsoup.nodes.Element
-import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
-import utils.{AmlsSpec, StatusConstants}
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
-
-import scala.collection.JavaConversions._
 
 class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChecks with HtmlAssertions {
 
@@ -156,7 +151,7 @@ class your_bank_accountsSpec extends AmlsSpec with MustMatchers with PropertyChe
       doc.getElementById("incomplete-detail-edit-1").text must be(Messages("bankdetails.yourbankaccount.edit"))
       doc.getElementById("incomplete-detail-remove-1").attr("href") must be(controllers.bankdetails.routes.RemoveBankDetailsController.get(2).url)
       doc.getElementById("incomplete-detail-remove-1").text must be(Messages("bankdetails.yourbankaccount.remove"))
-      doc.getElementById("incomplete-action-panel").text must include(Messages("bankdetails.yourbankaccount.or"))
+      doc.getElementById("incomplete-action-panel-1").text must include(Messages("bankdetails.yourbankaccount.or"))
     }
 
     "have an complete section with correct data and remove links - if there are complete elements" in new ViewFixture {

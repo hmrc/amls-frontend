@@ -830,7 +830,14 @@ fieldset .panel-indent {
   padding-bottom:15px;
 }
 
+.summary__listing > div > div:nth-child(1) {
+    display:inline-block;
+}
 
+.summary__listing > div > div:nth-child(2) {
+    float:right;
+    margin-right:10px;
+}
 
 /* class for older browsers; pseudo-class for modern browsers */
 
