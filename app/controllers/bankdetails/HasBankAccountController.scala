@@ -43,7 +43,7 @@ class HasBankAccountController @Inject()(val authConnector: AuthConnector,
   def get = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Future.successful(Ok(view(request)(EmptyForm)))
+        Future.successful(Ok(view.apply(EmptyForm)))
   }
 
   def post = Authorised.async {
@@ -56,7 +56,7 @@ class HasBankAccountController @Inject()(val authConnector: AuthConnector,
           case ValidForm(_, data) =>
             cacheConnector.save(BankDetails.key, Seq.empty[BankDetails]) map { _ => Redirect(router(data)) }
 
-          case f: InvalidForm => Future.successful(BadRequest(view(request)(f)))
+          case f: InvalidForm => Future.successful(BadRequest(view.apply(f)))
         }
   }
 }
