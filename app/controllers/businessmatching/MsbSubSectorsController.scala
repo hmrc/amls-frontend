@@ -23,9 +23,12 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
+import models.flowmanagement.{ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import play.api.mvc.Result
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
+import services.flowmanagement.flowrouters.businessmatching.ChangeSubSectorRouter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,6 +38,7 @@ import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
+                                        val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -59,23 +63,12 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
 
           case ValidForm(_, data) =>
-            lazy val updateModel = for {
-              bm <- businessMatchingService.getModel
-              cache <- businessMatchingService.updateModel(if (data.msbServices.contains(TransmittingMoney)) {
-                bm.msbServices(Some(data))
-              } else {
-                bm.msbServices(Some(data)).clearPSRNumber
-              })
-              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
-            } yield cache
 
-            lazy val redirectResult = OptionT.some[Future, Result](if (data.msbServices.contains(TransmittingMoney)) {
-              Redirect(routes.PSRNumberController.get(edit))
-            } else {
-              Redirect(routes.SummaryController.get())
-            })
-
-            updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
+            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) { maybeModel =>
+              maybeModel.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
+            } flatMap {
+              case Some(updatedModel) => router.getRoute(ChangeMsbSubSectorPageId, updatedModel)
+            }
         }
   }
 

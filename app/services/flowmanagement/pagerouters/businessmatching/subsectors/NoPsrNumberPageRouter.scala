@@ -14,25 +14,22 @@
  * limitations under the License.
  */
 
-package services.flowmanagement
+package services.flowmanagement.pagerouters.businessmatching.subsectors
 
-import models.flowmanagement.PageId
-import play.api.mvc.{Call, Result}
-import play.api.mvc.Results.InternalServerError
+import controllers.businessmatching.routes
+import models.flowmanagement.ChangeSubSectorFlowModel
+import play.api.mvc.Result
+import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import play.api.mvc.Results.Redirect
+
 import scala.concurrent.{ExecutionContext, Future}
 
-trait PageRouter[A] {
-  def getPageRoute(model: A, edit: Boolean = false)(implicit ac: AuthContext,
-                                                              hc: HeaderCarrier,
-                                                              ec: ExecutionContext
-  ): Future[Result]
+class NoPsrNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
+  override def getPageRoute(model: ChangeSubSectorFlowModel, edit: Boolean)
+                           (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
 
-  implicit def toFutureRedirect(call: Call): Future[Result] = Future.successful(Redirect(call))
-  implicit def toFuture(result: Result): Future[Result] = Future.successful(result)
+    routes.SummaryController.get()
 
-  def error(pageId: PageId) = InternalServerError(s"Failed to get route from $pageId")
+  }
 }
-
