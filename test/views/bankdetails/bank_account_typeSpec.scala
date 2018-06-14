@@ -38,7 +38,7 @@ class bank_account_typeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0, 0)
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 
       doc.title() must startWith(Messages("bankdetails.accounttype.title") + " - " + Messages("summary.bankdetails"))
     }
@@ -47,7 +47,7 @@ class bank_account_typeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
 
-      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0, 0)
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 
       heading.html() must be(Messages("bankdetails.accounttype.title"))
     }
@@ -69,7 +69,7 @@ class bank_account_typeSpec extends AmlsSpec with MustMatchers  {
       Seq((Path \ bankAccountTypeField, Seq(ValidationError(messageKey1)))
       ))
 
-    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0, 0)
+    override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
 
     errorSummary.html() must include(messageKey1)
 
