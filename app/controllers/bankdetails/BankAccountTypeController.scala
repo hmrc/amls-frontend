@@ -43,13 +43,12 @@ class BankAccountTypeController @Inject()(
 
         for {
           bankDetail <- getData[BankDetails](index)
-          count <- getData[BankDetails].map(details => details.filterNot(filter).size)
           status <- statusService.getStatus
         } yield bankDetail match {
           case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index, count))
+            Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
           case Some(details) if details.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index, count))
+            Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
       }
@@ -60,7 +59,7 @@ class BankAccountTypeController @Inject()(
       implicit request => {
         Form2[Option[BankAccountType]](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index, count)))
+            Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[BankDetails](index) { bd =>
