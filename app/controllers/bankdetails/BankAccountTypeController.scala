@@ -17,12 +17,12 @@
 package controllers.bankdetails
 
 import javax.inject.{Inject, Singleton}
-
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.bankdetails._
+import play.api.mvc.{Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection, StatusConstants}
@@ -39,16 +39,14 @@ class BankAccountTypeController @Inject()(
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        val filter: BankDetails => Boolean = details => details.status.contains(StatusConstants.Deleted) || details.bankAccountType.contains(NoBankAccountUsed)
-
         for {
           bankDetail <- getData[BankDetails](index)
           status <- statusService.getStatus
         } yield bankDetail match {
           case Some(details@BankDetails(Some(data), _, _, _, _, _, _)) if details.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_types(Form2[Option[BankAccountType]](Some(data)), edit, index))
+            Ok(view.apply(Form2[Option[BankAccountType]](Some(data)), edit, index))
           case Some(details) if details.canEdit(status) =>
-            Ok(views.html.bankdetails.bank_account_types(EmptyForm, edit, index))
+            Ok(view.apply(EmptyForm, edit, index))
           case _ => NotFound(notFoundView)
         }
       }
@@ -59,7 +57,7 @@ class BankAccountTypeController @Inject()(
       implicit request => {
         Form2[Option[BankAccountType]](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.bankdetails.bank_account_types(f, edit, index)))
+            Future.successful(BadRequest(view(request)(f, edit, index)))
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[BankDetails](index) { bd =>
@@ -68,18 +66,20 @@ class BankAccountTypeController @Inject()(
                   case _ => bd.bankAccountType(data)
                 }
               }
-            } yield {
-              data match {
-                case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))
-                case Some(_) if !edit => Redirect(routes.BankAccountIsUKController.get(index))
-                case _ => Redirect(routes.SummaryController.get(index))
-              }
-            }
+            } yield router(data, edit, index)
           }.recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
         }
       }
+  }
+
+  private def view(implicit request: Request[_]) = views.html.bankdetails.bank_account_types.apply _
+
+  private val router = (data: Option[BankAccountType], edit: Boolean, index: Int) => data match {
+    case Some(NoBankAccountUsed) => Redirect(routes.SummaryController.get(index))
+    case Some(_) if !edit => Redirect(routes.BankAccountIsUKController.get(index))
+    case _ => Redirect(routes.SummaryController.get(index))
   }
 
 }
