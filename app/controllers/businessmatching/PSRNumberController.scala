@@ -16,7 +16,7 @@
 
 package controllers.businessmatching
 
-import _root_.forms.{Form2, InvalidForm, ValidForm}
+import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
@@ -40,10 +40,10 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         (for {
           bm <- businessMatchingService.getModel
-          number <- OptionT.fromOption[Future](bm.businessAppliedForPSRNumber)
           status <- OptionT.liftF(statusService.getStatus)
         } yield {
-          val form = Form2[BusinessAppliedForPSRNumber](number)
+          val form: Form2[BusinessAppliedForPSRNumber] = bm.businessAppliedForPSRNumber map
+                  Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
           Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPending(status)))
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
