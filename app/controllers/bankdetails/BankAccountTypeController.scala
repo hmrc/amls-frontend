@@ -39,8 +39,6 @@ class BankAccountTypeController @Inject()(
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
-        val filter: BankDetails => Boolean = details => details.status.contains(StatusConstants.Deleted) || details.bankAccountType.contains(NoBankAccountUsed)
-
         for {
           bankDetail <- getData[BankDetails](index)
           status <- statusService.getStatus
