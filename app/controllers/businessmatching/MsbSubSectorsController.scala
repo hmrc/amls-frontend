@@ -71,40 +71,4 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             }
         }
   }
-
-  private def updateMsb(existingServices: Option[BusinessMatchingMsbServices], updatedServices: Set[BusinessMatchingMsbService], cache: CacheMap)
-                       (implicit ac: AuthContext, hc: HeaderCarrier) = {
-
-    val updateCE = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
-      if (subSectorDiff.contains(CurrencyExchange)) {
-        msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
-      } else {
-        msb
-      }
-    }
-
-    val updateMT = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
-      if (subSectorDiff.contains(TransmittingMoney)) {
-        msb.copy(
-          businessUseAnIPSP = None,
-          fundsTransfer = None,
-          transactionsInNext12Months = None,
-          sendMoneyToOtherCountry = None,
-          sendTheLargestAmountsOfMoney = None,
-          mostTransactions = None
-        )
-      } else {
-        msb
-      }
-    }
-
-    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
-      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { _ =>
-        val sectorDiff = existingServices.fold(Set.empty[BusinessMatchingMsbService])(_.msbServices) diff updatedServices
-        val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
-
-        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb)
-      }
-    }
-  }
 }

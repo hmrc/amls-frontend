@@ -51,7 +51,7 @@ class TradingPremisesService {
     if(msbServicesInput.isDefined) {
       patchTradingPremisesMsbSubServices(updatedTradingPremises, msbServicesInput.get) { (tpservices, index) =>
         tpservices.copy(
-          if ((indices contains index)) {
+          if (indices contains index) {
             tpservices.services ++ tradingpremises.TradingPremisesMsbServices.convertServices(msbServicesInput.get.msbServices)
           } else {
             tpservices.services
@@ -83,7 +83,7 @@ class TradingPremisesService {
     }
 
   private def patchTradingPremisesBusinessActivities(tradingPremises: Seq[TradingPremises])
-                                                    (fn: ((WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo)): Seq[TradingPremises] = {
+                                                    (fn: (WhatDoesYourBusinessDo, Int) => WhatDoesYourBusinessDo): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
       val premise: TradingPremises = tp.whatDoesYourBusinessDoAtThisAddress {
         tp.whatDoesYourBusinessDoAtThisAddress.fold(WhatDoesYourBusinessDo(Set.empty)) { wdybd =>
@@ -95,7 +95,7 @@ class TradingPremisesService {
   }
 
   private def patchTradingPremisesMsbSubServices(tradingPremises: Seq[TradingPremises], newMsbServices: models.businessmatching.BusinessMatchingMsbServices)
-                                          (fn: ((models.tradingpremises.TradingPremisesMsbServices, Int) => models.tradingpremises.TradingPremisesMsbServices)): Seq[TradingPremises] = {
+                                          (fn: (models.tradingpremises.TradingPremisesMsbServices, Int) => models.tradingpremises.TradingPremisesMsbServices): Seq[TradingPremises] = {
     tradingPremises.zipWithIndex map { case (tp, index) =>
       tp match {
         case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined => {

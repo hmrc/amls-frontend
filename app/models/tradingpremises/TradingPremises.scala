@@ -16,6 +16,7 @@
 
 package models.tradingpremises
 
+import models.businessmatching.MoneyServiceBusiness
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -76,6 +77,8 @@ case class TradingPremises(
 
   def isComplete: Boolean =
     this match {
+      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), m, _, _, _, _, _, _, true)
+        if w.activities.contains(MoneyServiceBusiness) && m.fold(false)(_.services.nonEmpty) => true
       case TradingPremises(_, Some(_), _, _, _, _, Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
       case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
       case tp if !tp.hasAccepted => false
