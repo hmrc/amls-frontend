@@ -58,7 +58,7 @@
                         allowEdit = !isPending,
                         editLinkTag = "edit-registration-number"
                     ) {
-                        <p>@model.companyRegistrationNumber.map { number =>
+                        <p id="registration-number">@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
                         }</p>
                     }
@@ -69,7 +69,7 @@
                         editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString,
                         allowEdit = isPreSubmission
                     ) {
-                        <p>@model.typeOfBusiness.map { business =>
+                        <p id="type-of-business">@model.typeOfBusiness.map { business =>
                             @business.typeOfBusiness
                         }</p>
                     }
@@ -130,7 +130,7 @@
                             allowEdit = !isPending,
                             editLinkTag = "edit-psr-number"
                         ) {
-                            <p>@psr match {
+                            <p id="psr">@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
                                 case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
                             }</p>

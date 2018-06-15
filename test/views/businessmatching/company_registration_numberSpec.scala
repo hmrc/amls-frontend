@@ -33,17 +33,30 @@ class company_registration_numberSpec extends AmlsSpec with MustMatchers  {
   }
 
   "company_registration_number view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title for non-edit mode" in new ViewFixture {
 
       val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
 
-      def view = views.html.businessmatching.company_registration_number(form2, edit = true)
+      def view = views.html.businessmatching.company_registration_number(form2, edit = false)
 
       doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("businessmatching.registrationnumber.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
 
     }
+
+    "have correct title for edit mode" in new ViewFixture {
+
+      val form2: ValidForm[CompanyRegistrationNumber] = Form2(CompanyRegistrationNumber("12345678"))
+
+      def view = views.html.businessmatching.company_registration_number(form2, edit = true)
+
+      doc.title must startWith(Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.updateinformation"))
+      heading.html must be(Messages("businessmatching.registrationnumber.title"))
+      subHeading.html must include(Messages("summary.updateinformation"))
+
+    }
+
 
     "show errors in the correct locations" in new ViewFixture {
 

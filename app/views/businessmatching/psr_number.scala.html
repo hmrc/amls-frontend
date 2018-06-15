@@ -26,7 +26,7 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", "summary.businessmatching")
+    @heading("businessmatching.psr.number.title", if(edit) "summary.updateinformation" else "summary.businessmatching")
 }
 
 @psrInput = {
@@ -44,7 +44,7 @@
 }
 
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.psr.number.title") + " - " + {if(edit) Messages("summary.updateinformation") else Messages("summary.businessmatching")},
     heading = header
 )  {
 

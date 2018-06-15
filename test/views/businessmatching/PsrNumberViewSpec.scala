@@ -30,15 +30,27 @@ class PsrNumberViewSpec extends AmlsSpec {
     }
 
     "psr_number view" must {
-        "have correct title" in new ViewFixture {
+        "have correct title for non-edit mode" in new ViewFixture {
+
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+            def view = views.html.businessmatching.psr_number(form2, edit = false)
+
+            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
+            heading.html must be(Messages("businessmatching.psr.number.title"))
+            subHeading.html must include(Messages("summary.businessmatching"))
+
+        }
+
+        "have correct title for edit mode" in new ViewFixture {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
             def view = views.html.businessmatching.psr_number(form2, edit = true)
 
-            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
+            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateinformation"))
             heading.html must be(Messages("businessmatching.psr.number.title"))
-            subHeading.html must include(Messages("summary.businessmatching"))
+            subHeading.html must include(Messages("summary.updateinformation"))
 
         }
 
