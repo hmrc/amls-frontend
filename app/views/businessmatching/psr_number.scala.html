@@ -18,7 +18,7 @@
 @import forms2._
 @import utils.HtmlElementHelpers._
 
-@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPending: Boolean = true)(implicit request: Request[_],m:Messages)
 
 @target = @{
     s"""${f("regNumber").id}-panel"""
@@ -26,11 +26,25 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.psr.number.title", "summary.businessmatching")
+    @heading("businessmatching.psr.number.title", if(edit) "summary.updateinformation" else "summary.businessmatching")
+}
+
+@psrInput = {
+    @input(
+        attrMaxlength = "6",
+        attrPattern = "[0-9]{1,6}",
+        attrType = "tel",
+        bold = false,
+        // classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
+        dataAttrs = digitsOnlyAttributes,
+        field = f("regNumber"),
+        hintText = "",
+        labelText = "businessmatching.psr.number.lbl"
+    )
 }
 
 @main(
-    title = Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.psr.number.title") + " - " + {if(edit) Messages("summary.updateinformation") else Messages("summary.businessmatching")},
     heading = header
 )  {
 
@@ -46,42 +60,34 @@
             classes = Seq("inline")
         ) {
 
-            @errorGroup(
-                field = f("appliedFor")
-            ) {
-
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.yes",
-                    value = "true",
-                    target = s"#$target",
-                    inline = true
-                )
-                @radio(
-                    f = f("appliedFor"),
-                    labelText = "lbl.no",
-                    value = "false",
-                    inline = true
-                )
+            @if(edit && !isPending) {
+                <input type="hidden" name="appliedFor" value=true />
+                @psrInput
+            } else {
+                @errorGroup(
+                    field = f("appliedFor")
+                ) {
+                    @radio(
+                        f = f("appliedFor"),
+                        labelText = "lbl.yes",
+                        value = "true",
+                        target = s"#$target",
+                        inline = true
+                    )
+                    @radio(
+                        f = f("appliedFor"),
+                        labelText = "lbl.no",
+                        value = "false",
+                        inline = true
+                    )
+                }
             }
         }
 
         @panel(
             field = Some(f(s"$target")),
             id = target
-        ) {
-            @input(
-                attrMaxlength = "6",
-                attrPattern = "[0-9]{1,6}",
-                attrType = "tel",
-                bold = false,
-                // classes = Seq("form-control-1-4 form-control-1-4"), // yes, twice to override shady asset library nonsense *facepalm*
-                dataAttrs = digitsOnlyAttributes,
-                field = f("regNumber"),
-                hintText = "",
-                labelText = "businessmatching.psr.number.lbl"
-            )
-        }
+        ) { @psrInput }
 
         @submit(edit, returnLink = showReturnLink)
    }

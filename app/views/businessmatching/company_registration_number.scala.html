@@ -23,11 +23,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.registrationnumber.title", "summary.businessmatching")
+    @heading("businessmatching.registrationnumber.title", if(edit) "summary.updateinformation" else "summary.businessmatching")
 }
 
 @main(
-    title = Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.registrationnumber.title") + " - " + {if(edit) Messages("summary.updateinformation") else Messages("summary.businessmatching")},
     heading = header
 ) {
 

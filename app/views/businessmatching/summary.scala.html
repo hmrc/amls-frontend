@@ -55,9 +55,10 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
-                        allowEdit = isPreSubmission
+                        allowEdit = !isPending,
+                        editLinkTag = "edit-registration-number"
                     ) {
-                        <p>@model.companyRegistrationNumber.map { number =>
+                        <p id="registration-number">@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
                         }</p>
                     }
@@ -68,7 +69,7 @@
                         editUrl = controllers.businessmatching.routes.TypeOfBusinessController.get(true).toString,
                         allowEdit = isPreSubmission
                     ) {
-                        <p>@model.typeOfBusiness.map { business =>
+                        <p id="type-of-business">@model.typeOfBusiness.map { business =>
                             @business.typeOfBusiness
                         }</p>
                     }
@@ -126,9 +127,10 @@
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
                             editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
-                            allowEdit = isPreSubmission
+                            allowEdit = !isPending,
+                            editLinkTag = "edit-psr-number"
                         ) {
-                            <p>@psr match {
+                            <p id="psr">@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
                                 case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
                             }</p>
@@ -146,7 +148,8 @@
                     @anchor(
                         attrHref = appConfig.logoutUrl.toString,
                         attrRole = true,
-                        linkText = Messages("button.logout")
+                        linkText = Messages("button.logout"),
+                        id = Some("logout")
                     )
                 }
                 case BusinessAppliedForPSRNumberYes(number) => {
@@ -173,6 +176,6 @@
 
 @submitButton(linkText: String) = {
     @form(f, controllers.businessmatching.routes.SummaryController.post()) {
-        @submit(false, Some(Messages(linkText)), returnLink = false)
+        @submit(false, Some(Messages(linkText)), returnLink = false, buttonId=Some("submit-button"))
     }
 }
