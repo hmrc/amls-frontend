@@ -55,7 +55,8 @@
                     @checkYourAnswers(
                         question = Messages("businessmatching.registrationnumber.title"),
                         editUrl = controllers.businessmatching.routes.CompanyRegistrationNumberController.get(true).toString,
-                        allowEdit = !isPending
+                        allowEdit = !isPending,
+                        editLinkTag = "edit-registration-number"
                     ) {
                         <p>@model.companyRegistrationNumber.map { number =>
                             @number.companyRegistrationNumber
@@ -126,7 +127,8 @@
                         @checkYourAnswers(
                             question = Messages("businessmatching.psr.number.title"),
                             editUrl = controllers.businessmatching.routes.PSRNumberController.get(true).toString,
-                            allowEdit = !isPending
+                            allowEdit = !isPending,
+                            editLinkTag = "edit-psr-number"
                         ) {
                             <p>@psr match {
                                 case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
@@ -146,7 +148,8 @@
                     @anchor(
                         attrHref = appConfig.logoutUrl.toString,
                         attrRole = true,
-                        linkText = Messages("button.logout")
+                        linkText = Messages("button.logout"),
+                        id = Some("logout")
                     )
                 }
                 case BusinessAppliedForPSRNumberYes(number) => {
@@ -173,6 +176,6 @@
 
 @submitButton(linkText: String) = {
     @form(f, controllers.businessmatching.routes.SummaryController.post()) {
-        @submit(false, Some(Messages(linkText)), returnLink = false)
+        @submit(false, Some(Messages(linkText)), returnLink = false, buttonId=Some("submit-button"))
     }
 }
