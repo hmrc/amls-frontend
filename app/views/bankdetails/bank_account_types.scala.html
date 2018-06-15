@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index:Int, count:Int)(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, index:Int)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -29,7 +29,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit, count)) {
+    @form(f, controllers.bankdetails.routes.BankAccountTypeController.post(index, edit)) {
 
         @fieldset(
             f = f("bankAccountType-fieldset"),
