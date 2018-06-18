@@ -16,7 +16,8 @@
 
 package models
 
-import models.status.{SubmissionDecisionApproved, SubmissionStatus}
+import models.ResponseType.SubscriptionResponseType
+import models.status.{SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 
@@ -56,7 +57,7 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime) {
 
   def toPay(status: SubmissionStatus): BigDecimal = status match {
-    case SubmissionDecisionApproved => difference.getOrElse(0)
+    case SubmissionReadyForReview if responseType == SubscriptionResponseType => difference.getOrElse(0)
     case _ => totalFees
   }
 
