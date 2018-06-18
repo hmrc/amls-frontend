@@ -18,15 +18,29 @@ package controllers.msb
 
 import controllers.BaseController
 import javax.inject.Inject
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject() (val authConnector: AuthConnector) extends BaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+                                      val statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(what_you_need()))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(what_you_need()))
   }
+
+  def post = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        statusService.isPreSubmission map  { status =>
+          if (status) Redirect(routes.ExpectedThroughputController.get())
+          else Redirect(routes.BranchesOrAgentsController.get())
+        }
+
+  }
+
 }

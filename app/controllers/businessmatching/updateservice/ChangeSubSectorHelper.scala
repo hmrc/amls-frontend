@@ -157,6 +157,7 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
 
         case t => t
       }
+      case None => Seq.empty
     } map { t => t.getOrElse(Seq.empty) }
   }
 

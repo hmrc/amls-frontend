@@ -16,6 +16,7 @@
 
 @import include._
 @import forms2._
+@import forms.EmptyForm
 @()(implicit request: Request[_],m:Messages)
 
 @header = {
@@ -36,15 +37,9 @@
         <li>@Messages("msb.whatyouneed.line_3")</li>
     </ul>
 
-
-    @anchor(
-        attrHref = controllers.msb.routes.ExpectedThroughputController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.continue"),
-        visuallyhidden = Messages("summary.msb"),
-        returnLink = true,
-        id=Some("msbwhatyouneed-button")
-    )
+    @form(EmptyForm, controllers.msb.routes.WhatYouNeedController.post()) {
+        @submit(false, Some(Messages("button.continue")), true, buttonId = Some("msbwhatyouneed-button"))
+    }
 
 }
 

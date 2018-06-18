@@ -244,6 +244,15 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       updatedTps.head.hasAccepted mustBe true
     }
 
+    "handle when there is no trading presmises" in new Fixture {
+      val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal)), None)
+
+      mockCacheUpdate(Some(TradingPremises.key), Seq.empty)
+
+      val updatedTps = await(helper.updateTradingPremises(model))
+      updatedTps.size mustBe 0
+    }
+
     "leave trading premises with an empty list if we are adding more than one sub sector" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal, TransmittingMoney)), None)
 
