@@ -82,9 +82,6 @@ class CompanyRegistrationNumberControllerSpec extends AmlsSpec with MockitoSugar
 
     "on get() display existing data if it exists" in new Fixture {
 
-//      when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-//        (any(), any(), any())).thenReturn(Future.successful(Some(businessMatching)))
-
       val result = controller.get()(request)
       status(result) must be(OK)
 
