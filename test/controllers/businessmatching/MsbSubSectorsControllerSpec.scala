@@ -20,13 +20,12 @@ import cats.data.OptionT
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel}
-import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
+import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
+import models.moneyservicebusiness.MoneyServiceBusinessTestData
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -126,7 +125,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
     }
 
     "redirect to the summary page when adding 'CurrencyExchange' as a service" in new Fixture {
@@ -143,7 +142,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
 
     }
   }

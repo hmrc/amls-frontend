@@ -17,17 +17,28 @@
 package services.flowmanagement.flowrouters.businessmatching
 
 import javax.inject.Inject
-import models.flowmanagement.{ChangeSubSectorFlowModel, PageId}
+import models.flowmanagement._
 import play.api.mvc.Result
 import services.flowmanagement.Router
+import services.flowmanagement.pagerouters.businessmatching.subsectors.{MsbSubSectorsPageRouter, NoPsrNumberPageRouter, PSRNumberPageRouter}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class ChangeSubSectorRouter @Inject() extends Router[ChangeSubSectorFlowModel] {
+// $COVERAGE_OFF$
+// Individual page routers are tested, plus acceptance tests are
+// testing the flow
+class ChangeSubSectorRouter @Inject()(
+                                     subSectorRouter: MsbSubSectorsPageRouter,
+                                     psrNumberRouter: PSRNumberPageRouter,
+                                     noPsrRouter: NoPsrNumberPageRouter
+                                     ) extends Router[ChangeSubSectorFlowModel] {
   override def getRoute(pageId: PageId, model: ChangeSubSectorFlowModel, edit: Boolean)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
-    ???
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = pageId match {
+    case SubSectorsPageId => subSectorRouter.getPageRoute(model, edit)
+    case PsrNumberPageId => psrNumberRouter.getPageRoute(model, edit)
+    case NoPSRPageId => noPsrRouter.getPageRoute(model, edit)
   }
 }
+// $COVERAGE_ON$

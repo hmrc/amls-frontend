@@ -18,11 +18,11 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.TransmittingMoney
-import models.flowmanagement.{ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel}
+import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import play.api.mvc.Result
+import play.api.mvc.Results.Redirect
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
-import play.api.mvc.Results.Redirect
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -36,6 +36,6 @@ class MsbSubSectorsPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
       case _ => routes.SummaryController.get()
     }
 
-    result.fold(error(ChangeMsbSubSectorPageId))(Redirect)
+    result.fold(error(SubSectorsPageId))(Redirect)
   }
 }

@@ -21,7 +21,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
-import models.flowmanagement.{ChangeMsbSubSectorPageId, ChangeSubSectorFlowModel}
+import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -59,7 +59,7 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) { maybeModel =>
               maybeModel.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
-              case Some(updatedModel) => router.getRoute(ChangeMsbSubSectorPageId, updatedModel)
+              case Some(updatedModel) => router.getRoute(SubSectorsPageId, updatedModel)
             }
         }
   }

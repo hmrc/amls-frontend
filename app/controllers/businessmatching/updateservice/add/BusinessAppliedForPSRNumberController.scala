@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
 import models.businessmatching._
-import models.flowmanagement.{AddBusinessTypeFlowModel, BusinessAppliedForPSRNumberPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.updateservice.add.business_applied_for_psr_number
@@ -57,7 +57,7 @@ class BusinessAppliedForPSRNumberController @Inject()(
             dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => model.businessAppliedForPSRNumber(data)
             } flatMap {
-              case Some(model) => router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit)
+              case Some(model) => router.getRoute(PsrNumberPageId, model, edit)
               case _ => Future.successful(InternalServerError("Post: Cannot retrieve data: BusinessAppliedForPSRNumberController"))
             }
           }

@@ -19,7 +19,7 @@ package services.flowmanagement.pagerouters.addflow
 import controllers.businessmatching.updateservice.add.{routes => addRoutes}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
-import models.flowmanagement.{AddBusinessTypeFlowModel, BusinessAppliedForPSRNumberPageId, PageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId, PageId}
 import play.api.mvc.Result
 import play.api.mvc.Results.{InternalServerError, Redirect}
 import services.StatusService
@@ -44,7 +44,7 @@ class BusinessAppliedForPsrNumberPageRouter @Inject()(val statusService: StatusS
       case (true, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.AddBusinessTypeSummaryController.get()))
       case (false, Some(BusinessAppliedForPSRNumberYes(_))) => Future.successful(Redirect(addRoutes.FitAndProperController.get()))
       case (_, Some(BusinessAppliedForPSRNumberNo)) => Future.successful(Redirect(addRoutes.NoPsrController.get()))
-      case (_, None) => Future.successful(error(BusinessAppliedForPSRNumberPageId))
+      case (_, None) => Future.successful(error(PsrNumberPageId))
     }
   }
 }

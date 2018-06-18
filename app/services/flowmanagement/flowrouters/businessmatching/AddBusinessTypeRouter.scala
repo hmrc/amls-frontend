@@ -48,7 +48,7 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
-      case BusinessAppliedForPSRNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
+      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
       case FitAndProperPageId => fitAndProperPageRouter.getPageRoute(model, edit)
       case NeedMoreInformationPageId => newServicesInformationPageRouter.getPageRoute(model, edit)
       case NoPSRPageId => noPSRPageRouter.getPageRoute(model, edit)

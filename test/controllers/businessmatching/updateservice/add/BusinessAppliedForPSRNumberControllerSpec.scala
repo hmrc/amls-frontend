@@ -19,7 +19,7 @@ package controllers.businessmatching.updateservice.add
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
-import models.flowmanagement.{AddBusinessTypeFlowModel, BusinessAppliedForPSRNumberPageId}
+import models.flowmanagement.{AddBusinessTypeFlowModel, PsrNumberPageId}
 import models.status.SubmissionDecisionApproved
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -110,7 +110,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(BusinessAppliedForPSRNumberPageId, flowModel)
+            controller.router.verify(PsrNumberPageId, flowModel)
 
           }
         }
@@ -128,7 +128,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(false)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+            controller.router.verify(PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))))
 
           }
@@ -148,7 +148,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+            controller.router.verify(PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo)), true)
 
           }
@@ -167,7 +167,7 @@ class BusinessAppliedForPSRNumberControllerSpec extends AmlsSpec
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            controller.router.verify(BusinessAppliedForPSRNumberPageId,
+            controller.router.verify(PsrNumberPageId,
               AddBusinessTypeFlowModel(businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("123789"))), true)
 
           }

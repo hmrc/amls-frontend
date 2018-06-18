@@ -18,9 +18,8 @@ package models.flowmanagement
 
 sealed trait PageId
 
-// Add service flow
 case object AddMoreBusinessTypesPageId extends PageId
-case object BusinessAppliedForPSRNumberPageId extends PageId
+case object PsrNumberPageId extends PageId
 case object FitAndProperPageId extends PageId
 case object NeedMoreInformationPageId extends PageId
 case object NoPSRPageId extends PageId
@@ -31,15 +30,9 @@ case object AddBusinessTypeSummaryPageId extends PageId
 case object WhatDoYouDoHerePageId extends PageId
 case object WhichFitAndProperPageId extends PageId
 case object WhichTradingPremisesPageId extends PageId
-
-case object ChangeBusinesTypesPageId extends PageId
-
-// Remove service flow
+case object ChangeBusinessTypesPageId extends PageId
 case object WhatBusinessTypesToRemovePageId extends PageId
 case object NeedToUpdatePageId extends PageId
 case object RemoveBusinessTypesSummaryPageId extends PageId
 case object UnableToRemovePageId extends PageId
 case object WhatDateRemovedPageId extends PageId
-
-// Change MSB sub sector flow
-case object ChangeMsbSubSectorPageId extends PageId

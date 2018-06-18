@@ -18,7 +18,7 @@ package services.flowmanagement.pagerouters.businessmatching.subsectors
 
 import controllers.businessmatching.routes
 import models.businessmatching.BusinessAppliedForPSRNumberYes
-import models.flowmanagement.{BusinessAppliedForPSRNumberPageId, ChangeSubSectorFlowModel}
+import models.flowmanagement.{PsrNumberPageId, ChangeSubSectorFlowModel}
 import play.api.mvc.Result
 import services.flowmanagement.PageRouter
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,6 +34,6 @@ class PSRNumberPageRouter extends PageRouter[ChangeSubSectorFlowModel] {
       case _ => routes.NoPsrController.get()
     }
 
-    call.fold(error(BusinessAppliedForPSRNumberPageId))(Redirect)
+    call.fold(error(PsrNumberPageId))(Redirect)
   }
 }

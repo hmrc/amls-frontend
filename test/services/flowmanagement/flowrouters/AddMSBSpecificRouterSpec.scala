@@ -104,7 +104,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
 
-          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model))
+          val result = await(router.getRoute(PsrNumberPageId, model))
 
           result mustBe Redirect(addRoutes.NoPsrController.get())
         }
@@ -118,7 +118,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("aaaaa")))
 
-          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model))
+          val result = await(router.getRoute(PsrNumberPageId, model))
 
           result mustBe Redirect(addRoutes.FitAndProperController.get(false))
         }
@@ -459,7 +459,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("bbbbb")),
             subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingScrapMetal))),
             tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))
-          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
+          val result = await(router.getRoute(PsrNumberPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.AddBusinessTypeSummaryController.get())
         }
@@ -473,7 +473,7 @@ class AddMSBSpecificRouterSpec extends AmlsSpec {
           val model = AddBusinessTypeFlowModel(
             activity = Some(MoneyServiceBusiness),
             businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo))
-          val result = await(router.getRoute(BusinessAppliedForPSRNumberPageId, model, edit = true))
+          val result = await(router.getRoute(PsrNumberPageId, model, edit = true))
 
           result mustBe Redirect(addRoutes.NoPsrController.get())
         }
