@@ -16,32 +16,38 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
-import models.businessmatching.{CompanyRegistrationNumber, BusinessMatching}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
+import models.businessmatching.{BusinessMatching, CompanyRegistrationNumber}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.company_registration_number
+import services.StatusService
+import services.businessmatching.BusinessMatchingService
 
 import scala.concurrent.Future
 
-trait CompanyRegistrationNumberController extends BaseController {
-
-  private[controllers] def dataCacheConnector: DataCacheConnector
+class CompanyRegistrationNumberController@Inject()(val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val statusService: StatusService,
+                                                   val businessMatchingService:BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) map {
-        response =>
-          val form: Form2[CompanyRegistrationNumber] = (for {
-            businessMatching <- response
-            registrationNumber <- businessMatching.companyRegistrationNumber
-          } yield Form2[CompanyRegistrationNumber](registrationNumber)).getOrElse(EmptyForm)
+    implicit authContext =>
+      implicit request =>
+        (for {
+          bm <- businessMatchingService.getModel
+          status <- OptionT.liftF(statusService.getStatus)
+        } yield {
+          val form: Form2[CompanyRegistrationNumber] = bm.companyRegistrationNumber map
+            Form2[CompanyRegistrationNumber] getOrElse EmptyForm
+            Ok(company_registration_number(form, edit, bm.hasAccepted , statusService.isPreSubmission(status)))
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
+    }
 
-          Ok(company_registration_number(form, edit, response.fold(false)(_.hasAccepted)))
-      }
-  }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
@@ -61,12 +67,5 @@ trait CompanyRegistrationNumberController extends BaseController {
       }
     }
   }
-
-
 }
 
-object CompanyRegistrationNumberController extends CompanyRegistrationNumberController {
-  // $COVERAGE-OFF$
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
-}

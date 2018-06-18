@@ -17,11 +17,13 @@
 package controllers.businessmatching
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
@@ -30,18 +32,20 @@ import scala.concurrent.Future
 
 class PSRNumberController @Inject()(val authConnector: AuthConnector,
                                     val dataCacheConnector: DataCacheConnector,
+                                    val statusService: StatusService,
                                     val businessMatchingService: BusinessMatchingService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        businessMatchingService.getModel.value map { maybeBm =>
-          val form: Form2[BusinessAppliedForPSRNumber] = (for {
-            bm <- maybeBm
-            number <- bm.businessAppliedForPSRNumber
-          } yield Form2[BusinessAppliedForPSRNumber](number)).getOrElse(EmptyForm)
-          Ok(psr_number(form, edit, maybeBm.fold(false)(_.preAppComplete)))
-        }
+        (for {
+          bm <- businessMatchingService.getModel
+          status <- OptionT.liftF(statusService.getStatus)
+        } yield {
+          val form: Form2[BusinessAppliedForPSRNumber] = bm.businessAppliedForPSRNumber map
+                  Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
+          Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+        }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
   }
 
   def post(edit: Boolean = false) = Authorised.async {

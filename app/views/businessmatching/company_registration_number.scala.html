@@ -19,15 +19,15 @@
 @import include.forms2._
 @import models.aboutthebusiness._
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true,  isPreSubmission: Boolean = true)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @heading("businessmatching.registrationnumber.title", "summary.businessmatching")
+    @heading("businessmatching.registrationnumber.title", if(isPreSubmission)  "summary.businessmatching" else "summary.updateinformation")
 }
 
 @main(
-    title = Messages("businessmatching.registrationnumber.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.registrationnumber.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
     heading = header
 ) {
 

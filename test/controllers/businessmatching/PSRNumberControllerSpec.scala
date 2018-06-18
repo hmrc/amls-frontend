@@ -20,6 +20,7 @@ import cats.data.OptionT
 import cats.implicits._
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -47,8 +48,19 @@ class PSRNumberControllerSpec extends AmlsSpec
     val controller = new PSRNumberController(
       self.authConnector,
       mockCacheConnector,
+      statusService = mockStatusService,
       mock[BusinessMatchingService]
     )
+
+    when {
+      mockStatusService.isPreSubmission(any())
+    } thenReturn true
+
+    when {
+      mockStatusService.isPending(any())
+    } thenReturn false
+
+    mockApplicationStatus(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
 
@@ -67,9 +79,12 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
+        val model = BusinessMatching(
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
+        )
         when {
           controller.businessMatchingService.getModel(any(), any(), any())
-        } thenReturn OptionT.none[Future, BusinessMatching]
+        } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
         status(result) must be(OK)
