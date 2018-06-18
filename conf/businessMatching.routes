@@ -10,8 +10,8 @@ POST        /type-of-business                                       controllers.
 GET         /activities                                             @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /activities                                             @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)
 
-GET         /registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
-POST        /registration-number                                    controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
+GET         /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.get(edit: Boolean ?= false)
+POST        /registration-number                                    @controllers.businessmatching.CompanyRegistrationNumberController.post(edit: Boolean ?= false)
 
 GET         /services                                               @controllers.businessmatching.MsbSubSectorsController.get(edit: Boolean ?= false)
 POST        /services                                               @controllers.businessmatching.MsbSubSectorsController.post(edit: Boolean ?= false)
