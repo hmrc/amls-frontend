@@ -60,7 +60,7 @@
             classes = Seq("inline")
         ) {
 
-            @if(edit && isPreSubmission) {
+            @if(edit && !isPreSubmission) {
                 <input type="hidden" name="appliedFor" value=true />
                 @psrInput
             } else {
