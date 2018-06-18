@@ -21,10 +21,12 @@ import cats.implicits._
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
+import models.moneyservicebusiness.MoneyServiceBusiness
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers._
+import org.mockito.Matchers.{ eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -57,7 +59,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     val businessMatching = businessMatchingGen.sample.get
 
-
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -97,9 +99,15 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     "post is called" must {
       "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
+        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
         when {
           controller.helper.createFlowModel()(any(), any(), any())
-        } thenReturn Future.successful(ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+        } thenReturn Future.successful(flowModel)
+
+        when {
+          controller.helper.updateSubSectors(any())(any(), any(), any())
+        } thenReturn Future.successful((mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty))
 
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "true",
@@ -118,7 +126,6 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "redirect when No is selected" in new Fixture {
-
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "false"
         )
@@ -126,7 +133,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel.empty)
+        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel.empty, true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

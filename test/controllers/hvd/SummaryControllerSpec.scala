@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.joda.time.LocalDate
@@ -65,6 +66,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     )
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
@@ -102,7 +104,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
     "hide edit link for involved in other, turnover expected from activities and amls turnover expected page" when {
       "application in variation mode" in new Fixture {
 
-        when(controller.dataCache.fetch[Hvd](any())
+        when(controller.dataCache.fetch[Hvd](eqTo(Hvd.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
         when(controller.statusService.getStatus(any(), any(), any()))
@@ -140,7 +142,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       }
 
       "in variation mode and also in the new service flow" in new Fixture {
-        when(controller.dataCache.fetch[Hvd](any())
+        when(controller.dataCache.fetch[Hvd](eqTo(Hvd.key))
           (any(), any(), any())).thenReturn(Future.successful(Some(completeModel)))
 
         when(controller.statusService.getStatus(any(), any(), any()))

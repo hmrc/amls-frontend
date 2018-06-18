@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -42,6 +43,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
       serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)

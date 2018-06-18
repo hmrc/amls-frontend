@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry, TransactionsInNext12Months}
 import models.status.{NotCompleted, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -42,6 +43,7 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
     )
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -92,28 +94,17 @@ class TransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSuga
       }
     }
 
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
+    "redirect to the next page in the flow" when {
+      "application is in variation mode and this page can't be edited" in new Fixture {
 
         when(controller.statusService.getStatus(any(), any(), any()))
           .thenReturn(Future.successful(SubmissionDecisionApproved))
 
         val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
+        status(result) mustBe SEE_OTHER
+        redirectLocation(result) must be(Some(controllers.msb.routes.SendMoneyToOtherCountryController.get().url))
       }
     }
-
-    "redirect to Page not found" when {
-      "application is in variation mode and status is SubmissionDecisionRejected" in new Fixture {
-
-        when(controller.statusService.getStatus(any(), any(), any()))
-          .thenReturn(Future.successful(SubmissionDecisionRejected))
-
-        val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
-      }
-    }
-
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
 

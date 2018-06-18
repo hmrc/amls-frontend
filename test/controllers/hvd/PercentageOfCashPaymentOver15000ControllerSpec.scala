@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -45,6 +46,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
     )
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)

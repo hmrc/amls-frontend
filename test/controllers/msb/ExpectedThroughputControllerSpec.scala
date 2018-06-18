@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -44,6 +45,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
       serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)

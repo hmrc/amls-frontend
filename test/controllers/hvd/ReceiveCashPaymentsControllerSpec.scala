@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PaymentMethods}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -39,6 +40,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
+    mockCacheFetch[ServiceChangeRegister](None, None)
     mockCacheSave[Hvd]
     mockIsNewActivity(false)
   }

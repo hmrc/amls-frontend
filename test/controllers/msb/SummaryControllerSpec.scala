@@ -18,6 +18,7 @@ package controllers.msb
 
 import models.Country
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -63,6 +64,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       mockStatusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
+
+    mockCacheFetch[ServiceChangeRegister](None, None)
+    mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
   }
 
   "Get" must {

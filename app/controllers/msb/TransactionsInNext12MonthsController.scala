@@ -49,7 +49,8 @@ class TransactionsInNext12MonthsController @Inject()(val authConnector: AuthConn
               } yield Form2[TransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
               Ok(transactions_in_next_12_months(form, edit))
           }
-          case false => Future.successful(NotFound(notFoundView))
+
+          case false => Future.successful(Redirect(routes.SendMoneyToOtherCountryController.get(edit)))
         }
   }
 

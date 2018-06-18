@@ -57,7 +57,7 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(psr_number(f, edit)))
-          case ValidForm(_, x: BusinessAppliedForPSRNumber) =>
+          case ValidForm(_, x@BusinessAppliedForPSRNumberYes(_)) =>
             dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
               _.getOrElse(ChangeSubSectorFlowModel.empty).copy(psrNumber = Some(x))
             } flatMap {

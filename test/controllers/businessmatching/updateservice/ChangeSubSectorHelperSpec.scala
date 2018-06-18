@@ -261,11 +261,15 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
 
     "update the service change register" when {
       "something already exists in the register" in new Fixture {
+        mockCacheFetch[BusinessMatching](Some(
+          BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))))),
+          Some(BusinessMatching.key))
+
         val model = ServiceChangeRegister(Some(Set(MoneyServiceBusiness)))
 
         mockCacheUpdate(Some(ServiceChangeRegister.key), model)
 
-        val result = await(helper.updateServiceRegister(ChangeSubSectorFlowModel(Some(Set(CurrencyExchange)))))
+        val result = await(helper.updateServiceRegister(ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, CurrencyExchange)))))
 
         result mustBe model.copy(addedSubSectors = Some(Set(CurrencyExchange)))
       }

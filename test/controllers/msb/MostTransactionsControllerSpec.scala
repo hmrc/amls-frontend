@@ -17,6 +17,7 @@
 package controllers.msb
 
 import models.Country
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -38,6 +39,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockStatusService,
       mockServiceFlow
     )
+
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   "MostTransactionsController" must {

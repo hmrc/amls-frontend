@@ -19,7 +19,8 @@ package generators.tradingpremises
 import generators.businessmatching.BusinessActivitiesGenerator
 import generators.{BaseGenerator, CountryGenerator}
 import models.businessmatching._
-import models.tradingpremises.{Address, TradingPremises, WhatDoesYourBusinessDo, YourTradingPremises}
+import models.tradingpremises._
+
 import org.scalacheck.Gen
 
 //noinspection ScalaStyle
@@ -49,6 +50,14 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
     activity <- singleBusinessTypeGen
   } yield WhatDoesYourBusinessDo(activities.toSet union Set(activity), None)
 
+  val tpSubSectorGen: Gen[TradingPremisesMsbServices] = for {
+    subSectors <- Gen.choose(1, 3).flatMap(Gen.pick(_, Seq(
+      models.tradingpremises.TransmittingMoney,
+      models.tradingpremises.CurrencyExchange,
+      models.tradingpremises.ChequeCashingScrapMetal,
+      models.tradingpremises.ChequeCashingNotScrapMetal)))
+  } yield TradingPremisesMsbServices(subSectors.toSet)
+
   val tradingPremisesGen: Gen[TradingPremises] = for {
     ytp <- yourTradingPremisesGen
     activities <- whatBusinessActivitiesGen
@@ -62,9 +71,11 @@ trait TradingPremisesGenerator extends BaseGenerator with BusinessActivitiesGene
   val tradingPremisesWithAtLeastOneBusinessTypeGen: Gen[TradingPremises] = for {
     ytp <- yourTradingPremisesGen
     activities <- whatBusinessTypesAtLeastOneGen
+    subSectors <- tpSubSectorGen
   } yield TradingPremises(
     yourTradingPremises = Some(ytp),
     whatDoesYourBusinessDoAtThisAddress = Some(activities),
+    msbServices = if(activities.activities.contains(MoneyServiceBusiness)) Some(subSectors) else None,
     hasAccepted = true,
     hasChanged = true
   )

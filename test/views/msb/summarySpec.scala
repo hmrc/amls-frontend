@@ -17,7 +17,8 @@
 package views.msb
 
 import models.Country
-import models.businessmatching.{BusinessMatching, CurrencyExchange, BusinessMatchingMsbServices, TransmittingMoney}
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
 import models.moneyservicebusiness._
 import org.jsoup.nodes.Element
 import org.scalatest.prop.TableDrivenPropertyChecks
@@ -41,7 +42,7 @@ class summarySpec extends AmlsSpec
   "summary view" must {
     "have correct title" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true)
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
 
       doc.title must be(Messages("title.cya") +
         " - " + Messages("summary.msb") +
@@ -51,7 +52,7 @@ class summarySpec extends AmlsSpec
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true)
+      def view = views.html.msb.summary(MoneyServiceBusiness(), None, true, ServiceChangeRegister())
 
       heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.msb"))
@@ -94,7 +95,8 @@ class summarySpec extends AmlsSpec
           Some(CETransactionsInNext12Months("10"))
         ),
         Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney))),
-        true
+        true,
+        ServiceChangeRegister()
       )
 
       forAll(sectionChecks) { (key, check) => {

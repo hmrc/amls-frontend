@@ -50,17 +50,25 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
 
   def updateSubSectors(model: ChangeSubSectorFlowModel)
                       (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext) = for {
+    _ <- updateServiceRegister(model)
     msb <- updateMsb(model)
     bm <- updateBusinessMatching(model)
     tp <- updateTradingPremises(model)
-    _ <- updateServiceRegister(model)
   } yield (msb, bm, tp)
 
   def updateServiceRegister(model: ChangeSubSectorFlowModel)
                            (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[ServiceChangeRegister] = {
-    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-      _.getOrElse(ServiceChangeRegister()).copy(addedSubSectors = model.subSectors)
-    } map { _.getOrElse(ServiceChangeRegister()) }
+    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { maybeBm =>
+      dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+        val changedSubSectors = maybeBm.fold[Set[BusinessMatchingMsbService]](Set.empty) {
+          _.msbServices.fold[Set[BusinessMatchingMsbService]](Set.empty)(_.msbServices)
+        }
+
+        _.getOrElse(ServiceChangeRegister()).copy(addedSubSectors = model.subSectors.map(_ diff changedSubSectors))
+      } map {
+        _.getOrElse(ServiceChangeRegister())
+      }
+    }
   }
 
   def updateMsb(model: ChangeSubSectorFlowModel)

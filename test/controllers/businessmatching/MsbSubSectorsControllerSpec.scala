@@ -22,7 +22,7 @@ import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
-import models.moneyservicebusiness.MoneyServiceBusinessTestData
+import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -54,6 +54,10 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     when {
       controller.businessMatchingService.updateModel(any())(any(), any(), any())
     } thenReturn cacheMapT
+
+    when {
+      controller.helper.updateSubSectors(any())(any(), any(), any())
+    } thenReturn Future.successful(mock[MoneyServiceBusiness], mock[BusinessMatching], Seq.empty)
 
     def setupModel(model: Option[BusinessMatching]): Unit = when {
       controller.businessMatchingService.getModel(any(), any(), any())
