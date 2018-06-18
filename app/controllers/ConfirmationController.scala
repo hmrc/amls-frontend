@@ -195,7 +195,7 @@ class ConfirmationController @Inject()(
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
-      case Some(fees) if fees.paymentReference.isDefined =>
+      case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status) > 0 =>
 
         lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
 
