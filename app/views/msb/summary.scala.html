@@ -21,8 +21,9 @@
 @import models.Country
 @import forms.EmptyForm
 @import config.ApplicationConfig
+@import models.businessmatching.updateservice.ServiceChangeRegister
 
-@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable:Boolean, register: ServiceChangeRegister)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @heading("title.cya", "summary.msb")
@@ -119,7 +120,9 @@
                 @checkYourAnswers(
                     question = Messages("msb.transactions.expected.title"),
                     editLinkTag = "msbtransactionsexpected-edit",
-                    editUrl = if(isEditable){controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString} else ""
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                        controllers.msb.routes.TransactionsInNext12MonthsController.get(true).toString
+                    } else ""
                 ) {
                     <p>@trans.txnAmount</p>
                 }
@@ -129,7 +132,9 @@
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
                     editLinkTag = "msbsendmoneytoothercountries-edit",
-                    editUrl = if(isEditable) { controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString } else ""
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                        controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
+                    } else ""
                 ) {
                     <p>@otherCountries.money match {
                         case true => {@Messages("lbl.yes")}
@@ -142,7 +147,9 @@
                         @checkYourAnswers(
                             question = Messages("msb.send.the.largest.amounts.of.money.title"),
                             editLinkTag = "msbsendlargestamounts-edit",
-                            editUrl = if(isEditable){controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString} else ""
+                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                                controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
+                            } else ""
                         ) {
                             <ul class="list list--comma">
                                 @lom.countryList.map { country =>
@@ -156,7 +163,9 @@
                         @checkYourAnswers(
                             question = Messages("msb.most.transactions.title"),
                             editLinkTag = "msbmosttransactions-edit",
-                            editUrl = if(isEditable){controllers.msb.routes.MostTransactionsController.get(true).toString} else ""
+                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                                controllers.msb.routes.MostTransactionsController.get(true).toString
+                            } else ""
                         ) {
                             <ul class="list list--comma">
                                 @mt.countries.map { country =>
@@ -174,7 +183,9 @@
                 @checkYourAnswers(
                     question = Messages("msb.ce.transactions.expected.in.12.months.title"),
                     editLinkTag = "msbcetransactionsexpected-edit",
-                    editUrl = if(isEditable){controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString} else ""
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
+                        controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).toString
+                    } else ""
                 ) {
                     <p>@trans.ceTransaction</p>
                 }
@@ -184,7 +195,9 @@
                 @checkYourAnswers(
                     question = Messages("msb.which_currencies.title"),
                     editLinkTag = "msbwhichcurrencies-edit",
-                    editUrl = if(isEditable){controllers.msb.routes.WhichCurrenciesController.get(true).toString} else ""
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                        controllers.msb.routes.WhichCurrenciesController.get(true).toString
+                    } else ""
                 ) {
                     <ul class="list list--comma">
                         @wc.currencies.map { cur =>

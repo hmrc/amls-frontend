@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.MoneyServiceBusiness
 import services.StatusService
@@ -47,8 +48,9 @@ class SummaryController @Inject()
             cache <- optionalCache
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+            register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
           } yield {
-            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, x)))
+            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, x, register)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }
