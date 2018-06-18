@@ -18,7 +18,7 @@ package controllers.msb
 
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -96,7 +96,18 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         mockApplicationStatus(SubmissionDecisionApproved)
 
         val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
+        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      }
+    }
+
+    "redirect to CETransactionsInNext12Months" when {
+      "page is not editable and CurrencyExchange has been added" in new Fixture {
+        mockIsNewActivity(false)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(CurrencyExchange)))))
+
+        val result = controller.get()(request)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
       }
     }
 

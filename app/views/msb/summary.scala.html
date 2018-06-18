@@ -195,7 +195,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.which_currencies.title"),
                     editLinkTag = "msbwhichcurrencies-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) {
                         controllers.msb.routes.WhichCurrenciesController.get(true).toString
                     } else ""
                 ) {

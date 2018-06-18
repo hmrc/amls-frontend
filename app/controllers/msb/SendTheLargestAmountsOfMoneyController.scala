@@ -21,7 +21,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{TransmittingMoney, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{CurrencyExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -48,7 +49,11 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
             } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
             Ok(send_largest_amounts_of_money(form, edit))
         }
-        case false => Future.successful(NotFound(notFoundView))
+        case _ => cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key) map {
+          case Some(r) if r.addedSubSectors.fold(false)(_.contains(CurrencyExchange)) =>
+            Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+          case _ => Redirect(routes.SummaryController.get())
+        }
       }
   }
 

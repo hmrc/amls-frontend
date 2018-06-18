@@ -59,12 +59,16 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
   def updateServiceRegister(model: ChangeSubSectorFlowModel)
                            (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[ServiceChangeRegister] = {
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { maybeBm =>
-      dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-        val changedSubSectors = maybeBm.fold[Set[BusinessMatchingMsbService]](Set.empty) {
+      dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) { maybeRegister =>
+        val bmSectors = maybeBm.fold[Set[BusinessMatchingMsbService]](Set.empty) {
           _.msbServices.fold[Set[BusinessMatchingMsbService]](Set.empty)(_.msbServices)
         }
 
-        _.getOrElse(ServiceChangeRegister()).copy(addedSubSectors = model.subSectors.map(_ diff changedSubSectors))
+        val newSectors = model.subSectors.getOrElse(Set.empty) diff bmSectors
+        val register = maybeRegister.getOrElse(ServiceChangeRegister())
+        val mergedSubSectors = register.addedSubSectors.getOrElse(Set.empty) ++ newSectors
+
+        register.copy(addedSubSectors = Some(mergedSubSectors))
       } map {
         _.getOrElse(ServiceChangeRegister())
       }
