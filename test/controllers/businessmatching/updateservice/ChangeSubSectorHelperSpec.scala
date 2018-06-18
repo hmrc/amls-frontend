@@ -135,6 +135,21 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       updatedBm.hasAccepted mustBe true
     }
 
+    "apply the PSR number when one is given, and transmitting money is given" in new Fixture {
+      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("12345678")))
+
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal))))),
+        Some(BusinessMatching.key))
+
+      mockCacheSave[BusinessMatching]
+
+      val updatedBm = await(helper.updateBusinessMatching(model))
+
+      updatedBm.businessAppliedForPSRNumber mustBe Some(BusinessAppliedForPSRNumberYes("12345678"))
+    }
+
     "update the business matching sub sectors" in new Fixture {
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingScrapMetal)), None)
 

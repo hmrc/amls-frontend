@@ -98,12 +98,13 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
 
     val updatePsr = (bm: BusinessMatching, newSectors: Set[BusinessMatchingMsbService]) => {
       val updatedBm = bm.copy(msbServices = Some(BusinessMatchingMsbServices(model.subSectors.getOrElse(Set.empty))))
+
       if (!newSectors.contains(TransmittingMoney)) {
         updatedBm.copy(
           businessAppliedForPSRNumber = None
         )
       } else {
-        updatedBm
+        updatedBm.copy(businessAppliedForPSRNumber = model.psrNumber)
       }
     }
 
