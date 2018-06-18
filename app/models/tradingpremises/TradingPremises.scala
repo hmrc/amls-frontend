@@ -75,15 +75,29 @@ case class TradingPremises(
       hasChanged || !this.registeringAgentPremises.contains(p),
       hasAccepted = hasAccepted && this.registeringAgentPremises.contains(p))
 
-  def isComplete: Boolean =
-    this match {
-      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), m, _, _, _, _, _, _, true)
-        if w.activities.contains(MoneyServiceBusiness) && m.fold(false)(_.services.nonEmpty) => true
-      case TradingPremises(_, Some(_), _, _, _, _, Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
-      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), Some(w), _, _, _, _, _, _, _, true) if w.activities.nonEmpty => true
-      case tp if !tp.hasAccepted => false
+
+  private def activitiesAreValid(wdbd: Option[WhatDoesYourBusinessDo], subSectors: Option[TradingPremisesMsbServices]) = {
+    (wdbd, subSectors) match {
+      case (Some(x), Some(y)) if x.activities.contains(MoneyServiceBusiness) && y.services.nonEmpty => true
+      case (Some(x), _) if x.activities.nonEmpty && !x.activities.contains(MoneyServiceBusiness) => true
       case _ => false
     }
+  }
+
+  def isComplete: Boolean = {
+    this match {
+      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), maybeActivities, maybeSubSectors, _, _, _, _, _, _, true)
+        if activitiesAreValid(maybeActivities, maybeSubSectors) => true
+
+      case TradingPremises(_, Some(_), _, _, _, _, maybeActivities, maybeSubSectors, _, _, _, _, _, _, true)
+        if activitiesAreValid(maybeActivities, maybeSubSectors) => true
+
+      case TradingPremises(_, _, Some(_), Some(_), Some(_), Some(_), maybeActivities, maybeSubSectors, _, _, _, _, _, _, true)
+        if activitiesAreValid(maybeActivities, maybeSubSectors) => true
+
+      case _ => false
+    }
+  }
 
   def label: Option[String] = {
     this.yourTradingPremises.map { tradingpremises =>

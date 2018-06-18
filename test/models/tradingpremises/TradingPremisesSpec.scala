@@ -165,6 +165,13 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         "tradingPremises contains complete data" in {
           completeModel.isComplete must be(true)
         }
+
+        "trading premises specify MSB and has sub-sectors" in {
+          completeModel.copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+            msbServices = Some(TradingPremisesMsbServices(Set(TransmittingMoney)))
+          ).isComplete mustBe true
+        }
       }
 
       "return false" when {
@@ -176,6 +183,13 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
         "tradingPremises no data" in {
           val tradingPremises = TradingPremises(None, None, hasAccepted = true)
           tradingPremises.isComplete mustBe false
+        }
+
+        "trading premises specifies MSB but has no sub-sectors" in {
+          completeModel.copy(
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+            msbServices = Some(TradingPremisesMsbServices(Set.empty))
+          ).isComplete mustBe false
         }
       }
 
