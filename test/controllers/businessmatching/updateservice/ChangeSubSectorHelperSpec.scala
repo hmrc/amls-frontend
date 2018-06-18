@@ -65,7 +65,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
 
       await {
         helper.createFlowModel()
-      } mustBe (expectedModel)
+      } mustBe expectedModel
 
     }
   }

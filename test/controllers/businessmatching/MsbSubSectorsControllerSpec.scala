@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
@@ -44,7 +45,8 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       self.authConnector,
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
-      mock[BusinessMatchingService]
+      mock[BusinessMatchingService],
+      mock[ChangeSubSectorHelper]
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)

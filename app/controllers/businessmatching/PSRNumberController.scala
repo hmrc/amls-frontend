@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
-import models.businessmatching.BusinessAppliedForPSRNumber
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
@@ -52,6 +52,8 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
+        val route = router.getRoute(PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
+
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(psr_number(f, edit)))
@@ -59,10 +61,15 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
             dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
               _.getOrElse(ChangeSubSectorFlowModel.empty).copy(psrNumber = Some(x))
             } flatMap {
-              case Some(m) => router.getRoute(PsrNumberPageId, m)
+              case Some(m@ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
+                helper.updateSubSectors(m) flatMap { _ =>
+                  route(m)
+                }
+              case Some(m) =>
+                route(m)
             }
           case ValidForm(_, _) =>
-            router.getRoute(PsrNumberPageId, ChangeSubSectorFlowModel.empty)
+            route(ChangeSubSectorFlowModel.empty)
         }
       }
   }
