@@ -39,14 +39,16 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def createFlowModel()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
+  def createFlowModel()
+                     (implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).map {
       case Some(x) => ChangeSubSectorFlowModel(subSectors = x.msbServices.map(_.msbServices), psrNumber = x.businessAppliedForPSRNumber)
       case None => ChangeSubSectorFlowModel()
     }
   }
 
-  def updateMsb(model: ChangeSubSectorFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[MoneyServiceBusiness] = {
+  def updateMsb(model: ChangeSubSectorFlowModel)
+               (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[MoneyServiceBusiness] = {
 
     val updateCE = (msb: MoneyServiceBusiness, newSectors: Set[BusinessMatchingMsbService]) => {
       if (!newSectors.contains(CurrencyExchange)) {
@@ -84,7 +86,8 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def updateBusinessMatching(model: ChangeSubSectorFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[BusinessMatching] = {
+  def updateBusinessMatching(model: ChangeSubSectorFlowModel)
+                            (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[BusinessMatching] = {
 
     val updatePsr = (bm: BusinessMatching, newSectors: Set[BusinessMatchingMsbService]) => {
       val updatedBm = bm.copy(msbServices = Some(BusinessMatchingMsbServices(model.subSectors.getOrElse(Set.empty))))
@@ -115,12 +118,6 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
 
     import models.tradingpremises.TradingPremisesMsbServices.{convertServices, convertSingleService}
 
-    val hasMsb = (tp: TradingPremises) => tp match {
-      case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined
-        && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(models.businessmatching.MoneyServiceBusiness) => true
-      case _ => false
-    }
-
     dataCacheConnector.update[Seq[TradingPremises]](TradingPremises.key) {
       case Some(tp) => tp map {
         case t if hasMsb(t) =>
@@ -136,5 +133,11 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
         case t => t
       }
     } map { t => t.getOrElse(Seq.empty) }
+  }
+
+  private def hasMsb(tp: TradingPremises) = tp match {
+    case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined
+      && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(models.businessmatching.MoneyServiceBusiness) => true
+    case _ => false
   }
 }

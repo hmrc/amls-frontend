@@ -20,10 +20,10 @@ import com.google.inject.{AbstractModule, TypeLiteral}
 import config.{AMLSAuditConnector, WSHttp}
 import connectors._
 import models.businessmatching.updateservice.ChangeBusinessType
-import models.flowmanagement.{AddBusinessTypeFlowModel, RemoveBusinessTypeFlowModel}
+import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
 import services._
 import services.flowmanagement.Router
-import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, RemoveBusinessTypeRouter}
+import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http.{CoreGet, CorePost, HttpGet, HttpPost}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
@@ -49,5 +49,6 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
+    bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
   }
 }
