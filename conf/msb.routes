@@ -1,4 +1,5 @@
 GET         /what-you-need                                     @controllers.msb.WhatYouNeedController.get()
+POST        /what-you-need                                     @controllers.msb.WhatYouNeedController.post()
 
 GET         /check-your-answers                                @controllers.msb.SummaryController.get()
 POST        /check-your-answers                                @controllers.msb.SummaryController.post()
