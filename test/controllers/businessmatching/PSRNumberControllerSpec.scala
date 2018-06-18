@@ -18,8 +18,10 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
+import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
@@ -29,6 +31,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.flowrouters.businessmatching.ChangeSubSectorRouter
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -47,18 +50,14 @@ class PSRNumberControllerSpec extends AmlsSpec
     val controller = new PSRNumberController(
       self.authConnector,
       mockCacheConnector,
-      mock[BusinessMatchingService]
+      mock[BusinessMatchingService],
+      createRouter[ChangeSubSectorFlowModel],
+      mock[ChangeSubSectorHelper]
     )
 
     val businessMatching = businessMatchingGen.sample.get
 
-    when {
-      controller.businessMatchingService.getModel(any(), any(), any())
-    } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
-    when {
-      controller.businessMatchingService.updateModel(any())(any(), any(), any())
-    } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -98,36 +97,27 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     "post is called" must {
       "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is false" in new Fixture {
+        when {
+          controller.helper.createFlowModel()(any(), any(), any())
+        } thenReturn Future.successful(ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
+
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "true",
           "regNumber" -> "123789"
         )
+
+        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
 
         val result = controller.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+
+        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(
+            Some(Set(TransmittingMoney)),
+            Some(BusinessAppliedForPSRNumberYes("123789"))))
       }
 
-      "respond with SEE_OTHER and redirect to the SummaryController when Yes is selected and edit is true" in new Fixture {
-
-        val newRequest = request.withFormUrlEncodedBody(
-          "appliedFor" -> "true",
-          "regNumber" -> "123789"
-        )
-
-        when(controller.dataCacheConnector.fetch[BusinessMatching](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
-
-        when(controller.dataCacheConnector.save[BusinessMatching](any(), any())
-          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-        val result = controller.post(true)(newRequest)
-        status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
-      }
-
-      "remove data from the cache and redirect to the CannotContinueWithTheApplicationController when No is selected" in new Fixture {
+      "redirect when No is selected" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "false"
@@ -136,7 +126,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.NoPsrController.get().url))
+        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel.empty)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
@@ -150,22 +140,6 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))
-      }
-
-      "return 500" when {
-        "'Yes' was given but there is no model" in new Fixture {
-          val newRequest = request.withFormUrlEncodedBody(
-            "appliedFor" -> "true",
-            "regNumber" -> "123456"
-          )
-
-          when {
-            controller.businessMatchingService.getModel(any(), any(), any())
-          } thenReturn OptionT.none[Future, BusinessMatching]
-
-          val result = controller.post()(newRequest)
-          status(result) mustBe INTERNAL_SERVER_ERROR
-        }
       }
     }
   }

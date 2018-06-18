@@ -27,4 +27,6 @@ object ChangeSubSectorFlowModel {
   val key = "change-sub-sector-flow"
 
   implicit val format = Json.format[ChangeSubSectorFlowModel]
+
+  val empty = ChangeSubSectorFlowModel()
 }
