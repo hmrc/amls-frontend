@@ -19,6 +19,7 @@ package controllers.businessmatching.updateservice
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
@@ -52,7 +53,15 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     msb <- updateMsb(model)
     bm <- updateBusinessMatching(model)
     tp <- updateTradingPremises(model)
+    _ <- updateServiceRegister(model)
   } yield (msb, bm, tp)
+
+  def updateServiceRegister(model: ChangeSubSectorFlowModel)
+                           (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[ServiceChangeRegister] = {
+    dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
+      _.getOrElse(ServiceChangeRegister()).copy(addedSubSectors = model.subSectors)
+    } map { _.getOrElse(ServiceChangeRegister()) }
+  }
 
   def updateMsb(model: ChangeSubSectorFlowModel)
                (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[MoneyServiceBusiness] = {

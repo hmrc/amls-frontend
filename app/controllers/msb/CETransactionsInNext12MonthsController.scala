@@ -20,7 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -30,15 +30,15 @@ import views.html.msb.ce_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
-class CETransactionsInNext12MonthsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                        val authConnector: AuthConnector,
+class CETransactionsInNext12MonthsController @Inject() (val authConnector: AuthConnector,
+                                                        implicit val dataCacheConnector: DataCacheConnector,
                                                         implicit val statusService: StatusService,
                                                         implicit val serviceFlow: ServiceFlow
                                                        ) extends BaseController {
 
   def get(edit:Boolean = false) = Authorised.async {
    implicit authContext => implicit request =>
-     ControllerHelper.allowedToEdit(MsbActivity) flatMap {
+     ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
          response =>
            val form: Form2[CETransactionsInNext12Months] = (for {

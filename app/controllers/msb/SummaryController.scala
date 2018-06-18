@@ -33,9 +33,9 @@ import scala.concurrent.Future
 
 class SummaryController @Inject()
 (
-  val dataCache: DataCacheConnector,
-  implicit val statusService: StatusService,
   val authConnector: AuthConnector,
+  implicit val dataCache: DataCacheConnector,
+  implicit val statusService: StatusService,
   implicit val serviceFlow: ServiceFlow
 ) extends BaseController {
 
@@ -48,7 +48,7 @@ class SummaryController @Inject()
             businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
             msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
           } yield {
-            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices,x)))
+            ControllerHelper.allowedToEdit(MsbActivity) map(x => Ok(summary(msb, businessMatching.msbServices, x)))
           }) getOrElse Future.successful(Redirect(controllers.routes.RegistrationProgressController.get()))
       }
   }

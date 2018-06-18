@@ -35,7 +35,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController(mockCacheConnector, mockStatusService, self.authConnector, mockServiceFlow)
+    val controller = new SummaryController(self.authConnector, mockCacheConnector, mockStatusService, mockServiceFlow)
 
     val completeModel = MoneyServiceBusiness(
       throughput = Some(ExpectedThroughput.Second),

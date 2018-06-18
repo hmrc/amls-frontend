@@ -17,9 +17,16 @@
 package controllers.businessmatching.updateservice
 
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
-import models.moneyservicebusiness.{BusinessUseAnIPSP, CETransactionsInNext12Months, FundsTransfer, MostTransactions, SendMoneyToOtherCountry, SendTheLargestAmountsOfMoney, TransactionsInNext12Months, WhichCurrencies, MoneyServiceBusiness => MSB}
-import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
+
+import models.tradingpremises.{
+  ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
+  CurrencyExchange => TPCurrencyExchange,
+  TransmittingMoney => TPTransmittingMoney,
+  ChequeCashingNotScrapMetal => _, _}
+
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -250,6 +257,18 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       val updatedTps = await(helper.updateTradingPremises(model))
       updatedTps.head.msbServices.get mustBe TradingPremisesMsbServices(Set.empty)
       updatedTps.head.hasAccepted mustBe true
+    }
+
+    "update the service change register" when {
+      "something already exists in the register" in new Fixture {
+        val model = ServiceChangeRegister(Some(Set(MoneyServiceBusiness)))
+
+        mockCacheUpdate(Some(ServiceChangeRegister.key), model)
+
+        val result = await(helper.updateServiceRegister(ChangeSubSectorFlowModel(Some(Set(CurrencyExchange)))))
+
+        result mustBe model.copy(addedSubSectors = Some(Set(CurrencyExchange)))
+      }
     }
   }
 }

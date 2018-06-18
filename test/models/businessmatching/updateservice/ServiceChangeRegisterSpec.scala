@@ -16,7 +16,7 @@
 
 package models.businessmatching.updateservice
 
-import models.businessmatching.{AccountancyServices, BillPaymentServices, HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching._
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
@@ -24,19 +24,26 @@ class ServiceChangeRegisterSpec extends PlaySpec {
 
   "The Json serializer" must {
     "produce the correct Json" in {
-      val model = ServiceChangeRegister(Some(Set(HighValueDealing, MoneyServiceBusiness)))
+      val model = ServiceChangeRegister(
+        Some(Set(HighValueDealing, MoneyServiceBusiness)),
+        Some(Set(TransmittingMoney))
+      )
 
       Json.toJson(model) mustBe Json.obj(
-        "addedActivities" -> Seq("04", "05")
+        "addedActivities" -> Seq("04", "05"),
+        "addedSubSectors" -> Seq("01")
       )
     }
 
     "be able to parse the json correctly" in {
       val json = Json.obj(
-        "addedActivities" -> Seq("01", "02")
+        "addedActivities" -> Seq("01", "02"),
+        "addedSubSectors" -> Seq("02")
       )
 
-      Json.fromJson[ServiceChangeRegister](json).get mustBe ServiceChangeRegister(Some(Set(AccountancyServices, BillPaymentServices)))
+      Json.fromJson[ServiceChangeRegister](json).get mustBe ServiceChangeRegister(
+        Some(Set(AccountancyServices, BillPaymentServices)),
+        Some(Set(CurrencyExchange)))
     }
   }
 

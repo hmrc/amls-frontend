@@ -17,10 +17,12 @@
 package utils
 
 import cats.implicits._
+import connectors.DataCacheConnector
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
-import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
+import models.status._
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
@@ -94,13 +96,15 @@ object ControllerHelper {
     }
   }
 
-  def allowedToEdit(activity: BusinessActivity)
-                   (implicit statusService: StatusService, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
+  def allowedToEdit(activity: BusinessActivity, msbSubSector: Option[BusinessMatchingMsbService] = None)
+                   (implicit statusService: StatusService, cacheConnector: DataCacheConnector, hc: HeaderCarrier, auth: AuthContext, serviceFlow: ServiceFlow): Future[Boolean] = for {
     status <- statusService.getStatus
     isNewActivity <- serviceFlow.isNewActivity(activity)
-  } yield (status, isNewActivity) match {
-    case (_, true) => true
-    case (SubmissionReady | NotCompleted | SubmissionReadyForReview, false) => true
+    changeRegister <- cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key)
+  } yield (status, isNewActivity, changeRegister, msbSubSector) match {
+    case (SubmissionDecisionApproved | ReadyForRenewal(_), _, Some(c), Some(m)) if c.addedSubSectors.fold(false)(_.contains(m)) => true
+    case (_, true, _, _) => true
+    case (SubmissionReady | NotCompleted | SubmissionReadyForReview, false, _, _) => true
     case _ => false
   }
 

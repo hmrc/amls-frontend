@@ -30,49 +30,52 @@ import views.html.hvd.receiving
 
 import scala.concurrent.Future
 
-class ReceiveCashPaymentsController @Inject() (val cacheConnector: DataCacheConnector,
-                                               implicit val serviceFlow: ServiceFlow,
-                                               implicit val statusService: StatusService,
-                                               val authConnector: AuthConnector) extends BaseController {
+class ReceiveCashPaymentsController @Inject()(val authConnector: AuthConnector,
+                                              implicit val cacheConnector: DataCacheConnector,
+                                              implicit val serviceFlow: ServiceFlow,
+                                              implicit val statusService: StatusService
+                                             ) extends BaseController {
 
   val NAME = "receivePayments"
   implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(NAME)
   implicit val boolRead = utils.BooleanFormReadWrite.formRule(NAME, "error.required.hvd.receive.cash.payments")
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
-        case true =>
-          cacheConnector.fetch[Hvd](Hvd.key) map {
-            response =>
-              val form: Form2[Boolean] = (for {
-                hvd <- response
-                receivePayments <- hvd.receiveCashPayments
-              } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
-              Ok(receiving(form, edit))
-          }
-        case false => Future.successful(NotFound(notFoundView))
-      }
+    implicit authContext =>
+      implicit request =>
+        ControllerHelper.allowedToEdit(HighValueDealing) flatMap {
+          case true =>
+            cacheConnector.fetch[Hvd](Hvd.key) map {
+              response =>
+                val form: Form2[Boolean] = (for {
+                  hvd <- response
+                  receivePayments <- hvd.receiveCashPayments
+                } yield Form2[Boolean](receivePayments)).getOrElse(EmptyForm)
+                Ok(receiving(form, edit))
+            }
+          case false => Future.successful(NotFound(notFoundView))
+        }
   }
 
   def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[Boolean](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(receiving(f, edit)))
-        case ValidForm(_, data) => {
-          for {
-            hvd <- cacheConnector.fetch[Hvd](Hvd.key)
-            _ <- cacheConnector.save[Hvd](Hvd.key, {
-              (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
-                case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
-                case _ => hvd.receiveCashPayments(data)
-              }
-            })
-          } yield redirectTo(data, hvd, edit)
+    implicit authContext =>
+      implicit request => {
+        Form2[Boolean](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(receiving(f, edit)))
+          case ValidForm(_, data) => {
+            for {
+              hvd <- cacheConnector.fetch[Hvd](Hvd.key)
+              _ <- cacheConnector.save[Hvd](Hvd.key, {
+                (hvd.flatMap(h => h.receiveCashPayments).contains(true), data) match {
+                  case (true, false) => hvd.receiveCashPayments(data).copy(cashPaymentMethods = None)
+                  case _ => hvd.receiveCashPayments(data)
+                }
+              })
+            } yield redirectTo(data, hvd, edit)
+          }
         }
       }
-    }
   }
 
   def redirectTo(data: Boolean, hvd: Hvd, edit: Boolean) =

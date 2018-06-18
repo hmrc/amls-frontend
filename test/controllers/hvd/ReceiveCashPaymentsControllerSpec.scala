@@ -28,12 +28,15 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+
     val request = addToken(authRequest)
 
-    val controller = new ReceiveCashPaymentsController( mockCacheConnector,
-                                                        mockServiceFlow,
-                                                        mockStatusService,
-                                                        self.authConnector)
+    val controller = new ReceiveCashPaymentsController(
+      self.authConnector,
+      mockCacheConnector,
+      mockServiceFlow,
+      mockStatusService
+    )
 
     mockCacheFetch[Hvd](None, Some(Hvd.key))
     mockCacheSave[Hvd]
@@ -43,7 +46,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
   "ReceiveCashPaymentsController" must {
 
     "load the view" when {
-     "status is pre-submission" in new Fixture {
+      "status is pre-submission" in new Fixture {
 
         mockApplicationStatus(NotCompleted)
 
@@ -90,16 +93,16 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
     "redirect to PercentageOfCashPaymentOver15000Controller on form equals no" in new Fixture {
 
-        val newRequest = request.withFormUrlEncodedBody(
-          "receivePayments" -> "false"
-        )
+      val newRequest = request.withFormUrlEncodedBody(
+        "receivePayments" -> "false"
+      )
 
-        val result = controller.post()(newRequest)
+      val result = controller.post()(newRequest)
 
-        status(result) mustEqual SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.PercentageOfCashPaymentOver15000Controller.get().url)
 
-      }
+    }
 
     "redirect to ExpectToReceiveCashPaymentsController on form equals yes" when {
       "edit is true and hvd cashPaymentMethods is not defined" in new Fixture {
@@ -135,7 +138,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
         mockCacheFetch[Hvd](Some(Hvd(
           receiveCashPayments = Some(true),
-          cashPaymentMethods = Some(PaymentMethods(true,true,Some("")))
+          cashPaymentMethods = Some(PaymentMethods(true, true, Some("")))
         )), Some(Hvd.key))
 
         val newRequest = request.withFormUrlEncodedBody(
@@ -148,7 +151,7 @@ class ReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
         verify(controller.cacheConnector).save[Hvd](any(), eqTo(Hvd(
           receiveCashPayments = Some(false),
           hasChanged = true
-        )))(any(),any(),any())
+        )))(any(), any(), any())
       }
     }
   }

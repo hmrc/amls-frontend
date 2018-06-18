@@ -16,10 +16,11 @@
 
 package models.businessmatching.updateservice
 
-import models.businessmatching.BusinessActivity
+import models.businessmatching.{BusinessActivity, BusinessMatchingMsbService}
 import play.api.libs.json.Json
 
-case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]] = None)
+case class ServiceChangeRegister(addedActivities: Option[Set[BusinessActivity]] = None,
+                                 addedSubSectors: Option[Set[BusinessMatchingMsbService]] = None)
 
 object ServiceChangeRegister {
   val key = "service-change-register"

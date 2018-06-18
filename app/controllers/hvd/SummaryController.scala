@@ -30,10 +30,10 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.hvd.summary
 
-class SummaryController @Inject() ( val dataCache: DataCacheConnector,
-                                    val authConnector: AuthConnector,
-                                    implicit val statusService: StatusService,
-                                    implicit val serviceFlow: ServiceFlow
+class SummaryController @Inject() (val authConnector: AuthConnector,
+                                   implicit val dataCache: DataCacheConnector,
+                                   implicit val statusService: StatusService,
+                                   implicit val serviceFlow: ServiceFlow
                                   ) extends BaseController {
 
   def get = Authorised.async {

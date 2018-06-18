@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import services.StatusService
@@ -32,16 +32,15 @@ import utils.ControllerHelper
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(
-                                            val authConnector: AuthConnector = AMLSAuthConnector,
-                                            val cacheConnector: DataCacheConnector,
-                                            implicit val statusService: StatusService,
-                                            implicit val serviceFlow: ServiceFlow
+class MostTransactionsController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
+                                           implicit val cacheConnector: DataCacheConnector,
+                                           implicit val statusService: StatusService,
+                                           implicit val serviceFlow: ServiceFlow
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(MsbActivity) flatMap {
+      ControllerHelper.allowedToEdit(MsbActivity, Some(TransmittingMoney)) flatMap {
         case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
             val form = (for {
