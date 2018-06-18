@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
@@ -31,7 +32,8 @@ import scala.concurrent.Future
 class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
-                                        val businessMatchingService: BusinessMatchingService) extends BaseController {
+                                        val businessMatchingService: BusinessMatchingService,
+                                        val helper: ChangeSubSectorHelper) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -55,11 +57,13 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
 
           case ValidForm(_, data) =>
-
-            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) { maybeModel =>
-              maybeModel.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
+            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
+              _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
             } flatMap {
-              case Some(updatedModel) => router.getRoute(SubSectorsPageId, updatedModel)
+              case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
+                helper.updateSubSectors(m) flatMap { _ => router.getRoute(SubSectorsPageId, m) }
+              case Some(updatedModel) =>
+                router.getRoute(SubSectorsPageId, updatedModel)
             }
         }
   }

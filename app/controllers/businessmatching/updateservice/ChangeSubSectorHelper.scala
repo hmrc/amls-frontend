@@ -47,6 +47,13 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  def updateSubSectors(model: ChangeSubSectorFlowModel)
+                      (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext) = for {
+    msb <- updateMsb(model)
+    bm <- updateBusinessMatching(model)
+    tp <- updateTradingPremises(model)
+  } yield (msb, bm, tp)
+
   def updateMsb(model: ChangeSubSectorFlowModel)
                (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[MoneyServiceBusiness] = {
 
