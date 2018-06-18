@@ -140,9 +140,6 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
         "there is no ASP business type in the model" in new Fixture {
           val tradingPremises = Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get
 
-          import utils.Strings._
-          println(tradingPremises.toString in Console.YELLOW)
-
           mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get))
 
           val model = RemoveBusinessTypeFlowModel(
