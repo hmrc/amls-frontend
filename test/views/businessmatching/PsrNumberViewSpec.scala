@@ -30,11 +30,11 @@ class PsrNumberViewSpec extends AmlsSpec {
     }
 
     "psr_number view" must {
-        "have correct title for non-edit mode" in new ViewFixture {
+        "have correct title for pre-submission mode" in new ViewFixture {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = false)
+            def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = true)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
             heading.html must be(Messages("businessmatching.psr.number.title"))
@@ -42,11 +42,11 @@ class PsrNumberViewSpec extends AmlsSpec {
 
         }
 
-        "have correct title for edit mode" in new ViewFixture {
+        "have correct title for non-pre-submisson mode" in new ViewFixture {
 
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            def view = views.html.businessmatching.psr_number(form2, edit = true)
+            def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
 
             doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateinformation"))
             heading.html must be(Messages("businessmatching.psr.number.title"))
@@ -82,17 +82,17 @@ class PsrNumberViewSpec extends AmlsSpec {
             doc.body().text() must not include Messages("link.return.registration.progress")
         }
 
-        "hide the Yes/No selection when editing an inputted PSR number and not pending" in new ViewFixture {
+        "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
             val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPending = false)
+            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
 
             doc.body().text() must not include "Yes"
             doc.body().text() must not include "No"
         }
 
-        "show the Yes/No selection when editing an inputted PSR number and pending" in new ViewFixture {
-            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPending = true)
+        "show the Yes/No selection when editing an inputted PSR number and in pre-submission mode" in new ViewFixture {
+            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPreSubmission = true)
 
             doc.body().text() must include("Yes")
             doc.body().text() must include("No")
