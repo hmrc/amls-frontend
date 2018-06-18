@@ -73,7 +73,7 @@
         )</p>
     }
 
-    @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p>@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
+    @if(inCompleteModel.isEmpty && completedModel.isEmpty) { <p id="no-bank-account">@Messages("bankdetails.yourbankaccounts.nobank.account")</p> }
 
     @if(inCompleteModel.nonEmpty) {
         <h2 id="incomplete-header">@Messages("bankdetails.yourbankaccounts.incomplete")</h2>
