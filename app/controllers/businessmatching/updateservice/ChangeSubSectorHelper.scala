@@ -22,6 +22,7 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.tradingpremises.TradingPremisesMsbServices.{convertServices, convertSingleService}
 import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -102,16 +103,17 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
 
     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) flatMap { maybeMsb =>
-      val sectorDiff = model.subSectors match {
-        case Some(x) if x.nonEmpty => x
-        case _ => throw new Exception
-      }
+      val sectorDiff = model.subSectors.getOrElse(Set.empty)
       val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
       val hasAccepted = msb.hasAccepted
       val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
 
-      dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
-        updatedMsb.copy(hasAccepted = hasAccepted)
+      if (sectorDiff.isEmpty) {
+        Future.successful(msb)
+      } else {
+        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
+          updatedMsb.copy(hasAccepted = hasAccepted)
+        }
       }
     }
   }
@@ -132,44 +134,47 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
 
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { maybeBm =>
-      val sectorDiff = model.subSectors match {
-        case Some(x) if x.nonEmpty => x
-        case _ => throw new Exception
-      }
+      val sectorDiff = model.subSectors.getOrElse(Set.empty)
       val bm = maybeBm.getOrElse(BusinessMatching())
       val hasAccepted = bm.hasAccepted
       val updatedBm = updatePsr(maybeBm.getOrElse(bm), sectorDiff)
 
-      dataCacheConnector.save[BusinessMatching](BusinessMatching.key, updatedBm) map { _ =>
-        updatedBm.copy(hasAccepted = hasAccepted)
+      if (sectorDiff.isEmpty) {
+        Future.successful(bm)
+      } else {
+        dataCacheConnector.save[BusinessMatching](BusinessMatching.key, updatedBm) map { _ =>
+          updatedBm.copy(hasAccepted = hasAccepted)
+        }
       }
     }
   }
 
   def updateTradingPremises(model: ChangeSubSectorFlowModel)
                            (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext): Future[Seq[TradingPremises]] = {
-
-    import models.tradingpremises.TradingPremisesMsbServices.{convertServices, convertSingleService}
-
-    dataCacheConnector.update[Seq[TradingPremises]](TradingPremises.key) {
-      case Some(tp) => tp map {
-        case t if hasMsb(t) =>
-          val newSectors = model.subSectors.getOrElse(Set.empty)
-          val hasAccepted = t.hasAccepted
-          val s = newSectors.map(convertSingleService) intersect t.msbServices.getOrElse(TradingPremisesMsbServices(Set.empty)).services
-
-          t.msbServices(Some(TradingPremisesMsbServices(s match {
-            case l if l.isEmpty && newSectors.size == 1 => convertServices(newSectors)
-            case _ => s
-          }))).copy(hasAccepted = hasAccepted)
-
-        case t => t
-      }
-      case None => Seq.empty
-    } map { t => t.getOrElse(Seq.empty) }
+    if (model.subSectors.getOrElse(Set.empty).isEmpty) {
+      Future.successful(Seq.empty)
+    } else {
+      dataCacheConnector.update[Seq[TradingPremises]](TradingPremises.key) {
+        case Some(tp) => tp map {
+          case t if hasMsb(t) => applySubSectorsTo(t, model.subSectors.get)
+          case t => t
+        }
+        case None => Seq.empty
+      } map { _.getOrElse(Seq.empty) }
+    }
   }
 
-  private def hasMsb(tp: TradingPremises) = tp match {
+  private def applySubSectorsTo(t: TradingPremises, subSectors: Set[BusinessMatchingMsbService]): TradingPremises = {
+    val hasAccepted = t.hasAccepted
+    val s = subSectors.map(convertSingleService) intersect t.msbServices.getOrElse(TradingPremisesMsbServices(Set.empty)).services
+
+    t.msbServices(Some(TradingPremisesMsbServices(s match {
+      case l if l.isEmpty && subSectors.size == 1 => convertServices(subSectors)
+      case _ => s
+    }))).copy(hasAccepted = hasAccepted)
+  }
+
+  private def hasMsb(tp: TradingPremises): Boolean = tp match {
     case t if t.whatDoesYourBusinessDoAtThisAddress.isDefined
       && t.whatDoesYourBusinessDoAtThisAddress.get.activities.contains(models.businessmatching.MoneyServiceBusiness) => true
     case _ => false

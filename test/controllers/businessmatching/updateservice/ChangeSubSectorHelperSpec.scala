@@ -20,6 +20,8 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSB, _}
+import org.mockito.Mockito.{verify, never}
+import org.mockito.Matchers.{eq => eqTo, any}
 
 import models.tradingpremises.{
   ChequeCashingScrapMetal => TPChequeCashingScrapMetal,
@@ -126,6 +128,25 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       updatedMsb.hasAccepted mustBe true
     }
 
+    "leave MSB alone if there are no sub-sectors to add" in new Fixture {
+      val model = ChangeSubSectorFlowModel(None, None)
+
+      val msb = MSB(
+        businessUseAnIPSP = Some(mock[BusinessUseAnIPSP]),
+        fundsTransfer = Some(mock[FundsTransfer]),
+        transactionsInNext12Months = Some(mock[TransactionsInNext12Months]),
+        sendMoneyToOtherCountry = Some(mock[SendMoneyToOtherCountry]),
+        sendTheLargestAmountsOfMoney = Some(mock[SendTheLargestAmountsOfMoney]),
+        mostTransactions = Some(mock[MostTransactions]),
+        hasAccepted = true)
+
+      mockCacheFetch[MSB](Some(msb), Some(MSB.key))
+
+      await(helper.updateMsb(model)) mustEqual msb
+
+      verify(mockCacheConnector, never).save(eqTo(MSB.key), any[MSB])(any(), any(), any())
+    }
+
     "wipe the psr number when transmitting money isn't set" in new Fixture {
 
       val model = ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal)), None)
@@ -175,6 +196,23 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       val updatedBm = await(helper.updateBusinessMatching(model))
       updatedBm.msbServices.get.msbServices mustBe Set(ChequeCashingScrapMetal)
       updatedBm.hasAccepted mustBe true
+    }
+
+    "leave Business Matching alone if there are no sub-sectors to add" in new Fixture {
+      val model = ChangeSubSectorFlowModel(None, None)
+
+      val bm = BusinessMatching(
+        msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
+        businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+        hasAccepted = true)
+
+      mockCacheFetch[BusinessMatching](
+        Some(bm),
+        Some(BusinessMatching.key))
+
+      await(helper.updateBusinessMatching(model)) mustBe bm
+
+      verify(mockCacheConnector, never).save(eqTo(BusinessMatching.key), any[BusinessMatching])(any(), any(), any())
     }
 
     "update the business matching sub sectors when it has transmitting money" in new Fixture {
@@ -247,6 +285,20 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       val updatedTps = await(helper.updateTradingPremises(model))
       updatedTps.head.msbServices.get mustBe TradingPremisesMsbServices(Set(TPChequeCashingScrapMetal))
       updatedTps.head.hasAccepted mustBe true
+    }
+
+    "leave trading premises alone when there are no sub-sectors to change" in new Fixture {
+      val model = ChangeSubSectorFlowModel(None, None)
+
+      val tradingPremises = Seq(
+        TradingPremises(whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(MoneyServiceBusiness))),
+          msbServices = Some(TradingPremisesMsbServices(Set(TPCurrencyExchange))),
+          hasAccepted = true)
+      )
+
+      mockCacheUpdate(Some(TradingPremises.key), tradingPremises)
+
+      await(helper.updateTradingPremises(model)) mustEqual Seq.empty
     }
 
     "handle when there is no trading presmises" in new Fixture {
