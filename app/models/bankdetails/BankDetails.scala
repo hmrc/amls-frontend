@@ -131,7 +131,13 @@ object BankDetails {
     val deletedFilter = (bd: BankDetails) => bd.status.contains(StatusConstants.Deleted)
     val completeFilter = (bd: BankDetails) => bd.isComplete
     val noBankAccountFilter = (bd: BankDetails) => bd.bankAccountType.contains(NoBankAccountUsed)
-    val visibleAccountsFilter = (bd: BankDetails) => !deletedFilter(bd) && !noBankAccountFilter(bd)
+
+    val emptyModelFilter: BankDetails => Boolean = {
+      case BankDetails(None, None, None, _, _, _, _) => true
+      case _ => false
+    }
+
+    val visibleAccountsFilter = (bd: BankDetails) => !deletedFilter(bd) && !noBankAccountFilter(bd) && !emptyModelFilter(bd)
 
     implicit class ZippedSyntax(zipped: Seq[(BankDetails, Int)]) {
       def visibleAccounts = zipped filter { case (bd, _) => visibleAccountsFilter(bd) }

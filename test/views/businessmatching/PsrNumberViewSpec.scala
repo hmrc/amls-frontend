@@ -16,7 +16,7 @@
 
 package views.businessmatching
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import play.api.i18n.Messages
@@ -25,49 +25,84 @@ import views.Fixture
 
 class PsrNumberViewSpec extends AmlsSpec {
 
-  trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
-  }
-
-  "psr_number view" must {
-    "have correct title" in new ViewFixture {
-
-      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
-
-      def view = views.html.businessmatching.psr_number(form2, edit = true)
-
-      doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
-      heading.html must be(Messages("businessmatching.psr.number.title"))
-      subHeading.html must include(Messages("summary.businessmatching"))
-
+    trait ViewFixture extends Fixture {
+        implicit val requestWithToken = addToken(request)
     }
 
-    "show errors in the correct locations" in new ViewFixture {
+    "psr_number view" must {
+        "have correct title for pre-submission mode" in new ViewFixture {
 
-      val form2: InvalidForm = InvalidForm(Map.empty,
-        Seq(
-          (Path \ "appliedFor") -> Seq(ValidationError("not a message Key")),
-          (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
-        ))
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
 
-      def view = views.html.businessmatching.psr_number(form2, edit = true)
+            def view = views.html.businessmatching.psr_number(form2, edit = false, isPreSubmission = true)
 
-      errorSummary.html() must include("not a message Key")
-      errorSummary.html() must include("second not a message Key")
+            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.businessmatching"))
+            heading.html must be(Messages("businessmatching.psr.number.title"))
+            subHeading.html must include(Messages("summary.businessmatching"))
 
-      doc.getElementById("appliedFor")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
+        }
 
-      doc.getElementById("regNumber-panel")
-        .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+        "have correct title for non-pre-submisson mode" in new ViewFixture {
 
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+            def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
+
+            doc.title must startWith(Messages("businessmatching.psr.number.title") + " - " + Messages("summary.updateinformation"))
+            heading.html must be(Messages("businessmatching.psr.number.title"))
+            subHeading.html must include(Messages("summary.updateinformation"))
+
+        }
+
+        "show errors in the correct locations" in new ViewFixture {
+
+            val form2: InvalidForm = InvalidForm(Map.empty,
+                Seq(
+                    (Path \ "appliedFor") -> Seq(ValidationError("not a message Key")),
+                    (Path \ "regNumber-panel") -> Seq(ValidationError("second not a message Key"))
+                ))
+
+            def view = views.html.businessmatching.psr_number(form2, edit = false)
+
+            errorSummary.html() must include("not a message Key")
+            errorSummary.html() must include("second not a message Key")
+
+            doc.getElementById("appliedFor")
+                    .getElementsByClass("error-notification").first().html() must include("not a message Key")
+
+            doc.getElementById("regNumber-panel")
+                    .getElementsByClass("error-notification").first().html() must include("second not a message Key")
+
+        }
+
+        "hide the return to progress link"in new ViewFixture {
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+            def view = views.html.businessmatching.psr_number(form2, edit = true, showReturnLink = false)
+            doc.body().text() must not include Messages("link.return.registration.progress")
+        }
+
+        "hide the Yes/No selection when editing an inputted PSR number and not in-presubmission mode" in new ViewFixture {
+            val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
+
+            override def view = views.html.businessmatching.psr_number(form2, edit = true, isPreSubmission = false)
+
+            doc.body().text() must not include "Yes"
+            doc.body().text() must not include "No"
+        }
+
+        "show the Yes/No selection when editing an inputted PSR number and in pre-submission mode" in new ViewFixture {
+            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPreSubmission = true)
+
+            doc.body().text() must include("Yes")
+            doc.body().text() must include("No")
+        }
+
+        "show the Yes/No selection when not editing" in new ViewFixture {
+            override def view = views.html.businessmatching.psr_number(EmptyForm, edit = false)
+
+            doc.body().text() must include("Yes")
+            doc.body().text() must include("No")
+        }
     }
-
-    "hide the return to progress link"in new ViewFixture {
-      val form2: ValidForm[BusinessAppliedForPSRNumber] = Form2(BusinessAppliedForPSRNumberYes("1234"))
-
-      def view = views.html.businessmatching.psr_number(form2, edit = true, showReturnLink = false)
-      doc.body().text() must not include Messages("link.return.registration.progress")
-    }
-  }
 }

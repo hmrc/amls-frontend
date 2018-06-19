@@ -1,20 +1,20 @@
 GET         /what-you-need                                              @controllers.bankdetails.WhatYouNeedController.get
 
 GET         /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.get(index:Int, edit: Boolean ?= false)
-POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false, count:Int ?= 0)
+POST        /accounts/:index                                             @controllers.bankdetails.BankAccountTypeController.post(index:Int, edit: Boolean ?= false)
 
 GET         /account-name                                                @controllers.bankdetails.BankAccountNameController.getNoIndex
 GET         /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.getIndex(index:Int, edit: Boolean ?= false)
 POST        /account-name                                                @controllers.bankdetails.BankAccountNameController.postNoIndex
 POST        /account-name/:index                                         @controllers.bankdetails.BankAccountNameController.postIndex(index:Int, edit: Boolean ?= false)
 
-GET         /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
-POST        /uk-account/:index                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
+GET         /uk-account/:index/                                           @controllers.bankdetails.BankAccountIsUKController.get(index:Int, edit: Boolean ?= false)
+POST        /uk-account/:index/                                           @controllers.bankdetails.BankAccountIsUKController.post(index:Int, edit: Boolean ?= false)
 
 GET         /your-bank-accounts                                          @controllers.bankdetails.YourBankAccountsController.get()
 
-GET         /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.get(index:Int)
-POST        /check-your-answers/:index                                   @controllers.bankdetails.SummaryController.post(index:Int)
+GET         /check-your-answers/:index/                                   @controllers.bankdetails.SummaryController.get(index:Int)
+POST        /check-your-answers/:index/                                   @controllers.bankdetails.SummaryController.post(index:Int)
 
 GET         /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.get(index: Int)
 POST        /remove/:index                                               @controllers.bankdetails.RemoveBankDetailsController.remove(index: Int)

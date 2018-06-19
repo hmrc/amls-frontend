@@ -24,16 +24,16 @@ import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.{ eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.flowmanagement.flowrouters.businessmatching.ChangeSubSectorRouter
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -52,10 +52,21 @@ class PSRNumberControllerSpec extends AmlsSpec
     val controller = new PSRNumberController(
       self.authConnector,
       mockCacheConnector,
+      mockStatusService,
       mock[BusinessMatchingService],
       createRouter[ChangeSubSectorFlowModel],
       mock[ChangeSubSectorHelper]
     )
+
+    when {
+      mockStatusService.isPreSubmission(any())
+    } thenReturn true
+
+    when {
+      mockStatusService.isPending(any())
+    } thenReturn false
+
+    mockApplicationStatus(NotCompleted)
 
     val businessMatching = businessMatchingGen.sample.get
 
@@ -68,9 +79,12 @@ class PSRNumberControllerSpec extends AmlsSpec
 
     "get is called" must {
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?'" in new Fixture {
+        val model = BusinessMatching(
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("1"))
+        )
         when {
           controller.businessMatchingService.getModel(any(), any(), any())
-        } thenReturn OptionT.none[Future, BusinessMatching]
+        } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
         status(result) must be(OK)
