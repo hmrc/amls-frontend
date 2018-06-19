@@ -85,7 +85,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       mockCacheFetch[MSB](
         Some(MSB(
           ceTransactionsInNext12Months = Some(mock[CETransactionsInNext12Months]),
-          whichCurrencies = Some(mock[WhichCurrencies]))),
+          whichCurrencies = Some(mock[WhichCurrencies]),
+          hasAccepted = true)),
         Some(MSB.key))
 
       mockCacheSave[MSB]
@@ -108,7 +109,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
           transactionsInNext12Months = Some(mock[TransactionsInNext12Months]),
           sendMoneyToOtherCountry = Some(mock[SendMoneyToOtherCountry]),
           sendTheLargestAmountsOfMoney = Some(mock[SendTheLargestAmountsOfMoney]),
-          mostTransactions = Some(mock[MostTransactions]))),
+          mostTransactions = Some(mock[MostTransactions]),
+          hasAccepted = true)),
         Some(MSB.key))
 
       mockCacheSave[MSB]
@@ -131,7 +133,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       mockCacheFetch[BusinessMatching](
         Some(BusinessMatching(
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+          hasAccepted = true)),
         Some(BusinessMatching.key))
 
       mockCacheSave[BusinessMatching]
@@ -163,7 +166,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       mockCacheFetch[BusinessMatching](
         Some(BusinessMatching(
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+          hasAccepted = true  )),
         Some(BusinessMatching.key))
 
       mockCacheSave[BusinessMatching]
@@ -179,7 +183,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
       mockCacheFetch[BusinessMatching](
         Some(BusinessMatching(
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
-          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
+          hasAccepted = true)),
         Some(BusinessMatching.key))
 
       mockCacheSave[BusinessMatching]

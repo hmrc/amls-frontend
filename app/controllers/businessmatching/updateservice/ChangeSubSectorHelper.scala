@@ -101,15 +101,17 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
       }
     }
 
-    dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) flatMap { msb =>
+    dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) flatMap { maybeMsb =>
       val sectorDiff = model.subSectors match {
         case Some(x) if x.nonEmpty => x
         case _ => throw new Exception
       }
+      val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
+      val hasAccepted = msb.hasAccepted
       val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
 
       dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
-        updatedMsb.copy(hasAccepted = true)
+        updatedMsb.copy(hasAccepted = hasAccepted)
       }
     }
   }
@@ -129,15 +131,17 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
       }
     }
 
-    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { bm =>
+    dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key) flatMap { maybeBm =>
       val sectorDiff = model.subSectors match {
         case Some(x) if x.nonEmpty => x
         case _ => throw new Exception
       }
+      val bm = maybeBm.getOrElse(BusinessMatching())
+      val hasAccepted = bm.hasAccepted
+      val updatedBm = updatePsr(maybeBm.getOrElse(bm), sectorDiff)
 
-      val updatedBm = updatePsr(bm, sectorDiff)
       dataCacheConnector.save[BusinessMatching](BusinessMatching.key, updatedBm) map { _ =>
-        updatedBm.copy(hasAccepted = true)
+        updatedBm.copy(hasAccepted = hasAccepted)
       }
     }
   }
@@ -151,13 +155,13 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
       case Some(tp) => tp map {
         case t if hasMsb(t) =>
           val newSectors = model.subSectors.getOrElse(Set.empty)
-
+          val hasAccepted = t.hasAccepted
           val s = newSectors.map(convertSingleService) intersect t.msbServices.getOrElse(TradingPremisesMsbServices(Set.empty)).services
 
           t.msbServices(Some(TradingPremisesMsbServices(s match {
             case l if l.isEmpty && newSectors.size == 1 => convertServices(newSectors)
             case _ => s
-          }))).copy(hasAccepted = true)
+          }))).copy(hasAccepted = hasAccepted)
 
         case t => t
       }
