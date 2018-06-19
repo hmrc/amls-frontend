@@ -81,12 +81,13 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
   }
 
   private def standardRouting(shouldRouteToNext: Boolean, services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister)
-                             (implicit ac: AuthContext, hc: HeaderCarrier) =
+                             (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
     statusService.isPreSubmission map { isPreSubmission =>
       (shouldRouteToNext, services, isPreSubmission) match {
         case (true, _, _) =>
           Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
-        case (false, _, false) if register.addedSubSectors.fold(false)(_.contains(CurrencyExchange)) =>
+        case (false, _, false) if shouldAnswerCurrencyExchangeQuestions(services, register) =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains CurrencyExchange =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
@@ -94,6 +95,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
           Redirect(routes.SummaryController.get())
       }
     }
+  }
 
   private def editRouting(next: Boolean, services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     (next: Boolean, services) match {

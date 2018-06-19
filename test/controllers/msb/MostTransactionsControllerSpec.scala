@@ -130,9 +130,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       document.select(".amls-error-summary").size mustEqual 1
     }
 
-    "redirect to the next page on submission" when {
+    "redirect to the CE 'Transactions' on submission" when {
       "edit is false and Currency Exchange is available" in new Fixture {
-
         val msbServices = Some(
           BusinessMatchingMsbServices(
             Set(
@@ -158,6 +157,38 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         mockCacheFetchAll
         mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
         mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
+      "edit is false and we're adding MSB to an approved application" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
         mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
 
         val result = controller.post()(newRequest)
@@ -272,7 +303,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
     "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
@@ -305,7 +336,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get(true).url)
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
     }
 
     "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
@@ -338,7 +369,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(edit = true)(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
   }
 

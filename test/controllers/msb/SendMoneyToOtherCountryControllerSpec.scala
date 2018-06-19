@@ -176,7 +176,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     "redirect to the CE transactions page" when {
       "the application is not registered as Currency Exchange, but it has just been added to the application" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("money" -> "false")
-        val msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -199,6 +199,33 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
       }
+
+      "MSB has just been added to the application with Currency Exchange, and we're not in pre-application mode" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody("money" -> "false")
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+          hasChanged = true
+        )
+
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness]
+
+        mockCacheGetEntry[ServiceChangeRegister](Some(
+          ServiceChangeRegister(addedActivities = Some(Set(models.businessmatching.MoneyServiceBusiness)))), ServiceChangeRegister.key)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
     }
 
     "redirect to the summary page" when {
