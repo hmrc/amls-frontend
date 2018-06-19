@@ -16,10 +16,12 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
-import org.mockito.Matchers._
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -32,7 +34,12 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController(authConnector = self.authConnector, mockStatusService)
+    val controller = new WhatYouNeedController(
+      self.authConnector,
+      mockStatusService,
+      mockCacheConnector)
+
+    mockCacheFetch[ServiceChangeRegister](None)
   }
 
   "WhatYouNeedController" must {
@@ -54,15 +61,25 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     "post" must {
 
       "redirect to the expected throughput controller if in pre-submission status" in new Fixture {
-
         when {
           mockStatusService.isPreSubmission(any(), any(), any())
         } thenReturn Future.successful(true)
 
+        val result = controller.post(request)
+        redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)
+      }
 
-        val result =  controller.post(request)
-        redirectLocation(result).get mustBe controllers.msb.routes.ExpectedThroughputController.get().url
+      "redirect to the expected throughput page if MSB has just been added to the application" in new Fixture {
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
 
+        mockCacheFetch(
+          Some(ServiceChangeRegister(Some(Set(MoneyServiceBusiness, HighValueDealing)))),
+          Some(ServiceChangeRegister.key))
+
+        val result = controller.post(request)
+        redirectLocation(result) mustBe Some(controllers.msb.routes.ExpectedThroughputController.get().url)
       }
 
       "redirect to the branches or agents controller if not in pre-submission status" in new Fixture {
@@ -72,9 +89,8 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
         } thenReturn Future.successful(false)
 
 
-        val result =  controller.post(request)
-        redirectLocation(result).get mustBe controllers.msb.routes.BranchesOrAgentsController.get().url
-
+        val result = controller.post(request)
+        redirectLocation(result) mustBe Some(controllers.msb.routes.BranchesOrAgentsController.get().url)
       }
     }
   }
