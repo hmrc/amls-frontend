@@ -18,15 +18,15 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission:Boolean = true)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
-    @heading("msb.services.title", "summary.businessmatching")
+    @heading("msb.services.title", if(isPreSubmission) "summary.businessmatching" else "summary.updateinformation")
 }
 
 @main(
-    title = Messages("msb.services.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("msb.services.title") + " - " + {if(isPreSubmission) Messages("summary.businessmatching") else Messages("summary.updateinformation")},
     heading = header
 ) {
 

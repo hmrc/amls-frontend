@@ -23,6 +23,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MoneyServiceBusinessTestData}
+import models.status.NotCompleted
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -46,6 +47,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
+      mockStatusService,
       mock[ChangeSubSectorHelper]
     )
 
@@ -65,6 +67,8 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       case Some(bm) => OptionT.pure[Future, BusinessMatching](bm)
       case _ => OptionT.none[Future, BusinessMatching]
     })
+
+    mockApplicationStatus(NotCompleted)
   }
 
   "ServicesController" must {

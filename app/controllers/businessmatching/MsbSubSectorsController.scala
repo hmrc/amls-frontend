@@ -16,6 +16,8 @@
 
 package controllers.businessmatching
 
+import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
@@ -23,6 +25,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -33,19 +36,20 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
                                         val router: Router[ChangeSubSectorFlowModel],
                                         val businessMatchingService: BusinessMatchingService,
+                                        val statusService:StatusService,
                                         val helper: ChangeSubSectorHelper) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        businessMatchingService.getModel.value map { maybeBM =>
-          val form = (for {
-            bm <- maybeBM
-            services <- bm.msbServices
-          } yield Form2[BusinessMatchingMsbServices](services)).getOrElse(EmptyForm)
-
-          Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
-        }
+        (for {
+          bm <- businessMatchingService.getModel
+          status <- OptionT.liftF(statusService.getStatus)
+        } yield {
+          val form: Form2[BusinessMatchingMsbServices] = bm.msbServices map
+            Form2[BusinessMatchingMsbServices] getOrElse EmptyForm
+            Ok(views.html.businessmatching.services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+        }) getOrElse Ok(views.html.businessmatching.services(EmptyForm, edit))
   }
 
   def post(edit: Boolean = false) = Authorised.async {
