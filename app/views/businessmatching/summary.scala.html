@@ -106,6 +106,7 @@
             @model.msbServices.map { services =>
                 @checkYourAnswers(
                     question = Messages("businessmatching.services.title"),
+                    allowEdit = !isPending,
                     editUrl = controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString,
                     editLinkTag="msbservices-edit"
                 ) {
