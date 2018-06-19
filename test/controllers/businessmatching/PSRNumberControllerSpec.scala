@@ -140,6 +140,8 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "redirect when No is selected" in new Fixture {
+        mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
+
         val newRequest = request.withFormUrlEncodedBody(
           "appliedFor" -> "false"
         )
@@ -147,7 +149,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val result = controller.post(true)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel.empty, true)
+        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(None, Some(BusinessAppliedForPSRNumberNo)), edit = true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {

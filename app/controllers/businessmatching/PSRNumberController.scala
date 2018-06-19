@@ -23,7 +23,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -62,9 +62,10 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(psr_number(f, edit)))
-          case ValidForm(_, x@BusinessAppliedForPSRNumberYes(_)) =>
+
+          case ValidForm(_, data) =>
             dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
-              _.getOrElse(ChangeSubSectorFlowModel.empty).copy(psrNumber = Some(x))
+              _.getOrElse(ChangeSubSectorFlowModel.empty).copy(psrNumber = Some(data))
             } flatMap {
               case Some(m@ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
                 helper.updateSubSectors(m) flatMap { _ =>
@@ -73,8 +74,6 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
               case Some(m) =>
                 route(m)
             }
-          case ValidForm(_, _) =>
-            route(ChangeSubSectorFlowModel.empty)
         }
       }
   }
