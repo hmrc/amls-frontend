@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
@@ -27,6 +28,10 @@ import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import org.mockito.Mockito.when
+import org.mockito.Matchers.any
+
+import scala.concurrent.Future
 
 class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -41,6 +46,12 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)
+    mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister()), ServiceChangeRegister.key)
+    mockApplicationStatus(NotCompleted)
+
+    when {
+      mockStatusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
   }
 
   "MostTransactionsController" must {
@@ -119,15 +130,46 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       document.select(".amls-error-summary").size mustEqual 1
     }
 
-    "on valid submission (no edit) (CE)" in new Fixture {
+    "redirect to the next page on submission" when {
+      "edit is false and Currency Exchange is available" in new Fixture {
 
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            CurrencyExchange
+        val msbServices = Some(
+          BusinessMatchingMsbServices(
+            Set(
+              CurrencyExchange
+            )
           )
         )
-      )
+
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+    }
+
+    "redirect to Check Your Answers on valid submission when CE is available but has not just been added to the application " in new Fixture {
+
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
@@ -145,12 +187,17 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+      mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(addedSubSectors = Some(Set(TransmittingMoney)))), ServiceChangeRegister.key)
+      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+      
+      when {
+        mockStatusService.isPreSubmission(any(), any(), any())
+      } thenReturn Future.successful(false)
 
-      val result = controller.post(edit = false)(newRequest)
+      val result = controller.post()(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.CETransactionsInNext12MonthsController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
     "on valid submission (no edit) (non-CE)" in new Fixture {
@@ -180,10 +227,10 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
-      val result = controller.post(edit = false)(newRequest)
+      val result = controller.post()(newRequest)
 
       status(result) mustEqual SEE_OTHER
-      redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+      redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
     "return a redirect to the summary page on valid submission where the next page data exists (edit) (CE)" in new Fixture {
