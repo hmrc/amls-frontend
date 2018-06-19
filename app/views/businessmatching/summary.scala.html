@@ -22,7 +22,7 @@
 @(f: forms.Form2[_], model: BusinessMatching, changeActivitiesUrl: String, isPreSubmission: Boolean = true, isPending: Boolean = false)(implicit request: Request[_],messages:Messages)
 
 @header = {
-    @heading("title.cya", if(isPreSubmission) "summary.businessmatching" else "")
+    @heading("title.cya", if(isPreSubmission) "summary.businessmatching" else "summary.updateservice")
 }
 
 @main(
