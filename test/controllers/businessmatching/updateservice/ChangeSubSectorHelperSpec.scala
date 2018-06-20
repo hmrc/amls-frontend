@@ -73,9 +73,8 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
         Some(BusinessMatching.key))
 
       await {
-        helper.createFlowModel()
+        helper.createFlowModel
       } mustBe expectedModel
-
     }
   }
 
@@ -188,7 +187,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
         Some(BusinessMatching(
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
-          hasAccepted = true  )),
+          hasAccepted = true)),
         Some(BusinessMatching.key))
 
       mockCacheSave[BusinessMatching]

@@ -41,8 +41,7 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def createFlowModel()
-                     (implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
+  def createFlowModel(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).map {
       case Some(x) => ChangeSubSectorFlowModel(subSectors = x.msbServices.map(_.msbServices), psrNumber = x.businessAppliedForPSRNumber)
       case None => ChangeSubSectorFlowModel()
