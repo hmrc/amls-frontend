@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -31,17 +32,20 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures{
+class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new ExpectedThroughputController ( dataCacheConnector = mockCacheConnector,
-                                                        authConnector = self.authConnector,
-                                                        statusService = mockStatusService,
-                                                        serviceFlow = mockServiceFlow)
+    val controller = new ExpectedThroughputController(
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mockStatusService,
+      serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -115,7 +119,7 @@ class ExpectedThroughputControllerSpec extends AmlsSpec with MockitoSugar with S
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.throughput"))
+      contentAsString(result) must include(Messages("error.required.msb.throughput"))
     }
 
     "on post with valid data" in new Fixture {

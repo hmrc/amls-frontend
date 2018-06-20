@@ -21,10 +21,13 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
 
@@ -33,7 +36,10 @@ import scala.concurrent.Future
 class PSRNumberController @Inject()(val authConnector: AuthConnector,
                                     val dataCacheConnector: DataCacheConnector,
                                     val statusService: StatusService,
-                                    val businessMatchingService: BusinessMatchingService) extends BaseController {
+                                    val businessMatchingService: BusinessMatchingService,
+                                    val router: Router[ChangeSubSectorFlowModel],
+                                    val helper: ChangeSubSectorHelper
+                                   ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -51,21 +57,23 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request => {
+        val route = router.getRoute(PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
+
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(psr_number(f, edit)))
-          case ValidForm(_, BusinessAppliedForPSRNumberYes(x)) => {
-            (for {
-              bm <- businessMatchingService.getModel
-              _ <- businessMatchingService.updateModel(
-                bm.businessAppliedForPSRNumber(Some(BusinessAppliedForPSRNumberYes(x)))
-              )
-            } yield {
-              Redirect(routes.SummaryController.get())
-            }) getOrElse InternalServerError("Could not update psr number")
-          }
-          case ValidForm(_, _) =>
-            Future.successful(Redirect(routes.NoPsrController.get()))
+
+          case ValidForm(_, data) =>
+            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
+              _.getOrElse(ChangeSubSectorFlowModel.empty).copy(psrNumber = Some(data))
+            } flatMap {
+              case Some(m@ChangeSubSectorFlowModel(_, Some(BusinessAppliedForPSRNumberYes(_)))) =>
+                helper.updateSubSectors(m) flatMap { _ =>
+                  route(m)
+                }
+              case Some(m) =>
+                route(m)
+            }
         }
       }
   }

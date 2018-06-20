@@ -21,7 +21,8 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.{MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.updateservice.ServiceChangeRegister
+import models.businessmatching.{CurrencyExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -31,15 +32,15 @@ import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
 
-class SendTheLargestAmountsOfMoneyController @Inject()( val authConnector: AuthConnector = AMLSAuthConnector,
-                                                        val cacheConnector: DataCacheConnector,
-                                                        implicit val statusService: StatusService,
-                                                        implicit val serviceFlow: ServiceFlow
+class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
+                                                       implicit val cacheConnector: DataCacheConnector,
+                                                       implicit val statusService: StatusService,
+                                                       implicit val serviceFlow: ServiceFlow
                                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(MsbActivity) flatMap {
+      ControllerHelper.allowedToEdit(MsbActivity, Some(TransmittingMoney)) flatMap {
         case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
           response =>
             val form: Form2[SendTheLargestAmountsOfMoney] = (for {
@@ -48,7 +49,11 @@ class SendTheLargestAmountsOfMoneyController @Inject()( val authConnector: AuthC
             } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
             Ok(send_largest_amounts_of_money(form, edit))
         }
-        case false => Future.successful(NotFound(notFoundView))
+        case _ => cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key) map {
+          case Some(r) if r.addedSubSectors.fold(false)(_.contains(CurrencyExchange)) =>
+            Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+          case _ => Redirect(routes.SummaryController.get())
+        }
       }
   }
 

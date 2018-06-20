@@ -78,7 +78,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     for {
       activity <- OptionT.fromOption[Future](model.activity)
       updatedModel <- OptionT(dataCacheConnector.update[ServiceChangeRegister](ServiceChangeRegister.key) {
-        case Some(dcModel@ServiceChangeRegister(Some(activities))) =>
+        case Some(dcModel@ServiceChangeRegister(Some(activities), _)) =>
           dcModel.copy(addedActivities = Some(activities + activity))
         case _ => ServiceChangeRegister(Some(Set(activity)))
       })

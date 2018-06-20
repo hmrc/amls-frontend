@@ -20,34 +20,36 @@ import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
+import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
-import models.moneyservicebusiness.MoneyServiceBusiness
-import play.api.mvc.Result
+import models.flowmanagement.{ChangeSubSectorFlowModel, SubSectorsPageId}
+import services.StatusService
 import services.businessmatching.BusinessMatchingService
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
                                         val dataCacheConnector: DataCacheConnector,
-                                        val businessMatchingService: BusinessMatchingService) extends BaseController {
+                                        val router: Router[ChangeSubSectorFlowModel],
+                                        val businessMatchingService: BusinessMatchingService,
+                                        val statusService:StatusService,
+                                        val helper: ChangeSubSectorHelper) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        businessMatchingService.getModel.value map { maybeBM =>
-          val form = (for {
-            bm <- maybeBM
-            services <- bm.msbServices
-          } yield Form2[BusinessMatchingMsbServices](services)).getOrElse(EmptyForm)
-
-          Ok(views.html.businessmatching.services(form, edit, maybeBM.fold(false)(_.preAppComplete)))
-        }
+        (for {
+          bm <- businessMatchingService.getModel
+          status <- OptionT.liftF(statusService.getStatus)
+        } yield {
+          val form: Form2[BusinessMatchingMsbServices] = bm.msbServices map
+            Form2[BusinessMatchingMsbServices] getOrElse EmptyForm
+            Ok(views.html.businessmatching.services(form, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+        }) getOrElse Ok(views.html.businessmatching.services(EmptyForm, edit))
   }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -59,59 +61,14 @@ class MsbSubSectorsController @Inject()(val authConnector: AuthConnector,
             Future.successful(BadRequest(views.html.businessmatching.services(f, edit)))
 
           case ValidForm(_, data) =>
-            lazy val updateModel = for {
-              bm <- businessMatchingService.getModel
-              cache <- businessMatchingService.updateModel(if (data.msbServices.contains(TransmittingMoney)) {
-                bm.msbServices(Some(data))
-              } else {
-                bm.msbServices(Some(data)).clearPSRNumber
-              })
-              _ <- OptionT.liftF(updateMsb(bm.msbServices, data.msbServices, cache))
-            } yield cache
-
-            lazy val redirectResult = OptionT.some[Future, Result](if (data.msbServices.contains(TransmittingMoney)) {
-              Redirect(routes.PSRNumberController.get(edit))
-            } else {
-              Redirect(routes.SummaryController.get())
-            })
-
-            updateModel flatMap { _ => redirectResult } getOrElse InternalServerError("Could not update services")
+            dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) {
+              _.getOrElse(ChangeSubSectorFlowModel()).copy(subSectors = Some(data.msbServices))
+            } flatMap {
+              case Some(m@ChangeSubSectorFlowModel(Some(set), _)) if !(set contains TransmittingMoney) =>
+                helper.updateSubSectors(m) flatMap { _ => router.getRoute(SubSectorsPageId, m) }
+              case Some(updatedModel) =>
+                router.getRoute(SubSectorsPageId, updatedModel)
+            }
         }
-  }
-
-  private def updateMsb(existingServices: Option[BusinessMatchingMsbServices], updatedServices: Set[BusinessMatchingMsbService], cache: CacheMap)
-                       (implicit ac: AuthContext, hc: HeaderCarrier) = {
-
-    val updateCE = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
-      if (subSectorDiff.contains(CurrencyExchange)) {
-        msb.copy(ceTransactionsInNext12Months = None, whichCurrencies = None)
-      } else {
-        msb
-      }
-    }
-
-    val updateMT = (msb: MoneyServiceBusiness, subSectorDiff: Set[BusinessMatchingMsbService]) => {
-      if (subSectorDiff.contains(TransmittingMoney)) {
-        msb.copy(
-          businessUseAnIPSP = None,
-          fundsTransfer = None,
-          transactionsInNext12Months = None,
-          sendMoneyToOtherCountry = None,
-          sendTheLargestAmountsOfMoney = None,
-          mostTransactions = None
-        )
-      } else {
-        msb
-      }
-    }
-
-    cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key).fold[Future[CacheMap]](Future.successful(cache)) { msb =>
-      existingServices.fold[Future[CacheMap]](Future.successful(cache)) { _ =>
-        val sectorDiff = existingServices.fold(Set.empty[BusinessMatchingMsbService])(_.msbServices) diff updatedServices
-        val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
-
-        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb)
-      }
-    }
   }
 }

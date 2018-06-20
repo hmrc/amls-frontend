@@ -21,7 +21,7 @@ import cats.implicits._
 import models.businessmatching._
 import models.businessmatching.updateservice.{Add, ChangeBusinessType, Remove}
 import models.businessmatching.updateservice.{Add, ChangeBusinessType}
-import models.flowmanagement.{ChangeBusinesTypesPageId, RemoveBusinessTypeFlowModel}
+import models.flowmanagement.{ChangeBusinessTypesPageId, RemoveBusinessTypeFlowModel}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -101,7 +101,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "add"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinesTypesPageId, Add)
+          controller.router.verify(ChangeBusinessTypesPageId, Add)
         }
       }
 
@@ -111,7 +111,7 @@ class ChangeBusinessTypeControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(request.withFormUrlEncodedBody("changeServices" -> "remove"))
 
           status(result) must be(SEE_OTHER)
-          controller.router.verify(ChangeBusinesTypesPageId, Remove)
+          controller.router.verify(ChangeBusinessTypesPageId, Remove)
         }
       }
 

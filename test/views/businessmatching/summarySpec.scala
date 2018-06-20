@@ -57,6 +57,7 @@ class summarySpec extends AmlsSpec
 
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("title.cya"))
+      subHeading.html must include(Messages("summary.updateservice"))
     }
 
     def checkElementTextIncludes(el:Element, keys : String*) = {

@@ -17,6 +17,7 @@
 package controllers.msb
 
 import models.businessmatching._
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -32,15 +33,19 @@ import scala.concurrent.Future
 
 class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
+    val controller = new SendMoneyToOtherCountryController(mockCacheConnector, self.authConnector, mockStatusService)
 
-    val cacheMap = mock[CacheMap]
+    mockCacheGetEntry[ServiceChangeRegister](None, ServiceChangeRegister.key)
 
-    val controller = new SendMoneyToOtherCountryController (mockCacheConnector, authConnector = self.authConnector)
+    when {
+      mockStatusService.isPreSubmission(any(), any(), any())
+    } thenReturn Future.successful(true)
+
+    val emptyCache = CacheMap("", Map.empty)
   }
-
-  val emptyCache = CacheMap("", Map.empty)
 
   "SendMoneyToOtherCountryController" must {
 
@@ -79,13 +84,11 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           CurrencyExchange
         )
       ))
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(None)
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
@@ -116,12 +119,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       ))
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
 
@@ -153,12 +156,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
 
@@ -168,6 +171,90 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+    }
+
+    "redirect to the CE transactions page" when {
+      "the application is not registered as Currency Exchange, but it has just been added to the application" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody("money" -> "false")
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+          hasChanged = true
+        )
+
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness]
+
+        mockCacheGetEntry[ServiceChangeRegister](Some(
+          ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))), ServiceChangeRegister.key)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
+      "MSB has just been added to the application with Currency Exchange, and we're not in pre-application mode" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody("money" -> "false")
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+          hasChanged = true
+        )
+
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness]
+
+        mockCacheGetEntry[ServiceChangeRegister](Some(
+          ServiceChangeRegister(addedActivities = Some(Set(models.businessmatching.MoneyServiceBusiness)))), ServiceChangeRegister.key)
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
+    }
+
+    "redirect to the summary page" when {
+      "the application is registered as Currency Exchange, but it has not just been added to the application" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody("money" -> "false")
+
+        val msbServices = Some(BusinessMatchingMsbServices(
+          Set(TransmittingMoney,
+            CurrencyExchange)))
+
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+          hasChanged = true
+        )
+
+        when {
+          controller.statusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness]
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
+      }
     }
 
     "on valid post where the value is false (Non-CE)" in new Fixture {
@@ -190,12 +277,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
@@ -226,12 +313,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       )
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
@@ -262,12 +349,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false))
       )
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
@@ -298,12 +385,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
@@ -327,12 +414,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       )
 
       when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(None)
 
-      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))

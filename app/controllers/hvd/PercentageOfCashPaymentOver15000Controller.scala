@@ -30,10 +30,10 @@ import views.html.hvd.percentage
 
 import scala.concurrent.Future
 
-class PercentageOfCashPaymentOver15000Controller @Inject() ( val dataCacheConnector: DataCacheConnector,
+class PercentageOfCashPaymentOver15000Controller @Inject() (val authConnector: AuthConnector,
+                                                            implicit val dataCacheConnector: DataCacheConnector,
                                                             implicit val serviceFlow: ServiceFlow,
-                                                            implicit val statusService: StatusService,
-                                                            val authConnector: AuthConnector
+                                                            implicit val statusService: StatusService
                                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {

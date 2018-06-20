@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness, WhichCurrencies, WholesalerMoneySource}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -57,6 +58,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
       serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
   }
 
   "WhichCurrencyController" when {

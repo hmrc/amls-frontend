@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.{Hvd, PercentageOfCashPaymentOver15000}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -34,15 +35,18 @@ import scala.concurrent.Future
 class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new PercentageOfCashPaymentOver15000Controller(mockCacheConnector,
-                                                                    mockServiceFlow,
-                                                                    mockStatusService,
-                                                                    self.authConnector
-                                                                  )
+    val controller = new PercentageOfCashPaymentOver15000Controller(
+      self.authConnector,
+      mockCacheConnector,
+      mockServiceFlow,
+      mockStatusService
+    )
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -114,7 +118,7 @@ class PercentageOfCashPaymentOver15000ControllerSpec extends AmlsSpec with Mocki
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.hvd.percentage"))
+      contentAsString(result) must include(Messages("error.required.hvd.percentage"))
     }
 
     "on post with valid data" in new Fixture {

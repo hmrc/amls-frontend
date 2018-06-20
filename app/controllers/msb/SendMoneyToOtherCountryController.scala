@@ -20,79 +20,92 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.Result
+import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.send_money_to_other_country
 
 import scala.concurrent.Future
 
-class SendMoneyToOtherCountryController  @Inject() (val dataCacheConnector: DataCacheConnector,
-                                                    val authConnector: AuthConnector
-                                                   ) extends BaseController {
+class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                                  val authConnector: AuthConnector,
+                                                  val statusService: StatusService
+                                                 ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map { response =>
           val form: Form2[SendMoneyToOtherCountry] = (for {
             msb <- response
             money <- msb.sendMoneyToOtherCountry
           } yield Form2[SendMoneyToOtherCountry](money)).getOrElse(EmptyForm)
+
           Ok(send_money_to_other_country(form, edit))
+        }
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request => {
+        Form2[SendMoneyToOtherCountry](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(send_money_to_other_country(f, edit)))
+          case ValidForm(_, data) =>
+            dataCacheConnector.fetchAll flatMap { maybeCache =>
+              val result = for {
+                cache <- maybeCache
+                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
+                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
+                register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
+              } yield {
+                dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map { _ =>
+                  if (edit) {
+                    Future.successful(editRouting(data.money, services.msbServices, msb))
+                  } else {
+                    standardRouting(data.money, services.msbServices, register)
+                  }
+                }
+              }
+
+              result.map(_.flatMap(identity)) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
+        }
       }
   }
 
-  private def standardRouting(next: Boolean, services: Set[BusinessMatchingMsbService]): Result =
-    (next, services) match {
-      case (true, _) =>
-        Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
-      case (false, s) if s contains CurrencyExchange =>
-        Redirect(routes.CETransactionsInNext12MonthsController.get())
-      case (false, _) =>
-        Redirect(routes.SummaryController.get())
+  private def standardRouting(shouldRouteToNext: Boolean, services: Set[BusinessMatchingMsbService], register: ServiceChangeRegister)
+                             (implicit ac: AuthContext, hc: HeaderCarrier) = {
+
+    statusService.isPreSubmission map { isPreSubmission =>
+      (shouldRouteToNext, services, isPreSubmission) match {
+        case (true, _, _) =>
+          Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
+        case (false, _, false) if shouldAnswerCurrencyExchangeQuestions(services, register) =>
+          Redirect(routes.CETransactionsInNext12MonthsController.get())
+        case (false, s, true) if s contains CurrencyExchange =>
+          Redirect(routes.CETransactionsInNext12MonthsController.get())
+        case (false, _, _) =>
+          Redirect(routes.SummaryController.get())
+      }
     }
+  }
 
   private def editRouting(next: Boolean, services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
     (next: Boolean, services) match {
-      case (true, _) if !msb.sendTheLargestAmountsOfMoney.isDefined =>
+      case (true, _) if msb.sendTheLargestAmountsOfMoney.isEmpty =>
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get(true))
       case (false, s)
-        if (s contains CurrencyExchange) && !msb.sendTheLargestAmountsOfMoney.isDefined =>
+        if (s contains CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty =>
         Redirect(routes.CETransactionsInNext12MonthsController.get(true))
       case _ =>
         Redirect(routes.SummaryController.get())
     }
 
-  def post(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request => {
-      Form2[SendMoneyToOtherCountry](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(send_money_to_other_country(f, edit)))
-        case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll flatMap {
-            optMap =>
-              val result = for {
-                cache <- optMap
-                msb <- cache.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key)
-                bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-                services <- bm.msbServices
-              } yield {
-                dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                  msb.sendMoneyToOtherCountry(data)
-                ) map {
-                  _ =>
-                    if (edit) {
-                      editRouting(data.money, services.msbServices, msb)
-                    } else {
-                      standardRouting(data.money, services.msbServices)
-                    }
-                }
-              }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
-          }
-      }
-    }
-  }
 }

@@ -17,6 +17,7 @@
 package controllers.hvd
 
 import models.businessmatching.HighValueDealing
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.hvd.Hvd
 import models.status.{SubmissionDecisionApproved, SubmissionReady}
 import org.jsoup.Jsoup
@@ -27,7 +28,8 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
     val request = addToken(authRequest)
 
     val controller = new ExpectToReceiveCashPaymentsController(
@@ -41,6 +43,7 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
     mockCacheSave[Hvd]
     mockApplicationStatus(SubmissionReady)
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
   }
 
   "ExpectToReceiveCashPaymentsController" when {

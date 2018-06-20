@@ -22,11 +22,11 @@
 @()(implicit request: Request[_], m:Messages)
 
 @header = {
-    @heading("businessmatching.cannotchangeservices.title", "summary.businessmatching")
+    @heading("businessmatching.cannotchangeservices.title", "summary.updateservice")
 }
 
 @main(
-    title = Messages("businessmatching.cannotchangeservices.title") + " - " + Messages("summary.businessmatching"),
+    title = Messages("businessmatching.cannotchangeservices.title") + " - " + Messages("summary.updateservice"),
     heading = header
 ) {
 
@@ -36,6 +36,7 @@
         attrHref = controllers.businessmatching.routes.SummaryController.get.url,
         attrRole = true,
         linkText = Messages("businessmatching.cannotchangeservices.button.text"),
-        visuallyhidden = Messages("summary.businessmatching")
+        visuallyhidden = Messages("summary.businessmatching"),
+        id=Some("cannot-continue-with-application")
     )
 }

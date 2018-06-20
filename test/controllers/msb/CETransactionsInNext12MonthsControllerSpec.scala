@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
@@ -29,18 +30,20 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar  {
+class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
-    self => val request = addToken(authRequest)
+    self =>
+    val request = addToken(authRequest)
 
-    val controller = new CETransactionsInNext12MonthsController ( dataCacheConnector = mockCacheConnector,
-                                                                  authConnector = self.authConnector,
-                                                                  statusService = mockStatusService,
-                                                                  serviceFlow = mockServiceFlow)
-
+    val controller = new CETransactionsInNext12MonthsController(
+      authConnector = self.authConnector,
+      dataCacheConnector = mockCacheConnector,
+      statusService = mockStatusService,
+      serviceFlow = mockServiceFlow)
 
     mockIsNewActivity(false)
+    mockCacheFetch[ServiceChangeRegister](None, None)
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -68,7 +71,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
       contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
     }
 
-    "load the page 'How many currency exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture  {
+    "load the page 'How many currency exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
 
       when(controller.statusService.getStatus(any(), any(), any()))
         .thenReturn(Future.successful(NotCompleted))
@@ -108,7 +111,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
       }
     }
 
-    "Show error message when user has not filled the mandatory fields" in new Fixture  {
+    "Show error message when user has not filled the mandatory fields" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "ceTransaction" -> ""
@@ -122,12 +125,12 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post()(newRequest)
       status(result) must be(BAD_REQUEST)
-      contentAsString(result) must include (Messages("error.required.msb.transactions.in.12months"))
+      contentAsString(result) must include(Messages("error.required.msb.transactions.in.12months"))
 
     }
 
     "Successfully save data in save4later and navigate to Next page" in new Fixture {
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = request.withFormUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
@@ -154,7 +157,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = request.withFormUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 
@@ -179,7 +182,7 @@ class CETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         ), hasChanged = true
       )
 
-      val newRequest = request.withFormUrlEncodedBody (
+      val newRequest = request.withFormUrlEncodedBody(
         "ceTransaction" -> "12345678963"
       )
 

@@ -24,7 +24,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching._
 import models.businessmatching.updateservice.ChangeBusinessType
-import models.flowmanagement.ChangeBusinesTypesPageId
+import models.flowmanagement.ChangeBusinessTypesPageId
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.http.HeaderCarrier
@@ -64,7 +64,7 @@ class ChangeBusinessTypesController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- helper.removeFlowData
-              route <- OptionT.liftF(router.getRoute(ChangeBusinesTypesPageId, data))
+              route <- OptionT.liftF(router.getRoute(ChangeBusinessTypesPageId, data))
             } yield route
           } getOrElse InternalServerError("Could not remove the flow data")
         }

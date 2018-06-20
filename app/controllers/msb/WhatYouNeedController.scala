@@ -16,17 +16,42 @@
 
 package controllers.msb
 
+import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
+import models.businessmatching.MoneyServiceBusiness
+import models.businessmatching.updateservice.ServiceChangeRegister
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.msb.what_you_need
 
 import scala.concurrent.Future
 
-class WhatYouNeedController @Inject() (val authConnector: AuthConnector) extends BaseController {
+class WhatYouNeedController @Inject()(val authConnector: AuthConnector,
+                                      val statusService: StatusService,
+                                      val dataCacheConnector: DataCacheConnector) extends BaseController {
 
   def get = Authorised.async {
-    implicit authContext => implicit request =>
-      Future.successful(Ok(what_you_need()))
+    implicit authContext =>
+      implicit request =>
+        Future.successful(Ok(what_you_need()))
+  }
+
+  def post = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key) flatMap {
+          case Some(register) if register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) =>
+            Future.successful(Redirect(routes.ExpectedThroughputController.get()))
+          case _ =>
+            statusService.isPreSubmission map { status =>
+              if (status) {
+                Redirect(routes.ExpectedThroughputController.get())
+              }
+              else {
+                Redirect(routes.BranchesOrAgentsController.get())
+              }
+            }
+        }
   }
 }

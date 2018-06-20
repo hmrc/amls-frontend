@@ -33,17 +33,28 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
   }
 
   "services view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title in when in presubmission mode " in new ViewFixture {
 
       val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
 
-      def view = views.html.businessmatching.services(form2, edit = true)
+      def view = views.html.businessmatching.services(form2, edit = true, isPreSubmission = true)
 
       doc.title must startWith(Messages("msb.services.title") + " - " + Messages("summary.businessmatching"))
       heading.html must be(Messages("msb.services.title"))
       subHeading.html must include(Messages("summary.businessmatching"))
-
     }
+
+    "have correct title in when in non-presubmission mode " in new ViewFixture {
+
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+
+      def view = views.html.businessmatching.services(form2, edit = true, isPreSubmission = false)
+
+      doc.title must startWith(Messages("msb.services.title") + " - " + Messages("summary.updateinformation"))
+      heading.html must be(Messages("msb.services.title"))
+      subHeading.html must include(Messages("summary.updateinformation"))
+    }
+
 
     "show errors in the correct locations" in new ViewFixture {
 

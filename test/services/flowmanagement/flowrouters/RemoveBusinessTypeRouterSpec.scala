@@ -30,6 +30,7 @@ import org.scalacheck.Gen
 import play.api.mvc.Results.Redirect
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
+import services.flowmanagement.flowrouters.businessmatching.RemoveBusinessTypeRouter
 import services.flowmanagement.pagerouters.removeflow._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
@@ -137,12 +138,15 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     "return the 'progress' page (RegistrationProgressController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is no ASP business type in the model" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)) // map { tp => tp.copy(hasChanged = true).copy(hasAccepted = true) }))
+          val tradingPremises = Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get
+
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness)),
             dateOfChange = Some(DateOfChange(LocalDate.now()))
           )
+
           val result = await(router.getRoute(RemoveBusinessTypesSummaryPageId, model))
 
           result mustBe Redirect(controllers.routes.RegistrationProgressController.get())
@@ -154,7 +158,7 @@ class RemoveBusinessTypeRouterSpec extends AmlsSpec with TradingPremisesGenerato
     "return the 'Need to update Answers' page (NeedToUpdateController)" when {
       "the user is on the 'check your answers' page (RemoveBusinessTypesSummaryPageId)" when {
         "there is an ASP business type in the model" in new Fixture {
-          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get)) // map { tp => tp.copy(hasAccepted = true) }))
+          mockCacheFetch[Seq[TradingPremises]](Some(Gen.listOfN(2, tradingPremisesWithAtLeastOneBusinessTypeGen).sample.get))
 
           val model = RemoveBusinessTypeFlowModel(
             activitiesToRemove = Some(Set(HighValueDealing, MoneyServiceBusiness, AccountancyServices)),

@@ -14,12 +14,11 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.flowrouters
+package services.flowmanagement.flowrouters.businessmatching
 
 import javax.inject.{Inject, Singleton}
 import models.flowmanagement._
 import play.api.mvc.Result
-import play.api.mvc.Results.InternalServerError
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import services.flowmanagement.pagerouters.addflow._
@@ -49,7 +48,7 @@ class AddBusinessTypeRouter @Inject()(val businessMatchingService: BusinessMatch
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Result] = {
     pageId match {
       case AddMoreBusinessTypesPageId => addMoreActivitiesPageRouter.getPageRoute(model, edit)
-      case BusinessAppliedForPSRNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
+      case PsrNumberPageId => businessAppliedForPSRNumberPageRouter.getPageRoute(model, edit)
       case FitAndProperPageId => fitAndProperPageRouter.getPageRoute(model, edit)
       case NeedMoreInformationPageId => newServicesInformationPageRouter.getPageRoute(model, edit)
       case NoPSRPageId => noPSRPageRouter.getPageRoute(model, edit)

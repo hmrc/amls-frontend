@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package services.flowmanagement.flowrouters
+package services.flowmanagement.flowrouters.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._

@@ -32,7 +32,7 @@ import scala.concurrent.Future
 
 @Singleton
 class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthConnector,
-                                                       val cacheConnector: DataCacheConnector,
+                                                       implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
                                                        implicit val serviceFlow: ServiceFlow
                                                      ) extends BaseController {
