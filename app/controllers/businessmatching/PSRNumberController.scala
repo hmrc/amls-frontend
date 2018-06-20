@@ -23,16 +23,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes, BusinessMatching}
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
-import views.html.renewal.involved_in_other
-
-import scala.concurrent.Future
 
 class PSRNumberController @Inject()(val authConnector: AuthConnector,
                                     val dataCacheConnector: DataCacheConnector,
@@ -61,13 +58,12 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
         val route = router.getRoute(PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
-            for {
-              bm <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
-              status <- statusService.getStatus
-            } yield bm match {
-              case Some(_) => BadRequest(psr_number(f, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
-              case None => BadRequest(psr_number(f, edit))
-            }
+            (for {
+              bm <- businessMatchingService.getModel
+              status <- OptionT.liftF(statusService.getStatus)
+            } yield {
+              BadRequest(psr_number(f, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+            }) getOrElse BadRequest(psr_number(f, edit))
 
           case ValidForm(_, data) =>
             helper.getOrCreateFlowModel flatMap { flowModel =>
