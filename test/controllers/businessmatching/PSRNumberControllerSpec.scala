@@ -116,7 +116,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.createFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any(), any(), any())
         } thenReturn Future.successful(flowModel)
 
         when {
@@ -143,7 +143,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.createFlowModel(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any(), any(), any())
         } thenReturn Future.successful(flowModel)
 
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)

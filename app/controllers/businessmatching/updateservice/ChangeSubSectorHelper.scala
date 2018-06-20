@@ -48,6 +48,13 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  def getOrCreateFlowModel(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
+    (dataCacheConnector.fetch[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) map {
+      case Some(x) => Future.successful(x)
+      case None => createFlowModel
+    }).flatMap(identity)
+  }
+
   def updateSubSectors(model: ChangeSubSectorFlowModel)
                       (implicit ac: AuthContext, hc: HeaderCarrier, executionContext: ExecutionContext) = for {
     _ <- updateServiceRegister(model)
@@ -159,7 +166,9 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
           case t => t
         }
         case None => Seq.empty
-      } map { _.getOrElse(Seq.empty) }
+      } map {
+        _.getOrElse(Seq.empty)
+      }
     }
   }
 

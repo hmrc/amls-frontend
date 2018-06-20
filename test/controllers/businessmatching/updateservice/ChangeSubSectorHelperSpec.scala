@@ -78,6 +78,34 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
     }
   }
 
+  "get or create the flow model" must {
+    "create and populate a new one when it doesn't exist" in new Fixture {
+      val expectedModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+
+      mockCacheFetch[ChangeSubSectorFlowModel](None, Some(ChangeSubSectorFlowModel.key))
+
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+        Some(BusinessMatching.key))
+
+      await {
+        helper.getOrCreateFlowModel
+      } mustBe expectedModel
+    }
+
+    "return an existing one whe it does exist" in new Fixture {
+      val expectedModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+
+      mockCacheFetch[ChangeSubSectorFlowModel](Some(expectedModel), Some(ChangeSubSectorFlowModel.key))
+
+      await {
+        helper.getOrCreateFlowModel
+      } mustBe expectedModel
+    }
+  }
+
   "updating the sub sectors" must {
     "wipe the currency exchange questions when it isn't set" in new Fixture {
 

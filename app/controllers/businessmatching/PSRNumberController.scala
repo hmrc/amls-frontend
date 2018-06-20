@@ -52,7 +52,7 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
                   Form2[BusinessAppliedForPSRNumber] getOrElse EmptyForm
           Ok(psr_number(form, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
         }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
-  }
+   }
 
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -64,7 +64,7 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
             Future.successful(BadRequest(psr_number(f, edit)))
 
           case ValidForm(_, data) =>
-            helper.createFlowModel flatMap { flowModel =>
+            helper.getOrCreateFlowModel flatMap { flowModel =>
               dataCacheConnector.update[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) { _ =>
                 flowModel.copy(psrNumber = Some(data))
               } flatMap {
