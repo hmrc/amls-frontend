@@ -81,13 +81,13 @@
                         inline = true
                     )
                 }
+
+                @panel(
+                    field = Some(f(s"$target")),
+                    id = target
+                ) { @psrInput }
             }
         }
-
-        @panel(
-            field = Some(f(s"$target")),
-            id = target
-        ) { @psrInput }
 
         @submit(edit, returnLink = showReturnLink)
    }
