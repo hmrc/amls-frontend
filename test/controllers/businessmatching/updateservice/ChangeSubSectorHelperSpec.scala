@@ -73,9 +73,36 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
         Some(BusinessMatching.key))
 
       await {
-        helper.createFlowModel()
+        helper.createFlowModel
       } mustBe expectedModel
+    }
+  }
 
+  "get or create the flow model" must {
+    "create and populate a new one when it doesn't exist" in new Fixture {
+      val expectedModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+
+      mockCacheFetch[ChangeSubSectorFlowModel](None, Some(ChangeSubSectorFlowModel.key))
+
+      mockCacheFetch[BusinessMatching](
+        Some(BusinessMatching(
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")))),
+        Some(BusinessMatching.key))
+
+      await {
+        helper.getOrCreateFlowModel
+      } mustBe expectedModel
+    }
+
+    "return an existing one whe it does exist" in new Fixture {
+      val expectedModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney, ChequeCashingNotScrapMetal)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
+
+      mockCacheFetch[ChangeSubSectorFlowModel](Some(expectedModel), Some(ChangeSubSectorFlowModel.key))
+
+      await {
+        helper.getOrCreateFlowModel
+      } mustBe expectedModel
     }
   }
 
@@ -188,7 +215,7 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
         Some(BusinessMatching(
           msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))),
           businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("XXXX")),
-          hasAccepted = true  )),
+          hasAccepted = true)),
         Some(BusinessMatching.key))
 
       mockCacheSave[BusinessMatching]

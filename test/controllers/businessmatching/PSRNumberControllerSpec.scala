@@ -71,9 +71,9 @@ class PSRNumberControllerSpec extends AmlsSpec
     val businessMatching = businessMatchingGen.sample.get
 
     mockCacheFetch[ServiceChangeRegister](None, None)
-  }
 
-  val emptyCache = CacheMap("", Map.empty)
+    val emptyCache = CacheMap("", Map.empty)
+  }
 
   "BusinessAppliedForPSRNumberController" when {
 
@@ -87,7 +87,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         } thenReturn OptionT.some[Future, BusinessMatching](model)
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result) mustBe OK
       }
 
       "on get display the page 'business applied for a Payment Systems Regulator (PSR) registration number?' with pre populated data" in new Fixture {
@@ -103,7 +103,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
 
         val result = controller.get()(request)
-        status(result) must be(OK)
+        status(result) mustBe OK
 
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[value=true]").hasAttr("checked") must be(true)
@@ -116,7 +116,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
 
         when {
-          controller.helper.createFlowModel()(any(), any(), any())
+          controller.helper.getOrCreateFlowModel(any(), any(), any())
         } thenReturn Future.successful(flowModel)
 
         when {
@@ -132,7 +132,7 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         val result = controller.post()(newRequest)
 
-        status(result) must be(SEE_OTHER)
+        status(result) mustBe SEE_OTHER
 
         controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(
             Some(Set(TransmittingMoney)),
@@ -140,6 +140,12 @@ class PSRNumberControllerSpec extends AmlsSpec
       }
 
       "redirect when No is selected" in new Fixture {
+        val flowModel = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)))
+
+        when {
+          controller.helper.getOrCreateFlowModel(any(), any(), any())
+        } thenReturn Future.successful(flowModel)
+
         mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel.empty)
 
         val newRequest = request.withFormUrlEncodedBody(
@@ -148,8 +154,8 @@ class PSRNumberControllerSpec extends AmlsSpec
 
         val result = controller.post(true)(newRequest)
 
-        status(result) must be(SEE_OTHER)
-        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(None, Some(BusinessAppliedForPSRNumberNo)), edit = true)
+        status(result) mustBe SEE_OTHER
+        controller.router.verify(PsrNumberPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberNo)), edit = true)
       }
 
       "respond with BAD_REQUEST when given invalid data" in new Fixture {
@@ -159,7 +165,7 @@ class PSRNumberControllerSpec extends AmlsSpec
         )
 
         val result = controller.post()(newRequest)
-        status(result) must be(BAD_REQUEST)
+        status(result) mustBe BAD_REQUEST
 
         val document: Document = Jsoup.parse(contentAsString(result))
         document.select("span").html() must include(Messages("error.invalid.msb.psr.number"))

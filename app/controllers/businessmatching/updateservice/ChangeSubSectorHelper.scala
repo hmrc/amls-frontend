@@ -41,12 +41,18 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
   }
 
-  def createFlowModel()
-                     (implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
+  def createFlowModel(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
     dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key).map {
       case Some(x) => ChangeSubSectorFlowModel(subSectors = x.msbServices.map(_.msbServices), psrNumber = x.businessAppliedForPSRNumber)
       case None => ChangeSubSectorFlowModel()
     }
+  }
+
+  def getOrCreateFlowModel(implicit authContext: AuthContext, headerCarrier: HeaderCarrier, executionContext: ExecutionContext): Future[ChangeSubSectorFlowModel] = {
+    (dataCacheConnector.fetch[ChangeSubSectorFlowModel](ChangeSubSectorFlowModel.key) map {
+      case Some(x) => Future.successful(x)
+      case None => createFlowModel
+    }).flatMap(identity)
   }
 
   def updateSubSectors(model: ChangeSubSectorFlowModel)
@@ -160,7 +166,9 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
           case t => t
         }
         case None => Seq.empty
-      } map { _.getOrElse(Seq.empty) }
+      } map {
+        _.getOrElse(Seq.empty)
+      }
     }
   }
 
