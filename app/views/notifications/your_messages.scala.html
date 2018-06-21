@@ -23,6 +23,34 @@
     @heading("notifications.header", "summary.status")
 }
 
+@notification_table(
+    id: String,
+    notifications: Seq[NotificationRow]
+) = {
+    <div class="full-width">
+        <table id=@id class="notifications">
+            <thead>
+            <tr>
+                <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
+                <th scope="col">@Messages("notifications.table.header.subject")</th>
+                <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
+                <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
+            </tr>
+            </thead>
+            <tbody>
+            @notifications.map { comms =>
+            <tr class="@if(!comms.isRead){unread}">
+                <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
+                <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber)">@Messages(comms.subject)</a></td>
+                <!--<td></td>-->
+                <td>@comms.dateReceived</td>
+            </tr>
+            }
+            </tbody>
+        </table>
+    </div>
+}
+
 @notifications_your_messages(
     title = Messages("notifications.header"),
     heading = header
@@ -40,60 +68,18 @@
         </div>
     </div>
 
-    <div class="full-width">
-        <table id="current-application-notifications" class="notifications">
-            <thead>
-                <tr>
-                    <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
-                    <th scope="col">@Messages("notifications.table.header.subject")</th>
-                    <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
-                    <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
-                </tr>
-            </thead>
-            <tbody>
-            @currentApplicationNotifications.map { comms =>
-                <tr class="@if(!comms.isRead){unread}">
-                    <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
-                    <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber)">@Messages(comms.subject)</a></td>
-                    <!--<td></td>-->
-                    <td>@comms.dateReceived</td>
-                </tr>
-            }
-            </tbody>
-        </table>
-    </div>
+    @notification_table("current-application-notifications", currentApplicationNotifications)
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <p>
-                <span class="heading-small">Messages from your/any previous registrations</span>
+                <span id="previous-reg-title" class="heading-small">@Messages("notifications.previousReg")</span>
             </p>
         </div>
     </div>
 
     @if(previousApplicationNotifications.length > 0) {
-        <div class="full-width">
-            <table id="previous-application-notifications" class="notifications">
-                <thead>
-                <tr>
-                    <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
-                    <th scope="col">@Messages("notifications.table.header.subject")</th>
-                    <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
-                    <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
-                </tr>
-                </thead>
-                <tbody>
-                @previousApplicationNotifications.map { comms =>
-                <tr class="@if(!comms.isRead){unread}">
-                    <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
-                    <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber)">@Messages(comms.subject)</a></td>
-                    <!--<td></td>-->
-                    <td>@comms.dateReceived</td>
-                </tr>
-                }
-                </tbody>
-            </table>
-        </div>
+        @notification_table("previous-application-notifications", previousApplicationNotifications)
     }
 
 }

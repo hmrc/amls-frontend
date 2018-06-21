@@ -141,6 +141,9 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual false
             }
 
+            "Does not have previous registration title" in new ViewFixture {
+                Option(doc.getElementById("previous-reg-title")).isDefined mustEqual false
+            }
         }
 
         "when previous notifications is a Seq containing notifications" must {
