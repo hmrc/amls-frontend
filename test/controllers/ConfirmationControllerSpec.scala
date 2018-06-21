@@ -127,7 +127,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       0,
       200,
       Some(paymentReferenceNumber),
-      None,
+      Some(115),
       DateTime.now
     )
 
