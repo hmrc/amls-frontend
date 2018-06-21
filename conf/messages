@@ -1982,12 +1982,15 @@ renewal.whatyouneed.requiredinfo.heading = For this section you’ll need to sho
 renewal.whatyouneed.line_1 = your net profit
 renewal.whatyouneed.line_2 = your net profit on activities covered by Money Laundering Regulations
 renewal.progress.title = Your renewal progress
-renewal.progress.tpandrp.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
-  Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
-renewal.progress.tponly.intro = You need to complete the renewal section before you can submit. If something’s changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new trading premises.\n\
-  Your information is saved automatically. If you sign out, you’ll need to return and complete your application before {0}.
+renewal.progress.tpandrp.intro = If something has changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new responsible people or trading premises.\n\
+  Your information is saved automatically. If you sign out, you will have 28 days to return and complete your application.
+renewal.progress.tponly.intro = If something has changed in your business you’ll also need to amend your details before renewing. You may have to pay an additional fee if you add new trading premises.\n\
+  Your information is saved automatically. If you sign out, you will have 28 days to return and complete your application.
 renewal.progress.submit.header = Submit renewal
-renewal.progress.submit.intro = You can’t submit your renewal until you’ve completed the renewal section.
+renewal.progress.submit = Submit your renewal
+renewal.progress.edit = Edit your renewal
+renewal.progress.continue = Continue renewal
+renewal.progress.submit.intro = You can only submit your renewal when your registration form is complete.
 renewal.progress.submit.completed.intro = You have completed the renewal questions.
 renewal.progress.submit.completed.continue = You can continue making updates to your information, or submit your renewal.
 progress.renewal.name = Renewal

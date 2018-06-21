@@ -26,26 +26,22 @@
 
     <h3 class="heading-small">@messages("renewal.progress.submit.header")</h3>
 
-    @if(canSubmit){
-        <p>@messages("renewal.progress.submit.completed.intro")</p>
-        <p>@messages("renewal.progress.submit.completed.continue")</p>
-    } else {
-        <p>@messages("renewal.progress.submit.intro")</p>
-    }
 
-    <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
-        @CSRF.formField
-        <button type="submit" name="submit" class="button" @if(!canSubmit) {disabled}>
-            @messages("progress.submit")
-        </button>
-    </form>
+    <p>@messages("renewal.progress.submit.intro")</p>
+
 
     @if(canSubmit){
+        <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
+            @CSRF.formField
+            <button type="submit" name="submit" class="button">
+                @messages("renewal.progress.submit")
+            </button>
+        </form>
         <p>
             @anchor(
                 attrHref = controllers.renewal.routes.SummaryController.get().url,
-                linkText = Messages("link.renewal.progress.change.answers"),
-                visuallyhidden = Messages("link.renewal.progress.change.answers")
+                linkText = Messages("renewal.progress.edit"),
+                visuallyhidden = Messages("renewal.progress.edit")
             )
         </p>
     } else {
@@ -54,15 +50,17 @@
                 case _:RenewalSubmitted => {
                     anchor(
                         attrHref = controllers.renewal.routes.SummaryController.get().url,
-                        linkText = Messages("link.renewal.progress.change.answers"),
-                        visuallyhidden = Messages("link.renewal.progress.change.answers")
+                        linkText = Messages("renewal.progress.continue"),
+                        attrRole = true,
+                        visuallyhidden = Messages("renewal.progress.continue")
                     )
                 }
                 case _ => {
                     anchor(
                         attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
-                        linkText = Messages("link.renewal.progress.change.answers"),
-                        visuallyhidden = Messages("link.renewal.progress.change.answers")
+                        linkText = Messages("renewal.progress.continue"),
+                        attrRole = true,
+                        visuallyhidden = Messages("renewal.progress.continue")
                     )
                 }
             }}

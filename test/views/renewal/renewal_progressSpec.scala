@@ -58,22 +58,19 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.completed.intro"))
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.completed.continue"))
+      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
 
-      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
 
     }
 
-    "disable the submit registration button" in new ViewFixture {
+    "not have the submit registration button" in new ViewFixture {
 
       override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
 
-      doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
+      doc.select("form button[name=submit]").isEmpty mustBe true
 
-      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
-
-      doc.getElementsMatchingOwnText(Messages("link.renewal.progress.change.answers")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
 
     }
 
