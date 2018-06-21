@@ -23,15 +23,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import javax.inject.Inject
-import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberNo, BusinessAppliedForPSRNumberYes}
+import models.businessmatching.{BusinessAppliedForPSRNumber, BusinessAppliedForPSRNumberYes}
 import models.flowmanagement.{ChangeSubSectorFlowModel, PsrNumberPageId}
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import services.flowmanagement.Router
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.psr_number
-
-import scala.concurrent.Future
 
 class PSRNumberController @Inject()(val authConnector: AuthConnector,
                                     val dataCacheConnector: DataCacheConnector,
@@ -58,10 +56,14 @@ class PSRNumberController @Inject()(val authConnector: AuthConnector,
     implicit authContext =>
       implicit request => {
         val route = router.getRoute(PsrNumberPageId, _: ChangeSubSectorFlowModel, edit)
-
         Form2[BusinessAppliedForPSRNumber](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(psr_number(f, edit)))
+            (for {
+              bm <- businessMatchingService.getModel
+              status <- OptionT.liftF(statusService.getStatus)
+            } yield {
+              BadRequest(psr_number(f, edit, bm.preAppComplete, statusService.isPreSubmission(status)))
+            }) getOrElse BadRequest(psr_number(f, edit))
 
           case ValidForm(_, data) =>
             helper.getOrCreateFlowModel flatMap { flowModel =>

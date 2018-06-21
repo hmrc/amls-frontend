@@ -164,6 +164,10 @@ class PSRNumberControllerSpec extends AmlsSpec
           "regNumber" -> ""
         )
 
+        when {
+          controller.businessMatchingService.getModel(any(), any(), any())
+        } thenReturn OptionT.some[Future, BusinessMatching](businessMatching)
+
         val result = controller.post()(newRequest)
         status(result) mustBe BAD_REQUEST
 
