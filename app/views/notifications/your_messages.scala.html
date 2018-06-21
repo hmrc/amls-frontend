@@ -70,15 +70,15 @@
 
     @notification_table("current-application-notifications", currentApplicationNotifications)
 
-    <div class="grid-layout">
-        <div class="grid-layout__column grid-layout__column--2-3">
-            <p>
-                <span id="previous-reg-title" class="heading-small">@Messages("notifications.previousReg")</span>
-            </p>
-        </div>
-    </div>
-
     @if(previousApplicationNotifications.length > 0) {
+        <div class="grid-layout">
+            <div class="grid-layout__column grid-layout__column--2-3">
+                <p>
+                    <span id="previous-reg-title" class="heading-small">@Messages("notifications.previousReg")</span>
+                </p>
+            </div>
+        </div>
+
         @notification_table("previous-application-notifications", previousApplicationNotifications)
     }
 
