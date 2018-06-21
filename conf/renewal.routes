@@ -44,6 +44,3 @@ POST        /receiving                                                        @c
 
 GET         /check-your-answers                                               @controllers.renewal.SummaryController.get()
 POST        /check-your-answers                                               @controllers.renewal.SummaryController.post()
-
-GET         /update-any-information                                           @controllers.renewal.UpdateAnyInformationController.get()
-POST        /update-any-information                                           @controllers.renewal.UpdateAnyInformationController.post()

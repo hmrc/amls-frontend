@@ -141,7 +141,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(controllers.renewal.routes.UpdateAnyInformationController.get.url)
+      redirectLocation(result) mustBe Some(controllers.renewal.routes.RenewalProgressController.get.url)
 
       val captor = ArgumentCaptor.forClass(classOf[Renewal])
       verify(controller.dataCacheConnector).save[Renewal](eqTo(Renewal.key), captor.capture())(any(), any(), any())
