@@ -16,10 +16,12 @@
 
 package views.notifications
 
-import models.notifications.NotificationRow
+import models.notifications.ContactType.RenewalApproval
+import models.notifications.StatusType.{Approved, Rejected}
+import models.notifications._
+import org.joda.time.DateTime
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 
@@ -30,10 +32,50 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         implicit val requestWithToken = addToken(request)
 
         val emptyNotifications: Seq[NotificationRow] = Seq()
+        val notifications:Seq[NotificationRow] = Seq(
+            NotificationRow(
+                Some(Status(Some(Approved), None)),
+                Some(RenewalApproval),
+                Some("123456789"),
+                false,
+                new DateTime(2018, 4, 1, 0, 0),
+                false,
+                "XAML00000123456",
+                IDType("123")
+            ),
+            NotificationRow(
+                Some(Status(Some(Approved), None)),
+                Some(RenewalApproval),
+                Some("123456789"),
+                false,
+                new DateTime(2018, 3, 1, 0, 0),
+                false,
+                "XAML00000123456",
+                IDType("123")
+            ),
+            NotificationRow(
+                Some(Status(Some(Rejected), None)),
+                Some(RenewalApproval),
+                Some("123456789"),
+                false,
+                new DateTime(2018, 2, 1, 0, 0),
+                false,
+                "XAML00000123456",
+                IDType("123")
+            )
+        )
 
         val businessName = "Fake Name Ltd."
 
         def view = views.html.notifications.your_messages(businessName, emptyNotifications, emptyNotifications)
+    }
+
+    trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
+        override def view = views.html.notifications.your_messages(businessName, notifications, emptyNotifications)
+    }
+
+    trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
+        override def view = views.html.notifications.your_messages(businessName, notifications, notifications)
     }
 
     "your_messages view" must {
@@ -45,7 +87,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         }
 
         "have a back button link" in new ViewFixture {
-            override def view: HtmlFormat.Appendable = ???
+            Option(doc.getElementById("back-button")).isDefined mustBe(true)
         }
 
         "have correct headings" in new ViewFixture {
@@ -53,57 +95,90 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         }
 
         "have a panel displaying the business name" in new ViewFixture {
-            override def view: HtmlFormat.Appendable = ???
+            doc.getElementById("business-name").text mustEqual businessName
         }
 
-        "have a first notification table title" in new ViewFixture {
-            override def view: HtmlFormat.Appendable = ???
+        "have a first notification table" in new ViewFixture {
+            Option(doc.getElementById("current-application-notifications")).isDefined mustEqual true
         }
 
         "have a first notification table header" in new ViewFixture {
-            override def view: HtmlFormat.Appendable = ???
+            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.subject"))
+            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.date"))
         }
 
         "have a row for each of the current notifications in the first notification table" in new ViewFixture {
-            override def view: HtmlFormat.Appendable = ???
+            doc.getElementById("current-application-notifications").getElementsByTag("tr").size() mustEqual emptyNotifications.size + 1
         }
 
-        "for a row in a notification table" must {
+        "when current notifications is a Seq containing notifications" must {
 
-            "display the subject of the notification" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
-            }
+            "for a row in a notification table" must {
 
-            "display the date of the notification" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+                "display the subject of the notification" in new CurrentNotificationsOnlyViewFixture {
+                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(Messages(notifications(i).subject))
+                    }
+                }
+
+                "display the date of the notification" in new CurrentNotificationsOnlyViewFixture {
+                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(notifications(i).dateReceived)
+                    }
+                }
+
             }
 
         }
 
         "when previous notifications is an empty Seq" must {
 
-            "have one table with class notifications" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+            "have one table with class notifications" in new CurrentNotificationsOnlyViewFixture {
+                doc.getElementsByTag("table").size() mustEqual 1
+                doc.getElementsByClass("notifications").size() mustEqual 1
+                Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual false
             }
 
         }
 
         "when previous notifications is a Seq containing notifications" must {
 
-            "have a second notification table header" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+            "have two tables with class notifications" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                doc.getElementsByTag("table").size() mustEqual 2
+                doc.getElementsByClass("notifications").size() mustEqual 2
             }
 
-            "have two tables with class notifications" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+            "have a second notification table header" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.subject"))
+                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.date"))
             }
 
-            "have a second notification table title" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+            "have a second notification table" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                Option(doc.getElementById("previous-application-notifications")).isDefined mustEqual true
             }
 
-            "have a row for each of the previous notification" in new ViewFixture {
-                override def view: HtmlFormat.Appendable = ???
+            "have a row for each of the previous notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                doc.getElementById("previous-application-notifications").getElementsByTag("tr").size() mustEqual notifications.size + 1
+            }
+
+            "for a row in a notification table" must {
+
+                "display the subject of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(Messages(notifications(i).subject))
+                    }
+                }
+
+                "display the date of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(notifications(i).dateReceived)
+                    }
+                }
+
             }
 
         }
