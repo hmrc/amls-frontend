@@ -16,17 +16,17 @@
 
 package controllers
 
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import generators.AmlsReferenceNumberGenerator
 import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType, EstateAgentBusinessService, HighValueDealing}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.confirmation.Currency
 import models.notifications.ContactType._
 import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import models.registrationdetails.RegistrationDetails
-import models.status.{SubmissionDecisionRejected, SubmissionReadyForReview, SubmissionStatus}
+import models.status.{SubmissionDecisionRejected, SubmissionReadyForReview}
 import models.{Country, ReadStatusResponse}
 import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
 import org.mockito.Matchers._
@@ -41,10 +41,10 @@ import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
 
@@ -86,7 +86,8 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       testNotifications.copy(contactType = Some(MindedToRevoke), receivedAt = new DateTime(2017, 10, 1, 1, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(NoLongerMindedToReject), receivedAt = new DateTime(2003, 12, 1, 1, 3, DateTimeZone.UTC)),
       testNotifications.copy(contactType = Some(NoLongerMindedToRevoke), receivedAt = new DateTime(2002, 12, 1, 1, 3, DateTimeZone.UTC)),
-      testNotifications.copy(contactType = Some(Others), receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC))
+      testNotifications.copy(contactType = Some(Others), receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC)),
+      testNotifications.copy(amlsRegistrationNumber = "anotherstring")
     )
 
     val mockAuthEnrolmentsService = mock[AuthEnrolmentsService]
@@ -160,19 +161,6 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       status(result) mustBe OK
     }
 
-    "respond with OK and show the your_messages page when there is an invalid safeId and businessMatching is used (AuthEnrolmentsService returns value)" in new Fixture {
-
-      when(mockNotificationService.getNotifications(any())(any(), any()))
-        .thenReturn(Future.successful(testList))
-
-      when(mockStatusService.getReadStatus(any(), any(), any()))
-        .thenReturn(Future.successful(statusResponseBad))
-
-      val result = controller.getMessages()(request)
-
-      status(result) mustBe OK
-    }
-
     "respond with an error message when a valid safeId cannot be found  (AuthEnrolmentsService returns value)" in new Fixture {
 
       when(mockNotificationService.getNotifications(any())(any(), any()))
@@ -203,6 +191,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       val result = controller.getMessages()(request)
 
       status(result) mustBe OK
+      contentAsString(result) must not include Messages("notifications.previousReg")
     }
 
     "respond with an error message when a valid safeId cannot be found (AuthEnrolmentsService doesn't return value)" in new Fixture {
