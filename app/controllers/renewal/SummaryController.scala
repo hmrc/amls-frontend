@@ -63,6 +63,6 @@ class SummaryController @Inject()
     implicit authContext => implicit request => (for {
       renewal <- OptionT(dataCacheConnector.fetch[Renewal](Renewal.key))
       _ <- OptionT.liftF(dataCacheConnector.save[Renewal](Renewal.key, renewal.copy(hasAccepted = true)))
-    } yield Redirect(controllers.renewal.routes.UpdateAnyInformationController.get)) getOrElse InternalServerError("Could not update renewal")
+    } yield Redirect(controllers.renewal.routes.RenewalProgressController.get)) getOrElse InternalServerError("Could not update renewal")
   }
 }
