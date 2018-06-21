@@ -16,8 +16,9 @@
 
 package models
 
+import models.ResponseType.AmendOrVariationResponseType
+import models.status.{SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
-import jto.validation.ValidationError
 import play.api.libs.json._
 
 sealed trait ResponseType
@@ -55,8 +56,8 @@ case class FeeResponse(responseType: ResponseType,
                        difference: Option[BigDecimal],
                        createdAt: DateTime) {
 
-  def differenceOrTotalAmount: BigDecimal = difference match {
-    case Some(d) if d > 0 => d
+  def toPay(status: SubmissionStatus): BigDecimal = status match {
+    case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
     case _ => totalFees
   }
 

@@ -163,13 +163,13 @@ class ConfirmationController @Inject()(
 
     confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
-        case maybeRows@Some(rows) if fees.differenceOrTotalAmount > 0 =>
+        case maybeRows@Some(rows) if fees.toPay(status) > 0 =>
           if (isRenewalDefined) {
-            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.differenceOrTotalAmount, controllers.payments.routes.WaysToPayController.get().url)).some
+            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.toPay(status), controllers.payments.routes.WaysToPayController.get().url)).some
           } else {
             Ok(confirm_amendvariation(fees.paymentReference,
               fees.totalFees,
-              fees.differenceOrTotalAmount,
+              fees.toPay(status),
               maybeRows,
               controllers.payments.routes.WaysToPayController.get().url)).some
           }
@@ -178,10 +178,10 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]])
+  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]], status: SubmissionStatus)
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     breakdownRows map { maybeRows =>
-      val amount = fees.differenceOrTotalAmount
+      val amount = fees.toPay(status)
 
       Ok(confirm_amendvariation(fees.paymentReference,
         Currency(fees.totalFees),
@@ -195,13 +195,13 @@ class ConfirmationController @Inject()(
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
-      case Some(fees) if fees.paymentReference.isDefined =>
+      case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status) > 0 =>
 
         lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
-            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows))
+            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows, status))
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
             OptionT(showRenewalConfirmation(fees, breakdownRows, status))
           case _ =>
