@@ -45,9 +45,9 @@
         <div class="grid-layout__column grid-layout__column--2-3">
             @renewal.renewalDate.map {date =>
                 @if(msbOrTcspExists) {
-                    <p>@messages("renewal.progress.tpandrp.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
+                    <p>@messages("renewal.progress.tpandrp.intro").convertLineBreaksH</p>
                 } else {
-                <p>@messages("renewal.progress.tponly.intro", DateHelper.formatDate(date)).convertLineBreaksH</p>
+                <p>@messages("renewal.progress.tponly.intro").convertLineBreaksH</p>
                 }
             }
             <div class="grid-layout grid-layout--stacked">
