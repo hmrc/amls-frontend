@@ -1987,6 +1987,9 @@ renewal.progress.tpandrp.intro = If something has changed in your business youâ€
 renewal.progress.tponly.intro = If something has changed in your business youâ€™ll also need to amend your details before renewing. You may have to pay an additional fee if you add new trading premises.\n\
   Your information is saved automatically. If you sign out, you will have 28 days to return and complete your application.
 renewal.progress.submit.header = Submit renewal
+renewal.progress.submit = Submit your renewal
+renewal.progress.edit = Edit your renewal
+renewal.progress.continue = Continue renewal
 renewal.progress.submit.intro = You can only submit your renewal when your registration form is complete.
 renewal.progress.submit.completed.intro = You have completed the renewal questions.
 renewal.progress.submit.completed.continue = You can continue making updates to your information, or submit your renewal.
