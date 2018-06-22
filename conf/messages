@@ -1930,6 +1930,10 @@ changeofficer.furtherupdates.validationerror = You must select yes or no. Select
 
 ###############################  Notifications ###############################
 
+notifications.type.statusChange = Status change
+notifications.type.reminder = Reminder
+notifications.type.communication = Communication
+
 notifications.subject.ApplicationApproval = Application Approval
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.RenewalApproval = Renewal Approval
