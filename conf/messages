@@ -1957,7 +1957,7 @@ notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration d
 
 notifications.subject.NoSubject = <no subject>
 
-notifications.previousReg = Messages from previous registrations
+notifications.previousReg = Messages from your previous registrations
 
 notifications.header = Your Messages
 notifications.unread = You have unread messages
