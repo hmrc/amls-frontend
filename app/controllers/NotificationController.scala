@@ -51,25 +51,32 @@ class NotificationController @Inject()(
         authEnrolmentsService.amlsRegistrationNumber flatMap {
           case Some(mlrRegNumber) => {
               statusService.getReadStatus(mlrRegNumber) flatMap {
-                case readStatus if readStatus.safeId.isDefined => generateNotificationView(readStatus.safeId.get)
+                case readStatus if readStatus.safeId.isDefined => generateNotificationView(readStatus.safeId.get, Some(mlrRegNumber))
                 case _ => throw new Exception("Unable to retrieve SafeID")
               }
             }
           case _ => {
               businessMatchingService.getModel.value flatMap {
-                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(model.reviewDetails.get.safeId)
+                case Some(model) if model.reviewDetails.isDefined => generateNotificationView(model.reviewDetails.get.safeId, None)
                 case _ => throw new Exception("Unable to retrieve SafeID from reviewDetails")
               }
             }
         }
   }
 
-  private def generateNotificationView(safeId: String)(implicit hc: HeaderCarrier, authContext: AuthContext, request: Request[_]): Future[Result] = {
+  private def generateNotificationView(safeId: String, refNumber: Option[String])
+                                      (implicit hc: HeaderCarrier, authContext: AuthContext, request: Request[_]): Future[Result] = {
     (for {
       businessName <- BusinessName.getName(Some(safeId))
       records: Seq[NotificationRow] <- OptionT.liftF(amlsNotificationService.getNotifications(safeId))
     } yield {
-      Ok(views.html.notifications.your_messages(businessName, records))
+      val currentRecords: Seq[NotificationRow] = (for {
+        amls <- refNumber
+      } yield records.filter(_.amlsRegistrationNumber == amls)) getOrElse records
+      val previousRecords: Seq[NotificationRow] = (for {
+        amls <- refNumber
+      } yield records.filter(_.amlsRegistrationNumber != amls)) getOrElse Seq()
+      Ok(views.html.notifications.your_messages(businessName, currentRecords, previousRecords))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
