@@ -33,7 +33,7 @@
     @if(canSubmit){
         <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
             @CSRF.formField
-            <button type="submit" name="submit" class="button">
+            <button id="renewal-progress-submit" type="submit" name="submit" class="button">
                 @messages("renewal.progress.submit")
             </button>
         </form>
@@ -41,7 +41,8 @@
             @anchor(
                 attrHref = controllers.renewal.routes.SummaryController.get().url,
                 linkText = Messages("renewal.progress.edit"),
-                visuallyhidden = Messages("renewal.progress.edit")
+                visuallyhidden = Messages("renewal.progress.edit"),
+                id=Some("renewal-progress-edit")
             )
         </p>
     } else {
@@ -52,7 +53,8 @@
                         attrHref = controllers.renewal.routes.SummaryController.get().url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
-                        visuallyhidden = Messages("renewal.progress.continue")
+                        visuallyhidden = Messages("renewal.progress.continue"),
+                        id=Some("renewal-progress-continue")
                     )
                 }
                 case _ => {
@@ -60,7 +62,8 @@
                         attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
                         linkText = Messages("renewal.progress.continue"),
                         attrRole = true,
-                        visuallyhidden = Messages("renewal.progress.continue")
+                        visuallyhidden = Messages("renewal.progress.continue"),
+                        id=Some("renewal-progress-continue")
                     )
                 }
             }}
