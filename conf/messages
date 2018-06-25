@@ -1963,7 +1963,7 @@ notifications.subject.NoSubject = <no subject>
 
 notifications.previousReg = Messages from your previous registrations
 
-notifications.header = Your Messages
+notifications.header = Your messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = View your messages
 
