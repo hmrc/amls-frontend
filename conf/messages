@@ -1966,6 +1966,7 @@ notifications.previousReg = Messages from your previous registrations
 notifications.header = Your messages
 notifications.unread = You have unread messages
 notifications.youHaveMessages = View your messages
+notifications.title = Your business
 
 notifications.table.header.subject = Subject
 notifications.table.header.type = Type
