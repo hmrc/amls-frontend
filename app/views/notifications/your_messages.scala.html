@@ -33,7 +33,7 @@
             <tr>
                 <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
                 <th scope="col">@Messages("notifications.table.header.subject")</th>
-                <!-- <th class="message-type" scope="col">@Messages("secure.communications.table.header.type")</th> -->
+                <th class="message-type" scope="col">@Messages("notifications.table.header.type")</th>
                 <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
             </tr>
             </thead>
@@ -42,7 +42,7 @@
             <tr class="@if(!comms.isRead){unread}">
                 <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
                 <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber)">@Messages(comms.subject)</a></td>
-                <!--<td></td>-->
+                <td>@Messages(comms.notificationType)</td>
                 <td>@comms.dateReceived</td>
             </tr>
             }
@@ -61,7 +61,7 @@
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <p>
-                <span class="heading-small">Your Business:</span>
+                <span class="heading-small">Your business</span>
                 <br />
                 <span id="business-name">@businessName</span>
             </p>

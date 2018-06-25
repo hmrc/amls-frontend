@@ -75,6 +75,25 @@ case class NotificationRow(
     }
   }
 
+  def notificationType: String = getContactType match {
+    case ApplicationApproval |
+         RegistrationVariationApproval |
+         RenewalApproval |
+         RejectionReasons |
+         ApplicationAutorejectionForFailureToPay |
+         RevocationReasons |
+         AutoExpiryOfRegistration |
+         RegistrationVariationApproval |
+         ApplicationAutorejectionForFailureToPay |
+         DeRegistrationEffectiveDateChange => "notifications.type.statusChange"
+    case ReminderToPayForApplication |
+         ReminderToPayForVariation |
+         ReminderToPayForRenewal |
+         ReminderToPayForManualCharges |
+         RenewalReminder => "notifications.type.reminder"
+    case _ => "notifications.type.communication"
+  }
+
 }
 
 object NotificationRow {

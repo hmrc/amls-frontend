@@ -104,6 +104,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
 
         "have a first notification table header" in new ViewFixture {
             doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.subject"))
+            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.type"))
             doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.date"))
         }
 
@@ -119,6 +120,13 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                     val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
                     notifications.indices foreach { i =>
                         tableRows.get(i + 1).text must include(Messages(notifications(i).subject))
+                    }
+                }
+
+                "display the type of the notification" in new CurrentNotificationsOnlyViewFixture {
+                    val tableRows = doc.getElementById("current-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(Messages(notifications(i).notificationType))
                     }
                 }
 
@@ -159,6 +167,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
 
             "have a second notification table header" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
                 doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.subject"))
+                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.type"))
                 doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.date"))
             }
 
@@ -176,6 +185,13 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                     val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
                     notifications.indices foreach { i =>
                         tableRows.get(i + 1).text must include(Messages(notifications(i).subject))
+                    }
+                }
+
+                "display the type of the notification" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
+                    val tableRows = doc.getElementById("previous-application-notifications").getElementsByTag("tr")
+                    notifications.indices foreach { i =>
+                        tableRows.get(i + 1).text must include(Messages(notifications(i).notificationType))
                     }
                 }
 
