@@ -52,7 +52,7 @@
                     <p>@Messages("status.submittedForReview.submitteddate.text", DateHelper.formatDate(fees.createdAt.toLocalDate))</p>
                 }
                 <p class="no-print">
-                    <a href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
+                    <a id="withdraw-application" href="@controllers.withdrawal.routes.WithdrawApplicationController.get()">@Messages("status.withdraw.link-text")</a>
                 </p>
 
             </div>
