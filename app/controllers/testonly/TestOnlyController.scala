@@ -26,6 +26,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.status.status_submitted
+import views.html.submission.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -73,7 +74,7 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
 
   def duplicateSubmission = Authorised.async {
     implicit authContext => implicit request =>
-      Future.successful(Ok(status_submitted("XML498749237483", Some("An example business"), None, true)))
+      Future.successful(Ok(duplicate_submission("There's an error")))
   }
 
   def wrongCredentials = Authorised.async {
