@@ -24,7 +24,7 @@ import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel
 import services._
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
-import uk.gov.hmrc.http.{CoreGet, CorePost, HttpGet, HttpPost}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
 class Module extends AbstractModule {
@@ -34,6 +34,7 @@ class Module extends AbstractModule {
   override def configure() = {
     bind(classOf[HttpGet]).toInstance(WSHttp)
     bind(classOf[HttpPost]).toInstance(WSHttp)
+    bind(classOf[HttpDelete]).toInstance(WSHttp)
     bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
