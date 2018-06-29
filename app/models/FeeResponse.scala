@@ -17,7 +17,7 @@
 package models
 
 import models.ResponseType.AmendOrVariationResponseType
-import models.status.{RenewalSubmitted, SubmissionReadyForReview, SubmissionStatus}
+import models.status.{SubmissionReadyForReview, SubmissionStatus}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json._
 
@@ -57,7 +57,7 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime) {
 
   def toPay(status: SubmissionStatus): BigDecimal = status match {
-    case (SubmissionReadyForReview | RenewalSubmitted(_)) if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
+    case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
     case _ => totalFees
   }
 
