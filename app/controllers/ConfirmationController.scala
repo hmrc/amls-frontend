@@ -29,7 +29,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
 import models.status._
-import models.{FeeResponse, ReadStatusResponse}
+import models.{FeeResponse, ReadStatusResponse, SubmissionRequestStatus}
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, PaymentsService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -64,7 +64,8 @@ class ConfirmationController @Inject()(
         for {
           _ <- authenticator.refreshProfile
           status <- statusService.getStatus
-          result <- resultFromStatus(status)
+          submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](SubmissionRequestStatus.key)
+          result <- resultFromStatus(status, submissionRequestStatus)
           _ <- keystoreConnector.setConfirmationStatus
         } yield result
   }
@@ -158,18 +159,27 @@ class ConfirmationController @Inject()(
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }
 
-  private def showRenewalConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]], status: SubmissionStatus)
+  private def showRenewalConfirmation(
+                                             fees: FeeResponse,
+                                             breakdownRows: Future[Option[Seq[BreakdownRow]]],
+                                             status: SubmissionStatus,
+                                             submissionRequestStatus: Option[SubmissionRequestStatus]
+                                     )
                                      (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
 
     confirmationService.isRenewalDefined flatMap { isRenewalDefined =>
       breakdownRows map {
-        case maybeRows@Some(rows) if fees.toPay(status) > 0 =>
+        case maybeRows@Some(rows) if fees.toPay(status, submissionRequestStatus) > 0 =>
           if (isRenewalDefined) {
-            Ok(confirm_renewal(fees.paymentReference, fees.totalFees, rows, fees.toPay(status), controllers.payments.routes.WaysToPayController.get().url)).some
+            Ok(confirm_renewal(fees.paymentReference,
+              fees.totalFees,
+              rows,
+              fees.toPay(status, submissionRequestStatus),
+              controllers.payments.routes.WaysToPayController.get().url)).some
           } else {
             Ok(confirm_amendvariation(fees.paymentReference,
               fees.totalFees,
-              fees.toPay(status),
+              fees.toPay(status, submissionRequestStatus),
               maybeRows,
               controllers.payments.routes.WaysToPayController.get().url)).some
           }
@@ -178,10 +188,14 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def showAmendmentVariationConfirmation(fees: FeeResponse, breakdownRows: Future[Option[Seq[BreakdownRow]]], status: SubmissionStatus)
+  private def showAmendmentVariationConfirmation(
+                                                        fees: FeeResponse,
+                                                        breakdownRows: Future[Option[Seq[BreakdownRow]]],
+                                                        status: SubmissionStatus,
+                                                        submissionRequestStatus: Option[SubmissionRequestStatus])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     breakdownRows map { maybeRows =>
-      val amount = fees.toPay(status)
+      val amount = fees.toPay(status, submissionRequestStatus)
 
       Ok(confirm_amendvariation(fees.paymentReference,
         Currency(fees.totalFees),
@@ -191,19 +205,19 @@ class ConfirmationController @Inject()(
     }
   }
 
-  private def resultFromStatus(status: SubmissionStatus)
+  private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
-      case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status) > 0 =>
+      case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
 
         lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
-            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows, status))
+            OptionT(showAmendmentVariationConfirmation(fees, breakdownRows, status, submissionRequestStatus))
           case ReadyForRenewal(_) | RenewalSubmitted(_) =>
-            OptionT(showRenewalConfirmation(fees, breakdownRows, status))
+            OptionT(showRenewalConfirmation(fees, breakdownRows, status, submissionRequestStatus))
           case _ =>
             OptionT.liftF(breakdownRows) map { maybeRows =>
               Ok(confirmation_new(fees.paymentReference, fees.totalFees, maybeRows, controllers.payments.routes.WaysToPayController.get().url))

@@ -36,19 +36,14 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import play.api.i18n.Messages
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import play.api.{Application, Mode}
 import services._
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 // scalastyle:off magic.number
 class ConfirmationControllerSpec extends AmlsSpec
@@ -118,6 +113,10 @@ class ConfirmationControllerSpec extends AmlsSpec
     when {
       controller.amlsConnector.registrationDetails(any())(any(), any(), any())
     } thenReturn Future.successful(RegistrationDetails(companyName, isIndividual = false))
+
+    when {
+      controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+    } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
       responseType,

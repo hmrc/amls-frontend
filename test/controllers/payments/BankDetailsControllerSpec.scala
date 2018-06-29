@@ -16,16 +16,17 @@
 
 package controllers.payments
 
+import connectors.DataCacheConnector
 import generators.PaymentGenerator
-import models.FeeResponse
+import models.{FeeResponse, SubmissionRequestStatus}
 import models.ResponseType.SubscriptionResponseType
-import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
+import models.status.SubmissionDecisionApproved
 import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, FeeResponseService, StatusService}
+import services.{AuthEnrolmentsService, FeeResponseService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -43,6 +44,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
     implicit val ec: ExecutionContext = mock[ExecutionContext]
 
     val controller = new BankDetailsController(
+      dataCacheConnector = mock[DataCacheConnector],
       authConnector = self.authConnector,
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
@@ -68,6 +70,10 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
           SubscriptionResponseType,
           amlsRegistrationNumber, 100, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
         )
+
+        when {
+            controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
+        } thenReturn Future.successful(Some(SubmissionRequestStatus(true)))
 
         val result = controller.get()(request)
 
