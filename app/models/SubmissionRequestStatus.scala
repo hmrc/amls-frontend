@@ -18,7 +18,7 @@ package models
 
 import play.api.libs.json.Json
 
-case class SubmissionRequestStatus(hasSubmitted: Boolean, isRenewal: Boolean = false)
+case class SubmissionRequestStatus(hasSubmitted: Boolean, isRenewalAmendment: Boolean = false)
 
 object SubmissionRequestStatus {
   val key = "submission-request-status"

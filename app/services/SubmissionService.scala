@@ -169,7 +169,7 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key, isRenewal = true)
+      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
     } yield response
   }
 
@@ -181,14 +181,14 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewalAmendment] - No enrolment"))
       )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
+      _ <- saveResponse(response, AmendVariationRenewalResponse.key, isRenewalAmendment = true)
     } yield response
   }
 
-  private def saveResponse[T](response: T, key: String, isRenewal: Boolean = false)
+  private def saveResponse[T](response: T, key: String, isRenewalAmendment: Boolean = false)
                              (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](key, response)
-    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, isRenewal))
+    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, isRenewalAmendment))
   } yield c
 
   private def safeId(cache: CacheMap): Future[String] = {

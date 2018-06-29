@@ -55,16 +55,11 @@ case class FeeResponse(responseType: ResponseType,
                        paymentReference: Option[String],
                        difference: Option[BigDecimal],
                        createdAt: DateTime) {
-//
-//  def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = status match {
-//    case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
-//    case _ => totalFees
-//  }
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
-    val isRenewal = submissionRequestStatus exists { _.isRenewal }
+    val isRenewalAmendment: Boolean = submissionRequestStatus exists { _.isRenewalAmendment }
     status match {
-      case (RenewalSubmitted(_) | ReadyForRenewal(_)) if !isRenewal => difference.getOrElse(0)
+      case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment => difference.getOrElse(0)
       case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
       case _ => totalFees
     }
