@@ -2066,9 +2066,9 @@ survey.satisfaction.lbl.04 = Dissatisfied
 survey.satisfaction.lbl.05 = Very dissatisfied
 
 survey.satisfaction.beforeyougo = Before you go
-survey.satisfaction.please = Please
-survey.satisfaction.answer = answer some questions
-survey.satisfaction.helpus = to help us improve the service.
+survey.satisfaction.please = We use your feedback to make our services better. Please take the 
+survey.satisfaction.answer = feedback survey
+survey.satisfaction.helpus = now.
 
 ############################### Banners ###############################
 urr.title = Help improve GOV.UK

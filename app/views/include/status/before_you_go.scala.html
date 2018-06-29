@@ -19,12 +19,7 @@
 
 @()(implicit messages: Messages, request: Request[_])
 
-<div class="grid-layout grid-layout--stacked no-print">
- <div class="grid-layout__column grid-layout__column--2-3">
+<div class="no-print">
   <h3 class="heading-small">@Messages("survey.satisfaction.beforeyougo")</h3>
-  <p>@Messages("survey.satisfaction.please") <a href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
- </div>
- <div class="grid-layout__column grid-layout__column--1-3">
-  @* empty for layout reasons *@
- </div>
+  <p>@Messages("survey.satisfaction.please") <a id="satisfaction-survey" href="@controllers.routes.SatisfactionSurveyController.get()">@Messages("survey.satisfaction.answer")</a> @Messages("survey.satisfaction.helpus")</p>
 </div>
