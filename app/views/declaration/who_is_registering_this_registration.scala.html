@@ -40,6 +40,6 @@
         }
 
         @who_is_registering_common(Messages("declaration.who.is.registering.title"), f, model)(m, request)
-        @submit()
+        @submit(buttonId=Some("confirm-continue"))
     }
 }
