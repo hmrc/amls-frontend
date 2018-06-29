@@ -347,7 +347,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         doc.title must include(Messages("confirmation.renewal.title"))
         contentAsString(result) must include(Messages("confirmation.renewal.header"))
-        doc.select("#fee").text must include(Currency(115d).toString)
+        doc.select("#fee").text must include(Currency(200d).toString)
       }
     }
 
