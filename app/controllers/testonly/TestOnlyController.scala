@@ -17,7 +17,7 @@
 package controllers.testonly
 
 import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
 import play.api.libs.json.Json
@@ -34,6 +34,7 @@ import scala.concurrent.Future
 @Singleton
 class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val dataCacheConnector: DataCacheConnector,
+                                   implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateSave4LaterService) extends BaseController {
 
 
@@ -48,12 +49,12 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   def removeCacheData(implicit user: AuthContext,  hc: HeaderCarrier) = {
     BusinessCustomerSessionCache.remove()
     AmlsShortLivedCache.remove(user.user.oid)
+    testOnlyStubConnector.clearState()
   }
 
   def updateSave4Later(fileName:String)  = Authorised.async {
     implicit user =>
       implicit request =>
-
         stubsService.getSaveForLaterData(fileName) flatMap {
           case Some(data) => {
             removeCacheData flatMap { _ =>
