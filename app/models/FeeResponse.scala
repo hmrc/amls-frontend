@@ -56,7 +56,7 @@ case class FeeResponse(responseType: ResponseType,
                        difference: Option[BigDecimal],
                        createdAt: DateTime) {
 
-  def toPay(status: SubmissionStatus): BigDecimal = status match {
+  def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = status match {
     case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
     case _ => totalFees
   }
