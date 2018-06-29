@@ -228,7 +228,7 @@ class LandingController @Inject()(val landingService: LandingService,
             if (dataHasChanged(cacheMap)) {
               Logger.debug("Data has changed in getWithAmendments()")
               cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
-                case SubmissionRequestStatus(true) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
+                case SubmissionRequestStatus(true, _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
               } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
                 Redirect(controllers.routes.StatusController.get())
               }

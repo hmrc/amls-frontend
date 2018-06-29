@@ -16,11 +16,12 @@
 
 package services
 
-import javax.inject.Inject
 import com.fasterxml.jackson.core.JsonParseException
 import config.AppConfig
 import connectors.{AmlsConnector, DataCacheConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
+import javax.inject.Inject
+import models._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeUK}
 import models.asp.Asp
 import models.bankdetails.{BankDetails, NoBankAccountUsed}
@@ -38,14 +39,12 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.tradingpremises.TradingPremises.FilterUtils
-import models._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import play.api.http.Status.UNPROCESSABLE_ENTITY
 import play.api.libs.json.{Format, Json}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.{HeaderCarrier, Upstream4xxResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
-import utils.Strings._
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -170,7 +169,7 @@ class SubmissionService @Inject()
         createSubscriptionRequest(cache).withRenewalData(renewal),
         regNo.getOrElse(throw NoEnrolmentException("[SubmissionService][renewal] - No enrolment"))
       )
-      _ <- saveResponse(response, AmendVariationRenewalResponse.key)
+      _ <- saveResponse(response, AmendVariationRenewalResponse.key, isRenewal = true)
     } yield response
   }
 
@@ -186,10 +185,10 @@ class SubmissionService @Inject()
     } yield response
   }
 
-  private def saveResponse[T](response: T, key: String)
+  private def saveResponse[T](response: T, key: String, isRenewal: Boolean = false)
                              (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](key, response)
-    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true))
+    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, isRenewal))
   } yield c
 
   private def safeId(cache: CacheMap): Future[String] = {
