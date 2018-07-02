@@ -40,14 +40,14 @@ class FeeResponseSpec extends PlaySpec {
             "status is RenewalSubmitted and submissionRequestStatus is renewal amendment" in {
                 feeResponse.toPay(
                     RenewalSubmitted(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = true))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))
                 ) mustEqual difference
             }
 
             "status is ReadyForRenewal and submissionRequestStatus is renewal amendment" in {
                 feeResponse.toPay(
                     ReadyForRenewal(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = true))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))
                 ) mustEqual difference
             }
 
@@ -74,14 +74,14 @@ class FeeResponseSpec extends PlaySpec {
             "status is RenewalSubmitted and submissionRequestStatus is renewal amendment and difference is None" in {
                 feeResponse.toPay(
                     RenewalSubmitted(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = true))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))
                 ) mustEqual BigDecimal(0)
             }
 
             "status is ReadyForRenewal and submissionRequestStatus is renewal amendment and difference is None" in {
                 feeResponse.toPay(
                     ReadyForRenewal(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = true))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(true)))
                 ) mustEqual BigDecimal(0)
             }
 
@@ -106,17 +106,32 @@ class FeeResponseSpec extends PlaySpec {
                 Some(difference),
                 new DateTime(2018, 1, 1, 0, 0)
             )
+
             "status is RenewalSubmitted and submissionRequestStatus is not renewal amendment" in {
                 feeResponse.toPay(
                     RenewalSubmitted(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = false))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(false)))
                 ) mustEqual total
             }
 
             "status is ReadyForRenewal and submissionRequestStatus is not renewal amendment" in {
                 feeResponse.toPay(
                     ReadyForRenewal(None),
-                    Some(SubmissionRequestStatus(true, isRenewalAmendment = false))
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = Some(false)))
+                ) mustEqual total
+            }
+
+            "status is RenewalSubmitted and submissionRequestStatus does not set renewal amendment" in {
+                feeResponse.toPay(
+                    RenewalSubmitted(None),
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = None))
+                ) mustEqual total
+            }
+
+            "status is ReadyForRenewal and submissionRequestStatus does not set renewal amendment" in {
+                feeResponse.toPay(
+                    ReadyForRenewal(None),
+                    Some(SubmissionRequestStatus(true, isRenewalAmendment = None))
                 ) mustEqual total
             }
 

@@ -188,7 +188,7 @@ class SubmissionService @Inject()
   private def saveResponse[T](response: T, key: String, isRenewalAmendment: Boolean = false)
                              (implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext, fmt: Format[T]) = for {
     _ <- cacheConnector.save[T](key, response)
-    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, isRenewalAmendment))
+    c <- cacheConnector.save[SubmissionRequestStatus](SubmissionRequestStatus.key, SubmissionRequestStatus(true, Some(isRenewalAmendment)))
   } yield c
 
   private def safeId(cache: CacheMap): Future[String] = {
