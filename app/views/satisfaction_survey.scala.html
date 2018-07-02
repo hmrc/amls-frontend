@@ -36,7 +36,7 @@ heading = header
         legend = "survey.satisfaction.text.1",
         f = f("satisfaction"),
         panel = false,
-        bold = true
+        bold = false
     ) {
         @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.01", value = "01")
         @radio(f = f("satisfaction"), labelText = "survey.satisfaction.lbl.02", value = "02")
@@ -50,7 +50,7 @@ heading = header
         f = f("details"),
         panel = false,
         classes = Seq("heading-medium"),
-        bold = true
+        bold = false
     ) {
         @textarea(
             field = f("details"),
@@ -68,6 +68,6 @@ heading = header
 }
 }
 
-$('input:radio').click(function(){
+<script>$('input:radio').click(function(){
 ga('send', 'event', this.id, 'click');
-});
+});</script>
