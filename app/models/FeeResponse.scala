@@ -57,7 +57,7 @@ case class FeeResponse(responseType: ResponseType,
                        createdAt: DateTime) {
 
   def toPay(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus] = None): BigDecimal = {
-    val isRenewalAmendment: Boolean = submissionRequestStatus exists { _.isRenewalAmendment }
+    val isRenewalAmendment: Boolean = submissionRequestStatus exists { _.isRenewalAmendment.getOrElse(false) }
     status match {
       case (RenewalSubmitted(_) | ReadyForRenewal(_)) if isRenewalAmendment => difference.getOrElse(0)
       case SubmissionReadyForReview if responseType == AmendOrVariationResponseType => difference.getOrElse(0)
