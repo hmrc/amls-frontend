@@ -95,7 +95,7 @@ class summarySpec extends AmlsSpec with MustMatchers with PropertyChecks with Ht
 
       view.body must include("Other Business Account")
       view.body must include("NL26RABO0163975856")
-      view.body must include("A business account belonging to another business")
+      view.body must include(Messages("bankdetails.accounttype.lbl.03"))
     }
   }
 }
