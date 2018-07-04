@@ -21,12 +21,12 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
-class BusinessMatchingBusinessMatchingTradingPremisesTradingPremisesMsbServicesSpec extends PlaySpec with OneAppPerSuite {
+class TradingPremisesMsbServicesSpec extends PlaySpec with OneAppPerSuite {
 
   "MsbServices" must {
 
     "round trip through Json correctly" in {
-      val data = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val data = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
       val js = Json.toJson(data)
 
       js.as[TradingPremisesMsbServices] mustEqual data
@@ -34,7 +34,7 @@ class BusinessMatchingBusinessMatchingTradingPremisesTradingPremisesMsbServicesS
 
     "round trip through Forms correctly" in {
 
-      val model = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val model = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
       val data = implicitly[Write[TradingPremisesMsbServices, UrlFormEncoded]].writes(model)
 
       implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data) mustEqual Valid(model)
@@ -58,6 +58,15 @@ class BusinessMatchingBusinessMatchingTradingPremisesTradingPremisesMsbServicesS
 
       implicitly[Rule[UrlFormEncoded, TradingPremisesMsbServices]].validate(data)
           .mustEqual(Invalid(Seq((Path \ "msbServices" \ 0) -> Seq(ValidationError("error.invalid")))))
+    }
+
+    "serialize with the expected structure" in {
+
+      val model = TradingPremisesMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
+
+      val serializedModel = TradingPremisesMsbServices.formW.writes(model)
+
+      serializedModel.getOrElse("msbServices[]", Seq()).toSet mustEqual Set("01", "02", "03", "04", "05")
     }
   }
 }
