@@ -18,7 +18,7 @@ package models.businessmatching
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, _}
-import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
+import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, ForeignExchange => TPForeignExchange, TransmittingMoney => TPTransmittingMoney}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
@@ -133,6 +133,7 @@ object BusinessMatchingMsbServices {
       case TPCurrencyExchange => CurrencyExchange
       case TPChequeCashingNotScrapMetal => ChequeCashingNotScrapMetal
       case TPChequeCashingScrapMetal => ChequeCashingScrapMetal
+      case TPForeignExchange => ForeignExchange
     }
   }
 }
