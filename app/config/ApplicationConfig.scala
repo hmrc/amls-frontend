@@ -16,12 +16,12 @@
 
 package config
 
-import config.ApplicationConfig.{baseUrl, getConfBool, getConfigString}
+import config.ApplicationConfig.{baseUrl, getConfBool}
 import javax.inject.Inject
-import play.api.{Logger, Play}
+import play.api.Play
+import play.api.Play.current
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
-import play.api.Play.{configuration, current}
 
 trait ApplicationConfig {
 
@@ -112,6 +112,8 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
 
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
+
+  def fxEnabledToggle = config.getConfBool("feature-toggle.fx-enabled", defBool = false)
 
   def authUrl = config.baseUrl("auth")
 
