@@ -21,7 +21,7 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
 
-class BusinessMatchingBusinessMatchingTradingPremisesTradingPremisesMsbServicesSpec extends PlaySpec with OneAppPerSuite {
+class TradingPremisesMsbServicesSpec extends PlaySpec with OneAppPerSuite {
 
   "MsbServices" must {
 
