@@ -12,7 +12,6 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-
   private val frontendBootstrapVersion = "8.24.0"
   private val playPartialsVersion = "6.1.0"
   private val httpCachingClientVersion = "7.1.0"
@@ -20,6 +19,7 @@ private object AppDependencies {
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
+  private val playReactiveMongoVersion = "3.2.0"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -29,6 +29,7 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
+    "uk.gov.hmrc" %% "play-reactivemongo" % playReactiveMongoVersion,
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
