@@ -1788,6 +1788,7 @@ msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+msb.services.list.lbl.05 = Foreign exchange
 msb.throughput.title = How much throughput do you expect in the next 12 months?
 msb.throughput.sub = Throughput is the total value of the money you transmit, the currency you exchange, or the cheques you cash.
 msb.throughput.ipsp.hint = An IPSP is involved in the transfer of funds, but isn’t the Payment Service Provider for the payer or the payee.
