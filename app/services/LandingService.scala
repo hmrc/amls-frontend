@@ -51,38 +51,12 @@ trait LandingService {
   private[services] val statusService: StatusService
   private[services] val businessMatchingConnector: BusinessMatchingConnector
 
-  @deprecated("fetch the cacheMap itself instead", "")
-  def hasSavedForm
-  (implicit
-   hc: HeaderCarrier,
-   ec: ExecutionContext,
-   ac: AuthContext
-  ): Future[Boolean] =
-    cacheConnector.fetchAll map {
-      case Some(_) => true
-      case None => false
-    }
+  def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
 
-  def cacheMap
-  (implicit
-   hc: HeaderCarrier,
-   ec: ExecutionContext,
-   ac: AuthContext
-  ): Future[Option[CacheMap]] =
-    cacheConnector.fetchAll
+  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = cacheConnector.remove
 
-  def remove
-  (implicit
-   hc: HeaderCarrier
-  ): Future[HttpResponse] = {
-    cacheConnector.remove(BusinessMatching.key)
-  }
-
-  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)(implicit
-                                                                              authContext: AuthContext,
-                                                                              hc: HeaderCarrier,
-                                                                              ec: ExecutionContext
-  ): Future[CacheMap] = {
+  private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)
+                             (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
 
     import models.businessactivities.{InvolvedInOther => BAInvolvedInOther}
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000, ReceiveCashPayments => HvdReceiveCashPayments}
@@ -161,7 +135,7 @@ trait LandingService {
     viewResponse <- desConnector.view(amlsRefNumber)
     subscriptionResponse <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
     amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
-    _ <- cacheConnector.remove(authContext.user.oid)
+    _ <- cacheConnector.remove
     _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
     _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
     _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))

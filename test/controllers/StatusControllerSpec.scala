@@ -118,7 +118,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
-        when(controller.dataCache.remove(any())(any()))
+        when(controller.dataCache.remove(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
@@ -142,7 +142,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
-        when(controller.dataCache.remove(any())(any()))
+        when(controller.dataCache.remove(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))

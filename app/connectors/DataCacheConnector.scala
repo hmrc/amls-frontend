@@ -16,26 +16,24 @@
 
 package connectors
 
-import config.AmlsShortLivedCache
-import play.api.libs.json
-import play.api.libs.json.{Format, Json}
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
-
-import config.AppConfig
+import config.{AmlsShortLivedCache, AppConfig}
+import connectors.DataCacheConnector.cacheConnector
 import javax.inject.Inject
 import play.api.Logger
-import play.api.libs.json.{JsValue, Json, Reads, Writes}
+import play.api.http.Status._
+import play.api.libs.json
+import play.api.libs.json._
 import play.modules.reactivemongo.MongoDbConnection
 import uk.gov.hmrc.cache.TimeToLive
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.cache.repository.CacheRepository
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
 import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
+import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 trait CacheConnector {
@@ -53,7 +51,7 @@ trait CacheConnector {
 
 class S4LCacheConnector @Inject()() extends CacheConnector {
 
-  private lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+  lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
   override def fetch[T](cacheId: String)
                        (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] =
@@ -77,23 +75,56 @@ class S4LCacheConnector @Inject()() extends CacheConnector {
   }
 }
 
-class DataCacheConnector @Inject()(mongoCache: AmlsMongoCache) extends CacheConnector {
+trait DataCacheConnector extends CacheConnector {
+  def cacheConnector: CacheConnector
+
+  override def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+    cacheConnector.fetch(cacheId)
+
+  override def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+    cacheConnector.save(cacheId, data)
+
+  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+    cacheConnector.fetchAll
+
+  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
+    cacheConnector.remove
+
+  override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+    cacheConnector.update(cacheId)(f)
+}
+
+object DataCacheConnector extends DataCacheConnector {
+  def cacheConnector: CacheConnector = new S4LCacheConnector()
+}
+
+class AmlsMongoCacheWrapper @Inject()(mongoCache: AmlsMongoCache) extends CacheConnector {
+
+  def toCacheMap(c: Cache): CacheMap = {
+    c.data.fold(CacheMap(c.id.id, Map())) { json =>
+      ???
+    }
+  }
+
   override def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     mongoCache.find(authContext.user.oid, cacheId)
   }
 
   override def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    mongoCache.createOrUpdate(authContext.user.oid, data, cacheId) map { r => CacheMap(r.id.id, Map("data" -> r.data.get))}
+    mongoCache.createOrUpdate(authContext.user.oid, data, cacheId) map { r =>
+      CacheMap(r.id.id, Map("data" -> r.data.get))
+    }
   }
 
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = {
+    mongoCache.cacheRepository.findById(authContext.user.oid)
     ???
   }
 
   override def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[HttpResponse] = {
     mongoCache.removeById(authContext.user.oid) map {
-      case true => HttpResponse(200)
-      case _ => HttpResponse(500)
+      case true => HttpResponse(OK)
+      case _ => HttpResponse(INTERNAL_SERVER_ERROR)
     }
   }
 
@@ -234,7 +265,7 @@ class AmlsMongoCache @Inject()(appConfig: AppConfig) extends MongoDbConnection w
       writeResult <- cacheRepository.removeById(id)
     } yield {
       if (writeResult.hasErrors) {
-        writeResult.errmsg.foreach(Logger.error)
+        writeResult.errmsg.foreach(m => Logger.error(m))
         throw new RuntimeException(writeResult.errmsg.getOrElse("Error while removing the session data"))
       } else {
         writeResult.ok
