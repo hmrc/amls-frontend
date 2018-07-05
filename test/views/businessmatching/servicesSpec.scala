@@ -78,13 +78,13 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
 
     "show the correct amount of checkboxes" in new ViewFixture {
       def view = views.html.businessmatching.services(EmptyForm, edit = false)
-      doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 5
+      doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 4
     }
 
     "show the correct label for the checkboxes" in new ViewFixture {
       def view = views.html.businessmatching.services(EmptyForm, edit = false)
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
-      val labels = Seq("01", "02", "05", "03", "04")
+      val labels = Seq("01", "02", "03", "04")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).attr("value") mustEqual labels(i)
       }
@@ -96,6 +96,30 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
       val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
       (0 until checkboxes.size()) foreach { i =>
         checkboxes.get(i).attr("checked") mustEqual (if (i == 0) "checked" else "")
+      }
+    }
+  }
+}
+
+class servicesFxEnabledSpec extends AmlsSpec with MustMatchers  {
+
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
+  }
+
+  "services fx-enabled view" must {
+
+    "show the correct amount of checkboxes" in new ViewFixture {
+      def view = views.html.businessmatching.services(EmptyForm, edit = false, fxEnabledToggle = true)
+      doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 5
+    }
+
+    "show the correct label for the checkboxes" in new ViewFixture {
+      def view = views.html.businessmatching.services(EmptyForm, edit = false, fxEnabledToggle = true)
+      val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
+      val labels = Seq("01", "02", "05", "03", "04")
+      (0 until checkboxes.size()) foreach { i =>
+        checkboxes.get(i).attr("value") mustEqual labels(i)
       }
     }
   }

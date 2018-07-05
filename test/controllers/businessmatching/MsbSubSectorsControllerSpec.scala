@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -42,13 +43,16 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     self =>
     val request = addToken(authRequest)
 
+    val config = mock[AppConfig]
+
     val controller = new MsbSubSectorsController(
       self.authConnector,
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
       mockStatusService,
-      mock[ChangeSubSectorHelper]
+      mock[ChangeSubSectorHelper],
+      config
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
@@ -82,6 +86,22 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe OK
 
+      document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox][checked]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 0
+    }
+
+    "show an empty form on get with no data in store when fx enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn true
+
+      setupModel(None)
+
+      val result = controller.get()(request)
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result) mustBe OK
+
       document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
       document.select(".amls-error-summary").size mustBe 0
@@ -102,7 +122,6 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe OK
 
-      document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 2
       document.select("input[value=01]").hasAttr("checked") mustBe true
       document.select("input[value=02]").hasAttr("checked") mustBe true
@@ -110,6 +129,23 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     }
 
     "return a Bad Request with errors on invalid submission" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[0]" -> "invalid"
+      )
+
+      val result = controller.post()(newRequest)
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result) mustBe BAD_REQUEST
+
+      document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox][checked]").size mustBe 0
+    }
+
+    "return a Bad Request with errors on invalid submission when fx enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn true
 
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[0]" -> "invalid"
