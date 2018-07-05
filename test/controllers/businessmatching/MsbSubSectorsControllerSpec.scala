@@ -82,7 +82,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe OK
 
-      document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
       document.select(".amls-error-summary").size mustBe 0
     }
@@ -102,6 +102,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe OK
 
+      document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 2
       document.select("input[value=01]").hasAttr("checked") mustBe true
       document.select("input[value=02]").hasAttr("checked") mustBe true
@@ -119,7 +120,7 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
 
       status(result) mustBe BAD_REQUEST
 
-      document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
     }
 
@@ -138,21 +139,22 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
     }
 
-    "redirect to the summary page when adding 'CurrencyExchange' as a service" in new Fixture {
+    "redirect to the summary page when adding anything other than TransmittingMoney as a service" in new Fixture {
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[1]" -> "02",
         "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04"
+        "msbServices[3]" -> "04",
+        "msbServices[4]" -> "05"
       )
 
       val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
 
     }
   }
