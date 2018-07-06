@@ -1232,6 +1232,8 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
 businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
+
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
