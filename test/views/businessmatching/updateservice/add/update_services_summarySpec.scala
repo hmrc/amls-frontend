@@ -17,6 +17,7 @@
 package views.businessmatching.updateservice.add
 
 import forms.EmptyForm
+import models.businessmatching.HighValueDealing
 import models.flowmanagement.AddBusinessTypeFlowModel
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
@@ -29,145 +30,141 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-
-    def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
   }
 
   "The update_services_summary view" must {
 
     "have the correct title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       heading.html must be(Messages("title.cya"))
     }
 
     "have correct subHeading" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
       subHeading.html must include(Messages("summary.updateservice"))
     }
+  }
 
-    "for which business type you wish to register" must {
-      "have a question title" in new ViewFixture {
-
-      }
-
-      "display the answer" in new ViewFixture {
-
-      }
-
-      "show edit link" in new ViewFixture {
-
-      }
+  "for which business type you wish to register" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(Some(HighValueDealing)))
+      doc.body().text must include(Messages("businessmatching.updateservice.selectactivities.title"))
     }
 
-    "for have any of your responsible people have passed the HMRC fit and proper test" must {
-      "have a question title" in new ViewFixture {
-
-      }
-
-      "display the answer" in new ViewFixture {
-
-      }
-
-      "show edit link" in new ViewFixture {
-
-      }
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(Some(HighValueDealing)))
+      doc.body().text must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
     }
 
-    "if any have passed test, which responsible people have passed the HMRC fit and proper test" must {
-      "have a question title" in new ViewFixture {
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(Some(HighValueDealing)))
+    }
+  }
 
-      }
-
-      "display the answer" in new ViewFixture {
-
-      }
-
-      "show edit link" in new ViewFixture {
-
-      }
+  "for have any of your responsible people have passed the HMRC fit and proper test" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
     }
 
-    "for will you do this business type at trading premises" must {
-      "have a question title" in new ViewFixture {
-
-      }
-
-      "display the answer" in new ViewFixture {
-
-      }
-
-      "show edit link" in new ViewFixture {
-
-      }
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
     }
 
-    "if yes for will you do, which trading premises you will do this business type at" must {
-      "have a question title" in new ViewFixture {
-
-      }
-
-      "display the answer" in new ViewFixture {
-
-      }
-
-      "show edit link" in new ViewFixture {
-
-      }
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
     }
-    
-    "if adding MSB" must {
-      "which services does your business provide" must {
-        "have a question title" in new ViewFixture {
-  
-        }
-  
-        "display the answer" in new ViewFixture {
-  
-        }
-  
-        "show edit link" in new ViewFixture {
-  
-        }
-      }
-  
-      "for what will your business do at these premises" must {
-        "have a question title" in new ViewFixture {
-  
-        }
-  
-        "display the answer" in new ViewFixture {
-  
-        }
-  
-        "for the edit link" must {
-          "not display when business does only one type of MSB subservice" in new ViewFixture {
-  
-          }
-  
-          "display when business does more than one type of MSB subservice" in new ViewFixture {
-  
-          }
-        }
-      }
-      
-      "if adding TransmittingMoney as an MSB subsector" must {
-        "for does your business have a PSR number" must {
-          "have a question title" in new ViewFixture {
+  }
 
-          }
+  "if any have passed test, which responsible people have passed the HMRC fit and proper test" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
 
-          "display the answer" in new ViewFixture {
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
 
-          }
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+  }
 
-          "show edit link" in new ViewFixture {
+  "for will you do this business type at trading premises" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
 
-          }
-        }
-      }
-      
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+  }
+
+  "for what will your business do at these premises" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+  }
+
+  "if adding msb, which services does your business provide" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+  }
+
+  "if adding msb, for what will your business do at these premises" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "for the edit link not display when business does only one type of MSB subservice" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "for the edit link display when business does more than one type of MSB subservice" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+  }
+
+  "if adding TransmittingMoney as an MSB subsector, for does your business have a PSR number" must {
+    "have a question title" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "display the answer" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
+    }
+
+    "show edit link" in new ViewFixture {
+      def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
     }
   }
 }
