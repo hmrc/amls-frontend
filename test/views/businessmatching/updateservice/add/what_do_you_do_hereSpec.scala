@@ -34,7 +34,7 @@ package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatchingMsbServices, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TransmittingMoney}
+import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
