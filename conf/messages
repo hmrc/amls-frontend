@@ -1195,6 +1195,7 @@ businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
 businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.05 = Foreign exchange
 
 businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.updateservice.psr.number.lbl = PSR registration number
@@ -1231,6 +1232,8 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
 businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
+
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?

@@ -34,7 +34,7 @@ package views.businessmatching.updateservice.add
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.businessmatching.{BusinessMatchingMsbServices, TransmittingMoney}
+import models.businessmatching.{BusinessMatchingMsbServices, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TransmittingMoney}
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
@@ -86,6 +86,25 @@ class what_do_you_do_hereSpec extends AmlsSpec {
       override def view = what_do_you_do_here(form2, edit = false)
 
       doc.body().text() must not include Messages("link.return.registration.progress")
+    }
+
+    "show the correct checkboxes" in new ViewFixture {
+      val msbSubservices: Set[String] = Set("01", "02")
+
+      override def view = what_do_you_do_here(EmptyForm, edit = true, msbSubservices)
+
+      doc.body().getElementsByAttributeValue("type", "checkbox").size() mustEqual 2
+    }
+
+    "show selected checkboxes as checked" in new ViewFixture {
+      val msbSubservices: Set[String] = Set("01", "02")
+      val form2: ValidForm[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+      override def view = what_do_you_do_here(form2, edit = true, msbSubservices)
+
+      val checkboxes = doc.body().getElementsByAttributeValue("type", "checkbox")
+      (0 until checkboxes.size()) foreach { i =>
+        checkboxes.get(i).attr("checked") mustEqual (if (i == 0) "checked" else "")
+      }
     }
   }
 }
