@@ -17,7 +17,8 @@
 // TODO: Rename this to the connectors.cache package
 package connectors
 
-import connectors.cache.{CacheConnector, Save4LaterCacheConnector}
+import connectors.cache.CacheConnector
+import play.api.Play
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -26,25 +27,26 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.Future
 
 // TODO: Remove this and replace it with the new DataCache orchestrator type
-trait DataCacheConnector extends CacheConnector {
+trait DataCacheConnector {
+
   def cacheConnector: CacheConnector
 
-  override def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
 
-  override def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+  def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
 
-  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
-  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
+  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
     cacheConnector.remove
 
-  override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+  def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
 }
 
 object DataCacheConnector extends DataCacheConnector {
-  def cacheConnector: CacheConnector = new Save4LaterCacheConnector()
+  def cacheConnector: CacheConnector = Play.current.injector.instanceOf[CacheConnector]
 }

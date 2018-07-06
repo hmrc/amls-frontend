@@ -33,11 +33,9 @@ class AmlsMongoCacheClient @Inject()(appConfig: AppConfig) extends MongoDbConnec
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = ApplicationCrypto.JsonCrypto
 
   private val expireAfter: Long = defaultExpireAfter
-  private val defaultKey = "AMLS-DATA"
+  def cacheRepository: CacheRepository = CacheRepository("app-cache", expireAfter, Cache.mongoFormats)
 
-  def cacheRepository: CacheRepository = CacheRepository("AMLS", expireAfter, Cache.mongoFormats)
-
-  def createOrUpdate[T](id: String, data: T, key: String = defaultKey)(implicit writes: Writes[T]): Future[Cache] = {
+  def createOrUpdate[T](id: String, data: T, key: String)(implicit writes: Writes[T]): Future[Cache] = {
     val jsonData = if(appConfig.mongoEncryptionEnabled){
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -48,18 +46,7 @@ class AmlsMongoCacheClient @Inject()(appConfig: AppConfig) extends MongoDbConnec
     cacheRepository.createOrUpdate(id, key, jsonData).map(_.updateType.savedValue)
   }
 
-  //  def createOrUpdateJson(id: String, json: JsValue, key: String = defaultKey): Future[Cache] = {
-  //    val jsonData = if(appConfig.mongoEncryptionEnabled){
-  //      val jsonEncryptor = new JsonEncryptor[JsValue]()
-  //      Json.toJson(Protected(json))(jsonEncryptor)
-  //    } else {
-  //      json
-  //    }
-  //
-  //    cacheRepository.createOrUpdate(id, key, jsonData).map(_.updateType.savedValue)
-  //  }
-
-  def createOrUpdateSeq[T](id: String, data: Seq[T], key: String = defaultKey)(implicit writes: Writes[T]): Future[Seq[T]] = {
+  def createOrUpdateSeq[T](id: String, data: Seq[T], key: String)(implicit writes: Writes[T]): Future[Seq[T]] = {
     val jsonData = if(appConfig.mongoEncryptionEnabled){
       val jsonEncryptor = new JsonEncryptor[Seq[T]]()
       Json.toJson(Protected(data))(jsonEncryptor)
@@ -69,7 +56,7 @@ class AmlsMongoCacheClient @Inject()(appConfig: AppConfig) extends MongoDbConnec
     cacheRepository.createOrUpdate(id, key, jsonData).map(_ => data)
   }
 
-  def find[T](id: String, key: String = defaultKey)(implicit reads: Reads[T]): Future[Option[T]] = {
+  def find[T](id: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     if(appConfig.mongoEncryptionEnabled){
       val jsonDecryptor = new JsonDecryptor[T]()
       cacheRepository.findById(id) map {
@@ -98,9 +85,9 @@ class AmlsMongoCacheClient @Inject()(appConfig: AppConfig) extends MongoDbConnec
     }
   }
 
-  def findJson(id: String, key: String = defaultKey): Future[Option[JsValue]] = find[JsValue](id, key)
+  def findJson(id: String, key: String): Future[Option[JsValue]] = find[JsValue](id, key)
 
-  def findSeq[T](id: String, key: String = defaultKey)(implicit reads: Reads[T]): Future[Seq[T]] = {
+  def findSeq[T](id: String, key: String)(implicit reads: Reads[T]): Future[Seq[T]] = {
     if (appConfig.mongoEncryptionEnabled) {
       val jsonDecryptor = new JsonDecryptor[Seq[T]]()
       cacheRepository.findById(id) map {
@@ -129,7 +116,7 @@ class AmlsMongoCacheClient @Inject()(appConfig: AppConfig) extends MongoDbConnec
     }
   }
 
-  def findOptSeq[T](id: String, key: String = defaultKey)(implicit reads: Reads[T]): Future[Option[Seq[T]]] = {
+  def findOptSeq[T](id: String, key: String)(implicit reads: Reads[T]): Future[Option[Seq[T]]] = {
     if(appConfig.mongoEncryptionEnabled){
       val jsonDecryptor = new JsonDecryptor[Seq[T]]()
       cacheRepository.findById(id) map {

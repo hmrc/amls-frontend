@@ -18,36 +18,30 @@ package connectors.cache
 
 import javax.inject.Inject
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, JsObject, JsValue}
 import services.cache.AmlsMongoCacheClient
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
+
 import scala.concurrent.Future
 
 class AmlsMongoCacheConnector @Inject()(mongoCache: AmlsMongoCacheClient) extends CacheConnector {
 
-  def toCacheMap(c: Cache): CacheMap = {
-    c.data.fold(CacheMap(c.id.id, Map())) { json =>
-      ???
-    }
-  }
+  import AmlsMongoCacheConnector._
 
   override def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     mongoCache.find(authContext.user.oid, cacheId)
   }
 
   override def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    mongoCache.createOrUpdate(authContext.user.oid, data, cacheId) map { r =>
-      CacheMap(r.id.id, Map("data" -> r.data.get))
-    }
+    mongoCache.createOrUpdate(authContext.user.oid, data, cacheId).map(toCacheMap)
   }
 
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = {
-    mongoCache.cacheRepository.findById(authContext.user.oid)
-    ???
+    mongoCache.cacheRepository.findById(authContext.user.oid).map(_.map(toCacheMap))
   }
 
   override def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[HttpResponse] = {
@@ -58,4 +52,12 @@ class AmlsMongoCacheConnector @Inject()(mongoCache: AmlsMongoCacheClient) extend
   }
 
   override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] = ???
+}
+
+object AmlsMongoCacheConnector {
+  def toMap(json: JsValue): Map[String, JsValue] = json match {
+    case JsObject(fields) => fields.toMap
+  }
+
+  def toCacheMap(cache: Cache): CacheMap = CacheMap(cache.id.id, cache.data.fold[Map[String, JsValue]](Map.empty)(toMap))
 }

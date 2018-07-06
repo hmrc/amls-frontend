@@ -19,6 +19,7 @@ package modules
 import com.google.inject.{AbstractModule, TypeLiteral}
 import config.{AMLSAuditConnector, WSHttp}
 import connectors._
+import connectors.cache.{AmlsMongoCacheConnector, CacheConnector}
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
 import services._
@@ -38,6 +39,7 @@ class Module extends AbstractModule {
     bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
+    bind(classOf[CacheConnector]).to(classOf[AmlsMongoCacheConnector])
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
     bind(classOf[StatusService]).toInstance(StatusService)

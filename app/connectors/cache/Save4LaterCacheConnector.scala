@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-class Save4LaterCacheConnector @Inject()() extends CacheConnector {
+class Save4LaterCacheConnector extends CacheConnector {
 
   lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
