@@ -14,29 +14,19 @@
  * limitations under the License.
  */
 
-package connectors
+package connectors.cache
 
-import cats.data.OptionT
-import config.{AmlsShortLivedCache, AppConfig}
-import connectors.DataCacheConnector.cacheConnector
+import config.AmlsShortLivedCache
+import connectors.DataCacheConnector
 import javax.inject.Inject
-import play.api.Logger
-import play.api.http.Status._
 import play.api.libs.json
 import play.api.libs.json._
-import play.modules.reactivemongo.MongoDbConnection
-import uk.gov.hmrc.cache.TimeToLive
-import uk.gov.hmrc.cache.model.Cache
-import uk.gov.hmrc.cache.repository.CacheRepository
-import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-
 
 class DataCacheConnectorMigrator @Inject()(newDataCacheConnector:DataCacheConnector, currentDataCacheConnector:DataCacheConnector) extends CacheConnector {
 
@@ -84,6 +74,8 @@ class DataCacheConnectorMigrator @Inject()(newDataCacheConnector:DataCacheConnec
 
   override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = newDataCacheConnector.remove
 
-  override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] = newDataCacheConnector.update[T](cacheId)(f)
+  override def update[T](cacheId: String)(f: Option[T] => T)
+                        (implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+    newDataCacheConnector.update[T](cacheId)(f)
 }
 

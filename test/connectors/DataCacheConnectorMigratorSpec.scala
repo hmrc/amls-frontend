@@ -16,6 +16,7 @@
 
 package connectors
 
+import connectors.cache.DataCacheConnectorMigrator
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
