@@ -23,7 +23,11 @@ import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.http.cache.client.CacheMap
 
-class AmlsMongoCacheConnectorSpec extends FreeSpec with MustMatchers with PropertyChecks {
+class MongoCacheConnectorSpec extends FreeSpec with MustMatchers with PropertyChecks {
+
+  trait Fixture extends Conversions {
+
+  }
 
   val referenceJson: JsValue = Json.obj(
     "dataKey" -> true,
@@ -36,9 +40,9 @@ class AmlsMongoCacheConnectorSpec extends FreeSpec with MustMatchers with Proper
 
   "toMap" - {
 
-    "should convert from a JsValue to a Map[String, JsValue] properly" in {
+    "should convert from a JsValue to a Map[String, JsValue] properly" in new Fixture {
 
-      AmlsMongoCacheConnector.toMap(referenceJson) mustBe Map[String, JsValue](
+      toMap(referenceJson) mustBe Map[String, JsValue](
         "dataKey" -> JsBoolean(true),
         "name" -> JsString("Some name"),
         "obj" -> Json.obj(
@@ -53,12 +57,12 @@ class AmlsMongoCacheConnectorSpec extends FreeSpec with MustMatchers with Proper
 
   "toCacheMap" - {
 
-    "should convert from a Cache type to a CacheMap type" in {
+    "should convert from a Cache type to a CacheMap type" in new Fixture {
 
       forAll(arbitrary[String]) { id =>
         val cache = Cache(id, Some(referenceJson))
 
-        AmlsMongoCacheConnector.toCacheMap(cache) mustBe CacheMap(cache.id.id, Map[String, JsValue](
+        toCacheMap(cache) mustBe CacheMap(cache.id.id, Map[String, JsValue](
           "dataKey" -> JsBoolean(true),
           "name" -> JsString("Some name"),
           "obj" -> Json.obj(

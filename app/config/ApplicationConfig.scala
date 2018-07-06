@@ -125,6 +125,6 @@ class AppConfig @Inject()(val config: iServicesConfig) {
 
   def feePaymentUrl = s"$amlsUrl/amls/payment"
 
-  val mongoEncryptionEnabled = false
+  val mongoEncryptionEnabled = true
 
 }

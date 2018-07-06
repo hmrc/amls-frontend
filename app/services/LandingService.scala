@@ -199,13 +199,8 @@ trait LandingService {
    * shouldn't be a problem as this should only happen when someone
    * first comes into the Application from Business Customer FE
    */
-  def updateReviewDetails
-  (reviewDetails: ReviewDetails)
-  (implicit
-   hc: HeaderCarrier,
-   ec: ExecutionContext,
-   ac: AuthContext
-  ): Future[CacheMap] = {
+  def updateReviewDetails(reviewDetails: ReviewDetails)
+                         (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[CacheMap] = {
     val bm = BusinessMatching(reviewDetails = Some(reviewDetails))
     cacheConnector.save[BusinessMatching](BusinessMatching.key, bm)
   }
