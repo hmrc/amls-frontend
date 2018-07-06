@@ -18,11 +18,13 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.flowmanagement.{AddBusinessTypeFlowModel, SubSectorsPageId}
 import models.moneyservicebusiness.MoneyServiceBusinessTestData
+import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
@@ -41,6 +43,8 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
 
     val request = addToken(authRequest)
 
+    val config = mock[AppConfig]
+
     val mockBusinessMatchingService = mock[BusinessMatchingService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
 
@@ -48,7 +52,8 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
       authConnector = self.authConnector,
       dataCacheConnector = mockCacheConnector,
       businessMatchingService = mockBusinessMatchingService,
-      router = createRouter[AddBusinessTypeFlowModel]
+      router = createRouter[AddBusinessTypeFlowModel],
+      config = config
     )
 
 
@@ -69,19 +74,70 @@ class SubSectorsControllerSpec extends AmlsSpec with MoneyServiceBusinessTestDat
   "SubServicesController" when {
 
     "get is called" must {
-      "return OK with 'msb_subservices' view" in new Fixture {
+      "return OK with 'msb_subservices' populated view and FXtoggle is enabled" in new Fixture {
 
+        when(config.fxEnabledToggle) thenReturn true
         mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
           subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
         val result = controller.get()(request)
 
         status(result) must be(OK)
 
-        contentAsString(result) must include(
-          Messages("businessmatching.updateservice.msb.services.heading")
-        )
+        contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[type=checkbox]").size mustBe 5
+        document.select("input[type=checkbox][checked]").size mustBe 2
+        document.select(".amls-error-summary").size mustBe 0
+
+      }
+
+      "return OK with 'msb_subservices' populated view and FXtoggle is not enabled" in new Fixture {
+
+        when(config.fxEnabledToggle) thenReturn false
+        mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness),
+          subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal))))))
+        val result = controller.get()(request)
+
+        status(result) must be(OK)
+
+        contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+        val document = Jsoup.parse(contentAsString(result))
+        document.select("input[type=checkbox]").size mustBe 4
+        document.select("input[type=checkbox][checked]").size mustBe 2
+        document.select(".amls-error-summary").size mustBe 0
+
       }
     }
+
+    "return OK with a 'msb_subservices' not populated view and FXtoggle is not enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn false
+      mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), subSectors = None)))
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+
+      contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox][checked]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 0
+    }
+
+    "return OK with a 'msb_subservices' not populated view and FXtoggle is enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn true
+      mockCacheFetch(Some(AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness), subSectors = None)))
+      val result = controller.get()(request)
+
+      status(result) must be(OK)
+      contentAsString(result) must include(Messages("businessmatching.updateservice.msb.services.heading"))
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("input[type=checkbox]").size mustBe 5
+      document.select("input[type=checkbox][checked]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 0
+    }
+
 
     "post is called" must {
 
