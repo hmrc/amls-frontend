@@ -65,6 +65,7 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.psr.number.title"),
                     editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                    editLinkTag="psr-edit",
                     allowEdit = true
                 )   {
                         <p>@psr match {
