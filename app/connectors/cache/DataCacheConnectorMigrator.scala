@@ -28,54 +28,63 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataCacheConnectorMigrator @Inject()(newDataCacheConnector:DataCacheConnector, currentDataCacheConnector:DataCacheConnector) extends CacheConnector {
+class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector {
 
   lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
+  /**
+    * Fetches T from the primary cache. If the data is not available in the primary cache, the data is
+    * fetched from the fallback cache, then saved into the primary cache before returning.
+    *
+    * @return The item T from the cache
+    */
   override def fetch[T](cacheId: String)
-                       (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] = {
-    (for(
-      newCacheData <- newDataCacheConnector.fetch[T](cacheId)
-    )
-    yield {
-        newCacheData match {
-          case Some(_) => Future.successful[Option[T]](newCacheData)
-          case _ => for(currentCacheData <- currentDataCacheConnector.fetch[T](cacheId)) yield {
-            currentCacheData match {
-              case Some(f) => save[T](cacheId, f)
-              case _ =>
-            }
-            currentCacheData
-          }
-        }
-      }).flatMap(identity)
+                       (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] =
+    primaryCache.fetch[T](cacheId) flatMap {
+      case primaryCacheData@Some(_) => Future.successful(primaryCacheData)
+      case _ => fallbackCache.fetch[T](cacheId) flatMap {
+        case o@Some(t) => save[T](cacheId, t) map { _ => o }
+        case t => Future.successful(t)
+      }
     }
 
+  /**
+    * Saves data into the primary cache
+    */
   override def save[T](cacheId: String, data: T)
-                      (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = newDataCacheConnector.save[T](cacheId, data)
+                      (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+    primaryCache.save[T](cacheId, data)
 
-  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = {
-    (for(
-      newCacheData <- newDataCacheConnector.fetchAll
-    )
-      yield {
-        newCacheData match {
-          case Some(_) => Future.successful[Option[CacheMap]](newCacheData)
-          case _ => for(currentCacheData <- currentDataCacheConnector.fetchAll) yield {
-              currentCacheData match {
-              //  case Some(f) => save[CacheMap](x, f)
-                case _ =>
-              }
-              currentCacheData
-            }
+  /**
+    * Fetches all data from the primary cache. If the data is not available in the primary cache,
+    * the data is fetched from the secondary cache instead, then saved into the primary cache before returning.
+    */
+  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+    primaryCache.fetchAll flatMap {
+      case primaryCacheMap@Some(_) => Future.successful(primaryCacheMap)
+      case _ => fallbackCache.fetchAll flatMap {
+        case Some(f) => primaryCache match {
+          case m: MongoCacheConnector => m.saveAll(f) map { _ => Some(f) }
+          case _ => throw new RuntimeException("No primary cache node for saveAll")
         }
-      }).flatMap(identity)
-  }
+        case fallbackCacheMap => Future.successful(fallbackCacheMap)
+      }
+    }
 
-  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = newDataCacheConnector.remove
 
+  /**
+    * Removes the user's data from the primary cache.
+    */
+  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = primaryCache.remove
+
+  /**
+    * Updates data using function f in the primary cache.
+    *
+    * @param f The function to execute in order to transform the data.
+    * @return The cache data after it has been transformed by f
+    */
   override def update[T](cacheId: String)(f: Option[T] => T)
                         (implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
-    newDataCacheConnector.update[T](cacheId)(f)
+    primaryCache.update[T](cacheId)(f)
 }
 

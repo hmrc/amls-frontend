@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connectors
+package connectors.cache
 
 import connectors.cache.DataCacheConnectorMigrator
 import org.mockito.ArgumentCaptor
