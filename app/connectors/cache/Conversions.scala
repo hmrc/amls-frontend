@@ -47,7 +47,7 @@ trait Conversions {
   private class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id.id, cache.data.fold[Map[String, JsValue]](Map.empty)(toMap)) {
     override def getEntry[T](key: String)(implicit fjs: Reads[T]): Option[T] = cache match {
       case c: CryptoCache => c.getEncryptedEntry(key)
-      case _ => this.getEntry(key)
+      case _ => super.getEntry(key)
     }
   }
 
