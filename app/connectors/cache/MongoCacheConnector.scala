@@ -29,12 +29,12 @@ import scala.concurrent.Future
 
 class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient) extends CacheConnector with Conversions {
 
-  override def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
-    mongoCache.find(authContext.user.oid, cacheId)
+  override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
+    mongoCache.find(authContext.user.oid, key)
   }
 
-  override def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
-    mongoCache.createOrUpdate(authContext.user.oid, data, cacheId).map(toCacheMap)
+  override def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+    mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
   }
 
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =

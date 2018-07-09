@@ -25,13 +25,13 @@ import scala.concurrent.Future
 
 trait CacheConnector {
 
-  def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]]
+  def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]]
 
-  def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap]
+  def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap]
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]]
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse]
 
-  def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]]
+  def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]]
 }
