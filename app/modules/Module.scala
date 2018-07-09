@@ -16,30 +16,41 @@
 
 package modules
 
-import com.google.inject.{AbstractModule, TypeLiteral}
-import config.{AMLSAuditConnector, WSHttp}
+import com.google.inject.{AbstractModule, Provider, TypeLiteral}
+import config.{AMLSAuditConnector, AppConfig, WSHttp}
 import connectors._
-import connectors.cache.{MongoCacheConnector, CacheConnector, Save4LaterCacheConnector}
+import connectors.cache.{CacheConnector, MongoCacheConnector, Save4LaterCacheConnector}
+import javax.inject.Inject
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
+import play.api.Application
 import services._
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 
+class CacheConnectorProvider @Inject()(appConfig: AppConfig, app: Application) extends Provider[CacheConnector] {
+  override def get(): CacheConnector = {
+    if (appConfig.mongoAppCacheEnabled) {
+      app.injector.instanceOf(classOf[MongoCacheConnector])
+    } else {
+      app.injector.instanceOf(classOf[Save4LaterCacheConnector])
+    }
+  }
+}
+
 class Module extends AbstractModule {
 
   type HmrcAuthConnector = uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-  override def configure() = {
+  def configure() = {
     bind(classOf[HttpGet]).toInstance(WSHttp)
     bind(classOf[HttpPost]).toInstance(WSHttp)
     bind(classOf[HttpDelete]).toInstance(WSHttp)
     bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
-    bind(classOf[CacheConnector]).to(classOf[MongoCacheConnector])
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
     bind(classOf[StatusService]).toInstance(StatusService)
@@ -53,5 +64,6 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
+    bind(classOf[CacheConnector]).toProvider(classOf[CacheConnectorProvider])
   }
 }
