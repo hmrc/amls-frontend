@@ -47,5 +47,13 @@ class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient) extends CacheC
     }
   }
 
-  override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] = ???
+  /**
+    * Performs a data fetch and then a save, transforming the model using the given function 'f' between the load and the save.
+    * @return The model after it has been transformed
+    */
+  override def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+    mongoCache.find[T](ac.user.oid, key) flatMap { maybeModel =>
+      val transformed = f(maybeModel)
+      mongoCache.createOrUpdate(ac.user.oid, transformed, key) map { _ => Some(transformed) }
+    }
 }
