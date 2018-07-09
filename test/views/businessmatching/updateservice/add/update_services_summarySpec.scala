@@ -104,7 +104,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
     ))
   }
 
-  trait MSBAllNoPSRViewFixture extends ViewFixture {
+  trait MSBNoPSRViewFixture extends ViewFixture {
     override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
       activity = Some(MoneyServiceBusiness),
       fitAndProper = Some(true),
@@ -242,7 +242,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
         doc.getElementById("psr").text mustBe Messages("businessmatching.psr.number.lbl") + ": 111111"
       }
 
-      "have answered no to do I have a PSR number " in new MSBAllNoPSRViewFixture {
+      "have answered no to do I have a PSR number " in new MSBNoPSRViewFixture {
         doc.getElementById("psr").text mustBe Messages("lbl.no")
       }
 
