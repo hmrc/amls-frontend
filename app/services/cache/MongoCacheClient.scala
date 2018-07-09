@@ -20,14 +20,15 @@ import config.AppConfig
 import connectors.cache.Conversions
 import javax.inject.Inject
 import play.api.Logger
+import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.modules.reactivemongo.MongoDbConnection
+import reactivemongo.api.commands.WriteResult
 import uk.gov.hmrc.cache.TimeToLive
 import uk.gov.hmrc.cache.model.Cache
 import uk.gov.hmrc.cache.repository.CacheRepository
-import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
-import play.api.libs.concurrent.Execution.Implicits.defaultContext
+import uk.gov.hmrc.crypto.{ApplicationCrypto, CompositeSymmetricCrypto, Protected}
 
 import scala.concurrent.Future
 
@@ -101,16 +102,6 @@ class MongoCacheClient @Inject()(appConfig: AppConfig)
     cacheRepository.createOrUpdate(id, key, jsonData).map(_.updateType.savedValue)
   }
 
-//  def createOrUpdateSeq[T](id: String, data: Seq[T], key: String)(implicit writes: Writes[T]): Future[Seq[T]] = {
-//    val jsonData = if (appConfig.mongoEncryptionEnabled) {
-//      val jsonEncryptor = new JsonEncryptor[Seq[T]]()
-//      Json.toJson(Protected(data))(jsonEncryptor)
-//    } else {
-//      Json.toJson(data)
-//    }
-//    cacheRepository.createOrUpdate(id, key, jsonData).map(_ => data)
-//  }
-
   def find[T](id: String, key: String)(implicit reads: Reads[T]): Future[Option[T]] = {
     if (appConfig.mongoEncryptionEnabled) {
       cacheRepository.findById(id) map {
@@ -137,74 +128,22 @@ class MongoCacheClient @Inject()(appConfig: AppConfig)
 
   def findJson(id: String, key: String): Future[Option[JsValue]] = find[JsValue](id, key)
 
-  //  def findSeq[T](id: String, key: String)(implicit reads: Reads[T]): Future[Seq[T]] = {
-  //    if (appConfig.mongoEncryptionEnabled) {
-  //      val jsonDecryptor = new JsonDecryptor[Seq[T]]()
-  //      cacheRepository.findById(id) map {
-  //        case Some(cache) => cache.data flatMap {
-  //          json =>
-  //            if ((json \ key).validate[Protected[Seq[T]]](jsonDecryptor).isSuccess) {
-  //              Some((json \ key).as[Protected[Seq[T]]](jsonDecryptor).decryptedValue)
-  //            } else {
-  //              None
-  //            }
-  //        } getOrElse Nil
-  //        case None => Nil
-  //      }
-  //    } else {
-  //      cacheRepository.findById(id) map {
-  //        case Some(cache) => cache.data flatMap {
-  //          json =>
-  //            if ((json \ key).validate[Seq[T]].isSuccess) {
-  //              Some((json \ key).as[Seq[T]])
-  //            } else {
-  //              None
-  //            }
-  //        } getOrElse Nil
-  //        case None => Nil
-  //      }
-  //    }
-  //  }
+  /**
+    * Removes the item with the specified id from the cache
+    */
+  def removeById(id: String): Future[Boolean] = cacheRepository.removeById(id) map handleWriteResult
 
-  //  def findOptSeq[T](id: String, key: String)(implicit reads: Reads[T]): Future[Option[Seq[T]]] = {
-  //    if (appConfig.mongoEncryptionEnabled) {
-  //      val jsonDecryptor = new JsonDecryptor[Seq[T]]()
-  //      cacheRepository.findById(id) map {
-  //        case Some(cache) => cache.data flatMap {
-  //          json =>
-  //            if ((json \ key).validate[Protected[Seq[T]]](jsonDecryptor).isSuccess) {
-  //              Some((json \ key).as[Protected[Seq[T]]](jsonDecryptor).decryptedValue)
-  //            } else {
-  //              None
-  //            }
-  //        }
-  //        case None => None
-  //      }
-  //    } else {
-  //      cacheRepository.findById(id) map {
-  //        case Some(cache) => cache.data flatMap {
-  //          json =>
-  //            if ((json \ key).validate[Seq[T]].isSuccess) {
-  //              Some((json \ key).as[Seq[T]])
-  //            } else {
-  //              None
-  //            }
-  //        }
-  //        case None => None
-  //      }
-  //    }
-  //  }
+  /**
+    * Saves the cache data into the database
+    */
+  def saveAll(cache: Cache): Future[Boolean] = cacheRepository.save(cache) map handleWriteResult
 
-  def removeById(id: String): Future[Boolean] = {
-    for {
-      writeResult <- cacheRepository.removeById(id)
-    } yield {
-      if (writeResult.hasErrors) {
-        writeResult.errmsg.foreach(m => Logger.error(m))
-        throw new RuntimeException(writeResult.errmsg.getOrElse("Error while removing the session data"))
-      } else {
-        writeResult.ok
-      }
-    }
+  private def handleWriteResult(writeResult: WriteResult) = writeResult match {
+    case w if w.ok => true
+    case w if w.writeErrors.nonEmpty =>
+      w.writeErrors.map(_.errmsg).foreach(m => Logger.error(m))
+      throw new RuntimeException(w.writeErrors.map(_.errmsg).mkString("; "))
+    case _ =>
+      throw new RuntimeException("Error while removing the session data")
   }
 }
