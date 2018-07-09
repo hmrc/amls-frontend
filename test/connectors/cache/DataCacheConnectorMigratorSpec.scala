@@ -16,17 +16,14 @@
 
 package connectors.cache
 
-import connectors.cache.DataCacheConnectorMigrator
-import org.mockito.ArgumentCaptor
+import connectors.DataCacheConnector
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 

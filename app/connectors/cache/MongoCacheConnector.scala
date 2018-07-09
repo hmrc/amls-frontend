@@ -16,18 +16,22 @@
 
 package connectors.cache
 
+import config.AppConfig
 import javax.inject.Inject
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{Format, Reads}
+import play.api.libs.json.{Format, JsValue, Json, Reads}
 import services.cache.MongoCacheClient
+import uk.gov.hmrc.cache.model.Cache
+import uk.gov.hmrc.crypto.Crypted
+import uk.gov.hmrc.crypto.json.JsonDecryptor
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient) extends CacheConnector with Conversions {
+class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient, appConfig: AppConfig) extends CacheConnector with Conversions {
 
   override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     mongoCache.find(authContext.user.oid, key)
@@ -45,6 +49,22 @@ class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient) extends CacheC
       case true => HttpResponse(OK)
       case _ => HttpResponse(INTERNAL_SERVER_ERROR)
     }
+  }
+
+  def saveAll(cacheMap: CacheMap): Future[Cache] = {
+    val jsonValue = (v: JsValue) => if (appConfig.mongoEncryptionEnabled) {
+      v
+    } else {
+      Json.parse(mongoCache.compositeSymmetricCrypto.decrypt(Crypted(v.toString())).value)
+    }
+
+    val json: JsValue = cacheMap.data.foldLeft(Json.obj()) { (acc, v) =>
+      acc ++ Json.obj(v._1 -> jsonValue(v._2))
+    }
+
+    val cache = Cache(cacheMap.id, Some(json))
+
+    mongoCache.saveAll(cache) map { _ => cache }
   }
 
   /**

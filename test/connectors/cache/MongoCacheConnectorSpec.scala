@@ -18,22 +18,45 @@ package connectors.cache
 
 import org.scalatest.prop.PropertyChecks
 import org.scalacheck.Arbitrary.arbitrary
+import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
 import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
+import services.cache.MongoCacheClient
 import uk.gov.hmrc.cache.model.Cache
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import org.mockito.Mockito.when
+import org.mockito.Matchers.any
 
-class MongoCacheConnectorSpec extends FreeSpec with MustMatchers with PropertyChecks {
+import scala.concurrent.Future
+
+class MongoCacheConnectorSpec extends FreeSpec
+  with MustMatchers
+  with PropertyChecks
+  with ScalaFutures
+  with MockitoSugar {
 
   trait Fixture extends Conversions {
-
+    implicit val hc = HeaderCarrier()
+    implicit val ac = mock[AuthContext]
   }
 
-  val referenceJson: JsValue = Json.obj(
+  def referenceJson(str1: String, str2: String): JsValue = Json.obj(
     "dataKey" -> true,
-    "name" -> "Some name",
+    "name" -> str1,
     "obj" -> Json.obj(
-      "prop1" -> "some string",
+      "prop1" -> str2,
+      "prop2" -> 12
+    )
+  )
+
+  def referenceMap(str1: String, str2: String) = Map[String, JsValue](
+    "dataKey" -> JsBoolean(true),
+    "name" -> JsString(str1),
+    "obj" -> Json.obj(
+      "prop1" -> str2,
       "prop2" -> 12
     )
   )
@@ -42,15 +65,9 @@ class MongoCacheConnectorSpec extends FreeSpec with MustMatchers with PropertyCh
 
     "should convert from a JsValue to a Map[String, JsValue] properly" in new Fixture {
 
-      toMap(referenceJson) mustBe Map[String, JsValue](
-        "dataKey" -> JsBoolean(true),
-        "name" -> JsString("Some name"),
-        "obj" -> Json.obj(
-          "prop1" -> "some string",
-          "prop2" -> 12
-        )
-      )
-      
+      forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
+        toMap(referenceJson(str1, str2)) mustBe referenceMap(str1, str2)
+      }
     }
 
   }
@@ -59,19 +76,32 @@ class MongoCacheConnectorSpec extends FreeSpec with MustMatchers with PropertyCh
 
     "should convert from a Cache type to a CacheMap type" in new Fixture {
 
-      forAll(arbitrary[String]) { id =>
-        val cache = Cache(id, Some(referenceJson))
+      forAll(arbitrary[String], arbitrary[String], arbitrary[String]) { (cacheId, str1, str2) =>
 
-        toCacheMap(cache) mustBe CacheMap(cache.id.id, Map[String, JsValue](
-          "dataKey" -> JsBoolean(true),
-          "name" -> JsString("Some name"),
-          "obj" -> Json.obj(
-            "prop1" -> "some string",
-            "prop2" -> 12
-          )
-        ))
+        val cache = Cache(cacheId, Some(referenceJson(str1, str2)))
+
+        toCacheMap(cache) mustBe CacheMap(cacheId, referenceMap(str1, str2))
       }
 
+    }
+
+  }
+
+  "saveAll" - {
+
+    "should convert the incoming CacheMap to a Cache before saving the data" in new Fixture {
+
+      val client = mock[MongoCacheClient]
+      when(client.saveAll(any())) thenReturn Future.successful(true)
+
+      forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
+        val connector = new MongoCacheConnector(client)
+        val cacheMap = CacheMap("test", referenceMap(str1, str2))
+
+        whenReady(connector.saveAll(cacheMap)) { cache =>
+          cache.data mustBe Some(referenceJson(str1, str2))
+        }
+      }
     }
 
   }

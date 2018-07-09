@@ -19,7 +19,7 @@ private object AppDependencies {
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val mongoCachingVersion = "5.0.0"
+  private val mongoCachingVersion = "5.4.0"
   private val jsonEncryptionVersion = "3.2.0"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
