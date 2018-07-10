@@ -87,7 +87,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         }
 
         "have a back button link" in new ViewFixture {
-            Option(doc.getElementById("back-button")).isDefined mustBe(true)
+            Option(doc.getElementById("back-link")).isDefined mustBe(true)
         }
 
         "have correct headings" in new ViewFixture {
