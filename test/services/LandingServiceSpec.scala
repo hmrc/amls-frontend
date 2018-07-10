@@ -61,33 +61,9 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     override private[services] val businessMatchingConnector = mock[BusinessMatchingConnector]
   }
 
-  "hasSavedFrom" must {
-
-    "return true if a cache exists" in {
-      when {
-        TestLandingService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-
-      whenReady (TestLandingService.hasSavedForm) {
-        _ mustEqual true
-      }
-    }
-
-    "return false if a cache does not exist" in {
-      when {
-        TestLandingService.cacheConnector.fetchAll(any(), any())
-      } thenReturn Future.successful(None)
-
-      whenReady (TestLandingService.hasSavedForm) {
-        _ mustEqual false
-      }
-    }
-  }
-
   "setAltCorrespondenceAddress" must {
 
     val cacheMap = CacheMap("", Map.empty)
-
 
     "return a cachmap with the saved alternative correspondence address - true" in {
       val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
@@ -245,7 +221,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
+      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(HttpResponse(OK)))
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
@@ -355,7 +331,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any())(any())).thenReturn(Future.successful(HttpResponse(OK)))
+      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(HttpResponse(OK)))
 
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)

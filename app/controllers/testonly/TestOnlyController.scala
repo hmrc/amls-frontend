@@ -46,23 +46,22 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def removeCacheData(implicit user: AuthContext,  hc: HeaderCarrier) = {
-    BusinessCustomerSessionCache.remove()
-    AmlsShortLivedCache.remove(user.user.oid)
-    testOnlyStubConnector.clearState()
-  }
+  def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
+    _ <- BusinessCustomerSessionCache.remove()
+    _ <- dataCacheConnector.remove
+    response <- testOnlyStubConnector.clearState()
+  } yield response
 
   def updateSave4Later(fileName:String)  = Authorised.async {
     implicit user =>
       implicit request =>
         stubsService.getSaveForLaterData(fileName) flatMap {
-          case Some(data) => {
+          case Some(data) =>
             removeCacheData flatMap { _ =>
               stubsService.update(data) map { _ =>
                 Redirect(controllers.routes.LandingController.get())
               }
             }
-          }
           case _ => Future.successful(BadRequest)
         }
   }
