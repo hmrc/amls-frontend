@@ -53,7 +53,7 @@ trait LandingService {
 
   def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
 
-  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] = cacheConnector.remove
+  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = cacheConnector.remove
 
   private def saveRenewalData(viewResponse: ViewResponse, cacheMap: CacheMap)
                              (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {

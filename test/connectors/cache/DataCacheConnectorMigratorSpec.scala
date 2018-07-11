@@ -16,27 +16,25 @@
 
 package connectors.cache
 
-import connectors.DataCacheConnector
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
+import services.cache.Cache
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import utils.AmlsSpec
+import org.scalacheck.Arbitrary.arbitrary
 
 import scala.concurrent.Future
 
-class DataCacheConnectorMigratorSpec
-  extends PlaySpec
-    with OneAppPerSuite
-    with MockitoSugar
+class DataCacheConnectorMigratorSpec extends AmlsSpec
     with ScalaFutures
     with IntegrationPatience {
 
   case class Model(value: String)
+
   object Model {
     implicit val format = Json.format[Model]
   }
@@ -46,14 +44,15 @@ class DataCacheConnectorMigratorSpec
     implicit val headerCarrier = HeaderCarrier()
     implicit val authContext = mock[AuthContext]
     implicit val user = mock[LoggedInUser]
+
     val oid = "user_oid"
     val key = "key"
     val cacheId = "12345"
 
-    implicit val newDataCacheConnectorMock = mock[DataCacheConnector]
-    implicit val currentDataCacheConnectorMock = mock[DataCacheConnector]
+    implicit val primaryConnector = mock[MongoCacheConnector]
+    implicit val fallbackConnector = mock[Save4LaterCacheConnector]
 
-    val migrator:DataCacheConnectorMigrator = new DataCacheConnectorMigrator(newDataCacheConnectorMock, currentDataCacheConnectorMock)
+    val migrator = new DataCacheConnectorMigrator(primaryConnector, fallbackConnector)
 
     when(authContext.user) thenReturn user
     when(user.oid) thenReturn oid
@@ -65,123 +64,138 @@ class DataCacheConnectorMigratorSpec
 
     "fetch data from the new connector, if the data exists the new connector" in new Fixture {
       val model = Model("data")
+
       when {
-        newDataCacheConnectorMock.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
       } thenReturn Future.successful[Option[Model]](Some(model))
 
       val result = migrator.fetch[Model](cacheId)
+
       whenReady(result) {
-        result => result must be(Some(model))
+        result => result mustBe Some(model)
       }
     }
 
-    "fetch data from the current data connector, if the data doesn't doesn't exist in the new data connector, but does in the current data connector - the data should be written into the new dataconnector" in new Fixture {
-      val model = Model("data")
-      when {
-        newDataCacheConnectorMock.fetch[Model](eqTo(cacheId))(any(), any(), any())
-      } thenReturn Future.successful(None)
+    "write data to the primary cache" when {
 
-      when {
-        currentDataCacheConnectorMock.fetch[Model](eqTo(cacheId))(any(), any(), any())
-      } thenReturn Future.successful[Option[Model]](Some(model))
+      "saving a single model" in new Fixture {
+        val model = Model("data")
 
-      val result = migrator.fetch[Model](cacheId)
-      whenReady(result) {
-        result => result must be(Some(model))
+        when {
+          primaryConnector.save[Model](any(), any())(any(), any(), any())
+        } thenReturn Future.successful[CacheMap](emptyCache)
+
+        val result = migrator.save[Model](key, model)
+
+        whenReady(result) { result =>
+          result mustBe emptyCache
+          verify(primaryConnector).save[Model](eqTo(key), eqTo(model))(any(), any(), any())
+        }
       }
-      verify(newDataCacheConnectorMock).save[Model](any(),any())(any(), any(), any())
+
+      "migrating the entire cache" in new Fixture {
+        when {
+          primaryConnector.fetchAll
+        } thenReturn Future.successful(None)
+
+        when {
+          fallbackConnector.fetchAll
+        } thenReturn Future.successful[Option[CacheMap]](Some(emptyCache))
+
+        when {
+          primaryConnector.saveAll(emptyCache)
+        } thenReturn Future.successful(Cache(emptyCache))
+
+        val result = migrator.fetchAll
+
+        whenReady(result) { result =>
+          result mustBe Some(emptyCache)
+        }
+      }
+
+      "data has been loaded from the fallback cache and needs to be migrated" in new Fixture {
+        val model = Model("data")
+        override val key = arbitrary[String].sample.get
+
+        when {
+          primaryConnector.fetch[Model](key)
+        } thenReturn Future.successful(None)
+
+        when {
+          fallbackConnector.fetch[Model](key)
+        } thenReturn Future.successful[Option[Model]](Some(model))
+
+        when {
+          primaryConnector.save(key, model)
+        } thenReturn Future.successful(emptyCache)
+
+        val result = migrator.fetch[Model](key)
+
+        whenReady(result) { result =>
+          result mustBe Some(model)
+          verify(primaryConnector).save[Model](any(), any())(any(), any(), any())
+        }
+      }
     }
 
     "return a record not found when fetching data, if there is no data in either" in new Fixture {
       when {
-        newDataCacheConnectorMock.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       when {
-        currentDataCacheConnectorMock.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        fallbackConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val result = migrator.fetch[Model](cacheId)
-      whenReady(result) {
-        result => result must be(None)
-      }
+
+      whenReady(result) { _ mustBe None }
     }
 
-    "fetch all data from the new connector, if the data exists in the new connector" in new Fixture {
+    "fetch all data from the primary connector, if the data exists in the primary connector" in new Fixture {
       when {
-        newDataCacheConnectorMock.fetchAll
+        primaryConnector.fetchAll
       } thenReturn Future.successful[Option[CacheMap]](Some(emptyCache))
 
       val result = migrator.fetchAll
-      whenReady(result) {
-        result => result must be(Some(emptyCache))
-      }
-      // verify(newDataCacheConnectorMock).save[CacheMap](any(),any())(any(), any(), any())
-    }
 
-    "fetch all data from the current data connector, if the data doesn't exist in the new data connector, but does in the current data connector - the data should be written into the new dataconnector" in new Fixture {
-      when {
-        newDataCacheConnectorMock.fetchAll
-      } thenReturn Future.successful(None)
-      when {
-        currentDataCacheConnectorMock.fetchAll
-      } thenReturn Future.successful[Option[CacheMap]](Some(emptyCache))
-
-      val result = migrator.fetchAll
-      whenReady(result) {
-        result => result must be(Some(emptyCache))
-      }
+      whenReady(result) { _ mustBe Some(emptyCache) }
     }
 
     "return a record not found when fetching all data, if there is no data in either" in new Fixture {
       when {
-        newDataCacheConnectorMock.fetchAll
+        primaryConnector.fetchAll
       } thenReturn Future.successful(None)
+
       when {
-        currentDataCacheConnectorMock.fetchAll
+        fallbackConnector.fetchAll
       } thenReturn Future.successful(None)
 
       val result = migrator.fetchAll
-      whenReady(result) {
-        result => result must be(None)
-      }
+      whenReady(result) { _ mustBe None }
     }
 
-    "Save data should save the data using the new connector" in new Fixture {
-      val model = Model("data")
+
+    "remove the data from the new connector" in new Fixture {
       when {
-        newDataCacheConnectorMock.save[Model](any(), any())(any(), any(), any())
-      } thenReturn Future.successful[CacheMap](emptyCache)
-
-      val result = migrator.save[Model](key, model)
-      whenReady(result) {
-        result => result must be(emptyCache)
-      }
-    }
-
-    "Remove data should remove the data from the new connector" in new Fixture {
-      val response = mock[HttpResponse]
-      when {
-        newDataCacheConnectorMock.remove(any(), any())
-      } thenReturn Future.successful[HttpResponse](response)
-
+        primaryConnector.remove(any(), any())
+      } thenReturn Future.successful(true)
 
       val result = migrator.remove
-      whenReady(result) {
-        result => result must be(response)
-      }
+
+      whenReady(result) { _ mustBe true }
     }
 
-    "Update should update the data in the new connector" in new Fixture {
+    "update the data in the new connector" in new Fixture {
       val model = Model("data")
+
       when {
-        newDataCacheConnectorMock.update[Model](any())(any())(any(), any(), any())
+        primaryConnector.update[Model](any())(any())(any(), any(), any())
       } thenReturn Future.successful[Option[Model]](Some(model))
 
-      val result = migrator.update[Model](cacheId)(f => model)
-      whenReady(result) {
-        result => result must be(Some(model))
-      }
+      val result = migrator.update[Model](cacheId)(_ => model)
+
+      whenReady(result) { _ mustBe Some(model) }
     }
   }
 }

@@ -17,12 +17,12 @@
 package connectors.cache
 
 import config.AmlsShortLivedCache
-import javax.inject.Inject
+import play.api.http.Status.OK
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json
 import play.api.libs.json.Format
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
@@ -42,8 +42,11 @@ class Save4LaterCacheConnector extends CacheConnector {
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     shortLivedCache.fetch(authContext.user.oid)
 
-  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse] =
-    shortLivedCache.remove(ac.user.oid)
+  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
+    shortLivedCache.remove(ac.user.oid) map {
+      case r if r.status == OK => true
+      case _ => false
+    }
 
   override def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] = {
     fetch(cacheId) flatMap { t =>

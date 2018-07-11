@@ -221,7 +221,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(HttpResponse(OK)))
+      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
@@ -331,7 +331,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(HttpResponse(OK)))
+      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
       setUpMockView(TestLandingService.cacheConnector, cacheMap, BusinessMatching.key, viewResponse.businessMatchingSection)
       setUpMockView(TestLandingService.cacheConnector, cacheMap, EstateAgentBusiness.key, viewResponse.eabSection)

@@ -16,42 +16,47 @@
 
 package connectors.cache
 
-import config.AppConfig
 import javax.inject.Inject
-import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json.Format
-import play.modules.reactivemongo.MongoDbConnection
-import services.cache.{Cache, MongoCacheClient}
+import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-class MongoCacheConnector @Inject()(appConfig: AppConfig) extends CacheConnector with Conversions {
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends CacheConnector with Conversions {
 
-  class DbConnection extends MongoDbConnection
+  lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 
-  private lazy val mongoCache = new MongoCacheClient(appConfig, new DbConnection().db)
-
-  override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
+  /**
+    * Fetches the data item with the specified key from the mongo store
+    */
+  override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
-  }
 
+  /**
+    * Saves the data item in the mongo store with the specified key
+    */
   override def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
 
+  /**
+    * Fetches the entire cache from the mongo store
+    */
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
 
-  override def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[HttpResponse] = {
-    mongoCache.removeById(authContext.user.oid) map {
-      case true => HttpResponse(OK)
-      case _ => HttpResponse(INTERNAL_SERVER_ERROR)
-    }
-  }
+  /**
+    * Removes the entire cache from the mongo store
+    */
+  override def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
+    mongoCache.removeById(authContext.user.oid)
 
+  /**
+    * Saves the given cache map into the mongo store
+    */
   def saveAll(cacheMap: CacheMap): Future[Cache] = {
     val cache = Cache(cacheMap)
     mongoCache.saveAll(cache) map { _ => cache }

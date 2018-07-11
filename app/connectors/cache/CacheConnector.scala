@@ -31,7 +31,7 @@ trait CacheConnector {
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]]
 
-  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[HttpResponse]
+  def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean]
 
   def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]]
 }

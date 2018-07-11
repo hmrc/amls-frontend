@@ -16,19 +16,18 @@
 
 package connectors.cache
 
-import org.scalatest.prop.PropertyChecks
+import org.mockito.Matchers.any
+import org.mockito.Mockito.{reset, when}
 import org.scalacheck.Arbitrary.arbitrary
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FreeSpec, MustMatchers}
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
-import services.cache.MongoCacheClient
-import uk.gov.hmrc.cache.model.Cache
+import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
+import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 
 import scala.concurrent.Future
 
@@ -36,23 +35,36 @@ class MongoCacheConnectorSpec extends FreeSpec
   with MustMatchers
   with PropertyChecks
   with ScalaFutures
-  with MockitoSugar {
+  with MockitoSugar
+  with IntegrationPatience {
 
-  trait Fixture extends Conversions {
-    implicit val hc = HeaderCarrier()
-    implicit val ac = mock[AuthContext]
+  case class Model(tmp: String)
+
+  object Model {
+    implicit val formats = Json.format[Model]
+
+    def apply(): Model = Model(arbitrary[String].sample.get)
   }
 
-  def referenceJson(str1: String, str2: String): JsValue = Json.obj(
-    "dataKey" -> true,
-    "name" -> str1,
-    "obj" -> Json.obj(
-      "prop1" -> str2,
-      "prop2" -> 12
-    )
-  )
+  trait Fixture {
+    implicit val hc = HeaderCarrier()
+    implicit val ac = mock[AuthContext]
+    implicit val user = mock[LoggedInUser]
 
-  def referenceMap(str1: String, str2: String) = Map[String, JsValue](
+    val factory = mock[MongoCacheClientFactory]
+    val client = mock[MongoCacheClient]
+    val cacheId = arbitrary[String].sample.get
+    val key = arbitrary[String].sample.get
+
+    when(ac.user) thenReturn user
+    when(user.oid) thenReturn cacheId
+
+    when(factory.createClient) thenReturn client
+
+    val connector = new MongoCacheConnector(factory)
+  }
+
+  def referenceMap(str1: String = "", str2: String = ""): Map[String, JsValue] = Map(
     "dataKey" -> JsBoolean(true),
     "name" -> JsString(str1),
     "obj" -> Json.obj(
@@ -61,27 +73,50 @@ class MongoCacheConnectorSpec extends FreeSpec
     )
   )
 
-  "toMap" - {
+  "fetch" - {
 
-    "should convert from a JsValue to a Map[String, JsValue] properly" in new Fixture {
+    "should delegate the call to the underlying mongo client" in new Fixture {
 
-      forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
-        toMap(referenceJson(str1, str2)) mustBe referenceMap(str1, str2)
-      }
+      val model = Model()
+
+      when {
+        client.find[Model](cacheId, key)
+      } thenReturn Future.successful(Some(model))
+
+      whenReady(connector.fetch[Model](key)) { _ mustBe Some(model) }
+
     }
 
   }
 
-  "toCacheMap" - {
+  "fetchAll" - {
 
-    "should convert from a Cache type to a CacheMap type" in new Fixture {
+    "should delegate the call to the underlying mongo client" in new Fixture with Conversions {
 
-      forAll(arbitrary[String], arbitrary[String], arbitrary[String]) { (cacheId, str1, str2) =>
+      val cache = Cache(cacheId, referenceMap())
 
-        val cache = Cache(cacheId, Some(referenceJson(str1, str2)))
+      when {
+        client.fetchAll(cacheId)
+      } thenReturn Future.successful(Some(cache))
 
-        toCacheMap(cache) mustBe CacheMap(cacheId, referenceMap(str1, str2))
-      }
+      whenReady(connector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
+
+    }
+
+  }
+
+  "save" - {
+
+    "should delegate the call to the underlying mongo client" in new Fixture with Conversions {
+
+      val model = Model()
+      val cache = Cache(cacheId, referenceMap())
+
+      when {
+        client.createOrUpdate(cacheId, model, key)
+      } thenReturn Future.successful(cache)
+
+      whenReady(connector.save(key, model)) { _ mustBe toCacheMap(cache) }
 
     }
 
@@ -90,18 +125,48 @@ class MongoCacheConnectorSpec extends FreeSpec
   "saveAll" - {
 
     "should convert the incoming CacheMap to a Cache before saving the data" in new Fixture {
-
-      val client = mock[MongoCacheClient]
       when(client.saveAll(any())) thenReturn Future.successful(true)
 
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
-        val connector = new MongoCacheConnector(client)
         val cacheMap = CacheMap("test", referenceMap(str1, str2))
 
         whenReady(connector.saveAll(cacheMap)) { cache =>
-          cache.data mustBe Some(referenceJson(str1, str2))
+          cache.data mustBe referenceMap(str1, str2)
         }
       }
+
+    }
+
+  }
+
+  "remove" - {
+
+    "should delegate the call to the underlying mongo client" in new Fixture {
+
+      forAll(arbitrary[Boolean]) { v =>
+
+        reset(client)
+        when(client.removeById(cacheId)) thenReturn Future.successful(v)
+
+        whenReady(connector.remove) { _ mustBe v }
+      }
+
+    }
+
+  }
+
+  "update" - {
+
+    "should fetch and then save into the underlying mongo client" in new Fixture {
+
+      val model = Model()
+      val updatedModel = model.copy(tmp = "this has been updated")
+      val f: Option[Model] => Model = { _ => updatedModel }
+
+      when(client.find[Model](cacheId, key)) thenReturn Future.successful(Some(model))
+      when(client.createOrUpdate(cacheId, updatedModel, key)) thenReturn Future.successful(Cache.empty)
+
+      whenReady(connector.update[Model](key)(f)) { _ mustBe Some(updatedModel) }
     }
 
   }

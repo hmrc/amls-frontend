@@ -18,10 +18,12 @@ package services.cache
 
 import config.AppConfig
 import connectors.cache.Conversions
+import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
+import play.modules.reactivemongo.MongoDbConnection
 import reactivemongo.api.DefaultDB
 import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
@@ -36,38 +38,9 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
 
-sealed trait CacheOps {
-
-  /**
-    * Retrieves an encrypted value from the cache
-    * @param cache The cache to retrieve the value from
-    * @param key The cache key
-    * @return The decrypted item from the cache as T, or None if the value wasn't present
-    */
-  def decryptValue[T](cache: Cache, key: String)(implicit decryptor: JsonDecryptor[T], reads: Reads[T]): Option[T] =
-    cache.data.get(key) flatMap { json =>
-      if (json.validate[Protected[T]](decryptor).isSuccess) {
-        Some(json.as[Protected[T]](decryptor).decryptedValue)
-      } else {
-        None
-      }
-    }
-
-  /**
-    * Gets an unencrypted value from the cache
-    * @param cache The cache to retrieve the value from
-    * @param key The cache key
-    * @return The value from the cache, or None if the value wasn't present
-    */
-  def getValue[T](cache: Cache, key: String)(implicit reads: Reads[T]): Option[T] = cache.data.get(key) flatMap { json =>
-    if (json.validate[T].isSuccess) {
-      Some(json.as[T])
-    } else {
-      None
-    }
-  }
-}
-
+// $COVERAGE-OFF$
+// Coverage has been turned off for these types, as the only things we can really do with them
+// is mock out the mongo connection, which is bad craic. This has all been manually tested in the running application.
 case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC))
 
 object Cache {
@@ -75,10 +48,12 @@ object Cache {
   implicit val format = Json.format[Cache]
 
   def apply(cacheMap: CacheMap): Cache = Cache(cacheMap.id, cacheMap.data)
+
+  val empty = Cache("", Map())
 }
 
 /**
-  * Implements getEntry[T], which will decrypt the entry on retrieval
+  * Implements getEncryptedEntry[T], which will decrypt the entry on retrieval
   * This type itself is a type of Cache.
   *
   * @param cache The cache to wrap.
@@ -87,6 +62,15 @@ object Cache {
 class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(cache.id, cache.data) with CacheOps {
   def getEncryptedEntry[T](key: String)(implicit fmt: Reads[T]): Option[T] =
     decryptValue(cache, key)(new JsonDecryptor[T]()(crypto, fmt), fmt)
+}
+
+/**
+  * An injectible factory for creating new MongoCacheClients
+  */
+class MongoCacheClientFactory @Inject()(config: AppConfig) {
+  class DbConnection extends MongoDbConnection
+
+  def createClient: MongoCacheClient = new MongoCacheClient(config, new DbConnection().db)
 }
 
 /**
@@ -100,6 +84,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
 
   private val logPrefix = "[MongoCacheClient]"
   private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
+  private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
   private def error(msg: String) = Logger.error(s"$logPrefix $msg")
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = ApplicationCrypto.JsonCrypto
@@ -207,7 +192,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   private def handleWriteResult(writeResult: WriteResult) = writeResult match {
     case w if w.ok => true
     case w if w.writeErrors.nonEmpty =>
-      w.writeErrors.map(_.errmsg).foreach(error)
+      w.writeErrors.map(_.errmsg).foreach(e => error(e))
       throw new RuntimeException(w.writeErrors.map(_.errmsg).mkString("; "))
     case _ =>
       throw new RuntimeException("Error while removing the session data")
@@ -221,3 +206,5 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     case Failure(e) => throw e
   }
 }
+
+// $COVERAGE-ON$
