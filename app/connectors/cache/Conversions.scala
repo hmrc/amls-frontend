@@ -17,8 +17,7 @@
 package connectors.cache
 
 import play.api.libs.json.{JsObject, JsValue, Reads}
-import services.cache.CryptoCache
-import uk.gov.hmrc.cache.model.Cache
+import services.cache.{Cache, CryptoCache}
 import uk.gov.hmrc.http.cache.client.CacheMap
 
 trait Conversions {
@@ -44,7 +43,7 @@ trait Conversions {
     * cache instance is a CryptoCache. Otherwise, the default implementation of CacheMap is used.
     * @param cache The cache to delegate to
     */
-  private class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id.id, cache.data.fold[Map[String, JsValue]](Map.empty)(toMap)) {
+  private class DelegateCacheMap(cache: Cache) extends CacheMap(cache.id, cache.data) {
     override def getEntry[T](key: String)(implicit fjs: Reads[T]): Option[T] = cache match {
       case c: CryptoCache => c.getEncryptedEntry(key)
       case _ => super.getEntry(key)

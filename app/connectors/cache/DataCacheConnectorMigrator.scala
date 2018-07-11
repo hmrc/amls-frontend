@@ -17,8 +17,7 @@
 package connectors.cache
 
 import config.AmlsShortLivedCache
-import connectors.DataCacheConnector
-import javax.inject.Inject
+import play.api.Logger
 import play.api.libs.json
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
@@ -30,7 +29,7 @@ import scala.concurrent.Future
 
 class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector {
 
-  lazy val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
+  private def log(msg: String): Unit = Logger.info(s"[DataCacheConnectorMigrator] $msg")
 
   /**
     * Fetches T from the primary cache. If the data is not available in the primary cache, the data is
@@ -38,12 +37,15 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
     *
     * @return The item T from the cache
     */
-  override def fetch[T](cacheId: String)
+  override def fetch[T](key: String)
                        (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] =
-    primaryCache.fetch[T](cacheId) flatMap {
+    primaryCache.fetch[T](key) flatMap {
       case primaryCacheData@Some(_) => Future.successful(primaryCacheData)
-      case _ => fallbackCache.fetch[T](cacheId) flatMap {
-        case o@Some(t) => save[T](cacheId, t) map { _ => o }
+      case _ => fallbackCache.fetch[T](key) flatMap {
+        case o@Some(t) => save[T](key, t) map { _ =>
+            log(s"Migrated cache key: $key")
+            o
+          }
         case t => Future.successful(t)
       }
     }
@@ -51,9 +53,9 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
   /**
     * Saves data into the primary cache
     */
-  override def save[T](cacheId: String, data: T)
+  override def save[T](key: String, data: T)
                       (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    primaryCache.save[T](cacheId, data)
+    primaryCache.save[T](key, data)
 
   /**
     * Fetches all data from the primary cache. If the data is not available in the primary cache,
@@ -64,7 +66,10 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
       case primaryCacheMap@Some(_) => Future.successful(primaryCacheMap)
       case _ => fallbackCache.fetchAll flatMap {
         case Some(f) => primaryCache match {
-          case m: MongoCacheConnector => m.saveAll(f) map { _ => Some(f) }
+          case m: MongoCacheConnector => m.saveAll(f) map { _ =>
+              log(s"Migrated entire cache")
+              Some(f)
+            }
           case _ => throw new RuntimeException("No primary cache node for saveAll")
         }
         case fallbackCacheMap => Future.successful(fallbackCacheMap)
@@ -83,8 +88,8 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
     * @param f The function to execute in order to transform the data.
     * @return The cache data after it has been transformed by f
     */
-  override def update[T](cacheId: String)(f: Option[T] => T)
+  override def update[T](key: String)(f: Option[T] => T)
                         (implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
-    primaryCache.update[T](cacheId)(f)
+    primaryCache.update[T](key)(f)
 }
 

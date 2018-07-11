@@ -20,26 +20,27 @@ import config.AppConfig
 import javax.inject.Inject
 import play.api.http.Status.{INTERNAL_SERVER_ERROR, OK}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
-import play.api.libs.json.{Format, JsValue, Json, Reads}
-import services.cache.MongoCacheClient
-import uk.gov.hmrc.cache.model.Cache
-import uk.gov.hmrc.crypto.Crypted
-import uk.gov.hmrc.crypto.json.JsonDecryptor
+import play.api.libs.json.Format
+import play.modules.reactivemongo.MongoDbConnection
+import services.cache.{Cache, MongoCacheClient}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
-class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient, appConfig: AppConfig) extends CacheConnector with Conversions {
+class MongoCacheConnector @Inject()(appConfig: AppConfig) extends CacheConnector with Conversions {
+
+  class DbConnection extends MongoDbConnection
+
+  private lazy val mongoCache = new MongoCacheClient(appConfig, new DbConnection().db)
 
   override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] = {
     mongoCache.find(authContext.user.oid, key)
   }
 
-  override def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+  override def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
-  }
 
   override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
@@ -52,18 +53,7 @@ class MongoCacheConnector @Inject()(mongoCache: MongoCacheClient, appConfig: App
   }
 
   def saveAll(cacheMap: CacheMap): Future[Cache] = {
-    val jsonValue = (v: JsValue) => if (appConfig.mongoEncryptionEnabled) {
-      v
-    } else {
-      Json.parse(mongoCache.compositeSymmetricCrypto.decrypt(Crypted(v.toString())).value)
-    }
-
-    val json: JsValue = cacheMap.data.foldLeft(Json.obj()) { (acc, v) =>
-      acc ++ Json.obj(v._1 -> jsonValue(v._2))
-    }
-
-    val cache = Cache(cacheMap.id, Some(json))
-
+    val cache = Cache(cacheMap)
     mongoCache.saveAll(cache) map { _ => cache }
   }
 

@@ -19,8 +19,8 @@ private object AppDependencies {
   private val validationVersion = "2.0.1"
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
-  private val mongoCachingVersion = "5.4.0"
   private val jsonEncryptionVersion = "3.2.0"
+  private val playReactivemongoVersion = "6.0.0"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
@@ -30,8 +30,8 @@ private object AppDependencies {
     "uk.gov.hmrc" %% "play-partials" % playPartialsVersion,
     "uk.gov.hmrc" %% "http-caching-client" % httpCachingClientVersion,
     "uk.gov.hmrc" %% "play-whitelist-filter" % playWhitelistFilterVersion,
-    "uk.gov.hmrc" %% "mongo-caching" % mongoCachingVersion exclude("uk.gov.hmrc","time_2.11"),
     "uk.gov.hmrc" %% "json-encryption" % jsonEncryptionVersion,
+    "uk.gov.hmrc" %% "play-reactivemongo" % playReactivemongoVersion,
 
     "io.github.jto" %% "validation-core"      % validationVersion excludeAll playJars,
     "io.github.jto" %% "validation-playjson"  % validationVersion excludeAll playJars,
