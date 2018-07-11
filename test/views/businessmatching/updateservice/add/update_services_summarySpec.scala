@@ -26,108 +26,9 @@ import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 import views.html.businessmatching.updateservice.add._
+import utils.UpdateServicesSummaryFixtures
 
-
-class update_services_summarySpec  extends AmlsSpec with MustMatchers {
-
-
-  trait ViewFixture extends Fixture {
-    implicit val requestWithToken = addToken(request)
-  }
-
-  trait SimpleFlowModelViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(HighValueDealing),
-      areNewActivitiesAtTradingPremises = Some(true)
-    ))
-  }
-
-  trait SimpleTCSPViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2)))
-    ))
-  }
-
-  trait SimpleTCSPNoFitAndProperViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(TrustAndCompanyServices),
-      fitAndProper = Some(false),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2)))
-    ))
-  }
-
-  trait MSBViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      tradingPremisesActivities = Some(TradingPremisesActivities(Set(1,2)))
-    ))
-  }
-
-  trait MSBViewNoPremisesFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-      areNewActivitiesAtTradingPremises = Some(false)
-    ))
-  }
-
-  trait MSBAllViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney,
-        CurrencyExchange,
-        ForeignExchange,
-        ChequeCashingNotScrapMetal,
-        ChequeCashingScrapMetal)
-      )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111")),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney,
-        CurrencyExchange,
-        ForeignExchange,
-        ChequeCashingNotScrapMetal,
-        ChequeCashingScrapMetal))),
-      tradingPremisesActivities = Some(TradingPremisesActivities(Set(1,2)))
-    ))
-  }
-
-  trait MSBNoPSRViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      fitAndProper = Some(true),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(
-        TransmittingMoney)
-      )),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
-      areNewActivitiesAtTradingPremises = Some(true),
-      tradingPremisesMsbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-    ))
-  }
-
-  trait SingleSubSectorMSBViewFixture extends ViewFixture {
-    override def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel(
-      activity = Some(MoneyServiceBusiness),
-      responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(1, 2))),
-      subSectors = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-      businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberYes("111111")),
-      areNewActivitiesAtTradingPremises = Some(true)
-    ))
-  }
-
+class update_services_summarySpec  extends AmlsSpec with MustMatchers with UpdateServicesSummaryFixtures {
   "The update_services_summary view" must {
     "have the correct title" in new ViewFixture {
       def view = update_services_summary(EmptyForm, AddBusinessTypeFlowModel())
@@ -157,76 +58,119 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
       Option(doc.getElementById("selectactivities-edit")).isDefined mustBe true
     }
 
-    "show AccountancyServices if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.01"))
-    }
+    "for all business types" must {
+      "show AccountancyServices if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(AccountancyServices))
 
-    "show BillPaymentServices if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.02"))
-    }
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-    "show EstateAgentBusinessService if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.03"))
-    }
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.01"))
+      }
 
-    "show HighValueDealing if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.04"))
-    }
 
-    "show MoneyServiceBusiness if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.05"))
-    }
+      "show BillPaymentServices if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(BillPaymentServices))
 
-    "show TrustAndCompanyServices if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.06"))
-    }
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
 
-    "show TelephonePaymentService if present" in new ViewFixture {
-      val addBusinessTypeFlowModel:AddBusinessTypeFlowModel  = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
-      def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
-      doc.getElementById("activity-name").text mustBe(Messages("businessmatching.registerservices.servicename.lbl.07"))
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.02"))
+      }
+
+      "show EstateAgentBusinessService if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(EstateAgentBusinessService))
+
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.03"))
+      }
+
+      "show HighValueDealing if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(HighValueDealing))
+
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.04"))
+      }
+
+      "show MoneyServiceBusiness if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(MoneyServiceBusiness))
+
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.05"))
+      }
+
+      "show TrustAndCompanyServices if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TrustAndCompanyServices))
+
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.06"))
+      }
+
+      "show TelephonePaymentService if present" in new ViewFixture {
+        val addBusinessTypeFlowModel: AddBusinessTypeFlowModel = AddBusinessTypeFlowModel(activity = Some(TelephonePaymentService))
+
+        def view = update_services_summary(EmptyForm, addBusinessTypeFlowModel)
+
+        doc.getElementById("activity-name").text mustBe (Messages("businessmatching.registerservices.servicename.lbl.07"))
+      }
     }
   }
 
-  "if adding msb, which services does your business provide" must {
-    "have a question title" in new MSBAllViewFixture {
-      doc.body().text must include(Messages("businessmatching.services.title"))
-    }
+  "if adding msb" must {
+    "which services does your business provide" must {
+      "have a question title" in new MSBAllViewFixture {
+        doc.body().text must include(Messages("businessmatching.services.title"))
+      }
 
-    "show edit link" in new MSBAllViewFixture {
-      Option(doc.getElementById("msbservices-edit")).isDefined mustBe true
-    }
+      "show edit link" in new MSBAllViewFixture {
+        Option(doc.getElementById("msbservices-edit")).isDefined mustBe true
+      }
 
-    "show msb service TransmittingMoney" in new MSBAllViewFixture {
-      doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.01"))
-    }
+      "for all msb services" must {
+        "show msb service TransmittingMoney" in new MSBAllViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.01"))
+        }
 
-    "show msb service CurrencyExchange" in new MSBAllViewFixture {
-      doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.02"))
-    }
+        "show msb service CurrencyExchange" in new MSBAllViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.02"))
+        }
 
-    "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
-      doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.03"))
-    }
+        "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.03"))
+        }
 
-    "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
-      doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.04"))
-    }
+        "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.04"))
+        }
 
-    "show msb service ForeignExchange" in new MSBAllViewFixture {
-      doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.05"))
+        "show msb service ForeignExchange" in new MSBAllViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.05"))
+        }
+      }
+
+      "for single msb" must {
+        "show msb service TransmittingMoney" in new MSBSingleViewFixture {
+          doc.getElementById("msb-service").text must include(Messages("businessmatching.services.list.lbl.01"))
+        }
+
+        "show msb service CurrencyExchange" in new MSBSingleViewFixture {
+          doc.getElementById("msb-service").text must not include(Messages("businessmatching.services.list.lbl.02"))
+        }
+
+        "show msb service ChequeCashingNotScrapMetal" in new MSBSingleViewFixture {
+          doc.getElementById("msb-service").text must not include(Messages("businessmatching.services.list.lbl.03"))
+        }
+
+        "show msb service ChequeCashingScrapMetal" in new MSBSingleViewFixture {
+          doc.getElementById("msb-service").text must not include(Messages("businessmatching.services.list.lbl.04"))
+        }
+
+        "show msb service ForeignExchange" in new MSBSingleViewFixture {
+          doc.getElementById("msb-service").text must not include(Messages("businessmatching.services.list.lbl.05"))
+        }
+      }
     }
 
     "if adding TransmittingMoney as an MSB subsector, for does your business have a PSR number" must {
@@ -250,6 +194,86 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
         Option(doc.getElementById("psr")).isDefined mustBe false
       }
     }
+
+    "for what will your business do at these premises" must {
+      "have a question title" in new MSBViewFixture {
+        doc.body().text must include(Messages("businessmatching.updateservice.whatdoyoudohere.heading"))
+      }
+
+      "for the edit link display when business does more than one type of MSB subservice" in new MSBAllViewFixture {
+        Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe true
+      }
+
+      "for the edit link not display when business does only one type of MSB subservice" in new SingleSubSectorPSRMSBViewFixture {
+        Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe false
+      }
+
+      "for all tp msb services" must {
+        "show msb service TransmittingMoney" in new MSBAllViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.01"))
+        }
+
+        "show msb service CurrencyExchange" in new MSBAllViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.02"))
+        }
+
+        "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.03"))
+        }
+
+        "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.04"))
+        }
+
+        "show msb service ForeignExchange" in new MSBAllViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.05"))
+        }
+      }
+
+      "for a single tp msb service" must {
+        "show msb service TransmittingMoney" in new MSBSingleViewFixture {
+          doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.01"))
+        }
+
+        "show msb service CurrencyExchange" in new MSBSingleViewFixture {
+          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.02"))
+        }
+
+        "show msb service ChequeCashingNotScrapMetal" in new MSBSingleViewFixture {
+          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.03"))
+        }
+
+        "show msb service ChequeCashingScrapMetal" in new MSBSingleViewFixture {
+          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.04"))
+        }
+
+        "show msb service ForeignExchange" in new MSBSingleViewFixture {
+          doc.getElementById("tp-msb-services").text must not include(Messages("businessmatching.updateservice.msb.services.list.lbl.05"))
+        }
+      }
+    }
+
+    "for have any of your responsible people have passed the HMRC fit and proper test" must {
+      "have a question title" in new MSBViewFixture {
+        doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading", Messages("businessmatching.registerservices.servicename.lbl.05")))
+        doc.getElementById("fit-and-proper").text mustBe Messages("lbl.yes")
+      }
+
+      "show edit link" in new MSBViewFixture {
+        Option(doc.getElementById("fitandproper-edit")).isDefined mustBe true
+      }
+
+      "which responsible people have passed the HMRC fit and proper test" must {
+        "have a question title" in new MSBViewFixture {
+          doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
+          doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count", 1)
+        }
+
+        "show edit link" in new MSBViewFixture {
+          Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
+        }
+      }
+    }
   }
 
   "if not msb" in new SimpleFlowModelViewFixture {
@@ -265,49 +289,27 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
     "show edit link" in new SimpleTCSPViewFixture {
       Option(doc.getElementById("fitandproper-edit")).isDefined mustBe true
     }
-  }
 
-  "if adding TCSP and any have passed test, which responsible people have passed the HMRC fit and proper test" must {
-    "have a question title" in new SimpleTCSPViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-      doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", 2)
+    "which responsible people have passed the HMRC fit and proper test" must {
+      "have a question title" in new SimpleTCSPViewFixture {
+        doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
+        doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", 2)
+      }
+
+      "show edit link" in new SimpleTCSPViewFixture {
+        Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
+      }
     }
 
-    "show edit link" in new SimpleTCSPViewFixture {
-      Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
-    }
-  }
-
-  "if adding MSB, for have any of your responsible people have passed the HMRC fit and proper test" must {
-    "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.fitandproper.heading", Messages("businessmatching.registerservices.servicename.lbl.05")))
-      doc.getElementById("fit-and-proper").text mustBe Messages("lbl.yes")
-    }
-
-    "show edit link" in new MSBViewFixture {
-      Option(doc.getElementById("fitandproper-edit")).isDefined mustBe true
+    "if no fit and proper then no responsible people section" in new SimpleTCSPNoFitAndProperViewFixture {
+      Option(doc.getElementById("fit-and-proper-count")).isDefined mustBe false
+      doc.getElementById("fit-and-proper").text mustBe Messages("lbl.no")
     }
   }
 
   "if not msb or tcsp then no fit and proper section" in new SimpleFlowModelViewFixture {
     Option(doc.getElementById("fit-and-proper")).isDefined mustBe false
     Option(doc.getElementById("fit-and-proper-count")).isDefined mustBe false
-  }
-
-  "for tcsp if no fit and proper then no responsible people section" in new SimpleTCSPNoFitAndProperViewFixture {
-    Option(doc.getElementById("fit-and-proper-count")).isDefined mustBe false
-    doc.getElementById("fit-and-proper").text mustBe Messages("lbl.no")
-  }
-
-  "if adding MSB and any have passed test, which responsible people have passed the HMRC fit and proper test" must {
-    "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichfitandproper.heading"))
-      doc.getElementById("fit-and-proper-count").text mustBe Messages("businessmatching.updateservice.summary.whichfitandproper.count", 1)
-    }
-
-    "show edit link" in new MSBViewFixture {
-      Option(doc.getElementById("whichfitandproper-edit")).isDefined mustBe true
-    }
   }
 
   "for will you do this business type at trading premises" must {
@@ -344,41 +346,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers {
     }
   }
 
-  "if adding msb, for what will your business do at these premises" must {
-    "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whatdoyoudohere.heading"))
-    }
-
-    "for the edit link display when business does more than one type of MSB subservice" in new MSBAllViewFixture {
-      Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe true
-    }
-
-    "for the edit link not display when business does only one type of MSB subservice" in new SingleSubSectorMSBViewFixture {
-      Option(doc.getElementById("whatdoyoudohere-edit")).isDefined mustBe false
-    }
-
-    "show msb service TransmittingMoney" in new MSBAllViewFixture {
-      doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.01"))
-    }
-
-    "show msb service CurrencyExchange" in new MSBAllViewFixture {
-      doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.02"))
-    }
-
-    "show msb service ChequeCashingNotScrapMetal" in new MSBAllViewFixture {
-      doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.03"))
-    }
-
-    "show msb service ChequeCashingScrapMetal" in new MSBAllViewFixture {
-      doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.04"))
-    }
-
-    "show msb service ForeignExchange" in new MSBAllViewFixture {
-      doc.getElementById("tp-msb-services").text must include(Messages("businessmatching.updateservice.msb.services.list.lbl.05"))
-    }
-  }
-
-  "have a submit button with correct text" in new MSBAllViewFixture {
+  "The page have a submit button with correct text" in new MSBAllViewFixture {
     doc.getElementById("updatesummary-submit").text mustBe Messages("button.checkyouranswers.acceptandcomplete")
   }
 }
