@@ -53,6 +53,7 @@ case class BankDetails(
     case details if details.status.contains(StatusConstants.Deleted) => true
     case BankDetails(Some(NoBankAccountUsed), _, None, _, _, _, accepted) => accepted
     case BankDetails(Some(_), Some(_), Some(_), _, _, _, accepted) => accepted
+    case BankDetails(None, None, None, false, false, None, false) => true
     case BankDetails(None, _, None, _, _, _, accepted) => accepted
     case _ => false
   }

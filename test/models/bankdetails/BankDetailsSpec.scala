@@ -91,6 +91,11 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
 
         bankDetails.isComplete must be(true)
       }
+
+      "empty model" in {
+        val bankDetails = BankDetails()
+        bankDetails.isComplete must be(true)
+      }
     }
 
     "return false" when {
