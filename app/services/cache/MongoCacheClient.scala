@@ -98,11 +98,15 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     with Conversions
     with CacheOps {
 
+  private val logPrefix = "[MongoCacheClient]"
+  private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
+  private def error(msg: String) = Logger.error(s"$logPrefix $msg")
+
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = ApplicationCrypto.JsonCrypto
 
-  val timeToLiveInSeconds: Int = 300
+  val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
 
-  createIndex("lastUpdated", "cacheExpiry", timeToLiveInSeconds)
+  createIndex("lastUpdated", "cacheExpiry", cacheExpiryInSeconds)
 
   /**
     * Inserts data into the cache with the specified key. If the data does not exist, it will be created.
@@ -185,10 +189,10 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
       Some(indexName),
       options = BSONDocument("expireAfterSeconds" -> ttl))
     ) map { result =>
-      Logger.debug(s"Index $indexName set with value $ttl -> result: $result")
+      debug(s"Index $indexName set with value $ttl -> result: $result")
       result
     } recover {
-      case e => Logger.error("Failed to set TTL index", e); false
+      case e => error("Failed to set TTL index", e); false
     }
   }
 
@@ -203,7 +207,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   private def handleWriteResult(writeResult: WriteResult) = writeResult match {
     case w if w.ok => true
     case w if w.writeErrors.nonEmpty =>
-      w.writeErrors.map(_.errmsg).foreach(m => Logger.error(m))
+      w.writeErrors.map(_.errmsg).foreach(error)
       throw new RuntimeException(w.writeErrors.map(_.errmsg).mkString("; "))
     case _ =>
       throw new RuntimeException("Error while removing the session data")
