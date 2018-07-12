@@ -204,6 +204,20 @@ class YourBankAccountsControllerSpec extends AmlsSpec with MockitoSugar {
 
       contentAsString(result) must not include Messages("bankdetails.yourbankaccounts.noaccountname")
     }
+
+    "filters out empty and not accepted bank accounts" in new Fixture {
+      mockCacheFetch[Seq[BankDetails]](Some(Seq(
+        BankDetails()
+      )))
+
+      mockApplicationStatus(SubmissionReady)
+
+      val result = controller.get()(request)
+
+      status(result) mustBe OK
+
+      contentAsString(result) must not include Messages("bankdetails.yourbankaccounts.noaccountname")
+    }
   }
 }
 

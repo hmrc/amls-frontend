@@ -88,7 +88,6 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
       "given complete model" in {
         val bankAccount = UKAccount("123456", "00-00-00")
         val bankDetails = BankDetails(Some(accountType), Some("name"), Some(bankAccount), hasAccepted = true)
-
         bankDetails.isComplete must be(true)
       }
 
@@ -96,22 +95,19 @@ class BankDetailsSpec extends AmlsSpec with CharacterSets with OneAppPerSuite wi
         val bankDetails = BankDetails()
         bankDetails.isComplete must be(true)
       }
+
+      "given empty model with accepted" in {
+        val bankDetails = BankDetails(None, None, hasAccepted = true)
+        bankDetails.isComplete must be(true)
+      }
     }
 
     "return false" when {
       "given incomplete model" in {
         val bankDetails = BankDetails(Some(accountType), None)
-
         bankDetails.isComplete must be(false)
       }
-
-      "given empty model" in {
-        val bankDetails = BankDetails(None, None, hasAccepted = true)
-
-        bankDetails.isComplete must be(true)
-      }
     }
-
   }
 
   "getBankAccountDescription" must {
