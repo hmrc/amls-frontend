@@ -20,6 +20,9 @@ import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.tradingpremises._
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import services.UpdateSave4LaterService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -122,6 +125,22 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   def confirmationBacsTransitionalRenewal = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
+  }
+
+  def populateTP = Authorised.async {
+    implicit authContext => implicit request =>
+      val c = (1 until 1625) map { i =>
+          TradingPremises(
+            Some(RegisteringAgentPremises(false)),
+            Some(YourTradingPremises(s"Test $i", Address(s"Trading Premises $i", "Line 2", None, None, "RE1 1ER"), Some(true), Some(LocalDate.now()))),
+            Some(LimitedLiabilityPartnership),
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasChanged = true,
+            hasAccepted = true
+          )
+      }
+
+      dataCacheConnector.save(TradingPremises.key, c) map { _ => Redirect(controllers.routes.StatusController.get())}
   }
 
 }
