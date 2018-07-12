@@ -32,9 +32,10 @@ import models.tradingpremises.TradingPremises
 import models.DataImport
 import play.api.libs.json._
 import scala.collection.Seq
+import play.api.libs.functional.syntax._
 
 case class UpdateSave4LaterResponse(dataImport: Option[DataImport],
-                                    view:Option[ViewResponse],
+                                    view: Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
                                     estateAgencyBusiness: Option[EstateAgentBusiness],
                                     tradingPremises: Option[Seq[TradingPremises]],
@@ -50,10 +51,39 @@ case class UpdateSave4LaterResponse(dataImport: Option[DataImport],
                                     supervision: Option[Supervision],
                                     Subscription: Option[SubscriptionResponse],
                                     amendVariationResponse: Option[AmendVariationRenewalResponse]
-                                    )
+                                   )
 
 object UpdateSave4LaterResponse {
-     implicit val format = Json.format[UpdateSave4LaterResponse]
- }
+
+  import utils.MappingUtils.constant
+  implicit val writes = Json.writes[UpdateSave4LaterResponse]
+
+  def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] =
+      {
+        (__ \ key).read[T] orElse (__ \ oldKey).read[T]
+      }.map(Option(_)) orElse constant[Option[T]](None)
+
+  implicit val reads: Reads[UpdateSave4LaterResponse] = {
+    (
+      (__ \ DataImport.key).readNullable[DataImport] ~
+        readLegacyField[ViewResponse](ViewResponse.key, "view") ~
+        readLegacyField[BusinessMatching](BusinessMatching.key, "businessMatching") ~
+        readLegacyField[EstateAgentBusiness](EstateAgentBusiness.key, "estateAgencyBusiness") ~
+        readLegacyField[Seq[TradingPremises]](TradingPremises.key, "tradingPremises") ~
+        readLegacyField[AboutTheBusiness](AboutTheBusiness.key, "aboutTheBusiness") ~
+        readLegacyField[Seq[BankDetails]](BankDetails.key, "bankDetails") ~
+        readLegacyField[AddPerson](AddPerson.key, "addPerson") ~
+        readLegacyField[BusinessActivities](BusinessActivities.key, "businessActivities") ~
+        readLegacyField[Seq[ResponsiblePerson]](ResponsiblePerson.key, "responsiblePeople") ~
+        (__ \ Tcsp.key).readNullable[Tcsp] ~
+        (__ \ Asp.key).readNullable[Asp] ~
+        (__ \ MoneyServiceBusiness.key).readNullable[MoneyServiceBusiness] ~
+        (__ \ Hvd.key).readNullable[Hvd] ~
+        (__ \ Supervision.key).readNullable[Supervision] ~
+        (__ \ SubscriptionResponse.key).readNullable[SubscriptionResponse] ~
+        (__ \ AmendVariationRenewalResponse.key).readNullable[AmendVariationRenewalResponse]
+      ) (UpdateSave4LaterResponse.apply _)
+  }
+}
 
 
