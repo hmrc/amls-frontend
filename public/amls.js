@@ -97,7 +97,7 @@ $(function () {
           select: _select,
           change: _change
         });
-        _this.element.attr('id', 'input-' + _this.element.attr('id'))
+        _this.element.attr('id', 'select-' + _this.element.attr('id'))
     }
   });
 
