@@ -86,8 +86,9 @@ $(function () {
         }
       };
 
+
       input = $('<input>')
-          .attr('id', 'input-'+ _this.element.attr('id'))
+          .attr('id', _this.element.attr('id'))
         .insertAfter(this.element)
         .val(value)
         .addClass('form-control')
@@ -96,6 +97,7 @@ $(function () {
           select: _select,
           change: _change
         });
+        _this.element.attr('id', 'select-' + _this.element.attr('id'))
     }
   });
 
