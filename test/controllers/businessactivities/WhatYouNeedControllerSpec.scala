@@ -43,7 +43,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("next-page").attr("href") mustBe routes.InvolvedInOtherController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.InvolvedInOtherController.get().url
         }
 
         "performing a variation" in new Fixture {
@@ -54,7 +54,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
         }
 
         "in a renewal pending status" in new Fixture {
@@ -65,7 +65,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
         }
 
         "in a renewal submitted status" in new Fixture {
@@ -76,7 +76,7 @@ class WhatYouNeeControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
           val doc = Jsoup.parse(contentAsString(result))
 
-          doc.getElementById("next-page").attr("href") mustBe routes.BusinessFranchiseController.get().url
+          doc.getElementById("ba-whatyouneed-button").attr("href") mustBe routes.BusinessFranchiseController.get().url
         }
 
       }

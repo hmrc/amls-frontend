@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice.add
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -37,9 +38,9 @@ class SubSectorsController @Inject()(
                                        val authConnector: AuthConnector,
                                        implicit val dataCacheConnector: DataCacheConnector,
                                        val businessMatchingService: BusinessMatchingService,
-                                       val router: Router[AddBusinessTypeFlowModel]
+                                       val router: Router[AddBusinessTypeFlowModel],
+                                       val config:AppConfig
                                      ) extends BaseController {
-
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -50,7 +51,7 @@ class SubSectorsController @Inject()(
           val flowSubServices: Set[BusinessMatchingMsbService] = model.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices
           val form: Form2[BusinessMatchingMsbServices] = Form2(BusinessMatchingMsbServices(flowSubServices))
 
-          Ok(msb_subservices(form, edit))
+          Ok(msb_subservices(form, edit, config.fxEnabledToggle))
         }) getOrElse InternalServerError("Get: Unable to show Sub-Services page. Failed to retrieve data")
   }
 
@@ -60,8 +61,7 @@ class SubSectorsController @Inject()(
       implicit request =>
         Form2[BusinessMatchingMsbServices](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit)))
-
+            Future.successful(BadRequest(views.html.businessmatching.updateservice.add.msb_subservices(f, edit, config.fxEnabledToggle)))
           case ValidForm(_, data) => {
             dataCacheConnector.update[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key) {
               case Some(model) => {

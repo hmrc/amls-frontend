@@ -16,16 +16,14 @@
 
 package models.businessmatching
 
-import cats.std.map
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, ValidationError, _}
-import models.tradingpremises
+import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, ForeignExchange => TPForeignExchange, TransmittingMoney => TPTransmittingMoney}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.api.i18n.{Lang, Messages}
 import play.api.libs.json.{Reads, Writes, _}
 import utils.TraversableValidators._
-import models.tradingpremises.{ChequeCashingNotScrapMetal => TPChequeCashingNotScrapMetal, ChequeCashingScrapMetal => TPChequeCashingScrapMetal, CurrencyExchange => TPCurrencyExchange, TransmittingMoney => TPTransmittingMoney}
 
 
 case class BusinessMatchingMsbServices(msbServices : Set[BusinessMatchingMsbService])
@@ -39,6 +37,7 @@ sealed trait BusinessMatchingMsbService {
       case CurrencyExchange => Messages(s"${message}02")
       case ChequeCashingNotScrapMetal => Messages(s"${message}03")
       case ChequeCashingScrapMetal => Messages(s"${message}04")
+      case ForeignExchange => Messages(s"${message}05")
     }
   }
 }
@@ -47,6 +46,7 @@ case object TransmittingMoney extends BusinessMatchingMsbService
 case object CurrencyExchange extends BusinessMatchingMsbService
 case object ChequeCashingNotScrapMetal extends BusinessMatchingMsbService
 case object ChequeCashingScrapMetal extends BusinessMatchingMsbService
+case object ForeignExchange extends BusinessMatchingMsbService
 
 object BusinessMatchingMsbService {
 
@@ -55,6 +55,7 @@ object BusinessMatchingMsbService {
     case "02" => Valid(CurrencyExchange)
     case "03" => Valid(ChequeCashingNotScrapMetal)
     case "04" => Valid(ChequeCashingScrapMetal)
+    case "05" => Valid(ForeignExchange)
     case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
@@ -63,6 +64,7 @@ object BusinessMatchingMsbService {
     case CurrencyExchange => "02"
     case ChequeCashingNotScrapMetal => "03"
     case ChequeCashingScrapMetal => "04"
+    case ForeignExchange => "05"
   }
 
   implicit val jsonR:Reads[BusinessMatchingMsbService] =  Reads {
@@ -70,6 +72,7 @@ object BusinessMatchingMsbService {
     case JsString("02") => JsSuccess(CurrencyExchange)
     case JsString("03") => JsSuccess(ChequeCashingNotScrapMetal)
     case JsString("04") => JsSuccess(ChequeCashingScrapMetal)
+    case JsString("05") => JsSuccess(ForeignExchange)
     case _ => JsError((JsPath \ "services") -> play.api.data.validation.ValidationError("error.invalid"))
   }
 
@@ -78,6 +81,7 @@ object BusinessMatchingMsbService {
     case CurrencyExchange => JsString("02")
     case ChequeCashingNotScrapMetal => JsString("03")
     case ChequeCashingScrapMetal => JsString("04")
+    case ForeignExchange => JsString("05")
   }
 }
 
@@ -87,7 +91,8 @@ object BusinessMatchingMsbServices {
     TransmittingMoney,
     CurrencyExchange,
     ChequeCashingNotScrapMetal,
-    ChequeCashingScrapMetal
+    ChequeCashingScrapMetal,
+    ForeignExchange
   )
 
   import utils.MappingUtils.Implicits._
@@ -115,6 +120,7 @@ object BusinessMatchingMsbServices {
       case CurrencyExchange => "02"
       case ChequeCashingNotScrapMetal => "03"
       case ChequeCashingScrapMetal => "04"
+      case ForeignExchange => "05"
     }
 
   implicit def convertServices(msbServices: Set[models.tradingpremises.TradingPremisesMsbService]): Set[models.businessmatching.BusinessMatchingMsbService] =
@@ -127,6 +133,7 @@ object BusinessMatchingMsbServices {
       case TPCurrencyExchange => CurrencyExchange
       case TPChequeCashingNotScrapMetal => ChequeCashingNotScrapMetal
       case TPChequeCashingScrapMetal => ChequeCashingScrapMetal
+      case TPForeignExchange => ForeignExchange
     }
   }
 }

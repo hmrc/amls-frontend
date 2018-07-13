@@ -18,7 +18,7 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission:Boolean = true)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission:Boolean = true, fxEnabledToggle: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
     @errorSummary(f)
@@ -55,6 +55,13 @@
                 labelText = "msb.services.list.lbl.02",
                 value = "02"
               )
+              @if(fxEnabledToggle) {
+                  @checkbox(
+                    f = f("msbServices[]"),
+                    labelText = "msb.services.list.lbl.05",
+                    value = "05"
+                  )
+              }
               @checkbox(
                 f = f("msbServices[]"),
                 labelText = "msb.services.list.lbl.03",

@@ -1139,6 +1139,7 @@ businessmatching.services.list.lbl.01 = Transmitting money
 businessmatching.services.list.lbl.02 = Currency exchange
 businessmatching.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.services.list.lbl.05 = Foreign exchange
 businessmatching.cannotcontinuewiththeapplication.title = You can’t continue with your application
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.first = Your business must have a Payment Services Regulations (PSR) reference number in order to apply for anti-money laundering supervision from HM Revenue and Customs.
 businessmatching.cannotcontinuewiththeapplication.requiredinfo.second = You can apply for a PSR reference number from the Financial Conduct Authority (FCA).
@@ -1194,6 +1195,7 @@ businessmatching.updateservice.msb.services.list.lbl.01 = Transmitting money
 businessmatching.updateservice.msb.services.list.lbl.02 = Currency exchange
 businessmatching.updateservice.msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.updateservice.msb.services.list.lbl.05 = Foreign exchange
 
 businessmatching.updateservice.psr.number.title = Does your business have a Payment Services Regulations (PSR) registration number?
 businessmatching.updateservice.psr.number.lbl = PSR registration number
@@ -1230,6 +1232,8 @@ businessmatching.updateservice.whatdoyoudohere.list.lbl.01 = Transmitting money
 businessmatching.updateservice.whatdoyoudohere.list.lbl.02 = Currency exchange
 businessmatching.updateservice.whatdoyoudohere.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 businessmatching.updateservice.whatdoyoudohere.list.lbl.04 = Cheque cashing (scrap metal dealers)
+businessmatching.updateservice.whatdoyoudohere.list.lbl.05 = Foreign exchange
+
 
 businessmatching.updateservice.addmoreactivities.title = Do you want to add another type of business?
 businessmatching.updateservice.addmoreactivities.heading = Do you want to add another type of business?
@@ -1787,6 +1791,7 @@ msb.services.list.lbl.01 = Transmitting money
 msb.services.list.lbl.02 = Currency exchange
 msb.services.list.lbl.03 = Cheque cashing (all businesses except scrap metal dealers)
 msb.services.list.lbl.04 = Cheque cashing (scrap metal dealers)
+msb.services.list.lbl.05 = Foreign exchange
 msb.throughput.title = How much throughput do you expect in the next 12 months?
 msb.throughput.sub = Throughput is the total value of the money you transmit, the currency you exchange, or the cheques you cash.
 msb.throughput.ipsp.hint = An IPSP is involved in the transfer of funds, but isn’t the Payment Service Provider for the payer or the payee.

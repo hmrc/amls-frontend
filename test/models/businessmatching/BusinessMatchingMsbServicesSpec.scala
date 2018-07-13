@@ -22,20 +22,20 @@ import jto.validation.forms.UrlFormEncoded
 import jto.validation.ValidationError
 import play.api.libs.json._
 
-class BusinessMatchingTradingPremisesMsbServicesSpec extends PlaySpec {
+class BusinessMatchingMsbServicesSpec extends PlaySpec {
 
   "MsbServices" must {
     import jto.validation.forms.Rules._
     "round trip through Json correctly" in {
 
-      val data = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val data = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
       val js = Json.toJson(data)
       js.as[BusinessMatchingMsbServices] mustEqual data
     }
 
     "round trip through Forms correctly" in {
 
-      val model = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val model = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
       val data = implicitly[Write[BusinessMatchingMsbServices, UrlFormEncoded]].writes(model)
 
       implicitly[Rule[UrlFormEncoded, BusinessMatchingMsbServices]].validate(data) mustEqual Valid(model)
@@ -71,11 +71,11 @@ class BusinessMatchingTradingPremisesMsbServicesSpec extends PlaySpec {
 
     "serialize with the expected structure" in {
 
-      val model = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange))
+      val model = BusinessMatchingMsbServices(Set(TransmittingMoney, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, CurrencyExchange, ForeignExchange))
 
-      BusinessMatchingMsbServices.formWrites.writes(model) mustEqual Map(
-        "msbServices[]" -> Seq("01", "03", "04", "02")
-      )
+      val serializedModel = BusinessMatchingMsbServices.formWrites.writes(model)
+
+      serializedModel.getOrElse("msbServices[]", Seq()).toSet mustEqual Set("01", "02", "03", "04", "05")
     }
   }
 }

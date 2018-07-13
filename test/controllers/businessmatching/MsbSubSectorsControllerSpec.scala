@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
@@ -42,13 +43,16 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
     self =>
     val request = addToken(authRequest)
 
+    val config = mock[AppConfig]
+
     val controller = new MsbSubSectorsController(
       self.authConnector,
       mockCacheConnector,
       createRouter[ChangeSubSectorFlowModel],
       mock[BusinessMatchingService],
       mockStatusService,
-      mock[ChangeSubSectorHelper]
+      mock[ChangeSubSectorHelper],
+      config
     )
 
     val cacheMapT = OptionT.some[Future, CacheMap](mockCacheMap)
@@ -83,6 +87,22 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       status(result) mustBe OK
 
       document.select("input[type=checkbox]").size mustBe 4
+      document.select("input[type=checkbox][checked]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 0
+    }
+
+    "show an empty form on get with no data in store when fx enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn true
+
+      setupModel(None)
+
+      val result = controller.get()(request)
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result) mustBe OK
+
+      document.select("input[type=checkbox]").size mustBe 5
       document.select("input[type=checkbox][checked]").size mustBe 0
       document.select(".amls-error-summary").size mustBe 0
     }
@@ -123,6 +143,23 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       document.select("input[type=checkbox][checked]").size mustBe 0
     }
 
+    "return a Bad Request with errors on invalid submission when fx enabled" in new Fixture {
+
+      when(config.fxEnabledToggle) thenReturn true
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "msbServices[0]" -> "invalid"
+      )
+
+      val result = controller.post()(newRequest)
+      val document = Jsoup.parse(contentAsString(result))
+
+      status(result) mustBe BAD_REQUEST
+
+      document.select("input[type=checkbox]").size mustBe 5
+      document.select("input[type=checkbox][checked]").size mustBe 0
+    }
+
     "redirect to the 'PSR Number' page on valid submission when adding 'Transmitting Money' and you don't have a PSR Number" in new Fixture {
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel())
@@ -138,21 +175,22 @@ class MsbSubSectorsControllerSpec extends AmlsSpec with ScalaFutures with MoneyS
       controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(TransmittingMoney))))
     }
 
-    "redirect to the summary page when adding 'CurrencyExchange' as a service" in new Fixture {
+    "redirect to the summary page when adding anything other than TransmittingMoney as a service" in new Fixture {
 
       mockCacheUpdate[ChangeSubSectorFlowModel](Some(ChangeSubSectorFlowModel.key), ChangeSubSectorFlowModel(Some(Set(ChequeCashingNotScrapMetal))))
 
       val newRequest = request.withFormUrlEncodedBody(
         "msbServices[1]" -> "02",
         "msbServices[2]" -> "03",
-        "msbServices[3]" -> "04"
+        "msbServices[3]" -> "04",
+        "msbServices[4]" -> "05"
       )
 
       val result = controller.post()(newRequest)
 
       status(result) mustBe SEE_OTHER
 
-      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal))))
+      controller.router.verify(SubSectorsPageId, ChangeSubSectorFlowModel(Some(Set(CurrencyExchange, ChequeCashingScrapMetal, ChequeCashingNotScrapMetal, ForeignExchange))))
 
     }
   }

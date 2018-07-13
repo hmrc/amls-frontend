@@ -37,7 +37,7 @@
         editUrl = routes.SelectBusinessTypeController.get(edit = true).url,
         editLinkTag = "selectactivities-edit"
     ) {
-        <p>@(flowModel.activityName.getOrElse(""))</p>
+        <p id="activity-name">@(flowModel.activityName.getOrElse(""))</p>
     }
 
     @if(flowModel.activity.equals(Some(MoneyServiceBusiness))) {
@@ -48,13 +48,14 @@
                 allowEdit = true,
                 editLinkTag="msbservices-edit"
             ) {
-                <ul class="list list--comma">
+                <ul id="msb-service" class="list list--comma">
                     @services.msbServices.map { svc =>
                     <li>@svc match {
                         case TransmittingMoney => {@Messages("businessmatching.services.list.lbl.01")}
                         case CurrencyExchange => {@Messages("businessmatching.services.list.lbl.02")}
                         case ChequeCashingNotScrapMetal => {@Messages("businessmatching.services.list.lbl.03")}
                         case ChequeCashingScrapMetal => {@Messages("businessmatching.services.list.lbl.04")}
+                        case ForeignExchange => {@Messages("businessmatching.services.list.lbl.05")}
                         }</li>
                     }
                 </ul>
@@ -65,9 +66,10 @@
                 @checkYourAnswers(
                     question = Messages("businessmatching.psr.number.title"),
                     editUrl = routes.BusinessAppliedForPSRNumberController.get(true).toString,
+                    editLinkTag="psr-edit",
                     allowEdit = true
                 )   {
-                        <p>@psr match {
+                        <p id="psr">@psr match {
                             case BusinessAppliedForPSRNumberNo => {@Messages("lbl.no")}
                             case BusinessAppliedForPSRNumberYes(number) => {@Messages("businessmatching.psr.number.lbl"): @number}
                         }</p>
@@ -84,7 +86,7 @@
                 editUrl = routes.FitAndProperController.get(edit = true).url,
                 editLinkTag = "fitandproper-edit"
             ) {
-            <p>@(flowModel.fitAndProper map {
+            <p id = "fit-and-proper">@(flowModel.fitAndProper map {
                     case true => Messages("lbl.yes")
                     case _ => Messages("lbl.no")
                 })</p>
@@ -96,12 +98,12 @@
                 editUrl = routes.WhichFitAndProperController.get(edit = true).url,
                 editLinkTag = "whichfitandproper-edit"
             ) {
-            <p>
-                @(flowModel.responsiblePeople map { tp =>
-                    if(tp.index.size < 2) {
-                        Messages("businessmatching.updateservice.summary.whichfitandproper.count", tp.index.size)
+            <p id = "fit-and-proper-count">
+                @(flowModel.responsiblePeople map { fp =>
+                    if(fp.index.size < 2) {
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count", fp.index.size)
                     } else {
-                        Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", tp.index.size)
+                        Messages("businessmatching.updateservice.summary.whichfitandproper.count.plural", fp.index.size)
                     }
                 })
             </p>
@@ -114,7 +116,7 @@
         editUrl = routes.TradingPremisesController.get(edit = true).url,
         editLinkTag = "tradingpremises-edit"
     ) {
-        <p>@(flowModel.areNewActivitiesAtTradingPremises map {
+        <p id="tp-premises-activities">@(flowModel.areNewActivitiesAtTradingPremises map {
             case true => Messages("lbl.yes")
             case _ => Messages("lbl.no")
         })</p>
@@ -126,7 +128,7 @@
             editUrl = routes.WhichTradingPremisesController.get().url,
             editLinkTag = "whichtradingpremises-edit"
         ) {
-            <p>
+            <p id="tp-premises-activities-count">
                 @(flowModel.tradingPremisesActivities map { tp =>
                     Messages("businessmatching.updateservice.summary.whichtradingpremises.count", tp.index.size)
                 })
@@ -140,13 +142,14 @@
                     allowEdit = flowModel.subSectors.getOrElse(BusinessMatchingMsbServices(Set())).msbServices.size > 1,
                     editLinkTag = "whatdoyoudohere-edit"
                 ) {
-                    <ul class="list list--comma">
+                    <ul id="tp-msb-services" class="list list--comma">
                         @tpMsbServices.msbServices.map { service =>
                             <li>@service match {
                                 case TransmittingMoney => {@Messages("businessmatching.updateservice.msb.services.list.lbl.01")}
                                 case CurrencyExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.02")}
                                 case ChequeCashingNotScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.03")}
                                 case ChequeCashingScrapMetal => {@Messages("businessmatching.updateservice.msb.services.list.lbl.04")}
+                                case ForeignExchange => {@Messages("businessmatching.updateservice.msb.services.list.lbl.05")}
                             }</li>
                         }
                     </ul>

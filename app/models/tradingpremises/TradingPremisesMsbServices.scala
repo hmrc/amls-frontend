@@ -20,7 +20,7 @@ import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{ValidationError, _}
 import jto.validation.forms.UrlFormEncoded
 import models.DateOfChange
-import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, TransmittingMoney => BMTransmittingMoney}
+import models.businessmatching.{ChequeCashingNotScrapMetal => BMChequeCashingNotScrapMetal, ChequeCashingScrapMetal => BMChequeCashingScrapMetal, CurrencyExchange => BMCurrencyExchange, TransmittingMoney => BMTransmittingMoney, ForeignExchange => BMForeignExchange}
 import play.api.libs.json._
 import utils.TraversableValidators
 
@@ -30,6 +30,7 @@ case object TransmittingMoney extends TradingPremisesMsbService
 case object CurrencyExchange extends TradingPremisesMsbService
 case object ChequeCashingNotScrapMetal extends TradingPremisesMsbService
 case object ChequeCashingScrapMetal extends TradingPremisesMsbService
+case object ForeignExchange extends TradingPremisesMsbService
 
 case class TradingPremisesMsbServices(services : Set[TradingPremisesMsbService])
 
@@ -40,6 +41,7 @@ object TradingPremisesMsbService {
     case "02" => Valid(CurrencyExchange)
     case "03" => Valid(ChequeCashingNotScrapMetal)
     case "04" => Valid(ChequeCashingScrapMetal)
+    case "05" => Valid(ForeignExchange)
     case _ => Invalid(Seq(Path -> Seq(ValidationError("error.invalid"))))
   }
 
@@ -48,6 +50,7 @@ object TradingPremisesMsbService {
     case CurrencyExchange => "02"
     case ChequeCashingNotScrapMetal => "03"
     case ChequeCashingScrapMetal => "04"
+    case ForeignExchange => "05"
   }
 
   // TODO: Create generic rules that will remove the need for this
@@ -144,6 +147,7 @@ object TradingPremisesMsbServices {
       case BMCurrencyExchange => CurrencyExchange
       case BMChequeCashingNotScrapMetal => ChequeCashingNotScrapMetal
       case BMChequeCashingScrapMetal => ChequeCashingScrapMetal
+      case BMForeignExchange => ForeignExchange
     }
   }
 }

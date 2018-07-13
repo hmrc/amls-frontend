@@ -76,7 +76,7 @@ class summarySpec extends AmlsSpec
 
     "include the provided data when MoneyServicesBusiness and TransmittingMoney were selected for a Limited Company" in new ViewFixture {
 
-      val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
+      val msbServices = BusinessMatchingMsbServices(Set(TransmittingMoney, CurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, ForeignExchange))
       val BusinessActivitiesModel = BusinessActivities(Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices, TelephonePaymentService))
       val BusinessActivitiesWithouMSB = BusinessActivities(Set(TrustAndCompanyServices, TelephonePaymentService))
       val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AB1 2CD"), Country("United Kingdom", "GB"))
@@ -113,7 +113,8 @@ class summarySpec extends AmlsSpec
           "businessmatching.services.list.lbl.01",
           "businessmatching.services.list.lbl.02",
           "businessmatching.services.list.lbl.03",
-          "businessmatching.services.list.lbl.04")),
+          "businessmatching.services.list.lbl.04",
+          "businessmatching.services.list.lbl.05")),
           controllers.businessmatching.routes.MsbSubSectorsController.get(true).toString),
         ("businessmatching.psr.number.title", checkElementTextIncludes(_, "123456"),
           controllers.businessmatching.routes.PSRNumberController.get(true).toString)
