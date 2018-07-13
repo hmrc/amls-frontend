@@ -27,46 +27,47 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
 class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
 
     val controller = new VATRegisteredController {
-      override val dataCacheConnector = mock[DataCacheConnector]
+      override val dataCacheConnector = mockCacheConnector
       override val authConnector = self.authConnector
     }
   }
-
-  val emptyCache = CacheMap("", Map.empty)
 
   "BusinessRegisteredForVATController" when {
 
     "get is called" must {
 
       "display the registered for VAT page" in new Fixture {
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(None))
+
+        when{
+          controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())
+        } thenReturn Future.successful(None)
+
         val result = controller.get()(request)
+
         status(result) must be(OK)
         contentAsString(result) must include(Messages("aboutthebusiness.registeredforvat.title"))
       }
 
-
       "display the registered for VAT page with pre populated data" in new Fixture {
 
-        when(controller.dataCacheConnector.fetch[AboutTheBusiness](any())
-          (any(), any(), any())).thenReturn(Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), None, Some(VATRegisteredYes("123456789"))))))
+        when {
+          controller.dataCacheConnector.fetch[AboutTheBusiness](any())(any(), any(), any())
+        } thenReturn Future.successful(Some(AboutTheBusiness(Some(PreviouslyRegisteredYes("")), None, Some(VATRegisteredYes("123456789")))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -87,16 +88,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             val partnership = ReviewDetails("BusinessName", Some(Partnership),
               Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(Some(partnership))))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-              .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
-
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+            mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
+            mockCacheUpdate(Some(AboutTheBusiness.key), AboutTheBusiness())
 
             val newRequest = request.withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
@@ -115,16 +108,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             val llp = ReviewDetails("BusinessName", Some(LPrLLP),
               Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(Some(llp))))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-              .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
-
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+            mockCacheGetEntry(Some(BusinessMatching(Some(llp))), BusinessMatching.key)
+            mockCacheUpdate(Some(AboutTheBusiness.key), AboutTheBusiness())
 
             val newRequest = request.withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
@@ -135,21 +120,14 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get().url))
           }
+
           "customer is a Limited Company" in new Fixture {
 
             val details = ReviewDetails("BusinessName", Some(LimitedCompany),
               Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB")), "ghghg")
 
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(Some(details))))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-              .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
-
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+            mockCacheGetEntry(Some(BusinessMatching(Some(details))), BusinessMatching.key)
+            mockCacheUpdate(Some(AboutTheBusiness.key), AboutTheBusiness())
 
             val newRequest = request.withFormUrlEncodedBody(
               "registeredForVAT" -> "true",
@@ -173,16 +151,8 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
             val partnership = ReviewDetails("BusinessName", Some(LPrLLP),
               Address("line1", "line2", Some("line3"), Some("line4"), Some("NE77 0QQ"), Country("United Kingdom", "GB")), "ghghg")
 
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(Some(partnership))))
-
-            when(mockCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key))
-              .thenReturn(Some(AboutTheBusiness(vatRegistered = Some(VATRegisteredNo))))
-
-            when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+            mockCacheGetEntry(Some(BusinessMatching(Some(partnership))), BusinessMatching.key)
+            mockCacheUpdate(Some(AboutTheBusiness.key), AboutTheBusiness())
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -198,8 +168,6 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           val newRequest = request.withFormUrlEncodedBody(
             "registeredForVATYes" -> "1234567890"
           )
-
-          val mockCacheMap = mock[CacheMap]
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
