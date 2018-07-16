@@ -33,7 +33,7 @@
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
-            <span class="error-notification">@field.error</span>
+            <span class="error-notification" data-journey="error - field:user input:field.id">@field.error</span>
         }
 
         <select name="@field.name" id="@field.id" class="@classes.mkString(" ")" data-auto-complete @if(field.hasErrors){data-invalid-value="@field.value"}>

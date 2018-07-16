@@ -37,7 +37,7 @@
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
-            <span class="error-notification">@field.error</span>
+            <span class="error-notification" data-journey="error - field:user input:field.id">@field.error</span>
         }
     </label>
     <input name="@field.name" class="form-control @classes.mkString(" ")" type="text" value="@field.value"
