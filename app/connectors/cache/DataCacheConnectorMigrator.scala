@@ -16,18 +16,18 @@
 
 package connectors.cache
 
-import config.AmlsShortLivedCache
 import play.api.Logger
 import play.api.libs.json
 import play.api.libs.json._
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import services.cache.Cache
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector {
+class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector with Conversions {
 
   private def log(msg: String): Unit = Logger.info(s"[DataCacheConnectorMigrator] $msg")
 
@@ -41,12 +41,9 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
                        (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] =
     primaryCache.fetch[T](key) flatMap {
       case primaryCacheData@Some(_) => Future.successful(primaryCacheData)
-      case _ => fallbackCache.fetch[T](key) flatMap {
-        case o@Some(t) => save[T](key, t) map { _ =>
-            log(s"Migrated cache key: $key")
-            o
-          }
-        case t => Future.successful(t)
+      case _ => fallbackCache.fetchAll flatMap {
+        case Some(f) => doMigration(f) map { _ => f.getEntry(key) }
+        case _ => Future.successful(None)
       }
     }
 
@@ -65,13 +62,7 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
     primaryCache.fetchAll flatMap {
       case primaryCacheMap@Some(_) => Future.successful(primaryCacheMap)
       case _ => fallbackCache.fetchAll flatMap {
-        case Some(f) => primaryCache match {
-          case m: MongoCacheConnector => m.saveAll(f) map { _ =>
-              log(s"Migrated entire cache")
-              Some(f)
-            }
-          case _ => throw new RuntimeException("No primary cache node for saveAll")
-        }
+        case maybeCache@Some(f) => doMigration(f) map { _ => maybeCache }
         case fallbackCacheMap => Future.successful(fallbackCacheMap)
       }
     }
@@ -91,5 +82,17 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
   override def update[T](key: String)(f: Option[T] => T)
                         (implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     primaryCache.update[T](key)(f)
+
+  /**
+    * Performs the migration step of saving the cache into the new mongo store.
+    */
+  private def doMigration(cacheMap: CacheMap): Future[Cache] = primaryCache match {
+    case m: MongoCacheConnector => m.saveAll(cacheMap) map { newCache =>
+      log(s"Migrated entire cache")
+      newCache
+    }
+    case _ => throw new RuntimeException("No primary cache node for saveAll")
+  }
+
 }
 

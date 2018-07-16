@@ -116,35 +116,36 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
       "data has been loaded from the fallback cache and needs to be migrated" in new Fixture {
         val model = Model("data")
         override val key = arbitrary[String].sample.get
+        val cache = CacheMap("", Map(key -> Json.toJson(model)))
 
         when {
           primaryConnector.fetch[Model](key)
         } thenReturn Future.successful(None)
 
         when {
-          fallbackConnector.fetch[Model](key)
-        } thenReturn Future.successful[Option[Model]](Some(model))
+          fallbackConnector.fetchAll
+        } thenReturn Future.successful(Some(cache))
 
         when {
-          primaryConnector.save(key, model)
-        } thenReturn Future.successful(emptyCache)
+          primaryConnector.saveAll(cache)
+        } thenReturn Future.successful(Cache("", Map.empty))
 
         val result = migrator.fetch[Model](key)
 
         whenReady(result) { result =>
           result mustBe Some(model)
-          verify(primaryConnector).save[Model](any(), any())(any(), any(), any())
+          verify(primaryConnector).saveAll(cache)
         }
       }
     }
 
-    "return a record not found when fetching data, if there is no data in either" in new Fixture {
+    "return None if there is no data in either cache" in new Fixture {
       when {
-        primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        primaryConnector.fetch[Model](cacheId)
       } thenReturn Future.successful(None)
 
       when {
-        fallbackConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        fallbackConnector.fetchAll
       } thenReturn Future.successful(None)
 
       val result = migrator.fetch[Model](cacheId)
