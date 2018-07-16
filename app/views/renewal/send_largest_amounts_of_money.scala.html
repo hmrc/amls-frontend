@@ -20,7 +20,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
-    @errorSummary(f)
+    @errorSummary(f, "countries-fieldset")
     @heading("renewal.msb.largest.amounts.title", "summary.renewal")
 }
 
