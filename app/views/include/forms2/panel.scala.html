@@ -33,7 +33,7 @@
     <div @if(field.get.id.nonEmpty){ id="@field.get.id"}
         class="@if(panel){ panel-indent}@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(field.get.hasErrors){ form-field--error}@if(jsHidden){ js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
     @if(field.get.hasErrors) {
-        <span class="error-notification">@field.get.error</span>
+        <span class="error-notification" data-journey="error - field:user input:field.id">@field.get.error</span>
     }
 } else {
     <div class="@if(panel){ panel-indent }@if(wide){ panel-border-wide}@if(gutter){ panel-indent--gutter}@if(jsHidden){ js-hidden} @classes.mkString(" ")" @data.mkString(" ")>
