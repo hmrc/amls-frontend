@@ -33,8 +33,8 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 class CacheMigratorProvider @Inject()(app: Application) extends Provider[DataCacheConnectorMigrator] {
   override def get(): DataCacheConnectorMigrator = {
     new DataCacheConnectorMigrator(
-      app.injector.instanceOf(classOf[MongoCacheConnector]),
-      app.injector.instanceOf(classOf[Save4LaterCacheConnector])
+      app.injector.instanceOf(classOf[Save4LaterCacheConnector]),
+      app.injector.instanceOf(classOf[MongoCacheConnector])
     )
   }
 }

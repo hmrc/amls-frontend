@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector with Conversions {
+class DataCacheConnectorMigrator(primaryCache: CacheConnector, secondaryCache: CacheConnector) extends CacheConnector with Conversions {
 
   private def log(msg: String): Unit = Logger.info(s"[DataCacheConnectorMigrator] $msg")
 
@@ -39,34 +39,22 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
     */
   override def fetch[T](key: String)
                        (implicit authContext: AuthContext, hc: HeaderCarrier, formats: json.Format[T]): Future[Option[T]] =
-    primaryCache.fetch[T](key) flatMap {
-      case primaryCacheData@Some(_) => Future.successful(primaryCacheData)
-      case _ => fallbackCache.fetchAll flatMap {
-        case Some(f) => doMigration(f) map { _ => f.getEntry(key) }
-        case _ => Future.successful(None)
-      }
-    }
+    primaryCache.fetch[T](key)
 
   /**
-    * Saves data into the primary cache
+    * Saves data into the primary cache, as well as the secondary cache.
     */
   override def save[T](key: String, data: T)
-                      (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
-    primaryCache.save[T](key, data)
+                      (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = for {
+    c <- primaryCache.save[T](key, data)
+    _ <- secondaryCache.save[T](key, data)
+  } yield c
 
   /**
     * Fetches all data from the primary cache. If the data is not available in the primary cache,
     * the data is fetched from the secondary cache instead, then saved into the primary cache before returning.
     */
-  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
-    primaryCache.fetchAll flatMap {
-      case primaryCacheMap@Some(_) => Future.successful(primaryCacheMap)
-      case _ => fallbackCache.fetchAll flatMap {
-        case maybeCache@Some(f) => doMigration(f) map { _ => maybeCache }
-        case fallbackCacheMap => Future.successful(fallbackCacheMap)
-      }
-    }
-
+  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] = primaryCache.fetchAll
 
   /**
     * Removes the user's data from the primary cache.
@@ -82,17 +70,6 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
   override def update[T](key: String)(f: Option[T] => T)
                         (implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     primaryCache.update[T](key)(f)
-
-  /**
-    * Performs the migration step of saving the cache into the new mongo store.
-    */
-  private def doMigration(cacheMap: CacheMap): Future[Cache] = primaryCache match {
-    case m: MongoCacheConnector => m.saveAll(cacheMap) map { newCache =>
-      log(s"Migrated entire cache")
-      newCache
-    }
-    case _ => throw new RuntimeException("No primary cache node for saveAll")
-  }
 
 }
 

@@ -50,9 +50,9 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
     val cacheId = "12345"
 
     implicit val primaryConnector = mock[MongoCacheConnector]
-    implicit val fallbackConnector = mock[Save4LaterCacheConnector]
+    implicit val secondaryConnector = mock[Save4LaterCacheConnector]
 
-    val migrator = new DataCacheConnectorMigrator(primaryConnector, fallbackConnector)
+    val migrator = new DataCacheConnectorMigrator(primaryConnector, secondaryConnector)
 
     when(authContext.user) thenReturn user
     when(user.oid) thenReturn oid
@@ -62,21 +62,52 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
 
   "DataCacheConnectorMigrator" must {
 
-    "fetch data from the new connector, if the data exists the new connector" in new Fixture {
-      val model = Model("data")
+    "fetch data only from the primary cache" when {
 
-      when {
-        primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
-      } thenReturn Future.successful[Option[Model]](Some(model))
+      "fetching a single model" in new Fixture {
 
-      val result = migrator.fetch[Model](cacheId)
+        val model = Model("data")
 
-      whenReady(result) {
-        result => result mustBe Some(model)
+        when {
+          primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        } thenReturn Future.successful[Option[Model]](Some(model))
+
+        val result = migrator.fetch[Model](cacheId)
+
+        whenReady(result) {
+          result => result must be(defined)
+        }
+
+      }
+
+      "fetching something which isn't available" in new Fixture {
+
+        when {
+          primaryConnector.fetch[Model](eqTo(cacheId))(any(), any(), any())
+        } thenReturn Future.successful[Option[Model]](None)
+
+        val result = migrator.fetch[Model](cacheId)
+
+        whenReady(result) {
+          result => result must not be defined
+        }
+
       }
     }
 
-    "write data to the primary cache" when {
+    "read data only from the primary cache" in new Fixture {
+      when {
+        primaryConnector.fetchAll
+      } thenReturn Future.successful(None)
+
+      val result = migrator.fetchAll
+
+      whenReady(result) { result =>
+        result mustBe None
+      }
+    }
+
+    "migrate the data to the secondary cache" when {
 
       "saving a single model" in new Fixture {
         val model = Model("data")
@@ -85,58 +116,19 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
           primaryConnector.save[Model](any(), any())(any(), any(), any())
         } thenReturn Future.successful[CacheMap](emptyCache)
 
+        when {
+          secondaryConnector.save[Model](any(), any())(any(), any(), any())
+        } thenReturn Future.successful[CacheMap](emptyCache)
+
         val result = migrator.save[Model](key, model)
 
         whenReady(result) { result =>
           result mustBe emptyCache
           verify(primaryConnector).save[Model](eqTo(key), eqTo(model))(any(), any(), any())
+          verify(secondaryConnector).save[Model](eqTo(key), eqTo(model))(any(), any(), any())
         }
       }
 
-      "migrating the entire cache" in new Fixture {
-        when {
-          primaryConnector.fetchAll
-        } thenReturn Future.successful(None)
-
-        when {
-          fallbackConnector.fetchAll
-        } thenReturn Future.successful[Option[CacheMap]](Some(emptyCache))
-
-        when {
-          primaryConnector.saveAll(emptyCache)
-        } thenReturn Future.successful(Cache(emptyCache))
-
-        val result = migrator.fetchAll
-
-        whenReady(result) { result =>
-          result mustBe Some(emptyCache)
-        }
-      }
-
-      "data has been loaded from the fallback cache and needs to be migrated" in new Fixture {
-        val model = Model("data")
-        override val key = arbitrary[String].sample.get
-        val cache = CacheMap("", Map(key -> Json.toJson(model)))
-
-        when {
-          primaryConnector.fetch[Model](key)
-        } thenReturn Future.successful(None)
-
-        when {
-          fallbackConnector.fetchAll
-        } thenReturn Future.successful(Some(cache))
-
-        when {
-          primaryConnector.saveAll(cache)
-        } thenReturn Future.successful(Cache("", Map.empty))
-
-        val result = migrator.fetch[Model](key)
-
-        whenReady(result) { result =>
-          result mustBe Some(model)
-          verify(primaryConnector).saveAll(cache)
-        }
-      }
     }
 
     "return None if there is no data in either cache" in new Fixture {
@@ -145,7 +137,7 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
       } thenReturn Future.successful(None)
 
       when {
-        fallbackConnector.fetchAll
+        secondaryConnector.fetchAll
       } thenReturn Future.successful(None)
 
       val result = migrator.fetch[Model](cacheId)
@@ -169,7 +161,7 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
       } thenReturn Future.successful(None)
 
       when {
-        fallbackConnector.fetchAll
+        secondaryConnector.fetchAll
       } thenReturn Future.successful(None)
 
       val result = migrator.fetchAll
