@@ -14,9 +14,8 @@
  * limitations under the License.
  */
 
-package connectors
+package connectors.cache
 
-import config.AmlsShortLivedCache
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -24,10 +23,10 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class DataCacheConnectorSpec
   extends PlaySpec
@@ -55,15 +54,11 @@ class DataCacheConnectorSpec
 
   val emptyCache = CacheMap("", Map.empty)
 
-  object DataCacheConnector extends DataCacheConnector {
-    override val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
+  object DataCacheConnector extends Save4LaterCacheConnector {
+    override lazy val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
   }
 
   "DataCacheConnector" must {
-
-    "use the correct session cache for Amls" in {
-      connectors.DataCacheConnector.shortLivedCache mustBe AmlsShortLivedCache
-    }
 
     "save data to save4later" in new Fixture {
 

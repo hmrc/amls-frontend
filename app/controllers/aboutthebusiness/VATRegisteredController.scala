@@ -23,6 +23,7 @@ import controllers.BaseController
 import models.aboutthebusiness._
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership}
 import models.businessmatching.BusinessMatching
+import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
@@ -49,26 +50,31 @@ trait VATRegisteredController extends BaseController {
       Form2[VATRegistered](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(vat_registered(f, edit)))
+
         case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-              } yield {
-                dataCacheConnector.save[AboutTheBusiness](AboutTheBusiness.key,
-                  aboutTheBusiness.vatRegistered(data))
-                (businessType, edit) match {
-                  case (_,true) => Redirect(routes.SummaryController.get())
-                  case (LimitedCompany | LPrLLP, _) => Redirect(routes.CorporationTaxRegisteredController.get(edit))
-                  case (_, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
-                }
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+
+          val redirect = for {
+            cache <- dataCacheConnector.fetchAll
+            businessType <- Future.successful(getBusinessType(cache))
+            _ <- dataCacheConnector.update[AboutTheBusiness](AboutTheBusiness.key) {
+              case Some(m) => m.vatRegistered(data)
+              case _ => AboutTheBusiness().vatRegistered(data)
+            }
+          } yield (businessType, edit) match {
+            case (_,true) => Redirect(routes.SummaryController.get())
+            case (Some(LimitedCompany | LPrLLP), _) => Redirect(routes.CorporationTaxRegisteredController.get(edit))
+            case (_, false) => Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
           }
+
+          redirect.map(identity)
       }
     }
   }
+
+  private def getBusinessType(maybeCache: Option[CacheMap]) = for {
+    cache <- maybeCache
+    businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
+  } yield businessType
 }
 
 object VATRegisteredController extends VATRegisteredController {

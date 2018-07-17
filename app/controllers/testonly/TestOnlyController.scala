@@ -20,6 +20,9 @@ import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.tradingpremises._
+import org.joda.time.LocalDate
 import play.api.libs.json.Json
 import services.UpdateSave4LaterService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -46,23 +49,22 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
         }
   }
 
-  def removeCacheData(implicit user: AuthContext,  hc: HeaderCarrier) = {
-    BusinessCustomerSessionCache.remove()
-    AmlsShortLivedCache.remove(user.user.oid)
-    testOnlyStubConnector.clearState()
-  }
+  def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
+    _ <- BusinessCustomerSessionCache.remove()
+    _ <- dataCacheConnector.remove
+    response <- testOnlyStubConnector.clearState()
+  } yield response
 
   def updateSave4Later(fileName:String)  = Authorised.async {
     implicit user =>
       implicit request =>
         stubsService.getSaveForLaterData(fileName) flatMap {
-          case Some(data) => {
+          case Some(data) =>
             removeCacheData flatMap { _ =>
               stubsService.update(data) map { _ =>
                 Redirect(controllers.routes.LandingController.get())
               }
             }
-          }
           case _ => Future.successful(BadRequest)
         }
   }
@@ -123,6 +125,22 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   def confirmationBacsTransitionalRenewal = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(views.html.confirmation.confirmation_bacs_transitional_renewal("Company Name")))
+  }
+
+  def populateTP = Authorised.async {
+    implicit authContext => implicit request =>
+      val c = (1 until 1625) map { i =>
+          TradingPremises(
+            Some(RegisteringAgentPremises(false)),
+            Some(YourTradingPremises(s"Test $i", Address(s"Trading Premises $i", "Line 2", None, None, "RE1 1ER"), Some(true), Some(LocalDate.now()))),
+            Some(LimitedLiabilityPartnership),
+            whatDoesYourBusinessDoAtThisAddress = Some(WhatDoesYourBusinessDo(Set(HighValueDealing))),
+            hasChanged = true,
+            hasAccepted = true
+          )
+      }
+
+      dataCacheConnector.save(TradingPremises.key, c) map { _ => Redirect(controllers.routes.StatusController.get())}
   }
 
 }

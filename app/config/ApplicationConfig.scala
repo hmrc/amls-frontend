@@ -18,7 +18,7 @@ package config
 
 import config.ApplicationConfig.{baseUrl, getConfBool}
 import javax.inject.Inject
-import play.api.Play
+import play.api.{Configuration, Play}
 import play.api.Play.current
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
@@ -105,7 +105,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 }
 
-class AppConfig @Inject()(val config: iServicesConfig) {
+class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration) {
 
   def amlsUrl = baseUrl("amls")
 
@@ -124,5 +124,9 @@ class AppConfig @Inject()(val config: iServicesConfig) {
   def enrolmentStubsUrl = config.baseUrl("enrolment-stubs")
 
   def feePaymentUrl = s"$amlsUrl/amls/payment"
+
+  val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
+  val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
+  val cacheExpiryInSeconds = baseConfig.getInt("appCache.expiryInSeconds") getOrElse 60
 
 }

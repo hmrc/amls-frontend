@@ -33,7 +33,7 @@ import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models._
-import play.api.libs.json.Format
+import play.api.libs.json.{Format, Json}
 import play.api.mvc.Results.Ok
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -47,28 +47,25 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
   def update(response: UpdateSave4LaterResponse)
             (implicit hc: HeaderCarrier, authContext: AuthContext, ex: ExecutionContext): Future[Any] = {
 
-    Future.sequence(Seq(
-      fn(ViewResponse.key, response.view),
-      fn(BusinessMatching.key, response.businessMatching),
-      fn(TradingPremises.key, response.tradingPremises),
-      fn(BusinessActivities.key, response.businessActivities),
-      fn(Tcsp.key, response.tcsp),
-      fn(BankDetails.key, response.bankDetails),
-      fn(AddPerson.key, response.addPerson),
-      fn(ResponsiblePerson.key, response.responsiblePeople),
-      fn(Asp.key, response.asp),
-      fn(MoneyServiceBusiness.key, response.msb),
-      fn(Hvd.key, response.hvd),
-      fn(Supervision.key, response.supervision),
-      fn(AboutTheBusiness.key, response.aboutTheBusiness),
-      fn(EstateAgentBusiness.key, response.estateAgencyBusiness),
-      fn(SubscriptionResponse.key, response.Subscription),
-      fn(AmendVariationRenewalResponse.key, response.amendVariationResponse),
-      fn(DataImport.key, response.dataImport)
-    )
-    ) map { _ =>
-      Ok
-    }
+    for {
+      _ <- fn(ViewResponse.key, response.view)
+      _ <- fn(BusinessMatching.key, response.businessMatching)
+      _ <- fn(TradingPremises.key, response.tradingPremises)
+      _ <- fn(BusinessActivities.key, response.businessActivities)
+      _ <- fn(Tcsp.key, response.tcsp)
+      _ <- fn(BankDetails.key, response.bankDetails)
+      _ <- fn(AddPerson.key, response.addPerson)
+      _ <- fn(ResponsiblePerson.key, response.responsiblePeople)
+      _ <- fn(Asp.key, response.asp)
+      _ <- fn(MoneyServiceBusiness.key, response.msb)
+      _ <- fn(Hvd.key, response.hvd)
+      _ <- fn(Supervision.key, response.supervision)
+      _ <- fn(AboutTheBusiness.key, response.aboutTheBusiness)
+      _ <- fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
+      _ <- fn(SubscriptionResponse.key, response.Subscription)
+      _ <- fn(AmendVariationRenewalResponse.key, response.amendVariationResponse)
+      _ <- fn(DataImport.key, response.dataImport)
+    } yield true
   }
 
   def fn[T](key: String, m: Option[T])(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[CacheMap] = m match {
@@ -80,8 +77,12 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
     val requestUrl = s"${ApplicationConfig.save4LaterUpdateUrl}$fileName"
 
     http.GET[UpdateSave4LaterResponse](requestUrl)
-      .map(r => Some(r.copy(dataImport = Some(DataImport(fileName)))))
+      .map { r =>
+        import utils.Strings._
+        println(Json.prettyPrint(Json.toJson(r)) in Console.YELLOW)
+        Some(r.copy(dataImport = Some(DataImport(fileName)))) }
       .recover {
+        case e => throw e
         case _: NotFoundException => None
       }
   }

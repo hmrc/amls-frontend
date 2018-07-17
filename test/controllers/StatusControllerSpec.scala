@@ -118,8 +118,8 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
-        when(controller.dataCache.remove(any())(any()))
-          .thenReturn(Future.successful(HttpResponse(OK)))
+        when(controller.dataCache.remove(any(), any()))
+          .thenReturn(Future.successful(true))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
@@ -129,6 +129,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         verify(controller.enrolmentsService).deEnrol(eqTo(amlsRegistrationNumber))(any(), any(), any())
         redirectLocation(result) must be(Some(controllers.routes.LandingController.start(true).url))
       }
+
       "status is deregistered and the new submission button is selected" in new Fixture {
 
         val httpResponse = mock[HttpResponse]
@@ -142,8 +143,8 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.authenticator.refreshProfile(any(), any()))
           .thenReturn(Future.successful(HttpResponse(OK)))
 
-        when(controller.dataCache.remove(any())(any()))
-          .thenReturn(Future.successful(HttpResponse(OK)))
+        when(controller.dataCache.remove(any(), any()))
+          .thenReturn(Future.successful(true))
 
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any()))
           .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
