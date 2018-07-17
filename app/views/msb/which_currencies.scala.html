@@ -21,7 +21,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @errorSummary(f)
+    @errorSummary(f, "currencies-fieldset")
     @heading("msb.which_currencies.title", "summary.msb")
 }
 

@@ -20,7 +20,7 @@
 @(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
-    @errorSummary(f)
+    @errorSummary(f, "countries-fieldset")
     @heading("msb.send.the.largest.amounts.of.money.title", "summary.msb")
 }
 
@@ -36,22 +36,26 @@
 
         @fieldset(
             legend = "msb.send.the.largest.amounts.of.money.title",
-            f = f("countries"),
+            f = f("countries-fieldset"),
             legendHidden = true,
             panel = false
         ) {
-            @country(
-                field = f("country_1"),
-                labelText = "lbl.country.line1"
-            )
-            @country(
-                field = f("country_2"),
-                labelText = "lbl.country.line2"
-            )
-            @country(
-                field = f("country_3"),
-                labelText = "lbl.country.line3"
-            )
+            @errorGroup(
+              field = f("countries")
+            ) {
+                @country(
+                    field = f("country_1"),
+                    labelText = "lbl.country.line1"
+                )
+                @country(
+                    field = f("country_2"),
+                    labelText = "lbl.country.line2"
+                )
+                @country(
+                    field = f("country_3"),
+                    labelText = "lbl.country.line3"
+                )
+            }
         }
         @submit(edit)
     }
