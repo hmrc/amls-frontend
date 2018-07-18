@@ -53,7 +53,7 @@
             <span class="form-hint" id="@{field.id}-hint">@Messages(hintText)</span>
         }
         @if(field.hasErrors) {
-            <span class="error-notification">@Messages(field.rpError, personName)</span>
+            <span class="error-notification" data-journey="error - field:user input:field.id">@Messages(field.rpError, personName)</span>
         }
     </label>
     <input name="@field.name" class="form-control @if(attrType=="number"){ input--no-spinner} @classes.mkString(" ")"

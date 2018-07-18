@@ -18,7 +18,7 @@
 <fieldset class="form-field-group">
     <div class="form-field inline @if(f.hasErrors){form-field--error}" id="@f.id">
         @if(f.hasErrors) {
-            <span class="error-notification">@f.error</span>
+            <span class="error-notification" data-journey="error - field:user input:f.id">@f.error</span>
         }
         @content
     </div>
