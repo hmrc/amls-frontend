@@ -50,7 +50,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.util.{Success, Try}
 
 @Singleton
-class   LandingController @Inject()(val landingService: LandingService,
+class LandingController @Inject()(val landingService: LandingService,
                                   val enrolmentsService: AuthEnrolmentsService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
