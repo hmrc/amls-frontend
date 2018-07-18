@@ -160,12 +160,6 @@ class ServiceFlowSpec extends PlaySpec with MustMatchers with MockitoSugar with 
 
   "inNewServiceFlow" when {
     "called" must {
-      "return true if the specified service exists in the additional business activities" in new Fixture {
-        setUpActivities(Set(AccountancyServices))
-
-        whenReady(service.inNewServiceFlow(AccountancyServices))(_ mustBe true)
-      }
-
       "return false if the user is not in the new service flow" in new Fixture {
         setUpActivities(Set(AccountancyServices))
 

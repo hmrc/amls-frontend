@@ -17,6 +17,7 @@
 package controllers.testonly
 
 import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
+import connectors.cache.{MongoCacheConnector, Save4LaterCacheConnector}
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
@@ -37,6 +38,8 @@ import scala.concurrent.Future
 @Singleton
 class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val dataCacheConnector: DataCacheConnector,
+                                   val mongoCacheConnector: MongoCacheConnector,
+                                   val save4LaterConnector: Save4LaterCacheConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateSave4LaterService) extends BaseController {
 
@@ -51,7 +54,8 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
 
   def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
     _ <- BusinessCustomerSessionCache.remove()
-    _ <- dataCacheConnector.remove
+    _ <- mongoCacheConnector.remove
+    _ <- save4LaterConnector.remove
     response <- testOnlyStubConnector.clearState()
   } yield response
 
