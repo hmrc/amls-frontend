@@ -17,7 +17,8 @@
 @import include._
 @import forms2._
 @import forms.EmptyForm
-@()(implicit request: Request[_],m:Messages)
+@import models.businessmatching._
+@(bmMsbServices: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.msb")
