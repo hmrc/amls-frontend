@@ -18,17 +18,16 @@ package views.msb
 
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.moneyservicebusiness._
 import org.jsoup.nodes.Element
-import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
 
 import scala.collection.JavaConversions._
-
 
 class summarySpec extends AmlsSpec
   with MustMatchers
@@ -71,7 +70,8 @@ class summarySpec extends AmlsSpec
       ("msb.send.the.largest.amounts.of.money.title",checkElementTextIncludes(_, "United Kingdom")),
       ("msb.most.transactions.title",checkElementTextIncludes(_, "United Kingdom")),
       ("msb.transactions.expected.title",checkElementTextIncludes(_, "10")),
-      ("msb.ce.transactions.expected.in.12.months.title",checkElementTextIncludes(_, "10"))
+      ("msb.ce.transactions.expected.in.12.months.title",checkElementTextIncludes(_, "10")),
+      ("msb.fx.transactions.expected.in.12.months.title",checkElementTextIncludes(_, "13"))
     )
 
     "include the provided data" in new ViewFixture {
@@ -92,9 +92,10 @@ class summarySpec extends AmlsSpec
           Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
           Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
           Some(TransactionsInNext12Months("10")),
-          Some(CETransactionsInNext12Months("10"))
+          Some(CETransactionsInNext12Months("10")),
+          Some(FXTransactionsInNext12Months("13"))
         ),
-        Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney))),
+        Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney, ForeignExchange))),
         true,
         ServiceChangeRegister()
       )

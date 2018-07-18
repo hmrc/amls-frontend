@@ -54,7 +54,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
-      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))
+      ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+      fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("3242342442"))
     )
 
     when {
@@ -80,7 +81,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
             TransmittingMoney,
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
-            ChequeCashingScrapMetal
+            ChequeCashingScrapMetal,
+            ForeignExchange
           )
         )
       )
@@ -105,7 +107,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
             TransmittingMoney,
             CurrencyExchange,
             ChequeCashingNotScrapMetal,
-            ChequeCashingScrapMetal
+            ChequeCashingScrapMetal,
+            ForeignExchange
           )
         )
       )
@@ -123,7 +126,8 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val bm = Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney,CurrencyExchange,
           ChequeCashingNotScrapMetal,
-          ChequeCashingScrapMetal)))))
+          ChequeCashingScrapMetal,
+          ForeignExchange)))))
 
         mockIsNewActivity(false)
         mockCacheFetchAll
@@ -146,6 +150,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         document.getElementsByTag("section").get(8).getElementsByTag("a").hasClass("change-answer") must be(false)
         document.getElementsByTag("section").get(9).getElementsByTag("a").hasClass("change-answer") must be(false)
         document.getElementsByTag("section").get(10).getElementsByTag("a").hasClass("change-answer") must be(false)
+        document.getElementsByTag("section").get(11).getElementsByTag("a").hasClass("change-answer") must be(false)
       }
     }
 
