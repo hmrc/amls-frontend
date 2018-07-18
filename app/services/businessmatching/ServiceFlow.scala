@@ -63,6 +63,7 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
     AccountancyServices -> { c => c.getEntry[Asp](Asp.key).fold(false)(_.isComplete) }
   )
 
+  @Deprecated
   def next(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext) = {
     def redirectUrl(activities: Set[BusinessActivity], cacheMap: CacheMap) = OptionT.fromOption[Future](
       activities collectFirst {
@@ -80,14 +81,11 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
   def isNewActivity(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] =
     businessMatchingService.getAdditionalBusinessActivities map {_.contains(activity)} getOrElse false
 
-  def inNewServiceFlow(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[Boolean] = (for {
-    updateService <- OptionT(cacheConnector.fetch[UpdateService](UpdateService.key))
-    additionalActivities <- businessMatchingService.getAdditionalBusinessActivities
-  } yield (updateService.inNewServiceFlow, additionalActivities.contains(activity)) match {
-    case (true, true) => true
-    case _ => false
-  }) getOrElse false
+  @Deprecated
+  def inNewServiceFlow(activity: BusinessActivity)
+                      (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = Future.successful(false)
 
+  @Deprecated
   def setInServiceFlowFlag(value: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     val modelToSave: Option[UpdateService] => UpdateService =
       m => m.fold(UpdateService(inNewServiceFlow = value))(_.copy(inNewServiceFlow = value))
