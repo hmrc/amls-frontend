@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnrolmentStoreConnectorSpec extends PlaySpec
+class TaxEnrolmentsConnectorSpec extends PlaySpec
   with MustMatchers
   with ScalaFutures
   with MockitoSugar
@@ -59,7 +59,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     val authConnector = mock[AuthConnector]
     val auditConnector = mock[AuditConnector]
 
-    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector, auditConnector)
+    val connector = new TaxEnrolmentsConnector(http, appConfig, authConnector, auditConnector)
     val baseUrl = "http://localhost:3001"
     val serviceStub = "tax-enrolments"
     val userDetails = userDetailsGen.sample.get

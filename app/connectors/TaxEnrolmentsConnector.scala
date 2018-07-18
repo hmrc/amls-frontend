@@ -31,10 +31,10 @@ import play.api.http.Status._
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
+class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
 
   lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
-  val warn: String => Unit = msg => Logger.warn(s"[EnrolmentStoreConnector] $msg")
+  val warn: String => Unit = msg => Logger.warn(s"[TaxEnrolmentsConnector] $msg")
 
   object ResponseCodes {
     val duplicateEnrolment = "ERROR_INVALID_IDENTIFIERS"
