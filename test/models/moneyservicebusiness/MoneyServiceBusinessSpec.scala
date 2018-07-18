@@ -18,14 +18,12 @@ package models.moneyservicebusiness
 
 import models.Country
 import models.businessmatching._
-import models.registrationprogress.{Started, Completed, NotStarted, Section}
+import models.registrationprogress.{Completed, NotStarted, Section, Started}
+import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
-import org.mockito.Mockito._
-import play.api.mvc.Call
 
 class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServiceBusinessTestData with OneAppPerSuite{
 
@@ -137,6 +135,7 @@ trait MoneyServiceBusinessTestData {
     mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
     transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
     ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+    fxTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
     false,
     true
   )
@@ -168,6 +167,7 @@ trait MoneyServiceBusinessTestData {
     "mostTransactions" -> Json.obj("mostTransactionsCountries" -> Seq("GB")),
     "sendTheLargestAmountsOfMoney" -> Json.obj("country_1" ->"GB"),
     "ceTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
+    "fxTransactionsInNext12Months" -> Json.obj("ceTransaction" -> "12345678963"),
     "hasChanged" -> false,
     "hasAccepted" -> true
   )

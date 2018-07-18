@@ -157,6 +157,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       transactionsInNext12Months = Some(TransactionsInNext12Months("12345678963")),
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
+      fxTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
       false,
       true
     )
