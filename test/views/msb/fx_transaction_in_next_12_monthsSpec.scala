@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.{CETransactionsInNext12Months}
+import models.moneyservicebusiness.{FXTransactionsInNext12Months}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -31,14 +31,14 @@ class fx_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
         implicit val requestWithToken = addToken(request)
     }
 
-    "ce_transaction_in_next_12_months view" must {
+    "fx_transaction_in_next_12_months view" must {
         "have correct title" in new ViewFixture {
 
-            val form2: ValidForm[CETransactionsInNext12Months] = Form2(CETransactionsInNext12Months("1"))
+            val form2: ValidForm[FXTransactionsInNext12Months] = Form2(FXTransactionsInNext12Months("1"))
 
             def view = views.html.msb.fx_transaction_in_next_12_months(form2, true)
 
-            doc.title must be(Messages("msb.ce.transactions.expected.in.12.months.title") +
+            doc.title must be(Messages("msb.fx.transactions.expected.in.12.months.title") +
                     " - " + Messages("summary.msb") +
                     " - " + Messages("title.amls") +
                     " - " + Messages("title.gov"))
@@ -46,11 +46,11 @@ class fx_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
 
         "have correct headings" in new ViewFixture {
 
-            val form2: ValidForm[CETransactionsInNext12Months] = Form2(CETransactionsInNext12Months("1"))
+            val form2: ValidForm[FXTransactionsInNext12Months] = Form2(FXTransactionsInNext12Months("1"))
 
             def view = views.html.msb.fx_transaction_in_next_12_months(form2, true)
 
-            heading.html must be(Messages("msb.ce.transactions.expected.in.12.months.title"))
+            heading.html must be(Messages("msb.fx.transactions.expected.in.12.months.title"))
             subHeading.html must include(Messages("summary.msb"))
 
         }
@@ -59,14 +59,14 @@ class fx_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
 
             val form2: InvalidForm = InvalidForm(Map.empty,
                 Seq(
-                    (Path \ "ceTransaction") -> Seq(ValidationError("not a message Key"))
+                    (Path \ "fxTransaction") -> Seq(ValidationError("not a message Key"))
                 ))
 
-            def view = views.html.msb.ce_transaction_in_next_12_months(form2, true)
+            def view = views.html.msb.fx_transaction_in_next_12_months(form2, true)
 
             errorSummary.html() must include("not a message Key")
 
-            doc.getElementById("ceTransaction").parent()
+            doc.getElementById("fxTransaction").parent()
                     .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
         }

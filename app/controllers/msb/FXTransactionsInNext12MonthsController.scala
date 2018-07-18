@@ -21,7 +21,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MsbActivity}
-import models.moneyservicebusiness.{CETransactionsInNext12Months, MoneyServiceBusiness}
+import models.moneyservicebusiness.{FXTransactionsInNext12Months, MoneyServiceBusiness}
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -30,10 +30,10 @@ import views.html.msb.fx_transaction_in_next_12_months
 
 import scala.concurrent.Future
 
-class FETransactionsInNext12MonthsController @Inject() (val authConnector: AuthConnector,
-                                                        implicit val dataCacheConnector: DataCacheConnector,
-                                                        implicit val statusService: StatusService,
-                                                        implicit val serviceFlow: ServiceFlow
+class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthConnector,
+                                                       implicit val dataCacheConnector: DataCacheConnector,
+                                                       implicit val statusService: StatusService,
+                                                       implicit val serviceFlow: ServiceFlow
                                                        ) extends BaseController {
 
     def get(edit:Boolean = false) = Authorised.async {
@@ -41,10 +41,10 @@ class FETransactionsInNext12MonthsController @Inject() (val authConnector: AuthC
             ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
                 case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
                     response =>
-                        val form: Form2[CETransactionsInNext12Months] = (for {
+                        val form: Form2[FXTransactionsInNext12Months] = (for {
                             msb <- response
                             transactions <- msb.fxTransactionsInNext12Months
-                        } yield Form2[CETransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
+                        } yield Form2[FXTransactionsInNext12Months](transactions)).getOrElse(EmptyForm)
                         Ok(fx_transaction_in_next_12_months(form, edit))
                 }
                 case false => Future.successful(NotFound(notFoundView))
@@ -53,7 +53,7 @@ class FETransactionsInNext12MonthsController @Inject() (val authConnector: AuthC
 
     def post(edit: Boolean = false) = Authorised.async {
         implicit authContext => implicit request => {
-            Form2[CETransactionsInNext12Months](request.body) match {
+            Form2[FXTransactionsInNext12Months](request.body) match {
                 case f: InvalidForm =>
                     Future.successful(BadRequest(fx_transaction_in_next_12_months(f, edit)))
                 case ValidForm(_, data) =>

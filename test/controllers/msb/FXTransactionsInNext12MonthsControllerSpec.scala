@@ -30,13 +30,13 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
+class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSugar {
 
     trait Fixture extends AuthorisedFixture with DependencyMocks {
         self =>
         val request = addToken(authRequest)
 
-        val controller = new FETransactionsInNext12MonthsController(
+        val controller = new FXTransactionsInNext12MonthsController(
             authConnector = self.authConnector,
             dataCacheConnector = mockCacheConnector,
             statusService = mockStatusService,
@@ -58,7 +58,7 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     "FETransactionsInNext12MonthsController" must {
 
-        "load the page 'How many currency exchange transactions do you expect in the next 12 months?'" in new Fixture {
+        "load the page 'How many foreign exchange transactions do you expect in the next 12 months?'" in new Fixture {
 
             when(controller.statusService.getStatus(any(), any(), any()))
                     .thenReturn(Future.successful(NotCompleted))
@@ -68,20 +68,21 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.get()(request)
             status(result) must be(OK)
-            contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
+            contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
         }
 
-        "load the page 'How many currency exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
+        "load the page 'How many foreign exchange transactions do you expect in the next 12 months?' with pre populated data" in new Fixture {
 
             when(controller.statusService.getStatus(any(), any(), any()))
                     .thenReturn(Future.successful(NotCompleted))
 
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
                     (any(), any(), any())).thenReturn(Future.successful(Some(MoneyServiceBusiness(
-                fxTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963"))))))
+                fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("12345678963"))))))
 
             val result = controller.get()(request)
             status(result) must be(OK)
+            print(contentAsString(result))
             contentAsString(result) must include("12345678963")
         }
 
@@ -97,7 +98,7 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
             val result = controller.get()(request)
 
             status(result) must be(OK)
-            contentAsString(result) must include(Messages("msb.ce.transactions.expected.in.12.months.title"))
+            contentAsString(result) must include(Messages("msb.fx.transactions.expected.in.12.months.title"))
         }
 
         "redirect to Page not found" when {
@@ -114,7 +115,7 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "Show error message when user has not filled the mandatory fields" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
-                "ceTransaction" -> ""
+                "fxTransaction" -> ""
             )
 
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
@@ -125,13 +126,13 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post()(newRequest)
             status(result) must be(BAD_REQUEST)
-            contentAsString(result) must include(Messages("error.required.msb.transactions.in.12months"))
+            contentAsString(result) must include(Messages("error.required.msb.fx.transactions.in.12months"))
 
         }
 
         "Successfully save data in save4later and navigate to Next page" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
-                "ceTransaction" -> "12345678963"
+                "fxTransaction" -> "12345678963"
             )
 
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](any())
@@ -153,12 +154,12 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val outgoingModel = incomingModel.copy(
                 fxTransactionsInNext12Months = Some(
-                    CETransactionsInNext12Months("12345678963")
+                    FXTransactionsInNext12Months("12345678963")
                 ), hasChanged = true
             )
 
             val newRequest = request.withFormUrlEncodedBody(
-                "ceTransaction" -> "12345678963"
+                "fxTransaction" -> "12345678963"
             )
 
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
@@ -178,12 +179,12 @@ class FETransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val outgoingModel = incomingModel.copy(
                 fxTransactionsInNext12Months = Some(
-                    CETransactionsInNext12Months("12345678963")
+                    FXTransactionsInNext12Months("12345678963")
                 ), hasChanged = true
             )
 
             val newRequest = request.withFormUrlEncodedBody(
-                "ceTransaction" -> "12345678963"
+                "fxTransaction" -> "12345678963"
             )
 
             when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))

@@ -35,7 +35,7 @@ case class MoneyServiceBusiness(
                                  mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
                                  ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
-                                 fxTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
+                                 fxTransactionsInNext12Months: Option[FXTransactionsInNext12Months] = None,
                                  hasChanged: Boolean = false,
                                  hasAccepted: Boolean = false
                                ) {
@@ -73,7 +73,7 @@ case class MoneyServiceBusiness(
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = this.ceTransactionsInNext12Months.contains(p))
 
-  def fxTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
+  def fxTransactionsInNext12Months(p: FXTransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(fxTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.fxTransactionsInNext12Months.contains(p), hasAccepted = this.fxTransactionsInNext12Months.contains(p))
 
   private def allComplete: Boolean =
@@ -147,7 +147,7 @@ object MoneyServiceBusiness {
         (__ \ "mostTransactions").readNullable[MostTransactions] and
         (__ \ "transactionsInNext12Months").readNullable[TransactionsInNext12Months] and
         (__ \ "ceTransactionsInNext12Months").readNullable[CETransactionsInNext12Months] and
-        (__ \ "ceTransactionsInNext12Months").readNullable[CETransactionsInNext12Months] and
+        (__ \ "fxTransactionsInNext12Months").readNullable[FXTransactionsInNext12Months] and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
         } and

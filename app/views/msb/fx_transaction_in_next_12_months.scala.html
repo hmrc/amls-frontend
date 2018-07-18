@@ -22,23 +22,23 @@
 
 @header = {
     @errorSummary(f)
-    @heading("msb.ce.transactions.expected.in.12.months.title", "summary.msb")
+    @heading("msb.fx.transactions.expected.in.12.months.title", "summary.msb")
 }
 
 @main(
-    title = Messages("msb.ce.transactions.expected.in.12.months.title") + " - " + Messages("summary.msb"),
+    title = Messages("msb.fx.transactions.expected.in.12.months.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.FETransactionsInNext12MonthsController.post(edit)) {
+    @form(f, controllers.msb.routes.FXTransactionsInNext12MonthsController.post(edit)) {
 
         @input(
             attrMin = "1",
             attrStep = "1",
             attrType = "number",
-            field = f("ceTransaction"),
+            field = f("fxTransaction"),
             labelHidden = true,
-            labelText = "msb.ce.transactions.expected.in.12.months.title"
+            labelText = "msb.fx.transactions.expected.in.12.months.title"
         )
 
         @submit(edit)
