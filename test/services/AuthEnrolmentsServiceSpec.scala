@@ -20,7 +20,7 @@ import config.AppConfig
 import connectors.{AuthConnector, Authority, EnrolmentStoreConnector, EnrolmentStubConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.auth.UserDetails
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, EnrolmentStoreEnrolment, GovernmentGatewayEnrolment}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, TaxEnrolment, GovernmentGatewayEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -97,7 +97,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
       val postcode = postcodeGen.sample.get
 
       whenReady(service.enrol(amlsRegistrationNumber, postcode)) { _ =>
-        val enrolment = EnrolmentStoreEnrolment("12345678", postcode)
+        val enrolment = TaxEnrolment("12345678", postcode)
         verify(enrolmentStore).enrol(eqTo(AmlsEnrolmentKey(amlsRegistrationNumber)), eqTo(enrolment))(any(), any(), any())
       }
     }

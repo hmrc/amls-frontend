@@ -21,7 +21,7 @@ import audit.{ESDeEnrolEvent, ESEnrolEvent, ESEnrolFailureEvent, ESRemoveKnownFa
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import models.enrolment.ErrorResponse._
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
+import models.enrolment.{AmlsEnrolmentKey, EnrolmentKey, TaxEnrolment, ErrorResponse}
 import play.api.Logger
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
@@ -41,7 +41,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
     val invalidCredentialRole = "INVALID_CREDENTIAL_ID"
   }
 
-  def enrol(enrolKey: EnrolmentKey, enrolment: EnrolmentStoreEnrolment)
+  def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
 
     auth.userDetails flatMap { details =>
@@ -49,7 +49,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
         case Some(groupId) =>
           val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/${enrolKey.key}"
 
-          http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment) map { response =>
+          http.POST[TaxEnrolment, HttpResponse](url, enrolment) map { response =>
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
             response
           } recoverWith {

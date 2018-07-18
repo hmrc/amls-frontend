@@ -23,7 +23,7 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.auth.UserDetails
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment, ErrorResponse}
+import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment, ErrorResponse}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
@@ -77,7 +77,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
       authConnector.userDetails(any(), any(), any())
     } thenReturn Future.successful(userDetails)
 
-    val enrolment = EnrolmentStoreEnrolment("123456789", postcodeGen.sample.get)
+    val enrolment = TaxEnrolment("123456789", postcodeGen.sample.get)
 
     def jsonError(code: String, message: String): String = Json.toJson(ErrorResponse(code, message)).toString
 
@@ -89,12 +89,12 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
         val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
-          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
         } thenReturn Future.successful(HttpResponse(OK))
 
         whenReady(connector.enrol(enrolKey, enrolment)) { _ =>
           verify(authConnector).userDetails(any(), any(), any())
-          verify(http).POST[EnrolmentStoreEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
+          verify(http).POST[TaxEnrolment, HttpResponse](eqTo(endpointUrl), eqTo(enrolment), any())(any(), any(), any(), any())
           verify(auditConnector).sendEvent(any())(any(), any())
         }
       }
@@ -111,7 +111,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
       "throws a DuplicateEnrolmentException when the enrolment has already been created" in new Fixture {
         when {
-          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
         } thenReturn Future.failed(Upstream4xxResponse(jsonError("ERROR_INVALID_IDENTIFIERS", "The enrolment identifiers provided were invalid"), BAD_REQUEST, BAD_REQUEST))
 
         intercept[DuplicateEnrolmentException] {
@@ -121,7 +121,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
 
       "throws a InvalidEnrolmentCredentialsException when the enrolment has the wrong type of role" in new Fixture {
         when {
-          http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
+          http.POST[TaxEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
         } thenReturn Future.failed(Upstream4xxResponse(jsonError("INVALID_CREDENTIAL_ID", "Invalid credential ID"), FORBIDDEN, FORBIDDEN))
 
         intercept[InvalidEnrolmentCredentialsException] {

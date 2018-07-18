@@ -21,7 +21,7 @@ import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.Json
 
-class EnrolmentStoreEnrolmentSpec extends PlaySpec with MustMatchers with BaseGenerator with AmlsReferenceNumberGenerator {
+class TaxEnrolmentSpec extends PlaySpec with MustMatchers with BaseGenerator with AmlsReferenceNumberGenerator {
 
   trait Fixture {
     //noinspection ScalaStyle
@@ -31,7 +31,7 @@ class EnrolmentStoreEnrolmentSpec extends PlaySpec with MustMatchers with BaseGe
 
   "The model" must {
     "serialize to the correct Json" in new Fixture {
-      val model = EnrolmentStoreEnrolment(userId, postCode)
+      val model = TaxEnrolment(userId, postCode)
 
       val expectedJson = Json.obj(
         "userId" -> userId,

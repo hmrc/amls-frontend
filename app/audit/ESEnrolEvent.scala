@@ -16,7 +16,7 @@
 
 package audit
 
-import models.enrolment.{EnrolmentKey, EnrolmentStoreEnrolment}
+import models.enrolment.{EnrolmentKey, TaxEnrolment}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.AuditExtensions._
@@ -25,10 +25,10 @@ import uk.gov.hmrc.play.config.AppName
 
 object ESEnrolEvent {
   def apply
-  (enrolment: EnrolmentStoreEnrolment, response: HttpResponse, key: EnrolmentKey)
+  (enrolment: TaxEnrolment, response: HttpResponse, key: EnrolmentKey)
   (implicit
    hc: HeaderCarrier,
-   reqW: Writes[EnrolmentStoreEnrolment]
+   reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
       auditSource = AppName.appName,
@@ -82,10 +82,10 @@ object ESRemoveKnownFactsEvent {
 
 object ESEnrolFailureEvent {
   def apply
-  (enrolment: EnrolmentStoreEnrolment, exception: Throwable, key: EnrolmentKey)
+  (enrolment: TaxEnrolment, exception: Throwable, key: EnrolmentKey)
   (implicit
    hc: HeaderCarrier,
-   reqW: Writes[EnrolmentStoreEnrolment]
+   reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
       auditSource = AppName.appName,
