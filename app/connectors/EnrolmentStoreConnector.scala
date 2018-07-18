@@ -33,7 +33,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
 
-  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/enrolment-store-proxy"
+  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
   val warn: String => Unit = msg => Logger.warn(s"[EnrolmentStoreConnector] $msg")
 
   object ResponseCodes {
@@ -47,7 +47,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
     auth.userDetails flatMap { details =>
       details.groupIdentifier match {
         case Some(groupId) =>
-          val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/${enrolKey.key}"
+          val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
 
           http.POST[EnrolmentStoreEnrolment, HttpResponse](url, enrolment) map { response =>
             audit.sendEvent(ESEnrolEvent(enrolment, response, enrolKey))
@@ -83,7 +83,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
     auth.userDetails flatMap { details =>
       details.groupIdentifier match {
         case Some(groupId) =>
-          val url = s"$baseUrl/enrolment-store/groups/$groupId/enrolments/$enrolKey"
+          val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"
 
           http.DELETE(url) map { response =>
             audit.sendEvent(ESDeEnrolEvent(response, enrolKey))
@@ -99,7 +99,7 @@ class EnrolmentStoreConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth
                       (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
 
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-    val url = s"$baseUrl/enrolment-store/enrolments/$enrolKey"
+    val url = s"$baseUrl/enrolments/$enrolKey"
 
     http.DELETE(url) map { response =>
       audit.sendEvent(ESRemoveKnownFactsEvent(response, enrolKey))
