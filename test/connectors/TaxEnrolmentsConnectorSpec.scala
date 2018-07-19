@@ -40,7 +40,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class EnrolmentStoreConnectorSpec extends PlaySpec
+class TaxEnrolmentsConnectorSpec extends PlaySpec
   with MustMatchers
   with ScalaFutures
   with MockitoSugar
@@ -59,9 +59,9 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     val authConnector = mock[AuthConnector]
     val auditConnector = mock[AuditConnector]
 
-    val connector = new EnrolmentStoreConnector(http, appConfig, authConnector, auditConnector)
-    val baseUrl = "http://enrolment-store:3001"
-    val serviceStub = "enrolment-store-proxy"
+    val connector = new TaxEnrolmentsConnector(http, appConfig, authConnector, auditConnector)
+    val baseUrl = "http://localhost:3001"
+    val serviceStub = "tax-enrolments"
     val userDetails = userDetailsGen.sample.get
     val enrolKey = AmlsEnrolmentKey(amlsRegistrationNumber)
 
@@ -86,7 +86,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
   "enrol" when {
     "called" must {
       "call the ES8 enrolment store endpoint to enrol the user" in new Fixture {
-        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.POST[EnrolmentStoreEnrolment, HttpResponse](any(), any(), any())(any(), any(), any(), any())
@@ -135,7 +135,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES9 API endpoint" in new Fixture {
         val authority = mock[Authority]
-        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/groups/${userDetails.groupIdentifier.get}/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())
@@ -166,7 +166,7 @@ class EnrolmentStoreConnectorSpec extends PlaySpec
     "called" must {
       "call the ES7 API endpoint" in new Fixture {
 
-        val endpointUrl = s"$baseUrl/${serviceStub}/enrolment-store/enrolments/${enrolKey.key}"
+        val endpointUrl = s"$baseUrl/${serviceStub}/enrolments/${enrolKey.key}"
 
         when {
           http.DELETE[HttpResponse](any())(any(), any(), any())

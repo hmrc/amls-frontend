@@ -18,7 +18,7 @@ package services
 
 import config.AppConfig
 import javax.inject.Inject
-import connectors.{AuthConnector, EnrolmentStoreConnector, EnrolmentStubConnector}
+import connectors.{AuthConnector, TaxEnrolmentsConnector, EnrolmentStubConnector}
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
@@ -27,7 +27,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
-                                      val enrolmentStore: EnrolmentStoreConnector,
+                                      val enrolmentStore: TaxEnrolmentsConnector,
                                       val config: AppConfig,
                                       val stubConnector: EnrolmentStubConnector) {
 
