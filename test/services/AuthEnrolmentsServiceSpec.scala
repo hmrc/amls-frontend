@@ -17,7 +17,7 @@
 package services
 
 import config.AppConfig
-import connectors.{AuthConnector, Authority, EnrolmentStoreConnector, EnrolmentStubConnector}
+import connectors.{AuthConnector, Authority, TaxEnrolmentsConnector, EnrolmentStubConnector}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, EnrolmentIdentifier, TaxEnrolment, GovernmentGatewayEnrolment}
@@ -40,7 +40,7 @@ class AuthEnrolmentsServiceSpec extends AmlsSpec
 
   // scalastyle:off magic.number
   trait Fixture {
-    val enrolmentStore = mock[EnrolmentStoreConnector]
+    val enrolmentStore = mock[TaxEnrolmentsConnector]
     val enrolmentStubConnector = mock[EnrolmentStubConnector]
     val authConnector = mock[AuthConnector]
     val config = mock[AppConfig]
