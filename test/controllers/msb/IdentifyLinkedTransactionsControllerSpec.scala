@@ -169,7 +169,7 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
     }
 
-    "user selects No and navigates to next page if they have selected CE as a service" in new Fixture {
+    "user selects No and navigates to CE section if they have selected CE as a service" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody (
         "linkedTxn" -> "false"
@@ -207,6 +207,26 @@ class IdentifyLinkedTransactionsControllerSpec extends AmlsSpec with MockitoSuga
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+    }
+
+    "navigates to FX section if they have selected FX as a service" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody (
+        "linkedTxn" -> "false"
+      )
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(cacheMap)))
+      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+      when(cacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+              .thenReturn(Some(MoneyServiceBusiness()))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](any(), any())
+              (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get().url))
     }
 
     "Navigate to next page if they have selected cheque cashing as a service" in new Fixture {
