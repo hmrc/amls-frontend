@@ -91,6 +91,8 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
           Redirect(routes.CETransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains CurrencyExchange =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
+        case (false, _, false) if shouldAnswerForeignExchangeQuestions(services, register) =>
+          Redirect(routes.FXTransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains ForeignExchange =>
           Redirect(routes.FXTransactionsInNext12MonthsController.get())
         case (false, _, _) =>

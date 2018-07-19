@@ -164,8 +164,40 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
       }
 
-      "edit is false and we're adding MSB to an approved application" in new Fixture {
+      "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
         val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
+      "edit is false and we're adding MSB to an approved application (CE, FX)" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
         val incomingModel = MoneyServiceBusiness()
 
         val outgoingModel = incomingModel.copy(
@@ -224,6 +256,38 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
       }
+
+      "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
+      }
     }
 
     "redirect to Check Your Answers on valid submission when CE is available but has not just been added to the application " in new Fixture {
@@ -259,7 +323,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
-    "on valid submission (no edit) (non-CE)" in new Fixture {
+    "on valid submission (no edit) (non-CE, non-FE)" in new Fixture {
 
       val incomingModel = MoneyServiceBusiness()
 

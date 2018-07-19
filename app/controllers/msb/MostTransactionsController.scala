@@ -102,6 +102,8 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
       case _ =>
         if (shouldAnswerCurrencyExchangeQuestions(services, register)) {
           Redirect(routes.CETransactionsInNext12MonthsController.get())
+        } else if (shouldAnswerForeignExchangeQuestions(services, register)) {
+          Redirect(routes.FXTransactionsInNext12MonthsController.get())
         } else {
           Redirect(routes.SummaryController.get())
         }

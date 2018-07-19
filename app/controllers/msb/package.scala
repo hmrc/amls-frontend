@@ -17,13 +17,18 @@
 package controllers
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatchingMsbService, CurrencyExchange, MoneyServiceBusiness}
+import models.businessmatching.{BusinessMatchingMsbService, CurrencyExchange, ForeignExchange, MoneyServiceBusiness}
 
 package object msb {
 
   def shouldAnswerCurrencyExchangeQuestions(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
     (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
       register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) && msbActivities.contains(CurrencyExchange)
+  }
+
+  def shouldAnswerForeignExchangeQuestions(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
+    (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
+            register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) && msbActivities.contains(ForeignExchange)
   }
 
 }
