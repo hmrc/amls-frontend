@@ -1784,8 +1784,12 @@ supervision.whichprofessionalbody.title = Which professional body are you a memb
 
 msb.whatyouneed.requiredinfo.heading = In this section, you’ll be asked for things like:
 msb.whatyouneed.line_1 = how much throughput you expect in the next 12 months
-msb.whatyouneed.line_2 = how you manage transactions and money transfers
-msb.whatyouneed.line_3 = if you use an Intermediary Payment Service Provider and what their details are
+msb.whatyouneed.line_2 = if you have branches or agents in other countries
+msb.whatyouneed.line_3 = where you expect to send the largest amounts of money and most transactions
+msb.whatyouneed.line_4 = how many currency exchange and/or foreign exchange transactions you expect to make in the next 12 months
+msb.whatyouneed.line_5 = which currencies you expect to supply the most of
+msb.whatyouneed.line_6 = if you deal in physical foreign currencies, and who supplies them
+msb.whatyouneed.line_7 = if you use an intermediary payment service provider, and what their details are
 msb.services.title = Which services does your business provide?
 msb.services.list.heading = Select all that apply
 msb.services.list.lbl.01 = Transmitting money

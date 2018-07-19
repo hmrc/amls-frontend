@@ -16,6 +16,7 @@
 
 package views.msb
 
+import models.businessmatching.{BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -26,30 +27,89 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    def view = views.html.msb.what_you_need()
   }
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.msb.what_you_need()
-
       doc.title must startWith(Messages("title.wyn"))
     }
 
-    "Have the correct Headings" in new ViewFixture{
-      def view = views.html.msb.what_you_need()
-
+    "have the correct Headings" in new ViewFixture{
       heading.html must be (Messages("title.wyn"))
       subHeading.html must include (Messages("summary.msb"))
     }
 
-    "contain the expected content elements" in new ViewFixture{
-      def view = views.html.msb.what_you_need()
-
+    "have an introduction to the list of information needed" in new ViewFixture{
       html must include(Messages("msb.whatyouneed.requiredinfo.heading"))
+    }
 
+    "state that throughput info will be needed" in new ViewFixture {
       html must include(Messages("msb.whatyouneed.line_1"))
+    }
+
+    "state that branches or agents in other countries will be needed" in new ViewFixture {
       html must include(Messages("msb.whatyouneed.line_2"))
-      html must include(Messages("msb.whatyouneed.line_3"))
+    }
+
+    "not display info that will not be needed" in new ViewFixture {
+      html must not include Messages("msb.whatyouneed.line_3")
+      html must not include Messages("msb.whatyouneed.line_4")
+      html must not include Messages("msb.whatyouneed.line_5")
+      html must not include Messages("msb.whatyouneed.line_6")
+      html must not include Messages("msb.whatyouneed.line_7")
+    }
+
+    "Transmitting Money is a selected MSB subservice" when {
+      trait TMViewFixture extends ViewFixture {
+        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+      }
+
+      "state that where you expect to send money/transactions will be needed" in new TMViewFixture {
+        html must include(Messages("msb.whatyouneed.line_3"))
+      }
+
+      "state that IPSP info will be needed" in new TMViewFixture {
+        html must include(Messages("msb.whatyouneed.line_7"))
+      }
+    }
+
+    "Currency Exchange is a selected MSB subservice" when {
+      trait CXViewFixture extends ViewFixture {
+        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      }
+
+      "state which currencies you supply most of will be needed" in new CXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_5"))
+      }
+
+      "state if you deal in physical foreign currencies will be needed" in new CXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_6"))
+      }
+
+      "state currency exchange/foreign exchange transactions info will be needed" in new CXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_4"))
+      }
+    }
+
+    "Foreign Exchange is a selected MSB subservice" when {
+      trait FXViewFixture extends ViewFixture {
+        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      }
+
+      "state currency exchange/foreign exchange transactions info will be needed" in new FXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_4"))
+      }
+    }
+
+    "Foreign Exchange and Currency Exchange are selected MSB subservices" when {
+      trait CXFXViewFixture extends ViewFixture {
+        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
+      }
+
+      "state currency exchange/foreign exchange transactions info will be needed" in new CXFXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_4"))
+      }
     }
   }
 }

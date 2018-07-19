@@ -18,7 +18,7 @@
 @import forms2._
 @import forms.EmptyForm
 @import models.businessmatching._
-@(bmMsbServices: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages)
+@(services: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.msb")
@@ -35,7 +35,19 @@
     <ul class="list list-bullet">
         <li>@Messages("msb.whatyouneed.line_1")</li>
         <li>@Messages("msb.whatyouneed.line_2")</li>
-        <li>@Messages("msb.whatyouneed.line_3")</li>
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            <li>@Messages("msb.whatyouneed.line_3")</li>
+        }
+        @if(services.msbServices.contains(CurrencyExchange) || services.msbServices.contains(ForeignExchange)) {
+            <li>@Messages("msb.whatyouneed.line_4")</li>
+        }
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            <li>@Messages("msb.whatyouneed.line_5")</li>
+            <li>@Messages("msb.whatyouneed.line_6")</li>
+        }
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            <li>@Messages("msb.whatyouneed.line_7")</li>
+        }
     </ul>
 
     @form(EmptyForm, controllers.msb.routes.WhatYouNeedController.post()) {
