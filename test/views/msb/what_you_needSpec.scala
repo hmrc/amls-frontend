@@ -58,6 +58,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must not include Messages("msb.whatyouneed.line_5")
       html must not include Messages("msb.whatyouneed.line_6")
       html must not include Messages("msb.whatyouneed.line_7")
+      html must not include Messages("msb.whatyouneed.line_8")
     }
 
     "Transmitting Money is a selected MSB subservice" when {
@@ -70,7 +71,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       }
 
       "state that IPSP info will be needed" in new TMViewFixture {
-        html must include(Messages("msb.whatyouneed.line_7"))
+        html must include(Messages("msb.whatyouneed.line_8"))
       }
     }
 
@@ -80,15 +81,15 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       }
 
       "state which currencies you supply most of will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_5"))
+        html must include(Messages("msb.whatyouneed.line_4"))
       }
 
       "state if you deal in physical foreign currencies will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_6"))
+        html must include(Messages("msb.whatyouneed.line_5"))
       }
 
-      "state currency exchange/foreign exchange transactions info will be needed" in new CXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_4"))
+      "state currency exchange transactions info will be needed" in new CXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_6"))
       }
     }
 
@@ -97,18 +98,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
         override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(ForeignExchange)))
       }
 
-      "state currency exchange/foreign exchange transactions info will be needed" in new FXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_4"))
-      }
-    }
-
-    "Foreign Exchange and Currency Exchange are selected MSB subservices" when {
-      trait CXFXViewFixture extends ViewFixture {
-        override def view = views.html.msb.what_you_need(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
-      }
-
-      "state currency exchange/foreign exchange transactions info will be needed" in new CXFXViewFixture {
-        html must include(Messages("msb.whatyouneed.line_4"))
+      "state foreign exchange transactions info will be needed" in new FXViewFixture {
+        html must include(Messages("msb.whatyouneed.line_7"))
       }
     }
   }

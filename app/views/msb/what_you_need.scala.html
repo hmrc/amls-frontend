@@ -38,15 +38,16 @@
         @if(services.msbServices.contains(TransmittingMoney)) {
             <li>@Messages("msb.whatyouneed.line_3")</li>
         }
-        @if(services.msbServices.contains(CurrencyExchange) || services.msbServices.contains(ForeignExchange)) {
-            <li>@Messages("msb.whatyouneed.line_4")</li>
-        }
         @if(services.msbServices.contains(CurrencyExchange)) {
+            <li>@Messages("msb.whatyouneed.line_4")</li>
             <li>@Messages("msb.whatyouneed.line_5")</li>
             <li>@Messages("msb.whatyouneed.line_6")</li>
         }
-        @if(services.msbServices.contains(TransmittingMoney)) {
+        @if(services.msbServices.contains(ForeignExchange)) {
             <li>@Messages("msb.whatyouneed.line_7")</li>
+        }
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            <li>@Messages("msb.whatyouneed.line_8")</li>
         }
     </ul>
 
