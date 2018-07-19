@@ -49,7 +49,6 @@ class ConfirmationController @Inject()(
                                         private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                         private[controllers] implicit val amlsConnector: AmlsConnector,
                                         private[controllers] val statusService: StatusService,
-                                        private[controllers] val authenticator: AuthenticatorConnector,
                                         private[controllers] val feeResponseService: FeeResponseService,
                                         private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
                                         private[controllers] val paymentsConnector: PayApiConnector,

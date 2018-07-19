@@ -16,7 +16,6 @@
 
 package controllers
 
-import connectors.AuthenticatorConnector
 import exceptions._
 import generators.AmlsReferenceNumberGenerator
 import models.renewal.Renewal
@@ -44,7 +43,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       mock[SubmissionService],
       mock[StatusService],
       mock[RenewalService],
-      mock[AuthenticatorConnector],
       self.authConnector
     )
   }
