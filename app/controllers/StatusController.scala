@@ -89,7 +89,6 @@ class StatusController @Inject()(val landingService: LandingService,
         val redirect = for {
           amlsRegNumber <- OptionT(enrolmentsService.amlsRegistrationNumber)
           _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber))
-          _ <- OptionT.liftF(authenticator.refreshProfile)
           _ <- OptionT.liftF(dataCache.remove)
         } yield Redirect(controllers.routes.LandingController.start(true))
 

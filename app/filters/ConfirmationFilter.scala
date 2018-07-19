@@ -63,7 +63,6 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
           keystoreConnector.confirmationStatus flatMap {
             case ConfirmationStatus(Some(true)) if shouldRedirect =>
               for {
-                _ <- authenticator.refreshProfile
                 _ <- keystoreConnector.resetConfirmation
               } yield {
 

@@ -29,18 +29,4 @@ class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
   val serviceUrl = config.baseUrl("government-gateway-authentication")
 
-  def refreshProfile(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
-
-    //noinspection SimplifyBooleanMatch
-    config.getConfBool("feature-toggle.refresh-profile", defBool = false) match {
-      case true =>
-        http.POSTEmpty(s"$serviceUrl/government-gateway-authentication/refresh-profile") map { response =>
-          Logger.info("[AuthenticatorConnector] Current user profile was refreshed")
-          response
-        }
-      case _ => Future.successful(HttpResponse(OK))
-    }
-
-  }
-
 }

@@ -55,30 +55,9 @@ class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with Mockito
 
   "The Authenticator connector" must {
 
-    "connect to the authenticator service to refresh the auth profile" in new TestFixture {
+    "connect to the authenticator service to refresh the auth profile" in pending
 
-      val featureToggleSetting = true
-
-      when(http.POSTEmpty[HttpResponse](any())(any(), any(), any())) thenReturn Future.successful(HttpResponse(200))
-
-      val result = Await.result(connector.refreshProfile, 5 seconds)
-
-      result.status must be(200)
-
-      verify(http).POSTEmpty(eqTo(s"$configKey/government-gateway-authentication/refresh-profile"))(any(), any(), any())
-
-    }
-
-    "return a default successful result when the feature is toggled off" in new TestFixture {
-
-      val featureToggleSetting = false
-
-      val result = Await.result(connector.refreshProfile, 5 seconds)
-
-      result.status must be(200)
-
-      verify(http, never).POSTEmpty(any())(any(), any(), any())
-    }
+    "return a default successful result when the feature is toggled off" in pending
 
   }
 

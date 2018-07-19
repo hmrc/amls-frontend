@@ -52,8 +52,6 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
     when(keystore.confirmationStatus(any(), any())) thenReturn Future.successful(confirmationStatusResult)
 
-    when(authenticator.refreshProfile(any(), any())) thenReturn Future.successful(HttpResponse(OK))
-
   }
 
   "The confirmation filter" must {
@@ -131,8 +129,6 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
-      verify(authenticator).refreshProfile(any(), any())
 
     }
 

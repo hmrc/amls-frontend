@@ -62,7 +62,6 @@ class ConfirmationController @Inject()(
     implicit authContext =>
       implicit request =>
         for {
-          _ <- authenticator.refreshProfile
           status <- statusService.getStatus
           submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](SubmissionRequestStatus.key)
           result <- resultFromStatus(status, submissionRequestStatus)
@@ -125,7 +124,6 @@ class ConfirmationController @Inject()(
     implicit request =>
       implicit authContext =>
         val okResult = for {
-          _ <- OptionT.liftF(authenticator.refreshProfile)
           refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)

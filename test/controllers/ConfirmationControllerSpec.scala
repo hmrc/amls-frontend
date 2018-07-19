@@ -79,10 +79,6 @@ class ConfirmationControllerSpec extends AmlsSpec
     setupBusinessMatching(companyName)
 
     when {
-      controller.authenticator.refreshProfile(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
-
-    when {
       controller.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(mock[AuditResult])
 

@@ -52,10 +52,7 @@ class SubmissionController @Inject()(
       implicit request => {
         statusService.getStatus.flatMap[SubmissionResponse](subscribeBasedOnStatus)
       }.flatMap {
-        case SubscriptionResponse(_, _, _, Some(true)) =>
-          authenticator.refreshProfile map { _ =>
-            Redirect(controllers.routes.LandingController.get())
-          }
+        case SubscriptionResponse(_, _, _, Some(true)) => Future.successful(Redirect(controllers.routes.LandingController.get()))
         case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
       } recoverWith {
         case _: DuplicateEnrolmentException =>
