@@ -398,14 +398,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
-    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            CurrencyExchange
-          )
-        )
-      )
+    trait NextPageDataDoesNotExistFixture extends Fixture {
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
@@ -422,44 +415,41 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
-      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+    }
+
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
       val result = controller.post(edit = true)(newRequest)
-
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
     }
 
-    "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
-
-      val incomingModel = MoneyServiceBusiness()
-
-      val outgoingModel = incomingModel.copy(
-        mostTransactions = Some(
-          MostTransactions(
-            Seq(Country("United Kingdom", "GB"))
-          )
-        ), hasChanged = true
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
-      )
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            ChequeCashingScrapMetal
-          )
-        )
-      )
-      mockCacheFetchAll
-      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+  "return a redirect on valid submission where the next page data doesn't exist (edit) (CE, FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = true)(newRequest)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
+  }
 
+  "return a redirect on valid submission where the next page data doesn't exist (edit) (FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+
+      val result = controller.post(edit = true)(newRequest)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
+  }
+
+    "return a redirect to the summary page on valid submission (edit) (non-CE, non-FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+
+      val result = controller.post(edit = true)(newRequest)
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }

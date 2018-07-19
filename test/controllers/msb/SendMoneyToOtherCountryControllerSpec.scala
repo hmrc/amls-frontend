@@ -388,17 +388,9 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).url))
     }
 
-    "on valid post where the value is false in edit mode (CE)" in new Fixture {
-
+    trait FalseInEditModeFixture extends Fixture {
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"
-      )
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            CurrencyExchange
-          )
-        )
       )
       val incomingModel = MoneyServiceBusiness(
         hasChanged = true
@@ -410,52 +402,50 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       when(controller.dataCacheConnector.fetchAll(any(), any()))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
       when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
         .thenReturn(Some(incomingModel))
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+    }
+
+    "on valid post where the value is false in edit mode (CE)" in new FalseInEditModeFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
     }
 
-    "on valid post where the value is false in edit mode (Non-CE)" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "money" -> "false"
-      )
-
-      val incomingModel = MoneyServiceBusiness()
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            TransmittingMoney
-          )
-        )
-      )
-      val outgoingModel = incomingModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
-        hasChanged = true
-      )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
+    "on valid post where the value is false in edit mode (CE, FX)" in new FalseInEditModeFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
 
       val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get(true).url))
+    }
+
+    "on valid post where the value is false in edit mode (FX)" in new FalseInEditModeFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).url))
+    }
+
+    "on valid post where the value is false in edit mode (Non-CE, Non-FX)" in new FalseInEditModeFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+              .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
       redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 

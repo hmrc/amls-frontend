@@ -108,6 +108,9 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
       case (false, s)
         if (s contains CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty =>
         Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+      case (false, s)
+          if (s contains ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty =>
+          Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
       case _ =>
         Redirect(routes.SummaryController.get())
     }

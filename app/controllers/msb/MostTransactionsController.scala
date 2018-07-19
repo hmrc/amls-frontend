@@ -112,6 +112,8 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
   private def editRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness) =
     if ((services contains CurrencyExchange) && msb.ceTransactionsInNext12Months.isEmpty) {
       Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+    } else if ((services contains ForeignExchange) && msb.ceTransactionsInNext12Months.isEmpty) {
+        Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
     } else {
       Redirect(routes.SummaryController.get())
     }
