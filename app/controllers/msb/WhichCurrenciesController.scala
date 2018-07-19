@@ -69,11 +69,18 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
               } yield {
                 dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   msb.whichCurrencies(data)
-                ) map {
-                  _ => if (services.msbServices.contains(ForeignExchange)) {
-                    Redirect(routes.FXTransactionsInNext12MonthsController.get())
-                  } else {
-                    Redirect(routes.SummaryController.get())
+                ) map { _ =>
+                  edit match {
+                    case true => if (services.msbServices.contains(ForeignExchange) && msb.fxTransactionsInNext12Months.isEmpty) {
+                      Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
+                    } else {
+                      Redirect(routes.SummaryController.get())
+                    }
+                    case _ => if (services.msbServices.contains(ForeignExchange)) {
+                      Redirect(routes.FXTransactionsInNext12MonthsController.get())
+                    } else {
+                      Redirect(routes.SummaryController.get())
+                    }
                   }
                 }
               }
