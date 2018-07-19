@@ -21,7 +21,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendMoneyToOtherCountry}
 import play.api.mvc.Result
 import services.StatusService
@@ -91,6 +91,8 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
           Redirect(routes.CETransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains CurrencyExchange =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
+        case (false, s, true) if s contains ForeignExchange =>
+          Redirect(routes.FXTransactionsInNext12MonthsController.get())
         case (false, _, _) =>
           Redirect(routes.SummaryController.get())
       }

@@ -173,6 +173,28 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
     }
 
+    "on valid post where the value is false (FX)" in new Fixture {
+      val newRequest = request.withFormUrlEncodedBody("money" -> "false")
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange, TransmittingMoney)))
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+        hasChanged = true
+      )
+
+      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+      mockCacheSave[MoneyServiceBusiness]
+
+      mockCacheGetEntry[ServiceChangeRegister](Some(
+        ServiceChangeRegister(addedSubSectors = Some(Set(CurrencyExchange)))), ServiceChangeRegister.key)
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
+    }
+
     "redirect to the CE transactions page" when {
       "the application is not registered as Currency Exchange, but it has just been added to the application" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody("money" -> "false")
@@ -257,7 +279,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-    "on valid post where the value is false (Non-CE)" in new Fixture {
+    "on valid post where the value is false (Non-CE, Non-fx)" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"
