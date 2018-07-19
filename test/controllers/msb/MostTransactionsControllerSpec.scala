@@ -16,20 +16,19 @@
 
 package controllers.msb
 
-import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
 
 import scala.concurrent.Future
 
@@ -195,6 +194,35 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+    }
+
+    "redirect to the FX 'Transactions' on submission" when {
+      "edit is false and Foreign Exchange is available and Currency Exchange is not" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
       }
     }
 

@@ -19,11 +19,10 @@ package controllers.msb
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
 import services.StatusService
@@ -33,7 +32,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 @Singleton
 class MostTransactionsController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
@@ -95,6 +94,8 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
       case true =>
         if (services contains CurrencyExchange) {
           Redirect(routes.CETransactionsInNext12MonthsController.get())
+        } else if (services contains ForeignExchange) {
+          Redirect(routes.FXTransactionsInNext12MonthsController.get())
         } else {
           Redirect(routes.SummaryController.get())
         }
