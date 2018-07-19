@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{BankMoneySource, MoneyServiceBusiness, WhichCurrencies, WholesalerMoneySource}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -59,7 +59,18 @@ class WhichCurrencyControllerSpec extends AmlsSpec
 
     mockIsNewActivity(false)
     mockCacheFetch[ServiceChangeRegister](None, Some(ServiceChangeRegister.key))
+
+    val cacheMap = mock[CacheMap]
+
+    when(controller.dataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(cacheMap)))
+    val msbServices = Some(BusinessMatchingMsbServices(Set()))
+    when(cacheMap.getEntry[MoneyServiceBusiness](MoneyServiceBusiness.key))
+            .thenReturn(Some(MoneyServiceBusiness()))
+    when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
   }
+
 
   "WhichCurrencyController" when {
     "get is called" should {
@@ -124,7 +135,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
 
     "post is called " when {
       "data is valid" should {
-        "user deals in foreign currency, redirect to check your answers" in new Fixture {
+        trait DealsInForeignCurrencyFixture extends Fixture {
           val newRequest = request.withFormUrlEncodedBody (
             "currencies[0]" -> "USD",
             "currencies[1]" -> "GBP",
@@ -136,25 +147,49 @@ class WhichCurrencyControllerSpec extends AmlsSpec
             "customerMoneySource" -> "Yes",
             "usesForeignCurrencies" -> "Yes"
           )
-
-          val result = controller.post(false).apply(newRequest)
-
-          status(result) must be (SEE_OTHER)
-          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
         }
 
-        "user does not in foreign currency, redirect to check your answers" in new Fixture {
+        trait NoDealsInForeignCurrencyFixture extends Fixture {
           val newRequest = request.withFormUrlEncodedBody (
             "currencies[0]" -> "USD",
             "currencies[1]" -> "GBP",
             "currencies[2]" -> "BOB",
             "usesForeignCurrencies" -> "No"
           )
+        }
 
-          val result = controller.post(false).apply(newRequest)
-
+        "user deals in foreign currency, redirect to check your answers when FX not an msb subservice" in new DealsInForeignCurrencyFixture {
+          val result = controller.post().apply(newRequest)
           status(result) must be (SEE_OTHER)
           redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+        }
+
+        "user does not in foreign currency, redirect to check your answers when FX not an msb subservice" in new NoDealsInForeignCurrencyFixture {
+          val result = controller.post().apply(newRequest)
+          status(result) must be (SEE_OTHER)
+          redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
+        }
+
+        "user deals in foreign currency, go to FX transactions when FX an msb subservice" in new DealsInForeignCurrencyFixture {
+          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(cacheMap)))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+          val result = controller.post().apply(newRequest)
+          status(result) must be (SEE_OTHER)
+          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get().url)
+        }
+
+        "user does not in foreign currency, go to FX transactions when FX an msb subservice" in new NoDealsInForeignCurrencyFixture {
+          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+          when(controller.dataCacheConnector.fetchAll(any(), any()))
+                  .thenReturn(Future.successful(Some(cacheMap)))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+                  .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+          val result = controller.post().apply(newRequest)
+          status(result) must be (SEE_OTHER)
+          redirectLocation(result) mustEqual Some(routes.FXTransactionsInNext12MonthsController.get().url)
         }
       }
 
