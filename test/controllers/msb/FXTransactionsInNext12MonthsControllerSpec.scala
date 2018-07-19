@@ -130,7 +130,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
         }
 
-        "Successfully save data in save4later and navigate to Next page" in new Fixture {
+        "Successfully save data in save4later and navigate to Summary page" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
@@ -143,7 +143,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get().url))
+            redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
         }
 
         "Successfully save data in save4later and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
@@ -171,31 +171,6 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
-        }
-
-        "on valid submission (edit) without next page's data" in new Fixture {
-
-            val incomingModel = MoneyServiceBusiness()
-
-            val outgoingModel = incomingModel.copy(
-                fxTransactionsInNext12Months = Some(
-                    FXTransactionsInNext12Months("12345678963")
-                ), hasChanged = true
-            )
-
-            val newRequest = request.withFormUrlEncodedBody(
-                "fxTransaction" -> "12345678963"
-            )
-
-            when(controller.dataCacheConnector.fetch[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))
-                    (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
-
-            when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
-                    (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post(true)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.msb.routes.WhichCurrenciesController.get(true).url))
         }
     }
 }

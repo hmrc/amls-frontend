@@ -62,12 +62,7 @@ class FXTransactionsInNext12MonthsController @Inject()(val authConnector: AuthCo
                         _ <- dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                             msb.fxTransactionsInNext12Months(data)
                         )
-                    } yield edit match {
-                        case true if msb.whichCurrencies.isDefined =>
-                            Redirect(routes.SummaryController.get())
-                        case _ =>
-                            Redirect(routes.WhichCurrenciesController.get(edit))
-                    }
+                    } yield Redirect(routes.SummaryController.get())
             }
         }
     }
