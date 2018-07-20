@@ -18,8 +18,8 @@ package services
 
 import config.AppConfig
 import javax.inject.Inject
+import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment}
 import connectors.{AuthConnector, TaxEnrolmentsConnector, EnrolmentStubConnector}
-import models.enrolment.{AmlsEnrolmentKey, EnrolmentStoreEnrolment}
 import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -71,7 +71,7 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
     authConnector.getCurrentAuthority flatMap {
       authority =>
-        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), EnrolmentStoreEnrolment(authority.credId, postcode))
+        enrolmentStore.enrol(AmlsEnrolmentKey(amlsRegistrationNumber), TaxEnrolment(authority.credId, postcode))
     }
   }
 

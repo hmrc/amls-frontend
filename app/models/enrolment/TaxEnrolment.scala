@@ -18,13 +18,13 @@ package models.enrolment
 
 import play.api.libs.json.Json
 
-case class EnrolmentStoreEnrolment(userId: String, friendlyName: String, `type`: String, verifiers: Seq[EnrolmentIdentifier])
+case class TaxEnrolment(userId: String, friendlyName: String, `type`: String, verifiers: Seq[EnrolmentIdentifier])
 
-object EnrolmentStoreEnrolment {
-  implicit val format = Json.writes[EnrolmentStoreEnrolment]
+object TaxEnrolment {
+  implicit val format = Json.writes[TaxEnrolment]
 
-  def apply(userId: String, postCode: String): EnrolmentStoreEnrolment =
-    EnrolmentStoreEnrolment(userId, "AMLS Enrolment", "principal", Seq(
+  def apply(userId: String, postCode: String): TaxEnrolment =
+    TaxEnrolment(userId, "AMLS Enrolment", "principal", Seq(
       EnrolmentIdentifier("Postcode", postCode)
     ))
 
