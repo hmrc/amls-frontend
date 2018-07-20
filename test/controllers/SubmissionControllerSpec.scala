@@ -16,7 +16,6 @@
 
 package controllers
 
-import connectors.AuthenticatorConnector
 import exceptions._
 import generators.AmlsReferenceNumberGenerator
 import models.renewal.Renewal
@@ -44,7 +43,6 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       mock[SubmissionService],
       mock[StatusService],
       mock[RenewalService],
-      mock[AuthenticatorConnector],
       self.authConnector
     )
   }
@@ -97,17 +95,12 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
           controller.subscriptionService.subscribe(any(), any(), any())
         } thenReturn Future.successful(response.copy(previouslySubmitted = Some(true)))
 
-        when {
-          controller.authenticator.refreshProfile(any(), any())
-        } thenReturn Future.successful(HttpResponse(OK))
-
         when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady))
 
         val result = controller.post()(request)
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-        verify(controller.authenticator).refreshProfile(any(), any())
       }
     }
 

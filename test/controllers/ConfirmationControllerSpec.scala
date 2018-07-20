@@ -64,7 +64,6 @@ class ConfirmationControllerSpec extends AmlsSpec
       amlsConnector = mock[AmlsConnector],
       authEnrolmentsService = mock[AuthEnrolmentsService],
       feeResponseService = mock[FeeResponseService],
-      authenticator = mock[AuthenticatorConnector],
       paymentsConnector = mock[PayApiConnector],
       confirmationService = mock[ConfirmationService],
       paymentsService = mock[PaymentsService],
@@ -77,10 +76,6 @@ class ConfirmationControllerSpec extends AmlsSpec
     val companyName = "My Test Company"
 
     setupBusinessMatching(companyName)
-
-    when {
-      controller.authenticator.refreshProfile(any(), any())
-    } thenReturn Future.successful(HttpResponse(OK))
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())

@@ -19,7 +19,7 @@ package filters
 import javax.inject.Inject
 
 import akka.stream.Materializer
-import connectors.{AuthenticatorConnector, KeystoreConnector}
+import connectors.{KeystoreConnector}
 import models.status.ConfirmationStatus
 import play.api.Logger
 import play.api.mvc.{Filter, RequestHeader, Result}
@@ -28,7 +28,7 @@ import play.api.mvc.Results.Redirect
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.play.HeaderCarrierConverter.fromHeadersAndSession
 
-class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, authenticator: AuthenticatorConnector)
+class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector)
                                   (implicit val mat: Materializer, ec: ExecutionContext) extends Filter {
   override def apply(nextFilter: (RequestHeader) => Future[Result])(rh: RequestHeader): Future[Result] = {
 
@@ -63,7 +63,6 @@ class ConfirmationFilter @Inject()(val keystoreConnector: KeystoreConnector, aut
           keystoreConnector.confirmationStatus flatMap {
             case ConfirmationStatus(Some(true)) if shouldRedirect =>
               for {
-                _ <- authenticator.refreshProfile
                 _ <- keystoreConnector.resetConfirmation
               } yield {
 

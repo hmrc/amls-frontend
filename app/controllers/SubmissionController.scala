@@ -17,7 +17,6 @@
 package controllers
 
 import config.AMLSAuthConnector
-import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
 import javax.inject.{Inject, Singleton}
 import models.status._
@@ -36,7 +35,6 @@ class SubmissionController @Inject()(
                                      val subscriptionService: SubmissionService,
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
-                                     val authenticator: AuthenticatorConnector,
                                      val authConnector: AuthConnector = AMLSAuthConnector
                                     ) extends BaseController {
 
@@ -52,10 +50,7 @@ class SubmissionController @Inject()(
       implicit request => {
         statusService.getStatus.flatMap[SubmissionResponse](subscribeBasedOnStatus)
       }.flatMap {
-        case SubscriptionResponse(_, _, _, Some(true)) =>
-          authenticator.refreshProfile map { _ =>
-            Redirect(controllers.routes.LandingController.get())
-          }
+        case SubscriptionResponse(_, _, _, Some(true)) => Future.successful(Redirect(controllers.routes.LandingController.get()))
         case _ => Future.successful(Redirect(controllers.routes.ConfirmationController.get()))
       } recoverWith {
         case _: DuplicateEnrolmentException =>

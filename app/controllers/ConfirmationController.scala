@@ -49,7 +49,6 @@ class ConfirmationController @Inject()(
                                         private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                         private[controllers] implicit val amlsConnector: AmlsConnector,
                                         private[controllers] val statusService: StatusService,
-                                        private[controllers] val authenticator: AuthenticatorConnector,
                                         private[controllers] val feeResponseService: FeeResponseService,
                                         private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
                                         private[controllers] val paymentsConnector: PayApiConnector,
@@ -62,7 +61,6 @@ class ConfirmationController @Inject()(
     implicit authContext =>
       implicit request =>
         for {
-          _ <- authenticator.refreshProfile
           status <- statusService.getStatus
           submissionRequestStatus <- dataCacheConnector.fetch[SubmissionRequestStatus](SubmissionRequestStatus.key)
           result <- resultFromStatus(status, submissionRequestStatus)
@@ -125,7 +123,6 @@ class ConfirmationController @Inject()(
     implicit request =>
       implicit authContext =>
         val okResult = for {
-          _ <- OptionT.liftF(authenticator.refreshProfile)
           refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)

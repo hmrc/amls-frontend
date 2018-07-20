@@ -19,7 +19,7 @@ package controllers
 import cats.data.OptionT
 import cats.implicits._
 import config.{AMLSAuthConnector, ApplicationConfig}
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
+import connectors.{AmlsConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
 import models.responsiblepeople.ResponsiblePerson
@@ -45,7 +45,6 @@ class StatusController @Inject()(val landingService: LandingService,
                                   val progressService: ProgressService,
                                   val amlsConnector: AmlsConnector,
                                   val dataCache: DataCacheConnector,
-                                  val authenticator: AuthenticatorConnector,
                                   val authConnector: AuthConnector = AMLSAuthConnector,
                                  val feeResponseService: FeeResponseService
                                  ) extends BaseController {
@@ -89,7 +88,6 @@ class StatusController @Inject()(val landingService: LandingService,
         val redirect = for {
           amlsRegNumber <- OptionT(enrolmentsService.amlsRegistrationNumber)
           _ <- OptionT.liftF(enrolmentsService.deEnrol(amlsRegNumber))
-          _ <- OptionT.liftF(authenticator.refreshProfile)
           _ <- OptionT.liftF(dataCache.remove)
         } yield Redirect(controllers.routes.LandingController.start(true))
 

@@ -17,7 +17,7 @@
 package controllers
 
 import cats.implicits._
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
+import connectors.{AmlsConnector, DataCacheConnector, FeeConnector}
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
@@ -64,7 +64,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
        mock[ProgressService],
        mock[AmlsConnector],
        mockCacheConnector,
-       mock[AuthenticatorConnector],
        self.authConnector,
        mock[FeeResponseService]
     )
@@ -115,9 +114,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
         when(controller.enrolmentsService.deEnrol(any())(any(), any(), any()))
           .thenReturn(Future.successful(true))
 
-        when(controller.authenticator.refreshProfile(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK)))
-
         when(controller.dataCache.remove(any(), any()))
           .thenReturn(Future.successful(true))
 
@@ -139,9 +135,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
         when(controller.enrolmentsService.deEnrol(any())(any(), any(), any()))
           .thenReturn(Future.successful(true))
-
-        when(controller.authenticator.refreshProfile(any(), any()))
-          .thenReturn(Future.successful(HttpResponse(OK)))
 
         when(controller.dataCache.remove(any(), any()))
           .thenReturn(Future.successful(true))
