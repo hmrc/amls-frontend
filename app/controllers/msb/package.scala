@@ -21,12 +21,12 @@ import models.businessmatching.{BusinessMatchingMsbService, CurrencyExchange, Fo
 
 package object msb {
 
-  def shouldAnswerCurrencyExchangeQuestions(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
+  def currencyExchangeAddedPostSubmission(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
     (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
       register.addedSubSectors.fold(false)(_.contains(CurrencyExchange))) && msbActivities.contains(CurrencyExchange)
   }
 
-  def shouldAnswerForeignExchangeQuestions(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
+  def foreignExchangeAddedPostSubmission(msbActivities: Set[BusinessMatchingMsbService], register: ServiceChangeRegister) = {
     (register.addedActivities.fold(false)(_.contains(MoneyServiceBusiness)) ||
             register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) && msbActivities.contains(ForeignExchange)
   }

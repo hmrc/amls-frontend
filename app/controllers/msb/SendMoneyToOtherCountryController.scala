@@ -86,11 +86,11 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
       (shouldRouteToNext, services, isPreSubmission) match {
         case (true, _, _) =>
           Redirect(routes.SendTheLargestAmountsOfMoneyController.get())
-        case (false, _, false) if shouldAnswerCurrencyExchangeQuestions(services, register) =>
+        case (false, _, false) if currencyExchangeAddedPostSubmission(services, register) =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains CurrencyExchange =>
           Redirect(routes.CETransactionsInNext12MonthsController.get())
-        case (false, _, false) if shouldAnswerForeignExchangeQuestions(services, register) =>
+        case (false, _, false) if foreignExchangeAddedPostSubmission(services, register) =>
           Redirect(routes.FXTransactionsInNext12MonthsController.get())
         case (false, s, true) if s contains ForeignExchange =>
           Redirect(routes.FXTransactionsInNext12MonthsController.get())
