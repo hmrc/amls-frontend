@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -228,8 +228,8 @@ class WhichCurrencyControllerSpec extends AmlsSpec
           redirectLocation(result) mustEqual Some(routes.SummaryController.get().url)
         }
 
-        "user does not in foreign currency, redirect to check your answers when FX transaction question answered and in edit mode" in new NoDealsInForeignCurrencyFixture {
-          override val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+        "user does not deal in foreign currency, redirect to check your answers when FX transaction question answered and in edit mode" in new NoDealsInForeignCurrencyFixture {
+          override val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
           when(controller.dataCacheConnector.fetchAll(any(), any()))
                   .thenReturn(Future.successful(Some(cacheMap)))
           when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
