@@ -73,7 +73,6 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                   }
                 }
               }
-
               result.map(_.flatMap(identity)) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
             }
         }
@@ -102,14 +101,12 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
   }
 
   private def editRouting(next: Boolean, services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
-    (next: Boolean, services) match {
-      case (true, _) if msb.sendTheLargestAmountsOfMoney.isEmpty =>
+    (next: Boolean, services, msb.sendTheLargestAmountsOfMoney.isEmpty) match {
+      case (true, _, true) =>
         Redirect(routes.SendTheLargestAmountsOfMoneyController.get(true))
-      case (false, s)
-        if (s contains CurrencyExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty =>
+      case (false, s, true) if s contains CurrencyExchange =>
         Redirect(routes.CETransactionsInNext12MonthsController.get(true))
-      case (false, s)
-          if (s contains ForeignExchange) && msb.sendTheLargestAmountsOfMoney.isEmpty =>
+      case (false, s, true) if s contains ForeignExchange =>
           Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
       case _ =>
         Redirect(routes.SummaryController.get())

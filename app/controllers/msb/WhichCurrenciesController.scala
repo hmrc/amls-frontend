@@ -71,9 +71,8 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
                   msb.whichCurrencies(data)
                 ) map { _ =>
                   services.msbServices.contains(ForeignExchange) match {
-                    case true if msb.fxTransactionsInNext12Months.isEmpty || !edit => {
+                    case true if msb.fxTransactionsInNext12Months.isEmpty || !edit =>
                       Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-                    }
                     case _ => Redirect(routes.SummaryController.get())
                   }
                 }
