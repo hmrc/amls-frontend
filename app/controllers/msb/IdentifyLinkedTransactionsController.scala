@@ -44,49 +44,15 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
       }
   }
 
-  private def standardRouting(services: Set[BusinessMatchingMsbService]): Result =
-    services match {
-      case s if s contains TransmittingMoney =>
-        Redirect(routes.BusinessUseAnIPSPController.get())
-      case s if s contains CurrencyExchange =>
-        Redirect(routes.CETransactionsInNext12MonthsController.get())
-      case s if s contains ForeignExchange =>
-        Redirect(routes.FXTransactionsInNext12MonthsController.get())
-      case _ =>
+  private def routing(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness, edit: Boolean): Result =
+    if (services.contains(TransmittingMoney) && (msb.businessUseAnIPSP.isEmpty || !edit)) {
+        Redirect(routes.BusinessUseAnIPSPController.get(edit))
+    } else if (services.contains(CurrencyExchange) && (msb.ceTransactionsInNext12Months.isEmpty || !edit)) {
+        Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
+    } else if (services.contains(ForeignExchange) && (msb.fxTransactionsInNext12Months.isEmpty || !edit)) {
+        Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
+    } else {
         Redirect(routes.SummaryController.get())
-    }
-
-  private def editRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
-    services match {
-      case s if s contains TransmittingMoney =>
-        mtRouting(services, msb)
-      case s if s contains CurrencyExchange =>
-        ceRouting(msb)
-      case s if s contains ForeignExchange =>
-        fxRouting(msb)
-      case _ =>
-        Redirect(routes.SummaryController.get())
-    }
-
-  private def mtRouting(services: Set[BusinessMatchingMsbService], msb: MoneyServiceBusiness): Result =
-    if (msb.businessUseAnIPSP.isDefined) {
-      editRouting(services - TransmittingMoney, msb)
-    } else {
-      Redirect(routes.BusinessUseAnIPSPController.get(true))
-    }
-
-  private def ceRouting(msb: MoneyServiceBusiness): Result =
-    if (msb.ceTransactionsInNext12Months.isDefined) {
-      Redirect(routes.SummaryController.get())
-    } else {
-      Redirect(routes.CETransactionsInNext12MonthsController.get(true))
-    }
-
-  private def fxRouting(msb: MoneyServiceBusiness): Result =
-    if (msb.fxTransactionsInNext12Months.isDefined) {
-      Redirect(routes.SummaryController.get())
-    } else {
-      Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
     }
 
   def post(edit: Boolean = false) = Authorised.async {
@@ -106,12 +72,7 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
                 dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
                   msb.identifyLinkedTransactions(data)
                 ) map {
-                  _ =>
-                    if (edit) {
-                      editRouting(services.msbServices, msb)
-                    } else {
-                      standardRouting(services.msbServices)
-                    }
+                  _ => routing(services.msbServices, msb, edit)
                 }
               }
               result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
