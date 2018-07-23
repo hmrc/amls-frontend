@@ -62,6 +62,8 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
         mtRouting(services, msb)
       case s if s contains CurrencyExchange =>
         ceRouting(msb)
+      case s if s contains ForeignExchange =>
+        fxRouting(msb)
       case _ =>
         Redirect(routes.SummaryController.get())
     }
@@ -78,6 +80,13 @@ class IdentifyLinkedTransactionsController @Inject() (val dataCacheConnector: Da
       Redirect(routes.SummaryController.get())
     } else {
       Redirect(routes.CETransactionsInNext12MonthsController.get(true))
+    }
+
+  private def fxRouting(msb: MoneyServiceBusiness): Result =
+    if (msb.fxTransactionsInNext12Months.isDefined) {
+      Redirect(routes.SummaryController.get())
+    } else {
+      Redirect(routes.FXTransactionsInNext12MonthsController.get(true))
     }
 
   def post(edit: Boolean = false) = Authorised.async {
