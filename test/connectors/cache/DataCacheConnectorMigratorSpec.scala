@@ -182,9 +182,16 @@ class DataCacheConnectorMigratorSpec extends AmlsSpec
         primaryConnector.remove(any(), any())
       } thenReturn Future.successful(true)
 
+      when {
+        fallbackConnector.remove(any(), any())
+      } thenReturn Future.successful(true)
+
       val result = migrator.remove
 
       whenReady(result) { _ mustBe true }
+
+      verify(primaryConnector).remove(any(), any())
+      verify(fallbackConnector).remove(any(), any())
     }
 
     "update the data in the new connector" in new Fixture {
