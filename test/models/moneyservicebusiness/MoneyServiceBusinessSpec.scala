@@ -91,11 +91,11 @@ class MoneyServiceBusinessSpec extends PlaySpec with MockitoSugar with MoneyServ
     "have an isComplete function that" must {
 
       "correctly show if the model is complete" in {
-        completeMsb.isComplete(true, true) must be(true)
+        completeMsb.isComplete(true, true, true) must be(true)
       }
 
       "correctly show if the model is incomplete" in {
-        emptyMsb.isComplete(false, false) must be(false)
+        emptyMsb.isComplete(false, false, true) must be(false)
       }
     }
 

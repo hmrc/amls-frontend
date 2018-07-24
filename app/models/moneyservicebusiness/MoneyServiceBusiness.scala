@@ -17,7 +17,7 @@
 package models.moneyservicebusiness
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessMatching, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -104,10 +104,17 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && this.hasAccepted
+  private def fxComplete(fxFlag: Boolean): Boolean =
+    if (fxFlag) {
+      this.fxTransactionsInNext12Months.isDefined
+    } else {
+      true
+    }
+
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
   } else {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag)
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag)
   }
 }
 
@@ -124,7 +131,7 @@ object MoneyServiceBusiness {
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange))) {
+        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
           Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get())

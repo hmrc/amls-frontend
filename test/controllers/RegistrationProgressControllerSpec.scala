@@ -461,7 +461,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           when(hvd.isComplete) thenReturn true
 
           val msb = mock[models.moneyservicebusiness.MoneyServiceBusiness]
-          when(msb.isComplete(any(), any())) thenReturn true
+          when(msb.isComplete(any(), any(), any())) thenReturn true
 
           mockCacheGetEntry(Some(msb), models.moneyservicebusiness.MoneyServiceBusiness.key)
           mockCacheGetEntry(Some(hvd), models.hvd.Hvd.key)
