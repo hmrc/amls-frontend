@@ -93,6 +93,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   def getWithoutAmendments(implicit authContext: AuthContext, request: Request[_]) = {
     val amlsReferenceNumber = enrolmentsService.amlsRegistrationNumber
+    Logger.debug("getWithoutAmendments:AMLS-Reference:" + amlsReferenceNumber)
     landingService.cacheMap flatMap {
       case Some(cache) =>
         preApplicationComplete(cache)
@@ -218,6 +219,7 @@ class LandingController @Inject()(val landingService: LandingService,
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
         case Some(c) =>
+          Logger.debug("getWithoutAmendments:AMLS-Reference:" + amlsRegistrationNumber)
           lazy val fixEmpties = for {
             c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
             c2 <- fixEmptyRecords[ResponsiblePerson](c1, ResponsiblePerson.key)
@@ -239,7 +241,7 @@ class LandingController @Inject()(val landingService: LandingService,
             }
           }
         case _ => {
-          Logger.debug("Data with amlsRegistration number route in getWithAmendments()")
+          Logger.debug("Data with amlsRegistration number route in getWithAmendments()" + amlsRegistrationNumber)
           refreshAndRedirect(amlsRegistrationNumber, None)
         }
       }
