@@ -93,7 +93,7 @@ class LandingController @Inject()(val landingService: LandingService,
 
   def getWithoutAmendments(implicit authContext: AuthContext, request: Request[_]) = {
     val amlsReferenceNumber = enrolmentsService.amlsRegistrationNumber
-    Logger.debug("getWithoutAmendments:AMLS-Reference:" + amlsReferenceNumber)
+    Logger.debug("getWithoutAmendments:AMLSReference:" + amlsReferenceNumber)
     landingService.cacheMap flatMap {
       case Some(cache) =>
         preApplicationComplete(cache)
@@ -103,6 +103,7 @@ class LandingController @Inject()(val landingService: LandingService,
           amlsRef <- amlsReferenceNumber
         } yield (reviewDetails, amlsRef) match {
           case (Some(rd), None) =>
+            Logger.debug("LandingController:getWithoutAmendments: " + rd)
             landingService.updateReviewDetails(rd) map { _ => {
               auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
@@ -113,8 +114,10 @@ class LandingController @Inject()(val landingService: LandingService,
             }
             }
           case (None, None) =>
+            Logger.debug("LandingController:getWithoutAmendments - (None, None)")
             Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
           case (_, Some(_)) =>
+            Logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
@@ -219,7 +222,7 @@ class LandingController @Inject()(val landingService: LandingService,
       case Some(amlsRegistrationNumber) => landingService.cacheMap flatMap {
         //enrolment exists
         case Some(c) =>
-          Logger.debug("getWithoutAmendments:AMLS-Reference:" + amlsRegistrationNumber)
+          Logger.debug("getWithAmendments:AMLSReference:" + amlsRegistrationNumber)
           lazy val fixEmpties = for {
             c1 <- fixEmptyRecords[TradingPremises](c, TradingPremises.key)
             c2 <- fixEmptyRecords[ResponsiblePerson](c1, ResponsiblePerson.key)
