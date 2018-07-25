@@ -24,6 +24,7 @@ import org.joda.time.LocalDate
 import play.api.{Mode, Play}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -56,6 +57,7 @@ trait StatusService {
   }
 
   private def getETMPStatus(response: ReadStatusResponse) = {
+    Logger.debug("StatusService:getETMPStatus:formBundleStatus:" + response.formBundleStatus)
     response.formBundleStatus match {
       case `Pending` => SubmissionReadyForReview
       case `Approved` => getApprovedStatus(response)
@@ -74,6 +76,7 @@ trait StatusService {
     amlsConnector.status(mlrRegNumber) map {
       response =>
         val status = getETMPStatus(response)
+        Logger.debug("StatusService:etmpStatusInformation:status:" + status)
         (status, Some(response))
     }
   }
@@ -81,8 +84,10 @@ trait StatusService {
   def getDetailedStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[(SubmissionStatus, Option[ReadStatusResponse])] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
+        Logger.debug("StatusService:getDetailedStatus:mlrRegNumber:" + mlrRegNumber)
         etmpStatusInformation(mlrRegNumber)(hc, authContext, ec)
       case None =>
+        Logger.debug("StatusService:getDetailedStatus: No mlrRegNumber")
         notYetSubmitted(hc, authContext, ec) map { status =>
           (status, None)
         }
@@ -92,8 +97,10 @@ trait StatusService {
   def getStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
+        Logger.debug("StatusService:getStatus:mlrRegNumber:" + mlrRegNumber)
         etmpStatus(mlrRegNumber)(hc, authContext, ec)
       case None =>
+        Logger.debug("StatusService:getStatus: No mlrRegNumber")
         notYetSubmitted(hc, authContext, ec)
     }
   }
@@ -108,6 +115,7 @@ trait StatusService {
   def getReadStatus(implicit hc: HeaderCarrier, authContext: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     enrolmentsService.amlsRegistrationNumber flatMap {
       case Some(mlrRegNumber) =>
+        Logger.debug("StatusService:getReadStatus:mlrRegNumber:" + mlrRegNumber)
         etmpReadStatus(mlrRegNumber)(hc, authContext, ec)
       case _ => throw new RuntimeException("ETMP returned no read status")
     }
@@ -126,8 +134,10 @@ trait StatusService {
     progressService.sections map {
       sections =>
         if (isComplete(sections)) {
+          Logger.debug("StatusService:notYetSubmitted: SubmissionReady")
           SubmissionReady
         } else {
+          Logger.debug("StatusService:notYetSubmitted: NotCompleted")
           NotCompleted
         }
     }
@@ -136,15 +146,16 @@ trait StatusService {
   private def etmpStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[SubmissionStatus] = {
     {
       amlsConnector.status(amlsRefNumber) map {
-        response =>
-          getETMPStatus(response)
+        response => getETMPStatus(response)
       }
     }
   }
 
   private def etmpReadStatus(amlsRefNumber: String)(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[ReadStatusResponse] = {
     {
-      amlsConnector.status(amlsRefNumber)
+      val status = amlsConnector.status(amlsRefNumber)
+      Logger.debug("StatusService:etmpReadStatus:status:" + status)
+      status
     }
   }
 
