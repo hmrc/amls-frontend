@@ -16,7 +16,7 @@
 
 package filters
 
-import connectors.{KeystoreConnector}
+import connectors.{AuthenticatorConnector, KeystoreConnector}
 import models.status.ConfirmationStatus
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -35,20 +35,24 @@ import uk.gov.hmrc.play.frontend.filters.MicroserviceFilterSupport
 class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with Results with MicroserviceFilterSupport {
 
   val keystore = mock[KeystoreConnector]
+  val authenticator = mock[AuthenticatorConnector]
 
   override lazy val app = new GuiceApplicationBuilder()
     .overrides(bind[KeystoreConnector].to(keystore))
+    .bindings(bind[AuthenticatorConnector].to(authenticator))
     .build()
 
   trait TestFixture {
 
     val confirmationStatusResult = ConfirmationStatus(Some(true))
 
-    Seq(keystore).foreach(reset(_))
+    Seq(keystore, authenticator).foreach(reset(_))
 
     when(keystore.resetConfirmation(any(), any())) thenReturn Future.successful()
 
     when(keystore.confirmationStatus(any(), any())) thenReturn Future.successful(confirmationStatusResult)
+
+    when(authenticator.refreshProfile(any(), any())) thenReturn Future.successful(HttpResponse(OK))
 
   }
 
@@ -127,6 +131,8 @@ class ConfirmationFilterSpec extends PlaySpec with OneAppPerSuite with MockitoSu
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
+
+      verify(authenticator).refreshProfile(any(), any())
 
     }
 
