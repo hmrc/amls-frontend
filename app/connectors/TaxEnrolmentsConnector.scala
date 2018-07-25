@@ -43,8 +43,9 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
 
   def enrol(enrolKey: EnrolmentKey, enrolment: TaxEnrolment)
            (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
-
     auth.userDetails flatMap { details =>
+      Logger.debug("TaxEnrolmentsConnector:enrol:enrolKey:" + enrolKey)
+      Logger.debug("TaxEnrolmentsConnector:enrol:auth.userDetails:" + details)
       details.groupIdentifier match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/${enrolKey.key}"
@@ -79,8 +80,9 @@ class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth:
   def deEnrol(registrationNumber: String)
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext): Future[HttpResponse] = {
     val enrolKey = AmlsEnrolmentKey(registrationNumber).key
-
     auth.userDetails flatMap { details =>
+      Logger.debug("TaxEnrolmentsConnector:deEnrol:enrolKey:" + enrolKey)
+      Logger.debug("TaxEnrolmentsConnector:deEnrol:auth.userDetails:" + details)
       details.groupIdentifier match {
         case Some(groupId) =>
           val url = s"$baseUrl/groups/$groupId/enrolments/$enrolKey"
