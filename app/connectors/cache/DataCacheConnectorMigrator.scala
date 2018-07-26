@@ -69,7 +69,7 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
 
 
   /**
-    * Removes the user's data from any cache.
+    * Removes the user's data from the primary and secondary cache.
     */
   override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = {
     for {
