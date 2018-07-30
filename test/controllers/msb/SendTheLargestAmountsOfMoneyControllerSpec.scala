@@ -18,7 +18,7 @@ package controllers.msb
 
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{CurrencyExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -108,6 +108,28 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
         val result = controller.get()(request)
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+    }
+
+    "redirect to CETransactionsInNext12Months" when {
+      "page is not editable and CurrencyExchange and ForeignExchange has been added" in new Fixture {
+        mockIsNewActivity(false)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(CurrencyExchange, ForeignExchange)))))
+
+        val result = controller.get()(request)
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+    }
+
+    "redirect to FXTransactionsInNext12Months" when {
+      "page is not editable and ForeignExchange has been added" in new Fixture {
+        mockIsNewActivity(false)
+        mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(ForeignExchange)))))
+
+        val result = controller.get()(request)
+        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
       }
     }
 
