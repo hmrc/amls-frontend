@@ -51,11 +51,11 @@ class ServiceFlow @Inject()(businessMatchingService: BusinessMatchingService, ca
   private val activityToData = Map[BusinessActivity, CacheMap => Boolean](
     MoneyServiceBusiness -> { c =>
 
-      val (tm, cx) = c.getEntry[BusinessMatching](BusinessMatching.key) map { b =>
-        b.msbServices.fold((false, false))(s => (s.msbServices.contains(TransmittingMoney), s.msbServices.contains(CurrencyExchange)))
-      } getOrElse (false, false)
+      val (tm, cx, fx) = c.getEntry[BusinessMatching](BusinessMatching.key) map { b =>
+        b.msbServices.fold((false, false, false))(s => (s.msbServices.contains(TransmittingMoney), s.msbServices.contains(CurrencyExchange), s.msbServices.contains(ForeignExchange)))
+      } getOrElse (false, false, false)
 
-      c.getEntry[MSBModel](MSBModel.key).fold(false)(_.isComplete(tm, cx))
+      c.getEntry[MSBModel](MSBModel.key).fold(false)(_.isComplete(tm, cx, fx))
     },
     HighValueDealing -> { c => c.getEntry[Hvd](Hvd.key).fold(false)(_.isComplete) },
     TrustAndCompanyServices -> { c => c.getEntry[Tcsp](Tcsp.key).fold(false)(_.isComplete) },

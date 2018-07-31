@@ -17,7 +17,7 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{BusinessMatching, HighValueDealing, MoneyServiceBusiness}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -40,6 +40,8 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       mockCacheConnector)
 
     mockCacheFetch[ServiceChangeRegister](None)
+    mockCacheFetchAll
+    mockCacheGetEntry[BusinessMatching](Some(BusinessMatching()), BusinessMatching.key)
   }
 
   "WhatYouNeedController" must {

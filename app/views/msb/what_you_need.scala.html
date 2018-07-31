@@ -17,7 +17,8 @@
 @import include._
 @import forms2._
 @import forms.EmptyForm
-@()(implicit request: Request[_],m:Messages)
+@import models.businessmatching._
+@(services: BusinessMatchingMsbServices = BusinessMatchingMsbServices(Set()))(implicit request: Request[_],m:Messages)
 
 @header = {
     @heading("title.wyn", "summary.msb")
@@ -34,8 +35,22 @@
     <ul class="list list-bullet">
         <li>@Messages("msb.whatyouneed.line_1")</li>
         <li>@Messages("msb.whatyouneed.line_2")</li>
-        <li>@Messages("msb.whatyouneed.line_3")</li>
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            <li>@Messages("msb.whatyouneed.line_3")</li>
+        }
+        @if(services.msbServices.contains(CurrencyExchange)) {
+            <li>@Messages("msb.whatyouneed.line_4")</li>
+            <li>@Messages("msb.whatyouneed.line_5")</li>
+            <li>@Messages("msb.whatyouneed.line_6")</li>
+        }
+        @if(services.msbServices.contains(ForeignExchange)) {
+            <li>@Messages("msb.whatyouneed.line_7")</li>
+        }
+        @if(services.msbServices.contains(TransmittingMoney)) {
+            <li>@Messages("msb.whatyouneed.line_8")</li>
+        }
     </ul>
+
 
     @form(EmptyForm, controllers.msb.routes.WhatYouNeedController.post()) {
         @submit(false, Some(Messages("button.continue")), true, buttonId = Some("msbwhatyouneed-button"))

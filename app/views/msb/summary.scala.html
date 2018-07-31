@@ -226,6 +226,20 @@
                 }
             }
         }
+
+        @if(services.msbServices.contains(ForeignExchange)) {
+            @model.fxTransactionsInNext12Months.map{ trans =>
+                @checkYourAnswers(
+                    question = Messages("msb.fx.transactions.expected.in.12.months.title"),
+                    editLinkTag = "msbfxtransactionsexpected-edit",
+                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(ForeignExchange))) {
+                        controllers.msb.routes.FXTransactionsInNext12MonthsController.get(true).toString
+                    } else ""
+                ) {
+                    <p>@trans.fxTransaction</p>
+                }
+            }
+        }
     }
 
     @if(ApplicationConfig.hasAcceptedToggle) {

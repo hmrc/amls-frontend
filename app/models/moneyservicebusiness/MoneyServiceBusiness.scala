@@ -17,7 +17,7 @@
 package models.moneyservicebusiness
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessMatching, CurrencyExchange, TransmittingMoney}
+import models.businessmatching.{BusinessMatching, CurrencyExchange, ForeignExchange, TransmittingMoney}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import play.api.libs.json._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,6 +35,7 @@ case class MoneyServiceBusiness(
                                  mostTransactions: Option[MostTransactions] = None,
                                  transactionsInNext12Months: Option[TransactionsInNext12Months] = None,
                                  ceTransactionsInNext12Months: Option[CETransactionsInNext12Months] = None,
+                                 fxTransactionsInNext12Months: Option[FXTransactionsInNext12Months] = None,
                                  hasChanged: Boolean = false,
                                  hasAccepted: Boolean = false
                                ) {
@@ -72,6 +73,9 @@ case class MoneyServiceBusiness(
   def ceTransactionsInNext12Months(p: CETransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(ceTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInNext12Months.contains(p), hasAccepted = this.ceTransactionsInNext12Months.contains(p))
 
+  def fxTransactionsInNext12Months(p: FXTransactionsInNext12Months): MoneyServiceBusiness =
+    this.copy(fxTransactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.fxTransactionsInNext12Months.contains(p), hasAccepted = this.fxTransactionsInNext12Months.contains(p))
+
   private def allComplete: Boolean =
     this.throughput.isDefined &&
       this.branchesOrAgents.isDefined &&
@@ -100,10 +104,17 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && this.hasAccepted
+  private def fxComplete(fxFlag: Boolean): Boolean =
+    if (fxFlag) {
+      this.fxTransactionsInNext12Months.isDefined
+    } else {
+      true
+    }
+
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
   } else {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag)
+    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag)
   }
 }
 
@@ -120,7 +131,7 @@ object MoneyServiceBusiness {
     cache.getEntry[MoneyServiceBusiness](key).fold(notStarted) {
       model =>
         val msbService = ControllerHelper.getMsbServices(cache.getEntry[BusinessMatching](BusinessMatching.key)).getOrElse(Set.empty)
-        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange))) {
+        if (model.isComplete(msbService.contains(TransmittingMoney), msbService.contains(CurrencyExchange), msbService.contains(ForeignExchange))) {
           Section(messageKey, Completed, model.hasChanged, controllers.msb.routes.SummaryController.get())
         } else {
           Section(messageKey, Started, model.hasChanged, controllers.msb.routes.WhatYouNeedController.get())
@@ -143,6 +154,7 @@ object MoneyServiceBusiness {
         (__ \ "mostTransactions").readNullable[MostTransactions] and
         (__ \ "transactionsInNext12Months").readNullable[TransactionsInNext12Months] and
         (__ \ "ceTransactionsInNext12Months").readNullable[CETransactionsInNext12Months] and
+        (__ \ "fxTransactionsInNext12Months").readNullable[FXTransactionsInNext12Months] and
         (__ \ "hasChanged").readNullable[Boolean].map {
           _.getOrElse(false)
         } and

@@ -16,20 +16,19 @@
 
 package controllers.msb
 
-import controllers.businessmatching.updateservice.ChangeSubSectorHelper
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
+import org.mockito.Matchers.any
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import org.mockito.Mockito.when
-import org.mockito.Matchers.any
 
 import scala.concurrent.Future
 
@@ -165,7 +164,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
       }
 
-      "edit is false and we're adding MSB to an approved application" in new Fixture {
+      "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
         val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
         val incomingModel = MoneyServiceBusiness()
 
@@ -195,6 +194,99 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
         status(result) mustEqual SEE_OTHER
         redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+
+      "edit is false and we're adding MSB to an approved application (CE, FX)" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
+      }
+    }
+
+    "redirect to the FX 'Transactions' on submission" when {
+      "edit is false and Foreign Exchange is available and Currency Exchange is not" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
+      }
+
+      "edit is false and we're adding MSB to an approved application (CE)" in new Fixture {
+        val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+        val incomingModel = MoneyServiceBusiness()
+
+        val outgoingModel = incomingModel.copy(
+          mostTransactions = Some(
+            MostTransactions(
+              Seq(Country("United Kingdom", "GB"))
+            )
+          ), hasChanged = true
+        )
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "mostTransactionsCountries[]" -> "GB"
+        )
+
+        when {
+          mockStatusService.isPreSubmission(any(), any(), any())
+        } thenReturn Future.successful(false)
+
+        mockCacheFetchAll
+        mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+        mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+        mockCacheGetEntry[ServiceChangeRegister](Some(ServiceChangeRegister(Some(Set(MoneyServiceBusinessActivity)))), ServiceChangeRegister.key)
+        mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key))
+
+        val result = controller.post()(newRequest)
+
+        status(result) mustEqual SEE_OTHER
+        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
       }
     }
 
@@ -231,7 +323,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
-    "on valid submission (no edit) (non-CE)" in new Fixture {
+    "on valid submission (no edit) (non-CE, non-FE)" in new Fixture {
 
       val incomingModel = MoneyServiceBusiness()
 
@@ -306,14 +398,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }
 
-    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new Fixture {
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            CurrencyExchange
-          )
-        )
-      )
+    trait NextPageDataDoesNotExistFixture extends Fixture {
       val incomingModel = MoneyServiceBusiness()
 
       val outgoingModel = incomingModel.copy(
@@ -330,44 +415,41 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
       mockCacheFetchAll
       mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
-      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
       mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
+    }
+
+    "return a redirect on valid submission where the next page data doesn't exist (edit) (CE)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
 
       val result = controller.post(edit = true)(newRequest)
-
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
     }
 
-    "return a redirect to the summary page on valid submission (edit) (non-CE)" in new Fixture {
-
-      val incomingModel = MoneyServiceBusiness()
-
-      val outgoingModel = incomingModel.copy(
-        mostTransactions = Some(
-          MostTransactions(
-            Seq(Country("United Kingdom", "GB"))
-          )
-        ), hasChanged = true
-      )
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "mostTransactionsCountries[]" -> "GB"
-      )
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            ChequeCashingScrapMetal
-          )
-        )
-      )
-      mockCacheFetchAll
-      mockCacheGetEntry[MoneyServiceBusiness](Some(incomingModel), MoneyServiceBusiness.key)
+  "return a redirect on valid submission where the next page data doesn't exist (edit) (CE, FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange)))
       mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
-      mockCacheSave[MoneyServiceBusiness](outgoingModel, Some(MoneyServiceBusiness.key) )
 
       val result = controller.post(edit = true)(newRequest)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get(true).url)
+  }
 
+  "return a redirect on valid submission where the next page data doesn't exist (edit) (FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+
+      val result = controller.post(edit = true)(newRequest)
+      status(result) mustEqual SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get(true).url)
+  }
+
+    "return a redirect to the summary page on valid submission (edit) (non-CE, non-FX)" in new NextPageDataDoesNotExistFixture {
+      val msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingScrapMetal)))
+      mockCacheGetEntry[BusinessMatching](Some(BusinessMatching(msbServices = msbServices)), BusinessMatching.key)
+
+      val result = controller.post(edit = true)(newRequest)
       status(result) mustEqual SEE_OTHER
       redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
     }

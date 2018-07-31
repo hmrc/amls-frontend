@@ -36,3 +36,6 @@ POST        /largest-amounts                                   @controllers.msb.
 
 GET         /transfers-b                                       @controllers.msb.CETransactionsInNext12MonthsController.get(edit: Boolean ?= false)
 POST        /transfers-b                                       @controllers.msb.CETransactionsInNext12MonthsController.post(edit: Boolean ?= false)
+
+GET         /transfers-c                                       @controllers.msb.FXTransactionsInNext12MonthsController.get(edit: Boolean ?= false)
+POST        /transfers-c                                       @controllers.msb.FXTransactionsInNext12MonthsController.post(edit: Boolean ?= false)
