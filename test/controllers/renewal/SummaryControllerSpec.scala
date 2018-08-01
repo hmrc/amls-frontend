@@ -76,7 +76,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("123")),
-      None,
+      Some(FXTransactionsInLast12Months("12")),
       false,
       hasAccepted = true)
 

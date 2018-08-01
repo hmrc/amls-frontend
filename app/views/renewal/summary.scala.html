@@ -17,7 +17,7 @@
 @import include._
 @import forms2._
 @import models.renewal._
-@import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange}
+@import models.businessmatching.{BusinessActivities, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange, ForeignExchange}
 @import config.ApplicationConfig
 
 @(f: forms.Form2[_], model: Renewal, activities: Option[BusinessActivities], bmMsbServices: Option[BusinessMatchingMsbServices], canSubmit: Boolean)(implicit request: Request[_], messages: Messages, lang: Lang)
@@ -221,6 +221,17 @@
             }
             }
         }
+        @if(services.msbServices.contains(ForeignExchange)) {
+            @model.fxTransactionsInLast12Months.map{ trans =>
+                @checkYourAnswers(
+                    question = Messages("renewals.msb.fx.transactions.expected.title"),
+                    editLinkTag = "msbfxtransactionsexpected-edit",
+                    editUrl = controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(edit = true).toString
+                ) {
+                    <p>@trans.fxTransaction</p>
+                }
+            }
+        }
     }
 
     @model.percentageOfCashPaymentOver15000.map { p =>
@@ -269,6 +280,7 @@
                 }
         }
     }
+
 
     @form(f, controllers.renewal.routes.SummaryController.post()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
