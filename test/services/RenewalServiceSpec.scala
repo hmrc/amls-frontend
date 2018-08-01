@@ -65,6 +65,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
       Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("123")),
+      None,
       true,
       Some(SendMoneyToOtherCountry(true))
     )
@@ -186,6 +187,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           None,
           None,
           None,
+          None,
           hasChanged = true,
           None
         )
@@ -211,6 +213,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
           Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          None,
           None,
           None,
           None,
@@ -258,6 +261,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -292,6 +296,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -327,6 +332,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -361,6 +367,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -397,6 +404,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   Some(CETransactionsInLast12Months("123")),
+                  None,
                   hasChanged = true,
                   Some(SendMoneyToOtherCountry(false))
                 )
@@ -430,6 +438,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   Some(CETransactionsInLast12Months("123")),
+                  None,
                   hasChanged = true,
                   Some(SendMoneyToOtherCountry(false))
                 )
@@ -468,6 +477,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     None,
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -500,6 +510,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(TransactionsInLast12Months("1500")),
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
                     None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
@@ -537,6 +548,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     None,
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -567,6 +579,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(TotalThroughput("01")),
                     None,
                     Some(TransactionsInLast12Months("1500")),
+                    None,
                     None,
                     None,
                     None,
@@ -606,6 +619,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   None,
+                  None,
                   hasChanged = true,
                   Some(SendMoneyToOtherCountry(false))
                 )
@@ -634,6 +648,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   Some(PercentageOfCashPaymentOver15000.First),
                   Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
                   Some(TotalThroughput("01")),
+                  None,
                   None,
                   None,
                   None,
@@ -680,6 +695,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -712,6 +728,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -746,6 +763,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -778,6 +796,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     Some(CETransactionsInLast12Months("123")),
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -813,6 +832,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   Some(CETransactionsInLast12Months("123")),
+                  None,
                   hasChanged = true,
                   None
                 )
@@ -845,6 +865,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   Some(CETransactionsInLast12Months("123")),
+                  None,
                   hasChanged = true,
                   None
                 )
@@ -883,6 +904,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                     None,
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
                   )
@@ -914,6 +936,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(TransactionsInLast12Months("1500")),
                     Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                     Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+                    None,
                     None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(true))
@@ -950,6 +973,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     None,
                     None,
                     None,
+                    None,
                     hasChanged = true,
                     Some(SendMoneyToOtherCountry(false))
                   )
@@ -979,6 +1003,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                     Some(TotalThroughput("01")),
                     None,
                     Some(TransactionsInLast12Months("1500")),
+                    None,
                     None,
                     None,
                     None,
@@ -1017,6 +1042,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   None,
+                  None,
                   hasChanged = true,
                   sendMoneyToOtherCountry = None
                 )
@@ -1044,6 +1070,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   None,
                   None,
                   Some(TotalThroughput("01")),
+                  None,
                   None,
                   None,
                   None,
@@ -1088,6 +1115,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               None,
               None,
               None,
+              None,
               hasChanged = true,
               None
             )
@@ -1113,6 +1141,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
               Some(PercentageOfCashPaymentOver15000.First),
               Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+              None,
               None,
               None,
               None,
@@ -1152,6 +1181,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               None,
               None,
               None,
+              None,
               hasChanged = true,
               None
             )
@@ -1175,6 +1205,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               None,
               Some(AMLSTurnover.First),
               Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+              None,
               None,
               None,
               None,
@@ -1220,6 +1251,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           None,
           None,
           None,
+          None,
           hasChanged = true,
           None
         )
@@ -1244,6 +1276,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(InvolvedInOtherYes("test")),
           Some(BusinessTurnover.First),
           Some(AMLSTurnover.First),
+          None,
           None,
           None,
           None,
@@ -1290,6 +1323,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                 Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                 None,
+                None,
                 hasChanged = true,
                 Some(SendMoneyToOtherCountry(true))
               )
@@ -1321,6 +1355,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
                 Some(TotalThroughput("01")),
                 Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+                None,
                 None,
                 None,
                 None,
@@ -1361,6 +1396,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                 Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                 None,
+                None,
                 hasChanged = true,
                 Some(SendMoneyToOtherCountry(true))
               )
@@ -1398,6 +1434,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
                 Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                 None,
+                None,
                 hasChanged = true,
                 Some(SendMoneyToOtherCountry(true))
               )
@@ -1426,6 +1463,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 None,
                 None,
                 Some(TotalThroughput("01")),
+                None,
                 None,
                 None,
                 None,
@@ -1466,6 +1504,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 None,
                 Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
                 None,
+                None,
                 hasChanged = true,
                 Some(SendMoneyToOtherCountry(true))
               )
@@ -1503,6 +1542,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               None,
               None,
               None,
+              None,
               hasChanged = true,
               None
             )
@@ -1524,6 +1564,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
+              None,
               None,
               None,
               None,

@@ -34,6 +34,7 @@ case class Renewal(
                     sendTheLargestAmountsOfMoney: Option[SendTheLargestAmountsOfMoney] = None,
                     mostTransactions: Option[MostTransactions] = None,
                     ceTransactionsInLast12Months: Option[CETransactionsInLast12Months] = None,
+                    fxTransactionsInLast12Months: Option[FXTransactionsInLast12Months] = None,
                     hasChanged: Boolean = false,
                     sendMoneyToOtherCountry: Option[SendMoneyToOtherCountry] = None,
                     hasAccepted: Boolean = true
@@ -88,6 +89,10 @@ case class Renewal(
     this.copy(ceTransactionsInLast12Months = Some(p), hasChanged = hasChanged || !this.ceTransactionsInLast12Months.contains(p),
       hasAccepted = hasAccepted && this.ceTransactionsInLast12Months.contains(p))
 
+  def fxTransactionsInLast12Months(p: FXTransactionsInLast12Months): Renewal =
+    this.copy(fxTransactionsInLast12Months = Some(p), hasChanged = hasChanged || !this.fxTransactionsInLast12Months.contains(p),
+      hasAccepted = hasAccepted && this.fxTransactionsInLast12Months.contains(p))
+
   def mostTransactions(model: MostTransactions): Renewal =
     this.copy(mostTransactions = Some(model), hasChanged = hasChanged || !this.mostTransactions.contains(model),
       hasAccepted = hasAccepted && this.mostTransactions.contains(model))
@@ -120,6 +125,11 @@ object Renewal {
     val currencyExchangeRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.whichCurrencies.isDefined && r.ceTransactionsInLast12Months.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for currency exchange"))))
+    }
+
+    val foreignExchangeRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.fxTransactionsInLast12Months.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for foreign exchange"))))
     }
 
     val moneyTransmitterRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {

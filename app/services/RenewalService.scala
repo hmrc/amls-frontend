@@ -45,7 +45,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
             Future.successful(Section(Renewal.sectionKey, Completed, model.hasChanged, controllers.renewal.routes.SummaryController.get()))
           } else {
             model match {
-              case Renewal(None, None, None, None, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
+              case Renewal(None, None, None, None, _, _, _, _, _, _, _, _, _, _, _, _) => Future.successful(notStarted)
               case _ => Future.successful(Section(Renewal.sectionKey, Started, model.hasChanged, controllers.renewal.routes.WhatYouNeedController.get()))
             }
           }

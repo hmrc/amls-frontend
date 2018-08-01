@@ -292,6 +292,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"),None,None)),
       Some(MostTransactions(List(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("12345678963")),
+      None,
       false)
 
     val cacheMap = CacheMap("", Map.empty)
