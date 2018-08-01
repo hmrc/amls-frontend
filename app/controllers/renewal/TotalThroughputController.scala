@@ -75,11 +75,10 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
 
   private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result = {
     (services, businessActivities, edit) match {
-      case (_, _, true) => Redirect(routes.SummaryController.get())
-      case (x, _, _) if x.contains(TransmittingMoney) => Redirect(routes.TransactionsInLast12MonthsController.get())
-      case (x, _, _) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
-      case (_, x, _) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
-      case (_, x, _) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
+      case (x, _, false) if x.contains(TransmittingMoney) => Redirect(routes.TransactionsInLast12MonthsController.get())
+      case (x, _, false) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
+      case (_, x, false) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+      case (_, x, false) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
       case _ => Redirect(routes.SummaryController.get())
     }
   }
