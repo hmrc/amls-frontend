@@ -33,6 +33,9 @@ POST        /most-transactions                                                @c
 GET         /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.get(edit: Boolean ?= false)
 POST        /transaction-currency                                             @controllers.renewal.CETransactionsInLast12MonthsController.post(edit: Boolean ?= false)
 
+GET         /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.get(edit: Boolean ?= false)
+POST        /transaction-fx                                                   @controllers.renewal.FXTransactionsInLast12MonthsController.post(edit: Boolean ?= false)
+
 GET         /currency                                                         @controllers.renewal.WhichCurrenciesController.get(edit: Boolean ?= false)
 POST        /currency                                                         @controllers.renewal.WhichCurrenciesController.post(edit: Boolean ?= false)
 

@@ -43,7 +43,6 @@ class FXTransactionsInLast12MonthsController  @Inject()(
                         } yield Form2[FXTransactionsInLast12Months](transactions)).getOrElse(EmptyForm)
                         Ok(fx_transaction_in_last_12_months(form, edit))
                 }
-                Future.successful(NotFound(notFoundView))
             }
 
     def post(edit: Boolean = false) = Authorised.async {
@@ -54,9 +53,7 @@ class FXTransactionsInLast12MonthsController  @Inject()(
                 case ValidForm(_, data) =>
                     for {
                         renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-                        _ <- dataCacheConnector.save[Renewal](Renewal.key,
-                            renewal.fxTransactionsInLast12Months(data)
-                        )
+                        _ <- renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data))
                     } yield Redirect(routes.SummaryController.get())
             }
         }

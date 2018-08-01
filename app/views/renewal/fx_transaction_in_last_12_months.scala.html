@@ -22,15 +22,15 @@
 
 @header = {
     @errorSummary(f)
-    @heading("renewals.msb.fx.transactions.expected.title", "summary.msb")
+    @heading("renewals.msb.fx.transactions.expected.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("renewals.msb.fx.transactions.expected.title") + " - " + Messages("summary.msb"),
+    title = Messages("renewals.msb.fx.transactions.expected.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.FXTransactionsInNext12MonthsController.post(edit)) {
+    @form(f, controllers.renewal.routes.FXTransactionsInLast12MonthsController.post(edit)) {
 
         @input(
             attrMin = "1",
@@ -38,7 +38,7 @@
             attrType = "number",
             field = f("fxTransaction"),
             labelHidden = true,
-            labelText = "msb.fx.transactions.expected.in.12.months.title"
+            labelText = "renewals.msb.fx.transactions.expected.title"
         )
 
         @submit(edit)

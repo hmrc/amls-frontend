@@ -33,11 +33,11 @@ class fx_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
   "fxTransactions view" must {
 
-    val ce = FXTransactionsInLast12Months("123")
+    val fx = FXTransactionsInLast12Months("123")
 
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[FXTransactionsInLast12Months] = Form2(ce)
+      val form2: ValidForm[FXTransactionsInLast12Months] = Form2(fx)
 
       def view = fx_transaction_in_last_12_months(form2, true)
 
@@ -46,7 +46,7 @@ class fx_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[FXTransactionsInLast12Months] = Form2(ce)
+      val form2: ValidForm[FXTransactionsInLast12Months] = Form2(fx)
 
       def view = fx_transaction_in_last_12_months(form2, true)
 

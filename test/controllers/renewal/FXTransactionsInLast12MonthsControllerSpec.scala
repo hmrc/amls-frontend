@@ -46,7 +46,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "MsbForeignExchangeTransactionsController" must {
+  "RenewalForeignExchangeTransactionsController" must {
 
     "load the page 'How many foreign exchange transactions'" in new Fixture {
 
@@ -116,7 +116,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       )
 
       val newRequest = request.withFormUrlEncodedBody (
-        "ceTransaction" -> "12345678963"
+        "fxTransaction" -> "12345678963"
       )
 
       when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))
