@@ -20,7 +20,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import models.Country
 import models.businessmatching._
-import models.renewal.{CETransactionsInLast12Months, MostTransactions, Renewal}
+import models.renewal.{CETransactionsInLast12Months, FXTransactionsInLast12Months, MostTransactions, Renewal}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -30,7 +30,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -160,7 +160,100 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
             }
 
           }
+
+          "msb includes CE and FX" in new FormSubmissionFixture {
+
+            val msbServices = Some(
+              BusinessMatchingMsbServices(
+                Set(
+                  CurrencyExchange
+                )
+              )
+            )
+            val incomingModel = Renewal()
+
+            val outgoingModel = incomingModel.copy(
+              mostTransactions = Some(
+                MostTransactions(
+                  Seq(Country("United Kingdom", "GB"))
+                )
+              ), hasChanged = true
+            )
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "mostTransactionsCountries[]" -> "GB"
+            )
+
+            when(cache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(cacheMap)))
+
+            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+                    .thenReturn(Some(incomingModel))
+
+            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+                    .thenReturn(Some(BusinessMatching(
+                      msbServices = msbServices,
+                      activities = Some(BusinessActivities(Set.empty))
+                    )))
+
+            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+                    .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustEqual routes.CETransactionsInLast12MonthsController.get().url.some
+            }
+
+          }
         }
+
+        "go to FXTransactionsInLast12MonthsController" when {
+          "msb includes FX and not CE" in new FormSubmissionFixture {
+
+            val msbServices = Some(
+              BusinessMatchingMsbServices(
+                Set(
+                  ForeignExchange
+                )
+              )
+            )
+            val incomingModel = Renewal()
+
+            val outgoingModel = incomingModel.copy(
+              mostTransactions = Some(
+                MostTransactions(
+                  Seq(Country("United Kingdom", "GB"))
+                )
+              ), hasChanged = true
+            )
+
+            val newRequest = request.withFormUrlEncodedBody(
+              "mostTransactionsCountries[]" -> "GB"
+            )
+
+            when(cache.fetchAll(any(), any()))
+                    .thenReturn(Future.successful(Some(cacheMap)))
+
+            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+                    .thenReturn(Some(incomingModel))
+
+            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+                    .thenReturn(Some(BusinessMatching(
+                      msbServices = msbServices,
+                      activities = Some(BusinessActivities(Set.empty))
+                    )))
+
+            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+                    .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+            post() { result =>
+              result.header.status mustBe SEE_OTHER
+              result.header.headers.get("Location") mustEqual routes.FXTransactionsInLast12MonthsController.get().url.some
+            }
+
+          }
+        }
+
         "go to PercentageOfCashPaymentOver15000Controller" when {
           "activities include hvd and asp" in new FormSubmissionFixture {
             val incomingModel = Renewal()
@@ -246,7 +339,7 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
 
         }
         "go to SummaryController" when {
-          "msb does not include CE" in new FormSubmissionFixture {
+          "msb does not include CE or FX" in new FormSubmissionFixture {
 
             val incomingModel = Renewal()
 
@@ -292,96 +385,53 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "edit is true" must {
-        "go to SummaryController" when {
-          "msb includes CE" in new FormSubmissionFixture {
+        "go to SummaryController" in new FormSubmissionFixture {
 
-            val msbServices = Some(
-              BusinessMatchingMsbServices(
-                Set(
-                  CurrencyExchange
-                )
+          val incomingModel = Renewal(
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months(
+              "1223131"
+            )),
+            fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months(
+              "1223131"
+            ))
+          )
+
+          val outgoingModel = incomingModel.copy(
+            mostTransactions = Some(
+              MostTransactions(
+                Seq(Country("United Kingdom", "GB"))
+              )
+            ), hasChanged = true
+          )
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "mostTransactionsCountries[]" -> "GB"
+          )
+          val msbServices = Some(
+            BusinessMatchingMsbServices(
+              Set(
+                CurrencyExchange,
+                ForeignExchange,
+                TransmittingMoney,
+                ChequeCashingScrapMetal
               )
             )
+          )
+          when(cache.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(cacheMap)))
+          when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(
+              msbServices = msbServices,
+              activities = Some(BusinessActivities(Set.empty))
+            )))
+          when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+            .thenReturn(Some(incomingModel))
+          when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+            .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-            val incomingModel = Renewal(
-              ceTransactionsInLast12Months = Some(CETransactionsInLast12Months(
-                "1223131"
-              ))
-            )
-
-            val outgoingModel = Renewal(
-              ceTransactionsInLast12Months = Some(CETransactionsInLast12Months(
-                "1223131"
-              )),
-              mostTransactions = Some(
-                MostTransactions(
-                  Seq(Country("United Kingdom", "GB"))
-                )
-              ), hasChanged = true
-            )
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "mostTransactionsCountries[]" -> "GB"
-            )
-
-            when(cache.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(cacheMap)))
-
-            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-              .thenReturn(Some(incomingModel))
-
-            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(
-                msbServices = msbServices,
-                activities = Some(BusinessActivities(Set.empty))
-              )))
-
-            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-            post(edit = true) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
-            }
-          }
-          "msb does not include CE" in new FormSubmissionFixture {
-
-            val incomingModel = Renewal()
-
-            val outgoingModel = incomingModel.copy(
-              mostTransactions = Some(
-                MostTransactions(
-                  Seq(Country("United Kingdom", "GB"))
-                )
-              ), hasChanged = true
-            )
-
-            val newRequest = request.withFormUrlEncodedBody(
-              "mostTransactionsCountries[]" -> "GB"
-            )
-            val msbServices = Some(
-              BusinessMatchingMsbServices(
-                Set(
-                  ChequeCashingScrapMetal
-                )
-              )
-            )
-            when(cache.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(cacheMap)))
-            when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(
-                msbServices = msbServices,
-                activities = Some(BusinessActivities(Set.empty))
-              )))
-            when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-              .thenReturn(Some(incomingModel))
-            when(cache.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
-            post(edit = true) { result =>
-              result.header.status mustBe SEE_OTHER
-              result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
-            }
+          post(edit = true) { result =>
+            result.header.status mustBe SEE_OTHER
+            result.header.headers.get("Location") mustEqual routes.SummaryController.get().url.some
           }
         }
       }
