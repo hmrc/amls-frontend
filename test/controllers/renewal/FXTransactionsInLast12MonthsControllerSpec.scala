@@ -105,9 +105,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
     }
 
     "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
-
-      val incomingModel = Renewal(
-      )
+      val incomingModel = Renewal()
 
       val outgoingModel = incomingModel.copy(
         fxTransactionsInLast12Months = Some(

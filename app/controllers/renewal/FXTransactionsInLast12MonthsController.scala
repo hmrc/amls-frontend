@@ -27,35 +27,37 @@ import views.html.renewal.fx_transaction_in_last_12_months
 
 import scala.concurrent.Future
 
-class FXTransactionsInLast12MonthsController  @Inject()(
-                                                         val dataCacheConnector: DataCacheConnector,
-                                                         val authConnector: AuthConnector,
-                                                         val renewalService: RenewalService
-                                                       ) extends BaseController {
+class FXTransactionsInLast12MonthsController @Inject()(
+                                                        val dataCacheConnector: DataCacheConnector,
+                                                        val authConnector: AuthConnector,
+                                                        val renewalService: RenewalService
+                                                      ) extends BaseController {
 
-    def get(edit:Boolean = false) = Authorised.async {
-        implicit authContext => implicit request =>
-                dataCacheConnector.fetch[Renewal](Renewal.key) map {
-                    response =>
-                        val form: Form2[FXTransactionsInLast12Months] = (for {
-                            renewal <- response
-                            transactions <- renewal.fxTransactionsInLast12Months
-                        } yield Form2[FXTransactionsInLast12Months](transactions)).getOrElse(EmptyForm)
-                        Ok(fx_transaction_in_last_12_months(form, edit))
-                }
-            }
-
-    def post(edit: Boolean = false) = Authorised.async {
-        implicit authContext => implicit request => {
-            Form2[FXTransactionsInLast12Months](request.body) match {
-                case f: InvalidForm =>
-                    Future.successful(BadRequest(fx_transaction_in_last_12_months(f, edit)))
-                case ValidForm(_, data) =>
-                    for {
-                        renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-                        _ <- renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data))
-                    } yield Redirect(routes.SummaryController.get())
-            }
+  def get(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[Renewal](Renewal.key) map {
+          response =>
+            val form: Form2[FXTransactionsInLast12Months] = (for {
+              renewal <- response
+              transactions <- renewal.fxTransactionsInLast12Months
+            } yield Form2[FXTransactionsInLast12Months](transactions)).getOrElse(EmptyForm)
+            Ok(fx_transaction_in_last_12_months(form, edit))
         }
-    }
+  }
+
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request => {
+        Form2[FXTransactionsInLast12Months](request.body) match {
+          case f: InvalidForm =>
+            Future.successful(BadRequest(fx_transaction_in_last_12_months(f, edit)))
+          case ValidForm(_, data) =>
+            for {
+              renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
+              _ <- renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data))
+            } yield Redirect(routes.SummaryController.get())
+        }
+      }
+  }
 }
