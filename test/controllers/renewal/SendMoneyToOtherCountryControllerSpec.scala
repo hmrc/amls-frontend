@@ -16,10 +16,10 @@
 
 package controllers.renewal
 
+import cats.implicits._
 import connectors.DataCacheConnector
-import models.Country
 import models.businessmatching._
-import models.renewal.{CustomersOutsideUK, Renewal, SendMoneyToOtherCountry}
+import models.renewal.{Renewal, SendMoneyToOtherCountry}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -29,9 +29,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
-import cats.implicits._
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -184,6 +182,42 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
+    "redirect to the CETransactionsInLast12MonthsController" when {
+      "post no and has currency exchange and foreign exchange" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange))),
+                  activities = Some(BusinessActivities(Set(HighValueDealing)))
+                )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url))
+      }
+    }
+
+    "redirect to the CETransactionsInLast12MonthsController" when {
+      "post no and has foreign exchange" in new Fixture {
+        val newRequest = request.withFormUrlEncodedBody(
+          "money" -> "false"
+        )
+
+        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange))),
+                  activities = Some(BusinessActivities(Set(HighValueDealing)))
+                )))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url))
+      }
+    }
+
     "redirect to the PercentageOfCashPaymentOver15000Controller" when {
       "post no and has HVD and ASP and NOT CE" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
@@ -237,7 +271,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
 
       }
-      "not CE and not HVD" in new Fixture {
+      "not CE, not FX, and not HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
         )
