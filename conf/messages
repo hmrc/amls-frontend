@@ -2069,7 +2069,7 @@ survey.satisfaction.title = Satisfaction survey
 
 survey.satisfaction.text.1 = Overall, how did you feel about using the service?
 survey.satisfaction.text.2 = How could we improve this service?
-survey.satisfaction.hint = Please don’t include any personal or financial information.
+survey.satisfaction.hint = Please do not include any personal or financial information. We are unable to provide a response to your comments.
 
 survey.satisfaction.lbl.01 = Very satisfied
 survey.satisfaction.lbl.02 = Satisfied
