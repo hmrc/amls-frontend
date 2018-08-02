@@ -66,6 +66,10 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any())
     } thenReturn(Some(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))))
+
+    def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -73,14 +77,12 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
   "SendMoneyToOtherCountryController" must {
 
     "load the page 'Did you send money to other countries in the past 12 months?'" in new Fixture {
-
       val result = controller.get()(request)
       status(result) must be(OK)
       contentAsString(result) must include(Messages("renewal.msb.send.money.title"))
     }
 
     "load the page 'Do you send money to other countries?' with pre populated data" in new Fixture {
-
       when {
         mockRenewalService.getRenewal(any(), any(), any())
       } thenReturn Future.successful(Renewal(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true))).some)
@@ -94,34 +96,14 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "Show error message when user has not filled the mandatory fields" in new Fixture {
+      setupBusinessMatching(msbServices = Set(TransmittingMoney, CurrencyExchange))
 
-      val newRequest = request.withFormUrlEncodedBody(
-      )
-
-      val msbServices = Some(BusinessMatchingMsbServices(
-        Set(
-          TransmittingMoney,
-          CurrencyExchange
-        )
-      ))
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
-      when(controller.dataCacheConnector.save[Renewal](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
+      val result = controller.post()(request.withFormUrlEncodedBody())
       status(result) must be(BAD_REQUEST)
       contentAsString(result) must include(Messages("error.required.msb.send.money"))
-
     }
 
     "throw exception when Msb services in Business Matching returns none" in new Fixture {
-
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"
       )
@@ -132,9 +114,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
         hasChanged = true
       )
-
-      when(controller.dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
 
       when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(None)
@@ -152,11 +131,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "true"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          )))
+        setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -170,11 +145,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange))),
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          )))
+        setupBusinessMatching(Set(HighValueDealing), Set(CurrencyExchange))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -188,11 +159,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, ForeignExchange))),
-                  activities = Some(BusinessActivities(Set(HighValueDealing)))
-                )))
+        setupBusinessMatching(Set(HighValueDealing), Set(CurrencyExchange, ForeignExchange))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -206,11 +173,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  msbServices = Some(BusinessMatchingMsbServices(Set(ForeignExchange))),
-                  activities = Some(BusinessActivities(Set(HighValueDealing)))
-                )))
+        setupBusinessMatching(Set(HighValueDealing), Set(ForeignExchange))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -224,11 +187,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            activities = Some(BusinessActivities(Set(HighValueDealing, AccountancyServices)))
-          )))
+        setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -242,11 +201,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          )))
+        setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
@@ -260,27 +215,20 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            activities = Some(BusinessActivities(Set(HighValueDealing)))
-          )))
+        setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
         val result = controller.post(true)(newRequest)
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
 
       }
+      
       "not CE, not FX, and not HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
         )
 
-        when(cacheMap.getEntry[BusinessMatching](eqTo(BusinessMatching.key))(any()))
-          .thenReturn(Some(BusinessMatching(
-            msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney))),
-            activities = Some(BusinessActivities(Set(AccountancyServices)))
-          )))
+        setupBusinessMatching(Set(AccountancyServices), Set(TransmittingMoney))
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)

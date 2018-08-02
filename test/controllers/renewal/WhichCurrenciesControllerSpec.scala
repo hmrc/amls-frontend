@@ -107,11 +107,9 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
     when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(expectedRenewal))(any(), any(), any()))
       .thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
-    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]): Unit = {
-      when {
-        cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-      } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
-    }
+    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService]) = when {
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
   }
 
   "Calling the GET action" must {
