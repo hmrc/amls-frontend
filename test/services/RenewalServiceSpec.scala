@@ -24,21 +24,16 @@ import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.renewal._
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.inject.bind
-import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.mvc.Call
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
@@ -52,29 +47,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
     val service = new RenewalService(dataCache)
 
-    val completeModel = Renewal(
-      Some(InvolvedInOtherYes("test")),
-      Some(BusinessTurnover.First),
-      Some(AMLSTurnover.First),
-      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-      Some(PercentageOfCashPaymentOver15000.First),
-      Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-      Some(TotalThroughput("01")),
-      Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-      Some(TransactionsInLast12Months("1500")),
-      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-      Some(CETransactionsInLast12Months("123")),
-      None,
-      true,
-      Some(SendMoneyToOtherCountry(true))
-    )
-
     val mockCacheMap = mock[CacheMap]
-
-    //val msbModel = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)))
-    //val msbModelDoNotSendMoneyToOtherCountries = moneyServiceBusiness(sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)))
-
   }
 
   "The renewal service" must {
@@ -106,6 +79,24 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             ))),
             msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
           )))
+
+        val completeModel = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          Some(TotalThroughput("01")),
+          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          Some(TransactionsInLast12Months("1500")),
+          Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactionsInLast12Months("123")),
+          Some(FXTransactionsInLast12Months("456")),
+          true,
+          Some(SendMoneyToOtherCountry(true))
+        )
 
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
