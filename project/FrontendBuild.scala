@@ -12,7 +12,7 @@ private object AppDependencies {
   import play.sbt.PlayImport._
   import play.core.PlayVersion
 
-  private val frontendBootstrapVersion = "8.24.0"
+  private val frontendBootstrapVersion = "8.25.0"
   private val playPartialsVersion = "6.1.0"
   private val httpCachingClientVersion = "7.1.0"
   private val playWhitelistFilterVersion = "2.0.0"
@@ -20,7 +20,7 @@ private object AppDependencies {
   private val flexmarkVersion = "0.19.1"
   private val okHttpVersion = "3.9.1"
   private val jsonEncryptionVersion = "3.2.0"
-  private val playReactivemongoVersion = "6.0.0"
+  private val playReactivemongoVersion = "6.2.0"
 
   private val playJars = ExclusionRule(organization = "com.typesafe.play")
 
