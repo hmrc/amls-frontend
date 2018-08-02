@@ -74,12 +74,31 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
       )
     }
-    def mtComplete(renewalModel: Renewal): Renewal = {
+    def msbComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        totalThroughput = Some(TotalThroughput("01"))
+      )
+    }
+    def mtCompleteSendMoneyToOtherCountriesTrue(renewalModel: Renewal): Renewal = {
       renewalModel.copy(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
         transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
         sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
         mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+      )
+    }
+    def mtCompleteSendMoneyToOtherCountriesFalse(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        sendMoneyToOtherCountry = None,
+        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+        mostTransactions = None
+      )
+    }
+    def mtCompleteSendMoneyToOtherCountriesNone(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+        mostTransactions = None
       )
     }
     def ceComplete(renewalModel: Renewal): Renewal = {
@@ -93,11 +112,19 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
       )
     }
-    def standardComplete(renewalModel: Renewal): Renewal = {
+    def standardCompleteInvolvedInOtherActivities(renewalModel: Renewal): Renewal = {
       renewalModel.copy(
         involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.First),
+        hasAccepted = true
+      )
+    }
+    def standardCompleteNotInvolvedInOtherActivities(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        involvedInOtherActivities = Some(InvolvedInOtherNo),
+        turnover = Some(AMLSTurnover.First),
+        businessTurnover = None,
         hasAccepted = true
       )
     }
@@ -121,10 +148,11 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
         var completeModel: Renewal = Renewal(hasChanged = true)
-        completeModel = standardComplete(completeModel)
+        completeModel = standardCompleteInvolvedInOtherActivities(completeModel)
         completeModel = aspComplete(completeModel)
         completeModel = hvdComplete(completeModel)
-        completeModel = mtComplete(completeModel)
+        completeModel = msbComplete(completeModel)
+        completeModel = mtCompleteSendMoneyToOtherCountriesTrue(completeModel)
         completeModel = ceComplete(completeModel)
         completeModel = fxComplete(completeModel)
 
@@ -155,1025 +183,375 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     }
   }
 
-  "isRenewalCompleteOld" must {
+  trait StandardFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+  }
+
+  trait ASPFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait HVDFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait ASPHVDFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait MSBFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait MTFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait CEFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait FXFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  trait AllFixture extends Fixture {
+    setupBusinessMatching()
+    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+  }
+
+  "isRenewalComplete" must {
     "be true" when {
-      "it is an HVD and customers outside the UK is set" in new Fixture {
-        setupBusinessMatching(Set(HighValueDealing))
 
-        var model: Renewal = Renewal(hasChanged = true)
-        model = standardComplete(model)
-        val hvdComplete = model.copy(
-          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
-        )
+      "Standard renewal flow questions section is complete" when {
+        "involvedInOtherActivities is true" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
 
-        await(service.isRenewalComplete(hvdComplete)) mustBe true
+        "involvedInOtherActivites is false" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
       }
 
-      "it is an ASP and customers outside the UK is set" in new Fixture {
-        setupBusinessMatching(Set(AccountancyServices))
+      "ASP is selected business activity and section is complete along with standard renewal flow questions" when {
+        "involvedInOtherActivities is true" in new ASPFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
 
-        val model = Renewal(
-          Some(InvolvedInOtherYes("test")),
-          Some(BusinessTurnover.First),
-          Some(AMLSTurnover.First),
-          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          hasChanged = true,
-          None
-        )
+        "involvedInOtherActivites is false" in new ASPFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
+      }
 
+      "HVD is selected business activity and section is complete along with standard renewal flow questions" when {
+        "involvedInOtherActivities is true" in new HVDFixture {
+          val model = preFilledModel.copy(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+            receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+          )
+          await(service.isRenewalComplete(model)) mustBe true
+        }
+
+        "involvedInOtherActivites is false" in new HVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
+      }
+
+      "ASP and HVD are selected business activities and section is complete along with standard renewal flow questions" when {
+        "involvedInOtherActivities is true" in new ASPHVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
+
+        "involvedInOtherActivites is false" in new ASPHVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
+      }
+
+      "MSB is selected business activity w/o MT, CE, FX subsectors and section is complete along with standard renewal flow questions" in new MSBFixture {
+        val model = preFilledModel.copy()
         await(service.isRenewalComplete(model)) mustBe true
       }
 
-      "it is an MSB" when {
-        "it is an HVD" when {
-          "it is a CurrencyExchange" when {
-            "it is a TransmittingMoney" when {
-              "there are customers outside the UK" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-
-              "they do not send money to other countries" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-            }
-
-            "it is NOT a TransmittingMoney" when {
-              "involvedInOther is true" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherYes("test")),
-                  Some(BusinessTurnover.First),
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  Some(PercentageOfCashPaymentOver15000.First),
-                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                  Some(TotalThroughput("01")),
-                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                  None,
-                  None,
-                  None,
-                  Some(CETransactionsInLast12Months("123")),
-                  None,
-                  hasChanged = true,
-                  Some(SendMoneyToOtherCountry(false))
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-
-              "involvedInOther is false" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherNo),
-                  None,
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  Some(PercentageOfCashPaymentOver15000.First),
-                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                  Some(TotalThroughput("01")),
-                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                  None,
-                  None,
-                  None,
-                  Some(CETransactionsInLast12Months("123")),
-                  None,
-                  hasChanged = true,
-                  Some(SendMoneyToOtherCountry(false))
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-            }
-          }
-
-          "it is NOT a CurrencyExchange" when {
-            "it is a TransmittingMoney" when {
-              "there are customers outside the UK" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-
-              "they do not send money to other countries" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    Some(PercentageOfCashPaymentOver15000.First),
-                    Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-            }
-
-            "it is NOT a TransmittingMoney" when {
-              "involvedInOther is true" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(ChequeCashingNotScrapMetal))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherYes("test")),
-                  Some(BusinessTurnover.First),
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  Some(PercentageOfCashPaymentOver15000.First),
-                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                  Some(TotalThroughput("01")),
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  hasChanged = true,
-                  Some(SendMoneyToOtherCountry(false))
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-
-              "involvedInOther is false" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(ChequeCashingNotScrapMetal))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherNo),
-                  None,
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  Some(PercentageOfCashPaymentOver15000.First),
-                  Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                  Some(TotalThroughput("01")),
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  hasChanged = true,
-                  Some(SendMoneyToOtherCountry(false))
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-            }
-          }
+      "MSB is selected business activity with MT subsector and w/o CE, FX subsectors and section is complete along with standard renewal flow questions" when {
+        "sendMoneyToOtherCountries is true" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
         }
 
-        "it is NOT an HVD" when {
-          "it is a CurrencyExchange" when {
-            "it is a TransmittingMoney" when {
-              "there are customers outside the UK" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
+        "sendMoneyToOtherCountries is false" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
 
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-
-              "they do not send money to other countries" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    Some(CETransactionsInLast12Months("123")),
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-            }
-
-            "it is NOT a TransmittingMoney" when {
-              "involvedInOther is true" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherYes("test")),
-                  Some(BusinessTurnover.First),
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  None,
-                  None,
-                  Some(TotalThroughput("01")),
-                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                  None,
-                  None,
-                  None,
-                  Some(CETransactionsInLast12Months("123")),
-                  None,
-                  hasChanged = true,
-                  None
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-
-              "involvedInOther is false" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherNo),
-                  None,
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  None,
-                  None,
-                  Some(TotalThroughput("01")),
-                  Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                  None,
-                  None,
-                  None,
-                  Some(CETransactionsInLast12Months("123")),
-                  None,
-                  hasChanged = true,
-                  None
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-            }
-          }
-
-          "it is NOT a CurrencyExchange" when {
-            "it is a TransmittingMoney" when {
-              "there are customers outside the UK" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                    Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(true))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-
-              "they do not send money to other countries" when {
-                "involvedInOther is true" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherYes("test")),
-                    Some(BusinessTurnover.First),
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-
-                "involvedInOther is false" in new Fixture {
-                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
-
-                  val model = Renewal(
-                    Some(InvolvedInOtherNo),
-                    None,
-                    Some(AMLSTurnover.First),
-                    Some(CustomersOutsideUK(None)),
-                    None,
-                    None,
-                    Some(TotalThroughput("01")),
-                    None,
-                    Some(TransactionsInLast12Months("1500")),
-                    None,
-                    None,
-                    None,
-                    None,
-                    hasChanged = true,
-                    Some(SendMoneyToOtherCountry(false))
-                  )
-
-                  await(service.isRenewalComplete(model)) mustBe true
-                }
-              }
-            }
-
-            "it is NOT a TransmittingMoney" when {
-              "involvedInOther is true" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness), Set(ChequeCashingNotScrapMetal))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherYes("test")),
-                  Some(BusinessTurnover.First),
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  None,
-                  None,
-                  Some(TotalThroughput("01")),
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  hasChanged = true,
-                  sendMoneyToOtherCountry = None
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-
-              "involvedInOther is false" in new Fixture {
-                setupBusinessMatching(Set(MoneyServiceBusiness), Set(ChequeCashingScrapMetal))
-
-                val model = Renewal(
-                  Some(InvolvedInOtherNo),
-                  None,
-                  Some(AMLSTurnover.First),
-                  Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                  None,
-                  None,
-                  Some(TotalThroughput("01")),
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  None,
-                  hasChanged = true,
-                  None
-                )
-
-                await(service.isRenewalComplete(model)) mustBe true
-              }
-            }
-          }
-
+        "sendMoneyToOtherCountries is None" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
         }
       }
 
-      "it is NOT an MSB" when {
-        "it is an HVD" when {
-          "involvedInOther is true" in new Fixture {
-            setupBusinessMatching(Set(HighValueDealing))
+      "MSB is selected business activity with CE subsector and w/o MT, FX subsectors and section is complete along with standard renewal flow questions" in new CEFixture {
+        val model = preFilledModel.copy()
+        await(service.isRenewalComplete(model)) mustBe true
+      }
 
-            val model = Renewal(
-              Some(InvolvedInOtherYes("test")),
-              Some(BusinessTurnover.First),
-              Some(AMLSTurnover.First),
-              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-              Some(PercentageOfCashPaymentOver15000.First),
-              Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
+      "MSB is selected business activity with FX subsector and w/o MT, CE subsectors and section is complete along with standard renewal flow questions" in new FXFixture {
+        val model = preFilledModel.copy()
+        await(service.isRenewalComplete(model)) mustBe true
+      }
 
-            await(service.isRenewalComplete(model)) mustBe true
-          }
-
-          "involvedInOther is false" in new Fixture {
-            setupBusinessMatching(Set(HighValueDealing))
-
-            val model = Renewal(
-              Some(InvolvedInOtherNo),
-              None,
-              Some(AMLSTurnover.First),
-              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-              Some(PercentageOfCashPaymentOver15000.First),
-              Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
-
-            await(service.isRenewalComplete(model)) mustBe true
-          }
+      "MSB is selected business activity with MT, CE, FX subsectors and section is complete along with standard renewal flow questions" when {
+        "sendMoneyToOtherCountries is true" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
         }
 
-        "it is NOT an HVD" when {
-          "involvedInOther is true" in new Fixture {
-            setupBusinessMatching(Set(TelephonePaymentService))
+        "sendMoneyToOtherCountries is False" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
+        }
 
-            val model = Renewal(
-              Some(InvolvedInOtherYes("test")),
-              Some(BusinessTurnover.First),
-              Some(AMLSTurnover.First),
-              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
-
-            await(service.isRenewalComplete(model)) mustBe true
-          }
-
-          "involvedInOther is false" in new Fixture {
-            setupBusinessMatching(Set(TelephonePaymentService))
-
-            val model = Renewal(
-              Some(InvolvedInOtherNo),
-              None,
-              Some(AMLSTurnover.First),
-              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
-
-            await(service.isRenewalComplete(model)) mustBe true
-          }
+        "sendMoneyToOtherCountries is None" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe true
         }
       }
+
     }
 
     "be false" when {
-      "it is an HVD and customers outside the UK is not set" in new Fixture {
-        setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
 
-        val model = Renewal(
-          Some(InvolvedInOtherYes("test")),
-          Some(BusinessTurnover.First),
-          Some(AMLSTurnover.First),
-          None,
-          Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          hasChanged = true,
-          None
-        )
+      "Standard renewal flow questions section are incomplete" when {
 
-        await(service.isRenewalComplete(model)) mustBe false
-      }
-
-      "it is an ASP and customers outside the UK is set" in new Fixture {
-        setupBusinessMatching(Set(MoneyServiceBusiness, AccountancyServices), Set(CurrencyExchange))
-
-
-        val model = Renewal(
-          Some(InvolvedInOtherYes("test")),
-          Some(BusinessTurnover.First),
-          Some(AMLSTurnover.First),
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          hasChanged = true,
-          None
-        )
-
-        await(service.isRenewalComplete(model)) mustBe false
-      }
-
-      "it is an MSB" when {
-        "it is an HVD" when {
-          "it is a CurrencyExchange" when {
-            "it is TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                Some(PercentageOfCashPaymentOver15000.First),
-                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                Some(TotalThroughput("01")),
-                Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                Some(TransactionsInLast12Months("1500")),
-                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                None,
-                None,
-                hasChanged = true,
-                Some(SendMoneyToOtherCountry(true))
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-
-            "it is NOT TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                Some(PercentageOfCashPaymentOver15000.First),
-                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                Some(TotalThroughput("01")),
-                Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-                None,
-                None,
-                None,
-                None,
-                None,
-                hasChanged = true,
-                None
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-          }
-
-          "it is not a CurrencyExchange" when {
-            "it is TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                Some(PercentageOfCashPaymentOver15000.First),
-                Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-                Some(TotalThroughput("01")),
-                None,
-                None,
-                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                None,
-                None,
-                hasChanged = true,
-                Some(SendMoneyToOtherCountry(true))
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-          }
-        }
-
-        "it is NOT an HVD" when {
-          "it is a CurrencyExchange" when {
-            "it is TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                None,
-                None,
-                Some(TotalThroughput("01")),
-                None,
-                Some(TransactionsInLast12Months("1500")),
-                Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"))),
-                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                None,
-                None,
-                hasChanged = true,
-                Some(SendMoneyToOtherCountry(true))
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-
-            "it is NOT TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                None,
-                None,
-                Some(TotalThroughput("01")),
-                None,
-                None,
-                None,
-                None,
-                None,
-                None,
-                hasChanged = true,
-                None
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-          }
-
-          "it is NOT a CurrencyExchange" when {
-            "it is TransmittingMoney" in new Fixture {
-              setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
-
-              val model = Renewal(
-                Some(InvolvedInOtherYes("test")),
-                Some(BusinessTurnover.First),
-                Some(AMLSTurnover.First),
-                Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-                None,
-                None,
-                Some(TotalThroughput("01")),
-                None,
-                Some(TransactionsInLast12Months("1500")),
-                None,
-                Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-                None,
-                None,
-                hasChanged = true,
-                Some(SendMoneyToOtherCountry(true))
-              )
-
-              await(service.isRenewalComplete(model)) mustBe false
-            }
-          }
-        }
-      }
-
-      "It is not an MSB" when {
-        "it is an HVD" in new Fixture {
-          setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing))
-
-          val model = Renewal(
-            Some(InvolvedInOtherYes("test")),
-            Some(BusinessTurnover.First),
-            Some(AMLSTurnover.First),
-            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-            Some(PercentageOfCashPaymentOver15000.First),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            hasChanged = true,
-            None
-          )
-
+        "involvedInOtherActivities is not defined" in new StandardFixture {
+          val model = preFilledModel.copy()
           await(service.isRenewalComplete(model)) mustBe false
         }
 
-        "it is NOT an HVD" in new Fixture {
-          setupBusinessMatching(Set(MoneyServiceBusiness))
+        "turnover is not defined" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
 
-          val model = Renewal(
-            Some(InvolvedInOtherYes("test")),
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            None,
-            hasChanged = true,
-            None
-          )
+        "if involvedInOtherActivities and businessTurnover is not defined" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
 
+        "if not involvedInOtherActivities and businessTurnover is defined" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "hasAccepted is false" in new StandardFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+      }
+
+      "ASP is selected business activity and section is incomplete with standard renewal flow questions complete" when {
+
+        "customerOutsideUk is not defined" in new ASPFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+      }
+
+      "HVD is selected business activity and section is incomplete with standard renewal flow questions complete" when {
+
+        "customersOutsideUk is not defined" in new HVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new HVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new HVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+      }
+
+      "ASP and HVD are selected business activities and section is incomplete with standard renewal flow questions complete" when {
+
+        "customersOutsideUk is not defined" in new ASPHVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new ASPHVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new ASPHVDFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+      }
+
+      "MSB is selected business activity w/o MT, CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
+        "totalThroughput is not defined" in new MSBFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+      }
+
+      "MSB is selected business activity with MT subsector and w/o CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
+
+        "totalThroughput is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new MTFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+      }
+
+      "MSB is selected business activity with CE subsector and w/o MT, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
+        "totalThroughput is not defined" in new CEFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "whichCurrencies is not defined" in new CEFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "ceTransactionsInLast12Months is not defined" in new CEFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+      }
+
+      "MSB is selected business activity with FX subsector and w/o MT, CE subsectors and section is incomplete with standard renewal flow questions complete" when {
+        "totalThroughput is not defined" in new FXFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "fxTransactionsInLast12Months is not defined" in new FXFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+      }
+
+      "MSB is selected business activity with MT, CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
+        "totalThroughput is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "whichCurrencies is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "ceTransactionsInLast12Months is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
+          await(service.isRenewalComplete(model)) mustBe false
+        }
+
+        "fxTransactionsInLast12Months is not defined" in new AllFixture {
+          val model = preFilledModel.copy()
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
