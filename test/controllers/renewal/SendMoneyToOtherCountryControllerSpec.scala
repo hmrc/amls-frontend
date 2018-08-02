@@ -222,7 +222,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
 
       }
-      
+
       "not CE, not FX, and not HVD" in new Fixture {
         val newRequest = request.withFormUrlEncodedBody(
           "money" -> "false"
