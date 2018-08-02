@@ -66,14 +66,14 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       dataCacheConnector.fetchAll(any(), any())
     } thenReturn Future.successful(Some(cache))
 
-    setupActivities(Set(HighValueDealing, MoneyServiceBusiness))
+    setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness))
 
     def post(edit: Boolean = false)(block: Result => Unit) =
       block(await(controller.post(edit)(formRequest)))
 
-    def setupActivities(activities: Set[BusinessActivity]) = when {
-      cache.getEntry[BusinessMatching](BusinessMatching.key)
-    } thenReturn Some(BusinessMatching(activities = Some(BusinessActivities(activities))))
+    def setupBusinessMatching(activities: Set[BusinessActivity], msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+        cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
   }
 
   "The MSB throughput controller" must {
@@ -113,53 +113,39 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "return a bad request result when an invalid form is posted" in new Fixture {
-
       val result = controller.post()(request)
       status(result) mustBe BAD_REQUEST
     }
   }
 
+  trait RenewalModelFormSubmissionFixture extends FormSubmissionFixture {
+      val incomingModel = Renewal()
+      val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+              TotalThroughput(
+                  "01"
+              )
+          ), hasChanged = true
+      )
+      val newRequest = request.withFormUrlEncodedBody(
+          "throughput" -> "01"
+      )
+
+      when(dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(cacheMap)))
+
+      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+              .thenReturn(Some(incomingModel))
+
+      when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+              .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+  }
+
   "A valid form post to the MSB throughput controller" when {
 
     "edit is false" must {
-      "redirect to TransactionsInLast12MonthsController if MSB MT" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              TransmittingMoney
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to TransactionsInLast12MonthsController if MSB MT" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing, MoneyServiceBusiness), Set(TransmittingMoney))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
@@ -167,44 +153,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to CETransactionsInLast12MonthsController if MSB CE" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              CurrencyExchange
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to CETransactionsInLast12MonthsController if MSB CE" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing), Set(CurrencyExchange))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
@@ -212,44 +162,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to CETransactionsInLast12MonthsController if MSB FX" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              ForeignExchange
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-                .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-                .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-                .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-                .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to FXTransactionsInLast12MonthsController if MSB FX" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing), Set(ForeignExchange))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
@@ -257,44 +171,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to PercentageOfCashPaymentOver15000Controller if HVD and ASP" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              ChequeCashingScrapMetal
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing, AccountancyServices))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to PercentageOfCashPaymentOver15000Controller if HVD and ASP" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(ChequeCashingScrapMetal))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
@@ -302,44 +180,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "redirect to CustomersOutsideUK if HVD and NOT ASP" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              ChequeCashingScrapMetal
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to CustomersOutsideUK if HVD and NOT ASP" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
         post() { result =>
           result.header.status mustBe SEE_OTHER
@@ -349,45 +191,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "edit is true" must {
-      "redirect to the summary page" in new FormSubmissionFixture {
-
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              ChequeCashingScrapMetal
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
-
-        val outgoingModel = incomingModel.copy(
-          totalThroughput = Some(
-            TotalThroughput(
-              "01"
-            )
-          ), hasChanged = true
-        )
-        val newRequest = request.withFormUrlEncodedBody(
-          "throughput" -> "01"
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
-        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
-          .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+      "redirect to the summary page" in new RenewalModelFormSubmissionFixture {
+        setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
         post(edit = true) { result =>
           result.header.status mustBe SEE_OTHER
@@ -396,44 +201,8 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
       }
     }
 
-
-
-    "save the throughput model into the renewals model when posted" in new FormSubmissionFixture {
-
-      val incomingModel = Renewal()
-
-      val msbServices = Some(
-        BusinessMatchingMsbServices(
-          Set(
-            ChequeCashingScrapMetal
-          )
-        )
-      )
-
-      val businessActivities = Some(
-        BusinessActivities(Set(HighValueDealing))
-      )
-
-
-      val outgoingModel = incomingModel.copy(
-        totalThroughput = Some(
-          TotalThroughput(
-            "01"
-          )
-        ), hasChanged = true
-      )
-      val newRequest = request.withFormUrlEncodedBody(
-        "throughput" -> "01"
-      )
-
-      when(dataCacheConnector.fetchAll(any(), any()))
-        .thenReturn(Future.successful(Some(cacheMap)))
-
-      when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-        .thenReturn(Some(incomingModel))
-
-      when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+    "save the throughput model into the renewals model when posted" in new RenewalModelFormSubmissionFixture {
+      setupBusinessMatching(Set(HighValueDealing), Set(ChequeCashingScrapMetal))
 
       post() { result =>
         result.header.status mustBe SEE_OTHER
