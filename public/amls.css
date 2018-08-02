@@ -36,6 +36,10 @@ a.block-link {
   margin-top: 1.8em;
 }
 
+.char-counter-text {
+  text-align: left;
+}
+
 .page-header .heading-xlarge {
   margin: .15em 0 1.25em;
 }
