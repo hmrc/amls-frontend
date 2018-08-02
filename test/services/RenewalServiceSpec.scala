@@ -48,6 +48,19 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     val service = new RenewalService(dataCache)
 
     val mockCacheMap = mock[CacheMap]
+
+    when(dataCache.fetchAll(any(),any()))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+    when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
+            .thenReturn(Some(BusinessMatching()))
+
+    def setupBusinessMatching(activities: Set[BusinessActivity] = Set(), msbServices: Set[BusinessMatchingMsbService] = Set()) = when {
+        mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn Some(BusinessMatching(msbServices = Some(BusinessMatchingMsbServices(msbServices)), activities = Some(BusinessActivities(activities))))
+
+    def setUpRenewal(renewalModel: Renewal) = when {
+      dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
+    } thenReturn Future.successful(Some(renewalModel))
   }
 
   "The renewal service" must {
@@ -55,30 +68,17 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     "return the correct section" when {
 
       "the renewal hasn't been started" in new Fixture {
-
         when {
           dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
         } thenReturn Future.successful(None)
 
         val section = await(service.getSection)
-
         section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
 
       }
 
       "the renewal is complete and has been started" in new Fixture {
-
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              MoneyServiceBusiness,
-              HighValueDealing
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-          )))
+        setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
         val completeModel = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -98,72 +98,37 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           Some(SendMoneyToOtherCountry(true))
         )
 
-        when {
-          dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(completeModel))
+        setUpRenewal(completeModel)
 
         val section = await(service.getSection)
-
         await(service.isRenewalComplete(completeModel)) mustBe true
         section mustBe Section(Renewal.sectionKey, Completed, hasChanged = true, controllers.renewal.routes.SummaryController.get())
-
       }
 
       "the renewal model is not complete" in new Fixture {
-
         val renewal = mock[Renewal]
         when(renewal.hasChanged) thenReturn true
 
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching()))
-
-        when {
-          dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(renewal))
+        setUpRenewal(renewal)
 
         val section = await(service.getSection)
-
         section mustBe Section(Renewal.sectionKey, Started, hasChanged = true, controllers.renewal.routes.WhatYouNeedController.get())
-
       }
 
       "the renewal model is not complete and not started" in new Fixture {
         val renewal = Renewal(None)
-
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching()))
-
-        when {
-          dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
-        } thenReturn Future.successful(Some(renewal))
+        setUpRenewal(renewal)
 
         val section = await(service.getSection)
-
         section mustBe Section(Renewal.sectionKey, NotStarted, hasChanged = false, controllers.renewal.routes.WhatYouNeedController.get())
       }
-
     }
-
   }
 
   "isRenewalComplete" must {
     "be true" when {
       "it is an HVD and customers outside the UK is set" in new Fixture {
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              HighValueDealing
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-          )))
-
+        setupBusinessMatching(Set(HighValueDealing))
 
         val model = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -187,17 +152,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       }
 
       "it is an ASP and customers outside the UK is set" in new Fixture {
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              AccountancyServices
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-          )))
-
+        setupBusinessMatching(Set(AccountancyServices))
 
         val model = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -226,18 +181,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             "it is a TransmittingMoney" when {
               "there are customers outside the UK" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -261,18 +205,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 }
 
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -295,20 +228,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
+
               "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -330,20 +253,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
-
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -367,20 +279,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 }
               }
             }
+
             "it is NOT a TransmittingMoney" when {
               "involvedInOther is true" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness,
-                      HighValueDealing
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
 
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
@@ -402,19 +304,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                 await(service.isRenewalComplete(model)) mustBe true
               }
+
               "involvedInOther is false" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness,
-                      HighValueDealing
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -438,22 +330,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               }
             }
           }
+
           "it is NOT a CurrencyExchange" when {
             "it is a TransmittingMoney" when {
               "there are customers outside the UK" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -475,19 +357,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -510,21 +382,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
+
               "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
-
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -546,19 +407,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness,
-                        HighValueDealing
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -582,20 +433,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 }
               }
             }
+
             "it is NOT a TransmittingMoney" when {
               "involvedInOther is true" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness,
-                      HighValueDealing
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(ChequeCashingNotScrapMetal))
 
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
@@ -617,19 +458,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                 await(service.isRenewalComplete(model)) mustBe true
               }
+
               "involvedInOther is false" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness,
-                      HighValueDealing
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(ChequeCashingNotScrapMetal))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -652,7 +483,6 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 await(service.isRenewalComplete(model)) mustBe true
               }
             }
-
           }
         }
 
@@ -661,17 +491,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             "it is a TransmittingMoney" when {
               "there are customers outside the UK" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -693,18 +513,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -727,19 +538,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
+
               "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -761,18 +563,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -796,19 +589,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                 }
               }
             }
+
             "it is NOT a TransmittingMoney" when {
               "involvedInOther is true" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
 
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
@@ -830,18 +614,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                 await(service.isRenewalComplete(model)) mustBe true
               }
+
               "involvedInOther is false" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -870,17 +645,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             "it is a TransmittingMoney" when {
               "there are customers outside the UK" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -902,18 +667,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -936,20 +692,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
                   await(service.isRenewalComplete(model)) mustBe true
                 }
               }
+
               "they do not send money to other countries" when {
                 "involvedInOther is true" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
-
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherYes("test")),
@@ -971,18 +717,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                   await(service.isRenewalComplete(model)) mustBe true
                 }
+
                 "involvedInOther is false" in new Fixture {
-
-                  when(dataCache.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                    .thenReturn(Some(BusinessMatching(
-                      activities = Some(BusinessActivities(Set(
-                        MoneyServiceBusiness
-                      ))),
-                      msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                    )))
+                  setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
 
                   val model = Renewal(
                     Some(InvolvedInOtherNo),
@@ -1009,17 +746,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
             "it is NOT a TransmittingMoney" when {
               "involvedInOther is true" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness), Set(ChequeCashingNotScrapMetal))
 
                 val model = Renewal(
                   Some(InvolvedInOtherYes("test")),
@@ -1040,18 +767,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
                 await(service.isRenewalComplete(model)) mustBe true
               }
+
               "involvedInOther is false" in new Fixture {
-
-                when(dataCache.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                  .thenReturn(Some(BusinessMatching(
-                    activities = Some(BusinessActivities(Set(
-                      MoneyServiceBusiness
-                    ))),
-                    msbServices = Some(BusinessMatchingMsbServices(Set(ChequeCashingNotScrapMetal)))
-                  )))
+                setupBusinessMatching(Set(MoneyServiceBusiness), Set(ChequeCashingScrapMetal))
 
                 val model = Renewal(
                   Some(InvolvedInOtherNo),
@@ -1082,16 +800,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "it is NOT an MSB" when {
         "it is an HVD" when {
           "involvedInOther is true" in new Fixture {
-
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  HighValueDealing
-                )))
-              )))
+            setupBusinessMatching(Set(HighValueDealing))
 
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
@@ -1113,17 +822,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
             await(service.isRenewalComplete(model)) mustBe true
           }
+
           "involvedInOther is false" in new Fixture {
-
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  HighValueDealing
-                )))
-              )))
+            setupBusinessMatching(Set(HighValueDealing))
 
             val model = Renewal(
               Some(InvolvedInOtherNo),
@@ -1146,18 +847,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
             await(service.isRenewalComplete(model)) mustBe true
           }
         }
+
         "it is NOT an HVD" when {
           "involvedInOther is true" in new Fixture {
-
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  TelephonePaymentService
-                )))
-              )))
+            setupBusinessMatching(Set(TelephonePaymentService))
 
             val model = Renewal(
               Some(InvolvedInOtherYes("test")),
@@ -1179,17 +872,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
             await(service.isRenewalComplete(model)) mustBe true
           }
+
           "involvedInOther is false" in new Fixture {
-
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  TelephonePaymentService
-                )))
-              )))
+            setupBusinessMatching(Set(TelephonePaymentService))
 
             val model = Renewal(
               Some(InvolvedInOtherNo),
@@ -1217,17 +902,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
     "be false" when {
       "it is an HVD and customers outside the UK is not set" in new Fixture {
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              HighValueDealing
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-          )))
-
+        setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
 
         val model = Renewal(
           Some(InvolvedInOtherYes("test")),
@@ -1251,16 +926,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       }
 
       "it is an ASP and customers outside the UK is set" in new Fixture {
-        when(dataCache.fetchAll(any(),any()))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
-
-        when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-          .thenReturn(Some(BusinessMatching(
-            activities = Some(BusinessActivities(Set(
-              AccountancyServices
-            ))),
-            msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-          )))
+        setupBusinessMatching(Set(MoneyServiceBusiness, AccountancyServices), Set(CurrencyExchange))
 
 
         val model = Renewal(
@@ -1288,18 +954,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
         "it is an HVD" when {
           "it is a CurrencyExchange" when {
             "it is TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness,
-                    HighValueDealing
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                )))
+              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1320,22 +975,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
+
             "it is NOT TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness,
-                    HighValueDealing
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                )))
-
+              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1356,23 +999,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
           }
+
           "it is not a CurrencyExchange" when {
             "it is TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness,
-                    HighValueDealing
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                )))
+              setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(TransmittingMoney))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1393,24 +1025,14 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
           }
         }
+
         "it is NOT an HVD" when {
           "it is a CurrencyExchange" when {
             "it is TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange, TransmittingMoney)))
-                )))
+              setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange, TransmittingMoney))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1431,20 +1053,10 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
+
             "it is NOT TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(CurrencyExchange)))
-                )))
+              setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1465,22 +1077,12 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
           }
+
           "it is NOT a CurrencyExchange" when {
             "it is TransmittingMoney" in new Fixture {
-
-              when(dataCache.fetchAll(any(),any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(
-                    MoneyServiceBusiness
-                  ))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                )))
+              setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
 
               val model = Renewal(
                 Some(InvolvedInOtherYes("test")),
@@ -1501,78 +1103,58 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
               )
 
               await(service.isRenewalComplete(model)) mustBe false
-
             }
           }
         }
       }
+
       "It is not an MSB" when {
         "it is an HVD" in new Fixture {
+          setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing))
 
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+          val model = Renewal(
+            Some(InvolvedInOtherYes("test")),
+            Some(BusinessTurnover.First),
+            Some(AMLSTurnover.First),
+            Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            Some(PercentageOfCashPaymentOver15000.First),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            hasChanged = true,
+            None
+          )
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  MoneyServiceBusiness,
-                  HighValueDealing
-                )))
-              )))
-
-            val model = Renewal(
-              Some(InvolvedInOtherYes("test")),
-              Some(BusinessTurnover.First),
-              Some(AMLSTurnover.First),
-              Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-              Some(PercentageOfCashPaymentOver15000.First),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
-
-            await(service.isRenewalComplete(model)) mustBe false
-
+          await(service.isRenewalComplete(model)) mustBe false
         }
+
         "it is NOT an HVD" in new Fixture {
+          setupBusinessMatching(Set(MoneyServiceBusiness))
 
-            when(dataCache.fetchAll(any(),any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
+          val model = Renewal(
+            Some(InvolvedInOtherYes("test")),
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            None,
+            hasChanged = true,
+            None
+          )
 
-            when(mockCacheMap.getEntry[BusinessMatching](any())(any()))
-              .thenReturn(Some(BusinessMatching(
-                activities = Some(BusinessActivities(Set(
-                  MoneyServiceBusiness
-                )))
-              )))
-
-            val model = Renewal(
-              Some(InvolvedInOtherYes("test")),
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              None,
-              hasChanged = true,
-              None
-            )
-
-            await(service.isRenewalComplete(model)) mustBe false
-
+          await(service.isRenewalComplete(model)) mustBe false
         }
       }
     }
@@ -1581,8 +1163,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   "canSubmit" must {
     "return true" when {
       "renewal has not started" when {
-        "sections are completed and changed" in new Fixture {
 
+        "sections are completed and changed" in new Fixture {
           val renewal = Section("renewal", NotStarted, false, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -1594,7 +1176,6 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       }
       "renewal has started" when {
         "renewal section is complete and changed, sections are completed and changed" in new Fixture {
-
           val renewal = Section("renewal", Completed, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -1603,8 +1184,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
           service.canSubmit(renewal, sections) must be(true)
         }
-        "renewal section is complete and changed, sections are completed and not changed" in new Fixture {
 
+        "renewal section is complete and changed, sections are completed and not changed" in new Fixture {
           val renewal = Section("renewal", Completed, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -1617,8 +1198,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     }
     "return false" when {
       "renewal has started" when {
-        "sections are completed and not changed" in new Fixture {
 
+        "sections are completed and not changed" in new Fixture {
           val renewal = Section("renewal", Started, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -1627,8 +1208,8 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
           service.canSubmit(renewal, sections) must be(false)
         }
-        "sections are completed and changed" in new Fixture {
 
+        "sections are completed and changed" in new Fixture {
           val renewal = Section("renewal", Started, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
