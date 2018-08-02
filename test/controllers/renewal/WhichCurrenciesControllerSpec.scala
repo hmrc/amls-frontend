@@ -195,42 +195,13 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
 
-      "save the model data into the renewal object" in new FormSubmissionFixture {
-        val incomingModel = Renewal()
-
-        val msbServices = Some(
-          BusinessMatchingMsbServices(
-            Set(
-              TransmittingMoney
-            )
-          )
-        )
-
-        val businessActivities = Some(
-          BusinessActivities(Set(HighValueDealing))
-        )
-
+      "save the model data into the renewal object" in new RoutingFixture {
         val currentModel = WhichCurrencies(
           Seq("USD", "GBP", "BOB"),
           Some(true),
           Some(BankMoneySource("Bank names")),
           Some(WholesalerMoneySource("wholesaler names")),
           Some(true))
-
-
-        val outgoingModel = incomingModel.copy(
-          whichCurrencies = Some(currentModel), hasChanged = true
-        )
-
-        when(dataCacheConnector.fetchAll(any(), any()))
-          .thenReturn(Future.successful(Some(cacheMap)))
-
-        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
-          .thenReturn(Some(incomingModel))
-
-        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
-
 
         val result = await(controller.post()(validFormRequest))
         val captor = ArgumentCaptor.forClass(classOf[Renewal])
