@@ -17,12 +17,9 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
-import models.Country
-import models.aboutthebusiness.AboutTheBusiness
-import models.aboutthebusiness._
 import models.businessmatching.{BusinessActivities, _}
-import models.moneyservicebusiness.ExpectedThroughput
 import models.renewal._
+import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -32,9 +29,7 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.RenewalService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -214,6 +209,51 @@ class TotalThroughputControllerSpec extends AmlsSpec with MockitoSugar {
         post() { result =>
           result.header.status mustBe SEE_OTHER
           result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.CETransactionsInLast12MonthsController.get().url)
+        }
+      }
+
+      "redirect to CETransactionsInLast12MonthsController if MSB FX" in new FormSubmissionFixture {
+        val incomingModel = Renewal()
+
+        val msbServices = Some(
+          BusinessMatchingMsbServices(
+            Set(
+              ForeignExchange
+            )
+          )
+        )
+
+        val businessActivities = Some(
+          BusinessActivities(Set(HighValueDealing))
+        )
+
+
+        val outgoingModel = incomingModel.copy(
+          totalThroughput = Some(
+            TotalThroughput(
+              "01"
+            )
+          ), hasChanged = true
+        )
+        val newRequest = request.withFormUrlEncodedBody(
+          "throughput" -> "01"
+        )
+
+        when(dataCacheConnector.fetchAll(any(), any()))
+                .thenReturn(Future.successful(Some(cacheMap)))
+
+        when(cacheMap.getEntry[Renewal](eqTo(Renewal.key))(any()))
+                .thenReturn(Some(incomingModel))
+
+        when(cacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+                .thenReturn(Some(BusinessMatching(msbServices = msbServices, activities = businessActivities)))
+
+        when(dataCacheConnector.save[Renewal](eqTo(Renewal.key), eqTo(outgoingModel))(any(), any(), any()))
+                .thenReturn(Future.successful(new CacheMap("", Map.empty)))
+
+        post() { result =>
+          result.header.status mustBe SEE_OTHER
+          result.header.headers.get("Location") mustBe Some(controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url)
         }
       }
 

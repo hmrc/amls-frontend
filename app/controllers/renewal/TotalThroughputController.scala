@@ -77,6 +77,7 @@ class TotalThroughputController @Inject()(val authConnector: AuthConnector,
     (services, businessActivities, edit) match {
       case (x, _, false) if x.contains(TransmittingMoney) => Redirect(routes.TransactionsInLast12MonthsController.get())
       case (x, _, false) if x.contains(CurrencyExchange) => Redirect(routes.CETransactionsInLast12MonthsController.get())
+      case (x, _, false) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
       case (_, x, false) if x.contains(HighValueDealing) && x.contains(AccountancyServices) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case (_, x, false) if x.contains(HighValueDealing) => Redirect(routes.CustomersOutsideUKController.get())
       case _ => Redirect(routes.SummaryController.get())
