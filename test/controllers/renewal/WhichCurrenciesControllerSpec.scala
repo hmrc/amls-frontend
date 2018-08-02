@@ -25,7 +25,6 @@ import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.mockito.stubbing.OngoingStubbing
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
@@ -136,7 +135,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
       }
 
       "reads the current value from the renewals model" in new Fixture {
-
         when {
           renewalService.getRenewal(any(), any(), any())
         } thenReturn Future.successful(Renewal(whichCurrencies = WhichCurrencies(Seq("EUR"), None, None, None, None).some).some)
@@ -153,9 +151,19 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
   "Calling the POST action" when {
     "posting valid data" must {
+      "redirect to How many Foreign Exchange Controller" when {
+        "the business is FX" in new RoutingFixture {
+          setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(ForeignExchange))
+
+          val result = controller.post()(validFormRequest)
+
+          status(result) mustBe SEE_OTHER
+          redirectLocation(result) mustBe controllers.renewal.routes.FXTransactionsInLast12MonthsController.get().url.some
+        }
+      }
+
       "redirect to PercentageOfCashPaymentOver15000Controller" when {
         "the business is HVD and ASP" in new RoutingFixture {
-
           setupBusinessMatching(Set(HighValueDealing, AccountancyServices), Set(TransmittingMoney))
 
           val result = controller.post()(validFormRequest)
@@ -167,7 +175,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to CustomersOutsideTheUKController" when {
         "the business is HVD and not an ASP" in new RoutingFixture {
-
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val result = controller.post()(validFormRequest)
@@ -179,7 +186,6 @@ class WhichCurrenciesControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to the summary page" when {
         "editing" in new RoutingFixture {
-
           setupBusinessMatching(Set(HighValueDealing), Set(TransmittingMoney))
 
           val result = controller.post(edit = true)(validFormRequest)

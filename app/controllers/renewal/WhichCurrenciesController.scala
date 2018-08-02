@@ -59,10 +59,11 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
                 cacheMap <- optMap
                 renewal <- cacheMap.getEntry[Renewal](Renewal.key)
                 bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                services <- bm.msbServices
                 activities <- bm.activities
               } yield {
                 renewalService.updateRenewal(renewal.whichCurrencies(model)) map { _ =>
-                  standardRouting(activities.businessActivities, edit)
+                  standardRouting(services.msbServices, activities.businessActivities, edit)
                 }
 
               }
@@ -71,10 +72,11 @@ class WhichCurrenciesController @Inject()(val authConnector: AuthConnector,
       }
   }
 
-  private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
-    (businessActivities, edit) match {
-      case (x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
-      case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+  private def standardRouting(services: Set[BusinessMatchingMsbService], businessActivities: Set[BusinessActivity], edit: Boolean): Result =
+    (services, businessActivities, edit) match {
+      case (x, _, false) if x.contains(ForeignExchange) => Redirect(routes.FXTransactionsInLast12MonthsController.get())
+      case (_, x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+      case (_, x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
       case _ => Redirect(routes.SummaryController.get())
     }
 
