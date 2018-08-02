@@ -155,30 +155,20 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     }
   }
 
-  "isRenewalComplete" must {
+  "isRenewalCompleteOld" must {
     "be true" when {
       "it is an HVD and customers outside the UK is set" in new Fixture {
         setupBusinessMatching(Set(HighValueDealing))
 
-        val model = Renewal(
-          Some(InvolvedInOtherYes("test")),
-          Some(BusinessTurnover.First),
-          Some(AMLSTurnover.First),
-          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          None,
-          hasChanged = true,
-          None
+        var model: Renewal = Renewal(hasChanged = true)
+        model = standardComplete(model)
+        val hvdComplete = model.copy(
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
         )
 
-        await(service.isRenewalComplete(model)) mustBe true
+        await(service.isRenewalComplete(hvdComplete)) mustBe true
       }
 
       "it is an ASP and customers outside the UK is set" in new Fixture {
