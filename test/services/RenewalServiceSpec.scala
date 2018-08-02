@@ -61,6 +61,32 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
     def setUpRenewal(renewalModel: Renewal) = when {
       dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
     } thenReturn Future.successful(Some(renewalModel))
+
+//    val completeModel = Renewal(
+//      Some(InvolvedInOtherYes("test")),
+//      Some(BusinessTurnover.First),
+//      Some(AMLSTurnover.First),
+//      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+//      Some(PercentageOfCashPaymentOver15000.First),
+//      Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+//      Some(TotalThroughput("01")),
+//      Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+//      Some(TransactionsInLast12Months("1500")),
+//      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+//      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+//      Some(CETransactionsInLast12Months("123")),
+//      Some(FXTransactionsInLast12Months("456")),
+//      true,
+//      Some(SendMoneyToOtherCountry(true))
+//    )
+
+    def aspComplete(renewalModel: Renewal) = ???
+    def hvdComplete(renewalModel: Renewal) = ???
+    def msbBasicComplete(renewalModel: Renewal) = ???
+    def mtComplete(renewalModel: Renewal) = ???
+    def ceComplete(renewalModel: Renewal) = ???
+    def fxComplete(renewalModel: Renewal) = ???
+    def standardComplete(renewalModel: Renewal) = ???
   }
 
   "The renewal service" must {

@@ -19,7 +19,7 @@ package models.renewal
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, Rule, ValidationError}
 import models.ValidationRule
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.Json
 
 case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
@@ -144,6 +144,11 @@ object Renewal {
         r.mostTransactions.isEmpty => Valid(r)
 
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money transmitting"))))
+    }
+
+    val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.customersOutsideUK.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
     val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
