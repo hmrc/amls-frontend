@@ -140,7 +140,6 @@ object Renewal {
 
       case r if (r.sendMoneyToOtherCountry.isEmpty || r.sendMoneyToOtherCountry.exists(_.money == false)) &&
         r.transactionsInLast12Months.isDefined &&
-        r.mostTransactions.isEmpty &&
         r.mostTransactions.isEmpty => Valid(r)
 
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money transmitting"))))

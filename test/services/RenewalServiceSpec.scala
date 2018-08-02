@@ -62,31 +62,45 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
     } thenReturn Future.successful(Some(renewalModel))
 
-//    val completeModel = Renewal(
-//      Some(InvolvedInOtherYes("test")),
-//      Some(BusinessTurnover.First),
-//      Some(AMLSTurnover.First),
-//      Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-//      Some(PercentageOfCashPaymentOver15000.First),
-//      Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-//      Some(TotalThroughput("01")),
-//      Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-//      Some(TransactionsInLast12Months("1500")),
-//      Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-//      Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-//      Some(CETransactionsInLast12Months("123")),
-//      Some(FXTransactionsInLast12Months("456")),
-//      true,
-//      Some(SendMoneyToOtherCountry(true))
-//    )
-
-    def aspComplete(renewalModel: Renewal) = ???
-    def hvdComplete(renewalModel: Renewal) = ???
-    def msbBasicComplete(renewalModel: Renewal) = ???
-    def mtComplete(renewalModel: Renewal) = ???
-    def ceComplete(renewalModel: Renewal) = ???
-    def fxComplete(renewalModel: Renewal) = ???
-    def standardComplete(renewalModel: Renewal) = ???
+    def aspComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
+      )
+    }
+    def hvdComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+        percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+      )
+    }
+    def mtComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+        mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+      )
+    }
+    def ceComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
+      )
+    }
+    def fxComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+      )
+    }
+    def standardComplete(renewalModel: Renewal): Renewal = {
+      renewalModel.copy(
+        involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
+        turnover = Some(AMLSTurnover.First),
+        businessTurnover = Some(BusinessTurnover.First),
+        hasAccepted = true
+      )
+    }
   }
 
   "The renewal service" must {
@@ -106,23 +120,13 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "the renewal is complete and has been started" in new Fixture {
         setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
-        val completeModel = Renewal(
-          Some(InvolvedInOtherYes("test")),
-          Some(BusinessTurnover.First),
-          Some(AMLSTurnover.First),
-          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-          Some(PercentageOfCashPaymentOver15000.First),
-          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
-          Some(TotalThroughput("01")),
-          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-          Some(TransactionsInLast12Months("1500")),
-          Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
-          Some(CETransactionsInLast12Months("123")),
-          Some(FXTransactionsInLast12Months("456")),
-          true,
-          Some(SendMoneyToOtherCountry(true))
-        )
+        var completeModel: Renewal = Renewal(hasChanged = true)
+        completeModel = standardComplete(completeModel)
+        completeModel = aspComplete(completeModel)
+        completeModel = hvdComplete(completeModel)
+        completeModel = mtComplete(completeModel)
+        completeModel = ceComplete(completeModel)
+        completeModel = fxComplete(completeModel)
 
         setUpRenewal(completeModel)
 
