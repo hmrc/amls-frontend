@@ -122,6 +122,11 @@ object Renewal {
       case _ => Invalid(Seq(Path \ "involvedInOtherActivities" -> Seq(ValidationError("Invalid state"))))
     }
 
+    val msbRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.totalThroughput.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money service business"))))
+    }
+
     val currencyExchangeRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.whichCurrencies.isDefined && r.ceTransactionsInLast12Months.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for currency exchange"))))

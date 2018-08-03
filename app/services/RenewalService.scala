@@ -89,6 +89,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
     val validationRule = compileOpt {
       Seq(
+        Some(msbRule),
         if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(moneyTransmitterRule) else None,
         if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(currencyExchangeRule) else None,
         if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(foreignExchangeRule) else None,
