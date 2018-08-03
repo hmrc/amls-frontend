@@ -80,7 +80,9 @@ class summarySpec extends AmlsSpec
       ("renewal.msb.transfers.header", checkElementTextIncludes(_, "1500"), controllers.renewal.routes.TransactionsInLast12MonthsController.get(true).toString),
       ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
       ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
-      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString)
+      ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString),
+      ("renewals.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
+      ("renewals.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
     )
 
     "include the provided data" in new ViewFixture {
@@ -118,7 +120,8 @@ class summarySpec extends AmlsSpec
               TransmittingMoney,
               CurrencyExchange,
               ChequeCashingNotScrapMetal,
-              ChequeCashingScrapMetal
+              ChequeCashingScrapMetal,
+              ForeignExchange
             )
           )
         )
