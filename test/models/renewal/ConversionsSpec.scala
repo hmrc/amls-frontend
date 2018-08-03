@@ -113,7 +113,7 @@ class ConversionsSpec extends WordSpec with MustMatchers {
       converted.msbSection.get.ceTransactionsInNext12Months mustBe Some(models.moneyservicebusiness.CETransactionsInNext12Months("12345678963"))
     }
 
-    "convert the 'MSB which currencies' model" in new Fixture{
+    "convert the 'MSB which currencies' model" in new Fixture {
       val model = WhichCurrencies(Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None)
       val renewal = Renewal(whichCurrencies = Some(model))
       val converted = subscriptionRequest.withRenewalData(renewal)
@@ -122,6 +122,16 @@ class ConversionsSpec extends WordSpec with MustMatchers {
         models.moneyservicebusiness.WhichCurrencies(
           Seq("USD", "CHF", "EUR"), None, Some(BankMoneySource("Bank names")), None, None))
 
+    }
+
+    "convert the 'MSB foreign exchange transactions' model" in new Fixture {
+      val model = FXTransactionsInLast12Months("987")
+      val renewal = Renewal(fxTransactionsInLast12Months = Some(model))
+      val converted = subscriptionRequest.withRenewalData(renewal)
+
+      converted.msbSection.get.fxTransactionsInNext12Months mustBe Some(
+        models.moneyservicebusiness.FXTransactionsInNext12Months("987")
+      )
     }
 
     "convert the 'HVD percentage' model" in new Fixture {
