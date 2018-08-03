@@ -40,7 +40,7 @@ class ce_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
-      doc.title must startWith(Messages("renewals.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -49,7 +49,7 @@ class ce_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = views.html.renewal.ce_transactions_in_last_12_months(form2, true)
 
-      heading.html must be(Messages("renewals.msb.ce.transactions.expected.title"))
+      heading.html must be(Messages("renewal.msb.ce.transactions.expected.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

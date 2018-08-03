@@ -81,8 +81,8 @@ class summarySpec extends AmlsSpec
       ("renewal.msb.largest.amounts.title", checkElementTextIncludes(_, "France"), controllers.renewal.routes.SendTheLargestAmountsOfMoneyController.get(true).toString),
       ("renewal.msb.most.transactions.title", checkElementTextIncludes(_, "United Kingdom"), controllers.renewal.routes.MostTransactionsController.get(true).toString),
       ("renewal.msb.whichcurrencies.header", checkElementTextIncludes(_, "EUR"), controllers.renewal.routes.WhichCurrenciesController.get(true).toString),
-      ("renewals.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
-      ("renewals.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
+      ("renewal.msb.ce.transactions.expected.title", checkElementTextIncludes(_, "123"), controllers.renewal.routes.CETransactionsInLast12MonthsController.get(true).toString),
+      ("renewal.msb.fx.transactions.expected.title", checkElementTextIncludes(_, "12"), controllers.renewal.routes.FXTransactionsInLast12MonthsController.get(true).toString)
     )
 
     "include the provided data" in new ViewFixture {

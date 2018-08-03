@@ -55,7 +55,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewals.msb.ce.transactions.expected.title"))
+      contentAsString(result) must include(Messages("renewal.msb.ce.transactions.expected.title"))
     }
 
     "load the page 'How many currency exchange transactions' with pre populated data" in new Fixture  {
