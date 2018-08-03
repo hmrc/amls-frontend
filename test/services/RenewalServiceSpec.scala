@@ -62,70 +62,13 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       dataCache.fetch[Renewal](eqTo(Renewal.key))(any(), any(), any())
     } thenReturn Future.successful(Some(renewalModel))
 
-    def aspComplete(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
-      )
-    }
-    def hvdComplete(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-        percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-        receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
-      )
-    }
-    def msbComplete(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        totalThroughput = Some(TotalThroughput("01"))
-      )
-    }
-    def mtCompleteSendMoneyToOtherCountriesTrue(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
-        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
-        sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
-        mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
-      )
-    }
-    def mtCompleteSendMoneyToOtherCountriesFalse(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        sendMoneyToOtherCountry = None,
-        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
-        mostTransactions = None
-      )
-    }
-    def mtCompleteSendMoneyToOtherCountriesNone(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
-        transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
-        mostTransactions = None
-      )
-    }
-    def ceComplete(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
-        ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
-      )
-    }
-    def fxComplete(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
-      )
-    }
-    def standardCompleteInvolvedInOtherActivities(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
+    def standardCompleteInvolvedInOtherActivities(): Renewal = {
+      Renewal(
         involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
         turnover = Some(AMLSTurnover.First),
         businessTurnover = Some(BusinessTurnover.First),
-        hasAccepted = true
-      )
-    }
-    def standardCompleteNotInvolvedInOtherActivities(renewalModel: Renewal): Renewal = {
-      renewalModel.copy(
-        involvedInOtherActivities = Some(InvolvedInOtherNo),
-        turnover = Some(AMLSTurnover.First),
-        businessTurnover = None,
-        hasAccepted = true
+        hasAccepted = true,
+        hasChanged = true
       )
     }
   }
@@ -147,14 +90,23 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "the renewal is complete and has been started" in new Fixture {
         setupBusinessMatching(Set(MoneyServiceBusiness, HighValueDealing), Set(CurrencyExchange, TransmittingMoney))
 
-        var completeModel: Renewal = Renewal(hasChanged = true)
-        completeModel = standardCompleteInvolvedInOtherActivities(completeModel)
-        completeModel = aspComplete(completeModel)
-        completeModel = hvdComplete(completeModel)
-        completeModel = msbComplete(completeModel)
-        completeModel = mtCompleteSendMoneyToOtherCountriesTrue(completeModel)
-        completeModel = ceComplete(completeModel)
-        completeModel = fxComplete(completeModel)
+        val completeModel = Renewal(
+          Some(InvolvedInOtherYes("test")),
+          Some(BusinessTurnover.First),
+          Some(AMLSTurnover.First),
+          Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          Some(PercentageOfCashPaymentOver15000.First),
+          Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other"))))),
+          Some(TotalThroughput("01")),
+          Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          Some(TransactionsInLast12Months("1500")),
+          Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+          Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+          Some(CETransactionsInLast12Months("123")),
+          Some(FXTransactionsInLast12Months("456")),
+          true,
+          Some(SendMoneyToOtherCountry(true))
+        )
 
         setUpRenewal(completeModel)
 
@@ -184,56 +136,48 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   }
 
   trait StandardFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
+    setupBusinessMatching(Set(TelephonePaymentService))
+    val preFilledModel: Renewal = Renewal(hasChanged = true)
   }
 
   trait ASPFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(AccountancyServices))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait HVDFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(HighValueDealing))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait ASPHVDFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(AccountancyServices, HighValueDealing))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait MSBFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(MoneyServiceBusiness), Set(ChequeCashingNotScrapMetal, ChequeCashingScrapMetal))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait MTFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait CEFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(MoneyServiceBusiness), Set(CurrencyExchange))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait FXFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(MoneyServiceBusiness), Set(ForeignExchange))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   trait AllFixture extends Fixture {
-    setupBusinessMatching()
-    var preFilledModel: Renewal = Renewal(hasChanged = true)
-    preFilledModel = standardCompleteInvolvedInOtherActivities(preFilledModel)
+    setupBusinessMatching(Set(MoneyServiceBusiness), Set(TransmittingMoney, CurrencyExchange, ForeignExchange))
+    val preFilledModel = standardCompleteInvolvedInOtherActivities()
   }
 
   "isRenewalComplete" must {
@@ -241,101 +185,146 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "Standard renewal flow questions section is complete" when {
         "involvedInOtherActivities is true" in new StandardFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
-
-        "involvedInOtherActivites is false" in new StandardFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
-      }
-
-      "ASP is selected business activity and section is complete along with standard renewal flow questions" when {
-        "involvedInOtherActivities is true" in new ASPFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
-
-        "involvedInOtherActivites is false" in new ASPFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
-      }
-
-      "HVD is selected business activity and section is complete along with standard renewal flow questions" when {
-        "involvedInOtherActivities is true" in new HVDFixture {
           val model = preFilledModel.copy(
-            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
-            percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
-            receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+            involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
+            turnover = Some(AMLSTurnover.First),
+            businessTurnover = Some(BusinessTurnover.First),
+            hasAccepted = true
           )
           await(service.isRenewalComplete(model)) mustBe true
         }
 
-        "involvedInOtherActivites is false" in new HVDFixture {
-          val model = preFilledModel.copy()
+        "involvedInOtherActivites is false" in new StandardFixture {
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = Some(InvolvedInOtherNo),
+            turnover = Some(AMLSTurnover.First),
+            businessTurnover = None,
+            hasAccepted = true
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
       }
 
-      "ASP and HVD are selected business activities and section is complete along with standard renewal flow questions" when {
-        "involvedInOtherActivities is true" in new ASPHVDFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
+      "ASP is selected business activity and section is complete along with standard renewal flow questions" in new ASPFixture {
+        val model = preFilledModel.copy(
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB")))))
+        )
+        await(service.isRenewalComplete(model)) mustBe true
+      }
 
-        "involvedInOtherActivites is false" in new ASPHVDFixture {
-          val model = preFilledModel.copy()
-          await(service.isRenewalComplete(model)) mustBe true
-        }
+      "HVD is selected business activity and section is complete along with standard renewal flow questions" in new HVDFixture {
+        val model = preFilledModel.copy(
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+        )
+        await(service.isRenewalComplete(model)) mustBe true
+      }
+
+      "ASP and HVD are selected business activities and section is complete along with standard renewal flow questions" in new ASPHVDFixture {
+        val model = preFilledModel.copy(
+          customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+          percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+          receiveCashPayments = Some(ReceiveCashPayments(Some(PaymentMethods(true, true, Some("other")))))
+        )
+        await(service.isRenewalComplete(model)) mustBe true
       }
 
       "MSB is selected business activity w/o MT, CE, FX subsectors and section is complete along with standard renewal flow questions" in new MSBFixture {
-        val model = preFilledModel.copy()
+        val model = preFilledModel.copy(
+          totalThroughput = Some(TotalThroughput("01"))
+        )
         await(service.isRenewalComplete(model)) mustBe true
       }
 
       "MSB is selected business activity with MT subsector and w/o CE, FX subsectors and section is complete along with standard renewal flow questions" when {
         "sendMoneyToOtherCountries is true" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
 
         "sendMoneyToOtherCountries is false" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
 
         "sendMoneyToOtherCountries is None" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
       }
 
       "MSB is selected business activity with CE subsector and w/o MT, FX subsectors and section is complete along with standard renewal flow questions" in new CEFixture {
-        val model = preFilledModel.copy()
+        val model = preFilledModel.copy(
+          totalThroughput = Some(TotalThroughput("01")),
+          whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+          ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
+        )
         await(service.isRenewalComplete(model)) mustBe true
       }
 
       "MSB is selected business activity with FX subsector and w/o MT, CE subsectors and section is complete along with standard renewal flow questions" in new FXFixture {
-        val model = preFilledModel.copy()
+        val model = preFilledModel.copy(
+          totalThroughput = Some(TotalThroughput("01")),
+          fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+        )
         await(service.isRenewalComplete(model)) mustBe true
       }
 
       "MSB is selected business activity with MT, CE, FX subsectors and section is complete along with standard renewal flow questions" when {
         "sendMoneyToOtherCountries is true" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
+            fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
 
         "sendMoneyToOtherCountries is False" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None,
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
+            fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
 
         "sendMoneyToOtherCountries is None" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None,
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
+            fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+          )
           await(service.isRenewalComplete(model)) mustBe true
         }
       }
@@ -347,27 +336,49 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "Standard renewal flow questions section are incomplete" when {
 
         "involvedInOtherActivities is not defined" in new StandardFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = None,
+            hasAccepted = true
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "turnover is not defined" in new StandardFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
+            turnover = None,
+            hasAccepted = true
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "if involvedInOtherActivities and businessTurnover is not defined" in new StandardFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
+            turnover = Some(AMLSTurnover.First),
+            businessTurnover = None,
+            hasAccepted = true
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "if not involvedInOtherActivities and businessTurnover is defined" in new StandardFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = Some(InvolvedInOtherNo),
+            turnover = Some(AMLSTurnover.First),
+            businessTurnover = Some(BusinessTurnover.First),
+            hasAccepted = true
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "hasAccepted is false" in new StandardFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            involvedInOtherActivities = Some(InvolvedInOtherYes("test")),
+            turnover = Some(AMLSTurnover.First),
+            businessTurnover = Some(BusinessTurnover.First),
+            hasAccepted = false
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
@@ -376,7 +387,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "ASP is selected business activity and section is incomplete with standard renewal flow questions complete" when {
 
         "customerOutsideUk is not defined" in new ASPFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
@@ -385,17 +398,26 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "HVD is selected business activity and section is incomplete with standard renewal flow questions complete" when {
 
         "customersOutsideUk is not defined" in new HVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new HVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            percentageOfCashPaymentOver15000 = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new HVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+            receiveCashPayments = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
@@ -404,17 +426,26 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "ASP and HVD are selected business activities and section is incomplete with standard renewal flow questions complete" when {
 
         "customersOutsideUk is not defined" in new ASPHVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is not defined" in new ASPHVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            percentageOfCashPaymentOver15000 = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "customersOutsideUk is defined and percentageOfCashPaymentsOver15000 is defined and receivedCashPayments is not defined" in new ASPHVDFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            customersOutsideUK = Some(CustomersOutsideUK(Some(Seq(Country("United Kingdom", "GB"))))),
+            percentageOfCashPaymentOver15000 = Some(PercentageOfCashPaymentOver15000.First),
+            receiveCashPayments = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
@@ -422,7 +453,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
 
       "MSB is selected business activity w/o MT, CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
         "totalThroughput is not defined" in new MSBFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
@@ -430,128 +463,241 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
       "MSB is selected business activity with MT subsector and w/o CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
 
         "totalThroughput is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new MTFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            sendTheLargestAmountsOfMoney = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
 
       "MSB is selected business activity with CE subsector and w/o MT, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
         "totalThroughput is not defined" in new CEFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = None,
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "whichCurrencies is not defined" in new CEFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            whichCurrencies = None,
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "ceTransactionsInLast12Months is not defined" in new CEFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
 
       "MSB is selected business activity with FX subsector and w/o MT, CE subsectors and section is incomplete with standard renewal flow questions complete" when {
         "totalThroughput is not defined" in new FXFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = None,
+            fxTransactionsInLast12Months = Some(FXTransactionsInLast12Months("456"))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "fxTransactionsInLast12Months is not defined" in new FXFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            fxTransactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
 
       "MSB is selected business activity with MT, CE, FX subsectors and section is incomplete with standard renewal flow questions complete" when {
         "totalThroughput is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is None and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = None,
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is false and transactionsInLast12Months is defined and mostTransactions is defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB"))))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "sendMoneyToOtherCountries is true and transactionsInLast12Months and mostTransactions is defined and sendTheLargestAmountsOfMoney is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            sendTheLargestAmountsOfMoney = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "whichCurrencies is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            whichCurrencies = None,
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123"))
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "ceTransactionsInLast12Months is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
 
         "fxTransactionsInLast12Months is not defined" in new AllFixture {
-          val model = preFilledModel.copy()
+          val model = preFilledModel.copy(
+            totalThroughput = Some(TotalThroughput("01")),
+            sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+            transactionsInLast12Months = Some(TransactionsInLast12Months("1500")),
+            mostTransactions = Some(MostTransactions(Seq(Country("United Kingdom", "GB")))),
+            sendTheLargestAmountsOfMoney = Some(SendTheLargestAmountsOfMoney(Country("us", "US"))),
+            whichCurrencies = Some(WhichCurrencies(Seq("EUR"), None, None, None, None)),
+            ceTransactionsInLast12Months = Some(CETransactionsInLast12Months("123")),
+            fxTransactionsInLast12Months = None
+          )
           await(service.isRenewalComplete(model)) mustBe false
         }
       }
