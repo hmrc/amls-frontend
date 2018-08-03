@@ -91,6 +91,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       Seq(
         if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(moneyTransmitterRule) else None,
         if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(currencyExchangeRule) else None,
+        if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(foreignExchangeRule) else None,
         Some(standardRule)
       )
     }
