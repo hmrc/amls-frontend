@@ -22,11 +22,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("renewals.msb.ce.transactions.expected.title", "summary.renewal")
+    @heading("renewal.msb.ce.transactions.expected.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("renewals.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.msb.ce.transactions.expected.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
@@ -39,7 +39,7 @@
             classes = Seq("input--no-spinner form-control-1-4 form-control-1-4"),
             field = f("ceTransaction"),
             labelHidden = true,
-            labelText = "renewals.msb.ce.transactions.expected.title"
+            labelText = "renewal.msb.ce.transactions.expected.title"
         )
 
         @submit(edit, returnLocation = Some("renewal"))

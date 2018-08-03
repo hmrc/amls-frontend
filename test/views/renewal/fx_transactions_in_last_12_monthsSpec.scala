@@ -41,7 +41,7 @@ class fx_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = fx_transaction_in_last_12_months(form2, true)
 
-      doc.title must startWith(Messages("renewals.msb.fx.transactions.expected.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.msb.fx.transactions.expected.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -50,7 +50,7 @@ class fx_transactions_in_last_12_monthsSpec extends AmlsSpec with MustMatchers  
 
       def view = fx_transaction_in_last_12_months(form2, true)
 
-      heading.html must be(Messages("renewals.msb.fx.transactions.expected.title"))
+      heading.html must be(Messages("renewal.msb.fx.transactions.expected.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }

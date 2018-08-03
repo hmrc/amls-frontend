@@ -22,11 +22,11 @@
 
 @header = {
     @errorSummary(f)
-    @heading("renewals.msb.fx.transactions.expected.title", "summary.renewal")
+    @heading("renewal.msb.fx.transactions.expected.title", "summary.renewal")
 }
 
 @main(
-    title = Messages("renewals.msb.fx.transactions.expected.title") + " - " + Messages("summary.renewal"),
+    title = Messages("renewal.msb.fx.transactions.expected.title") + " - " + Messages("summary.renewal"),
     heading = header
 ) {
 
@@ -38,7 +38,7 @@
             attrType = "number",
             field = f("fxTransaction"),
             labelHidden = true,
-            labelText = "renewals.msb.fx.transactions.expected.title"
+            labelText = "renewal.msb.fx.transactions.expected.title"
         )
 
         @submit(edit)

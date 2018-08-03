@@ -55,7 +55,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("renewals.msb.fx.transactions.expected.title"))
+      contentAsString(result) must include(Messages("renewal.msb.fx.transactions.expected.title"))
     }
 
     "load the page 'How many foreign exchange transactions' with pre populated data" in new Fixture  {
