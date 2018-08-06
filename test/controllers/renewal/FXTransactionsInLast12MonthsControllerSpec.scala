@@ -17,6 +17,7 @@
 package controllers.renewal
 
 import connectors.DataCacheConnector
+import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -42,6 +43,14 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       authConnector = self.authConnector,
       renewalService = mockRenewalService
     )
+
+    val cacheMap = mock[CacheMap]
+    when(mockDataCacheConnector.fetchAll(any(), any()))
+            .thenReturn(Future.successful(Some(cacheMap)))
+
+    def setupBusinessMatching(activities: Set[BusinessActivity]) = when {
+      cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+    } thenReturn Some(BusinessMatching(activities = Some(BusinessActivities(activities))))
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -76,8 +85,9 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
         "fxTransaction" -> ""
       )
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when {
+        cacheMap.getEntry[Renewal](Renewal.key)
+      } thenReturn Some(Renewal())
 
       when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
         .thenReturn(Future.successful(emptyCache))
@@ -88,44 +98,78 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     }
 
-    "Successfully save data in save4later and navigate to Next page" in new Fixture {
+    trait FlowFixture extends Fixture {
       val newRequest = request.withFormUrlEncodedBody (
         "fxTransaction" -> "12345678963"
       )
 
-      when(controller.dataCacheConnector.fetch[Renewal](any())
-        (any(), any(), any())).thenReturn(Future.successful(None))
+      when {
+        cacheMap.getEntry[Renewal](Renewal.key)
+      } thenReturn Some(Renewal())
 
       when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
-        .thenReturn(Future.successful(emptyCache))
-
-      val result = controller.post()(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+              .thenReturn(Future.successful(mock[CacheMap]))
     }
 
-    "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
-      val incomingModel = Renewal()
+    "Successfully save data in save4later and navigate to Next page" when {
 
-      val outgoingModel = incomingModel.copy(
-        fxTransactionsInLast12Months = Some(
-          FXTransactionsInLast12Months("12345678963")
-        ), hasChanged = true
-      )
+      "business activities does not contain HVD or ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness))
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
 
-      val newRequest = request.withFormUrlEncodedBody (
-        "fxTransaction" -> "12345678963"
-      )
+      "business activities contains HVD" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing))
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.CustomersOutsideUKController.get().url))
+      }
 
-      when(controller.dataCacheConnector.fetch[Renewal](eqTo(Renewal.key))
-        (any(), any(), any())).thenReturn(Future.successful(Some(incomingModel)))
+      "business activities contains ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, AccountancyServices))
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
 
-      when(mockRenewalService.updateRenewal(any())(any(),any(), any()))
-        .thenReturn(Future.successful(emptyCache))
+      "business activities contains HVD and ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing, AccountancyServices))
+        val result = controller.post()(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.PercentageOfCashPaymentOver15000Controller.get().url))
+      }
+    }
 
-      val result = controller.post(true)(newRequest)
-      status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+    "Successfully save data in save4later and navigate to Summary page in edit mode" when {
+      "business activities does not contain HVD or ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
+
+      "business activities contains HVD" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
+
+      "business activities contains ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, AccountancyServices))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
+
+      "business activities contains HVD and ASP" in new FlowFixture {
+        setupBusinessMatching(activities = Set(MoneyServiceBusiness, HighValueDealing, AccountancyServices))
+        val result = controller.post(true)(newRequest)
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.renewal.routes.SummaryController.get().url))
+      }
     }
 
   }

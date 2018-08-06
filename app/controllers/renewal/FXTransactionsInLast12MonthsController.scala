@@ -20,7 +20,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
+import models.businessmatching._
 import models.renewal.{FXTransactionsInLast12Months, Renewal}
+import play.api.mvc.Result
 import services.RenewalService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.fx_transaction_in_last_12_months
@@ -53,11 +55,28 @@ class FXTransactionsInLast12MonthsController @Inject()(
           case f: InvalidForm =>
             Future.successful(BadRequest(fx_transaction_in_last_12_months(f, edit)))
           case ValidForm(_, data) =>
-            for {
-              renewal <- dataCacheConnector.fetch[Renewal](Renewal.key)
-              _ <- renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data))
-            } yield Redirect(routes.SummaryController.get())
+            dataCacheConnector.fetchAll flatMap {
+              optMap =>
+                val result = for {
+                  cacheMap <- optMap
+                  renewal <- cacheMap.getEntry[Renewal](Renewal.key)
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                  activities <- bm.activities
+                } yield {
+                  renewalService.updateRenewal(renewal.fxTransactionsInLast12Months(data)) map { _ =>
+                    standardRouting(activities.businessActivities, edit)
+                  }
+                }
+                result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+            }
         }
       }
   }
+
+  private def standardRouting(businessActivities: Set[BusinessActivity], edit: Boolean): Result =
+    (businessActivities, edit) match {
+      case (x, false) if x.contains(HighValueDealing) && !x.contains(AccountancyServices) => Redirect(routes.CustomersOutsideUKController.get())
+      case (x, false) if x.contains(HighValueDealing) => Redirect(routes.PercentageOfCashPaymentOver15000Controller.get())
+      case _ => Redirect(routes.SummaryController.get())
+    }
 }
