@@ -19,7 +19,7 @@ package models.renewal
 import cats.data.Validated.{Invalid, Valid}
 import jto.validation.{Path, Rule, ValidationError}
 import models.ValidationRule
-import play.api.libs.json.{Json, Reads}
+import play.api.libs.json.Json
 
 case class Renewal(
                     involvedInOtherActivities: Option[InvolvedInOther] = None,
@@ -122,6 +122,11 @@ object Renewal {
       case _ => Invalid(Seq(Path \ "involvedInOtherActivities" -> Seq(ValidationError("Invalid state"))))
     }
 
+    val msbRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.totalThroughput.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money service business"))))
+    }
+
     val currencyExchangeRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
       case r if r.whichCurrencies.isDefined && r.ceTransactionsInLast12Months.isDefined => Valid(r)
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for currency exchange"))))
@@ -140,10 +145,14 @@ object Renewal {
 
       case r if (r.sendMoneyToOtherCountry.isEmpty || r.sendMoneyToOtherCountry.exists(_.money == false)) &&
         r.transactionsInLast12Months.isDefined &&
-        r.mostTransactions.isEmpty &&
         r.mostTransactions.isEmpty => Valid(r)
 
       case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for money transmitting"))))
+    }
+
+    val aspRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {
+      case r if r.customersOutsideUK.isDefined => Valid(r)
+      case _ => Invalid(Seq(Path -> Seq(ValidationError("Invalid model state for accountancy service provider"))))
     }
 
     val hvdRule: ValidationRule[Renewal] = Rule[Renewal, Renewal] {

@@ -38,13 +38,10 @@ import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, Vie
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.http.Status.OK
 import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 import utils.AmlsSpec
 
@@ -292,7 +289,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       Some(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB"),None,None)),
       Some(MostTransactions(List(Country("United Kingdom", "GB")))),
       Some(CETransactionsInLast12Months("12345678963")),
-      None,
+      Some(FXTransactionsInLast12Months("3987654321")),
       false)
 
     val cacheMap = CacheMap("", Map.empty)

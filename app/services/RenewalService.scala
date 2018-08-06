@@ -71,7 +71,7 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
       activities.businessActivities collect {
         case MoneyServiceBusiness => checkCompletionOfMsb(renewal, businessMatching.msbServices)
         case HighValueDealing => checkCompletionOfHvd(renewal)
-        case AccountancyServices => renewal.customersOutsideUK.isDefined
+        case AccountancyServices => checkCompletionOfAsp(renewal)
       } match {
         case s if s.nonEmpty => s.forall(identity)
 
@@ -89,8 +89,26 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
 
     val validationRule = compileOpt {
       Seq(
+        Some(msbRule),
         if (msbServices.exists(_.msbServices.contains(TransmittingMoney))) Some(moneyTransmitterRule) else None,
         if (msbServices.exists(_.msbServices.contains(CurrencyExchange))) Some(currencyExchangeRule) else None,
+        if (msbServices.exists(_.msbServices.contains(ForeignExchange))) Some(foreignExchangeRule) else None,
+        Some(standardRule)
+      )
+    }
+
+    // Validate the renewal object using the composed chain of validation rules
+    validationRule.validate(renewal) match {
+      case Valid(_) => true
+      case r => false
+    }
+  }
+
+  private def checkCompletionOfAsp(renewal: Renewal) = {
+
+    val validationRule = compileOpt {
+      Seq(
+        Some(aspRule),
         Some(standardRule)
       )
     }
