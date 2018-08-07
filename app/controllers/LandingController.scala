@@ -125,6 +125,11 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
+
+    val deleteAndRedirect = () => cacheConnector.remove map { _ =>
+      Redirect(controllers.routes.LandingController.get())
+    }
+
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
         case (true, Some(abt)) =>
@@ -134,15 +139,9 @@ class LandingController @Inject()(val landingService: LandingService,
 
         case (true, _) => Future.successful(Redirect(controllers.routes.StatusController.get()))
 
-        case (false, _) =>
-          shortLivedCache.remove(authContext.user.oid).map { http =>
-            http.status match {
-              case NO_CONTENT => Redirect(controllers.routes.LandingController.get())
-              case _ => throw new Exception("Cannot remove pre application data")
-            }
-          }
+        case (false, _) => deleteAndRedirect()
       }
-    } getOrElse Future.successful(Redirect(controllers.routes.LandingController.get()))
+    } getOrElse deleteAndRedirect()
   }
 
   private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap])
