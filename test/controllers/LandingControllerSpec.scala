@@ -216,6 +216,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
+          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -233,6 +234,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
           when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
+          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -243,24 +245,21 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
       "pre application must remove save4later" when {
         "the business matching is incomplete" in new Fixture {
-          val cachmap = mock[CacheMap]
+          val cacheMap = mock[CacheMap]
           val httpResponse = mock[HttpResponse]
-
           val complete = mock[BusinessMatching]
 
-          when(httpResponse.status) thenReturn (NO_CONTENT)
+          when(httpResponse.status) thenReturn NO_CONTENT
+          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
-          when(controller.shortLivedCache.remove(any())(any(), any())) thenReturn Future.successful(httpResponse)
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
+          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(complete.isComplete) thenReturn false
-          when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-          when(cachmap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+          when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
         }
       }
 
