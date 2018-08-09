@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: CacheConnector) extends CacheConnector with Conversions {
 
-  private def log(msg: String): Unit = Logger.info(s"[DataCacheConnectorMigrator] $msg")
+  private def warn(msg: String): Unit = Logger.warn(s"[DataCacheConnectorMigrator] $msg")
 
   /**
     * Fetches T from the primary cache. If the data is not available in the primary cache, the data is
