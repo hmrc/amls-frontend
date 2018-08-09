@@ -67,16 +67,10 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
       }
     }
 
-
   /**
     * Removes the user's data from the primary and secondary cache.
     */
-  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = {
-    for {
-      primaryResult <- primaryCache.remove
-      fallbackResult <- fallbackCache.remove
-    } yield primaryResult && fallbackResult
-  }
+  override def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] = primaryCache.remove
 
   /**
     * Updates data using function f in the primary cache.
@@ -91,13 +85,17 @@ class DataCacheConnectorMigrator(primaryCache: CacheConnector, fallbackCache: Ca
   /**
     * Performs the migration step of saving the cache into the new mongo store.
     */
-  private def doMigration(cacheMap: CacheMap): Future[Cache] = primaryCache match {
-    case m: MongoCacheConnector => m.saveAll(cacheMap) map { newCache =>
-      log(s"Migrated entire cache")
-      newCache
+  private def doMigration(cacheMap: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Future[Cache] =
+    primaryCache match {
+      case m: MongoCacheConnector => m.saveAll(cacheMap) flatMap { newCache =>
+        warn(s"Migrated entire cache")
+        fallbackCache.remove map { _ =>
+          warn(s"Removed Save4Later cache")
+          newCache
+        }
+      }
+      case _ => throw new RuntimeException("No primary cache node for saveAll")
     }
-    case _ => throw new RuntimeException("No primary cache node for saveAll")
-  }
 
 }
 
