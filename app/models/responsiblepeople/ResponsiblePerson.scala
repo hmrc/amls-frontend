@@ -204,7 +204,7 @@ object ResponsiblePerson {
               case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
         }
       }
     }
