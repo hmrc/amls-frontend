@@ -34,7 +34,7 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
-      def view = views.html.responsiblepeople.your_answers(Seq(ResponsiblePerson()))
+      def view = views.html.responsiblepeople.your_answers(Seq((ResponsiblePerson(),0)), Seq((ResponsiblePerson(),0)))
 
       doc.title must be(Messages("title.ya") +
         " - " + Messages("summary.responsiblepeople") +

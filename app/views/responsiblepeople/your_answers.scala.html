@@ -21,7 +21,29 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(responsiblePeople: Seq[ResponsiblePerson])(implicit request: Request[_],m:Messages)
+@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson,Int)])(implicit request: Request[_],m:Messages)
+
+@rpList(responsiblePeople: Seq[(ResponsiblePerson, Int)], header: String) = {
+    <h2>@Messages(header)</h2>
+    <ul class="list">
+    @responsiblePeople.map { case (rp, index) =>
+        @if(!rp.status.contains(StatusConstants.Deleted)) {
+
+            @rp.personName.map { pn =>
+                @checkYourAnswersListing(
+                    item = pn.fullName,
+                    editUrl = rp.isComplete match {
+                        case true => controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1, true).toString
+                        case _ => controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1).toString
+                    },
+                    removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
+                )
+            }
+
+        }
+    }
+    </ul>
+}
 
 @header = {
     @heading("title.ya", "summary.responsiblepeople")
@@ -40,20 +62,9 @@
         <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a>
     }
 
-    <ul class="list">
-        @responsiblePeople.zipWithIndex.map { case (rp, index) =>
-            @if(!rp.status.contains(StatusConstants.Deleted)) {
-                @rp.personName.map { pn =>
-                    @checkYourAnswersListing(
-                        item = pn.fullName,
-                        editUrl = controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1, true).toString,
-                        removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
-                    )
-                }
-            }
-        }
-    </ul>
+    @rpList(responsiblePeopleIncomplete, "responsiblepeople.check_your_answers.incomplete")
 
+    @rpList(responsiblePeopleComplete, "responsiblepeople.check_your_answers.complete")
 
     @if(ApplicationConfig.hasAcceptedToggle) {
         @form(EmptyForm, controllers.responsiblepeople.routes.SummaryController.post()) {

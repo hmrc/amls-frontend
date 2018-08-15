@@ -31,7 +31,11 @@ trait YourAnswersController extends RepeatingSection with BaseController {
       Authorised.async {
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
-            case Some(data) => Ok(your_answers(data))
+            case Some(data) => {
+              val s = data.zipWithIndex.partition(x=> x._1.isComplete)
+
+              Ok(your_answers(s._1, s._2))
+            }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
