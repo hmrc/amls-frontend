@@ -92,16 +92,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- removeAspIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                savedModel.businessActivities)
-              _ <- removeEabIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                savedModel.businessActivities)
-              _ <- removeHvdIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                savedModel.businessActivities)
-              _ <- removeMsbIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                savedModel.businessActivities)
-              _ <- removeTcspIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                savedModel.businessActivities)
+              _ <- removeBusinessActivitiesSectionsIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                  savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -127,6 +119,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .accountantForAMLSRegulations(None)
       .taxMatters(None)
       .copy(hasAccepted = true)
+
+  private def removeBusinessActivitiesSectionsIfNotSelectedAndPreviouslySelected(
+                                                                                        previousBusinessActivities: Set[BusinessActivity],
+                                                                                        currentBusinessActivities: Set[BusinessActivity]
+                                                                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+      removeAspIfNotSelectedAndPreviouslySelected(previousBusinessActivities, currentBusinessActivities)
+      removeEabIfNotSelectedAndPreviouslySelected(previousBusinessActivities, currentBusinessActivities)
+      removeHvdIfNotSelectedAndPreviouslySelected(previousBusinessActivities, currentBusinessActivities)
+      removeMsbIfNotSelectedAndPreviouslySelected(previousBusinessActivities, currentBusinessActivities)
+      removeTcspIfNotSelectedAndPreviouslySelected(previousBusinessActivities, currentBusinessActivities)
+  }
 
   private def removeAspIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
     val aspPreviouslySelected = previousBusinessActivities.contains(AccountancyServices)
