@@ -136,13 +136,13 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                                                                      previousBusinessActivities: Set[BusinessActivity],
                                                                                      currentBusinessActivities: Set[BusinessActivity],
                                                                                      businessActivity: BusinessActivity,
-                                                                                     section: String,
-                                                                                     thing:T
+                                                                                     key: String,
+                                                                                     clearedModel: T
                                                                              )(implicit ac: AuthContext, hc: HeaderCarrier, format: Format[T]) = {
     val previouslySelected = previousBusinessActivities.contains(businessActivity)
     val currentlySelected = currentBusinessActivities.contains(businessActivity)
     if (previouslySelected && !currentlySelected) {
-      dataCacheConnector.save[T](section, thing )
+      dataCacheConnector.save[T](key, clearedModel)
     } else {
       Future.successful(None)
     }
