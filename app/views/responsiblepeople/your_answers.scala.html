@@ -41,21 +41,25 @@
 }
 
 @header = {
-    @heading("title.ya", "summary.responsiblepeople")
+    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("title.ya") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.whomustregister.title") + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        jsHidden = false,
-        gutter = true
-    ) {
-        <a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a>
-    }
+    <p>@Messages("responsiblepeople.whomustregister.ymr")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("responsiblepeople.whomustregister.line_1")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_2")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_4")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_5")</li>
+    </ul>
+
+    <p><a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
 
     @if(responsiblePeopleIncomplete.nonEmpty) {
         <h2>@Messages("responsiblepeople.check_your_answers.incomplete")</h2>
@@ -71,7 +75,7 @@
 
     @if(ApplicationConfig.hasAcceptedToggle) {
         @form(EmptyForm, controllers.responsiblepeople.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.confirmandcontinue")), false)
+            @submit(false, Some(Messages("button.returntoapplicationprogress")), false)
         }
     } else {
         @anchor(

@@ -28,21 +28,25 @@
     sidebar = sidebar
 ) {
 
+    <p>@Messages("responsiblepeople.whomustregister.ymr")</p>
+
     <ul class="list list-bullet">
         <li>@Messages("responsiblepeople.whomustregister.line_1")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_2")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_4")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_5")</li>
     </ul>
 
-    @anchor(
-        attrHref = controllers.responsiblepeople.routes.WhatYouNeedController.get(index, flow).toString,
-        attrRole = true,
-        linkText = Messages("button.continue"),
-        visuallyhidden = Messages("summary.responsiblepeople"),
-        returnLink = true,
-        id=Some("tpwhomustregister-button")
-    )
+    <p><a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
 
+    <p>@Messages("responsiblepeople.whomustregister.nopeople")</p>
+
+    @anchor(
+        attrHref = controllers.routes.RegistrationProgressController.get().toString,
+        attrRole = true,
+        linkText = Messages("button.returntoapplicationprogress")
+    )
 }
 
 @sidebar = {
