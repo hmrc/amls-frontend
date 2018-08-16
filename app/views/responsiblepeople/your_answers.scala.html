@@ -31,7 +31,7 @@
                 item = pn.fullName,
                 editUrl = rp.isComplete match {
                     case true => controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1, true).toString
-                    case _ => controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1).toString
+                    case false => controllers.responsiblepeople.routes.PersonNameController.get(index+1, false, None).toString
                 },
                 removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
             )
@@ -71,6 +71,10 @@
             <h2>@Messages("responsiblepeople.check_your_answers.complete")</h2>
         }
         @rpList(responsiblePeopleComplete)
+    }
+
+    @if(responsiblePeopleComplete.isEmpty && responsiblePeopleIncomplete.isEmpty) {
+        <p>@Messages("responsiblepeople.whomustregister.nopeople")</p>
     }
 
     @if(ApplicationConfig.hasAcceptedToggle) {
