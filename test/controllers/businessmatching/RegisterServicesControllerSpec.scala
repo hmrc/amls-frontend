@@ -336,8 +336,38 @@ class RegisterServicesControllerSpec extends AmlsSpec
     }
 
     "post" must {
+      "Do nothing to non-existing section data" when {
+        "ASP is not selected, and was not previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Asp.key), any())(any(), any(), any())
+        }
+
+        "EAB is not selected, but was previously" in pending
+        "HVD is not selected, but was previously" in pending
+        "MSB is not selected, but was previously" in pending
+        "TCSP is not selected, but was previously" in pending
+      }
+
       "Remove existing section data " when {
-        "ASP is not selected, but was previously" in pending
+        "ASP is not selected, but was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(1)).save(eqTo(Asp.key), any())(any(), any(), any())
+        }
+
         "EAB is not selected, but was previously" in pending
         "HVD is not selected, but was previously" in pending
         "MSB is not selected, but was previously" in pending

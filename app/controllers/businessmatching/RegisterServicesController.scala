@@ -17,12 +17,12 @@
 package controllers.businessmatching
 
 import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.asp.Asp
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.responsiblepeople.ResponsiblePerson
 import services.StatusService
@@ -88,6 +88,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
+              _ <- removeAspIfNotSelectedAndPreviouslySelected(businessMatching.activities, savedModel.businessActivities)
               // Add a removal clear section here....
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
@@ -114,6 +115,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .accountantForAMLSRegulations(None)
       .taxMatters(None)
       .copy(hasAccepted = true)
+
+  private def removeAspIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Option[models.businessmatching.BusinessActivities], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val aspPreviouslySelected = previousBusinessActivities.get.businessActivities.contains(AccountancyServices)
+    val aspCurrentlySelected = currentBusinessActivities.contains(AccountancyServices)
+    if (aspPreviouslySelected && !aspCurrentlySelected) {
+      dataCacheConnector.save(Asp.key, Asp())
+    } else {
+      Future.successful(None)
+    }
+  }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) = {
