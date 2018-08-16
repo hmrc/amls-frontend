@@ -32,7 +32,7 @@ class who_must_registerSpec extends AmlsSpec with MustMatchers {
     "Have the correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.who_must_register(1)
 
-      doc.title must be(Messages("responsiblepeople.whomustregister.title") +
+      doc.title must be(Messages("responsiblepeople.whomustregister.ymr") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -41,7 +41,7 @@ class who_must_registerSpec extends AmlsSpec with MustMatchers {
     "Have the correct Headings" in new ViewFixture{
       def view = views.html.responsiblepeople.who_must_register(1)
 
-      heading.html must be (Messages("responsiblepeople.whomustregister.title"))
+      heading.html must be (Messages("responsiblepeople.whomustregister.ymr"))
       subHeading.html must include (Messages("summary.responsiblepeople"))
     }
 
@@ -52,6 +52,8 @@ class who_must_registerSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("responsiblepeople.whomustregister.line_1"))
       html must include(Messages("responsiblepeople.whomustregister.line_2"))
       html must include(Messages("responsiblepeople.whomustregister.line_3"))
+      html must include(Messages("responsiblepeople.whomustregister.line_4"))
+      html must include(Messages("responsiblepeople.whomustregister.line_5"))
 
       html must include(Messages("main.sidebar.title"))
       html must include(Messages("main.sidebar.information"))
