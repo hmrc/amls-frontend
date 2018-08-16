@@ -88,8 +88,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- removeAspIfNotSelectedAndPreviouslySelected(businessMatching.activities, savedModel.businessActivities)
-              // Add a removal clear section here....
+              _ <- removeAspIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -116,8 +116,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .taxMatters(None)
       .copy(hasAccepted = true)
 
-  private def removeAspIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Option[models.businessmatching.BusinessActivities], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    val aspPreviouslySelected = previousBusinessActivities.get.businessActivities.contains(AccountancyServices)
+  private def removeAspIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val aspPreviouslySelected = previousBusinessActivities.contains(AccountancyServices)
     val aspCurrentlySelected = currentBusinessActivities.contains(AccountancyServices)
     if (aspPreviouslySelected && !aspCurrentlySelected) {
       dataCacheConnector.save(Asp.key, Asp())
