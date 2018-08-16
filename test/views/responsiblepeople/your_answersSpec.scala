@@ -36,11 +36,11 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.your_answers(Seq((ResponsiblePerson(),0)), Seq((ResponsiblePerson(),0)))
 
-      doc.title must be(Messages("title.ya") +
+      doc.title must be(Messages("responsiblepeople.whomustregister.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("title.ya"))
+      heading.html must be(Messages("responsiblepeople.whomustregister.title"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
 
       doc.getElementsByAttributeValue("id", "addResponsiblePerson") must not be empty
