@@ -78,7 +78,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     }
 
     "continue to show the correct view" when {
-      "application is in variation mode but the service has just been added" in new Fixture {
+      "application is in variation mode and a service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
@@ -89,47 +89,15 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
       }
     }
 
-
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-        mockIsNewActivity(false)
+    "continue to show the correct view" when {
+      "application is in variation mode and no service has been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+        mockIsNewActivity(false)
 
         val result = controller.get()(request)
-        redirectLocation(result) mustBe Some(routes.SummaryController.get().url)
-      }
-    }
-
-    "redirect to CETransactionsInNext12Months" when {
-      "page is not editable and CurrencyExchange has been added" in new Fixture {
-        mockIsNewActivity(false)
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(CurrencyExchange)))))
-
-        val result = controller.get()(request)
-        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
-      }
-    }
-
-    "redirect to CETransactionsInNext12Months" when {
-      "page is not editable and CurrencyExchange and ForeignExchange has been added" in new Fixture {
-        mockIsNewActivity(false)
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(CurrencyExchange, ForeignExchange)))))
-
-        val result = controller.get()(request)
-        redirectLocation(result) mustBe Some(routes.CETransactionsInNext12MonthsController.get().url)
-      }
-    }
-
-    "redirect to FXTransactionsInNext12Months" when {
-      "page is not editable and ForeignExchange has been added" in new Fixture {
-        mockIsNewActivity(false)
-        mockApplicationStatus(SubmissionDecisionApproved)
-        mockCacheFetch(Some(ServiceChangeRegister(None, Some(Set(ForeignExchange)))))
-
-        val result = controller.get()(request)
-        redirectLocation(result) mustBe Some(routes.FXTransactionsInNext12MonthsController.get().url)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("msb.send.the.largest.amounts.of.money.title"))
       }
     }
 

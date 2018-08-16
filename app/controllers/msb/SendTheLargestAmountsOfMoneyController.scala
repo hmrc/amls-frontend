@@ -40,22 +40,13 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-      ControllerHelper.allowedToEdit(MsbActivity, Some(TransmittingMoney)) flatMap {
-        case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-          response =>
-            val form: Form2[SendTheLargestAmountsOfMoney] = (for {
-              msb <- response
-              amount <- msb.sendTheLargestAmountsOfMoney
-            } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-            Ok(send_largest_amounts_of_money(form, edit))
-        }
-        case _ => cacheConnector.fetch[ServiceChangeRegister](ServiceChangeRegister.key) map {
-          case Some(r) if r.addedSubSectors.fold(false)(_.contains(CurrencyExchange)) =>
-            Redirect(routes.CETransactionsInNext12MonthsController.get(edit))
-          case Some(r) if r.addedSubSectors.fold(false)(_.contains(ForeignExchange)) =>
-            Redirect(routes.FXTransactionsInNext12MonthsController.get(edit))
-          case _ => Redirect(routes.SummaryController.get())
-        }
+      cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+        response =>
+          val form: Form2[SendTheLargestAmountsOfMoney] = (for {
+            msb <- response
+            amount <- msb.sendTheLargestAmountsOfMoney
+          } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
+          Ok(send_largest_amounts_of_money(form, edit))
       }
   }
 
