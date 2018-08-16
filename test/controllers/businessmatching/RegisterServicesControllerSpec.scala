@@ -21,7 +21,7 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
-import models.asp.{Asp, PayrollServices, ServicesOfBusiness}
+import models.asp.Asp
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.estateagentbusiness.EstateAgentBusiness
@@ -45,8 +45,8 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
-import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
+import scala.concurrent.Future
 
 class RegisterServicesControllerSpec extends AmlsSpec
   with MockitoSugar
@@ -511,7 +511,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
         "TCSP is selected and was previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
-          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
 
           when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
 

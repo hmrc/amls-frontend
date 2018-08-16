@@ -33,6 +33,10 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching._
 import models.businessactivities.BusinessActivities
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
+import models.tcsp.Tcsp
 
 import scala.concurrent.Future
 
@@ -90,6 +94,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
               _ <- removeAspIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
                 savedModel.businessActivities)
+              _ <- removeEabIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                savedModel.businessActivities)
+              _ <- removeHvdIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                savedModel.businessActivities)
+              _ <- removeMsbIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                savedModel.businessActivities)
+              _ <- removeTcspIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -121,6 +133,46 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     val aspCurrentlySelected = currentBusinessActivities.contains(AccountancyServices)
     if (aspPreviouslySelected && !aspCurrentlySelected) {
       dataCacheConnector.save(Asp.key, Asp())
+    } else {
+      Future.successful(None)
+    }
+  }
+
+  private def removeEabIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val eabPreviouslySelected = previousBusinessActivities.contains(EstateAgentBusinessService)
+    val eabCurrentlySelected = currentBusinessActivities.contains(EstateAgentBusinessService)
+    if (eabPreviouslySelected && !eabCurrentlySelected) {
+      dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+    } else {
+      Future.successful(None)
+    }
+  }
+
+  private def removeHvdIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val hvdPreviouslySelected = previousBusinessActivities.contains(HighValueDealing)
+    val hvdCurrentlySelected = currentBusinessActivities.contains(HighValueDealing)
+    if (hvdPreviouslySelected && !hvdCurrentlySelected) {
+      dataCacheConnector.save(Hvd.key, Hvd())
+    } else {
+      Future.successful(None)
+    }
+  }
+
+  private def removeMsbIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val msbPreviouslySelected = previousBusinessActivities.contains(MoneyServiceBusiness)
+    val msbCurrentlySelected = currentBusinessActivities.contains(MoneyServiceBusiness)
+    if (msbPreviouslySelected && !msbCurrentlySelected) {
+      dataCacheConnector.save(MSBModel.key, MSBModel())
+    } else {
+      Future.successful(None)
+    }
+  }
+
+  private def removeTcspIfNotSelectedAndPreviouslySelected(previousBusinessActivities: Set[BusinessActivity], currentBusinessActivities: Set[BusinessActivity])(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val tcspPreviouslySelected = previousBusinessActivities.contains(TrustAndCompanyServices)
+    val tcspCurrentlySelected = currentBusinessActivities.contains(TrustAndCompanyServices)
+    if (tcspPreviouslySelected && !tcspCurrentlySelected) {
+      dataCacheConnector.save(Tcsp.key, Tcsp())
     } else {
       Future.successful(None)
     }
