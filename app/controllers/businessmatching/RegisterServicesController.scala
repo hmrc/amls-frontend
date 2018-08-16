@@ -88,6 +88,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
+              // Add a removal clear section here....
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){

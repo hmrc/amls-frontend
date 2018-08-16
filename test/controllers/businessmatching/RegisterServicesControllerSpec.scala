@@ -21,9 +21,14 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
+import models.asp.{Asp, PayrollServices, ServicesOfBusiness}
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
+import models.estateagentbusiness.EstateAgentBusiness
+import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
+import models.tcsp.Tcsp
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -38,7 +43,7 @@ import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -326,6 +331,78 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           }
 
+        }
+      }
+    }
+
+    "post" must {
+      "Remove existing section data " when {
+        "ASP is not selected, but was previously" in pending
+        "EAB is not selected, but was previously" in pending
+        "HVD is not selected, but was previously" in pending
+        "MSB is not selected, but was previously" in pending
+        "TCSP is not selected, but was previously" in pending
+      }
+
+      "Must not remove existing section data " when {
+        "ASP is selected and was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(AccountancyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Asp.key), any())(any(), any(), any())
+        }
+
+        "EAB is selected and was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(EstateAgentBusinessService))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "03")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
+        }
+
+        "HVD is selected and was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(HighValueDealing))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "04")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Hvd.key), any())(any(), any(), any())
+        }
+
+        "MSB is selected and was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(MoneyServiceBusiness))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "05")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(MSBModel.key), any())(any(), any(), any())
+        }
+
+        "TCSP is selected and was previously" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "07")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Tcsp.key), any())(any(), any(), any())
         }
       }
     }
