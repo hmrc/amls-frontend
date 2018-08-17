@@ -392,7 +392,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       }
 
       "Remove supervision section data" when {
-        "jgr ASP deselected, TCSP not selected" in new Fixture {
+        "ASP deselected, TCSP not selected" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
           val newRequest = request.withFormUrlEncodedBody(
             "businessActivities" -> "02"
