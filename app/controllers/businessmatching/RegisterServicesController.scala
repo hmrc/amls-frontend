@@ -122,24 +122,10 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
     val diffActivities = (previousBusinessActivities diff currentBusinessActivities)
     val ret = Future.sequence(diffActivities.map(businessMatchingService.clearSection(_)))
-    val previousHasASPTCSP = ASPTCSPCheck(previousBusinessActivities)
-    val currentHasASPTCSP = ASPTCSPCheck(currentBusinessActivities)
-    val diffHasASPTCSP = ASPTCSPCheck(diffActivities)
 
-    // If we haven't had a previous ASPTCSP, then don't worry
-    if(previousHasASPTCSP) {
+    if(hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities) && hasASPorTCSP(diffActivities))
+      dataCacheConnector.save[Supervision](Supervision.key, Supervision())
 
-      // If we still have one, then don't worry
-
-      if(!currentHasASPTCSP) {
-
-        // If we have one on the deleted list, then clear the supervision section
-
-        if(diffHasASPTCSP) {
-          dataCacheConnector.save[Supervision](Supervision.key, Supervision())
-        }
-      }
-    }
     ret
   }
 
@@ -212,7 +198,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def ASPTCSPCheck(activities:Set[BusinessActivity]) = {
+  private def hasASPorTCSP(activities:Set[BusinessActivity]) = {
     val containsASP = activities.contains(AccountancyServices)
     val containsTCSP = activities.contains(TrustAndCompanyServices)
     (containsASP | containsTCSP)
