@@ -21,14 +21,10 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
-import models.asp.Asp
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
-import models.tcsp.Tcsp
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -96,8 +92,13 @@ class RegisterServicesControllerSpec extends AmlsSpec
       controller.businessMatchingService.updateModel(any())(any(),any(),any())
     } thenReturn OptionT.some[Future, CacheMap](mockCacheMap)
 
+    when {
+      controller.businessMatchingService.clearSection(any())(any(),any())
+    } thenReturn Future.successful(mockCacheMap)
+
     val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
+
 
     val fitAndProperResponsiblePeople = Seq(
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
@@ -346,7 +347,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Asp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(AccountancyServices))(any(), any())
         }
 
         "EAB is not selected, and was not previously" in new Fixture {
@@ -358,7 +359,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
         }
 
         "HVD is not selected, and was not previously" in new Fixture {
@@ -370,7 +371,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Hvd.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(HighValueDealing))(any(), any())
         }
 
         "MSB is not selected, and was not previously" in new Fixture {
@@ -382,7 +383,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(MSBModel.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
         }
 
         "TCSP is not selected, and was not previously" in new Fixture {
@@ -394,7 +395,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Tcsp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
         }
       }
 
@@ -408,7 +409,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Asp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(AccountancyServices))(any(), any())
         }
 
         "EAB is not selected, but was previously" in new Fixture {
@@ -420,7 +421,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
         }
 
         "HVD is not selected, but was previously" in new Fixture {
@@ -432,7 +433,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Hvd.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(HighValueDealing))(any(), any())
         }
 
         "MSB is not selected, but was previously" in new Fixture {
@@ -444,7 +445,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(MSBModel.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
         }
 
         "TCSP is not selected, but was previously" in new Fixture {
@@ -456,7 +457,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(1)).save(eqTo(Tcsp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(1)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
         }
       }
 
@@ -470,7 +471,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Asp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(AccountancyServices))(any(), any())
         }
 
         "EAB is selected and was previously" in new Fixture {
@@ -482,7 +483,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(EstateAgentBusiness.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(EstateAgentBusinessService))(any(), any())
         }
 
         "HVD is selected and was previously" in new Fixture {
@@ -494,7 +495,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Hvd.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(HighValueDealing))(any(), any())
         }
 
         "MSB is selected and was previously" in new Fixture {
@@ -506,7 +507,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(MSBModel.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(MoneyServiceBusiness))(any(), any())
         }
 
         "TCSP is selected and was previously" in new Fixture {
@@ -518,7 +519,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
           val result = controller.post()(newRequest)
 
           status(result) must be(SEE_OTHER)
-          verify(controller.dataCacheConnector, times(0)).save(eqTo(Tcsp.key), any())(any(), any(), any())
+          verify(controller.businessMatchingService, times(0)).clearSection(eqTo(TrustAndCompanyServices))(any(), any())
         }
       }
     }

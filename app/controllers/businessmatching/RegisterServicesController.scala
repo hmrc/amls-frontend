@@ -144,7 +144,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                                                                      clearedModel: T
                                                                              )(implicit ac: AuthContext, hc: HeaderCarrier, format: Format[T]) = {
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
-      dataCacheConnector.save(key, clearedModel).map(Some(_))
+      businessMatchingService.clearSection(businessActivity)
     } else {
       Future.successful(None)
     }
