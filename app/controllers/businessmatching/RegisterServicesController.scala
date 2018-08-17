@@ -16,14 +16,15 @@
 
 package controllers.businessmatching
 
-import javax.inject.{Inject, Singleton}
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.asp.Asp
+import javax.inject.{Inject, Singleton}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -32,12 +33,6 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching._
-import models.businessactivities.BusinessActivities
-import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.tcsp.Tcsp
-import play.api.libs.json.Format
 
 import scala.concurrent.Future
 
@@ -93,7 +88,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- removeBusinessActivitiesSectionsIfNotSelectedAndPreviouslySelected(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+              _ <- clearRemovedSections(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
                   savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
@@ -121,28 +116,24 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .taxMatters(None)
       .copy(hasAccepted = true)
 
-  private def removeBusinessActivitiesSectionsIfNotSelectedAndPreviouslySelected(
-                                                                                        previousBusinessActivities: Set[BusinessActivity],
-                                                                                        currentBusinessActivities: Set[BusinessActivity]
-                                                                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+  private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
+                                   currentBusinessActivities: Set[BusinessActivity]
+                                  )(implicit ac: AuthContext, hc: HeaderCarrier) = {
     val result: Future[Any] = for {
-      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Asp](previousBusinessActivities, currentBusinessActivities, AccountancyServices, Asp.key, Asp())
-      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[EstateAgentBusiness](previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService, EstateAgentBusiness.key, EstateAgentBusiness())
-      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Hvd](previousBusinessActivities, currentBusinessActivities, HighValueDealing, Hvd.key, Hvd())
-      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[MSBModel](previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness, MSBModel.key, MSBModel())
-      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Tcsp](previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices, Tcsp.key, Tcsp())
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, AccountancyServices)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, HighValueDealing)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
     } yield true
 
     result
   }
 
-  private def removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[T](
-                                                                                     previousBusinessActivities: Set[BusinessActivity],
-                                                                                     currentBusinessActivities: Set[BusinessActivity],
-                                                                                     businessActivity: BusinessActivity,
-                                                                                     key: String,
-                                                                                     clearedModel: T
-                                                                             )(implicit ac: AuthContext, hc: HeaderCarrier, format: Format[T]) = {
+  private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
+                                    currentBusinessActivities: Set[BusinessActivity],
+                                    businessActivity: BusinessActivity
+                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
       businessMatchingService.clearSection(businessActivity)
     } else {
