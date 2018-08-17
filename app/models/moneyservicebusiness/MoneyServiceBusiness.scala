@@ -61,11 +61,12 @@ case class MoneyServiceBusiness(
   def sendMoneyToOtherCountry(p: SendMoneyToOtherCountry): MoneyServiceBusiness =
     this.copy(sendMoneyToOtherCountry = Some(p), hasChanged = hasChanged || !this.sendMoneyToOtherCountry.contains(p), hasAccepted = this.sendMoneyToOtherCountry.contains(p))
 
-  def sendTheLargestAmountsOfMoney(p: SendTheLargestAmountsOfMoney): MoneyServiceBusiness =
-    this.copy(sendTheLargestAmountsOfMoney = Some(p), hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.contains(p), hasAccepted = this.sendTheLargestAmountsOfMoney.contains(p))
+  def sendTheLargestAmountsOfMoney(p: Option[SendTheLargestAmountsOfMoney]): MoneyServiceBusiness =
+    this.copy(sendTheLargestAmountsOfMoney = p, hasChanged = hasChanged || !this.sendTheLargestAmountsOfMoney.equals(p),
+      hasAccepted = this.sendTheLargestAmountsOfMoney.equals(p))
 
-  def mostTransactions(p: MostTransactions): MoneyServiceBusiness =
-    this.copy(mostTransactions = Some(p), hasChanged = hasChanged || !this.mostTransactions.contains(p), hasAccepted = this.mostTransactions.contains(p))
+  def mostTransactions(p: Option[MostTransactions]): MoneyServiceBusiness =
+    this.copy(mostTransactions = p, hasChanged = hasChanged || !this.mostTransactions.equals(p), hasAccepted = this.mostTransactions.equals(p))
 
   def transactionsInNext12Months(p: TransactionsInNext12Months): MoneyServiceBusiness =
     this.copy(transactionsInNext12Months = Some(p), hasChanged = hasChanged || !this.transactionsInNext12Months.contains(p), hasAccepted = this.transactionsInNext12Months.contains(p))

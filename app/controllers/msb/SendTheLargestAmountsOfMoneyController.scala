@@ -69,7 +69,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
             msb <-
             cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)
             _ <- cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-              msb.sendTheLargestAmountsOfMoney(data)
+              msb.sendTheLargestAmountsOfMoney(Some(data))
             )
           } yield edit match {
             case true if msb.mostTransactions.isDefined =>

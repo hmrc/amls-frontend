@@ -152,6 +152,8 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val outgoingModel = incomingModel.copy(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+        sendTheLargestAmountsOfMoney = None,
+        mostTransactions = None,
         hasChanged = true
       )
 
@@ -163,7 +165,6 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
-
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

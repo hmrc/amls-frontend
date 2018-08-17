@@ -73,7 +73,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
                 register <- cacheMap.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
                 cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
-                  msb.mostTransactions(data)
+                  msb.mostTransactions(Some(data))
                 ) flatMap {
                   _ => routing(services.msbServices, register, msb, edit)
                 }
