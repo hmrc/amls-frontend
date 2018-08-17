@@ -44,7 +44,7 @@ class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with Scal
       "load the page" in new Fixture {
         val result = controller.get(1)(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("responsiblepeople.whomustregister.title"))
+        contentAsString(result) must include(Messages("responsiblepeople.whomustregister.ymr"))
       }
     }
   }

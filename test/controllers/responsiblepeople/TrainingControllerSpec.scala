@@ -144,7 +144,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
         }
 
         "edit is false" must {
-          "redirect to PersonRegisteredController when training is yes" in new Fixture {
+          "redirect to DeatiledAnswersController when training is yes" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -156,7 +156,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PersonRegisteredController.get(recordId).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, true).url))
           }
 
           "redirect to FitAndProperController when businessActivities includes TrustAndCompanyServices" in new Fixture {

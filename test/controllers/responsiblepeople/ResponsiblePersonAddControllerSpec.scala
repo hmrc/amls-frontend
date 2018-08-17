@@ -61,7 +61,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
       ("guidanceRequested", "fromDeclaration", "expectedRedirect"),
       (true, Some(`flowFromDeclaration`), controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1, Some(`flowFromDeclaration`))),
       (true, None, controllers.responsiblepeople.routes.WhoMustRegisterController.get(currentCount + 1)),
-      (false, None, controllers.responsiblepeople.routes.PersonNameController.get(currentCount + 1, false))
+      (false, None, controllers.responsiblepeople.routes.WhatYouNeedController.get(currentCount + 1))
     )
   }
 

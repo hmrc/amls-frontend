@@ -55,7 +55,7 @@ class YourAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include (s"${Messages("title.ya")} - ${Messages("summary.responsiblepeople")}")
+        contentAsString(result) must include (s"${Messages("responsiblepeople.whomustregister.title")} - ${Messages("summary.responsiblepeople")}")
       }
 
       "show the 'Add a responsible person' link" in new Fixture {
