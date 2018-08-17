@@ -119,19 +119,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    val result: Future[Any] = Future.successful(BusinessMatchingActivities.all.map(clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, _)))
-    result
-  }
-
-  private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
-                                    currentBusinessActivities: Set[BusinessActivity],
-                                    businessActivity: BusinessActivity
-                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
-      businessMatchingService.clearSection(businessActivity)
-    } else {
-      Future.successful(None)
-    }
+    Future.successful((previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection(_)))
   }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
