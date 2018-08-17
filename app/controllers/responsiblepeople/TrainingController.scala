@@ -74,7 +74,7 @@ trait TrainingController extends RepeatingSection with BaseController {
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)),_,_,_,_, _, _, _)))
             if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
           => Redirect(routes.FitAndProperController.get(index, false, flow))
-          case (false, _) => Redirect(routes.PersonRegisteredController.get(index, flow))
+          case (false, _) => Redirect(routes.DetailedAnswersController.get(index, true, flow))
         }
       }
       case _ => Redirect(routes.PersonRegisteredController.get(index, flow))

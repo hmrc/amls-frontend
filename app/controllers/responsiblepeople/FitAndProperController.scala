@@ -65,7 +65,7 @@ class FitAndProperController @Inject()(
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false => Redirect(routes.PersonRegisteredController.get(index, flow))
+              case false => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
             }
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
