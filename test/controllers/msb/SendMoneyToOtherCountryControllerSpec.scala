@@ -16,6 +16,7 @@
 
 package controllers.msb
 
+import models.Country
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.moneyservicebusiness.{MoneyServiceBusiness, _}
@@ -136,7 +137,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       redirectLocation(result) must be(Some(controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get().url))
     }
 
-    "on valid post where the value is false (CE)" in new Fixture {
+    "on valid post where the value is false and was previously true" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody(
         "money" -> "false"
@@ -148,7 +149,20 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
         )
       ))
 
-      val incomingModel = MoneyServiceBusiness()
+      val incomingModel = MoneyServiceBusiness(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(true)),
+        sendTheLargestAmountsOfMoney = Some(
+          SendTheLargestAmountsOfMoney(
+            Country("United Kingdom", "GB")
+          )
+        ),
+        mostTransactions = Some(
+          MostTransactions(
+            Seq(Country("United Kingdom", "GB"))
+          )
+        ),
+        hasChanged = true
+      )
 
       val outgoingModel = incomingModel.copy(
         sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
@@ -165,6 +179,43 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
+      when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
+        (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+      val result = controller.post(false)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+    }
+
+    "on valid post where the value is false (CE)" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "money" -> "false"
+      )
+      val msbServices = Some(BusinessMatchingMsbServices(
+        Set(
+          TransmittingMoney,
+          CurrencyExchange
+        )
+      ))
+
+      val incomingModel = MoneyServiceBusiness()
+
+      val outgoingModel = incomingModel.copy(
+        sendMoneyToOtherCountry = Some(SendMoneyToOtherCountry(false)),
+        hasChanged = true
+      )
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(mockCacheMap.getEntry[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key))(any()))
+        .thenReturn(Some(incomingModel))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(msbServices = msbServices)))
+
 
       when(controller.dataCacheConnector.save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(outgoingModel))
         (any(), any(), any())).thenReturn(Future.successful(emptyCache))

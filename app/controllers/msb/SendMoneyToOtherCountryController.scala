@@ -65,15 +65,16 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                 register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
                 data.money match {
-                  case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb
-                    .sendMoneyToOtherCountry(data)) map {
-                      _ => routing(data.money, services.msbServices,register, msb, edit)
+                  case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
+                    _ => routing(data.money, services.msbServices,register, msb, edit)
                   }
-                  case _ => dataCacheConnector.save(MoneyServiceBusiness.key, msb
+                  case _ => val newModel = msb
                     .sendMoneyToOtherCountry(data)
                     .sendTheLargestAmountsOfMoney(None)
-                    .mostTransactions(None)) map {
-                      _ => routing(data.money, services.msbServices,register, msb, edit)
+                    .mostTransactions(None)
+
+                    dataCacheConnector.save(MoneyServiceBusiness.key, newModel) map {
+                    _ => routing(data.money, services.msbServices,register, newModel, edit)
                   }
                 }
               }
