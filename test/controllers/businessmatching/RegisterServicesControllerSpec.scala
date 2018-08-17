@@ -25,6 +25,7 @@ import models.businessactivities.{AccountantForAMLSRegulations, BusinessActiviti
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
+import models.supervision.Supervision
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -337,6 +338,219 @@ class RegisterServicesControllerSpec extends AmlsSpec
     }
 
     "post" must {
+      "Do nothing to non-existing supervision section data" when {
+        "ASP, TCSP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "02")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+        "ASP added, TCSP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "01")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+        "TCSP added, ASP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody("businessActivities" -> "06")
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+        "ASP, TCSP added" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "06"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+      }
+
+      "Remove supervision section data" when {
+        "jgr ASP deselected, TCSP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+        "TCSP deselected, ASP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "ASP, TCSP deselected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(1)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+       }
+
+      "Must not remove supervision section data" when {
+        "ASP selected, TCSP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "ASP selected, TCSP deselected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "TCSP selected, ASP not selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "06",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "TCSP selected, ASP deselected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "06",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+        }
+
+        "ASP, TCSP selected" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "06",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "ASP deselected, TCSP added" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, AccountancyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "06",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+
+        "TCSP deselected, ASP added" in new Fixture {
+          val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set(BillPaymentServices, TrustAndCompanyServices))), preAppComplete = true)
+          val newRequest = request.withFormUrlEncodedBody(
+            "businessActivities" -> "01",
+            "businessActivities" -> "02"
+          )
+
+          when(controller.businessMatchingService.getModel(any(), any(), any())).thenReturn(OptionT.some[Future, BusinessMatching](businessMatchingWithData))
+
+          val result = controller.post()(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          verify(controller.dataCacheConnector, times(0)).save(eqTo(Supervision.key), any())(any(), any(), any())
+
+        }
+      }
+
+
       "Do nothing to non-existing section data" when {
         "ASP is not selected, and was not previously" in new Fixture {
           val businessMatchingWithData = BusinessMatching(None, Some(BMBusinessActivities(businessActivities = Set())), preAppComplete = true)

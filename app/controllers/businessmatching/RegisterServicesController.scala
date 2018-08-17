@@ -26,6 +26,7 @@ import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
+import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -118,8 +119,29 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
-                                  )(implicit ac: AuthContext, hc: HeaderCarrier) =
-    Future.sequence((previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection(_)))
+                                  )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    val diffActivities = (previousBusinessActivities diff currentBusinessActivities)
+    val ret = Future.sequence(diffActivities.map(businessMatchingService.clearSection(_)))
+    val previousHasASPTCSP = ASPTCSPCheck(previousBusinessActivities)
+    val currentHasASPTCSP = ASPTCSPCheck(currentBusinessActivities)
+    val diffHasASPTCSP = ASPTCSPCheck(diffActivities)
+
+    // If we haven't had a previous ASPTCSP, then don't worry
+    if(previousHasASPTCSP) {
+
+      // If we still have one, then don't worry
+
+      if(!currentHasASPTCSP) {
+
+        // If we have one on the deleted list, then clear the supervision section
+
+        if(diffHasASPTCSP) {
+          dataCacheConnector.save[Supervision](Supervision.key, Supervision())
+        }
+      }
+    }
+    ret
+  }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) = {
@@ -188,6 +210,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       updatedBusinessActivities
     }
 
+  }
+
+  private def ASPTCSPCheck(activities:Set[BusinessActivity]) = {
+    val containsASP = activities.contains(AccountancyServices)
+    val containsTCSP = activities.contains(TrustAndCompanyServices)
+    (containsASP | containsTCSP)
   }
 
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
