@@ -125,11 +125,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                                                                         previousBusinessActivities: Set[BusinessActivity],
                                                                                         currentBusinessActivities: Set[BusinessActivity]
                                                                                 )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Asp](previousBusinessActivities, currentBusinessActivities, AccountancyServices, Asp.key, Asp())
-    removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[EstateAgentBusiness](previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService, EstateAgentBusiness.key, EstateAgentBusiness())
-    removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Hvd](previousBusinessActivities, currentBusinessActivities, HighValueDealing, Hvd.key, Hvd())
-    removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[MSBModel](previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness, MSBModel.key, MSBModel())
-    removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Tcsp](previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices, Tcsp.key, Tcsp())
+    val result: Future[Any] = for {
+      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Asp](previousBusinessActivities, currentBusinessActivities, AccountancyServices, Asp.key, Asp())
+      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[EstateAgentBusiness](previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService, EstateAgentBusiness.key, EstateAgentBusiness())
+      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Hvd](previousBusinessActivities, currentBusinessActivities, HighValueDealing, Hvd.key, Hvd())
+      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[MSBModel](previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness, MSBModel.key, MSBModel())
+      _ <- removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[Tcsp](previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices, Tcsp.key, Tcsp())
+    } yield true
+
+    result
   }
 
   private def removeBusinessActivitySectionIfNotSelectedAndPreviouslySelected[T](
@@ -140,7 +144,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                                                                      clearedModel: T
                                                                              )(implicit ac: AuthContext, hc: HeaderCarrier, format: Format[T]) = {
     if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
-      dataCacheConnector.save(key, clearedModel)
+      dataCacheConnector.save(key, clearedModel).map(Some(_))
     } else {
       Future.successful(None)
     }
