@@ -119,14 +119,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    val result: Future[Any] = for {
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, AccountancyServices)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, HighValueDealing)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
-      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
-    } yield true
-
+    val result: Future[Any] = Future.successful(BusinessMatchingActivities.all.map(clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, _)))
     result
   }
 
