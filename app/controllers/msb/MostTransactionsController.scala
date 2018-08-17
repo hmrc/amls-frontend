@@ -44,16 +44,13 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
       implicit request =>
-        ControllerHelper.allowedToEdit(MsbActivity, Some(TransmittingMoney)) flatMap {
-          case true => cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-            response =>
-              val form = (for {
-                msb <- response
-                transactions <- msb.mostTransactions
-              } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-              Ok(views.html.msb.most_transactions(form, edit))
-          }
-          case false => Future.successful(NotFound(notFoundView))
+        cacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+          response =>
+            val form = (for {
+              msb <- response
+              transactions <- msb.mostTransactions
+            } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
+            Ok(views.html.msb.most_transactions(form, edit))
         }
   }
 
