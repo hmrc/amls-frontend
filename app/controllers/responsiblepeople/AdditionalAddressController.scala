@@ -98,7 +98,7 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
         })
     } map { _ =>
       data.timeAtAddress match {
-        case Some(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+        case Some(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
         case _ => Redirect(routes.TimeAtAdditionalAddressController.get(index, edit, flow))
       }
     }

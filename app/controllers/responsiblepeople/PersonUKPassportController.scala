@@ -79,9 +79,9 @@ class PersonUKPassportController @Inject()(
     val responsiblePerson = rp(index - 1)
     data match {
       case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
       case UKPassportYes(_) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportNo if edit && responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case UKPassportNo if edit && responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index, flow))
       case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, flow))
     }
   }

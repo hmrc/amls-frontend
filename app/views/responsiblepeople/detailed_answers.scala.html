@@ -22,7 +22,7 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(model: Option[ResponsiblePerson], idx: Int, fromYourAnswers: Boolean, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePerson], idx: Int, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
@@ -416,26 +416,7 @@
 
     }
 
-    @if(ApplicationConfig.hasAcceptedToggle) {
-        @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, fromYourAnswers, flow)) {
-            @submit(false, Some(Messages("button.confirmandcontinue")), false)
-        }
-    } else {
-        @(fromYourAnswers, flow) match {
-            case (true, None) => {
-                @anchor(
-                    attrHref = controllers.responsiblepeople.routes.YourAnswersController.get().toString,
-                    attrRole = true,
-                    linkText = Messages("button.confirmandcontinue")
-                )
-            }
-            case (_,_) => {
-                @anchor(
-                    attrHref = controllers.responsiblepeople.routes.SummaryController.get(flow).toString,
-                    attrRole = true,
-                    linkText = Messages("button.confirmandcontinue")
-                )
-            }
-        }
+    @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, flow)) {
+        @submit(false, Some(Messages("button.confirmandcontinue")), false)
     }
 }

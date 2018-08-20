@@ -52,8 +52,8 @@ POST        /nationality/:index                                    controllers.r
 GET         /check-your-answers                                    @controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
 POST        /check-your-answers                                    @controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
 
-GET         /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
-POST        /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, fromYourAnswers: Boolean ?= false, flow: Option[String] ?= None)
+GET         /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, flow: Option[String] ?= None)
+POST        /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, flow: Option[String] ?= None)
 
 GET         /additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

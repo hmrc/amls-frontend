@@ -86,10 +86,10 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     val existingPassport = rp(index - 1).ukPassport
 
     isUKResidence match {
-      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case UKResidence(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
       case UKResidence(_) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
       case NonUKResidence if existingPassport.isEmpty => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
-      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case NonUKResidence if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
       case NonUKResidence => Redirect(routes.PersonUKPassportController.get(index, edit, flow))
     }
 

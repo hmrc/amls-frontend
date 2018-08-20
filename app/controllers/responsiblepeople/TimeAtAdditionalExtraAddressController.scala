@@ -83,7 +83,7 @@ trait TimeAtAdditionalExtraAddressController extends RepeatingSection with BaseC
       )
     } map { _ =>
       edit match {
-        case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+        case true => Redirect(routes.DetailedAnswersController.get(index, flow))
         case false => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       }
     }

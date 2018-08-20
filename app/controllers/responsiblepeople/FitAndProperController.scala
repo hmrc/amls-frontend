@@ -64,7 +64,7 @@ class FitAndProperController @Inject()(
                 rp.hasAlreadyPassedFitAndProper(Some(data))
               }
             } yield
-              Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              Redirect(routes.DetailedAnswersController.get(index, flow))
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }

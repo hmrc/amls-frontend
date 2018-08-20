@@ -101,7 +101,7 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                          flow: Option[String])(implicit request:Request[AnyContent]) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
-      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
       case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
     }
   }

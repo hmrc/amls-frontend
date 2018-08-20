@@ -67,7 +67,7 @@ class LegalNameController @Inject()(val dataCacheConnector: DataCacheConnector,
               }
             } yield edit match {
               case true if data.hasPreviousName.contains(true) => Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
-              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
               case false if data.hasPreviousName.contains(true) =>
                 Redirect(routes.LegalNameChangeDateController.get(index, edit, flow))
               case _ => Redirect(routes.KnownByController.get(index, edit, flow))

@@ -65,7 +65,7 @@ trait NationalityController extends RepeatingSection with BaseController {
                   rp.personResidenceType(residenceType)
                 }
               } yield edit match {
-                case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+                case true => Redirect(routes.DetailedAnswersController.get(index, flow))
                 case false => Redirect(routes.ContactDetailsController.get(index, edit, flow))
               }
             }.recoverWith {

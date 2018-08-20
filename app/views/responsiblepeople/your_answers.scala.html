@@ -30,7 +30,7 @@
             @checkYourAnswersListing(
                 item = pn.fullName,
                 editUrl = rp.isComplete match {
-                    case true => controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1, true).toString
+                    case true => controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).toString
                     case false => controllers.responsiblepeople.routes.PersonNameController.get(index+1, false, None).toString
                 },
                 removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
