@@ -120,13 +120,13 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    val diffActivities = (previousBusinessActivities diff currentBusinessActivities)
-    val ret = Future.sequence(diffActivities.map(businessMatchingService.clearSection(_)))
-
-    if(hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities) && hasASPorTCSP(diffActivities))
-      dataCacheConnector.save[Supervision](Supervision.key, Supervision())
-
-    ret
+    val sectionsToRemove = if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
+      (previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection) +
+              dataCacheConnector.save[Supervision](Supervision.key, Supervision())
+    } else {
+      (previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection)
+    }
+    Future.sequence(sectionsToRemove)
   }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
@@ -201,7 +201,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def hasASPorTCSP(activities:Set[BusinessActivity]) = {
     val containsASP = activities.contains(AccountancyServices)
     val containsTCSP = activities.contains(TrustAndCompanyServices)
-    (containsASP | containsTCSP)
+    containsASP | containsTCSP
   }
 
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =

@@ -100,7 +100,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
-
     val fitAndProperResponsiblePeople = Seq(
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
       responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
