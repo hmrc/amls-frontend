@@ -100,9 +100,6 @@ POST        /fit-and-proper/:index                                 @controllers.
 GET         /contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.get(index:Int, flow: Option[String] ?= None)
-POST        /responsible-person-registered/:index                  controllers.responsiblepeople.PersonRegisteredController.post(index:Int, flow: Option[String] ?= None)
-
 GET         /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean, flow: Option[String] ?= None)
 POST        /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, flow: Option[String] ?= None)
 

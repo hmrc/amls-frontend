@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
-import models.responsiblepeople.{PersonResidenceType, ResponsiblePerson, Training}
+import models.responsiblepeople.{ResponsiblePerson, Training}
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{ControllerHelper, RepeatingSection}
@@ -77,7 +77,7 @@ trait TrainingController extends RepeatingSection with BaseController {
           case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
       }
-      case _ => Redirect(routes.PersonRegisteredController.get(index, flow))
+      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
   }
 }
