@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePerson
-import utils.{RepeatingSection, StatusConstants}
+import utils.RepeatingSection
 import views.html.responsiblepeople.your_answers
 
 trait YourAnswersController extends RepeatingSection with BaseController {
@@ -32,8 +32,7 @@ trait YourAnswersController extends RepeatingSection with BaseController {
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
             case Some(data) => {
-              val s = data.zipWithIndex
-                .filterNot(_._1.status.contains(StatusConstants.Deleted))
+              val s = ResponsiblePerson.filterWithIndex(data)
                 .partition(_._1.isComplete)
 
               Ok(your_answers(s._1, s._2))
