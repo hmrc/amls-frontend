@@ -77,7 +77,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
     }
 
-    "continue to show the correct view" when {
+    "render the SendTheLargestAmountOfMoney view" when {
       "application is in variation mode and a service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
@@ -87,9 +87,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
         status(result) must be(OK)
         contentAsString(result) must include(Messages("msb.send.the.largest.amounts.of.money.title"))
       }
-    }
 
-    "continue to show the correct view" when {
       "application is in variation mode and no service has been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))

@@ -144,8 +144,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
       )
       val msbServices = Some(BusinessMatchingMsbServices(
         Set(
-          TransmittingMoney,
-          CurrencyExchange
+          TransmittingMoney
         )
       ))
 
@@ -185,7 +184,7 @@ class SendMoneyToOtherCountryControllerSpec extends AmlsSpec with MockitoSugar {
 
       val result = controller.post(false)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.msb.routes.CETransactionsInNext12MonthsController.get().url))
+      redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
     }
 
     "on valid post where the value is false (CE)" in new Fixture {
