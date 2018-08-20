@@ -271,7 +271,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
               val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
             }
           }
           "time at address is ThreeYearsPlus" must {
@@ -296,7 +296,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
               val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+              redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
             }
           }
         }
@@ -427,7 +427,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1, true).url))
+                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
               }
             }
           }
@@ -533,7 +533,7 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
                 val result = timeAtAddressController.post(RecordId, true)(requestWithParams)
 
                 status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1, true).url))
+                redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
               }
             }
           }

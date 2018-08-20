@@ -127,7 +127,7 @@ class LegalNameChangeDateControllerSpec extends AmlsSpec with ScalaFutures {
 
             val result = controller.post(RecordId, true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
           }
         }
       }
