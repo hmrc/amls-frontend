@@ -14,12 +14,9 @@
  * limitations under the License.
  *@
 
-@import include._
+@@import include._
 @import include.forms2._
 @import models.responsiblepeople.ResponsiblePerson
-@import utils.StatusConstants
-@import forms.EmptyForm
-@import config.ApplicationConfig
 
 @(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson,Int)])(implicit request: Request[_],m:Messages)
 
@@ -77,16 +74,18 @@
         <p>@Messages("responsiblepeople.whomustregister.nopeople")</p>
     }
 
-    @if(ApplicationConfig.hasAcceptedToggle) {
-        @form(EmptyForm, controllers.responsiblepeople.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.returntoapplicationprogress")), false)
-        }
-    } else {
+    @if(responsiblePeopleComplete.nonEmpty && responsiblePeopleIncomplete.isEmpty) {
         @anchor(
             attrHref = controllers.routes.RegistrationProgressController.get().toString,
             attrRole = true,
             linkText = Messages("button.summary.acceptandcomplete")
         )
-
+    } else {
+        @anchor(
+            attrHref = controllers.routes.RegistrationProgressController.get().toString,
+            attrRole = true,
+            linkText = Messages("button.returntoapplicationprogress")
+        )
     }
+
 }

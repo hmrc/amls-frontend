@@ -22,8 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
-import play.api.Play
-import services.{AuthEnrolmentsService, StatusService}
+import services.StatusService
 import utils.{RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
@@ -61,7 +60,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
         def redirectAppropriately = complete match {
           case true => Redirect(routes.YourAnswersController.get())
-          case false => Redirect(routes.SummaryController.get(flow))
+          case false => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
 
         def removeWithoutDate = removeDataStrict[ResponsiblePerson](index) map { _ =>
