@@ -49,9 +49,6 @@ POST        /date-of-birth/:index                                  @controllers.
 GET         /nationality/:index                                    controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /nationality/:index                                    controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /check-your-answers                                    @controllers.responsiblepeople.SummaryController.get(flow: Option[String] ?= None)
-POST        /check-your-answers                                    @controllers.responsiblepeople.SummaryController.post(flow: Option[String] ?= None)
-
 GET         /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, flow: Option[String] ?= None)
 POST        /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, flow: Option[String] ?= None)
 
