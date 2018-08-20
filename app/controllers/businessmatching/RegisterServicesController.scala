@@ -30,6 +30,7 @@ import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
@@ -120,16 +121,35 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
                                    currentBusinessActivities: Set[BusinessActivity]
                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
-    val businessActivitiesWithSections: Set[BusinessActivity] = Set(AccountancyServices, EstateAgentBusinessService, HighValueDealing, MoneyServiceBusiness, TrustAndCompanyServices)
-    val diffActivities: Set[BusinessActivity] = (previousBusinessActivities diff currentBusinessActivities)
-//    val sectionsToRemove = if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
-//      (previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection) +
-//              dataCacheConnector.save[Supervision](Supervision.key, Supervision())
-//    } else {
-//      (previousBusinessActivities diff currentBusinessActivities).map(businessMatchingService.clearSection)
-//    }
-//    Future.sequence(sectionsToRemove)
-    Future.sequence((diffActivities intersect businessActivitiesWithSections).map(businessMatchingService.clearSection))
+    for {
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, AccountancyServices)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, HighValueDealing)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
+      _ <- clearSupervisionIfNoLongerRequired(previousBusinessActivities, currentBusinessActivities)
+    } yield true
+  }
+
+  private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
+                                    currentBusinessActivities: Set[BusinessActivity],
+                                    businessActivity: BusinessActivity
+                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
+      businessMatchingService.clearSection(businessActivity)
+    } else {
+      Future.successful(CacheMap)
+    }
+  }
+
+  private def clearSupervisionIfNoLongerRequired(previousBusinessActivities: Set[BusinessActivity],
+                                    currentBusinessActivities: Set[BusinessActivity]
+                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
+      dataCacheConnector.save[Supervision](Supervision.key, Supervision())
+    } else {
+      Future.successful(CacheMap)
+    }
   }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
