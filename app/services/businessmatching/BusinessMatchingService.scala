@@ -91,7 +91,6 @@ class BusinessMatchingService @Inject()(
     case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
     case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
     case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
-    case _ => Future.successful(None)
   }
 
 }
