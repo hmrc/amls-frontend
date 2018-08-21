@@ -16,23 +16,25 @@
 
 package controllers.businessmatching
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
+import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.ResponsiblePerson
+import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.businessmatching._
-import models.businessactivities.BusinessActivities
 
 import scala.concurrent.Future
 
@@ -88,6 +90,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
+              _ <- clearRemovedSections(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
+                  savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
                 if(fitAndProperRequired(savedActivities)){
@@ -113,6 +117,40 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       .accountantForAMLSRegulations(None)
       .taxMatters(None)
       .copy(hasAccepted = true)
+
+  private def clearRemovedSections(previousBusinessActivities: Set[BusinessActivity],
+                                   currentBusinessActivities: Set[BusinessActivity]
+                                  )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    for {
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, AccountancyServices)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, EstateAgentBusinessService)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, HighValueDealing)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, MoneyServiceBusiness)
+      _ <- clearSectionIfRemoved(previousBusinessActivities, currentBusinessActivities, TrustAndCompanyServices)
+      _ <- clearSupervisionIfNoLongerRequired(previousBusinessActivities, currentBusinessActivities)
+    } yield true
+  }
+
+  private def clearSectionIfRemoved(previousBusinessActivities: Set[BusinessActivity],
+                                    currentBusinessActivities: Set[BusinessActivity],
+                                    businessActivity: BusinessActivity
+                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    if (previousBusinessActivities.contains(businessActivity) && !currentBusinessActivities.contains(businessActivity)) {
+      businessMatchingService.clearSection(businessActivity)
+    } else {
+      Future.successful(CacheMap)
+    }
+  }
+
+  private def clearSupervisionIfNoLongerRequired(previousBusinessActivities: Set[BusinessActivity],
+                                    currentBusinessActivities: Set[BusinessActivity]
+                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
+      dataCacheConnector.save[Supervision](Supervision.key, Supervision())
+    } else {
+      Future.successful(CacheMap)
+    }
+  }
 
   private def maybeRemoveAccountantForAMLSRegulations(bmActivities: BusinessMatchingActivities)
                                                      (implicit ac: AuthContext, hc: HeaderCarrier) = {
@@ -181,6 +219,12 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       updatedBusinessActivities
     }
 
+  }
+
+  private def hasASPorTCSP(activities:Set[BusinessActivity]) = {
+    val containsASP = activities.contains(AccountancyServices)
+    val containsTCSP = activities.contains(TrustAndCompanyServices)
+    containsASP | containsTCSP
   }
 
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
