@@ -62,19 +62,19 @@
     <p><a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
 
     @if(responsiblePeopleIncomplete.nonEmpty) {
-        <h2>@Messages("responsiblepeople.check_your_answers.incomplete")</h2>
+        <h2 id="incomplete-header">@Messages("responsiblepeople.check_your_answers.incomplete")</h2>
         @rpList(responsiblePeopleIncomplete)
     }
 
     @if(responsiblePeopleComplete.nonEmpty) {
         @if(responsiblePeopleIncomplete.nonEmpty) {
-            <h2>@Messages("responsiblepeople.check_your_answers.complete")</h2>
+            <h2 id="complete-header">@Messages("responsiblepeople.check_your_answers.complete")</h2>
         }
         @rpList(responsiblePeopleComplete)
     }
 
     @if(responsiblePeopleComplete.isEmpty && responsiblePeopleIncomplete.isEmpty) {
-        <p>@Messages("responsiblepeople.whomustregister.nopeople")</p>
+        <p id="nopeople-message">@Messages("responsiblepeople.whomustregister.nopeople")</p>
     }
 
     @if(responsiblePeopleComplete.nonEmpty && responsiblePeopleIncomplete.isEmpty) {
