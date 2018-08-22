@@ -49,8 +49,8 @@
     <p><a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
 
     @if(responsiblePeopleIncomplete.nonEmpty) {
-        <h2 id="incomplete-header">@Messages("responsiblepeople.check_your_answers.incomplete")</h2>
-        <ul class="list">
+       <p><h2 id="incomplete-header">@Messages("responsiblepeople.check_your_answers.incomplete")</h2></p>
+        <ul class="list" id="incomplete-rp-list">
         @responsiblePeopleIncomplete.map { case (rp, index) =>
             <li class="summary__listing">
                 <div>
@@ -70,9 +70,9 @@
 
     @if(responsiblePeopleComplete.nonEmpty) {
         @if(responsiblePeopleIncomplete.nonEmpty) {
-            <h2 id="complete-header">@Messages("responsiblepeople.check_your_answers.complete")</h2>
+            <p><h2 id="complete-header">@Messages("responsiblepeople.check_your_answers.complete")</h2></p>
         }
-        <ul class="list">
+        <ul class="list" id="complete-rp-list">
         @responsiblePeopleComplete.map { case (rp, index) =>
             <li class="group summary__listing">
                 <div>

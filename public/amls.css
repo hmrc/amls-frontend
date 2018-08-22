@@ -828,6 +828,26 @@ fieldset .panel-indent {
   word-break: break-word;
 }
 
+ul#complete-rp-list {
+  border-top: 1px solid #bfc1c3;
+  margin-top: 20px;
+}
+
+ul#incomplete-rp-list {
+  border-top: 1px solid #bfc1c3;
+  margin-top: 20px;
+  margin-bottom: 40px;
+}
+
+h2#incomplete-header {
+  margin-top: 1.875em !important;
+  margin-bottom: 0.83333em;
+}
+h2#complete-header {
+  margin-top: 1.875em !important;
+  margin-bottom: 0.83333em;
+}
+
 .summary__listing {
   border-bottom: 1px solid #bfc1c3;
   padding-top:15px;
@@ -841,7 +861,7 @@ fieldset .panel-indent {
 
 .summary__listing > div > div:nth-child(2) {
     float:right;
-    margin-right:10px;
+    margin-right:0px;
 }
 
 /* class for older browsers; pseudo-class for modern browsers */
