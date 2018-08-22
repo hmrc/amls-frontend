@@ -95,8 +95,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       document.select(".amls-error-summary").size mustEqual 0
     }
 
-    "continue to show the correct view" when {
-      "application is in variation mode but the service has just been added" in new Fixture {
+    "render the SendTheLargestAmountOfMoney view" when {
+      "application is in variation and a service has just been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
         mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
         mockIsNewActivity(true, Some(MoneyServiceBusinessActivity))
@@ -105,15 +105,15 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
         contentAsString(result) must include(Messages("msb.most.transactions.title"))
       }
-    }
 
-    "redirect to Page not found" when {
-      "application is in variation mode" in new Fixture {
-        mockIsNewActivity(false)
+      "application is in variation mode and no service has been added" in new Fixture {
         mockApplicationStatus(SubmissionDecisionApproved)
+        mockCacheFetch[MoneyServiceBusiness](None, Some(MoneyServiceBusiness.key))
+        mockIsNewActivity(false)
 
         val result = controller.get()(request)
-        status(result) must be(NOT_FOUND)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("msb.most.transactions.title"))
       }
     }
 

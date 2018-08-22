@@ -64,8 +64,18 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                 services <- bm.msbServices
                 register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
-                dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map { _ =>
-                  routing(data.money, services.msbServices,register, msb, edit)
+                data.money match {
+                  case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
+                    _ => routing(data.money, services.msbServices,register, msb, edit)
+                  }
+                  case _ => val newModel = msb
+                    .sendMoneyToOtherCountry(data)
+                    .sendTheLargestAmountsOfMoney(None)
+                    .mostTransactions(None)
+
+                    dataCacheConnector.save(MoneyServiceBusiness.key, newModel) map {
+                    _ => routing(data.money, services.msbServices,register, newModel, edit)
+                  }
                 }
               }
               result.map(_.flatMap(identity)) getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
