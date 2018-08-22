@@ -58,9 +58,9 @@
                         @rpDetail(rp)
                     </div>
                     <div id="incompleted-action-panel-@index">
-                        <a id="incompleted-detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
+                        <a id="detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
                         @Messages("lbl.or")
-                        <a id="incompleted-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
+                        <a id="detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
                     </div>
                 </div>
             </li>
@@ -80,9 +80,9 @@
                         @rpDetail(rp)
                     </div>
                     <div id="completed-action-panel-@index">
-                        <a id="completed-detail-edit-@index" href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).url">@Messages("button.edit")</a>
+                        <a id="detail-edit-@index" href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).url">@Messages("button.edit")</a>
                         @Messages("lbl.or")
-                        <a id="completed-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
+                        <a id="detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
                     </div>
                 </div>
             </li>
