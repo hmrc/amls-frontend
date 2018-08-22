@@ -101,12 +101,12 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementById("incomplete-header").text must include(Messages("responsiblepeople.check_your_answers.incomplete"))
       html must include("Katie Test")
-      doc.getElementById("incompleted-detail-edit-1").attr("href") must be(controllers.responsiblepeople.routes.PersonNameController.get(2, false, None).url)
-      doc.getElementById("incompleted-detail-remove-1").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(2, true).url)
+      doc.getElementById("detail-edit-1").attr("href") must be(controllers.responsiblepeople.routes.PersonNameController.get(2, false, None).url)
+      doc.getElementById("detail-remove-1").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(2, true).url)
       doc.getElementById("complete-header").text must include(Messages("responsiblepeople.check_your_answers.complete"))
       html must include("John Test")
-      doc.getElementById("completed-detail-edit-2").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(3).url)
-      doc.getElementById("completed-detail-remove-2").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(3, true).url)
+      doc.getElementById("detail-edit-2").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(3).url)
+      doc.getElementById("detail-remove-2").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(3, true).url)
 
     }
   }

@@ -25,7 +25,7 @@ import views.html.responsiblepeople.your_answers
 
 trait YourAnswersController extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def get() =
       Authorised.async {
@@ -44,6 +44,6 @@ trait YourAnswersController extends RepeatingSection with BaseController {
 
 object YourAnswersController extends YourAnswersController {
   // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
+  override def dataCacheConnector = DataCacheConnector
+  override def authConnector = AMLSAuthConnector
 }
