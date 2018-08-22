@@ -49,8 +49,8 @@ POST        /date-of-birth/:index                                  @controllers.
 GET         /nationality/:index                                    controllers.responsiblepeople.NationalityController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /nationality/:index                                    controllers.responsiblepeople.NationalityController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.get(index: Int, flow: Option[String] ?= None)
-POST        /person-details/:index                                 controllers.responsiblepeople.DetailedAnswersController.post(index: Int, flow: Option[String] ?= None)
+GET         /check-your-answers/:index                             controllers.responsiblepeople.DetailedAnswersController.get(index: Int, flow: Option[String] ?= None)
+POST        /check-your-answers/:index                             controllers.responsiblepeople.DetailedAnswersController.post(index: Int, flow: Option[String] ?= None)
 
 GET         /additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /additional-address/:index                             controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -103,4 +103,4 @@ POST        /remove/:index                                         controllers.r
 GET         /country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /your-answers                                          controllers.responsiblepeople.YourAnswersController.get()
+GET         /your-responsible-people                               controllers.responsiblepeople.YourResponsiblePeopleController.get()

@@ -59,7 +59,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
     implicit authContext => implicit request =>
 
         def redirectAppropriately = complete match {
-          case true => Redirect(routes.YourAnswersController.get())
+          case true => Redirect(routes.YourResponsiblePeopleController.get())
           case false => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
 

@@ -198,7 +198,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "post is called" must {
-      "redirect to YourAnswersController" when {
+      "redirect to YourResponsiblePeopleController" when {
         "fromYourAnswers is true and flow is not defined" which {
           "updates hasAccepted" in new Fixture {
 
@@ -208,7 +208,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
             val result = controller.post(1, None)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
             verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
           }
@@ -226,7 +226,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
             val result = controller.post(1, flow)(request)
 
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourAnswersController.get().url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
             verify(controller.dataCacheConnector).save(any(),eqTo(Seq(model.copy(hasAccepted = true))))(any(),any(),any())
 
