@@ -37,8 +37,8 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
   val incompletePersonName: Option[PersonName] = Some(PersonName("John", None, "Test"))
   val completeRp1 = ResponsiblePerson(completePersonName)
   val completeRp2 = ResponsiblePerson()
-  val incompleteRp1 = ResponsiblePerson()
-  val incompleteRp2 = ResponsiblePerson(incompletePersonName)
+  val incompleteRp1 = ResponsiblePerson(incompletePersonName)
+  val incompleteRp2 = ResponsiblePerson()
 
   val completeRpSeq = Seq((completeRp1,0),(completeRp2,1))
   val incompleteRpSeq = Seq((incompleteRp1,2),(incompleteRp2,3))
@@ -96,13 +96,18 @@ class your_answersSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("addResponsiblePerson").attr("href") must be(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false).url)
     }
 
-    "have an incomplete/complete sections with people names displayed" in new ViewFixture {
+    "have an incomplete/complete sections with people names displayed and edit/remove links" in new ViewFixture {
       def view = views.html.responsiblepeople.your_answers(incompleteRpSeq, completeRpSeq)
 
       doc.getElementById("incomplete-header").text must include(Messages("responsiblepeople.check_your_answers.incomplete"))
       html must include("Katie Test")
+      doc.getElementById("incompleted-detail-edit-1").attr("href") must be(controllers.responsiblepeople.routes.PersonNameController.get(2, false, None).url)
+      doc.getElementById("incompleted-detail-remove-1").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(2, true).url)
       doc.getElementById("complete-header").text must include(Messages("responsiblepeople.check_your_answers.complete"))
       html must include("John Test")
+      doc.getElementById("completed-detail-edit-2").attr("href") must be(controllers.responsiblepeople.routes.DetailedAnswersController.get(3).url)
+      doc.getElementById("completed-detail-remove-2").attr("href") must be(controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(3, true).url)
+
     }
   }
 }

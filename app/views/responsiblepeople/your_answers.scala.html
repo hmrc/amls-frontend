@@ -57,10 +57,10 @@
                     <div id="incomplete-detail-@index">
                         @rpDetail(rp)
                     </div>
-                    <div id="incomplete-action-panel-@index">
-                        <a id="incomplete-detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
+                    <div id="incompleted-action-panel-@index">
+                        <a id="incompleted-detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
                         @Messages("lbl.or")
-                        <a id="incomplete-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
+                        <a id="incompleted-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
                     </div>
                 </div>
             </li>
