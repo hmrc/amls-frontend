@@ -21,27 +21,14 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson,Int)])(implicit request: Request[_],m:Messages)
+@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages)
 
-@rpList(responsiblePeople: Seq[(ResponsiblePerson, Int)]) = {
-    <ul class="list">
-    @responsiblePeople.map { case (rp, index) =>
-        @rp.personName.map { pn =>
-            @checkYourAnswersListing(
-                item = pn.fullName,
-                editUrl = rp.isComplete match {
-                    case true => controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).toString
-                    case false => controllers.responsiblepeople.routes.PersonNameController.get(index+1, false, None).toString
-                },
-                removeUrl = controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).toString
-            )
-        }
-    }
-    </ul>
+@rpDetail(rp: ResponsiblePerson) = {
+@rp.personName.map(pn => pn.fullName)
 }
 
 @header = {
-    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
+@heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
 }
 
 @main(
@@ -63,14 +50,44 @@
 
     @if(responsiblePeopleIncomplete.nonEmpty) {
         <h2 id="incomplete-header">@Messages("responsiblepeople.check_your_answers.incomplete")</h2>
-        @rpList(responsiblePeopleIncomplete)
+        <ul class="list">
+        @responsiblePeopleIncomplete.map { case (rp, index) =>
+            <li class="summary__listing">
+                <div>
+                    <div id="incomplete-detail-@index">
+                        @rpDetail(rp)
+                    </div>
+                    <div id="incomplete-action-panel-@index">
+                        <a id="incomplete-detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
+                        @Messages("lbl.or")
+                        <a id="incomplete-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
+                    </div>
+                </div>
+            </li>
+        }
+        </ul>
     }
 
     @if(responsiblePeopleComplete.nonEmpty) {
         @if(responsiblePeopleIncomplete.nonEmpty) {
             <h2 id="complete-header">@Messages("responsiblepeople.check_your_answers.complete")</h2>
         }
-        @rpList(responsiblePeopleComplete)
+        <ul class="list">
+        @responsiblePeopleComplete.map { case (rp, index) =>
+            <li class="group summary__listing">
+                <div>
+                    <div id="complete-detail-@index">
+                        @rpDetail(rp)
+                    </div>
+                    <div id="completed-action-panel-@index">
+                        <a id="completed-detail-edit-@index" href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).url">@Messages("button.edit")</a>
+                        @Messages("lbl.or")
+                        <a id="completed-detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1, true).url">@Messages("button.remove")</a>
+                    </div>
+                </div>
+            </li>
+        }
+        </ul>
     }
 
     @if(responsiblePeopleComplete.isEmpty && responsiblePeopleIncomplete.isEmpty) {
