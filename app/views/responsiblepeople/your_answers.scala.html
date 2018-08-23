@@ -98,7 +98,8 @@
         @anchor(
             attrHref = controllers.routes.RegistrationProgressController.get().toString,
             attrRole = true,
-            linkText = Messages("button.summary.acceptandcomplete")
+            linkText = Messages("button.summary.acceptandcomplete"),
+            id = Some("rp-accept-and-complete")
         )
     } else {
         @anchor(
