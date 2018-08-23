@@ -94,7 +94,7 @@
         <p id="nopeople-message">@Messages("responsiblepeople.whomustregister.nopeople")</p>
     }
 
-    @if(responsiblePeopleIncomplete.isEmpty) {
+    @if(responsiblePeopleIncomplete.isEmpty && responsiblePeopleComplete.nonEmpty) {
         @form(EmptyForm, controllers.routes.RegistrationProgressController.get()) {
             @submit(false, Some(Messages("button.summary.acceptandcomplete")), buttonId = Some("rp-accept-and-complete"))
         }
