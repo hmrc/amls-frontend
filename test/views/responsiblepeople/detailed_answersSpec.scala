@@ -73,13 +73,13 @@ class detailed_answersSpec extends AmlsSpec
     "have correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
-      doc.title must startWith(Messages("responsiblepeople.detailed_answers.title") + " - " + Messages("summary.responsiblepeople"))
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.responsiblepeople"))
     }
 
     "have correct headings" in new ViewFixture {
       def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
-      heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
+      heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
     }
 

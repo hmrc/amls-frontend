@@ -67,7 +67,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
+        contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
     }
@@ -152,7 +152,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
 
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
+        contentAsString(result) must include(Messages("title.cya"))
         contentAsString(result) must not include "/anti-money-laundering/responsible-people/your-answers"
       }
     }
@@ -165,7 +165,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(OK)
 
           val document = Jsoup.parse(contentAsString(result))
-          contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
+          contentAsString(result) must include(Messages("title.cya"))
         }
 
         "respond with OK and show the detailed answers page with a correctly formatted responsiblePerson startDate" in new Fixture {
