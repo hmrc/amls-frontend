@@ -94,18 +94,13 @@
         <p id="nopeople-message">@Messages("responsiblepeople.whomustregister.nopeople")</p>
     }
 
-    @if(responsiblePeopleComplete.nonEmpty && responsiblePeopleIncomplete.isEmpty) {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.summary.acceptandcomplete"),
-            id = Some("rp-accept-and-complete")
-        )
+    @if(responsiblePeopleIncomplete.isEmpty) {
+        @form(EmptyForm, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("button.summary.acceptandcomplete")), buttonId = Some("rp-accept-and-complete"))
+        }
     } else {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.returntoapplicationprogress")
-        )
+        @form(EmptyForm, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("link.return.registration.progress")), returnLink = false, buttonId = Some("rp-return-to-application"))
+        }
     }
 }
