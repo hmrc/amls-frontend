@@ -60,7 +60,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
   "DetailedAnswersController" when {
 
-    "get is called - from the yourAnswers controller" must {
+    "get is called - from the yourResponsiblePeople controller" must {
       "respond with OK and show the detailed answers page with a 'confirm and continue'" in new Fixture {
 
         val result = controller.get(1)(request)
@@ -68,7 +68,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
 
         val document = Jsoup.parse(contentAsString(result))
         contentAsString(result) must include(Messages("responsiblepeople.detailed_answers.title"))
-        contentAsString(result) must not include "/anti-money-laundering/responsible-people/check-your-answers"
+        contentAsString(result) must include("/anti-money-laundering/responsible-people/check-your-answers")
       }
     }
 
