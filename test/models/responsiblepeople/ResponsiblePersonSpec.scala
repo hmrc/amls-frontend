@@ -125,7 +125,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport.copy(hasAccepted = true))))
 
-          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
@@ -140,7 +140,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(rp))
 
-          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
@@ -178,7 +178,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(rp))
 
-          ResponsiblePerson.section(mockCacheMap).call.url mustBe controllers.responsiblepeople.routes.YourAnswersController.get().url
+          ResponsiblePerson.section(mockCacheMap).call.url mustBe controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url
         }
       }
     }
@@ -322,7 +322,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           section.hasChanged must be(true)
           section.status must be(Started)
-          section.call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          section.call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
@@ -340,7 +340,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          section.call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
     }

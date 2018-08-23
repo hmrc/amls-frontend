@@ -71,7 +71,7 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
         flow match {
           case Some(`flowFromDeclaration`) => redirectFromDeclarationFlow()
           case Some(`flowChangeOfficer`) => Future.successful(Redirect(controllers.changeofficer.routes.NewOfficerController.get()))
-          case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourAnswersController.get()))
+          case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
   }

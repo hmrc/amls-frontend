@@ -21,9 +21,9 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePerson
 import utils.RepeatingSection
-import views.html.responsiblepeople.your_answers
+import views.html.responsiblepeople.your_responsible_people
 
-trait YourAnswersController extends RepeatingSection with BaseController {
+trait YourResponsiblePeopleController extends RepeatingSection with BaseController {
 
   def dataCacheConnector: DataCacheConnector
 
@@ -35,14 +35,14 @@ trait YourAnswersController extends RepeatingSection with BaseController {
               val s = ResponsiblePerson.filterWithIndex(data)
                 .partition(_._1.isComplete)
 
-              Ok(your_answers(s._1, s._2))
+              Ok(your_responsible_people(s._1, s._2))
             }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
 }
 
-object YourAnswersController extends YourAnswersController {
+object YourResponsiblePeopleController extends YourResponsiblePeopleController {
   // $COVERAGE-OFF$
   override def dataCacheConnector = DataCacheConnector
   override def authConnector = AMLSAuthConnector
