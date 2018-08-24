@@ -111,7 +111,7 @@ trait RepeatingSection {
     }
 
   protected def updateDataStrict[T](index: Int)(fn: T => T)
-                                   (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[_] =
+                                   (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[CacheMap] =
     getData[T] flatMap {
       data => {
         putData(data.patch(index - 1, Seq(fn(data(index - 1))), 1))
