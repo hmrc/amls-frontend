@@ -27,7 +27,7 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class your_responsoble_peopleSpec extends AmlsSpec with MustMatchers {
+class your_responsible_peopleSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
