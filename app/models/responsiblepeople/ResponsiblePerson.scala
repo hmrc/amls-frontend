@@ -198,13 +198,13 @@ object ResponsiblePerson {
         filter(rp) match {
           case responsiblePeople if responsiblePeople.nonEmpty && responsiblePeople.forall {
             _.isComplete
-          } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourAnswersController.get())
+          } => Section(messageKey, Completed, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
           case _ =>
             val index = rp.indexWhere {
               case model if !model.isComplete && !model.status.contains(StatusConstants.Deleted) => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.WhoMustRegisterController.get(index + 1))
+            Section(messageKey, Started, anyChanged(rp), controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
     }

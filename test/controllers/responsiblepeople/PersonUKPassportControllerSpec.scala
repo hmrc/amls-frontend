@@ -118,7 +118,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
     "post is called" when {
 
       "edit is false" must {
-        "go to DateOfBirthController" when {
+        "go to CountryOfBirthController" when {
           "uk passport number is provided" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -142,7 +142,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
 
           }
         }
@@ -229,33 +229,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonNonUKPassportController.get(1, true).url))
           }
         }
-        "goes to DateOfBirthController" when {
-          "uk passport and DateOfBirth data does not exist" in new Fixture {
-            val newRequest = request.withFormUrlEncodedBody(
-              "ukPassport" -> "true",
-              "ukPassportNumber" -> ukPassportNumber
-            )
 
-            val responsiblePeople = ResponsiblePerson()
-
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
-
-            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-              .thenReturn(Some(Seq(responsiblePeople)))
-
-            when(controller.dataCacheConnector.fetchAll(any(), any()))
-              .thenReturn(Future.successful(Some(mockCacheMap)))
-
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
-
-            val result = controller.post(1, true)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1, true).url))
-
-          }
-        }
         "go to DetailedAnswersController" when {
           "uk passport" in new Fixture {
 
@@ -283,7 +257,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
 
           }
 
@@ -311,7 +285,7 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
 
           }
         }

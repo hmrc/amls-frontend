@@ -61,7 +61,7 @@ class PersonUKPassportController @Inject()(
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 data match {
-                  case UKPassportYes(_) if rp.ukPassport.contains(UKPassportNo) => rp.ukPassport(data).copy(nonUKPassport = None)
+                  case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None, dateOfBirth = None)
                   case _ => rp.ukPassport(data)
                 }
               })
@@ -78,10 +78,10 @@ class PersonUKPassportController @Inject()(
   private def redirectTo(rp: Seq[ResponsiblePerson], data: UKPassport, index: Int, edit: Boolean, flow: Option[String]) = {
     val responsiblePerson = rp(index - 1)
     data match {
-      case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-      case UKPassportYes(_) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case UKPassportNo if edit && responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+      case UKPassportYes(_) if responsiblePerson.dateOfBirth.isEmpty => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case UKPassportYes(_) if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case UKPassportYes(_) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case UKPassportNo if edit && responsiblePerson.ukPassport.contains(UKPassportNo) => Redirect(routes.DetailedAnswersController.get(index, flow))
       case UKPassportNo => Redirect(routes.PersonNonUKPassportController.get(index, edit, flow))
     }
   }

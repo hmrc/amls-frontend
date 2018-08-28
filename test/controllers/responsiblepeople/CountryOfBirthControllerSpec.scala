@@ -156,7 +156,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
           val result = controllers.post(RecordId, edit = true, Some(flowFromDeclaration))(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
           verify(controllers.dataCacheConnector).save[Seq[ResponsiblePerson]](any(),
             meq(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes), hasChanged = true))))(any(), any(), any())
         }

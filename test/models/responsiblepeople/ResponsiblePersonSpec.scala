@@ -125,21 +125,22 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(Seq(completeModelNonUkResidentNonUkPassport.copy(hasAccepted = true))))
 
-          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
       "is partially complete" must {
-        "direct the user to the start of the the journey at the correct index for the incomplete item" in {
+        "direct the user to the 'Your responsible people' page to show the incomplete items" in {
           val mockCacheMap = mock[CacheMap]
 
-          val rp = Seq(completeModelNonUkResidentNonUkPassport, completeModelNonUkResidentNonUkPassport, incompleteResponsiblePeople) map (_.copy(hasAccepted = true))
+          val rp = Seq(completeModelNonUkResidentNonUkPassport,
+            completeModelNonUkResidentNonUkPassport,
+            incompleteResponsiblePeople) map (_.copy(hasAccepted = true))
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(rp))
 
-          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
-
+          ResponsiblePerson.section(mockCacheMap).call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
@@ -177,7 +178,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
             .thenReturn(Some(rp))
 
-          ResponsiblePerson.section(mockCacheMap).call.url mustBe controllers.responsiblepeople.routes.WhoMustRegisterController.get(2).url
+          ResponsiblePerson.section(mockCacheMap).call.url mustBe controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url
         }
       }
     }
@@ -307,7 +308,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "the section is complete with all the Responsible People being removed and has one incomplete model" must {
-        "successfully redirect to what you need page" in {
+        "successfully redirect to the 'your responsible people' page" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -321,12 +322,12 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           section.hasChanged must be(true)
           section.status must be(Started)
-          section.call must be(controllers.responsiblepeople.routes.WhoMustRegisterController.get(3))
+          section.call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
 
       "the section is complete with one of the Responsible People object being removed" must {
-        "successfully redirect to check your answers page" in {
+        "successfully redirect to 'your responsible people' page" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -339,7 +340,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
           section.hasChanged must be(true)
           section.status must be(Completed)
-          section.call must be(controllers.responsiblepeople.routes.YourAnswersController.get())
+          section.call must be(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get())
         }
       }
     }

@@ -59,7 +59,7 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
             } yield {
               edit match {
                 case false => Redirect(routes.ExperienceTrainingController.get(index, edit, flow))
-                case true => Redirect(routes.DetailedAnswersController.get(index,edit, flow))
+                case true => Redirect(routes.DetailedAnswersController.get(index, flow))
               }
             }
           }.recoverWith {

@@ -19,11 +19,11 @@
 @(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
+    @heading("responsiblepeople.whomustregister.ymr", "summary.responsiblepeople")
 }
 
 @whatyouneed(
-    title = Messages("responsiblepeople.whomustregister.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.whomustregister.ymr") + " - " + Messages("summary.responsiblepeople"),
     heading = header,
     sidebar = sidebar
 ) {
@@ -32,6 +32,8 @@
         <li>@Messages("responsiblepeople.whomustregister.line_1")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_2")</li>
         <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_4")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_5")</li>
     </ul>
 
     @anchor(

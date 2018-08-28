@@ -56,7 +56,7 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
                 rp.contactDetails(data)
               }
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
               case false if index > 1 => Redirect(routes.CurrentAddressController.get(index, edit, flow))
               case false if index == 1 => Redirect(routes.ConfirmAddressController.get(index))
             }

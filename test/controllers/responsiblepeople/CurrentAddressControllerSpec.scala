@@ -348,7 +348,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
           val result = currentAddressController.post(RecordId, true)(requestWithParams)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId).url))
 
         }
       }

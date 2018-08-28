@@ -63,10 +63,8 @@ class FitAndProperController @Inject()(
               _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
                 rp.hasAlreadyPassedFitAndProper(Some(data))
               }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
-              case false => Redirect(routes.PersonRegisteredController.get(index, flow))
-            }
+            } yield
+              Redirect(routes.DetailedAnswersController.get(index, flow))
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }

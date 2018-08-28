@@ -43,7 +43,7 @@ trait ResponsiblePeopleAddController extends BaseController with RepeatingSectio
   private def redirectDependingOnGuidance(displayGuidance: Boolean, idx: Int, flow: Option[String]) = {
     displayGuidance match {
       case true => controllers.responsiblepeople.routes.WhoMustRegisterController.get(idx, flow)
-      case false => controllers.responsiblepeople.routes.PersonNameController.get(idx)
+      case false => controllers.responsiblepeople.routes.WhatYouNeedController.get(idx)
     }
   }
 }

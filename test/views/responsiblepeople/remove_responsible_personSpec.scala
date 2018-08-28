@@ -37,7 +37,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, false)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
 
       doc.title() must startWith(Messages("responsiblepeople.remove.responsible.person.title") + " - " + Messages("summary.responsiblepeople"))
 
@@ -47,7 +47,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, false)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
 
       heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title"))
     }
@@ -56,7 +56,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, true)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true)
 
       form.html() must include (Messages("responsiblepeople.remove.responsible.person.enddate.lbl"))
 
@@ -66,7 +66,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, false)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
 
       form.html() must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
 
@@ -82,7 +82,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
         Seq((Path \ endDateField, Seq(ValidationError(messageKey1))))
       )
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true, true)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true)
 
       errorSummary.html() must include(messageKey1)
 

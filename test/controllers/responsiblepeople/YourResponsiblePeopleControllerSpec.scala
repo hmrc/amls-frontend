@@ -30,12 +30,12 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class YourAnswersControllerSpec extends AmlsSpec with MockitoSugar {
+class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
 
     trait Fixture extends AuthorisedFixture {
       self => val request = addToken(authRequest)
 
-      val controller = new YourAnswersController {
+      val controller = new YourResponsiblePeopleController {
         override val dataCacheConnector = mock[DataCacheConnector]
         override val authConnector = self.authConnector
       }
@@ -44,8 +44,8 @@ class YourAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     "Get" must {
 
       "use correct services" in new Fixture {
-        YourAnswersController.authConnector must be(AMLSAuthConnector)
-        YourAnswersController.dataCacheConnector must be(DataCacheConnector)
+        YourResponsiblePeopleController.authConnector must be(AMLSAuthConnector)
+        YourResponsiblePeopleController.dataCacheConnector must be(DataCacheConnector)
       }
 
       "load the your answers page when section data is available" in new Fixture {
@@ -55,7 +55,7 @@ class YourAnswersControllerSpec extends AmlsSpec with MockitoSugar {
         val result = controller.get()(request)
         status(result) must be(OK)
         val document = Jsoup.parse(contentAsString(result))
-        contentAsString(result) must include (s"${Messages("title.ya")} - ${Messages("summary.responsiblepeople")}")
+        contentAsString(result) must include (s"${Messages("responsiblepeople.whomustregister.title")} - ${Messages("summary.responsiblepeople")}")
       }
 
       "show the 'Add a responsible person' link" in new Fixture {

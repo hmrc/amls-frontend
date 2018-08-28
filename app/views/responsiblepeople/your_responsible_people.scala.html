@@ -1,0 +1,106 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import include.forms2._
+@import models.responsiblepeople.ResponsiblePerson
+@import utils.StatusConstants
+@import forms.EmptyForm
+@import config.ApplicationConfig
+
+@(responsiblePeopleComplete: Seq[(ResponsiblePerson, Int)], responsiblePeopleIncomplete: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m: Messages)
+
+@rpDetail(rp: ResponsiblePerson) = {
+@rp.personName.map(pn => pn.fullName)
+}
+
+@header = {
+@heading("responsiblepeople.whomustregister.title", "summary.responsiblepeople")
+}
+
+@main(
+    title = Messages("responsiblepeople.whomustregister.title") + " - " + Messages("summary.responsiblepeople"),
+    heading = header
+) {
+
+    <p>@Messages("responsiblepeople.whomustregister.ymr")</p>
+
+    <ul class="list list-bullet">
+        <li>@Messages("responsiblepeople.whomustregister.line_1")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_2")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_3")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_4")</li>
+        <li>@Messages("responsiblepeople.whomustregister.line_5")</li>
+    </ul>
+
+    <p><a id="addResponsiblePerson" href="@controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false)">@Messages("responsiblepeople.check_your_answers.add")</a></p>
+
+    @if(responsiblePeopleIncomplete.nonEmpty) {
+       <p><h2 id="incomplete-header">@Messages("responsiblepeople.check_your_answers.incomplete")</h2></p>
+        <ul class="list" id="incomplete-rp-list">
+        @responsiblePeopleIncomplete.map { case (rp, index) =>
+            <li class="summary__listing">
+                <div>
+                    <div id="incomplete-detail-@index">
+                        @rpDetail(rp)
+                    </div>
+                    <div id="incompleted-action-panel-@index">
+                        <a id="detail-edit-@index" href="@controllers.responsiblepeople.routes.PersonNameController.get(index + 1, false, None).url">@Messages("button.edit")</a>
+                        @Messages("lbl.or")
+                        <a id="detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1).url">@Messages("button.remove")</a>
+                    </div>
+                </div>
+            </li>
+        }
+        </ul>
+    }
+
+    @if(responsiblePeopleComplete.nonEmpty) {
+        @if(responsiblePeopleIncomplete.nonEmpty) {
+            <p><h2 id="complete-header">@Messages("responsiblepeople.check_your_answers.complete")</h2></p>
+        }
+        <ul class="list" id="complete-rp-list">
+        @responsiblePeopleComplete.map { case (rp, index) =>
+            <li class="group summary__listing">
+                <div>
+                    <div id="complete-detail-@index">
+                        @rpDetail(rp)
+                    </div>
+                    <div id="completed-action-panel-@index">
+                        <a id="detail-edit-@index" href="@controllers.responsiblepeople.routes.DetailedAnswersController.get(index + 1).url">@Messages("button.edit")</a>
+                        @Messages("lbl.or")
+                        <a id="detail-remove-@index" href="@controllers.responsiblepeople.routes.RemoveResponsiblePersonController.get(index + 1).url">@Messages("button.remove")</a>
+                    </div>
+                </div>
+            </li>
+        }
+        </ul>
+    }
+
+    @if(responsiblePeopleComplete.isEmpty && responsiblePeopleIncomplete.isEmpty) {
+        <p id="nopeople-message">@Messages("responsiblepeople.whomustregister.nopeople")</p>
+    }
+
+    @if(responsiblePeopleIncomplete.isEmpty && responsiblePeopleComplete.nonEmpty) {
+        @form(EmptyForm, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("button.summary.acceptandcomplete")), buttonId = Some("rp-accept-and-complete"))
+        }
+    } else {
+        @form(EmptyForm, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("link.return.registration.progress")), returnLink = false, buttonId = Some("rp-return-to-application"))
+        }
+    }
+}

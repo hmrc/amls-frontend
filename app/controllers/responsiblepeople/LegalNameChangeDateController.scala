@@ -60,7 +60,7 @@ class LegalNameChangeDateController @Inject()(val dataCacheConnector: DataCacheC
                 rp.legalNameChangeDate(data.date)
               }
             } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index, edit, flow))
+              case true => Redirect(routes.DetailedAnswersController.get(index, flow))
               case false => Redirect(routes.KnownByController.get(index, edit, flow))
             }
           }.recoverWith {

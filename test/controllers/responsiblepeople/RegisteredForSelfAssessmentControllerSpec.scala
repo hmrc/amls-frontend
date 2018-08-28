@@ -148,7 +148,7 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
 
           val result = controller.post(recordId, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, true, Some(flowFromDeclaration)).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
         }
       }
     }

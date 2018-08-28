@@ -220,7 +220,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
           }
         }
         "time at address is ThreeYearsPlus" must {
@@ -242,7 +242,7 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
             val result = timeAtAdditionalAddressController.post(RecordId, true, Some(flowFromDeclaration))(requestWithParams)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, true, Some(flowFromDeclaration)).url))
+            redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
           }
         }
       }

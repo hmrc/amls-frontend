@@ -150,7 +150,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       }
 
       "respond with SEE_OTHER" when {
-        "given valid data and edit = false, and redirect to the PersonRegisteredController" in new Fixture {
+        "given valid data and edit = false, and redirect to the DetailedAnswersController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
@@ -164,7 +164,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.PersonRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
         }
 
         "given valid data and edit = true, and redirect to the DetailedAnswersController" in new Fixture {
@@ -181,7 +181,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
         }
       }
     }

@@ -22,13 +22,13 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
-import play.api.Play
-import services.{AuthEnrolmentsService, StatusService}
+import services.StatusService
 import utils.{RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
 
+//noinspection ScalaStyle
 trait RemoveResponsiblePersonController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector
@@ -42,7 +42,7 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
     }
   }
 
-  def get(index: Int, complete: Boolean = false, flow: Option[String] = None) = Authorised.async {
+  def get(index: Int, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
       for {
         rp <- getData[ResponsiblePerson](index)
@@ -50,29 +50,23 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
       } yield rp match {
         case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
           Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, complete, showRemovalDateField(status, rp.get.lineId.isDefined), flow
-          ))
+            EmptyForm, index, personName.fullName, showRemovalDateField(status, rp.get.lineId.isDefined), flow))
         case _ => NotFound(notFoundView)
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, flow: Option[String] = None) = Authorised.async {
+  def remove(index: Int, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
 
-        def redirectAppropriately = complete match {
-          case true => Redirect(routes.YourAnswersController.get())
-          case false => Redirect(routes.SummaryController.get(flow))
-        }
-
         def removeWithoutDate = removeDataStrict[ResponsiblePerson](index) map { _ =>
-          redirectAppropriately
+          Redirect(routes.YourResponsiblePeopleController.get())
         }
 
         statusService.getStatus flatMap {
           case NotCompleted | SubmissionReady => removeWithoutDate
           case SubmissionReadyForReview => for {
             _ <- updateDataStrict[ResponsiblePerson](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
-          } yield redirectAppropriately
+          } yield Redirect(routes.YourResponsiblePeopleController.get())
           case _ =>
             getData[ResponsiblePerson](index) flatMap { _ match {
                 case Some(person) if person.lineId.isEmpty => removeWithoutDate
@@ -86,14 +80,14 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
                   Form2[ResponsiblePersonEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
                     case f: InvalidForm =>
-                      Future.successful(BadRequest(remove_responsible_person(f, index, name, complete, true, flow)))
+                      Future.successful(BadRequest(remove_responsible_person(f, index, name, true, flow)))
 
                     case ValidForm(_, data) => {
                       for {
                         _ <- updateDataStrict[ResponsiblePerson](index) {
                           _.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                         }
-                      } yield redirectAppropriately
+                      } yield Redirect(routes.YourResponsiblePeopleController.get())
                     }
                     case _ => removeWithoutDate
                   }

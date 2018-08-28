@@ -21,24 +21,29 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePerson
 import utils.RepeatingSection
-import views.html.responsiblepeople.your_answers
+import views.html.responsiblepeople.your_responsible_people
 
-trait YourAnswersController extends RepeatingSection with BaseController {
+trait YourResponsiblePeopleController extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+  def dataCacheConnector: DataCacheConnector
 
   def get() =
       Authorised.async {
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
-            case Some(data) => Ok(your_answers(data))
+            case Some(data) => {
+              val (completeRP, incompleteRP) = ResponsiblePerson.filterWithIndex(data)
+                .partition(_._1.isComplete)
+
+              Ok(your_responsible_people(completeRP, incompleteRP))
+            }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
 }
 
-object YourAnswersController extends YourAnswersController {
+object YourResponsiblePeopleController extends YourResponsiblePeopleController {
   // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
+  override def dataCacheConnector = DataCacheConnector
+  override def authConnector = AMLSAuthConnector
 }

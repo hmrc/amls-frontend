@@ -274,7 +274,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
               val result = controller.post(1, true,Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, true, Some(flowFromDeclaration)).url))
+              redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
             }
           }
         }

@@ -73,13 +73,13 @@ class detailed_answersSpec extends AmlsSpec
     "have correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
-      doc.title must startWith(Messages("responsiblepeople.detailed_answers.title") + " - " + Messages("summary.responsiblepeople"))
+      doc.title must startWith(Messages("title.cya") + " - " + Messages("summary.responsiblepeople"))
     }
 
     "have correct headings" in new ViewFixture {
       def view = views.html.responsiblepeople.detailed_answers(Some(ResponsiblePerson()), 1, true)
 
-      heading.html must be(Messages("responsiblepeople.detailed_answers.title"))
+      heading.html must be(Messages("title.cya"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
     }
 
@@ -87,7 +87,7 @@ class detailed_answersSpec extends AmlsSpec
 
       "a full uk address history" in new ViewFixture {
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true, personName.fullName)
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, personName.fullName)
         }
 
         val element = doc.getElementsMatchingOwnText(Messages("responsiblepeople.detailed_answer.tell.us.moved", personName.fullName))
@@ -130,7 +130,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, true, false, personName.fullName)
+          views.html.responsiblepeople.detailed_answers(Some(nonUkresponsiblePeopleModel), 1, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -171,7 +171,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
+          views.html.responsiblepeople.detailed_answers(Some(nonUKPassportResponsiblePeopleModel), 1, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -204,7 +204,7 @@ class detailed_answersSpec extends AmlsSpec
           (Messages("responsiblepeople.detailed_answers.uk.passport", personName.fullName), checkElementTextIncludes(_, "Passport Number: 0000000000")))
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -239,7 +239,7 @@ class detailed_answersSpec extends AmlsSpec
         )
 
         def view = {
-          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, true, false, personName.fullName)
+          views.html.responsiblepeople.detailed_answers(Some(ukPassportResponsiblePeopleModel), 1, false, personName.fullName)
         }
 
         forAll(sectionChecks) { (key, check) => {
@@ -290,7 +290,7 @@ class detailed_answersSpec extends AmlsSpec
 
       val responsiblePeople = ResponsiblePerson(personName = Some(personName), addressHistory = Some(addressHistory))
 
-      def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, true, false, personName.fullName)
+      def view = views.html.responsiblepeople.detailed_answers(Some(responsiblePeople), 1, false, personName.fullName)
 
       val timeAtAddresses = doc.getElementsMatchingOwnText(Messages("responsiblepeople.timeataddress.address_history.heading", "firstName middleName lastName"))
 
@@ -302,7 +302,7 @@ class detailed_answersSpec extends AmlsSpec
 
     "have the correct href" in new ViewFixture {
       def view = {
-        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true, true)
+        views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModel), 1, true)
       }
 
       override val sectionChecks = Table[String, Element => Boolean](
