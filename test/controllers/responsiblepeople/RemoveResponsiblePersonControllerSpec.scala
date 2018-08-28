@@ -63,7 +63,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")))))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
 
@@ -75,7 +75,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          val result = controller.get(100, false)(request)
+          val result = controller.get(100)(request)
 
           status(result) must be(NOT_FOUND)
 
@@ -90,7 +90,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
           val contentString = contentAsString(result)
@@ -108,7 +108,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
           val contentString = contentAsString(result)
@@ -125,7 +125,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(Some(PersonName("firstName", None, "lastName")), lineId = Some(4444))))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
           val contentString = contentAsString(result)
@@ -140,7 +140,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
-          val result = controller.get(100, false)(request)
+          val result = controller.get(100)(request)
 
           status(result) must be(NOT_FOUND)
 
@@ -157,7 +157,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
 
@@ -177,7 +177,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
 
@@ -197,7 +197,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
             .thenReturn(Future.successful(Some(Seq(rp))))
 
-          val result = controller.get(1, false)(request)
+          val result = controller.get(1)(request)
 
           status(result) must be(OK)
 
@@ -220,7 +220,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(NotCompleted))
 
-          val result = controller.remove(1, true)(request)
+          val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
@@ -241,7 +241,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, true)(request)
+          val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
@@ -262,7 +262,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionReady))
 
-          val result = controller.remove(1, true)(request)
+          val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
@@ -284,7 +284,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
             .thenReturn(Future.successful(SubmissionReadyForReview))
 
 
-          val result = controller.remove(1, true)(request)
+          val result = controller.remove(1)(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
@@ -311,7 +311,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, complete = true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
 
@@ -341,7 +341,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, complete = true)(newRequest)
+          val result = controller.remove(1)(newRequest)
 
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
@@ -368,7 +368,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(SEE_OTHER)
 
         }
@@ -392,7 +392,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -414,7 +414,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -436,7 +436,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.expected.jodadate.format"))
 
@@ -458,7 +458,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           contentAsString(result) must include(Messages("error.future.date"))
 
@@ -484,7 +484,7 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           when(controller.statusService.getStatus(any(), any(), any()))
             .thenReturn(Future.successful(SubmissionDecisionApproved))
 
-          val result = controller.remove(1, true)(newRequest)
+          val result = controller.remove(1)(newRequest)
           status(result) must be(BAD_REQUEST)
           //contentAsString(result) must include(Messages("error.expected.future.date.after.start"))
 

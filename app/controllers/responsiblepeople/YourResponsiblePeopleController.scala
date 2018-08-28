@@ -32,10 +32,10 @@ trait YourResponsiblePeopleController extends RepeatingSection with BaseControll
         implicit authContext => implicit request =>
           dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key) map {
             case Some(data) => {
-              val s = ResponsiblePerson.filterWithIndex(data)
+              val (completeRP, incompleteRP) = ResponsiblePerson.filterWithIndex(data)
                 .partition(_._1.isComplete)
 
-              Ok(your_responsible_people(s._1, s._2))
+              Ok(your_responsible_people(completeRP, incompleteRP))
             }
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }

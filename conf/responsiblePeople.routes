@@ -97,8 +97,8 @@ POST        /fit-and-proper/:index                                 @controllers.
 GET         /contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /contacting-you/:index                                 controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, complete: Boolean, flow: Option[String] ?= None)
-POST        /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, complete: Boolean, flow: Option[String] ?= None)
+GET         /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.get(index: Int, flow: Option[String] ?= None)
+POST        /remove/:index                                         controllers.responsiblepeople.RemoveResponsiblePersonController.remove(index: Int, flow: Option[String] ?= None)
 
 GET         /country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /country-of-birth/:index                               @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
