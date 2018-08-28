@@ -28,6 +28,7 @@ import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
 
+//noinspection ScalaStyle
 trait RemoveResponsiblePersonController extends RepeatingSection with BaseController {
 
   val dataCacheConnector: DataCacheConnector

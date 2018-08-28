@@ -130,7 +130,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "is partially complete" must {
-        "direct the user to the 'your anwsers' page to show the incomplete items" in {
+        "direct the user to the 'Your responsible people' page to show the incomplete items" in {
           val mockCacheMap = mock[CacheMap]
 
           val rp = Seq(completeModelNonUkResidentNonUkPassport,
@@ -308,7 +308,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "the section is complete with all the Responsible People being removed and has one incomplete model" must {
-        "successfully redirect to the 'your answers' page" in {
+        "successfully redirect to the 'your responsible people' page" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
@@ -327,7 +327,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
       }
 
       "the section is complete with one of the Responsible People object being removed" must {
-        "successfully redirect to check your answers page" in {
+        "successfully redirect to 'your responsible people' page" in {
           val mockCacheMap = mock[CacheMap]
 
           when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
