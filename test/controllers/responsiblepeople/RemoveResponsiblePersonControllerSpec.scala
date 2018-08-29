@@ -33,10 +33,10 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
 import play.api.test.Helpers.{status, _}
-import services.{AuthEnrolmentsService, StatusService}
+import services.StatusService
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -272,12 +272,12 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
           )))(any(), any(), any())
         }
 
-        "removing a responsible person from an application with status SubmissionReadyForReview" in new Fixture {
+        "removing a responsible person with lineId from an application with status SubmissionReadyForReview" in new Fixture {
 
           val emptyCache = CacheMap("", Map.empty)
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(ResponsiblePeopleList)))
+                  .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1, CompleteResponsiblePeople2, CompleteResponsiblePeople3))))
           when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.getStatus(any(), any(), any()))
@@ -290,6 +290,28 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
 
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople1.copy(status = Some(StatusConstants.Deleted), hasChanged = true),
+            CompleteResponsiblePeople2,
+            CompleteResponsiblePeople3
+          )))(any(), any(), any())
+        }
+
+        "removing a responsible person without lineId from an application with status SubmissionReadyForReview" in new Fixture {
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(Some(Seq(CompleteResponsiblePeople1.copy(lineId = None), CompleteResponsiblePeople2, CompleteResponsiblePeople3))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
+                  .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.getStatus(any(), any(), any()))
+                  .thenReturn(Future.successful(SubmissionReadyForReview))
+
+
+          val result = controller.remove(1)(request)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().url))
+
+          verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](any(), meq(Seq(
             CompleteResponsiblePeople2,
             CompleteResponsiblePeople3
           )))(any(), any(), any())
