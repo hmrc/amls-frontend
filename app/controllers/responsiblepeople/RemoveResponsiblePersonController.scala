@@ -64,9 +64,13 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
 
         statusService.getStatus flatMap {
           case NotCompleted | SubmissionReady => removeWithoutDate
-          case SubmissionReadyForReview => for {
-            _ <- updateDataStrict[ResponsiblePerson](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
-          } yield Redirect(routes.YourResponsiblePeopleController.get())
+          case SubmissionReadyForReview =>
+              getData[ResponsiblePerson](index) flatMap {
+                  case Some(person) if person.lineId.isDefined => for {
+                      _ <- updateDataStrict[ResponsiblePerson](index)(_.copy(status = Some(StatusConstants.Deleted), hasChanged = true))
+                  } yield Redirect(routes.YourResponsiblePeopleController.get())
+                  case _ => removeWithoutDate
+              }
           case _ =>
             getData[ResponsiblePerson](index) flatMap { _ match {
                 case Some(person) if person.lineId.isEmpty => removeWithoutDate
