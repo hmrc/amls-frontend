@@ -1602,8 +1602,8 @@ responsiblepeople.whomustregister.ymr = You must register:
 responsiblepeople.whomustregister.line_1 = owners, partners, directors, shadow directors, designated members, and anyone who is in effect directing the business
 responsiblepeople.whomustregister.line_2 = the nominated officer
 responsiblepeople.whomustregister.line_3 = beneficial owners or shareholders who own or control more than 25% of the business
-responsiblepeople.whomustregister.line_4 = other officers ot the business, like the company secretary
-responsiblepeople.whomustregister.line_5 = senior managers, of activities covered by Money Laundering Regulations
+responsiblepeople.whomustregister.line_4 = other officers of the business, like the company secretary
+responsiblepeople.whomustregister.line_5 = senior managers of activities covered by Money Laundering Regulations
 responsiblepeople.whomustregister.nopeople = You currently have no responsible people registered.
 
 responsiblepeople.registeredforvat.title = Is this person registered for VAT with that business?
