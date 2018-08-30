@@ -19,11 +19,14 @@
 @(msgContent: String, amlsRegNo: String, businessName: String, endDate: String)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading(Messages("notifications.rejr.title"), "summary.status")
+<header class="page-header">
+    <h1 class="heading-xlarge">Your application has been refused</h1>
+    <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
+</header>
 }
 
 @main(
-    title = Messages(Messages("notifications.rejr.title")) + " - " + Messages("summary.status"),
+    title = "Your application has been refused - Your registration",
     heading = header
 )  {
 
@@ -32,10 +35,10 @@
     <p>Your application to register @businessName for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 was refused on @endDate.</p>
     <p>This means you’re not supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
-    <h2 class="heading-medium">@Messages("notifications.reason.refusal")</h2>
+    <h2 class="heading-medium">Reason for refusal</h2>
     <p>@Html(msgContent)</p>
 
     @info_for_decision()
 
-    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">@Messages("button.back")</a>
+    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">Back</a>
 }
