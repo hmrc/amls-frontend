@@ -21,7 +21,4 @@ case class NotificationParams(msgTitle: String,
                               reference: Option[String],
                               businessName: String,
                               amlsRegNo: String,
-                              endDate: String
-                             ) {
-
-}
+                              endDate: String)
