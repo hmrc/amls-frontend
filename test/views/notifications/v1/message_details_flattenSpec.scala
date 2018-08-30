@@ -29,20 +29,20 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
   "message_details flattened view" must {
     "be the same as non-flattened view when reference is not none" in new ViewFixture {
       val viewV1 = views.html.notifications.v1.message_details("msgTitle", "msgContent", Some("reference"))
-      val htmlV1 = viewV1.body
+      val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
       val view = views.html.notifications.message_details("msgTitle", "msgContent", Some("reference"))
-      val htmlUnflattened = view.body
+      val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
       htmlV1 mustEqual htmlUnflattened
     }
 
     "be the same as non-flattened view when reference is none" in new ViewFixture {
       val viewV1 = views.html.notifications.v1.message_details("msgTitle", "msgContent", None)
-      val htmlV1 = viewV1.body
+      val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
       val view = views.html.notifications.message_details("msgTitle", "msgContent", None)
-      val htmlUnflattened = view.body
+      val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
       htmlV1 mustEqual htmlUnflattened
     }

@@ -29,10 +29,10 @@ class rejection_reasons_flattenSpec extends AmlsSpec with MustMatchers {
     "rejection_reasons flattened view" must {
         "be the same as non-flattened view" in new ViewFixture {
             val viewV1 = views.html.notifications.v1.rejection_reasons("msgContent", "amlsRegNo", "businessName", "endDate")
-            val htmlV1 = viewV1.body
+            val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", "businessName", "endDate")
-            val htmlUnflattened = view.body
+            val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
             htmlV1 mustEqual htmlUnflattened
         }
