@@ -20,7 +20,10 @@
 @(businessName: String, currentApplicationNotifications: Seq[NotificationRow], previousApplicationNotifications: Seq[NotificationRow] = Seq())(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading("notifications.header", "summary.status")
+    <header class="page-header">
+        <h1 class="heading-xlarge">Your messages</h1>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
+    </header>
 }
 
 @notification_table(
@@ -32,9 +35,9 @@
             <thead>
             <tr>
                 <th scope="col" class="message-unread"><span class="visuallyhidden">Status</span></th>
-                <th scope="col">@Messages("notifications.table.header.subject")</th>
-                <th class="message-type" scope="col">@Messages("notifications.table.header.type")</th>
-                <th scope="col" class="message-date">@Messages("notifications.table.header.date")</th>
+                <th scope="col">Subject</th>
+                <th class="message-type" scope="col">Type</th>
+                <th scope="col" class="message-date">Date</th>
             </tr>
             </thead>
             <tbody>
@@ -52,16 +55,16 @@
 }
 
 @notifications_your_messages(
-    title = Messages("notifications.header"),
+    title = "Your messages",
     heading = header
 ) {
 
-    <a id="back-button" href="@controllers.routes.StatusController.get().url" id="back-link" class="back-link">@Messages("button.back")</a>
+    <a id="back-button" href="@controllers.routes.StatusController.get().url" id="back-link" class="back-link">Back</a>
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             <p>
-                <span id="your-business" class="heading-small">@Messages("notifications.title")</span>
+                <span id="your-business" class="heading-small">Your business</span>
                 <br />
                 <span id="business-name">@businessName</span>
             </p>
@@ -74,7 +77,7 @@
         <div class="grid-layout">
             <div class="grid-layout__column grid-layout__column--2-3">
                 <p>
-                    <span id="previous-reg-title" class="heading-small">@Messages("notifications.previousReg")</span>
+                    <span id="previous-reg-title" class="heading-small">Messages from your previous registrations</span>
                 </p>
             </div>
         </div>
