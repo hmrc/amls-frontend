@@ -16,7 +16,9 @@
 
 package views.notifications.v1
 
-import models.notifications.{IDType, NotificationRow}
+import models.notifications.ContactType._
+import models.notifications.StatusType._
+import models.notifications.{IDType, NotificationRow, Status}
 import org.joda.time.DateTime
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
@@ -27,10 +29,28 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
         val currentNotifications: Seq[NotificationRow] = Seq(
-            NotificationRow(None, None, None, variation = true, new DateTime(2018, 1, 1, 0, 0), isRead = true, "XA000", IDType("id"))
+            NotificationRow(None, None, None, variation = true, new DateTime(2018, 1, 1, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Expired), None)), None, None, variation = true, new DateTime(2018, 1, 2, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(None, Some(ApplicationApproval), None, variation = true, new DateTime(2018, 1, 3, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Approved), None)), Some(RenewalApproval), None, variation = true, new DateTime(2018, 1, 4, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Rejected), None)), Some(ReminderToPayForVariation), None, variation = true, new DateTime(2018, 1, 5, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Revoked), None)), Some(RevocationReasons), None, variation = true, new DateTime(2018, 1, 6, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(DeRegistered), None)), Some(AutoExpiryOfRegistration), None, variation = true, new DateTime(2018, 1, 7, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Expired), None)), Some(MindedToReject), None, variation = true, new DateTime(2018, 1, 8, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Approved), None)), Some(NoLongerMindedToRevoke), None, variation = true, new DateTime(2018, 1, 9, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Rejected), None)), Some(RegistrationVariationApproval), None, variation = true, new DateTime(2018, 1, 10, 0, 0), isRead = false, "XA000", IDType("id"))
         )
         val previousNotifications: Seq[NotificationRow] = Seq(
-            NotificationRow(None, None, None, variation = true, new DateTime(2018, 1, 1, 0, 0), isRead = true, "XA000", IDType("id"))
+            NotificationRow(None, None, None, variation = true, new DateTime(2018, 1, 1, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Expired), None)), None, None, variation = true, new DateTime(2018, 1, 2, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(None, Some(ApplicationApproval), None, variation = true, new DateTime(2018, 1, 3, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Approved), None)), Some(RenewalApproval), None, variation = true, new DateTime(2018, 1, 4, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Rejected), None)), Some(ReminderToPayForVariation), None, variation = true, new DateTime(2018, 1, 5, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Revoked), None)), Some(RevocationReasons), None, variation = true, new DateTime(2018, 1, 6, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(DeRegistered), None)), Some(AutoExpiryOfRegistration), None, variation = true, new DateTime(2018, 1, 7, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Expired), None)), Some(MindedToReject), None, variation = true, new DateTime(2018, 1, 8, 0, 0), isRead = false, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Approved), None)), Some(NoLongerMindedToRevoke), None, variation = true, new DateTime(2018, 1, 9, 0, 0), isRead = true, "XA000", IDType("id")),
+            NotificationRow(Some(Status(Some(Rejected), None)), Some(RegistrationVariationApproval), None, variation = true, new DateTime(2018, 1, 10, 0, 0), isRead = false, "XA000", IDType("id"))
         )
     }
 
