@@ -15,27 +15,28 @@
  *@
 
 @import include._
+@import models.notifications.NotificationParams
 
-@(msgContent: String, reference: String, businessName: String)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
 @header = {
     <header class="page-header">
-        <h1 class="heading-xlarge">Refusal being considered</h1>
+        <h1 class="heading-xlarge">@notificationParams.msgTitle</h1>
         <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
     </header>
 }
 
 @main(
-    title = "Refusal being considered - Your registration",
+    title = notificationParams.msgTitle + " - Your registration",
     heading = header
 )  {
 
-    <p>Your reference: @reference</p>
-    <p>Your application to register @businessName for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has been considered and we currently believe it should be refused.</p>
+    <p>Your reference: @notificationParams</p>
+    <p>Your application to register @notificationParams for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has been considered and we currently believe it should be refused.</p>
     <p>If we do reject your application, you’ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <h2 class="heading-medium">Reason for considering refusal</h2>
-    <p>@Html(msgContent)</p>
+    <p>@Html(notificationParams.msgContent)</p>
 
     <p>You can view the regulations at <a href="http://www.legislation.gov.uk/search">www.legislation.gov.uk</a>.</p>
 

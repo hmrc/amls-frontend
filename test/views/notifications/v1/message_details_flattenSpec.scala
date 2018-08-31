@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import views.Fixture
@@ -24,11 +25,13 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    val notificationParamsSome = NotificationParams("msgTitle", "msgContent", Some("reference"))
+    val notificationParamsNone = NotificationParams("msgTitle", "msgContent", None)
   }
 
   "message_details flattened view" must {
     "be the same as non-flattened view when reference is not none" in new ViewFixture {
-      val viewV1 = views.html.notifications.v1.message_details("msgTitle", "msgContent", Some("reference"))
+      val viewV1 = views.html.notifications.v1.message_details(notificationParamsSome)
       val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
       val view = views.html.notifications.message_details("msgTitle", "msgContent", Some("reference"))
@@ -38,7 +41,7 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
     }
 
     "be the same as non-flattened view when reference is none" in new ViewFixture {
-      val viewV1 = views.html.notifications.v1.message_details("msgTitle", "msgContent", None)
+      val viewV1 = views.html.notifications.v1.message_details(notificationParamsNone)
       val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
       val view = views.html.notifications.message_details("msgTitle", "msgContent", None)

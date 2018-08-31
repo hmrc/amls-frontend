@@ -15,8 +15,9 @@
  *@
 
 @import include._
+@import models.notifications.NotificationParams
 
-@(msgContent: String, amlsRegNo: String, businessName: String, endDate: String)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
 @header = {
 <header class="page-header">
@@ -30,13 +31,13 @@
     heading = header
 )  {
 
-    <p>Your reference: @amlsRegNo</p>
+    <p>Your reference: @notificationParams</p>
 
-    <p>Your application to register @businessName for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 was refused on @endDate.</p>
+    <p>Your application to register @notificationParams for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 was refused on @notificationParams.endDate.</p>
     <p>This means you’re not supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <h2 class="heading-medium">Reason for refusal</h2>
-    <p>@Html(msgContent)</p>
+    <p>@Html(notificationParams.msgContent)</p>
 
     <p>You can view the regulations at <a href="http://www.legislation.gov.uk/search">www.legislation.gov.uk</a>.</p>
 

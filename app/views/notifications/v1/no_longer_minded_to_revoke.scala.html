@@ -15,8 +15,9 @@
  *@
 
 @import include._
+@import models.notifications.NotificationParams
 
-@(msgContent: String, amlsRegNo: String)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
 @header = {
 <header class="page-header">
@@ -30,7 +31,7 @@
     heading = header
 )  {
 
-    <p>Your reference: @amlsRegNo</p>
+    <p>Your reference: @notificationParams</p>
     <p>We recently contacted you to tell you we were considering the revocation of your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <p>We're no longer considering revocation and your supervision will continue as normal.</p>

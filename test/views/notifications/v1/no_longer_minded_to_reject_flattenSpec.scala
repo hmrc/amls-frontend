@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import views.Fixture
@@ -24,11 +25,13 @@ class no_longer_minded_to_reject_flattenSpec extends AmlsSpec with MustMatchers 
 
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
+
+        val notificationParams = NotificationParams("msgTitle", "reference")
     }
 
     "no_longer_minded_to_reject flattened view" must {
         "be the same as non-flattened view" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.no_longer_minded_to_reject("msgTitle", "reference")
+            val viewV1 = views.html.notifications.v1.no_longer_minded_to_reject(notificationParams)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.no_longer_minded_to_reject("msgTitle", "reference")
