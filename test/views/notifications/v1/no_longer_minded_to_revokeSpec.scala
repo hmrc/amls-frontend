@@ -14,14 +14,14 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1
 
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
+class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
@@ -31,28 +31,27 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
   }
 
-  "rejected_reasons view" must {
+  "minded_to_revoke view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
 
-      doc.title must be(Messages("notifications.rejr.title") +
-        " - " + Messages("status.title") +
+      doc.title must be("No longer considering revocation" +
+        " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
 
-      heading.html must be(Messages("notifications.rejr.title"))
-      subHeading.html must include(Messages("status.title"))
+      heading.html must be("No longer considering revocation")
+      subHeading.html must include("Your registration")
 
     }
 
   }
-
 
 }

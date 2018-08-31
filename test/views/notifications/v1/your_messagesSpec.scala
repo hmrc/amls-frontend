@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1
 
 import models.notifications.ContactType.RenewalApproval
 import models.notifications.StatusType.{Approved, Rejected}
@@ -67,15 +67,15 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
 
         val businessName = "Fake Name Ltd."
 
-        def view = views.html.notifications.your_messages(businessName, emptyNotifications, emptyNotifications)
+        def view = views.html.notifications.v1.your_messages(businessName, emptyNotifications, emptyNotifications)
     }
 
     trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
-        override def view = views.html.notifications.your_messages(businessName, notifications, emptyNotifications)
+        override def view = views.html.notifications.v1.your_messages(businessName, notifications, emptyNotifications)
     }
 
     trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
-        override def view = views.html.notifications.your_messages(businessName, notifications, notifications)
+        override def view = views.html.notifications.v1.your_messages(businessName, notifications, notifications)
     }
 
     "your_messages view" must {
