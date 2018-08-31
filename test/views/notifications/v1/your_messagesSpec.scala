@@ -81,7 +81,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
     "your_messages view" must {
 
         "have correct title" in new ViewFixture {
-            doc.title must be(Messages("notifications.header") +
+            doc.title must be("Your messages" +
                     " - " + Messages("title.amls") +
                     " - " + Messages("title.gov"))
         }
@@ -91,7 +91,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         }
 
         "have correct headings" in new ViewFixture {
-            heading.html must be(Messages("notifications.header"))
+            heading.html must be("Your messages")
         }
 
         "have a panel displaying the business name" in new ViewFixture {
@@ -103,9 +103,9 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         }
 
         "have a first notification table header" in new ViewFixture {
-            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.subject"))
-            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.type"))
-            doc.getElementById("current-application-notifications").text must include(Messages("notifications.table.header.date"))
+            doc.getElementById("current-application-notifications").text must include("Subject")
+            doc.getElementById("current-application-notifications").text must include("Type")
+            doc.getElementById("current-application-notifications").text must include("Date")
         }
 
         "have a row for each of the current notifications in the first notification table" in new ViewFixture {
@@ -157,7 +157,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
         "when previous notifications is a Seq containing notifications" must {
 
             "have a panel displaying previous registration title" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                doc.getElementById("previous-reg-title").text mustEqual Messages("notifications.previousReg")
+                doc.getElementById("previous-reg-title").text mustEqual "Messages from your previous registrations"
             }
 
             "have two tables with class notifications" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
@@ -166,9 +166,9 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
             }
 
             "have a second notification table header" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
-                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.subject"))
-                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.type"))
-                doc.getElementById("previous-application-notifications").text must include(Messages("notifications.table.header.date"))
+                doc.getElementById("previous-application-notifications").text must include("Subject")
+                doc.getElementById("previous-application-notifications").text must include("Type")
+                doc.getElementById("previous-application-notifications").text must include("Date")
             }
 
             "have a second notification table" in new CurrentNotificationsAndPreviousNotificationsViewFixture {
