@@ -18,7 +18,7 @@ package views.notifications.v1
 
 import models.notifications.ContactType._
 import models.notifications.StatusType._
-import models.notifications.{IDType, NotificationRow, Status}
+import models.notifications.{IDType, NotificationParams, NotificationRow, Status}
 import org.joda.time.DateTime
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
@@ -52,11 +52,16 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
             NotificationRow(Some(Status(Some(Approved), None)), Some(NoLongerMindedToRevoke), None, variation = true, new DateTime(2018, 1, 9, 0, 0), isRead = true, "XA000", IDType("id")),
             NotificationRow(Some(Status(Some(Rejected), None)), Some(RegistrationVariationApproval), None, variation = true, new DateTime(2018, 1, 10, 0, 0), isRead = false, "XA000", IDType("id"))
         )
+
+        val notificationParams = NotificationParams(businessName = "businessName", currentApplicationNotification = currentNotifications, previousApplicationNotification = previousNotifications)
+        val notificationParamsPreviousEmpty = NotificationParams(businessName = "businessName", currentApplicationNotification = currentNotifications)
+        val notificationParamsCurrentEmpty = NotificationParams(businessName = "businessName", previousApplicationNotification = previousNotifications)
+        val notificationParamsEmpty = NotificationParams(businessName = "businessName")
     }
 
     "your_messages flattened view" must {
         "be the same as non-flattened view when there are current and previous notifications" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.your_messages("businessName", currentNotifications, previousNotifications)
+            val viewV1 = views.html.notifications.v1.your_messages(notificationParams)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.your_messages("businessName", currentNotifications, previousNotifications)
@@ -66,7 +71,7 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
         }
 
         "be the same as non-flattened view when there are current notifications only" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.your_messages("businessName", currentNotifications, Seq())
+            val viewV1 = views.html.notifications.v1.your_messages(notificationParamsPreviousEmpty)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.your_messages("businessName", currentNotifications, Seq())
@@ -76,7 +81,7 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
         }
 
         "be the same as non-flattened view when there are previous notifications only" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.your_messages("businessName", Seq(), previousNotifications)
+            val viewV1 = views.html.notifications.v1.your_messages(notificationParamsCurrentEmpty)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.your_messages("businessName", Seq(), previousNotifications)
@@ -86,7 +91,7 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
         }
 
         "be the same as non-flattened view when there are neither current or previous notifications" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.your_messages("businessName", Seq(), Seq())
+            val viewV1 = views.html.notifications.v1.your_messages(notificationParamsEmpty)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
             val view = views.html.notifications.your_messages("businessName", Seq(), Seq())

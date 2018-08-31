@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -27,7 +28,7 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = "amlsRegNo")
 
   }
 
@@ -35,7 +36,7 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
+      def view = views.html.notifications.v1.no_longer_minded_to_revoke(notificationParams)
 
       doc.title must be("No longer considering revocation" +
         " - " + "Your registration" +
@@ -45,7 +46,7 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
+      def view = views.html.notifications.v1.no_longer_minded_to_revoke(notificationParams)
 
       heading.html must be("No longer considering revocation")
       subHeading.html must include("Your registration")

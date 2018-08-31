@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -27,7 +28,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val safeId = "safeId"
+    val notificationParams = NotificationParams(msgContent = "msgContent", reference = Some("reference"))
 
   }
 
@@ -35,7 +36,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_reject("msgContent", safeId)
+      def view = views.html.notifications.v1.no_longer_minded_to_reject(notificationParams)
 
       doc.title must be("No longer considering refusal" +
         " - " + "Your registration" +
@@ -45,7 +46,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_reject("msgContent", safeId)
+      def view = views.html.notifications.v1.no_longer_minded_to_reject(notificationParams)
 
       heading.html must be("No longer considering refusal")
       subHeading.html must include("Your registration")

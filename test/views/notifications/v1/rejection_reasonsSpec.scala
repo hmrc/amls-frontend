@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -27,7 +28,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", msgContent = "msgContent", amlsRefNo = "amlsRegNo", endDate = "endDate")
 
   }
 
@@ -35,7 +36,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1.rejection_reasons(notificationParams)
 
       doc.title must be("Your application has been refused" +
         " - " + "Your registration" +
@@ -45,7 +46,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1.rejection_reasons(notificationParams)
 
       heading.html must be("Your application has been refused")
       subHeading.html must include("Your registration")

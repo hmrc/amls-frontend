@@ -15,7 +15,7 @@
  *@
 
 @import include._
-@import models.notifications.NotificationParams
+@import models.notifications._
 
 @(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
@@ -66,14 +66,14 @@
             <p>
                 <span id="your-business" class="heading-small">Your business</span>
                 <br />
-                <span id="business-name">@notificationParams</span>
+                <span id="business-name">@notificationParams.businessName</span>
             </p>
         </div>
     </div>
 
-    @notification_table("current-application-notifications", notificationParams)
+    @notification_table("current-application-notifications", notificationParams.currentApplicationNotification)
 
-    @if((notificationParams.previousApplicationNotifications).length > 0) {
+    @if(notificationParams.previousApplicationNotification.length > 0) {
         <div class="grid-layout">
             <div class="grid-layout__column grid-layout__column--2-3">
                 <p>
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        @notification_table("previous-application-notifications", notificationParams)
+        @notification_table("previous-application-notifications", notificationParams.previousApplicationNotification)
     }
 
 }

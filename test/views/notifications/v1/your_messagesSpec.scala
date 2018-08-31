@@ -65,17 +65,21 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
             )
         )
 
-        val businessName = "Fake Name Ltd."
+      val businessName = "Fake Name Ltd."
 
-        def view = views.html.notifications.v1.your_messages(businessName, emptyNotifications, emptyNotifications)
+      val notificationParamsEmpty = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = emptyNotifications, previousApplicationNotification = emptyNotifications)
+      val notificationParamsEmptyPrevious = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = notifications, previousApplicationNotification = emptyNotifications)
+      val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = notifications, previousApplicationNotification = notifications)
+
+      def view = views.html.notifications.v1.your_messages(notificationParamsEmpty)
     }
 
     trait CurrentNotificationsOnlyViewFixture extends ViewFixture {
-        override def view = views.html.notifications.v1.your_messages(businessName, notifications, emptyNotifications)
+        override def view = views.html.notifications.v1.your_messages(notificationParamsEmptyPrevious)
     }
 
     trait CurrentNotificationsAndPreviousNotificationsViewFixture extends ViewFixture {
-        override def view = views.html.notifications.v1.your_messages(businessName, notifications, notifications)
+        override def view = views.html.notifications.v1.your_messages(notificationParams)
     }
 
     "your_messages view" must {

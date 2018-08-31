@@ -16,6 +16,7 @@
 
 package views.notifications.v1
 
+import models.notifications._
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -27,9 +28,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val safeId = "safeId"
-
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", reference = Some("reference"))
 
   }
 
@@ -37,7 +36,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.minded_to_reject("msgContent", safeId, businessName)
+      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
 
       doc.title must be("Refusal being considered" +
         " - " + "Your registration" +
@@ -47,7 +46,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.minded_to_reject("msgContent", safeId, businessName)
+      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
 
       heading.html must be("Refusal being considered")
       subHeading.html must include("Your registration")
