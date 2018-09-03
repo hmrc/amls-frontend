@@ -41,7 +41,7 @@
             @notifications.map { comms =>
             <tr class="@if(!comms.isRead){unread}">
                 <td>@if(!comms.isRead){<span class="circle"></span><span class="visuallyhidden">Unread</span>}else{<span class="visuallyhidden">Read</span>}</td>
-                <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber)">@Messages(comms.subject)</a></td>
+                <td><a href="@controllers.routes.NotificationController.messageDetails(comms._id.id, comms.getContactType, comms.amlsRegistrationNumber, comms.templateVersion)">@Messages(comms.subject)</a></td>
                 <td>@Messages(comms.notificationType)</td>
                 <td>@comms.dateReceived</td>
             </tr>

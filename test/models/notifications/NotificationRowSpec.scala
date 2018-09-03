@@ -79,7 +79,8 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
         "XJML00000200000",
-        new IDType("5832e38e01000001005ca3ff"))
+        new IDType("5832e38e01000001005ca3ff"),
+        1)
 
       val json = Json.parse(
         """
@@ -92,7 +93,8 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           | "receivedAt":{"$date":1479730062573},
           | "amlsRegistrationNumber":"XJML00000200000",
           | "isRead":false,
-          | "_id":{"$oid":"5832e38e01000001005ca3ff"}}
+          | "_id":{"$oid":"5832e38e01000001005ca3ff"},
+          | "templateVersion":1}
           |
         """.stripMargin)
 

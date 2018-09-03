@@ -80,7 +80,7 @@ class NotificationController @Inject()(
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
-  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = Authorised.async {
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
         statusService.getReadStatus(amlsRegNo) flatMap {
@@ -90,7 +90,7 @@ class NotificationController @Inject()(
               businessName <- BusinessName.getName(readStatus.safeId)
               details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
               status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
-            } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
+            } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status, templateVersion)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
           case _ => Future.successful(BadRequest)
         }
@@ -101,7 +101,8 @@ class NotificationController @Inject()(
                                      reference: (String, String),
                                      businessName: String,
                                      details: NotificationDetails,
-                                     status: SubmissionStatus)(implicit request: Request[_]) = {
+                                     status: SubmissionStatus,
+                                     templateVersion: Int)(implicit request: Request[_]) = {
 
     val msgText = details.messageText.getOrElse("")
 
