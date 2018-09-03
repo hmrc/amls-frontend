@@ -588,6 +588,51 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
     }
   }
 
+
+  "filterEmpty" must {
+    "return an empty array if the responsible person record is empty" in {
+      val rpSeq = Seq(ResponsiblePerson())
+      val rpFinal = rpSeq.filterEmpty
+      rpFinal must be(empty)
+    }
+
+    "return a non-empty array if the responsible person record is not empty" in {
+      val rpSeq = Seq(completeModelUkResident)
+      println(">>>>>>>>>>>>>>>>>>       " + completeModelUkResident.isComplete)
+      val rpFinal = rpSeq.filterEmpty
+      rpFinal.size must be(1)
+    }
+
+    "return a non-empty array on a mixture of responsible people" in {
+      val rpSeq = Seq(completeModelUkResident, ResponsiblePerson(), completeModelUkResident)
+      val rpFinal = rpSeq.filterEmpty
+      rpFinal.size must be(2)
+    }
+  }
+
+  "filterInComplete" must {
+    "return an empty array if the responsible person record is not complete" in {
+      val rpSeq = Seq(incompleteResponsiblePeopleUpToNonUkPassportNumber)
+      val rpFinal = rpSeq.filterInComplete
+      rpFinal must be(empty)
+    }
+
+    "return a non-empty array if the responsible person record is complete" in {
+      val rpSeq = Seq(completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true))
+      val rpFinal = rpSeq.filterInComplete
+      rpFinal.size must be(1)
+    }
+
+    "return a non-empty array on a mixture of Complete and InComplete responsible people" in {
+      val rpSeq = Seq(completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true),
+                    ResponsiblePerson(),
+                    completeModelNonUkResidentNonUkPassport.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true))
+      val rpFinal = rpSeq.filterInComplete
+      rpFinal.size must be(2)
+    }
+  }
+
+
   "anyChanged" must {
     val originalResponsiblePeople = Seq(completeModelNonUkResidentNonUkPassport)
     val responsiblePeopleChanged = Seq(completeModelNonUkResidentNonUkPassport.copy(hasChanged = true))
