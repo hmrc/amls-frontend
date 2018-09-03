@@ -67,9 +67,9 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
 
       val businessName = "Fake Name Ltd."
 
-      val notificationParamsEmpty = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = emptyNotifications, previousApplicationNotification = emptyNotifications)
-      val notificationParamsEmptyPrevious = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = notifications, previousApplicationNotification = emptyNotifications)
-      val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", currentApplicationNotification = notifications, previousApplicationNotification = notifications)
+      val notificationParamsEmpty = NotificationListParams(businessName = "Fake Name Ltd.", currentApplicationNotifications = emptyNotifications, previousApplicationNotifications = emptyNotifications)
+      val notificationParamsEmptyPrevious = NotificationListParams(businessName = "Fake Name Ltd.", currentApplicationNotifications = notifications, previousApplicationNotifications = emptyNotifications)
+      val notificationParams = NotificationListParams(businessName = "Fake Name Ltd.", currentApplicationNotifications = notifications, previousApplicationNotifications = notifications)
 
       def view = views.html.notifications.v1.your_messages(notificationParamsEmpty)
     }

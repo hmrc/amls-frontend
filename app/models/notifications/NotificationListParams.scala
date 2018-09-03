@@ -16,11 +16,6 @@
 
 package models.notifications
 
-case class NotificationParams(msgTitle: String = "",
-                              msgContent: String = "",
-                              reference: Option[String] = None,
-                              businessName: String = "",
-                              amlsRefNo: String = "",
-                              endDate: String = "")
-
-//object NotificationParams
+case class NotificationListParams(businessName: String = "",
+                                  currentApplicationNotifications: Seq[NotificationRow] = Seq(),
+                                  previousApplicationNotifications: Seq[NotificationRow] = Seq())

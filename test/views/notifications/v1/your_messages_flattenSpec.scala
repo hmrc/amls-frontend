@@ -18,7 +18,7 @@ package views.notifications.v1
 
 import models.notifications.ContactType._
 import models.notifications.StatusType._
-import models.notifications.{IDType, NotificationParams, NotificationRow, Status}
+import models.notifications.{IDType, NotificationListParams, NotificationRow, Status}
 import org.joda.time.DateTime
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
@@ -53,10 +53,10 @@ class your_messages_flattenSpec extends AmlsSpec with MustMatchers {
             NotificationRow(Some(Status(Some(Rejected), None)), Some(RegistrationVariationApproval), None, variation = true, new DateTime(2018, 1, 10, 0, 0), isRead = false, "XA000", IDType("id"))
         )
 
-        val notificationParams = NotificationParams(businessName = "businessName", currentApplicationNotification = currentNotifications, previousApplicationNotification = previousNotifications)
-        val notificationParamsPreviousEmpty = NotificationParams(businessName = "businessName", currentApplicationNotification = currentNotifications)
-        val notificationParamsCurrentEmpty = NotificationParams(businessName = "businessName", previousApplicationNotification = previousNotifications)
-        val notificationParamsEmpty = NotificationParams(businessName = "businessName")
+        val notificationParams = NotificationListParams(businessName = "businessName", currentApplicationNotifications = currentNotifications, previousApplicationNotifications = previousNotifications)
+        val notificationParamsPreviousEmpty = NotificationListParams(businessName = "businessName", currentApplicationNotifications = currentNotifications)
+        val notificationParamsCurrentEmpty = NotificationListParams(businessName = "businessName", previousApplicationNotifications = previousNotifications)
+        val notificationParamsEmpty = NotificationListParams(businessName = "businessName")
     }
 
     "your_messages flattened view" must {
