@@ -33,13 +33,16 @@ class notificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait V1Fixture extends TemplateRouteFixture {
         val templateRouteVersion = s"${ templateRoute }v1/"
+        val checkSums: Map[String, String] = Map(
+            "message_details" -> "61129094be6311b0704d785723e198948a96c4424d9d1c6e2ff9351be804fc6c"
+        )
     }
 
     val templateNames: Seq[String] = Seq(
         "message_details"
     )
 
-    def checkSum(s: String): String = {
+    def generateCheckSum(s: String): String = {
         String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(s.getBytes)))
     }
 
@@ -47,8 +50,8 @@ class notificationsCheckSumSpec extends AmlsSpec with MustMatchers {
         templateNames.foreach(templateName => {
             val source = Source.fromFile(s"${ templateRouteVersion }${ templateName }${ templateSuffix }")
             val lines: String = try source.mkString finally source.close()
-            val cs: String = checkSum(lines)
-            cs mustEqual "61129094be6311b0704d785723e198948a96c4424d9d1c6e2ff9351be804fc6c"
+            val checkSum: String = generateCheckSum(lines)
+            checkSum mustEqual checkSums(templateName)
         })
     }
 }
