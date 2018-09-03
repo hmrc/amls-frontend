@@ -311,6 +311,11 @@ object ResponsiblePerson {
       case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
       case _ => false
     }
+
+    def filterInComplete: Seq[ResponsiblePerson] = people.filter {
+      case p if(p.isComplete)  => true
+      case _ => false
+    }
   }
 
 }

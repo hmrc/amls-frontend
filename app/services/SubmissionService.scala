@@ -105,7 +105,7 @@ class SubmissionService @Inject()
    ec: ExecutionContext
   ): SubscriptionRequest = {
 
-    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
+    def filteredResponsiblePeople = cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty).map(_.filterInComplete)
 
     def filteredTradingPremises = cache.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
 
