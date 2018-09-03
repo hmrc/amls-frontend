@@ -108,19 +108,19 @@ class NotificationController @Inject()(
     val (amlsRefNo, safeId) = reference
 
     contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(msgText, amlsRefNo, businessName = businessName)))
-      case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(msgText, safeId, businessName = businessName)))
-      case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(msgText, safeId, businessName = businessName, endDate = details.dateReceived)))
-      case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(msgText, amlsRefNo, businessName = businessName, endDate = details.dateReceived)))
-      case NoLongerMindedToReject => Ok(views.html.notifications.v1.no_longer_minded_to_reject(NotificationParams(msgText, safeId)))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.v1.no_longer_minded_to_revoke(NotificationParams(msgText, amlsRefNo)))
+      case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName)))
+      case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(msgContent = msgText, reference = Some(safeId), businessName = businessName)))
+      case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(msgContent = msgText, reference = Some(safeId), businessName = businessName, endDate = details.dateReceived)))
+      case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived)))
+      case NoLongerMindedToReject => Ok(views.html.notifications.v1.no_longer_minded_to_reject(NotificationParams(msgContent = msgText, reference = Some(safeId))))
+      case NoLongerMindedToRevoke => Ok(views.html.notifications.v1.no_longer_minded_to_revoke(NotificationParams(msgContent = msgText, amlsRefNo = amlsRefNo)))
       case _ =>
         (status, contactType) match {
-          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
-            //Ok(views.html.notifications.message_details(details.subject, msgText, safeId.some))
-            Ok(views.html.notifications.v1.message_details(NotificationParams(details.subject, msgText, safeId.some)))
+          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
+            Ok(views.html.notifications.v1.message_details(NotificationParams(msgTitle = details.subject, msgContent = msgText, reference = safeId.some)))
+          }
           case _ =>
-            Ok(views.html.notifications.v1.message_details(NotificationParams(details.subject, msgText, None)))
+            Ok(views.html.notifications.v1.message_details(NotificationParams(msgTitle = details.subject, msgContent = msgText, reference = None)))
         }
     }
   }
