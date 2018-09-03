@@ -25,8 +25,8 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    val notificationParamsSome = NotificationParams("msgTitle", "msgContent", Some("reference"))
-    val notificationParamsNone = NotificationParams("msgTitle", "msgContent", None)
+    val notificationParamsSome = NotificationParams("notifications.header", "msgContent", Some("reference"))
+    val notificationParamsNone = NotificationParams("notifications.header", "msgContent", None)
   }
 
   "message_details flattened view" must {
@@ -34,7 +34,7 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
       val viewV1 = views.html.notifications.v1.message_details(notificationParamsSome)
       val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
-      val view = views.html.notifications.message_details("msgTitle", "msgContent", Some("reference"))
+      val view = views.html.notifications.message_details("notifications.header", "msgContent", Some("reference"))
       val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
       htmlV1 mustEqual htmlUnflattened
@@ -44,7 +44,7 @@ class message_details_flattenSpec extends AmlsSpec with MustMatchers {
       val viewV1 = views.html.notifications.v1.message_details(notificationParamsNone)
       val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
-      val view = views.html.notifications.message_details("msgTitle", "msgContent", None)
+      val view = views.html.notifications.message_details("notifications.header", "msgContent", None)
       val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
       htmlV1 mustEqual htmlUnflattened

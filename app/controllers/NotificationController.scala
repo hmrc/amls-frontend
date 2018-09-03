@@ -111,7 +111,7 @@ class NotificationController @Inject()(
       case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(
         msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName)))
       case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(
-        msgContent = msgText, reference = Some(safeId), businessName = businessName)))
+        msgContent = msgText, amlsRefNo = safeId, businessName = businessName)))
       case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(
         msgContent = msgText, reference = Some(safeId), businessName = businessName, endDate = details.dateReceived)))
       case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(
