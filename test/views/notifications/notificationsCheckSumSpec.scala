@@ -22,6 +22,8 @@ import java.security.MessageDigest
 import org.scalatest.MustMatchers
 import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.io.Source
+
 class notificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait TemplateRouteFixture extends AuthorisedFixture {
@@ -43,11 +45,10 @@ class notificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     "V1 checksums must be equal" in new V1Fixture {
         templateNames.foreach(templateName => {
-            val source = scala.io.Source.fromFile(s"${ templateRouteVersion }${ templateName }${ templateSuffix }")
+            val source = Source.fromFile(s"${ templateRouteVersion }${ templateName }${ templateSuffix }")
             val lines: String = try source.mkString finally source.close()
             val cs: String = checkSum(lines)
-            println(cs)
-            true mustEqual false
+            cs mustEqual "61129094be6311b0704d785723e198948a96c4424d9d1c6e2ff9351be804fc6c"
         })
     }
 }
