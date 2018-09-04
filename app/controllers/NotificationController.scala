@@ -110,41 +110,43 @@ class NotificationController @Inject()(
 
     val (amlsRefNo, safeId) = reference
 
-    println(s"template version: $templateVersion")
-
     def getTemplate[T](name : String)(implicit man: Manifest[T]) : T =
       Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
 
-//    implicit request: Request[_],m:Messages
-    def render(templateVersion: String) =
-      getTemplate[Template3[NotificationParams, Request[_], Messages, play.twirl.api.Html]](s"views.html.notifications.$templateVersion.minded_to_revoke")
-        .render(NotificationParams(msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName), request, m)
+    def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =
+      getTemplate[Template3[NotificationParams, Request[_], Messages, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
+        .render(notificationParams, request, m)
 
-    Ok(render(templateVersion))
+    val notification = contactType match {
+      case MindedToRevoke => render("minded_to_revoke", NotificationParams(
+        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName), templateVersion)
 
-//    contactType match {
-//      case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(
-//        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName)))
-//      case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(
-//        msgContent = msgText, amlsRefNo = safeId, businessName = businessName)))
-//      case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(
-//        msgContent = msgText, reference = Some(safeId), businessName = businessName, endDate = details.dateReceived)))
-//      case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(
-//        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived)))
-//      case NoLongerMindedToReject => Ok(views.html.notifications.v1.no_longer_minded_to_reject(NotificationParams(
-//        msgContent = msgText, reference = Some(safeId))))
-//      case NoLongerMindedToRevoke => Ok(views.html.notifications.v1.no_longer_minded_to_revoke(NotificationParams(
-//        msgContent = msgText, amlsRefNo = amlsRefNo)))
-//      case _ =>
-//        (status, contactType) match {
-//          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
-//            Ok(views.html.notifications.v1.message_details(NotificationParams(
-//              msgTitle = details.subject, msgContent = msgText, reference = safeId.some)))
-//          }
-//          case _ =>
-//            Ok(views.html.notifications.v1.message_details(NotificationParams(
-//              msgTitle = details.subject, msgContent = msgText, reference = None)))
-//        }
-//    }
+      case MindedToReject => render("minded_to_reject", NotificationParams(
+        msgContent = msgText, amlsRefNo = safeId, businessName = businessName), templateVersion)
+
+      case RejectionReasons => render("rejection_reasons", NotificationParams(
+        msgContent = msgText, amlsRefNo = safeId, businessName = businessName, endDate = details.dateReceived), templateVersion)
+
+      case RevocationReasons => render("revocation_reasons", NotificationParams(
+        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived), templateVersion)
+
+      case NoLongerMindedToReject => render("no_longer_minded_to_reject", NotificationParams(
+        msgContent = msgText, reference = Some(safeId)), templateVersion)
+
+      case NoLongerMindedToRevoke => render("no_longer_minded_to_revoke", NotificationParams(
+        msgContent = msgText, amlsRefNo = amlsRefNo), templateVersion)
+
+      case _ =>
+        (status, contactType) match {
+          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
+            render("message_details", NotificationParams(
+              msgTitle = details.subject, msgContent = msgText, reference = safeId.some), templateVersion)
+          }
+          case _ =>
+            render("message_details", NotificationParams(
+              msgTitle = details.subject, msgContent = msgText, reference = None), templateVersion)
+        }
+    }
+    Ok(notification)
   }
 }
