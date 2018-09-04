@@ -23,7 +23,9 @@ import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
+import play.api.i18n.Messages
 import play.api.mvc.{Request, Result}
+import play.twirl.api.{Template1, Template2, Template3}
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -102,7 +104,7 @@ class NotificationController @Inject()(
                                      businessName: String,
                                      details: NotificationDetails,
                                      status: SubmissionStatus,
-                                     templateVersion: String)(implicit request: Request[_]) = {
+                                     templateVersion: String)(implicit request: Request[_], m: Messages) = {
 
     val msgText = details.messageText.getOrElse("")
 
@@ -110,29 +112,39 @@ class NotificationController @Inject()(
 
     println(s"template version: $templateVersion")
 
-    contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName)))
-      case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(
-        msgContent = msgText, amlsRefNo = safeId, businessName = businessName)))
-      case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(
-        msgContent = msgText, reference = Some(safeId), businessName = businessName, endDate = details.dateReceived)))
-      case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived)))
-      case NoLongerMindedToReject => Ok(views.html.notifications.v1.no_longer_minded_to_reject(NotificationParams(
-        msgContent = msgText, reference = Some(safeId))))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.v1.no_longer_minded_to_revoke(NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo)))
-      case _ =>
-        (status, contactType) match {
-          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
-            Ok(views.html.notifications.v1.message_details(NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, reference = safeId.some)))
-          }
-          case _ =>
-            Ok(views.html.notifications.v1.message_details(NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, reference = None)))
-        }
-    }
+    def getTemplate[T](name : String)(implicit man: Manifest[T]) : T =
+      Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
+
+//    implicit request: Request[_],m:Messages
+    def render(templateVersion: String) =
+      getTemplate[Template3[NotificationParams, Request[_], Messages, play.twirl.api.Html]](s"views.html.notifications.$templateVersion.minded_to_revoke")
+        .render(NotificationParams(msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName), request, m)
+
+    Ok(render(templateVersion))
+
+//    contactType match {
+//      case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(
+//        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName)))
+//      case MindedToReject => Ok(views.html.notifications.v1.minded_to_reject(NotificationParams(
+//        msgContent = msgText, amlsRefNo = safeId, businessName = businessName)))
+//      case RejectionReasons => Ok(views.html.notifications.v1.rejection_reasons(NotificationParams(
+//        msgContent = msgText, reference = Some(safeId), businessName = businessName, endDate = details.dateReceived)))
+//      case RevocationReasons => Ok(views.html.notifications.v1.revocation_reasons(NotificationParams(
+//        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived)))
+//      case NoLongerMindedToReject => Ok(views.html.notifications.v1.no_longer_minded_to_reject(NotificationParams(
+//        msgContent = msgText, reference = Some(safeId))))
+//      case NoLongerMindedToRevoke => Ok(views.html.notifications.v1.no_longer_minded_to_revoke(NotificationParams(
+//        msgContent = msgText, amlsRefNo = amlsRefNo)))
+//      case _ =>
+//        (status, contactType) match {
+//          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
+//            Ok(views.html.notifications.v1.message_details(NotificationParams(
+//              msgTitle = details.subject, msgContent = msgText, reference = safeId.some)))
+//          }
+//          case _ =>
+//            Ok(views.html.notifications.v1.message_details(NotificationParams(
+//              msgTitle = details.subject, msgContent = msgText, reference = None)))
+//        }
+//    }
   }
 }
