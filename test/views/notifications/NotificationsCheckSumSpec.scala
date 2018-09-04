@@ -24,7 +24,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.io.Source
 
-class notificationsCheckSumSpec extends AmlsSpec with MustMatchers {
+class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait TemplateRouteFixture extends AuthorisedFixture {
         val templateRoute: String = "./app/views/notifications/"

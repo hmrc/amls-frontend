@@ -22,5 +22,3 @@ case class NotificationParams(msgTitle: String = "",
                               businessName: String = "",
                               amlsRefNo: String = "",
                               endDate: String = "")
-
-//object NotificationParams
