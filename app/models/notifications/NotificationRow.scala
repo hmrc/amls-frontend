@@ -31,8 +31,8 @@ case class NotificationRow(
                             receivedAt: DateTime,
                             isRead: Boolean,
                             amlsRegistrationNumber: String,
-                            _id: IDType,
-                            templateVersion: Int = 1
+                            templatePackageVersion: String = "1",
+                            _id: IDType
                           ) {
 
   def dateReceived: String = {

@@ -66,6 +66,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       false,
       amlsRegistrationNumber,
+      "1",
       IDType("132456")
     )
 
@@ -236,7 +237,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           "dfgdhsjk",
           ContactType.ApplicationAutorejectionForFailureToPay,
           amlsRegistrationNumber,
-          1
+          "1"
         )(request)
 
         status(result) mustBe 200
@@ -258,7 +259,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(
@@ -283,7 +284,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -308,7 +309,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.MindedToReject, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.MindedToReject, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -332,7 +333,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.RejectionReasons, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.RejectionReasons, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -357,7 +358,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.NoLongerMindedToReject, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.NoLongerMindedToReject, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must not include msgTxt
@@ -381,7 +382,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.RevocationReasons, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.RevocationReasons, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must include(msgTxt)
@@ -407,7 +408,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
-        val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke, amlsRegistrationNumber, "1")(request)
 
         status(result) mustBe 200
         contentAsString(result) must not include msgTxt
@@ -431,7 +432,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
-        val result = controller.messageDetails("", ContactType.MindedToReject, amlsRegistrationNumber, 1)(request)
+        val result = controller.messageDetails("", ContactType.MindedToReject, amlsRegistrationNumber, "1")(request)
 
         status(result) must be(NOT_FOUND)
       }
@@ -445,7 +446,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           .thenReturn(Future.successful(statusResponse.copy(safeId = None)))
 
         intercept[Exception]{
-          await(controller.messageDetails("", ContactType.MindedToReject, amlsRegistrationNumber, 1)(request))
+          await(controller.messageDetails("", ContactType.MindedToReject, amlsRegistrationNumber, "1")(request))
         }.getMessage must be("Unable to retrieve SafeID")
 
       }

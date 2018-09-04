@@ -68,7 +68,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given amlsRegNo" in new Fixture {
         val amlsRegistrationNumber = "XAML00000000000"
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", IDType(""))
+          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", "1", IDType(""))
         )
         val url = s"${connector.baseUrl}/org/TestOrgRef/$amlsRegistrationNumber"
 
@@ -84,7 +84,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
       "given safeId" in new Fixture {
         val safeId = "AA1234567891234"
         val response = Seq(
-          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", IDType(""))
+          NotificationRow(None, None, None, true, new DateTime(1981, 12, 1, 1, 3, DateTimeZone.UTC), false, "XJML00000200000", "1", IDType(""))
         )
         val url = s"${connector.baseUrl}/org/TestOrgRef/safeId/$safeId"
 

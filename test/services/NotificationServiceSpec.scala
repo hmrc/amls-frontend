@@ -58,6 +58,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       false,
       "XJML00000200000",
+      "1",
       IDType("132456")
     )
 

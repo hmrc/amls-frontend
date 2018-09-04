@@ -80,7 +80,7 @@ class NotificationController @Inject()(
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
-  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: Int) = Authorised.async {
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
         statusService.getReadStatus(amlsRegNo) flatMap {
@@ -102,11 +102,13 @@ class NotificationController @Inject()(
                                      businessName: String,
                                      details: NotificationDetails,
                                      status: SubmissionStatus,
-                                     templateVersion: Int)(implicit request: Request[_]) = {
+                                     templateVersion: String)(implicit request: Request[_]) = {
 
     val msgText = details.messageText.getOrElse("")
 
     val (amlsRefNo, safeId) = reference
+
+    println(s"template version: $templateVersion")
 
     contactType match {
       case MindedToRevoke => Ok(views.html.notifications.v1.minded_to_revoke(NotificationParams(
