@@ -25,7 +25,7 @@ import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
 import play.api.i18n.Messages
 import play.api.mvc.{Request, Result}
-import play.twirl.api.{Template1, Template2, Template3}
+import play.twirl.api.Template3
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -119,16 +119,16 @@ class NotificationController @Inject()(
 
     val notification = contactType match {
       case MindedToRevoke => render("minded_to_revoke", NotificationParams(
-        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = businessName), templateVersion)
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = Some(businessName)), templateVersion)
 
       case MindedToReject => render("minded_to_reject", NotificationParams(
-        msgContent = msgText, safeId = Some(safeId), businessName = businessName), templateVersion)
+        msgContent = msgText, safeId = Some(safeId), businessName = Some(businessName)), templateVersion)
 
       case RejectionReasons => render("rejection_reasons", NotificationParams(
-        msgContent = msgText, safeId = Some(safeId), businessName = businessName, endDate = details.dateReceived), templateVersion)
+        msgContent = msgText, safeId = Some(safeId), businessName = Some(businessName), endDate = Some(details.dateReceived)), templateVersion)
 
       case RevocationReasons => render("revocation_reasons", NotificationParams(
-        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = businessName, endDate = details.dateReceived), templateVersion)
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = Some(businessName), endDate = Some(details.dateReceived)), templateVersion)
 
       case NoLongerMindedToReject => render("no_longer_minded_to_reject", NotificationParams(
         msgContent = msgText, safeId = Some(safeId)), templateVersion)

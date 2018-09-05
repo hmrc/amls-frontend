@@ -34,7 +34,7 @@
     @notificationParams.amlsRefNo.map{ amlsRefNo =>
         <p>Your reference: @amlsRefNo</p>
     }
-    <p>We&#8217;re considering revoking your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 for @notificationParams.businessName.</p>
+    <p>We&#8217;re considering revoking your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 for @{notificationParams.businessName.map{d => d}}.</p>
     <p>If we do revoke your application, you&#8217;ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <h2 class="heading-medium">Reason for considering refusal</h2>

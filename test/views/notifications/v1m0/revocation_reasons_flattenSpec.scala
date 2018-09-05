@@ -26,7 +26,7 @@ class revocation_reasons_flattenSpec extends AmlsSpec with MustMatchers {
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
 
-        val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), businessName = "businessName", endDate = "endDate")
+        val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), businessName = Some("businessName"), endDate = Some("endDate"))
     }
 
     "revocation_reasons flattened view" must {

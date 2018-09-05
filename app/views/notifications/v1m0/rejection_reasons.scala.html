@@ -35,7 +35,7 @@
         <p>Your reference: @safeId</p>
     }
 
-    <p>Your application to register @notificationParams.businessName for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 was refused on @notificationParams.endDate.</p>
+    <p>Your application to register @{notificationParams.businessName.map{d => d}} for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 was refused on @{notificationParams.endDate.map{d => d}}.</p>
     <p>This means you’re not supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <h2 class="heading-medium">Reason for refusal</h2>

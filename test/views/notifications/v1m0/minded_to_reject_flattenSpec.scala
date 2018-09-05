@@ -25,7 +25,7 @@ class minded_to_reject_flattenSpec extends AmlsSpec with MustMatchers {
 
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
-        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "businessName", safeId = Some("reference"))
+        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("businessName"), safeId = Some("reference"))
     }
 
     "minded_to_reject flattened view" must {

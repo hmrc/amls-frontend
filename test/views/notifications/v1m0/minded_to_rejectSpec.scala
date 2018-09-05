@@ -28,7 +28,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", safeId = Some("reference"))
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), safeId = Some("reference"))
 
   }
 

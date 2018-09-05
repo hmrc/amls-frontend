@@ -26,7 +26,7 @@ class rejection_reasons_flattenSpec extends AmlsSpec with MustMatchers {
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
 
-        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "businessName", endDate = "endDate", safeId = Some("reference"))
+        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("businessName"), endDate = Some("endDate"), safeId = Some("reference"))
     }
 
     "rejection_reasons flattened view" must {

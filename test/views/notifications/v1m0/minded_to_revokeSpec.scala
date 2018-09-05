@@ -28,7 +28,7 @@ class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", amlsRefNo = Some("amlsRegNo"))
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), amlsRefNo = Some("amlsRegNo"))
 
   }
 

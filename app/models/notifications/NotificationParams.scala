@@ -20,5 +20,5 @@ case class NotificationParams(msgTitle: String = "",
                               msgContent: String = "",
                               safeId: Option[String] = None,
                               amlsRefNo: Option[String] = None,
-                              businessName: String = "",
-                              endDate: String = "")
+                              businessName: Option[String] = None,
+                              endDate: Option[String] = None)
