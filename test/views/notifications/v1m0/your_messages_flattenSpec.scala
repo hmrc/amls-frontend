@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.notifications.v1
+package views.notifications.v1m0
 
 import models.notifications.ContactType._
 import models.notifications.StatusType._

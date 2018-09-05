@@ -14,27 +14,26 @@
  * limitations under the License.
  */
 
-package views.notifications.v1
+package views.notifications.v1m0
 
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import views.Fixture
 
-class revocation_reasons_flattenSpec extends AmlsSpec with MustMatchers {
+class minded_to_reject_flattenSpec extends AmlsSpec with MustMatchers {
 
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
-
-        val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = "amlsRegNo", businessName = "businessName", endDate = "endDate")
+        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "businessName", amlsRefNo = "amlsRegNo")
     }
 
-    "revocation_reasons flattened view" must {
+    "minded_to_reject flattened view" must {
         "be the same as non-flattened view" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.revocation_reasons(notificationParams)
+            val viewV1 = views.html.notifications.v1.minded_to_reject(notificationParams)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
-            val view = views.html.notifications.revocation_reasons("msgContent", "amlsRegNo", "businessName", "endDate")
+            val view = views.html.notifications.minded_to_reject("msgContent","amlsRegNo", "businessName")
             val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
             htmlV1 mustEqual htmlUnflattened

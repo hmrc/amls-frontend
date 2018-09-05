@@ -44,7 +44,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
     }
 
     trait V1Fixture extends TemplateRouteFixture {
-        val templateRouteVersion = s"${ templateRoute }v1/"
+        val templateRouteVersion = s"${ templateRoute }v1m0/"
         val checkSums: Map[String, String] = Map(
             "message_details" -> "61129094be6311b0704d785723e198948a96c4424d9d1c6e2ff9351be804fc6c",
             "minded_to_reject" -> "928eb5662a97231f1b1c6c17761f5dd3bfc68d4c1bf6f19804744f4d8d799c90",

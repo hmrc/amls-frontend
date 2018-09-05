@@ -14,31 +14,31 @@
  * limitations under the License.
  */
 
-package views.notifications.v1
+package views.notifications.v1m0
 
-import models.notifications.NotificationParams
+import models.notifications._
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
+class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = "amlsRegNo")
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", reference = Some("reference"))
 
   }
 
-  "minded_to_revoke view" must {
+  "minded_to_reject view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_revoke(notificationParams)
+      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
 
-      doc.title must be("No longer considering revocation" +
+      doc.title must be("Refusal being considered" +
         " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -46,13 +46,14 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.no_longer_minded_to_revoke(notificationParams)
+      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
 
-      heading.html must be("No longer considering revocation")
+      heading.html must be("Refusal being considered")
       subHeading.html must include("Your registration")
 
     }
 
   }
+
 
 }

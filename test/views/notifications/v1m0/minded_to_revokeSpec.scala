@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.notifications.v1
+package views.notifications.v1m0
 
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
@@ -22,23 +22,23 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
+class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", msgContent = "msgContent", amlsRefNo = "amlsRegNo", endDate = "endDate")
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", amlsRefNo = "amlsRegNo")
 
   }
 
-  "revocation_reasons view" must {
+  "minded_to_revoke view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.revocation_reasons(notificationParams)
+      def view = views.html.notifications.v1.minded_to_revoke(notificationParams)
 
-      doc.title must be("Your supervision has been revoked" +
+      doc.title must be("Revocation being considered" +
         " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -46,9 +46,9 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.revocation_reasons(notificationParams)
+      def view = views.html.notifications.v1.minded_to_revoke(notificationParams)
 
-      heading.html must be("Your supervision has been revoked")
+      heading.html must be("Revocation being considered")
       subHeading.html must include("Your registration")
 
     }

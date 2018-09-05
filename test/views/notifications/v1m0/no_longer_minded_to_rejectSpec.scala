@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package views.notifications.v1
+package views.notifications.v1m0
 
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
@@ -22,23 +22,23 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
+class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", msgContent = "msgContent", amlsRefNo = "amlsRegNo", endDate = "endDate")
+    val notificationParams = NotificationParams(msgContent = "msgContent", reference = Some("reference"))
 
   }
 
-  "rejected_reasons view" must {
+  "minded_to_reject view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.rejection_reasons(notificationParams)
+      def view = views.html.notifications.v1.no_longer_minded_to_reject(notificationParams)
 
-      doc.title must be("Your application has been refused" +
+      doc.title must be("No longer considering refusal" +
         " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
@@ -46,14 +46,13 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.rejection_reasons(notificationParams)
+      def view = views.html.notifications.v1.no_longer_minded_to_reject(notificationParams)
 
-      heading.html must be("Your application has been refused")
+      heading.html must be("No longer considering refusal")
       subHeading.html must include("Your registration")
 
     }
 
   }
-
 
 }
