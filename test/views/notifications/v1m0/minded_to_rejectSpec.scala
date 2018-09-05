@@ -28,7 +28,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", reference = Some("reference"))
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "Fake Name Ltd.", safeId = Some("reference"))
 
   }
 
@@ -36,7 +36,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
 
       doc.title must be("Refusal being considered" +
         " - " + "Your registration" +
@@ -46,7 +46,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.minded_to_reject(notificationParams)
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
 
       heading.html must be("Refusal being considered")
       subHeading.html must include("Your registration")

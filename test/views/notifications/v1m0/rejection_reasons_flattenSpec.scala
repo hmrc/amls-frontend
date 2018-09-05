@@ -26,15 +26,15 @@ class rejection_reasons_flattenSpec extends AmlsSpec with MustMatchers {
     trait ViewFixture extends Fixture {
         implicit val requestWithToken = addToken(request)
 
-        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "businessName", endDate = "endDate", amlsRefNo = "amlsRegNo")
+        val notificationParams = NotificationParams(msgContent = "msgContent", businessName = "businessName", endDate = "endDate", safeId = Some("reference"))
     }
 
     "rejection_reasons flattened view" must {
         "be the same as non-flattened view" in new ViewFixture {
-            val viewV1 = views.html.notifications.v1.rejection_reasons(notificationParams)
+            val viewV1 = views.html.notifications.v1m0.rejection_reasons(notificationParams)
             val htmlV1 = viewV1.body.filterNot(Set('\n', '\t', ' ').contains)
 
-            val view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", "businessName", "endDate")
+            val view = views.html.notifications.rejection_reasons("msgContent", "reference", "businessName", "endDate")
             val htmlUnflattened = view.body.filterNot(Set('\n', '\t', ' ').contains)
 
             htmlV1 mustEqual htmlUnflattened

@@ -31,7 +31,9 @@
     heading = header
 )  {
 
-    <p>Your reference: @notificationParams.amlsRefNo</p>
+    @notificationParams.safeId.map{ safeId =>
+        <p>Your reference: @safeId</p>
+    }
     <p>Your application to register @notificationParams.businessName for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has been considered and we currently believe it should be refused.</p>
     <p>If we do reject your application, you’ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 

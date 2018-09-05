@@ -31,8 +31,8 @@
     title = Messages(notificationParams.msgTitle) + " - Your registration",
     heading = header
 )  {
-    @notificationParams.reference.map{ ref =>
-        <p>Your reference: @ref</p>
+    @notificationParams.safeId.map{ safeId =>
+        <p>Your reference: @safeId</p>
     }
     <p>@Html(notificationParams.msgContent)</p>
     <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">Back</a>

@@ -45,13 +45,13 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
     trait V1Fixture extends TemplateRouteFixture {
         val templateRouteVersion = s"${ templateRoute }v1m0/"
         val checkSums: Map[String, String] = Map(
-            "message_details" -> "61129094be6311b0704d785723e198948a96c4424d9d1c6e2ff9351be804fc6c",
-            "minded_to_reject" -> "928eb5662a97231f1b1c6c17761f5dd3bfc68d4c1bf6f19804744f4d8d799c90",
-            "minded_to_revoke" -> "a65db89e3b61f3e33b7aa86877e5b3ecf604974fba47b791db4cb65a601c726",
-            "no_longer_minded_to_reject" -> "8d90003634cde11db6114b49a6a50a2be34eb040cbcbf6fc1046759376c5092f",
-            "no_longer_minded_to_revoke" -> "4ed45f4f0f813c544a4cc9a75748b5ea30a6ccb68a04035bf317398487461942",
-            "rejection_reasons" -> "1f6199b002d0f0652c386126fd0830c42578eb70f87fc7a683a310d68ea6ff3d",
-            "revocation_reasons" -> "e24be18a9e459fcf9febc16b344d9c67c1dc347a4f256821cd169c10ae1c206c"
+            "message_details" -> "bdf7127cf68f52ed48a7393bd0f9a99330a4b7c6955f6cd7948bd7281d71b387",
+            "minded_to_reject" -> "a23e584f9b233421701e44c3367f5f1f7040b98387b3976cf928f456d0e26ace",
+            "minded_to_revoke" -> "7d0fa72dcfbf78daa376ef66ce244f293c1322beec1969bcb005311ea213c5ff",
+            "no_longer_minded_to_reject" -> "1f7297641906bd1a2401071ba79363dc8f93a0d5228ffe3be86f0083c1ad5dd8",
+            "no_longer_minded_to_revoke" -> "e04806e5034c46802a94ddcb002df9eb1c039ec695c56595b5eac0e6470ba1fa",
+            "rejection_reasons" -> "466c1b5b3885d96e93edd100dbf747c45221daf5144565d9d67b7c2d7c8c3c07",
+            "revocation_reasons" -> "efe0f113254c9f778e5aae4eb2a682f871605c5cf2fcd3b006856f9bccb734f3"
         )
     }
 

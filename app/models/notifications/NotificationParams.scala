@@ -18,7 +18,7 @@ package models.notifications
 
 case class NotificationParams(msgTitle: String = "",
                               msgContent: String = "",
-                              reference: Option[String] = None,
+                              safeId: Option[String] = None,
+                              amlsRefNo: Option[String] = None,
                               businessName: String = "",
-                              amlsRefNo: String = "",
                               endDate: String = "")

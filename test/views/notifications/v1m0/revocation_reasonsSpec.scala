@@ -28,7 +28,7 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", msgContent = "msgContent", amlsRefNo = "amlsRegNo", endDate = "endDate")
+    val notificationParams = NotificationParams(businessName = "Fake Name Ltd.", msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), endDate = "endDate")
 
   }
 
@@ -36,7 +36,7 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1.revocation_reasons(notificationParams)
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
 
       doc.title must be("Your supervision has been revoked" +
         " - " + "Your registration" +
@@ -46,7 +46,7 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1.revocation_reasons(notificationParams)
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
 
       heading.html must be("Your supervision has been revoked")
       subHeading.html must include("Your registration")

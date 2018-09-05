@@ -119,32 +119,32 @@ class NotificationController @Inject()(
 
     val notification = contactType match {
       case MindedToRevoke => render("minded_to_revoke", NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName), templateVersion)
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = businessName), templateVersion)
 
       case MindedToReject => render("minded_to_reject", NotificationParams(
-        msgContent = msgText, amlsRefNo = safeId, businessName = businessName), templateVersion)
+        msgContent = msgText, safeId = Some(safeId), businessName = businessName), templateVersion)
 
       case RejectionReasons => render("rejection_reasons", NotificationParams(
-        msgContent = msgText, amlsRefNo = safeId, businessName = businessName, endDate = details.dateReceived), templateVersion)
+        msgContent = msgText, safeId = Some(safeId), businessName = businessName, endDate = details.dateReceived), templateVersion)
 
       case RevocationReasons => render("revocation_reasons", NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo, businessName = businessName, endDate = details.dateReceived), templateVersion)
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = businessName, endDate = details.dateReceived), templateVersion)
 
       case NoLongerMindedToReject => render("no_longer_minded_to_reject", NotificationParams(
-        msgContent = msgText, reference = Some(safeId)), templateVersion)
+        msgContent = msgText, safeId = Some(safeId)), templateVersion)
 
       case NoLongerMindedToRevoke => render("no_longer_minded_to_revoke", NotificationParams(
-        msgContent = msgText, amlsRefNo = amlsRefNo), templateVersion)
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo)), templateVersion)
 
       case _ =>
         (status, contactType) match {
           case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, reference = safeId.some), templateVersion)
+              msgTitle = details.subject, msgContent = msgText, safeId = safeId.some), templateVersion)
           }
           case _ =>
             render("message_details", NotificationParams(
-              msgTitle = details.subject, msgContent = msgText, reference = None), templateVersion)
+              msgTitle = details.subject, msgContent = msgText), templateVersion)
         }
     }
     Ok(notification)
