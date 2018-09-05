@@ -36,8 +36,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
             "no_longer_minded_to_reject",
             "no_longer_minded_to_revoke",
             "rejection_reasons",
-            "revocation_reasons",
-            "your_messages"
+            "revocation_reasons"
         )
         def generateCheckSum(s: String): String =
             String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(s.getBytes)))
@@ -52,8 +51,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
             "no_longer_minded_to_reject" -> "8d90003634cde11db6114b49a6a50a2be34eb040cbcbf6fc1046759376c5092f",
             "no_longer_minded_to_revoke" -> "4ed45f4f0f813c544a4cc9a75748b5ea30a6ccb68a04035bf317398487461942",
             "rejection_reasons" -> "1f6199b002d0f0652c386126fd0830c42578eb70f87fc7a683a310d68ea6ff3d",
-            "revocation_reasons" -> "e24be18a9e459fcf9febc16b344d9c67c1dc347a4f256821cd169c10ae1c206c",
-            "your_messages" -> "d3c6185f71d52f84e814554d4e72c93cb4adf9fc728f2b352c09ae880dcdaa2"
+            "revocation_reasons" -> "e24be18a9e459fcf9febc16b344d9c67c1dc347a4f256821cd169c10ae1c206c"
         )
     }
 

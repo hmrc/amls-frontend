@@ -78,7 +78,7 @@ class NotificationController @Inject()(
       val previousRecords: Seq[NotificationRow] = (for {
         amls <- refNumber
       } yield records.filter(_.amlsRegistrationNumber != amls)) getOrElse Seq()
-      Ok(views.html.notifications.v1.your_messages(NotificationListParams(businessName, currentRecords, previousRecords)))
+      Ok(views.html.notifications.your_messages(businessName, currentRecords, previousRecords))
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
