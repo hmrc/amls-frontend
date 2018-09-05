@@ -34,3 +34,9 @@ newpackageversion=v${majorversion}m${minorversion}
 
 echo $previouspackageversion
 echo $newpackageversion
+
+mkdir -p ./app/views/notifications/${newpackageversion}
+mkdir -p ./test/views/notifications/${newpackageversion}
+
+cp -r ./app/views/notifications/${previouspackageversion}/. ./app/views/notifications/${newpackageversion}
+cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifications/${newpackageversion}
