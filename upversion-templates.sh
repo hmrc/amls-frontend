@@ -21,6 +21,8 @@ for i in "${!packages[@]}"; do
     fi
 done
 
+previouspackageversion=v${majorversion}m${minorversion}
+
 if $minorflag; then
     ((minorversion++))
 else
@@ -30,4 +32,5 @@ fi
 
 newpackageversion=v${majorversion}m${minorversion}
 
+echo $previouspackageversion
 echo $newpackageversion
