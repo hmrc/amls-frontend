@@ -35,16 +35,21 @@ newpackageversion=v${majorversion}m${minorversion}
 echo $previouspackageversion
 echo $newpackageversion
 
-# mkdir -p ./app/views/notifications/${newpackageversion}
-# mkdir -p ./test/views/notifications/${newpackageversion}
+mkdir -p ./app/views/notifications/${newpackageversion}
+mkdir -p ./test/views/notifications/${newpackageversion}
 
-echo TODO: update version references in test files
+cp -r ./app/views/notifications/${previouspackageversion}/. ./app/views/notifications/${newpackageversion}
+cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifications/${newpackageversion}
+
+unittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
+
+for i in "${!unittestfilesfornewpackageversion[@]}"; do
+    unittestfile=${unittestfilesfornewpackageversion[$i]}
+    sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $unittestfile
+done
 
 echo TODO: checksum tests
 
 echo TODO: checksum files map?
 
 echo TODO: write to version number in checksum tests
-
-# cp -r ./app/views/notifications/${previouspackageversion}/. ./app/views/notifications/${newpackageversion}
-# cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifications/${newpackageversion}
