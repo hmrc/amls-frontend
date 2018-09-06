@@ -230,7 +230,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails(
@@ -256,7 +256,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("dfgdhsjk", ContactType.ReminderToPayForVariation, amlsRegistrationNumber, "v1m0")(request)
@@ -281,7 +281,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.MindedToRevoke, amlsRegistrationNumber, "v1m0")(request)
@@ -306,7 +306,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.MindedToReject, amlsRegistrationNumber, "v1m0")(request)
@@ -330,7 +330,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.RejectionReasons, amlsRegistrationNumber, "v1m0")(request)
@@ -355,7 +355,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.NoLongerMindedToReject, amlsRegistrationNumber, "v1m0")(request)
@@ -379,7 +379,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.RevocationReasons, amlsRegistrationNumber, "v1m0")(request)
@@ -405,7 +405,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(Some(notificationDetails)))
 
         val result = controller.messageDetails("id", ContactType.NoLongerMindedToRevoke, amlsRegistrationNumber, "v1m0")(request)
@@ -429,7 +429,7 @@ class NotificationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           dateTime
         )
 
-        when(mockNotificationService.getMessageDetails(any(), any(), any())(any(), any()))
+        when(mockNotificationService.getMessageDetails(any(), any(), any(), any())(any(), any()))
           .thenReturn(Future.successful(None))
 
         val result = controller.messageDetails("", ContactType.MindedToReject, amlsRegistrationNumber, "v1m0")(request)

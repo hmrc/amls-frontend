@@ -38,25 +38,25 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
       case notifications => notifications
     }
 
-  def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType)
+  def getMessageDetails(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                        (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     contactType match {
 
       case ContactType.ApplicationAutorejectionForFailureToPay |
            ContactType.RegistrationVariationApproval |
-           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType)
+           ContactType.DeRegistrationEffectiveDateChange => handleStaticMessage(amlsRegNo, id, contactType, templateVersion)
 
       case ContactType.ReminderToPayForVariation |
            ContactType.ReminderToPayForRenewal |
            ContactType.ReminderToPayForApplication |
-           ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType)
+           ContactType.ReminderToPayForManualCharges => handleReminderMessage(amlsRegNo, id, contactType, templateVersion)
 
-      case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType)
+      case ContactType.ApplicationApproval => handleEndDateWithRefMessage(amlsRegNo, id, contactType, templateVersion)
 
       case ContactType.RenewalApproval |
            ContactType.AutoExpiryOfRegistration |
-           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType)
+           ContactType.RenewalReminder => handleEndDateMessage(amlsRegNo, id, contactType, templateVersion)
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id))
@@ -65,7 +65,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType)
+  private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                  (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
@@ -73,10 +73,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
         Some(NotificationDetails(
           Some(contactType),
           None,
-          Some(
-            messagesApi(s"notification.static.text.$contactType",
-              controllers.routes.StatusController.get())
-          ),
+          Some(services.notifications.v1m0.MessageDetails.static(contactType, controllers.routes.StatusController.get().url)),
           false,
           notificationDetails.receivedAt
         ))
@@ -86,7 +83,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
   }
 
-  private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType)
+  private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                    (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
@@ -95,9 +92,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertReminderMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(messagesApi(
-            s"notification.reminder.to.pay.$contactType",
-            details.paymentAmount,
+          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.reminder(
+            contactType,
+            details.paymentAmount.toString,
             details.referenceNumber
           )))
         }
@@ -106,7 +103,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType)
+  private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                   (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
@@ -115,9 +112,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(messagesApi(
-            s"notification.message.with.end.date.$contactType",
-            details.endDate,
+          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.endDate(
+            contactType,
+            details.endDate.toString,
             controllers.routes.StatusController.get().url,
             ""
           )))
@@ -127,7 +124,7 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
     }
   }
 
-  private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType)
+  private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                          (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
@@ -136,9 +133,9 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateWithRefMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(messagesApi(
-            s"notification.message.with.end.date.$contactType",
-            details.endDate,
+          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.endDate(
+            contactType,
+            details.endDate.toString,
             controllers.routes.StatusController.get().url,
             details.referenceNumber.getOrElse("")
           )))

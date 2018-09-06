@@ -90,7 +90,7 @@ class NotificationController @Inject()(
             (for {
               safeId <- OptionT.fromOption[Future](readStatus.safeId)
               businessName <- BusinessName.getName(readStatus.safeId)
-              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
+              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion))
               status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
             } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status, templateVersion)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
