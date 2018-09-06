@@ -17,11 +17,15 @@
 package services.notifications.v1m0
 
 import models.notifications.ContactType
+import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
 
 object MessageDetails {
   def static(contactType: ContactType, url: String): String = {
-//    s"notification.static.text.$contactType"
-    ""
+    contactType match {
+      case ApplicationAutorejectionForFailureToPay => s"<p>Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p><p>As you’ve not paid the full fees due, your application has automatically expired.</p><p>You need to be registered with a <a href=${ "\"" }https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register${ "\"" }>supervisory body</a> if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p><p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account <a href=${ "\"" + url + "\"" }>status page</a>.</p>"
+      case RegistrationVariationApproval =>  s"<p>The recent changes made to your details have been approved.</p><p>You can find details of your registration on your <a href=${ "\"" + url + "\"" }>status page</a>.</p>"
+      case DeRegistrationEffectiveDateChange => s"<p>The date your anti-money laundering supervision ended has been changed.</p><p>You can see the new effective date on your <a href=${ "\"" + url + "\"" }>status page</a>.</p>"
+    }
   }
 
   def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String = {
