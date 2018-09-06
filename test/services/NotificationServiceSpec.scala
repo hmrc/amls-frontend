@@ -205,7 +205,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation, "v1m0"))
 
-          result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForVariation", Currency(1234), "ABC1234")
+          result.get.messageText.get mustBe("<p>You need to pay £1234.00 for the recent changes made to your details.</p><p>Your payment reference is: ABC1234.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>")
         }
 
         "contact type is ReminderToPayForApplication" in new Fixture {
@@ -221,7 +221,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication, "v1m0"))
 
-          result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForApplication", Currency(1234), "ABC1234")
+          result.get.messageText.get mustBe ("<p>You need to pay £1234.00 for your application to register with HM Revenue and Customs.</p><p>Your payment reference is: ABC1234.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>")
         }
 
         "contact type is ReminderToPayForRenewal" in new Fixture {
@@ -237,7 +237,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal, "v1m0"))
 
-          result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForRenewal", Currency(1234), "ABC1234")
+          result.get.messageText.get mustBe("<p>You need to pay £1234.00 for your annual renewal.</p><p>Your payment reference is: ABC1234.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>")
         }
 
         "contact type is ReminderToPayForManualCharges" in new Fixture {
@@ -253,7 +253,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges, "v1m0"))
 
-          result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges", Currency(1234), "ABC1234")
+          result.get.messageText.get mustBe("<p>You need to pay £1234.00 for the recent charge added to your account.</p><p>Your payment reference is: ABC1234.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>")
         }
 
         "contact type is ApplicationApproval" in new Fixture {
@@ -269,11 +269,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval, "v1m0"))
 
-          result.get.messageText.get mustBe Messages(
-            "notification.message.with.end.date.ApplicationApproval",
-            new LocalDate(2018, 7, 31),
-            controllers.routes.StatusController.get().url,
-            "ABC1234")
+          result.get.messageText.get mustBe(s"<p>Your application to register has been approved. You’re now registered until 2018-07-31.</p><p>Your anti-money laundering registration number is: ABC1234.</p><p>You can find details of your registration on your <a href=${ "\"" + controllers.routes.StatusController.get().url + "\"" }>status page</a>.</p>")
         }
 
         "contact type is RenewalApproval" in new Fixture {
@@ -289,11 +285,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval, "v1m0"))
 
-          result.get.messageText.get mustBe Messages(
-            "notification.message.with.end.date.RenewalApproval",
-            new LocalDate(2018, 7, 31),
-            controllers.routes.StatusController.get().url
-          )
+          result.get.messageText.get mustBe (s"<p>Your renewal has been approved. You’re now registered for supervision until 2018-07-31.</p><p>You can find details of your registration on your <a href=${ "\"" + controllers.routes.StatusController.get().url + "\"" }>status page</a>.</p>")
         }
 
         "contact type is AutoExpiryOfRegistration" in new Fixture {
@@ -309,11 +301,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration, "v1m0"))
 
-          result.get.messageText.get mustBe Messages(
-            "notification.message.with.end.date.AutoExpiryOfRegistration",
-            new LocalDate(2018, 7, 31),
-            controllers.routes.StatusController.get().url
-          )
+          result.get.messageText.get mustBe(s"<p>Your registration to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 expired on 2018-07-31.</p><p>You need to be registered with a <a href=${ "\"" }https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register${ "\"" }>supervisory body</a> if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p><p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your <a href=${ "\"" + controllers.routes.StatusController.get().url + "\"" }>status page</a>.</p>")
         }
 
         "contact type is RenewalReminder" in new Fixture {
@@ -329,11 +317,8 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
           val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder, "v1m0"))
 
-          result.get.messageText.get mustBe Messages(
-            "notification.message.with.end.date.RenewalReminder",
-            new LocalDate(2018, 7, 31),
-            controllers.routes.StatusController.get().url
-          )
+          result.get.messageText.get mustBe(s"<p>You need to renew your registration before 2018-07-31.</p><p>You can renew from your <a href=${ "\"" + controllers.routes.StatusController.get().url + "\"" }>status page</a>.</p><p>If you don’t renew and pay your fees before this date your registration will expire and you won’t be supervised by HM Revenue and Customs.</p>")
+
         }
 
         "content message is ETMP markdown" in new Fixture {
