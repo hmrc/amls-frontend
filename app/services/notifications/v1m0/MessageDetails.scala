@@ -29,7 +29,6 @@ object MessageDetails {
   }
 
   def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String = {
-    //            s"notification.message.with.end.date.$contactType"
     contactType match {
       case ApplicationApproval => s"<p>Your application to register has been approved. You’re now registered until ${ endDate }.</p><p>Your anti-money laundering registration number is: ${ referenceNumber }.</p><p>You can find details of your registration on your <a href=${ "\"" + url + "\"" }>status page</a>.</p>"
       case RenewalApproval => s"<p>Your renewal has been approved. You’re now registered for supervision until ${ endDate }.</p><p>You can find details of your registration on your <a href=${ "\"" + url + "\"" }>status page</a>.</p>"
@@ -39,7 +38,6 @@ object MessageDetails {
   }
 
   def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String = {
-    //            s"notification.reminder.to.pay.$contactType"
     contactType match {
       case ReminderToPayForVariation => s"<p>You need to pay ${ paymentAmount } for the recent changes made to your details.</p><p>Your payment reference is: ${ referenceNumber }.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"
       case ReminderToPayForRenewal => s"<p>You need to pay ${ paymentAmount } for your annual renewal.</p><p>Your payment reference is: ${ referenceNumber }.</p><p>Find details of how to pay on your online account home page.</p><p>It can take time for some payments to clear, so if you’ve already paid you can ignore this message.</p>"
