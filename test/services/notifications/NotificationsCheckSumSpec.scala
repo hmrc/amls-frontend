@@ -32,23 +32,24 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
         val templateNames: Seq[String] = Seq(
             "MessageDetails"
         )
+        val versionNumbers: Seq[String] = Seq(
+            "v1m0/"
+        )
         def generateCheckSum(s: String): String =
             String.format("%032x", new BigInteger(1, MessageDigest.getInstance("SHA-256").digest(s.getBytes)))
-    }
-
-    trait V1Fixture extends TemplateRouteFixture {
-        val templateRouteVersion = s"${ templateRoute }v1m0/"
         val checkSums: Map[String, String] = Map(
-            "MessageDetails" -> "49e4bc6831d3a03264d00294745b726e42ef9bc9b44da7b234f12e8c2dedeb42"
+            "v1m0/MessageDetails" -> "49e4bc6831d3a03264d00294745b726e42ef9bc9b44da7b234f12e8c2dedeb42"
         )
     }
 
-    "V1 checksums must be equal" in new V1Fixture {
-        templateNames.foreach(templateName => {
-            val source = Source.fromFile(s"${ templateRouteVersion }${ templateName }${ templateSuffix }")
-            val lines: String = try source.mkString finally source.close()
-            val checkSum: String = generateCheckSum(lines)
-            checkSum mustEqual checkSums(templateName)
+    "Checksums must be equal" in new TemplateRouteFixture {
+        versionNumbers.foreach(versionNumber => {
+            templateNames.foreach(templateName => {
+                val source = Source.fromFile(s"${ templateRoute }${ versionNumber }${ templateName }${ templateSuffix }")
+                val lines: String = try source.mkString finally source.close()
+                val checkSum: String = generateCheckSum(lines)
+                checkSum mustEqual checkSums(s"${ versionNumber }${ templateName }")
+            })
         })
     }
 }
