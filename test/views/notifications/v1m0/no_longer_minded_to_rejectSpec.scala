@@ -28,7 +28,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", safeId = Some("reference"))
+    val notificationParams = NotificationParams(safeId = Some("reference"))
 
   }
 
@@ -51,6 +51,13 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
       heading.html must be("No longer considering refusal")
       subHeading.html must include("Your registration")
 
+    }
+
+    "have correct reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.no_longer_minded_to_reject(notificationParams)
+
+      doc.html must include("reference")
     }
 
   }

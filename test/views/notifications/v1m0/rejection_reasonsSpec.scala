@@ -19,6 +19,7 @@ package views.notifications.v1m0
 import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 
@@ -28,7 +29,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), endDate = Some("endDate"))
+    val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", safeId = Some("reference"), endDate = Some("endDate"))
 
   }
 
@@ -53,6 +54,12 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     }
 
+    "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.rejection_reasons(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference") and include("endDate"))
+    }
   }
 
 

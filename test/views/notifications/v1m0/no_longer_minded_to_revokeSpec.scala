@@ -28,7 +28,7 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val notificationParams = NotificationParams(msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"))
+    val notificationParams = NotificationParams(amlsRefNo = Some("amlsRegNo"))
 
   }
 
@@ -51,6 +51,13 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
       heading.html must be("No longer considering revocation")
       subHeading.html must include("Your registration")
 
+    }
+
+    "have correct reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+
+      doc.html must include("amlsRegNo")
     }
 
   }

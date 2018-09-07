@@ -53,7 +53,11 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     }
 
+    "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo") and include("endDate"))
+    }
   }
-
-
 }

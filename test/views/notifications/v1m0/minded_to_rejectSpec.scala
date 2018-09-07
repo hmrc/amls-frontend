@@ -53,7 +53,11 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     }
 
+    "have correct content, businessName and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference"))
+    }
   }
-
-
 }
