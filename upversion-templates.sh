@@ -32,9 +32,6 @@ fi
 
 newpackageversion=v${majorversion}m${minorversion}
 
-echo $previouspackageversion
-echo $newpackageversion
-
 mkdir -p ./app/views/notifications/${newpackageversion}
 mkdir -p ./test/views/notifications/${newpackageversion}
 
@@ -44,7 +41,7 @@ cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifi
 viewunittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
 
 for i in "${!viewunittestfilesfornewpackageversion[@]}"; do
-    viewunittestfile=${unittestfilesfornewpackageversion[$i]}
+    viewunittestfile=${viewunittestfilesfornewpackageversion[$i]}
     sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $viewunittestfile
 done
 
@@ -54,10 +51,17 @@ mkdir -p ./test/services/notifications/${newpackageversion}
 cp -r ./app/services/notifications/${previouspackageversion}/. ./app/services/notifications/${newpackageversion}
 cp -r ./test/services/notifications/${previouspackageversion}/. ./test/services/notifications/${newpackageversion}
 
-serviceunittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
+servicefilesfornewpackageversion=(./app/services/notifications/${newpackageversion}/*)
+
+for i in "${!servicefilesfornewpackageversion[@]}"; do
+    servicefile=${servicefilesfornewpackageversion[$i]}
+    sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $servicefile
+done
+
+serviceunittestfilesfornewpackageversion=(./test/services/notifications/${newpackageversion}/*)
 
 for i in "${!serviceunittestfilesfornewpackageversion[@]}"; do
-    serviceunittestfile=${unittestfilesfornewpackageversion[$i]}
+    serviceunittestfile=${serviceunittestfilesfornewpackageversion[$i]}
     sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $serviceunittestfile
 done
 
