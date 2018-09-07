@@ -68,12 +68,15 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleStaticMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                  (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
+    val staticMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
+      .newInstance().asInstanceOf[{ def static(contactType: ContactType, url: String): String }]
+
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         Some(NotificationDetails(
           Some(contactType),
           None,
-          Some(services.notifications.v1m0.MessageDetails.static(contactType, controllers.routes.StatusController.get().url)),
+          Some(staticMessage.static(contactType, controllers.routes.StatusController.get().url)),
           false,
           notificationDetails.receivedAt
         ))
@@ -86,13 +89,16 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleReminderMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                    (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
+    val reminderMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
+      .newInstance().asInstanceOf[{ def reminder(contactType: ContactType, paymentAmount: String, referenceNumber: String): String }]
+
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertReminderMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.reminder(
+          notificationDetails.copy(messageText = Some(reminderMessage.reminder(
             contactType,
             details.paymentAmount.toString,
             details.referenceNumber
@@ -106,13 +112,16 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleEndDateMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                   (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
+    val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
+      .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
+
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.endDate(
+          notificationDetails.copy(messageText = Some(endDateMessage.endDate(
             contactType,
             details.endDate.toString,
             controllers.routes.StatusController.get().url,
@@ -127,13 +136,16 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
   private def handleEndDateWithRefMessage(amlsRegNo: String, id: String, contactType: ContactType, templateVersion: String)
                                          (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[NotificationDetails]] = {
 
+    val endDateMessage = Class.forName(s"services.notifications.${ templateVersion }.MessageDetails")
+      .newInstance().asInstanceOf[{ def endDate(contactType: ContactType, endDate: String, url: String, referenceNumber: String): String }]
+
     amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id) map {
       case Some(notificationDetails) => {
         for {
           message <- notificationDetails.messageText
           details <- NotificationDetails.convertEndDateWithRefMessageText(message)
         } yield {
-          notificationDetails.copy(messageText = Some(services.notifications.v1m0.MessageDetails.endDate(
+          notificationDetails.copy(messageText = Some(endDateMessage.endDate(
             contactType,
             details.endDate.toString,
             controllers.routes.StatusController.get().url,
