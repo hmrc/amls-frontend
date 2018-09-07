@@ -65,8 +65,6 @@ for i in "${!serviceunittestfilesfornewpackageversion[@]}"; do
     sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $serviceunittestfile
 done
 
-echo TODO: checksum tests
+mkdir -p ./conf/notifications/${newpackageversion}
 
-echo TODO: checksum files map?
-
-echo TODO: write to version number in checksum tests
+cp -r ./conf/notifications/${previouspackageversion}/. ./conf/notifications/${newpackageversion}
