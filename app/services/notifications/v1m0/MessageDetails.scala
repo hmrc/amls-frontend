@@ -19,9 +19,7 @@ package services.notifications.v1m0
 import models.notifications.ContactType
 import models.notifications.ContactType._
 
-class MessageDetails {
-
-}
+class MessageDetails
 
 object MessageDetails {
 

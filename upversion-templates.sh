@@ -41,11 +41,24 @@ mkdir -p ./test/views/notifications/${newpackageversion}
 cp -r ./app/views/notifications/${previouspackageversion}/. ./app/views/notifications/${newpackageversion}
 cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifications/${newpackageversion}
 
-unittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
+viewunittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
 
-for i in "${!unittestfilesfornewpackageversion[@]}"; do
-    unittestfile=${unittestfilesfornewpackageversion[$i]}
-    sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $unittestfile
+for i in "${!viewunittestfilesfornewpackageversion[@]}"; do
+    viewunittestfile=${unittestfilesfornewpackageversion[$i]}
+    sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $viewunittestfile
+done
+
+mkdir -p ./app/services/notifications/${newpackageversion}
+mkdir -p ./test/services/notifications/${newpackageversion}
+
+cp -r ./app/services/notifications/${previouspackageversion}/. ./app/services/notifications/${newpackageversion}
+cp -r ./test/services/notifications/${previouspackageversion}/. ./test/services/notifications/${newpackageversion}
+
+serviceunittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
+
+for i in "${!serviceunittestfilesfornewpackageversion[@]}"; do
+    serviceunittestfile=${unittestfilesfornewpackageversion[$i]}
+    sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $serviceunittestfile
 done
 
 echo TODO: checksum tests
