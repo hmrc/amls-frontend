@@ -68,3 +68,5 @@ done
 mkdir -p ./conf/notifications/${newpackageversion}
 
 cp -r ./conf/notifications/${previouspackageversion}/. ./conf/notifications/${newpackageversion}
+
+sed -i '' "s/${previouspackageversion}\"/${previouspackageversion}\",\"${newpackageversion}\"/g" ./test/NotificationsCheckSumSpec.scala

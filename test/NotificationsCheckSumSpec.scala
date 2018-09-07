@@ -26,7 +26,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait NotificationsCheckSumFixture extends AuthorisedFixture {
         val versionNumbers: Seq[String] = Seq(
-            "v1m0/"
+            "v1m0"
         )
         val checkSumRoute: String = "./conf/notifications/"
         def generateCheckSum(s: String): String =
@@ -59,34 +59,34 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     "Checksums must be equal - services" in new ServicesRouteFixture {
         versionNumbers.foreach(versionNumber => {
-            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }${ checkSumName }")
+            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }/${ checkSumName }")
             val checkSums: Map[String, String] = checkSumSource.getLines().map(line => {
                 val kv = line.split("=")
-                s"${ versionNumber }${ kv(0) }" -> kv(1)
+                s"${ versionNumber }/${ kv(0) }" -> kv(1)
             }).toMap
             checkSumSource.close()
             files.foreach(fileName => {
-                val source = Source.fromFile(s"${ route }${ versionNumber }${ fileName }${ suffix }")
+                val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
                 val lines: String = try source.mkString finally source.close()
                 val checkSum: String = generateCheckSum(lines)
-                checkSum mustEqual checkSums(s"${ versionNumber }${ fileName }")
+                checkSum mustEqual checkSums(s"${ versionNumber }/${ fileName }")
             })
         })
     }
 
     "Checksums must be equal - views" in new ViewsRouteFixture {
         versionNumbers.foreach(versionNumber => {
-            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }${ checkSumName }")
+            val checkSumSource = Source.fromFile(s"${ checkSumRoute }${ versionNumber }/${ checkSumName }")
             val checkSums: Map[String, String] = checkSumSource.getLines().map(line => {
                 val kv = line.split("=")
-                s"${ versionNumber }${ kv(0) }" -> kv(1)
+                s"${ versionNumber }/${ kv(0) }" -> kv(1)
             }).toMap
             checkSumSource.close()
             files.foreach(fileName => {
-                val source = Source.fromFile(s"${ route }${ versionNumber }${ fileName }${ suffix }")
+                val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
                 val lines: String = try source.mkString finally source.close()
                 val checkSum: String = generateCheckSum(lines)
-                checkSum mustEqual checkSums(s"${ versionNumber }${ fileName }")
+                checkSum mustEqual checkSums(s"${ versionNumber }/${ fileName }")
             })
         })
     }
