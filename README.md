@@ -8,3 +8,7 @@ amls-frontend
 This is the repository for the Anti-Money Laundering Supervision front end. This service provides users the ability to register for Supervision and update or vary their supervision details.
 
 To run the project clone the repository and in terminal $sbt "run $PORT"
+
+**Other helpful links**
+
+ * [Creating new notification template versions](documentation/template-versions.md)
