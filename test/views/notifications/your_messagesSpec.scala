@@ -41,7 +41,8 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 4, 1, 0, 0),
                 false,
                 "XAML00000123456",
-                _id = IDType("123")
+                "v1m0",
+                IDType("123")
             ),
             NotificationRow(
                 Some(Status(Some(Approved), None)),
@@ -51,7 +52,8 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 3, 1, 0, 0),
                 false,
                 "XAML00000123456",
-                _id = IDType("123")
+                "v1m0",
+                IDType("123")
             ),
             NotificationRow(
                 Some(Status(Some(Rejected), None)),
@@ -61,7 +63,8 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 2, 1, 0, 0),
                 false,
                 "XAML00000123456",
-                _id = IDType("123")
+                "v1m0",
+                IDType("123")
             )
         )
 

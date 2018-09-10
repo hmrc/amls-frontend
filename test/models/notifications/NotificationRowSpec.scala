@@ -36,7 +36,8 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     DateTime.now(),
     false,
     "XJML00000200000",
-    _id=IDType("1234567")
+    "v1m0",
+    IDType("1234567")
   )
 
   "NotificationRows " must {
