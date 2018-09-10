@@ -8,10 +8,10 @@ elif [ "$1" != "" ]; then
     exit 1
 fi
 
-packages=(./app/views/notifications/v*m*/)
+packages=(./conf/notifications/v*m*/)
 
 for i in "${!packages[@]}"; do
-    packages[$i]=${packages[$i]:26:4}
+    packages[$i]=${packages[$i]:21:4}
 done
 
 majorversion=0
@@ -37,10 +37,10 @@ fi
 
 newpackageversion=v${majorversion}m${minorversion}
 
-mkdir -p ./app/views/notifications/${newpackageversion}
-mkdir -p ./test/views/notifications/${newpackageversion}
-
+mkdir ./app/views/notifications/${newpackageversion}
 cp -r ./app/views/notifications/${previouspackageversion}/. ./app/views/notifications/${newpackageversion}
+
+mkdir ./test/views/notifications/${newpackageversion}
 cp -r ./test/views/notifications/${previouspackageversion}/. ./test/views/notifications/${newpackageversion}
 
 viewunittestfilesfornewpackageversion=(./test/views/notifications/${newpackageversion}/*)
@@ -50,10 +50,10 @@ for i in "${!viewunittestfilesfornewpackageversion[@]}"; do
     sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $viewunittestfile
 done
 
-mkdir -p ./app/services/notifications/${newpackageversion}
-mkdir -p ./test/services/notifications/${newpackageversion}
-
+mkdir ./app/services/notifications/${newpackageversion}
 cp -r ./app/services/notifications/${previouspackageversion}/. ./app/services/notifications/${newpackageversion}
+
+mkdir ./test/services/notifications/${newpackageversion}
 cp -r ./test/services/notifications/${previouspackageversion}/. ./test/services/notifications/${newpackageversion}
 
 servicefilesfornewpackageversion=(./app/services/notifications/${newpackageversion}/*)
@@ -70,8 +70,7 @@ for i in "${!serviceunittestfilesfornewpackageversion[@]}"; do
     sed -i '' "s/${previouspackageversion}/${newpackageversion}/g" $serviceunittestfile
 done
 
-mkdir -p ./conf/notifications/${newpackageversion}
-
+mkdir ./conf/notifications/${newpackageversion}
 cp -r ./conf/notifications/${previouspackageversion}/. ./conf/notifications/${newpackageversion}
 
 sed -i '' "s/${previouspackageversion}\"/${previouspackageversion}\",\"${newpackageversion}\"/g" ./test/NotificationsCheckSumSpec.scala
