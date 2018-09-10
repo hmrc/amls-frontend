@@ -41,6 +41,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 4, 1, 0, 0),
                 false,
                 "XAML00000123456",
+                "v1m0",
                 IDType("123")
             ),
             NotificationRow(
@@ -51,6 +52,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 3, 1, 0, 0),
                 false,
                 "XAML00000123456",
+                "v1m0",
                 IDType("123")
             ),
             NotificationRow(
@@ -61,6 +63,7 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
                 new DateTime(2018, 2, 1, 0, 0),
                 false,
                 "XAML00000123456",
+                "v1m0",
                 IDType("123")
             )
         )
@@ -82,8 +85,8 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
 
         "have correct title" in new ViewFixture {
             doc.title must be(Messages("notifications.header") +
-                    " - " + Messages("title.amls") +
-                    " - " + Messages("title.gov"))
+              " - " + Messages("title.amls") +
+              " - " + Messages("title.gov"))
         }
 
         "have a back button link" in new ViewFixture {

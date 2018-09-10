@@ -23,7 +23,9 @@ import javax.inject.{Inject, Singleton}
 import models.notifications.ContactType._
 import models.notifications._
 import models.status.{SubmissionDecisionRejected, SubmissionStatus}
+import play.api.i18n.Messages
 import play.api.mvc.{Request, Result}
+import play.twirl.api.Template3
 import services.businessmatching.BusinessMatchingService
 import services.{AuthEnrolmentsService, NotificationService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -80,7 +82,7 @@ class NotificationController @Inject()(
     }) getOrElse (throw new Exception("Cannot retrieve business name"))
   }
 
-  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String) = Authorised.async {
+  def messageDetails(id: String, contactType: ContactType, amlsRegNo: String, templateVersion: String) = Authorised.async {
     implicit authContext =>
       implicit request =>
         statusService.getReadStatus(amlsRegNo) flatMap {
@@ -88,9 +90,9 @@ class NotificationController @Inject()(
             (for {
               safeId <- OptionT.fromOption[Future](readStatus.safeId)
               businessName <- BusinessName.getName(readStatus.safeId)
-              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType))
+              details <- OptionT(amlsNotificationService.getMessageDetails(amlsRegNo, id, contactType, templateVersion))
               status <- OptionT.liftF(statusService.getStatus(amlsRegNo))
-            } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status)) getOrElse NotFound(notFoundView)
+            } yield contactTypeToResponse(contactType, (amlsRegNo, safeId), businessName, details, status, templateVersion)) getOrElse NotFound(notFoundView)
           case r if r.safeId.isEmpty => throw new Exception("Unable to retrieve SafeID")
           case _ => Future.successful(BadRequest)
         }
@@ -101,26 +103,50 @@ class NotificationController @Inject()(
                                      reference: (String, String),
                                      businessName: String,
                                      details: NotificationDetails,
-                                     status: SubmissionStatus)(implicit request: Request[_]) = {
+                                     status: SubmissionStatus,
+                                     templateVersion: String)(implicit request: Request[_], m: Messages) = {
 
     val msgText = details.messageText.getOrElse("")
 
     val (amlsRefNo, safeId) = reference
 
-    contactType match {
-      case MindedToRevoke => Ok(views.html.notifications.minded_to_revoke(msgText, amlsRefNo, businessName))
-      case MindedToReject => Ok(views.html.notifications.minded_to_reject(msgText, safeId, businessName))
-      case RejectionReasons => Ok(views.html.notifications.rejection_reasons(msgText, safeId, businessName, details.dateReceived))
-      case RevocationReasons => Ok(views.html.notifications.revocation_reasons(msgText, amlsRefNo, businessName, details.dateReceived))
-      case NoLongerMindedToReject => Ok(views.html.notifications.no_longer_minded_to_reject(msgText, safeId))
-      case NoLongerMindedToRevoke => Ok(views.html.notifications.no_longer_minded_to_revoke(msgText, amlsRefNo))
+    def getTemplate[T](name : String)(implicit man: Manifest[T]) : T =
+      Class.forName(name + "$").getField("MODULE$").get(man.runtimeClass).asInstanceOf[T]
+
+    def render(templateName: String, notificationParams: NotificationParams, templateVersion: String) =
+      getTemplate[Template3[NotificationParams, Request[_], Messages, play.twirl.api.Html]](s"views.html.notifications.${ templateVersion }.${ templateName }")
+        .render(notificationParams, request, m)
+
+    val notification = contactType match {
+      case MindedToRevoke => render("minded_to_revoke", NotificationParams(
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = Some(businessName)), templateVersion)
+
+      case MindedToReject => render("minded_to_reject", NotificationParams(
+        msgContent = msgText, safeId = Some(safeId), businessName = Some(businessName)), templateVersion)
+
+      case RejectionReasons => render("rejection_reasons", NotificationParams(
+        msgContent = msgText, safeId = Some(safeId), businessName = Some(businessName), endDate = Some(details.dateReceived)), templateVersion)
+
+      case RevocationReasons => render("revocation_reasons", NotificationParams(
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo), businessName = Some(businessName), endDate = Some(details.dateReceived)), templateVersion)
+
+      case NoLongerMindedToReject => render("no_longer_minded_to_reject", NotificationParams(
+        msgContent = msgText, safeId = Some(safeId)), templateVersion)
+
+      case NoLongerMindedToRevoke => render("no_longer_minded_to_revoke", NotificationParams(
+        msgContent = msgText, amlsRefNo = Some(amlsRefNo)), templateVersion)
+
       case _ =>
         (status, contactType) match {
-          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) =>
-            Ok(views.html.notifications.message_details(details.subject, msgText, safeId.some))
+          case (SubmissionDecisionRejected, _) | (_, DeRegistrationEffectiveDateChange) => {
+            render("message_details", NotificationParams(
+              msgTitle = details.subject, msgContent = msgText, safeId = safeId.some), templateVersion)
+          }
           case _ =>
-            Ok(views.html.notifications.message_details(details.subject, msgText, None))
+            render("message_details", NotificationParams(
+              msgTitle = details.subject, msgContent = msgText), templateVersion)
         }
     }
+    Ok(notification)
   }
 }

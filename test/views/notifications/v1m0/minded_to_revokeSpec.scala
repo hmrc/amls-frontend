@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1m0
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
+class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), amlsRefNo = Some("amlsRegNo"))
 
   }
 
@@ -35,23 +36,31 @@ class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
+      def view = views.html.notifications.v1m0.minded_to_revoke(notificationParams)
 
-      doc.title must be(Messages("notifications.nmrv.title") +
-        " - " + Messages("status.title") +
+      doc.title must be("Revocation being considered" +
+        " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.no_longer_minded_to_revoke("msgContent", "amlsRegNo")
+      def view = views.html.notifications.v1m0.minded_to_revoke(notificationParams)
 
-      heading.html must be(Messages("notifications.nmrv.title"))
-      subHeading.html must include(Messages("status.title"))
+      heading.html must be("Revocation being considered")
+      subHeading.html must include("Your registration")
 
     }
 
+    "have correct content, businessName and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.minded_to_revoke(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo"))
+    }
+
   }
+
 
 }

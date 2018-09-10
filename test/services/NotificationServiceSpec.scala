@@ -17,22 +17,21 @@
 package services
 
 import connectors.AmlsNotificationConnector
-import models.confirmation.Currency
-import models.notifications.ContactType.{ApplicationApproval, AutoExpiryOfRegistration, MindedToReject, MindedToRevoke, NoLongerMindedToReject, NoLongerMindedToRevoke, Others, RejectionReasons, ReminderToPayForApplication, ReminderToPayForManualCharges, ReminderToPayForRenewal, ReminderToPayForVariation, RenewalApproval, RenewalReminder, RevocationReasons}
-import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
-import org.joda.time.{DateTime, DateTimeZone, LocalDate}
+import models.notifications.ContactType._
+import models.notifications.{IDType, NotificationRow}
+import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.{Messages, MessagesApi}
+import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
 
@@ -58,6 +57,7 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
       false,
       "XJML00000200000",
+      "1",
       IDType("132456")
     )
 
@@ -101,290 +101,6 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
       result.head.receivedAt mustBe new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)
     }
 
-    "return static message details" when {
-
-      "contact type is auto-rejected for failure to pay" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ContactType.ApplicationAutorejectionForFailureToPay),
-            None,
-            None,
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails(
-          "thing",
-          "thing",
-          ContactType.ApplicationAutorejectionForFailureToPay
-        ))
-
-        result.get.messageText.get mustBe (
-          """<p>Your application to be supervised by HM Revenue and Customs (HMRC) under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has failed.</p>""" +
-            """<p>As you’ve not paid the full fees due, your application has automatically expired.</p>""" +
-            """<p>You need to be registered with a <a href="https://www.gov.uk/guidance/money-laundering-regulations-who-needs-to-register">supervisory body</a>""" +
-            """ if Money Laundering Regulations apply to your business. If you’re not supervised you may be subject to penalties and criminal charges.</p>""" +
-            """<p>If you still need to be registered with HMRC you should submit a new application immediately. You can apply from your account """ +
-            """<a href="""" +
-            controllers.routes.StatusController.get() +
-            """">status page</a>.</p>"""
-          )
-      }
-
-      "contact type is registration variation approval" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ContactType.RegistrationVariationApproval),
-            None,
-            None,
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails(
-          "thing",
-          "thing",
-          ContactType.RegistrationVariationApproval
-        ))
-
-        result.get.messageText.get mustBe (
-          """<p>The recent changes made to your details have been approved.</p>""" +
-            """<p>You can find details of your registration on your <a href="""" +
-            controllers.routes.StatusController.get() +
-            """">status page</a>.</p>"""
-          )
-      }
-
-      "contact type is DeRegistrationEffectiveDateChange" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ContactType.DeRegistrationEffectiveDateChange),
-            None,
-            None,
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails(
-          "thing",
-          "thing",
-          ContactType.DeRegistrationEffectiveDateChange
-        ))
-
-        result.get.messageText.get mustBe (
-          """<p>The date your anti-money laundering supervision ended has been changed.</p>""" +
-            """<p>You can see the new effective date on your <a href="""" +
-            controllers.routes.StatusController.get() +
-            """">status page</a>.</p>"""
-          )
-      }
-
-    }
-
-    "return correct message content" when {
-
-      "contact type is ReminderToPayForVariation" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ReminderToPayForVariation),
-            None,
-            Some(messageWithAmountRefNumberAndStatus),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
-
-        result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForVariation", Currency(1234), "ABC1234")
-      }
-
-      "contact type is ReminderToPayForApplication" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ReminderToPayForApplication),
-            None,
-            Some(messageWithAmountRefNumberAndStatus),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForApplication))
-
-        result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForApplication", Currency(1234), "ABC1234")
-      }
-
-      "contact type is ReminderToPayForRenewal" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ReminderToPayForRenewal),
-            None,
-            Some(messageWithAmountRefNumberAndStatus),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForRenewal))
-
-        result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForRenewal", Currency(1234), "ABC1234")
-      }
-
-      "contact type is ReminderToPayForManualCharges" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ReminderToPayForManualCharges),
-            None,
-            Some(messageWithAmountRefNumberAndStatus),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForManualCharges))
-
-        result.get.messageText.get mustBe Messages("notification.reminder.to.pay.ReminderToPayForManualCharges", Currency(1234), "ABC1234")
-      }
-
-      "contact type is ApplicationApproval" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(ApplicationApproval),
-            None,
-            Some(messageWithDateAndRefNumber),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
-
-        result.get.messageText.get mustBe Messages(
-          "notification.message.with.end.date.ApplicationApproval",
-          new LocalDate(2018, 7, 31),
-          controllers.routes.StatusController.get().url,
-          "ABC1234")
-      }
-
-      "contact type is RenewalApproval" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(RenewalApproval),
-            None,
-            Some(messageWithDate),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalApproval))
-
-        result.get.messageText.get mustBe Messages(
-          "notification.message.with.end.date.RenewalApproval",
-          new LocalDate(2018, 7, 31),
-          controllers.routes.StatusController.get().url
-        )
-      }
-
-      "contact type is AutoExpiryOfRegistration" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(AutoExpiryOfRegistration),
-            None,
-            Some(messageWithDate),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.AutoExpiryOfRegistration))
-
-        result.get.messageText.get mustBe Messages(
-          "notification.message.with.end.date.AutoExpiryOfRegistration",
-          new LocalDate(2018, 7, 31),
-          controllers.routes.StatusController.get().url
-        )
-      }
-
-      "contact type is RenewalReminder" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(RenewalReminder),
-            None,
-            Some(messageWithDate),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
-
-        result.get.messageText.get mustBe Messages(
-          "notification.message.with.end.date.RenewalReminder",
-          new LocalDate(2018, 7, 31),
-          controllers.routes.StatusController.get().url
-        )
-      }
-
-      "content message is ETMP markdown" in new Fixture {
-
-        val message = "<P># Test Heading</P><P>* bullet 1</P><P>* bullet 2</P><P>* bullet 3</P>"
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(NotificationDetails(
-            Some(MindedToReject),
-            None,
-            Some(message),
-            true,
-            dateTime
-          ))))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.MindedToRevoke))
-
-        result.get.messageText.get mustBe CustomAttributeProvider.commonMark(message)
-      }
-
-    }
-
-    "return None" when {
-      "getMessageDetails returns None and message is of type with end date only message" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.RenewalReminder))
-
-        result mustBe None
-
-      }
-
-      "getMessageDetails returns None and message is of type with end date and ref number message" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ApplicationApproval))
-
-        result mustBe None
-
-      }
-
-      "getMessageDetails returns None and message is of type with ref number, amount and status message" in new Fixture {
-
-        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
-
-        val result = await(service.getMessageDetails("regNo", "id", ContactType.ReminderToPayForVariation))
-
-        result mustBe None
-
-      }
-
-    }
   }
 
 }

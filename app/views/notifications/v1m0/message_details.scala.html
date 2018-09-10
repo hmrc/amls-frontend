@@ -16,20 +16,24 @@
 
 @import include._
 @import forms2._
+@import models.notifications.NotificationParams
 
-@(msgTitle: String, msgContent: String, reference: Option[String])(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading(msgTitle, "summary.status")
+    <header class="page-header">
+        <h1 class="heading-xlarge">@Messages(notificationParams.msgTitle)</h1>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
+    </header>
 }
 
 @main(
-    title = Messages(msgTitle) + " - " + Messages("summary.status"),
+    title = Messages(notificationParams.msgTitle) + " - Your registration",
     heading = header
 )  {
-    @reference.map{ ref =>
-        <p>Your reference: @ref</p>
+    @notificationParams.safeId.map{ safeId =>
+        <p>Your reference: @safeId</p>
     }
-    <p>@Html(msgContent)</p>
-    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">@Messages("button.back")</a>
+    <p>@Html(notificationParams.msgContent)</p>
+    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">Back</a>
 }

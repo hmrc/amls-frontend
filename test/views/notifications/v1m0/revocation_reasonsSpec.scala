@@ -14,8 +14,9 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1m0
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -27,7 +28,7 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(businessName = Some("Fake Name Ltd."), msgContent = "msgContent", amlsRefNo = Some("amlsRegNo"), endDate = Some("endDate"))
 
   }
 
@@ -35,24 +36,28 @@ class revocation_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.revocation_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
 
-      doc.title must be(Messages("notifications.revr.title") +
-        " - " + Messages("status.title") +
+      doc.title must be("Your supervision has been revoked" +
+        " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.revocation_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
 
-      heading.html must be(Messages("notifications.revr.title"))
-      subHeading.html must include(Messages("status.title"))
+      heading.html must be("Your supervision has been revoked")
+      subHeading.html must include("Your registration")
 
     }
 
+    "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.revocation_reasons(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo") and include("endDate"))
+    }
   }
-
-
 }

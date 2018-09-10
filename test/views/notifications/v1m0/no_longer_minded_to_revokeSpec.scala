@@ -14,20 +14,21 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1m0
 
+import models.notifications.NotificationParams
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
+class no_longer_minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(amlsRefNo = Some("amlsRegNo"))
 
   }
 
@@ -35,24 +36,30 @@ class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
 
-      doc.title must be(Messages("notifications.mtrv.title") +
-        " - " + Messages("status.title") +
+      doc.title must be("No longer considering revocation" +
+        " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.minded_to_revoke("msgContent", "amlsRegNo", businessName)
+      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
 
-      heading.html must be(Messages("notifications.mtrv.title"))
-      subHeading.html must include(Messages("status.title"))
+      heading.html must be("No longer considering revocation")
+      subHeading.html must include("Your registration")
 
     }
 
-  }
+    "have correct reference displayed" in new ViewFixture {
 
+      def view = views.html.notifications.v1m0.no_longer_minded_to_revoke(notificationParams)
+
+      doc.html must include("amlsRegNo")
+    }
+
+  }
 
 }

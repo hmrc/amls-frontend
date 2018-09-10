@@ -15,22 +15,28 @@
  *@
 
 @import include._
+@import models.notifications.NotificationParams
 
-@(msgContent: String, amlsRegNo: String)(implicit request: Request[_],m:Messages)
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
 
 @header = {
-    @heading(Messages("notifications.nmrv.title"), "summary.status")
+<header class="page-header">
+    <h1 class="heading-xlarge">No longer considering revocation</h1>
+    <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
+</header>
 }
 
 @main(
-    title = Messages(Messages("notifications.nmrv.title")) + " - " + Messages("summary.status"),
+    title = "No longer considering revocation - Your registration",
     heading = header
 )  {
 
-    <p>Your reference: @amlsRegNo</p>
+    @notificationParams.amlsRefNo.map{ amlsRefNo =>
+        <p>Your reference: @amlsRefNo</p>
+    }
     <p>We recently contacted you to tell you we were considering the revocation of your supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
 
     <p>We're no longer considering revocation and your supervision will continue as normal.</p>
 
-    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">@Messages("button.back")</a>
+    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">Back</a>
 }

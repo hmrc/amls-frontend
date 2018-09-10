@@ -36,6 +36,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
     DateTime.now(),
     false,
     "XJML00000200000",
+    "v1m0",
     IDType("1234567")
   )
 
@@ -79,7 +80,9 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
         "XJML00000200000",
-        new IDType("5832e38e01000001005ca3ff"))
+        "1",
+        new IDType("5832e38e01000001005ca3ff")
+        )
 
       val json = Json.parse(
         """
@@ -92,6 +95,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           | "receivedAt":{"$date":1479730062573},
           | "amlsRegistrationNumber":"XJML00000200000",
           | "isRead":false,
+          | "templatePackageVersion":"1",
           | "_id":{"$oid":"5832e38e01000001005ca3ff"}}
           |
         """.stripMargin)
@@ -114,6 +118,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
           "XJML00000200000",
+          "1",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -133,6 +138,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
           "XJML00000200000",
+          "1",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -151,6 +157,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
           "XJML00000200000",
+          "1",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -169,6 +176,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
           new DateTime(1479730062573L, DateTimeZone.UTC),
           false,
           "XJML00000200000",
+          "1",
           new IDType("5832e38e01000001005ca3ff"
           ))
 
@@ -187,6 +195,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
         "XJML00000200000",
+        "1",
         new IDType("5832e38e01000001005ca3ff"
         ))
 
@@ -251,6 +260,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
         "XJML00000200000",
+        "1",
         new IDType("5832e38e01000001005ca3ff"
         ))
 
@@ -298,6 +308,7 @@ class NotificationRowSpec extends PlaySpec with AmlsSpec {
         new DateTime(1479730062573L, DateTimeZone.UTC),
         false,
         "XJML00000200000",
+        "1",
         new IDType("5832e38e01000001005ca3ff"
         ))
 

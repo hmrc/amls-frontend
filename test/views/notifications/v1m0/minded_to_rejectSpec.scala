@@ -14,45 +14,50 @@
  * limitations under the License.
  */
 
-package views.notifications
+package views.notifications.v1m0
 
+import models.notifications._
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
+class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
 
     implicit val requestWithToken = addToken(request)
 
-    val businessName = "Fake Name Ltd."
+    val notificationParams = NotificationParams(msgContent = "msgContent", businessName = Some("Fake Name Ltd."), safeId = Some("reference"))
 
   }
 
-  "rejected_reasons view" must {
+  "minded_to_reject view" must {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
 
-      doc.title must be(Messages("notifications.rejr.title") +
-        " - " + Messages("status.title") +
+      doc.title must be("Refusal being considered" +
+        " - " + "Your registration" +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.rejection_reasons("msgContent", "amlsRegNo", businessName, "endDate")
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
 
-      heading.html must be(Messages("notifications.rejr.title"))
-      subHeading.html must include(Messages("status.title"))
+      heading.html must be("Refusal being considered")
+      subHeading.html must include("Your registration")
 
     }
 
+    "have correct content, businessName and reference displayed" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
+
+      doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference"))
+    }
   }
-
-
 }
