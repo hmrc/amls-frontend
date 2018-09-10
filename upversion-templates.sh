@@ -7,7 +7,7 @@ elif [ "$1" != "" ]; then
     exit 1
 fi
 
-packages=(./app/views/notifications/*/)
+packages=(./app/views/notifications/v*m*/)
 
 for i in "${!packages[@]}"; do
     packages[$i]=${packages[$i]:26:4}
