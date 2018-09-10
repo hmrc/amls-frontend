@@ -1,3 +1,5 @@
+#!/bin/bash
+
 minorflag=false
 if [ "$1" = "minor" ]; then
     minorflag=true
