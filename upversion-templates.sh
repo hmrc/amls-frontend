@@ -4,6 +4,7 @@ minorflag=false
 if [ "$1" = "minor" ]; then
     minorflag=true
 elif [ "$1" != "" ]; then
+    echo "Parameters passed in are not supported; only minor flag is allowed"
     exit 1
 fi
 
