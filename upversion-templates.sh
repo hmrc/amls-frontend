@@ -3,6 +3,8 @@
 minorflag=false
 if [ "$1" = "minor" ]; then
     minorflag=true
+elif [ "$1" != "" ]; then
+    exit 1
 fi
 
 packages=(./app/views/notifications/*/)
