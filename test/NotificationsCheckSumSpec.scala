@@ -69,7 +69,8 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
                 val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
                 val lines: String = try source.mkString finally source.close()
                 val checkSum: String = generateCheckSum(lines)
-                checkSum mustEqual checkSums(s"${ versionNumber }/${ fileName }")
+                assert(checkSum == checkSums(s"${ versionNumber }/${ fileName }"),
+                    s"Replace checksum for ${ versionNumber }/${ fileName } with ${ checkSum }")
             })
         })
     }
@@ -86,7 +87,8 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
                 val source = Source.fromFile(s"${ route }${ versionNumber }/${ fileName }${ suffix }")
                 val lines: String = try source.mkString finally source.close()
                 val checkSum: String = generateCheckSum(lines)
-                checkSum mustEqual checkSums(s"${ versionNumber }/${ fileName }")
+                assert(checkSum == checkSums(s"${ versionNumber }/${ fileName }"),
+                    s"Replace checksum for ${ versionNumber }/${ fileName } with ${ checkSum }")
             })
         })
     }
