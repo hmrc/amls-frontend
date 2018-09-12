@@ -87,11 +87,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     value
   }
 
-  def phase2Changes: Boolean = {
-    val value = getConfBool("feature-toggle.phase-2-changes", false)
-    value
-  }
-
   override def release7: Boolean = {
     val value = getConfBool("feature-toggle.release7", false)
     value
@@ -119,6 +114,8 @@ class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def fxEnabledToggle = config.getConfBool("feature-toggle.fx-enabled", defBool = false)
+
+  def phase2ChangesToggle = config.getConfBool("feature-toggle.phase-2-changes", defBool = false)
 
   def authUrl = config.baseUrl("auth")
 
