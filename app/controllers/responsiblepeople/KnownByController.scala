@@ -16,8 +16,8 @@
 
 package controllers.responsiblepeople
 
+import config.AppConfig
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -31,7 +31,8 @@ import scala.concurrent.Future
 
 @Singleton
 class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector) extends RepeatingSection with BaseController {
+                                  val authConnector: AuthConnector,
+                                  val appConfig: AppConfig) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
@@ -68,6 +69,7 @@ class KnownByController @Inject()(val dataCacheConnector: DataCacheConnector,
               }
             } yield edit match {
         case true => Redirect (routes.DetailedAnswersController.get (index, flow) )
+        case false if appConfig.phase2ChangesToggle => Redirect (routes.DateOfBirthController.get (index, edit, flow) )
         case false => Redirect (routes.PersonResidentTypeController.get (index, edit, flow) )
         }
         }.recoverWith {

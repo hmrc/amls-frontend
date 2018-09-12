@@ -130,7 +130,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             "nonUKPassportNumber" -> passportNumber
           )
 
-          when(mockApplicationConfig.phase2ChangesToggle).thenReturn(false);
+          when(mockApplicationConfig.phase2ChangesToggle).thenReturn(false)
 
           val responsiblePeople = ResponsiblePerson()
 
