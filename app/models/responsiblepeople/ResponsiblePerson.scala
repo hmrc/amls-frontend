@@ -139,10 +139,12 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
 
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
-    import utils.Strings._
-    println("Application Toggle : " + ApplicationConfig.phase2ChangesToggle in Console.YELLOW_B)
 
     this match {
+      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & ApplicationConfig.phase2ChangesToggle => true
+      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & ApplicationConfig.phase2ChangesToggle => true
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
         if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & !ApplicationConfig.phase2ChangesToggle => true
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)

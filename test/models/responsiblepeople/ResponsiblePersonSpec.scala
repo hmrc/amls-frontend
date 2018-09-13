@@ -1806,7 +1806,7 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
       }
 
       "the model is incomplete" in {
-        incompleteModelUkResidentNoDOBPhase2.copy(hasAccepted = true).isComplete must be(true)
+        incompleteModelUkResidentNoDOBPhase2.copy(hasAccepted = true).isComplete must be(false)
       }
 
       "the model is not complete" in {
