@@ -695,6 +695,55 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
+  val incompleteModelUkResidentNoDOBPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    None,
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResidentPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
 
   val completeModelUkResidentForOldData = ResponsiblePerson(
     Some(DefaultValues.personName),
@@ -705,6 +754,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     None,
     None,
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResidentForOldDataPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),
@@ -746,6 +820,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
+  val completeModelUkResidentForOldDataNoPreviousPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    None,
+    None,
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
   val completeModelNonUkResidentNonUkPassport = ResponsiblePerson(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
@@ -770,6 +869,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
+
   val completeModelNonUkResidentNonUkPassportNoPreviousName = ResponsiblePerson(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
