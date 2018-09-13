@@ -27,7 +27,8 @@
 @detailedAnswers[T](
     question: String = "",
     editUrl: String = "",
-    dataItem: Option[T]
+    dataItem: Option[T],
+    editLinkTag:String = ""
 )(content: T => Html)(implicit lang: Lang) = {
     <section class="check-your-answers">
     @if(question.nonEmpty){<h2 class="heading-small">@question</h2>}
@@ -38,7 +39,7 @@
     }
 
     @if(editUrl.nonEmpty){<footer class="group">
-        <p><a href="@editUrl" class="edit">@Messages("button.edit")<span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
+        <p><a @if(editLinkTag.nonEmpty) {id="@editLinkTag"} href="@editUrl" class="edit">@Messages("button.edit")<span class="visuallyhidden"> @Messages("summary.visuallyhidden.your.answer.for") &#8220;@question&#8221;</span></a></p>
     </footer>}
 </section>
 }
@@ -202,7 +203,8 @@
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.dob", personName),
                 editUrl = controllers.responsiblepeople.routes.DateOfBirthController.get(idx, true, flow).toString(),
-                dataItem = Some(dateOfBirth)
+                dataItem = Some(dateOfBirth),
+                editLinkTag = "date-of-birth"
             ) { dob =>
                 <p>@DateHelper.formatDate(dob.dateOfBirth)</p>
             }
