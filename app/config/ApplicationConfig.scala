@@ -92,6 +92,11 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     value
   }
 
+  def phase2ChangesToggle: Boolean =  {
+    val value = getConfBool("feature-toggle.phase-2-changes", false)
+    value
+  }
+
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
   override def frontendBaseUrl = {
