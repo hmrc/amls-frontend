@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.ArgumentCaptor
@@ -371,6 +372,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
 
             val countryCode = "GB"
 
+            val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
+
             val responsiblePeople = ResponsiblePerson(
               personResidenceType = Some(
                 PersonResidenceType(
@@ -380,7 +383,8 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
                 )
               ),
               ukPassport = Some(UKPassportNo),
-              nonUKPassport = Some(NonUKPassportYes("22654321"))
+              nonUKPassport = Some(NonUKPassportYes("22654321")),
+              dateOfBirth = Some(dateOfBirth)
             )
 
             val newRequest = request.withFormUrlEncodedBody(
@@ -394,7 +398,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
             val personName = PersonName("firstname", None, "lastname")
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
 
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
               .thenReturn(Some(Seq(responsiblePeople)))
@@ -417,6 +421,7 @@ class PersonResidentTypeControllerSpec extends AmlsSpec with MockitoSugar with N
               )),
               ukPassport = None,
               nonUKPassport = None,
+              dateOfBirth = None,
               hasChanged = true
             ))))(any(), any(), any())
           }
