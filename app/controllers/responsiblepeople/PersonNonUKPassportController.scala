@@ -56,9 +56,8 @@ class PersonNonUKPassportController @Inject()(
                          edit: Boolean, flow: Option[String] )(implicit authContext:AuthContext, request: Request[AnyContent]) = {
     (for {
       cache <- result
-      phase2Changes <- Some(appConfig.phase2ChangesToggle)
       rp <- getData[ResponsiblePerson](cache, index)
-    } yield (rp.dateOfBirth.isDefined && edit, phase2Changes) match {
+    } yield (rp.dateOfBirth.isDefined && edit, appConfig.phase2ChangesToggle) match {
       case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
       case (false, false) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
       case (false, true) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
