@@ -34,8 +34,8 @@ POST        /time-at-address/:index/                               controllers.r
 GET         /address/:index/date-change                            controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /address/:index/date-change                            controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
 
-GET         /residency/:index/                                     controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /residency/:index/                                     controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /residency/:index/                                     @controllers.responsiblepeople.PersonResidentTypeController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /residency/:index/                                     @controllers.responsiblepeople.PersonResidentTypeController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /passport/:index/                                      @controllers.responsiblepeople.PersonUKPassportController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /passport/:index/                                      @controllers.responsiblepeople.PersonUKPassportController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

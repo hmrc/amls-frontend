@@ -16,8 +16,8 @@
 
 package controllers.responsiblepeople
 
+import config.AppConfig
 import javax.inject.Inject
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -35,7 +35,8 @@ import scala.concurrent.Future
 class PersonNonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
+                                            val authConnector: AuthConnector,
+                                            val appConfig:AppConfig
                                           ) extends RepeatingSection with BaseController {
 
 
@@ -56,9 +57,10 @@ class PersonNonUKPassportController @Inject()(
     (for {
       cache <- result
       rp <- getData[ResponsiblePerson](cache, index)
-    } yield rp.dateOfBirth.isDefined && edit match {
-      case true => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case false => Redirect(routes.DateOfBirthController.get(index, edit, flow))
+    } yield (rp.dateOfBirth.isDefined && edit, appConfig.phase2ChangesToggle) match {
+      case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case (false, false) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
+      case (false, true) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
     }).getOrElse(NotFound(notFoundView))
   }
 
