@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -42,7 +43,8 @@ import scala.concurrent.Future
 class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                                            val statusService: StatusService,
                                            val dataCacheConnector: DataCacheConnector,
-                                           val businessMatchingService: BusinessMatchingService)() extends BaseController with RepeatingSection {
+                                           val businessMatchingService: BusinessMatchingService,
+                                           val appConfig:AppConfig)() extends BaseController with RepeatingSection {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -232,12 +234,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
 
-    def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+    if(!appConfig.phase2ChangesToggle) {
+      def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
-    (businessActivities.businessActivities, businessActivities.additionalActivities) match {
-      case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
-      case (a, _) => containsTcspOrMsb(a)
+      (businessActivities.businessActivities, businessActivities.additionalActivities) match {
+        case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
+        case (a, _) => containsTcspOrMsb(a)
+      }
     }
+    else true
   }
 
   private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
