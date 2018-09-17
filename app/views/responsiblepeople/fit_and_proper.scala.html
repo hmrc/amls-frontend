@@ -30,10 +30,16 @@
     heading = header
 ) {
 
-    @if(showFees){
-        <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
-    } else {
-        <p>@Messages("responsiblepeople.fit_and_proper.text.details.no.fees")</p>
+    @if(phase2Toggle) {
+        <p>@Messages("responsiblepeople.fit_and_proper.text.phase_2_details")</p>
+        <p>@Messages("responsiblepeople.fit_and_proper.text.phase_2_details2")</p>
+    }
+    else {
+        @if(showFees) {
+            <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
+        } else {
+            <p>@Messages("responsiblepeople.fit_and_proper.text.details.no.fees")</p>
+        }
     }
 
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
@@ -65,15 +71,17 @@
         }
         </div>
 
-@detailsSummary(
-            summary = Messages("responsiblepeople.fit_and_proper.text.info")
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false
+        @if(!phase2Toggle) {
+            @detailsSummary(
+                summary = Messages("responsiblepeople.fit_and_proper.text.info")
             ) {
-                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
-                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
+                @panel(
+                    jsHidden = false,
+                    wide = false
+                ) {
+                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
+                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
+                }
             }
         }
 
