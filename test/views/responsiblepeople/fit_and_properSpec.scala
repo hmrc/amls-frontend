@@ -62,10 +62,10 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
         val form2: Form2[_] = EmptyForm
 
         def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
-
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details"))
-
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.info"))
       }
+
       "phase 2 content is being shown" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
@@ -73,7 +73,8 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
         def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
 
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details"))
-        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details2"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details2", "PersonName"))
+        doc.body().html() mustNot include(Messages("responsiblepeople.fit_and_proper.text.info"))
 
       }
       "fees are being hidden when phase 2 toggle is false" in new ViewFixture {
@@ -81,8 +82,8 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
         val form2: Form2[_] = EmptyForm
 
         def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false, false)
-
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details.no.fees"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.info"))
       }
     }
 
