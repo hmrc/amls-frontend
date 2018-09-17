@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.asp.Asp
@@ -125,12 +126,11 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
-
     val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
-      (removing.contains(MoneyServiceBusiness) && !hasTCSP) || (removing.contains(TrustAndCompanyServices) && !hasMSB)
+      (removing.contains(MoneyServiceBusiness) && !hasTCSP) || (removing.contains(TrustAndCompanyServices) && !hasMSB) && !ApplicationConfig.phase2ChangesToggle
     }
 
     for {

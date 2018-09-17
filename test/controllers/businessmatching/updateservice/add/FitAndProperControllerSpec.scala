@@ -49,8 +49,6 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Respons
 
   }
 
-  //TODO Possibly need more tests
-
   "FitAndProperController" when {
 
     "get is called" must {

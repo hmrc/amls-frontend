@@ -16,6 +16,7 @@
 
 package controllers.businessmatching.updateservice
 
+import config.ApplicationConfig
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
@@ -32,11 +33,17 @@ import utils._
 import play.api.test.Helpers._
 import org.mockito.Mockito.{never, verify}
 import org.mockito.Matchers.{any, eq => eqTo}
+import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
+import play.api.{Application, Mode}
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
 class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
+    .build()
 
   val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
 
@@ -496,12 +503,41 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
   }
 
   "removing Responsible People types" when {
-
     "there is more than one business type" when {
+//      "always remove the responsible people fit and proper if the phase-2-changes toggle is true" in new Fixture {
+//        val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
+//
+//        val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+//          hasAccepted = true,
+//          hasChanged = true))
+//
+//        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
+//          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+//          hasAccepted = true,
+//          hasChanged = true)
+//
+//        mockCacheFetch[BusinessMatching](
+//          Some(startResultMatching),
+//          Some(BusinessMatching.key))
+//
+//        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+//
+//        mockCacheFetch[Seq[ResponsiblePerson]](
+//          Some(startResultRP),
+//          Some(ResponsiblePerson.key))
+//
+//        val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
+//          hasAccepted = true,
+//          hasChanged = true))
+//
+//        mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
+//        helper.removeFitAndProper(model).returnsSome(endResultRP)
+//
+//      }
 
       "removing an MSB" should {
+        "remove the ResponsiblePeople fit and proper if there is no TCSP and phase-2-changes toggle is false" in new Fixture {
 
-        "remove the ResponsiblePeople fit and proper if there is no TCSP" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
@@ -525,7 +561,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           helper.removeFitAndProper(model).returnsSome(endResultRP)
         }
 
-        "not remove the ResponsiblePeople fit and proper if there is TCSP" in new Fixture {
+        "not remove the ResponsiblePeople fit and proper if there is TCSP and phase-2-changes toggle is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
@@ -555,7 +591,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
       "removing an TCSP" should {
 
-        "remove the ResponsiblePeople fit and proper if there is no MSB" in new Fixture {
+        "remove the ResponsiblePeople fit and proper if there is no MSB and phase-2-changes toggle is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
@@ -586,7 +622,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           helper.removeFitAndProper(model).returnsSome(endResultRP)
         }
 
-        "not remove the ResponsiblePeople fit and proper if there is MSB" in new Fixture {
+        "not remove the ResponsiblePeople fit and proper if there is MSB and phase-2-changes is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
           val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
@@ -772,3 +808,54 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
     }
   }
 }
+
+class RemoveBusinessTypeHelperSpecForPhase2 extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
+
+  override implicit lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
+    .build()
+
+  val MSBOnlyModel = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness)))
+
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+
+    val helper = new RemoveBusinessTypeHelper(
+      self.authConnector,
+      mockCacheConnector
+    )
+  }
+
+  "removing Responsible People types" when {
+    "there is more than one business type" when {
+      "always remove the responsible people fit and proper if the phase-2-changes toggle is true" in new Fixture {
+
+        val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
+
+        val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+          hasAccepted = true,
+          hasChanged = true))
+
+        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(HighValueDealing, BillPaymentServices))),
+          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
+          hasAccepted = true,
+          hasChanged = true)
+
+        mockCacheFetch[BusinessMatching](
+          Some(startResultMatching),
+          Some(BusinessMatching.key))
+
+        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
+
+        mockCacheFetch[Seq[ResponsiblePerson]](
+          Some(startResultRP),
+          Some(ResponsiblePerson.key))
+
+        mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
+
+        helper.removeFitAndProper(model).returnsSome(startResultRP)
+      }
+    }
+  }
+}
+
