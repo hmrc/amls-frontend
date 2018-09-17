@@ -57,7 +57,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
     }
 
     "have the correct content" when {
-      "fees are being shown" in new ViewFixture {
+      "fees are being shown when phase 2 toggle is false" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
 
@@ -66,7 +66,17 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details"))
 
       }
-      "fees are being hidden" in new ViewFixture {
+      "phase 2 content is being shown" in new ViewFixture {
+
+        val form2: Form2[_] = EmptyForm
+
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
+
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details2"))
+
+      }
+      "fees are being hidden when phase 2 toggle is false" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
 

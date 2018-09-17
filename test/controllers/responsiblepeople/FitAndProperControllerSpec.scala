@@ -36,6 +36,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> true)
+      .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
