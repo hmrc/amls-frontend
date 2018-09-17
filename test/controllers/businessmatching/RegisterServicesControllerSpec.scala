@@ -788,7 +788,6 @@ class RegisterServicesControllerSpec extends AmlsSpec
       }
       "return true" when {
         "phase-2-changes toggle is true" in new Fixture {
-//TODO:
             when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 

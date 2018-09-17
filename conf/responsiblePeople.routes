@@ -88,8 +88,8 @@ POST        /vat/:index/                                           controllers.r
 GET         /experience-training/:index/                           controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /experience-training/:index/                           controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /training/:index/                                      controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /training/:index/                                      controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /training/:index/                                      @controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /training/:index/                                      @controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
