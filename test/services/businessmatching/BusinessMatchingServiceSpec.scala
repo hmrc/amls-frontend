@@ -270,7 +270,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
   }
-
+//TODO:
   "fitAndProperRequired" must {
     "return true" when {
       "existing activities does not contain msb and tcsp" when {
@@ -311,7 +311,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
             result must be(Some(true))
           }
         }
-
+        //TODO:
         "current activities contains tcsp" in new Fixture {
 
           val existing = BusinessMatching(
@@ -351,6 +351,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
         }
       }
     }
+
+    //TODO:
     "return false" when {
       "existing activities contains msb" in new Fixture {
 
