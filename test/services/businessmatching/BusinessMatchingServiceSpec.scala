@@ -272,7 +272,6 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
   }
-//TODO:
   "fitAndProperRequired" must {
     "return true" when {
       "When phase 2 toggle is true" in new Fixture {
@@ -352,7 +351,6 @@ class BusinessMatchingServiceSpec extends PlaySpec
             result must be(Some(true))
           }
         }
-        //TODO:
         "current activities contains tcsp" in new Fixture {
           when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
           val existing = BusinessMatching(
@@ -393,7 +391,6 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
 
-    //TODO:
     "return false" when {
       "existing activities contains msb" in new Fixture {
         when(mockAppConfig.phase2ChangesToggle).thenReturn(false)

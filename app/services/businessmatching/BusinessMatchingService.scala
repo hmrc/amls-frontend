@@ -81,7 +81,6 @@ class BusinessMatchingService @Inject()(
       activities <- OptionT.fromOption[Future](model.activities)
     } yield BusinessActivities.all diff activities.businessActivities
 
-  // TODO: Change fit and proper required
   def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
     fetchActivitySet map { case (current, existing) =>
       (!((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
