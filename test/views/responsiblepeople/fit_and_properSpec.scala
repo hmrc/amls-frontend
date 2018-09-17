@@ -35,7 +35,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       doc.title must be(
         Messages("responsiblepeople.fit_and_proper.title", "PersonName")
@@ -49,7 +49,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
@@ -61,7 +61,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details"))
 
@@ -70,7 +70,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false)
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false, false)
 
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details.no.fees"))
       }
@@ -83,7 +83,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
           (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       errorSummary.html() must include("not a message Key")
 

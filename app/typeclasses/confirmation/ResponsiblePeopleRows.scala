@@ -27,7 +27,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
              activities: Set[BusinessActivity],
              people: Option[Seq[ResponsiblePerson]]
            ): Seq[BreakdownRow]
-  
+
   val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
     fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
 
