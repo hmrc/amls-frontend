@@ -47,7 +47,6 @@ object AddPerson {
     }
   }
 
-  //TODO: Update these read types to use correct name types.
   implicit def formRule: Rule[UrlFormEncoded, AddPerson] = From[UrlFormEncoded] { __ =>
     import models.FormTypes._
     import jto.validation.forms.Rules._

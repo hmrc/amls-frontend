@@ -194,7 +194,7 @@ trait LandingService {
     }
   }
 
-  /* TODO: Consider if there's a good way to stop
+  /* Consider if there's a good way to stop
    * this from just overwriting whatever is in Business Matching,
    * shouldn't be a problem as this should only happen when someone
    * first comes into the Application from Business Customer FE

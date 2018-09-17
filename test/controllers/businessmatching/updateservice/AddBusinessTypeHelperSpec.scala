@@ -242,7 +242,6 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     }
   }
 
-//TODO:
   "updateResponsiblePeople" must {
     "set the fit and proper flag on the right people according to the indices" when {
       "adding the TCSP business type and phase-2-change toggle is false" in new Fixture {
