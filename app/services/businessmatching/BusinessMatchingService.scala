@@ -18,6 +18,7 @@ package services.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import javax.inject.Inject
 import models.ViewResponse
@@ -37,7 +38,8 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class BusinessMatchingService @Inject()(
                                          statusService: StatusService,
-                                         dataCacheConnector: DataCacheConnector
+                                         dataCacheConnector: DataCacheConnector,
+                                         appConfig: AppConfig
                                        ) {
 
   def preApplicationComplete(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): Future[Boolean] = {
@@ -82,8 +84,8 @@ class BusinessMatchingService @Inject()(
   // TODO: Change fit and proper required
   def fitAndProperRequired(implicit ac: AuthContext, hc: HeaderCarrier, ex: ExecutionContext): OptionT[Future, Boolean] =
     fetchActivitySet map { case (current, existing) =>
-      !((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
-        (current contains TrustAndCompanyServices) | (current contains MoneyServiceBusiness)
+      (!((existing contains TrustAndCompanyServices) | (existing contains MoneyServiceBusiness)) &
+        (current contains TrustAndCompanyServices) | (current contains MoneyServiceBusiness)) || appConfig.phase2ChangesToggle
     }
 
   def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
