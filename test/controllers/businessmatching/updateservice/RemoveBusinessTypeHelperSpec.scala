@@ -504,37 +504,6 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
   "removing Responsible People types" when {
     "there is more than one business type" when {
-//      "always remove the responsible people fit and proper if the phase-2-changes toggle is true" in new Fixture {
-//        val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
-//
-//        val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
-//          hasAccepted = true,
-//          hasChanged = true))
-//
-//        val startResultMatching = BusinessMatching(activities = Some(BMBusinessActivities(Set(TrustAndCompanyServices, MoneyServiceBusiness))),
-//          businessAppliedForPSRNumber = Some(BusinessAppliedForPSRNumberNo),
-//          hasAccepted = true,
-//          hasChanged = true)
-//
-//        mockCacheFetch[BusinessMatching](
-//          Some(startResultMatching),
-//          Some(BusinessMatching.key))
-//
-//        mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
-//
-//        mockCacheFetch[Seq[ResponsiblePerson]](
-//          Some(startResultRP),
-//          Some(ResponsiblePerson.key))
-//
-//        val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
-//          hasAccepted = true,
-//          hasChanged = true))
-//
-//        mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
-//        helper.removeFitAndProper(model).returnsSome(endResultRP)
-//
-//      }
-
       "removing an MSB" should {
         "remove the ResponsiblePeople fit and proper if there is no TCSP and phase-2-changes toggle is false" in new Fixture {
 

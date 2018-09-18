@@ -130,7 +130,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
-      (removing.contains(MoneyServiceBusiness) && !hasTCSP) || (removing.contains(TrustAndCompanyServices) && !hasMSB) && !ApplicationConfig.phase2ChangesToggle
+      !ApplicationConfig.phase2ChangesToggle && ((removing.contains(MoneyServiceBusiness) && !hasTCSP) || (removing.contains(TrustAndCompanyServices) && !hasMSB))
     }
 
     for {
