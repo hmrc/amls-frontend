@@ -233,16 +233,16 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
   private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
-
-    if(!appConfig.phase2ChangesToggle) {
+    if (!appConfig.phase2ChangesToggle) {
       def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
       (businessActivities.businessActivities, businessActivities.additionalActivities) match {
         case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
         case (a, _) => containsTcspOrMsb(a)
       }
+    } else {
+     true
     }
-    else true
   }
 
   private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =

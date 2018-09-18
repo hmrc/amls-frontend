@@ -135,7 +135,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
-      case Some(people) if model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness) | appConfig.phase2ChangesToggle =>
+      case Some(people) if appConfig.phase2ChangesToggle || model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness)=>
         responsiblePeopleService.updateFitAndProperFlag(people, indices)
       case Some(people) => people
     })

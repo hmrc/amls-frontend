@@ -32,11 +32,11 @@ import utils.{ControllerHelper, RepeatingSection}
 import scala.concurrent.Future
 
 class TrainingController @Inject()(
-                                            override val messagesApi: MessagesApi,
-                                            val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector,
-                                            val appConfig: AppConfig
-                                          ) extends RepeatingSection with BaseController {
+                                    override val messagesApi: MessagesApi,
+                                    val dataCacheConnector: DataCacheConnector,
+                                    val authConnector: AuthConnector,
+                                    val appConfig: AppConfig
+                                  ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
@@ -78,7 +78,7 @@ class TrainingController @Inject()(
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
           case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)),_,_,_,_, _, _, _)))
-            if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices) || appConfig.phase2ChangesToggle
+            if  appConfig.phase2ChangesToggle || acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
           => Redirect(routes.FitAndProperController.get(index, false, flow))
           case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
