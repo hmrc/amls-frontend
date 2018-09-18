@@ -1640,6 +1640,8 @@ responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one o
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘About the Business’ section and let you know what they need.
 
 responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
+responsiblepeople.fit_and_proper.phase_2_heading = Has {0} passed the fit and proper test?
+responsiblepeople.fit_and_proper.phase_2_title = Has this person passed the fit and proper test?
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 responsiblepeople.fit_and_proper.text.details.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.

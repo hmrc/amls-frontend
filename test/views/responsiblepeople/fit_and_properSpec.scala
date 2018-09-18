@@ -45,7 +45,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
       )
     }
 
-    "have correct headings" in new ViewFixture {
+    "have correct headings when phase2 changes toggle is false" in new ViewFixture {
 
       val form2: Form2[_] = EmptyForm
 
@@ -53,7 +53,19 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
+      doc.title must include(Messages("responsiblepeople.fit_and_proper.title"))
 
+    }
+
+    "have correct headings when phase2 changes is true" in new ViewFixture {
+
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
+
+      heading.html must be(Messages("responsiblepeople.fit_and_proper.phase_2_heading", "PersonName"))
+      subHeading.html must include(Messages("summary.responsiblepeople"))
+      doc.title must include(Messages("responsiblepeople.fit_and_proper.phase_2_title"))
     }
 
     "have the correct content" when {
@@ -72,8 +84,8 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
         def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
 
-        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details"))
-        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.phase_2_details2", "PersonName"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.phase_2_details"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.phase_2_details2", "PersonName"))
         doc.body().html() mustNot include(Messages("responsiblepeople.fit_and_proper.text.info"))
 
       }

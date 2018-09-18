@@ -22,19 +22,18 @@
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder((if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_heading" else "responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages(if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_title" else "responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
     @if(phase2Toggle) {
-        <p>@Messages("responsiblepeople.fit_and_proper.text.phase_2_details")</p>
-        <p>@Messages("responsiblepeople.fit_and_proper.text.phase_2_details2")</p>
-    }
-    else {
+        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details")</p>
+        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details2", personName)</p>
+    } else {
         @if(showFees) {
             <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
         } else {
