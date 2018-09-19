@@ -17,11 +17,12 @@
 package views.confirmation
 
 import generators.PaymentGenerator
-import models.confirmation.Currency
+import models.confirmation.{BreakdownRow, Currency}
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
+//TODO: Implement tests
 class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
@@ -34,8 +35,14 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     override def view = views.html.confirmation.confirmation_new(
       Some(paymentReferenceNumber),
       Currency(fee),
-      // TODO: Test when breakdown rows is not empty
-      Some(Seq.empty),
+      Some(Seq(
+        BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110)),
+        BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120)),
+        BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130)),
+        BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140)),
+        BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150)),
+        BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
+      )),
       continueHref
     )
   }
