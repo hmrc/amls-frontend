@@ -34,6 +34,7 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
       Some(paymentReferenceNumber),
       Currency(100),
       Currency(150),
+      // TODO: Test when breakdown rows is not empty
       Some(Seq.empty),
       continueHref
     )
@@ -67,6 +68,110 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
 
     "continue button has the right text" in new ViewFixture {
       doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
+    }
+
+    "show the breakdown row table quantity heading" in new ViewFixture {
+
+    }
+
+    "show the breakdown row table fee per item heading" in new ViewFixture {
+
+    }
+
+    "show the breakdown row table total heading" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row quantity" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row fee per item" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row total" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row title" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row quantity" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row fee per item" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row total" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row total" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row total" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises  row total" in new ViewFixture {
+
+    }
+
+    "show the total row title" in new ViewFixture {
+
+    }
+
+    "not show the total row quantity" in new ViewFixture {
+
+    }
+
+    "not show the total fee per item" in new ViewFixture {
+
+    }
+
+    "show the total total" in new ViewFixture {
+
     }
 
   }

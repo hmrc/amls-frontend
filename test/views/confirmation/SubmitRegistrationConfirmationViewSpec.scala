@@ -18,7 +18,6 @@ package views.confirmation
 
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
@@ -32,7 +31,13 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
 
     val fee = 100
 
-    override def view = views.html.confirmation.confirmation_new(Some(paymentReferenceNumber), Currency(fee), None, continueHref)
+    override def view = views.html.confirmation.confirmation_new(
+      Some(paymentReferenceNumber),
+      Currency(fee),
+      // TODO: Test when breakdown rows is not empty
+      Some(Seq.empty),
+      continueHref
+    )
   }
 
   "The amendment confirmation view" must {
@@ -63,6 +68,110 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
 
     "continue button has the right text" in new ViewFixture {
       doc.select(s".button[href=$continueHref]").text mustBe Messages("button.payfee")
+    }
+
+    "show the breakdown row table quantity heading" in new ViewFixture {
+
+    }
+
+    "show the breakdown row table fee per item heading" in new ViewFixture {
+
+    }
+
+    "show the breakdown row table total heading" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row quantity" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row fee per item" in new ViewFixture {
+
+    }
+
+    "show the responsible people without F & P row total" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row title" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row quantity" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row fee per item" in new ViewFixture {
+
+    }
+
+    "show the responsible people with F & P row total" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the full year trading premises row total" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the half year trading premises row total" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row title" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row quantity" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises row fee per item" in new ViewFixture {
+
+    }
+
+    "show the no year trading premises  row total" in new ViewFixture {
+
+    }
+
+    "show the total row title" in new ViewFixture {
+
+    }
+
+    "not show the total row quantity" in new ViewFixture {
+
+    }
+
+    "not show the total fee per item" in new ViewFixture {
+
+    }
+
+    "show the total total" in new ViewFixture {
+
     }
 
   }
