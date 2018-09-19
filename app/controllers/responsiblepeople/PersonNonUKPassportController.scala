@@ -57,10 +57,10 @@ class PersonNonUKPassportController @Inject()(
     (for {
       cache <- result
       rp <- getData[ResponsiblePerson](cache, index)
-    } yield (rp.dateOfBirth.isDefined && edit, appConfig.phase2ChangesToggle) match {
-      case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case (false, false) => Redirect(routes.DateOfBirthController.get(index, edit, flow))
-      case (false, true) => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+    } yield (rp.dateOfBirth.isDefined && edit) match {
+      case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+      case false if appConfig.phase2ChangesToggle => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
+      case _ => Redirect(routes.DateOfBirthController.get(index, edit, flow))
     }).getOrElse(NotFound(notFoundView))
   }
 

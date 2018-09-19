@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-import config.{AppConfig, ApplicationConfig}
+import config.ApplicationConfig
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
-import play.{Logger, Play}
+import play.Logger
 import play.api.libs.json.Reads
 import typeclasses.MongoKey
 import uk.gov.hmrc.http.cache.client.CacheMap
