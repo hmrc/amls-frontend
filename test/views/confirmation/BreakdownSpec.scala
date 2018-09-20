@@ -22,13 +22,18 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-//TODO: Implement tests
 class BreakdownSpec extends AmlsSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
     val continueHref = "http://google.co.uk"
+
+    def getRowDataElements(index: Int) = {
+      doc.getElementsByTag("tbody").first()
+        .getElementsByTag("tr").get(index)
+        .getElementsByTag("td")
+    }
 
     val responsiblePeopleWithoutFitAndProper: BreakdownRow =
       BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150))
@@ -65,55 +70,31 @@ class BreakdownSpec extends AmlsSpec with PaymentGenerator {
   }
 
   trait totalSubmissionFeeViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(totalSubmissionFee)
-
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(totalSubmissionFee))
   }
 
   trait TradingPremisesFullViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(tradingPremisesFull)
-
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(tradingPremisesFull))
   }
 
   trait TradingPremisesHalfViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(tradingPremisesHalf)
-
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(tradingPremisesHalf))
   }
 
   trait TradingPremisesZeroViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(tradingPremisesZero)
-
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(tradingPremisesZero))
   }
 
   trait ResponsiblePeopleWithoutFitAndProperViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(responsiblePeopleWithoutFitAndProper)
-
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(responsiblePeopleWithoutFitAndProper))
   }
 
   trait ResponsiblePeopleWithFitAndProperViewFixture extends ViewFixture {
-    val index = breakdownRows.indexOf(responsiblePeopleWithFitAndProper)
+    val rowDataElements = getRowDataElements(breakdownRows.indexOf(responsiblePeopleWithFitAndProper))
 
-    val rowDataElements = doc.getElementsByTag("tbody").first()
-      .getElementsByTag("tr").get(index)
-      .getElementsByTag("td")
   }
 
   "The breakdown view" must {
-
     "show the breakdown row table quantity heading" in new ViewFixture {
       doc.getElementsByTag("th").get(1).text mustBe Messages("confirmation.quantity")
     }
