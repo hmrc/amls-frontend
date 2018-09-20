@@ -36,12 +36,12 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
       Currency(100),
       Currency(150),
       Some(Seq(
-        BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110)),
-        BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120)),
-        BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130)),
-        BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140)),
-        BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150)),
-        BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
+          BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110)),
+          BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120)),
+          BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130)),
+          BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140)),
+          BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150)),
+          BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
       )),
       continueHref
     )
@@ -77,108 +77,28 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
       doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
     }
 
-    "show the breakdown row table quantity heading" in new ViewFixture {
+    "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
 
     }
 
-    "show the breakdown row table fee per item heading" in new ViewFixture {
-
+    "not show the breakdown row table when breakdown rows is None" in new ViewFixture {
+      override def view = views.html.confirmation.confirm_amendvariation(
+          Some(paymentReferenceNumber),
+          Currency(100),
+          Currency(150),
+          None,
+          continueHref
+      )
     }
 
-    "show the breakdown row table total heading" in new ViewFixture {
-
-    }
-
-    "show the responsible people without F & P row quantity" in new ViewFixture {
-
-    }
-
-    "show the responsible people without F & P row fee per item" in new ViewFixture {
-
-    }
-
-    "show the responsible people without F & P row total" in new ViewFixture {
-
-    }
-
-    "show the responsible people with F & P row title" in new ViewFixture {
-
-    }
-
-    "show the responsible people with F & P row quantity" in new ViewFixture {
-
-    }
-
-    "show the responsible people with F & P row fee per item" in new ViewFixture {
-
-    }
-
-    "show the responsible people with F & P row total" in new ViewFixture {
-
-    }
-
-    "show the full year trading premises row title" in new ViewFixture {
-
-    }
-
-    "show the full year trading premises row quantity" in new ViewFixture {
-
-    }
-
-    "show the full year trading premises row fee per item" in new ViewFixture {
-
-    }
-
-    "show the full year trading premises row total" in new ViewFixture {
-
-    }
-
-    "show the half year trading premises row title" in new ViewFixture {
-
-    }
-
-    "show the half year trading premises row quantity" in new ViewFixture {
-
-    }
-
-    "show the half year trading premises row fee per item" in new ViewFixture {
-
-    }
-
-    "show the half year trading premises row total" in new ViewFixture {
-
-    }
-
-    "show the no year trading premises row title" in new ViewFixture {
-
-    }
-
-    "show the no year trading premises row quantity" in new ViewFixture {
-
-    }
-
-    "show the no year trading premises row fee per item" in new ViewFixture {
-
-    }
-
-    "show the no year trading premises  row total" in new ViewFixture {
-
-    }
-
-    "show the total row title" in new ViewFixture {
-
-    }
-
-    "not show the total row quantity" in new ViewFixture {
-
-    }
-
-    "not show the total fee per item" in new ViewFixture {
-
-    }
-
-    "show the total total" in new ViewFixture {
-
+    "not show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
+        override def view = views.html.confirmation.confirm_amendvariation(
+            Some(paymentReferenceNumber),
+            Currency(100),
+            Currency(150),
+            Some(Seq.empty),
+            continueHref
+        )
     }
 
   }
