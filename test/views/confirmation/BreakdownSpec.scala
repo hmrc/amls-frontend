@@ -18,137 +18,220 @@ package views.confirmation
 
 import generators.PaymentGenerator
 import models.confirmation.{BreakdownRow, Currency}
+import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
 //TODO: Implement tests
 class BreakdownSpec extends AmlsSpec with PaymentGenerator {
 
-    trait ViewFixture extends Fixture {
-        implicit val requestWithToken = addToken(request)
+  trait ViewFixture extends Fixture {
+    implicit val requestWithToken = addToken(request)
 
-        val continueHref = "http://google.co.uk"
+    val continueHref = "http://google.co.uk"
 
-        override def view = views.html.confirmation.breakdown(
-            Currency(1234),
-            Seq(
-                BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110)),
-                BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120)),
-                BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130)),
-                BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140)),
-                BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150)),
-                BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
-            ),
-            continueHref
-        )
+    val responsiblePeopleWithoutFitAndProper: BreakdownRow =
+      BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150))
+
+    val responsiblePeopleWithFitAndProper: BreakdownRow =
+      BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
+
+    val tradingPremisesZero: BreakdownRow =
+      BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140))
+
+    val tradingPremisesHalf: BreakdownRow =
+      BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130))
+
+    val tradingPremisesFull: BreakdownRow =
+      BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120))
+
+    val totalSubmissionFee: BreakdownRow =
+      BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110))
+
+    val breakdownRows: Seq[BreakdownRow] = Seq(
+      totalSubmissionFee,
+      tradingPremisesFull,
+      tradingPremisesHalf,
+      tradingPremisesZero,
+      responsiblePeopleWithoutFitAndProper,
+      responsiblePeopleWithFitAndProper
+    )
+
+    override def view = views.html.confirmation.breakdown(
+      Currency(1234),
+      breakdownRows,
+      continueHref
+    )
+  }
+
+  trait totalSubmissionFeeViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(totalSubmissionFee)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  trait TradingPremisesFullViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(tradingPremisesFull)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  trait TradingPremisesHalfViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(tradingPremisesHalf)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  trait TradingPremisesZeroViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(tradingPremisesZero)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  trait ResponsiblePeopleWithoutFitAndProperViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(responsiblePeopleWithoutFitAndProper)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  trait ResponsiblePeopleWithFitAndProperViewFixture extends ViewFixture {
+    val index = breakdownRows.indexOf(responsiblePeopleWithFitAndProper)
+
+    val rowDataElements = doc.getElementsByTag("tbody").first()
+      .getElementsByTag("tr").get(index)
+      .getElementsByTag("td")
+  }
+
+  "The breakdown view" must {
+
+    "show the breakdown row table quantity heading" in new ViewFixture {
+      doc.getElementsByTag("th").get(1).text mustBe Messages("confirmation.quantity")
     }
 
-    "The breakdown view" must {
-
-        "show the breakdown row table quantity heading" in new ViewFixture {
-
-        }
-
-        "show the breakdown row table fee per item heading" in new ViewFixture {
-
-        }
-
-        "show the breakdown row table total heading" in new ViewFixture {
-
-        }
-
-        "show the responsible people without F & P row quantity" in new ViewFixture {
-
-        }
-
-        "show the responsible people without F & P row fee per item" in new ViewFixture {
-
-        }
-
-        "show the responsible people without F & P row total" in new ViewFixture {
-
-        }
-
-        "show the responsible people with F & P row title" in new ViewFixture {
-
-        }
-
-        "show the responsible people with F & P row quantity" in new ViewFixture {
-
-        }
-
-        "show the responsible people with F & P row fee per item" in new ViewFixture {
-
-        }
-
-        "show the responsible people with F & P row total" in new ViewFixture {
-
-        }
-
-        "show the full year trading premises row title" in new ViewFixture {
-
-        }
-
-        "show the full year trading premises row quantity" in new ViewFixture {
-
-        }
-
-        "show the full year trading premises row fee per item" in new ViewFixture {
-
-        }
-
-        "show the full year trading premises row total" in new ViewFixture {
-
-        }
-
-        "show the half year trading premises row title" in new ViewFixture {
-
-        }
-
-        "show the half year trading premises row quantity" in new ViewFixture {
-
-        }
-
-        "show the half year trading premises row fee per item" in new ViewFixture {
-
-        }
-
-        "show the half year trading premises row total" in new ViewFixture {
-
-        }
-
-        "show the no year trading premises row title" in new ViewFixture {
-
-        }
-
-        "show the no year trading premises row quantity" in new ViewFixture {
-
-        }
-
-        "show the no year trading premises row fee per item" in new ViewFixture {
-
-        }
-
-        "show the no year trading premises  row total" in new ViewFixture {
-
-        }
-
-        "show the total row title" in new ViewFixture {
-
-        }
-
-        "not show the total row quantity" in new ViewFixture {
-
-        }
-
-        "not show the total fee per item" in new ViewFixture {
-
-        }
-
-        "show the total total" in new ViewFixture {
-
-        }
-
+    "show the breakdown row table fee per item heading" in new ViewFixture {
+      doc.getElementsByTag("th").get(2).text mustBe Messages("confirmation.feeperitem")
     }
 
+    "show the breakdown row table total heading" in new ViewFixture {
+      doc.getElementsByTag("th").get(3).text mustBe Messages("confirmation.totalfee")
+    }
+  }
+
+  "Responsible People without F & P row" must {
+    "show the correct title" in new ResponsiblePeopleWithoutFitAndProperViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.responsiblepeople")
+    }
+
+    "show the correct quantity" in new ResponsiblePeopleWithoutFitAndProperViewFixture {
+      rowDataElements.get(1).text mustEqual "5"
+    }
+
+    "show the correct fee per item" in new ResponsiblePeopleWithoutFitAndProperViewFixture {
+      rowDataElements.get(2).text mustEqual "£50.00"
+    }
+
+    "show the correct total" in new ResponsiblePeopleWithoutFitAndProperViewFixture {
+      rowDataElements.get(3).text mustEqual "£150.00"
+    }
+  }
+
+  "Responsible People with F & P row" must {
+    "show the correct title" in new ResponsiblePeopleWithFitAndProperViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.responsiblepeople.fp.passed")
+    }
+
+    "show the correct quantity" in new ResponsiblePeopleWithFitAndProperViewFixture {
+      rowDataElements.get(1).text mustEqual "6"
+    }
+
+    "show the correct fee per item" in new ResponsiblePeopleWithFitAndProperViewFixture {
+      rowDataElements.get(2).text mustEqual "£60.00"
+    }
+
+    "show the correct total" in new ResponsiblePeopleWithFitAndProperViewFixture {
+      rowDataElements.get(3).text mustEqual "£160.00"
+    }
+  }
+
+  "Full year Trading Premises Row" must {
+    "show the correct title" in new TradingPremisesFullViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.tradingpremises")
+    }
+
+    "show the correct quantity" in new TradingPremisesFullViewFixture {
+      rowDataElements.get(1).text mustEqual "2"
+    }
+
+    "show the correct fee per item" in new TradingPremisesFullViewFixture {
+      rowDataElements.get(2).text mustEqual "£20.00"
+    }
+
+    "show the correct total" in new TradingPremisesFullViewFixture {
+      rowDataElements.get(3).text mustEqual "£120.00"
+    }
+  }
+
+  "Half year Trading Premises row" must {
+    "show the correct title" in new TradingPremisesHalfViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.tradingpremises.half")
+    }
+
+    "show the correct quantity" in new TradingPremisesHalfViewFixture {
+      rowDataElements.get(1).text mustEqual "3"
+    }
+
+    "show the correct fee per item" in new TradingPremisesHalfViewFixture {
+      rowDataElements.get(2).text mustEqual "£30.00"
+    }
+
+    "show the correct total" in new TradingPremisesHalfViewFixture {
+      rowDataElements.get(3).text mustEqual "£130.00"
+    }
+  }
+
+  "No year Trading Premises row" must {
+    "show the correct title" in new TradingPremisesZeroViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.tradingpremises.zero")
+    }
+
+    "show the correct quantity" in new TradingPremisesZeroViewFixture {
+      rowDataElements.get(1).text mustEqual "4"
+    }
+
+    "show the correct fee per item" in new TradingPremisesZeroViewFixture {
+      rowDataElements.get(2).text mustEqual "£40.00"
+    }
+
+    "show the correct total" in new TradingPremisesZeroViewFixture {
+      rowDataElements.get(3).text mustEqual "£140.00"
+    }
+  }
+
+  "Total row" must {
+    "show the correct title" in new totalSubmissionFeeViewFixture {
+      rowDataElements.get(0).text mustEqual Messages("confirmation.submission")
+    }
+
+    "not show correct quantity" in new totalSubmissionFeeViewFixture {
+      rowDataElements.get(1).text mustEqual "1"
+    }
+
+    "not show correct fee per item" in new totalSubmissionFeeViewFixture {
+      rowDataElements.get(2).text mustEqual "£10.00"
+    }
+
+    "show the correct total" in new totalSubmissionFeeViewFixture {
+      rowDataElements.get(3).text mustEqual "£110.00"
+    }
+  }
 }
