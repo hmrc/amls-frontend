@@ -77,10 +77,10 @@ class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
-
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
-    "not show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
+    "show the breakdown row table when a empty sequence of breakdown rows" in new ViewFixture {
       override def view = views.html.confirmation.confirm_renewal(
         Some(paymentReferenceNumber),
         Currency(100),
@@ -88,6 +88,8 @@ class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
         Currency(150),
         continueHref
       )
+
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
   }

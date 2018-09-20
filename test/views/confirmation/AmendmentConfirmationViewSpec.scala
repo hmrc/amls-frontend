@@ -78,27 +78,31 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
-
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
     "not show the breakdown row table when breakdown rows is None" in new ViewFixture {
       override def view = views.html.confirmation.confirm_amendvariation(
-          Some(paymentReferenceNumber),
-          Currency(100),
-          Currency(150),
-          None,
-          continueHref
+        Some(paymentReferenceNumber),
+        Currency(100),
+        Currency(150),
+        None,
+        continueHref
       )
+
+      Option(doc.getElementsByClass("details").first()) mustNot be(defined)
     }
 
-    "not show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
-        override def view = views.html.confirmation.confirm_amendvariation(
-            Some(paymentReferenceNumber),
-            Currency(100),
-            Currency(150),
-            Some(Seq.empty),
-            continueHref
-        )
+    "show the breakdown row table when a empty sequence of breakdown rows" in new ViewFixture {
+      override def view = views.html.confirmation.confirm_amendvariation(
+        Some(paymentReferenceNumber),
+        Currency(100),
+        Currency(150),
+        Some(Seq.empty),
+        continueHref
+      )
+
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
   }

@@ -78,7 +78,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
-
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
     "not show the breakdown row table when breakdown rows is None" in new ViewFixture {
@@ -88,15 +88,19 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
         None,
         continueHref
       )
+
+      Option(doc.getElementsByClass("details").first()) mustNot be(defined)
     }
 
-    "not show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
+    "show the breakdown row table when a nempty sequence of breakdown rows" in new ViewFixture {
       override def view = views.html.confirmation.confirmation_new(
         Some(paymentReferenceNumber),
         Currency(fee),
         Some(Seq.empty),
         continueHref
       )
+
+      Option(doc.getElementsByClass("details").first()) mustBe defined
     }
 
   }
