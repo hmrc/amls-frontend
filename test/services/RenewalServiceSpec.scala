@@ -707,7 +707,6 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
   "canSubmit" must {
     "return true" when {
       "renewal has not started" when {
-
         "sections are completed and changed" in new Fixture {
           val renewal = Section("renewal", NotStarted, false, mock[Call])
           val sections = Seq(
@@ -718,8 +717,9 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           service.canSubmit(renewal, sections) must be(true)
         }
       }
-      "renewal has started" when {
-        "renewal section is complete and changed, sections are completed and changed" in new Fixture {
+
+      "renewal section is complete and changed" when {
+        "sections are completed and changed" in new Fixture {
           val renewal = Section("renewal", Completed, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -729,7 +729,7 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           service.canSubmit(renewal, sections) must be(true)
         }
 
-        "renewal section is complete and changed, sections are completed and not changed" in new Fixture {
+        "sections are completed and not changed" in new Fixture {
           val renewal = Section("renewal", Completed, true, mock[Call])
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
@@ -739,7 +739,22 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           service.canSubmit(renewal, sections) must be(true)
         }
       }
+
+
+      "renewal section is complete and not changed" when {
+        "sections are completed and changed" in new Fixture {
+          val renewal = Section("renewal", Completed, false, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(true)
+        }
+      }
+
     }
+
     "return false" when {
       "renewal has started" when {
 
@@ -758,6 +773,159 @@ class RenewalServiceSpec extends AmlsSpec with MockitoSugar {
           val sections = Seq(
             Section("", Completed, false, mock[Call]),
             Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Started, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are mutually incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Started, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, true, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+
+        "sections are incomplete and not changed" in new Fixture {
+          val renewal = Section("renewal", Started, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Started, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+      }
+
+      "renewal has not started" when {
+
+        "sections are completed and not changed" in new Fixture {
+          val renewal = Section("renewal", NotStarted, false, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", NotStarted, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are mutually incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", NotStarted, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, true, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+
+        "sections are incomplete and not changed" in new Fixture {
+          val renewal = Section("renewal", NotStarted, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Started, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+      }
+
+      "renewal has completed and not changed" when {
+
+        "sections are completed and not changed" in new Fixture {
+          val renewal = Section("renewal", Completed, false, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Completed, false, mock[Call])
+          val sections = Seq(
+            Section("", Started, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are mutually incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Completed, false, mock[Call])
+          val sections = Seq(
+            Section("", Started, true, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+
+        "sections are incomplete and not changed" in new Fixture {
+          val renewal = Section("renewal", Completed, false, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Started, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+      }
+
+      "renewal has completed and changed" when {
+
+        "sections are incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Completed, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, false, mock[Call]),
+            Section("", Completed, true, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+        "sections are mutually incomplete and changed" in new Fixture {
+          val renewal = Section("renewal", Completed, true, mock[Call])
+          val sections = Seq(
+            Section("", Started, true, mock[Call]),
+            Section("", Completed, false, mock[Call])
+          )
+
+          service.canSubmit(renewal, sections) must be(false)
+        }
+
+
+        "sections are incomplete and not changed" in new Fixture {
+          val renewal = Section("renewal", Completed, true, mock[Call])
+          val sections = Seq(
+            Section("", Completed, false, mock[Call]),
+            Section("", Started, false, mock[Call])
           )
 
           service.canSubmit(renewal, sections) must be(false)
