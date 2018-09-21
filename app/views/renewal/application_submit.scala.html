@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import models.status.{Renewal, ReadyForRenewal, RenewalSubmitted}
 
-@(canSubmit: Boolean, renewal: Renewal)(implicit messages: Messages, request: Request[_])
+@(canSubmit: Boolean, renewal: Renewal, renewalSectionCompleted: Boolean = false)(implicit messages: Messages, request: Request[_])
 
 <div class="application-submit">
 
@@ -58,16 +58,17 @@
                     )
                 }
                 case _ => {
-                    anchor(
-                        attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
-                        linkText = Messages("renewal.progress.continue"),
-                        attrRole = true,
-                        visuallyhidden = Messages("renewal.progress.continue"),
-                        id=Some("renewal-progress-continue")
-                    )
+                    if(!renewalSectionCompleted) {
+                        anchor(
+                            attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+                            linkText = Messages("renewal.progress.continue"),
+                            attrRole = true,
+                            visuallyhidden = Messages("renewal.progress.continue"),
+                            id=Some("renewal-progress-continue")
+                        )
+                    }
                 }
             }}
         </p>
     }
-
 </div>

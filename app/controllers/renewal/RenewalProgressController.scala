@@ -16,20 +16,19 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessActivity, BusinessMatching}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessMatching
+import models.registrationprogress.Completed
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.businessmatching.BusinessMatchingService
 import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
-import views.html.registrationamendment.registration_amendment
 import views.html.renewal.renewal_progress
 
 import scala.concurrent.Future
@@ -64,8 +63,7 @@ class RenewalProgressController @Inject()
               val canSubmit = renewals.canSubmit(renewalSection, variationSections)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
-
-              Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r))
+              Ok(renewal_progress(variationSections, canSubmit, msbOrTcspExists, r, renewalSection.status == Completed))
             }
           }
           case (r:RenewalSubmitted, _) => OptionT.fromOption[Future](Some(Redirect(controllers.routes.RegistrationProgressController.get)))
