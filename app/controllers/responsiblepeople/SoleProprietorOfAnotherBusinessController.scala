@@ -16,12 +16,13 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
+import models.status.NotCompleted
+import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.sole_proprietor
@@ -36,9 +37,11 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
       implicit authContext => implicit request =>
         getData[ResponsiblePerson](index) map {
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
+         if StatusService.getStatus == Future.successful(NotCompleted)
           => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
           case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
           => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
+          case Some(rp) => getViewForVat(rp.vatRegistered, index, edit, flow)
           case _ => NotFound(notFoundView)
         }
     }
@@ -74,4 +77,15 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
         }
       }
   }
+
+  def getViewForVat(vatReg: Option[VATRegistered], index: Int, edit: Boolean = false, flow: Option[String] = None) = {
+
+      if (vatReg.nonEmpty) {
+        Redirect(routes.VATRegisteredController.get(index, edit, flow))
+      }
+      else {
+        Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+      }
+
+    }
 }
