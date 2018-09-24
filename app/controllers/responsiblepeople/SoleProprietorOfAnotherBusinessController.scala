@@ -44,12 +44,11 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
               if isPreSubmission
             => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
             => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
-
-            case Some(rp) if rp.personName.nonEmpty => getViewForVat(rp.vatRegistered, index, edit, flow)
-
+            case Some(rp)
+              if rp.personName.nonEmpty
+            => getViewForVat(rp.vatRegistered, index, edit, flow)
             case _ => NotFound(notFoundView)
           }
         }
