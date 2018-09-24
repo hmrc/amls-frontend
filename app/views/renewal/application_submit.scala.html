@@ -30,10 +30,10 @@
     <p>@messages("renewal.progress.submit.intro")</p>
 
 
-    @if(canSubmit){
+    @if(renewalSectionCompleted){
         <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
             @CSRF.formField
-            <button id="renewal-progress-submit" type="submit" name="submit" class="button">
+            <button id="renewal-progress-submit" type="submit" name="submit" class="button" disabled="@{!canSubmit}" >
                 @messages("renewal.progress.submit")
             </button>
         </form>
@@ -58,15 +58,13 @@
                     )
                 }
                 case _ => {
-                    if(!renewalSectionCompleted) {
-                        anchor(
-                            attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
-                            linkText = Messages("renewal.progress.continue"),
-                            attrRole = true,
-                            visuallyhidden = Messages("renewal.progress.continue"),
-                            id=Some("renewal-progress-continue")
-                        )
-                    }
+                    anchor(
+                        attrHref = controllers.renewal.routes.WhatYouNeedController.get().url,
+                        linkText = Messages("renewal.progress.continue"),
+                        attrRole = true,
+                        visuallyhidden = Messages("renewal.progress.continue"),
+                        id=Some("renewal-progress-continue")
+                    )
                 }
             }}
         </p>
