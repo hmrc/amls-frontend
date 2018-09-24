@@ -15,13 +15,11 @@
  */
 
 package controllers.responsiblepeople
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
-import models.status.NotCompleted
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
@@ -31,19 +29,31 @@ import scala.concurrent.Future
 
 @Singleton
 class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector: DataCacheConnector,
-                                                          val authConnector: AuthConnector) extends RepeatingSection with BaseController {
+                                                          val authConnector: AuthConnector,
+                                                          val statusService: StatusService) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-      implicit authContext => implicit request =>
-        getData[ResponsiblePerson](index) map {
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_, Some(soleProprietorOfAnotherBusiness)))
-         if StatusService.getStatus == Future.successful(NotCompleted)
-          => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
-          case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))
-          => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
-          case Some(rp) => getViewForVat(rp.vatRegistered, index, edit, flow)
-          case _ => NotFound(notFoundView)
+
+
+      implicit authContext => implicit request => {
+        for {
+          isPreSubmission <- statusService.isPreSubmission
+          responsiblePerson <- getData[ResponsiblePerson](index)
+        } yield {
+          responsiblePerson match {
+            case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
+              if isPreSubmission
+            => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
+
+            case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
+            => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
+
+            case Some(rp) if rp.personName.nonEmpty => getViewForVat(rp.vatRegistered, index, edit, flow)
+
+            case _ => NotFound(notFoundView)
+          }
         }
+      }
     }
 
   def getVatRegData(rp: ResponsiblePerson, data: SoleProprietorOfAnotherBusiness): Option[VATRegistered] = {
@@ -79,13 +89,10 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   }
 
   def getViewForVat(vatReg: Option[VATRegistered], index: Int, edit: Boolean = false, flow: Option[String] = None) = {
-
-      if (vatReg.nonEmpty) {
-        Redirect(routes.VATRegisteredController.get(index, edit, flow))
-      }
-      else {
-        Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-      }
-
+    if (vatReg.nonEmpty) {
+      Redirect(routes.VATRegisteredController.get(index, edit, flow))
+    } else {
+      Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
     }
+  }
 }
