@@ -17,13 +17,13 @@
 package typeclasses.confirmation
 
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
-import models.confirmation.BreakdownRow
+import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 
-// TODO: Implement
+// TODO: why does this work?
 class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
 
     override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.phase-2-changes" -> true))
@@ -85,7 +85,11 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
+                breakdownRowsAmendVariationRenewalShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople.fp.passed"
+                ) mustEqual Seq(
+                    BreakdownRow("confirmation.responsiblepeople.fp.passed", 9, Currency(0), Currency(0))
+                )
             }
 
             "set BreakdownRows for fit & proper charge" in {
@@ -96,7 +100,11 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
+                breakdownRowsAmendVariationRenewalShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople"
+                ) mustEqual Seq(
+                    BreakdownRow("confirmation.responsiblepeople", 8, Currency(3), Currency(2))
+                )
             }
         }
 
@@ -109,7 +117,9 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsAmendVariationRenewalNotShowBreakdown mustEqual Seq.empty
+                breakdownRowsAmendVariationRenewalNotShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople.fp.passed"
+                ) mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
@@ -120,7 +130,9 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsAmendVariationRenewalNotShowBreakdown mustEqual Seq.empty
+                breakdownRowsAmendVariationRenewalNotShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople"
+                ) mustEqual Seq.empty
             }
         }
     }
@@ -135,7 +147,11 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsSubsciptionShowBreakdown mustEqual Seq.empty
+                breakdownRowsSubsciptionShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople.fp.passed"
+                ) mustEqual Seq(
+
+                )
             }
 
             "set BreakdownRows for fit & proper charge" in {
@@ -146,7 +162,11 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsSubsciptionShowBreakdown mustEqual Seq.empty
+                breakdownRowsSubsciptionShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople"
+                ) mustEqual Seq(
+                    BreakdownRow("confirmation.responsiblepeople", 1, Currency(3), Currency(2))
+                )
             }
         }
 
@@ -159,7 +179,9 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsSubsciptionNotShowBreakdown mustEqual Seq.empty
+                breakdownRowsSubsciptionNotShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople.fp.passed"
+                ) mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
@@ -170,7 +192,9 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             responsiblePeople
                         )
 
-                breakdownRowsSubsciptionNotShowBreakdown mustEqual Seq.empty
+                breakdownRowsSubsciptionNotShowBreakdown.filter(
+                    _.label == "confirmation.responsiblepeople"
+                ) mustEqual Seq.empty
             }
         }
     }
