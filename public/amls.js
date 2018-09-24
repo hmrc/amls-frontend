@@ -22,11 +22,9 @@ $(window).load(function () {
         }
 })
 
-// TODO: Tidy up
 $(function () {
   // avoids double panel-indented sections
   // should be CSS but isn't possible.
-  // TODO: This needs a different approach
   $('.panel-indent > .form-field--error')
     .filter(function () {
       return $(this).siblings().not('legend').length === 0;

@@ -123,6 +123,5 @@ object AmlsShortLivedCache extends ShortLivedCache {
 
 object WhitelistFilter extends AkamaiWhitelistFilter with MicroserviceFilterSupport{
   override def whitelist: Seq[String] = ApplicationConfig.whitelist
-  // TODO redirect to shutter page when it is configured
   override def destination: Call = Call("GET", "https://www.gov.uk")
 }

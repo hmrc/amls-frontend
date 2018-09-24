@@ -1640,9 +1640,13 @@ responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one o
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘About the Business’ section and let you know what they need.
 
 responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
+responsiblepeople.fit_and_proper.phase_2_heading = Has {0} passed the fit and proper test?
+responsiblepeople.fit_and_proper.phase_2_title = Has this person passed the fit and proper test?
 responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
 responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
 responsiblepeople.fit_and_proper.text.details.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
+responsiblepeople.fit_and_proper.phase_2_details = The HMRC fit and proper test is part of the Money Laundering Regulations. It is not the same as the test done by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.phase_2_details2 = The test checks the details you provided about {0} are correct and they are a suitable responsible person. If they have passed the test, they do not need to do it again.
 responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
 responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.

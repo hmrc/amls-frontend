@@ -18,6 +18,7 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
@@ -66,6 +67,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     val statusService = mockStatusService
+    val mockAppConfig = mock[AppConfig]
+
     val businessMatchingService = mock[BusinessMatchingService]
 
     val activityData1: Set[BusinessActivity] = Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService)
@@ -81,6 +84,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
       .overrides(bind[StatusService].to(statusService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     val controller = app.injector.instanceOf[RegisterServicesController]
@@ -739,8 +743,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
     "fitAndProperRequired" must {
       "return true" when {
-        "tcsp is defined in businessActivities" in new Fixture {
+        "tcsp is defined in businessActivities and phase-2-changes toggle is false" in new Fixture {
 
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(TrustAndCompanyServices), None))
@@ -748,8 +753,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
             result must be(true)
 
           }
-        "msb is defined in businessActivities" in new Fixture {
+        "msb is defined in businessActivities and phase-2-changes toggle is false" in new Fixture {
 
+          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(MoneyServiceBusiness), None))
@@ -758,8 +764,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           }
         "additional activities is defined" when {
-          "tcsp is defined in additional activities" in new Fixture {
+          "tcsp is defined in additional activities and phase-2-changes toggle is false" in new Fixture {
 
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(TrustAndCompanyServices))))
@@ -767,8 +774,9 @@ class RegisterServicesControllerSpec extends AmlsSpec
             result must be(true)
 
           }
-          "msb is defined in additional activities" in new Fixture {
+          "msb is defined in additional activities and phase-2-changes toggle is false" in new Fixture {
 
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(MoneyServiceBusiness))))
@@ -778,10 +786,21 @@ class RegisterServicesControllerSpec extends AmlsSpec
           }
         }
       }
+      "return true" when {
+        "phase-2-changes toggle is true" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+            val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
+
+            val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(BillPaymentServices), None))
+
+            result must be(true)
+
+          }
+      }
       "return false" when {
         "additional activities is not defined" when {
-          "neither msb or tcsp appear businessActivities" in new Fixture {
-
+          "neither msb or tcsp appear businessActivities and phase-2-changes toggle is false" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), None))
@@ -791,8 +810,8 @@ class RegisterServicesControllerSpec extends AmlsSpec
           }
         }
         "additional activities is defined" when {
-          "neither msb or tcsp appear businessActivities or additonal activities" in new Fixture {
-
+          "neither msb or tcsp appear businessActivities or additional activities and phase-2-changes is false" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val fitAndProperRequired = PrivateMethod[Boolean]('fitAndProperRequired)
 
             val result = controller invokePrivate fitAndProperRequired(BMBusinessActivities(Set(HighValueDealing), Some(Set(EstateAgentBusinessService))))

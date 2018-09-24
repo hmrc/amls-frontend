@@ -18,22 +18,27 @@
 @import include._
 @import include.forms2._
 
-@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, showFees: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, showFees: Boolean, phase2Toggle: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder((if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_heading" else "responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages("responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages(if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_title" else "responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @if(showFees){
-        <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
+    @if(phase2Toggle) {
+        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details")</p>
+        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details2", personName)</p>
     } else {
-        <p>@Messages("responsiblepeople.fit_and_proper.text.details.no.fees")</p>
+        @if(showFees) {
+            <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
+        } else {
+            <p>@Messages("responsiblepeople.fit_and_proper.text.details.no.fees")</p>
+        }
     }
 
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
@@ -65,15 +70,17 @@
         }
         </div>
 
-@detailsSummary(
-            summary = Messages("responsiblepeople.fit_and_proper.text.info")
-        ) {
-            @panel(
-                jsHidden = false,
-                wide = false
+        @if(!phase2Toggle) {
+            @detailsSummary(
+                summary = Messages("responsiblepeople.fit_and_proper.text.info")
             ) {
-                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
-                <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
+                @panel(
+                    jsHidden = false,
+                    wide = false
+                ) {
+                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
+                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
+                }
             }
         }
 

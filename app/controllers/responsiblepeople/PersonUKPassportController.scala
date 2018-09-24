@@ -17,9 +17,9 @@
 package controllers.responsiblepeople
 
 import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -34,7 +34,8 @@ import scala.concurrent.Future
 class PersonUKPassportController @Inject()(
                                             override val messagesApi: MessagesApi,
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
+                                            val authConnector: AuthConnector,
+                                            val appConfig: AppConfig
                                           ) extends RepeatingSection with BaseController {
 
 
@@ -61,6 +62,7 @@ class PersonUKPassportController @Inject()(
             (for {
               cache <- OptionT(fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                 data match {
+                  case UKPassportYes(_) if appConfig.phase2ChangesToggle => rp.ukPassport(data).copy(nonUKPassport = None)
                   case UKPassportYes(_) => rp.ukPassport(data).copy(nonUKPassport = None, dateOfBirth = None)
                   case _ => rp.ukPassport(data)
                 }

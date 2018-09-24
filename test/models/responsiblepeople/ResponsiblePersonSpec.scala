@@ -25,13 +25,19 @@ import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
 class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
+
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
+    .build()
 
   "ResponsiblePeople" must {
 
@@ -695,6 +701,55 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
+  val incompleteModelUkResidentNoDOBPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    None,
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResidentPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    Some(DefaultValues.noKnownBy),
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
 
   val completeModelUkResidentForOldData = ResponsiblePerson(
     Some(DefaultValues.personName),
@@ -705,6 +760,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     None,
     None,
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResidentForOldDataPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
     Some(DefaultValues.positions),
@@ -746,6 +826,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
+  val completeModelUkResidentForOldDataNoPreviousPhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    None,
+    None,
+    None,
+    Some(DefaultValues.personResidenceTypeUk),
+    None,
+    None,
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
   val completeModelNonUkResidentNonUkPassport = ResponsiblePerson(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
@@ -770,6 +875,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     None,
     Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
+
   val completeModelNonUkResidentNonUkPassportNoPreviousName = ResponsiblePerson(
     Some(DefaultValues.personName),
     Some(DefaultValues.legalName),
@@ -778,6 +884,31 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.personResidenceTypeNonUk),
     Some(DefaultValues.ukPassportNo),
     Some(DefaultValues.nonUKPassportYes),
+    Some(DefaultValues.dateOfBirth),
+    Some(DefaultValues.contactDetails),
+    Some(DefaultValues.addressHistory),
+    Some(DefaultValues.positions),
+    Some(DefaultValues.saRegistered),
+    Some(DefaultValues.vatRegistered),
+    Some(DefaultValues.experienceTraining),
+    Some(DefaultValues.training),
+    Some(true),
+    false,
+    false,
+    Some(1),
+    Some(StatusConstants.Unchanged),
+    None,
+    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+  )
+
+  val completeModelUkResidentNoPreviousNamePhase2 = ResponsiblePerson(
+    Some(DefaultValues.personName),
+    Some(DefaultValues.legalName),
+    Some(new LocalDate(1990, 2, 24)),
+    Some(DefaultValues.knownBy),
+    Some(DefaultValues.personResidenceTypeUk),
+    Some(DefaultValues.ukPassportYes),
+    None,
     Some(DefaultValues.dateOfBirth),
     Some(DefaultValues.contactDetails),
     Some(DefaultValues.addressHistory),
@@ -1642,4 +1773,46 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "status" -> "Unchanged"
   )
 
+}
+
+class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
+
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
+    .build()
+
+  "ResponsiblePeople" must {
+    "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
+
+      "the model is fully complete" in {
+        completeModelUkResidentPhase2.copy(hasAccepted = true).isComplete must be(true)
+      }
+
+      "the model is fully complete with no previous name added" in {
+        completeModelUkResidentNoPreviousNamePhase2.copy(hasAccepted = true).isComplete must be(true)
+      }
+
+      "the model partially complete with soleProprietorOfAnotherBusiness is empty" in {
+        completeModelUkResidentPhase2.copy(soleProprietorOfAnotherBusiness = None, hasAccepted = true).isComplete must be(true)
+      }
+
+      "the model partially complete with vat registration model is empty" in {
+        completeModelUkResidentPhase2.copy(vatRegistered = None).isComplete must be(false)
+      }
+
+      "the model partially complete soleProprietorOfAnotherBusiness is selected as No vat registration is not empty" in {
+        completeModelUkResidentPhase2.copy(soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false)),
+          vatRegistered = Some(VATRegisteredNo)).isComplete must be(false)
+      }
+
+      "the model is incomplete" in {
+        incompleteModelUkResidentNoDOBPhase2.copy(hasAccepted = true).isComplete must be(false)
+      }
+
+      "the model is not complete" in {
+        val initial = ResponsiblePerson(Some(DefaultValues.personName))
+        initial.isComplete must be(false)
+      }
+    }
+  }
 }
