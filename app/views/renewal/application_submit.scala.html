@@ -33,7 +33,7 @@
     @if(renewalSectionCompleted){
         <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
             @CSRF.formField
-            <button id="renewal-progress-submit" type="submit" name="submit" class="button" @if(!canSubmit) {disabled="disabled"} >
+            <button id="renewal-progress-submit" type="submit" name="submit" class="button" @if(!canSubmit) {disabled} >
                 @messages("renewal.progress.submit")
             </button>
         </form>
