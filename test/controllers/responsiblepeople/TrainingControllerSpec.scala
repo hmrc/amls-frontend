@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, AppConfig}
 import connectors.DataCacheConnector
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
@@ -27,12 +27,14 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
 import org.mockito.Matchers.{eq => meq, _}
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
@@ -40,13 +42,22 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
   val recordId = 1
 
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+    val request = addToken(authRequest)
 
-    val controller = new TrainingController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    lazy val mockAppConfig = mock[AppConfig]
+
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .disable[com.kenshoo.play.metrics.PlayModule]
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[AppConfig].to(mockAppConfig))
+
+
+    val builder = defaultBuilder
+    lazy val app = builder.build()
+    lazy val controller = app.injector.instanceOf[TrainingController]
+
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -159,8 +170,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
           }
 
-          "redirect to FitAndProperController when businessActivities includes TrustAndCompanyServices" in new Fixture {
-
+          "redirect to FitAndProperController when businessActivities includes TrustAndCompanyServices and phase 2 changes toggle is false" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
@@ -183,8 +194,8 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
           }
-          "redirect to FitAndProperController when businessActivities includes MoneyServiceBusiness" in new Fixture {
-
+          "redirect to FitAndProperController when businessActivities includes MoneyServiceBusiness and phase 2 changes toggle is false" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
               "information" -> "I do not remember when I did the training"
@@ -199,6 +210,30 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
               .thenReturn(Some(
                 BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
+              ))
+            when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
+              .thenReturn(Some(Seq(ResponsiblePerson())))
+
+            val result = controller.post(recordId, false)(newRequest)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+          }
+          "redirect to FitAndProperController when businessActivities includes HighValueDealing and phase 2 changes toggle is true" in new Fixture {
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+            val newRequest = request.withFormUrlEncodedBody(
+              "training" -> "true",
+              "information" -> "I do not remember when I did the training"
+            )
+
+            val testCacheMap = CacheMap("", Map(
+
+            ))
+
+            when(controller.dataCacheConnector.fetchAll(any(), any()))
+              .thenReturn(Future.successful(Some(mockCacheMap)))
+            when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+              .thenReturn(Some(
+                BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))
               ))
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
@@ -241,13 +276,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
 
 
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      TrainingController.authConnector must be(AMLSAuthConnector)
-      TrainingController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

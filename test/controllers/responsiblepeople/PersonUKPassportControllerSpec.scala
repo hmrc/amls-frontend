@@ -16,6 +16,7 @@
 
 package controllers.responsiblepeople
 
+import config.AppConfig
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
@@ -27,7 +28,7 @@ import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 
@@ -40,10 +41,13 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
     val request = addToken(authRequest)
     val dataCacheConnector = mock[DataCacheConnector]
 
+    val mockAppConfig = mock[AppConfig]
+
     lazy val app = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     val controller = app.injector.instanceOf[PersonUKPassportController]
@@ -351,8 +355,10 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   it must {
-    "remove non uk passport data" when {
-      "data is changed to uk passport" in new Fixture {
+    "remove non uk passport data including date of birth" when {
+      "phase-2-changes toggle is false and data is changed to uk passport" in new Fixture {
+
+        val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
 
         val newRequest = request.withFormUrlEncodedBody(
           "ukPassport" -> "true",
@@ -361,11 +367,14 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         val responsiblePeople = ResponsiblePerson(
           ukPassport = Some(UKPassportNo),
-          nonUKPassport = Some(NoPassport)
+          nonUKPassport = Some(NoPassport),
+          dateOfBirth = Some(dateOfBirth)
         )
 
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+
         when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName))))))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
 
         when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
           .thenReturn(Some(Seq(responsiblePeople)))
@@ -380,6 +389,48 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           .save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople.copy(
           ukPassport = Some(UKPassportYes(ukPassportNumber)),
           nonUKPassport = None,
+          dateOfBirth = None,
+          hasChanged = true
+        ))))(any(), any(), any())
+
+      }
+    }
+
+    "remove non uk passport data excluding date of birth" when {
+      "phase-2-changes toggle is true and data is changed to uk passport" in new Fixture {
+
+        val dateOfBirth = DateOfBirth(LocalDate.parse("2000-01-01"))
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "ukPassport" -> "true",
+          "ukPassportNumber" -> ukPassportNumber
+        )
+
+        val responsiblePeople = ResponsiblePerson(
+          ukPassport = Some(UKPassportNo),
+          nonUKPassport = Some(NoPassport),
+          dateOfBirth = Some(dateOfBirth)
+        )
+
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+
+        when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = Some(personName), dateOfBirth = Some(dateOfBirth))))))
+
+        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+          .thenReturn(Some(Seq(responsiblePeople)))
+
+        when(controller.dataCacheConnector.fetchAll(any(), any()))
+          .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        val result = controller.post(1, true)(newRequest)
+        status(result) must be(SEE_OTHER)
+
+        verify(controller.dataCacheConnector)
+          .save[Seq[ResponsiblePerson]](any(), meq(Seq(responsiblePeople.copy(
+          ukPassport = Some(UKPassportYes(ukPassportNumber)),
+          nonUKPassport = None,
+          dateOfBirth = Some(dateOfBirth),
           hasChanged = true
         ))))(any(), any(), any())
 

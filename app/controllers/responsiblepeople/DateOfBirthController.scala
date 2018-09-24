@@ -17,8 +17,8 @@
 package controllers.responsiblepeople
 
 import javax.inject.Inject
-
 import cats.data.OptionT
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -33,7 +33,8 @@ import scala.concurrent.Future
 class DateOfBirthController @Inject()(
                                        override val messagesApi: MessagesApi,
                                        val dataCacheConnector: DataCacheConnector,
-                                       val authConnector: AuthConnector
+                                       val authConnector: AuthConnector,
+                                       val appConfig: AppConfig
                                      ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
@@ -62,6 +63,7 @@ class DateOfBirthController @Inject()(
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index, flow))
+              case false if appConfig.phase2ChangesToggle => Redirect(routes.PersonResidentTypeController.get(index, edit, flow))
               case false => Redirect(routes.CountryOfBirthController.get(index, edit, flow))
             }
 

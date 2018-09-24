@@ -33,7 +33,7 @@
                     bold = true
                 )
                 <p>@Messages("progress.updates.made")</p>
-                <button type="submit" name="submit" class="button">@Messages("button.continue")</button>
+                <button id="progress-continue" type="submit" name="submit" class="button">@Messages("button.continue")</button>
             </fieldset>
         </form>
     } else {
@@ -43,7 +43,8 @@
             attrRole = true,
             attrHref = controllers.routes.StatusController.get().url,
             linkText = Messages("button.continue"),
-            visuallyhidden = Messages("progress.view.status")
+            visuallyhidden = Messages("progress.view.status"),
+            id=Some("progress-continue")
         )</p>
     }
 </div>

@@ -75,15 +75,13 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
 
         val submissionRow = BreakdownRow(Messages("confirmation.submission"), submissionCount, Currency(submissionFee), Currency(submissionCount * submissionFee))
 
-        val peopleCount = {
-          if (activities.businessActivities.contains(MoneyServiceBusiness) || activities.businessActivities.contains(TrustAndCompanyServices)) {
-            responsiblepeople.count { responsiblePerson =>
-              !responsiblePerson.hasAlreadyPassedFitAndProper.contains(true)
-            }
-          } else {
-            0
-          }
+        val peopleCount = appConfig.phase2ChangesToggle match {
+          case true => countNonFitandProperResponsiblePeople(responsiblepeople)
+          case false if activities.businessActivities.contains(MoneyServiceBusiness) || activities.businessActivities.contains(TrustAndCompanyServices) =>
+            countNonFitandProperResponsiblePeople(responsiblepeople)
+          case _ => 0
         }
+
         val peopleRow = BreakdownRow(Messages("summary.responsiblepeople"), peopleCount, Currency(peopleFee), Currency(peopleCount * peopleFee))
 
         val premisesCount = tradingpremises.count(_ != TradingPremises())
@@ -96,6 +94,10 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
       }) getOrElse Seq.empty
     }
 
+  }
+
+  private def countNonFitandProperResponsiblePeople(responsiblepeople: Seq[ResponsiblePerson]) = {
+    responsiblepeople.count { responsiblePerson => !responsiblePerson.hasAlreadyPassedFitAndProper.contains(true) }
   }
 
   private def getTotal(breakdownRows: Seq[BreakdownRow]): Int = {

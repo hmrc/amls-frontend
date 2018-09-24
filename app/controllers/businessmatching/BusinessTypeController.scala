@@ -86,7 +86,6 @@ trait BusinessTypeController extends BaseController {
                       }
                   }
               } getOrElse Future.successful {
-                // TODO error and logging
                 Redirect(routes.RegisterServicesController.get())
               }
           }
