@@ -65,7 +65,7 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         </p>
         <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
             @CSRF.formField
-            <button type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
+            <button id="progress-continue" type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
                 @Messages("progress.submit")
             </button>
         </form>
