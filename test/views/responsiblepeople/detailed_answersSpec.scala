@@ -184,6 +184,34 @@ class detailed_answersSpec extends AmlsSpec
 
         }
         }
+      }
+
+      "date-of-birth" in new ViewFixture {
+
+        val responsiblePeopleModelWithDOB = responsiblePeopleModel.copy(
+          dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
+          ukPassport = Some(UKPassportNo)
+        )
+
+        override val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.date.of.birth.heading", personName.fullName), checkElementTextIncludes(_, "1 January 2000"))
+        )
+
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithDOB), 1, false, personName.fullName)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
+
+        }
+        }
 
       }
 
@@ -417,5 +445,4 @@ trait ResponsiblePeopleValues extends NinoUtil {
     hasAlreadyPassedFitAndProper = Some(true),
     soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
   )
-
 }

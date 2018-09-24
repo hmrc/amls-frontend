@@ -54,7 +54,6 @@ trait IdentifySuspiciousActivityController extends BaseController {
               businessActivities.identifySuspiciousActivity(data)
             )
           } yield edit match {
-              //todo : Implement the correct redirects when relevant pages are available
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.NCARegisteredController.get())
 

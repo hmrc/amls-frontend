@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.businessactivities.BusinessActivities
@@ -41,7 +42,8 @@ import scala.concurrent.Future
 class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                       implicit val dataCacheConnector: DataCacheConnector,
                                       val tradingPremisesService: TradingPremisesService,
-                                      val responsiblePeopleService: ResponsiblePeopleService
+                                      val responsiblePeopleService: ResponsiblePeopleService,
+                                      val appConfig:AppConfig
                                    ) extends RepeatingSection {
 
   def updateBusinessActivities(model: AddBusinessTypeFlowModel)(implicit ac: AuthContext, hc: HeaderCarrier): OptionT[Future, BusinessActivities] = {
@@ -133,7 +135,7 @@ class AddBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
     val indices = model.responsiblePeople.fold[Set[Int]](Set.empty)(_.index)
 
     OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
-      case Some(people) if model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness) =>
+      case Some(people) if appConfig.phase2ChangesToggle || model.activity.contains(TrustAndCompanyServices) || model.activity.contains(MoneyServiceBusiness)=>
         responsiblePeopleService.updateFitAndProperFlag(people, indices)
       case Some(people) => people
     })

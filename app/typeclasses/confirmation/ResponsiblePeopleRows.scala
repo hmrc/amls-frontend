@@ -16,6 +16,7 @@
 
 package typeclasses.confirmation
 
+import config.ApplicationConfig
 import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
@@ -29,7 +30,11 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
            ): Seq[BreakdownRow]
 
   val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
-    fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
+    if (ApplicationConfig.phase2ChangesToggle) {
+      fpFee.isDefined
+    } else {
+      fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
+    }
 
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))

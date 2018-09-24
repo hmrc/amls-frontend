@@ -29,7 +29,7 @@ trait WhoIsYourAccountantController extends BaseController {
 
   val dataCacheConnector: DataCacheConnector
 
-  //TODO: Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
+  //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
 
   def get(edit: Boolean = false) = Authorised.async {

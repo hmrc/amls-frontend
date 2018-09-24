@@ -21,7 +21,6 @@ import uk.gov.hmrc.play.frontend.auth.{AuthenticationProvider, TaxRegime}
 
 object AmlsRegime extends TaxRegime {
 
-  // TODO: must include amls regime
   override def isAuthorised(accounts: Accounts): Boolean = {
     accounts.ct.isDefined || accounts.org.isDefined || accounts.sa.isDefined
   }

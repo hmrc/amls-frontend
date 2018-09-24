@@ -53,13 +53,11 @@ object TradingPremisesMsbService {
     case ForeignExchange => "05"
   }
 
-  // TODO: Create generic rules that will remove the need for this
   implicit val jsonR: Rule[JsValue, TradingPremisesMsbService] = {
     import jto.validation.playjson.Rules._
     stringR andThen serviceR
   }
 
-  // TODO: Create generic writes that will remove the need for this
   implicit val jsonW: Write[TradingPremisesMsbService, JsValue] = {
     import jto.validation.playjson.Writes._
     serviceW andThen string

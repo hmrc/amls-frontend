@@ -597,9 +597,6 @@ th.numeric {
 }
 
 
-/* adding this for now
- * TODO: we really need to re-jig the markup for this */
-
 @media screen and (max-width: 640px) {
   .user-attention {
     margin: 0;
@@ -608,7 +605,7 @@ th.numeric {
 
 
 /* postcode */
-/* TODO, determine if there's a class in Assets Frontend for this
+/* determine if there's a class in Assets Frontend for this
  * …
  * seems there is: `.form-control-1-4`
  * http://govuk-elements.herokuapp.com/form-elements/example-form-elements/

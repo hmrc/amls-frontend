@@ -32,7 +32,7 @@ import scala.concurrent.Future
 class FitAndProperController @Inject()(
                                         val dataCacheConnector: DataCacheConnector,
                                         val authConnector: AuthConnector,
-                                        config: AppConfig
+                                        appConfig: AppConfig
                                       ) extends RepeatingSection with BaseController {
 
   val FIELDNAME = "hasAlreadyPassedFitAndProper"
@@ -43,9 +43,9 @@ class FitAndProperController @Inject()(
     implicit authContext => implicit request =>
       getData[ResponsiblePerson](index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, config.showFeesToggle))
+          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, config.showFeesToggle))
+          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
         case _ => NotFound(notFoundView)
       }
   }
@@ -56,7 +56,7 @@ class FitAndProperController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](index) map { rp =>
-              BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), config.showFeesToggle))
+              BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
             }
           case ValidForm(_, data) => {
             for {

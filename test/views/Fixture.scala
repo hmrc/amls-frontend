@@ -27,7 +27,6 @@ import utils.Strings.TextHelpers
 import scala.collection.JavaConverters._
 
 trait ParagraphHelpers extends MustMatchers {
-  // TODO: refactor this into a scalatest matcher
   def validateParagraphizedContent(messageKey: String)(implicit messages: Messages, doc: Document): Unit = {
     for(p <- Jsoup.parse(messages(messageKey).paragraphize).getElementsByTag("p").asScala) {
       doc.body().toString must include(p.text())

@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import cats.data.OptionT
 import cats.implicits._
+import config.AppConfig
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessActivitiesGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherNo, TaxMatters, WhoIsYourAccountant, BusinessActivities => BABusinessActivities}
@@ -33,7 +34,7 @@ import org.scalacheck.Gen
 import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
-import utils.{AuthorisedFixture, DependencyMocks, FutureAssertions, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -48,12 +49,14 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     val tradingPremisesService = mock[TradingPremisesService]
     val mockUpdateServiceHelper = mock[AddBusinessTypeHelper]
     val responsiblePeopleService = mock[ResponsiblePeopleService]
+    val mockAppConfig = mock[AppConfig]
 
     val SUT = new AddBusinessTypeHelper(
       self.authConnector,
       mockCacheConnector,
       tradingPremisesService,
-      responsiblePeopleService
+      responsiblePeopleService,
+      mockAppConfig
     )
 
     val businessActivitiesSection = BABusinessActivities(
@@ -239,10 +242,10 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     }
   }
 
-
   "updateResponsiblePeople" must {
     "set the fit and proper flag on the right people according to the indices" when {
-      "adding the TCSP business type" in new Fixture {
+      "adding the TCSP business type and phase-2-change toggle is false" in new Fixture {
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
           _.copy(hasAlreadyPassedFitAndProper = Some(false))
         }
@@ -263,10 +266,57 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
       }
+
+      "adding the MSB business type and phase-2-change toggle is false" in new Fixture {
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
+
+        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+        mockCacheUpdate(Some(ResponsiblePerson.key), people)
+
+        val model = AddBusinessTypeFlowModel(
+          Some(MoneyServiceBusiness),
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+        )
+
+        when {
+          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+        } thenReturn updatedPeople
+
+        SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
+      }
+
+      "adding a non TCSP and MSB business type and phase-2-change toggle is true" in new Fixture {
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+        val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+        }
+
+        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+
+        mockCacheUpdate(Some(ResponsiblePerson.key), people)
+
+        val model = AddBusinessTypeFlowModel(
+          Some(BillPaymentServices),
+          fitAndProper = Some(true),
+          responsiblePeople = Some(ResponsiblePeopleFitAndProper(Set(0, 1, 2, 4, 5)))
+        )
+
+        when {
+          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+        } thenReturn updatedPeople
+
+        SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
+      }
     }
 
     "not touch the responsible people" when {
-      "adding a business type that isn't TCSP" in new Fixture {
+      "adding a business type that isn't TCSP and phase-2-change toggle is false" in new Fixture {
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
           _.copy(hasAlreadyPassedFitAndProper = Some(false))
         }

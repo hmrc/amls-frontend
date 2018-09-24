@@ -16,21 +16,27 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.Inject
 import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.responsiblepeople.{ResponsiblePerson, Training}
+import play.api.i18n.MessagesApi
 import play.api.mvc.Result
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait TrainingController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class TrainingController @Inject()(
+                                    override val messagesApi: MessagesApi,
+                                    val dataCacheConnector: DataCacheConnector,
+                                    val authConnector: AuthConnector,
+                                    val appConfig: AppConfig
+                                  ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
@@ -72,7 +78,7 @@ trait TrainingController extends RepeatingSection with BaseController {
         (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
           case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)),_,_,_,_, _, _, _)))
-            if acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
+            if  appConfig.phase2ChangesToggle || acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
           => Redirect(routes.FitAndProperController.get(index, false, flow))
           case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
@@ -80,10 +86,4 @@ trait TrainingController extends RepeatingSection with BaseController {
       case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
   }
-}
-
-object TrainingController extends TrainingController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

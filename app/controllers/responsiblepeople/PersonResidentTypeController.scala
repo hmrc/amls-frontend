@@ -18,20 +18,24 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
+import config.{AMLSAuthConnector, AppConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.Country
 import models.responsiblepeople._
+import play.api.i18n.MessagesApi
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.person_residence_type
 
 import scala.concurrent.Future
 
-trait PersonResidentTypeController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class PersonResidentTypeController @Inject()(override val messagesApi: MessagesApi,
+                                             val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector,
+                                             val appConfig:AppConfig) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
@@ -61,6 +65,7 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
                 val countryOfBirth = rp.personResidenceType.fold[Option[Country]](None)(x => x.countryOfBirth)
                 val updatedData = data.copy(countryOfBirth = countryOfBirth, nationality = nationality)
                 residency match {
+                  case UKResidence(_) if appConfig.phase2ChangesToggle => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None)
                   case UKResidence(_) => rp.personResidenceType(updatedData).copy(ukPassport = None, nonUKPassport = None, dateOfBirth = None)
                   case NonUKResidence => rp.personResidenceType(updatedData)
                 }
@@ -94,12 +99,5 @@ trait PersonResidentTypeController extends RepeatingSection with BaseController 
     }
 
   }
-}
-
-object PersonResidentTypeController extends PersonResidentTypeController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-
-  override def dataCacheConnector = DataCacheConnector
 }
 
