@@ -169,7 +169,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                             activities,
                             responsiblePeople
                         )
-                
+
                 breakdownRowsSubsciptionNotShowBreakdown mustEqual Seq.empty
             }
         }
