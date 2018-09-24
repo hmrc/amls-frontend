@@ -16,15 +16,17 @@
 
 package typeclasses.confirmation
 
-import models.businessactivities.BusinessActivities
-import models.{AmendVariationRenewalResponse, SubmissionResponse, SubscriptionFees, SubscriptionResponse}
 import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
 import models.confirmation.BreakdownRow
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalatestplus.play.PlaySpec
+import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.test.FakeApplication
 
 // TODO: Implement
-class ResponsiblePeopleRowsSpec extends PlaySpec {
+class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
+
+    override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.phase-2-changes" -> true))
 
     val amendVariationRenewalResponse = AmendVariationRenewalResponse(
         processingDate = "",
@@ -44,10 +46,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec {
         zeroRatedTradingPremises = 12
     )
 
-    val subscriptionResponse = SubscriptionResponse(
-      etmpFormBundleNumber = "",
-      amlsRefNo = "",
-      subscriptionFees = Some(SubscriptionFees(
+    val subscriptionFees = Some(SubscriptionFees(
         registrationFee = 1.0,
         fpFee = Some(2.0),
         fpFeeRate = Some(3.0),
@@ -55,9 +54,18 @@ class ResponsiblePeopleRowsSpec extends PlaySpec {
         premiseFeeRate = Some(5.0),
         totalFees = 6.0,
         paymentReference = ""
-      )),
+    ))
+
+    val subscriptionFeesNoBreakdown = Some(subscriptionFees.get.copy(fpFee = None))
+
+    val subscriptionResponse = SubscriptionResponse(
+      etmpFormBundleNumber = "",
+      amlsRefNo = "",
+      subscriptionFees = subscriptionFees,
       previouslySubmitted = None
     )
+
+    val subscriptionResponseNoBreakdown = subscriptionResponse.copy(subscriptionFees = subscriptionFeesNoBreakdown)
 
     val activities: Set[BusinessActivity] = Set(
         MoneyServiceBusiness
@@ -67,51 +75,74 @@ class ResponsiblePeopleRowsSpec extends PlaySpec {
         ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")))
     ))
 
+    val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+            responsiblePeopleRowsFromVariation(
+                amendVariationRenewalResponse,
+                activities,
+                responsiblePeople
+            )
+
+    val breakdownRowsAmendVariationRenewalNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+            responsiblePeopleRowsFromVariation(
+                amendVariationRenewalResponse.copy(fpFee = None),
+                activities,
+                responsiblePeople
+            )
+
+    val breakdownRowsSubsciptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+            responsiblePeopleRowsFromSubscription(
+                subscriptionResponse,
+                activities,
+                responsiblePeople
+            )
+
+    val breakdownRowsSubsciptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+            responsiblePeopleRowsFromSubscription(
+                subscriptionResponseNoBreakdown,
+                activities,
+                responsiblePeople
+            )
+
     "value is a AmendVariationRenewalResponse" when {
-        "businessActivities is None" must {
+        "show breakdown" must {
             "set BreakdownRows for responsible people" in {
-              val breakdownRows: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                responsiblePeopleRowsFromVariation(
-                  amendVariationRenewalResponse,
-                  activities,
-                  responsiblePeople
-                )
+                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
-
+                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
             }
         }
 
-        "businessActivities is not None" must {
+        "not show breakdown" must {
             "set BreakdownRows for responsible people" in {
-
+                breakdownRowsAmendVariationRenewalNotShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
-
+                breakdownRowsAmendVariationRenewalNotShowBreakdown mustEqual Seq.empty
             }
         }
     }
 
     "value is a SubscriptionResponse" when {
-        "businessActivities is None" must {
+        "show breakdown" must {
             "set BreakdownRows for responsible people" in {
-
+                breakdownRowsSubsciptionShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
-
+                breakdownRowsSubsciptionShowBreakdown mustEqual Seq.empty
             }
         }
 
-        "businessActivities is not None" must {
+        "not show breakdown" must {
             "set BreakdownRows for responsible people" in {
-
+                breakdownRowsSubsciptionNotShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
-
+                breakdownRowsSubsciptionNotShowBreakdown mustEqual Seq.empty
             }
         }
     }
