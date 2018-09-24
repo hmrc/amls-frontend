@@ -17,7 +17,8 @@
 package typeclasses.confirmation
 
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
-import models.businessmatching.{BusinessActivity, MoneyServiceBusiness}
+import models.businessmatching.{BusinessActivities, BusinessActivity, MoneyServiceBusiness}
+import models.confirmation.BreakdownRow
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
@@ -74,11 +75,23 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
         ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")))
     ))
 
+    val premises = Some(Seq(
+        // TODO: Populate with premises
+    ))
+
     // TODO: lets just make this phase 2 dependent given its coming in for that reason, discuss?
     "value is a AmendVariationRenewalResponse" when {
         "businessActivities contains MSB" must {
             "set BreakdownRows for responsible people" in {
+                val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
+                        breakdownRowFromVariation(
+                            amendVariationRenewalResponse,
+                            Some(BusinessActivities(activities)),
+                            premises,
+                            responsiblePeople
+                        )
 
+                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
@@ -110,7 +123,15 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
     "value is a SubmissionResponse" when {
         "businessActivities contains MSB" must {
             "set BreakdownRows for responsible people" in {
+                val breakdownRowsSubscriptionShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
+                        breakdownRowFromSubscription(
+                            subscriptionResponse,
+                            Some(BusinessActivities(activities)),
+                            premises,
+                            responsiblePeople
+                        )
 
+                breakdownRowsSubscriptionShowBreakdown mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in {
