@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.ApplicationConfig
+import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -26,6 +26,7 @@ import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
 import org.scalatest.mock.MockitoSugar
@@ -38,7 +39,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -54,9 +55,11 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> false)
+      .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+
 
     val builder = defaultBuilder
     lazy val app = builder.build()
@@ -71,6 +74,11 @@ class FeeGuidanceControllerSpec extends AmlsSpec
     val breakdownRows = Seq(
       BreakdownRow(Messages("confirmation.submission"), 1, Currency(submissionFee), Currency(submissionFee)),
       BreakdownRow(Messages("summary.responsiblepeople"), 3, Currency(peopleFee), Currency(peopleFee * 3)),
+      BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
+    )
+
+    val breakdownRowsNoFandP = Seq(
+      BreakdownRow(Messages("confirmation.submission"), 1, Currency(submissionFee), Currency(submissionFee)),
       BreakdownRow(Messages("summary.tradingpremises"), 2, Currency(premisesFee), Currency(premisesFee * 2))
     )
   }
@@ -105,11 +113,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
     "getBreakdownRows is called" must {
 
-      "return all breakdownRows" when {
+      "return all breakdownRows when phase-2-changes toggle is set to false" when {
 
         "the business type contains msb" when {
 
           "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
+
+            override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
 
             val aboutTheBusiness = AboutTheBusiness(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
@@ -155,6 +165,8 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
 
+            override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
+
             val aboutTheBusiness = AboutTheBusiness(
               previouslyRegistered = Some(PreviouslyRegisteredNo)
             )
@@ -191,6 +203,103 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             await(result) must be(breakdownRows)
           }
         }
+
+        "the business type contains bps" when {
+
+          "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
+
+            override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> false)
+
+            val aboutTheBusiness = AboutTheBusiness(
+              previouslyRegistered = Some(PreviouslyRegisteredNo)
+            )
+
+            val tradingPremises = Seq(
+              nonEmptyTradingPremises,
+              nonEmptyTradingPremises
+            )
+
+            val responsiblePeople = Seq(
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              ),
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              ),
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              )
+            )
+
+            val businessMatching = BusinessMatching(
+              activities = Some(BusinessActivities(Set(BillPaymentServices)))
+            )
+
+            mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+
+            val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
+
+            val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
+
+            await(result) must be(breakdownRowsNoFandP)
+
+          }
+
+        }
+
+      }
+
+      "return all breakdownRows when phase-2-changes toggle is set to true" when {
+
+        "the business type contains bps" when {
+
+          "trading premises and responsible people (not fit&proper) are present and not already registered" in new Fixture {
+
+            override val builder = defaultBuilder.configure("microservice.services.feature-toggle.phase-2-changes" -> true)
+
+            val aboutTheBusiness = AboutTheBusiness(
+              previouslyRegistered = Some(PreviouslyRegisteredNo)
+            )
+
+            val tradingPremises = Seq(
+              nonEmptyTradingPremises,
+              nonEmptyTradingPremises
+            )
+
+            val responsiblePeople = Seq(
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              ),
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              ),
+              ResponsiblePerson(
+                hasAlreadyPassedFitAndProper = Some(false)
+              )
+            )
+
+            val businessMatching = BusinessMatching(
+              activities = Some(BusinessActivities(Set(BillPaymentServices)))
+            )
+
+            mockCacheGetEntry(Some(tradingPremises), TradingPremises.key)
+            mockCacheGetEntry(Some(responsiblePeople), ResponsiblePerson.key)
+            mockCacheGetEntry(Some(aboutTheBusiness), AboutTheBusiness.key)
+            mockCacheGetEntry(Some(businessMatching), BusinessMatching.key)
+
+            val privateGetBreakdownRows = PrivateMethod[Future[Seq[BreakdownRow]]]('getBreakdownRows)
+
+            val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
+
+            await(result) must be(breakdownRows)
+
+          }
+
+        }
+
       }
 
       "filter out empty responsible people" in new Fixture {

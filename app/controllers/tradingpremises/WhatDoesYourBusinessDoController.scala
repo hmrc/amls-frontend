@@ -55,7 +55,6 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
           }
         } yield (c, activities))
           .fold[Either[Result, (CacheMap, Set[BusinessActivity])]] {
-          // TODO: Need to think about what we should do in case of this error
           Left(Redirect(routes.WhereAreTradingPremisesController.get(index, edit)))
         } {
           t => Right(t)

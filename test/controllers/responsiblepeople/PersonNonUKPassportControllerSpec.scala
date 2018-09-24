@@ -16,6 +16,7 @@
 
 package controllers.responsiblepeople
 
+import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
@@ -26,11 +27,12 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -48,7 +50,8 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[AuthConnector].to(self.authConnector))
       .build()
 
-    val controller = app.injector.instanceOf[PersonNonUKPassportController]
+    val mockApplicationConfig = mock[AppConfig]
+    val controller = new PersonNonUKPassportController(messagesApi = messagesApi, dataCacheConnector, authConnector = authConnector, mockApplicationConfig)
 
     val emptyCache = CacheMap("", Map.empty)
     val mockCacheMap = mock[CacheMap]
@@ -119,13 +122,15 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
     "post is called" must {
 
-      "edit is false" must {
+      "edit is false and phase-2-changes feature toggle is false" must {
         "go to DateOfBirthController" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "nonUKPassport" -> "true",
             "nonUKPassportNumber" -> passportNumber
           )
+
+          when(mockApplicationConfig.phase2ChangesToggle).thenReturn(false)
 
           val responsiblePeople = ResponsiblePerson()
 
@@ -138,6 +143,30 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DateOfBirthController.get(1).url))
+        }
+      }
+
+      "edit is false and phase-2-changes feature toggle is true" must {
+        "go to CountryofBirthController" in new Fixture {
+
+          val newRequest = request.withFormUrlEncodedBody(
+            "nonUKPassport" -> "true",
+            "nonUKPassportNumber" -> passportNumber
+          )
+
+          when(mockApplicationConfig.phase2ChangesToggle).thenReturn(true);
+
+          val responsiblePeople = ResponsiblePerson()
+
+          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+            .thenReturn(Some(Seq(ResponsiblePerson(personName = Some(personName)))))
+
+          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+            .thenReturn(Future.successful(Some(mockCacheMap)))
+
+          val result = controller.post(1)(newRequest)
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.CountryOfBirthController.get(1).url))
 
         }
       }

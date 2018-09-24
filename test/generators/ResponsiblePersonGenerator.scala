@@ -16,6 +16,7 @@
 
 package generators
 
+import config.ApplicationConfig
 import models.responsiblepeople._
 import org.scalacheck.Gen
 import models.FormTypes

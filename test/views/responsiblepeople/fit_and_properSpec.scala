@@ -35,7 +35,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       doc.title must be(
         Messages("responsiblepeople.fit_and_proper.title", "PersonName")
@@ -45,34 +45,57 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
       )
     }
 
-    "have correct headings" in new ViewFixture {
+    "have correct headings when phase2 changes toggle is false" in new ViewFixture {
 
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       heading.html must be(Messages("responsiblepeople.fit_and_proper.heading", "PersonName"))
       subHeading.html must include(Messages("summary.responsiblepeople"))
+      doc.title must include(Messages("responsiblepeople.fit_and_proper.title"))
 
     }
 
+    "have correct headings when phase2 changes is true" in new ViewFixture {
+
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
+
+      heading.html must be(Messages("responsiblepeople.fit_and_proper.phase_2_heading", "PersonName"))
+      subHeading.html must include(Messages("summary.responsiblepeople"))
+      doc.title must include(Messages("responsiblepeople.fit_and_proper.phase_2_title"))
+    }
+
     "have the correct content" when {
-      "fees are being shown" in new ViewFixture {
+      "fees are being shown when phase 2 toggle is false" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
-
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.info"))
+      }
+
+      "phase 2 content is being shown" in new ViewFixture {
+
+        val form2: Form2[_] = EmptyForm
+
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, true)
+
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.phase_2_details"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.phase_2_details2", "PersonName"))
+        doc.body().html() mustNot include(Messages("responsiblepeople.fit_and_proper.text.info"))
 
       }
-      "fees are being hidden" in new ViewFixture {
+      "fees are being hidden when phase 2 toggle is false" in new ViewFixture {
 
         val form2: Form2[_] = EmptyForm
 
-        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false)
-
+        def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", false, false)
         doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.details.no.fees"))
+        doc.body().html() must include(Messages("responsiblepeople.fit_and_proper.text.info"))
       }
     }
 
@@ -83,7 +106,7 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
           (Path \ "hasAlreadyPassedFitAndProper") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true)
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
 
       errorSummary.html() must include("not a message Key")
 

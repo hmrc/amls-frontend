@@ -16,6 +16,7 @@
 
 package services.businessmatching
 
+import config.AppConfig
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.ViewResponse
@@ -36,7 +37,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{DependencyMocks, FutureAssertions, AmlsSpec}
+import utils.{AmlsSpec, DependencyMocks, FutureAssertions}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 
@@ -49,7 +50,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
   with BusinessMatchingGenerator {
 
   trait Fixture extends DependencyMocks {
-    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector)
+    val mockAppConfig = mock[AppConfig]
+    val service = new BusinessMatchingService(mockStatusService, mockCacheConnector, mockAppConfig)
 
     val businessMatchingModel = businessMatchingGen.sample.get
 
@@ -270,11 +272,49 @@ class BusinessMatchingServiceSpec extends PlaySpec
       }
     }
   }
-
   "fitAndProperRequired" must {
     "return true" when {
-      "existing activities does not contain msb and tcsp" when {
+      "When phase 2 toggle is true" in new Fixture {
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+        val existing = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(BillPaymentServices)
+          ))
+        )
+
+        val current = BusinessMatching(
+          activities = Some(BMActivities(
+            Set(HighValueDealing)
+          ))
+        )
+
+        val viewResponse = ViewResponse(
+          "",
+          businessMatchingSection = existing,
+          aboutTheBusinessSection = AboutTheBusiness(),
+          bankDetailsSection = Seq.empty,
+          businessActivitiesSection = BusinessActivities(),
+          eabSection = None,
+          aspSection = None,
+          tcspSection = None,
+          responsiblePeopleSection = None,
+          tradingPremisesSection = None,
+          msbSection = None,
+          hvdSection = None,
+          supervisionSection = None,
+          aboutYouSection = AddPerson("", None, "", RoleWithinBusinessRelease7(Set.empty))
+        )
+
+        mockCacheFetch(Some(current), Some(BusinessMatching.key))
+        mockCacheFetch[ViewResponse](Some(viewResponse), Some(ViewResponse.key))
+
+        whenReady(service.fitAndProperRequired.value) { result =>
+          result must be(Some(true))
+        }
+      }
+      "existing activities does not contain msb and tcsp and phase 2 toggle is false" when {
         "current activities contains msb" in new Fixture {
+          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
           val existing = BusinessMatching(
             activities = Some(BMActivities(
               Set(BillPaymentServices)
@@ -311,9 +351,8 @@ class BusinessMatchingServiceSpec extends PlaySpec
             result must be(Some(true))
           }
         }
-
         "current activities contains tcsp" in new Fixture {
-
+          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
           val existing = BusinessMatching(
             activities = Some(BMActivities(
               Set(BillPaymentServices)
@@ -351,9 +390,10 @@ class BusinessMatchingServiceSpec extends PlaySpec
         }
       }
     }
+
     "return false" when {
       "existing activities contains msb" in new Fixture {
-
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val existing = BusinessMatching(
           activities = Some(BMActivities(
             Set(MoneyServiceBusiness)
@@ -390,7 +430,7 @@ class BusinessMatchingServiceSpec extends PlaySpec
         }
       }
       "existing activities contains tcsp" in new Fixture {
-
+        when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val existing = BusinessMatching(
           activities = Some(BMActivities(
             Set(TrustAndCompanyServices)

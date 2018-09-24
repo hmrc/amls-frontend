@@ -240,8 +240,6 @@ object FormTypes {
 
   /** Business Identifier Rules */
 
-  //TODO: Add error messages
-
   val accountantRefNoType = notEmpty
     .andThen(maxLength(minAccountantRefNoTypeLength))
     .andThen(minLength(minAccountantRefNoTypeLength))

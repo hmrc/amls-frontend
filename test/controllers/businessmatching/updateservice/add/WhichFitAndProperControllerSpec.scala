@@ -16,15 +16,18 @@
 
 package controllers.businessmatching.updateservice.add
 
+
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import controllers.businessmatching.updateservice.AddBusinessTypeHelper
 import generators.ResponsiblePersonGenerator
 import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.responsiblepeople.{DateOfBirth, PersonName, ResponsiblePerson}
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -33,7 +36,7 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.ResponsiblePeopleService
 import services.businessmatching.BusinessMatchingService
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -62,8 +65,10 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
       responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
       responsiblePeopleGen(2).sample.get
 
+    val generateDOB = if(ApplicationConfig.phase2ChangesToggle) Some(DateOfBirth(new LocalDate(2001,12,2))) else None
+
     var peopleMixedWithInactive = Seq(
-      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1"))),
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1")), dateOfBirth = generateDOB ),
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "2")), status = Some(StatusConstants.Deleted)), // Deleted
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "3")), None) // isComplete = false
     )

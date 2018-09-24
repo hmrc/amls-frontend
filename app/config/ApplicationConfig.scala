@@ -92,6 +92,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
     value
   }
 
+  def phase2ChangesToggle: Boolean = getConfBool("feature-toggle.phase-2-changes", false)
+
   override def refreshProfileToggle = getConfBool("feature-toggle.refresh-profile", false)
 
   override def frontendBaseUrl = {
@@ -114,6 +116,8 @@ class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration
   def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def fxEnabledToggle = config.getConfBool("feature-toggle.fx-enabled", defBool = false)
+
+  def phase2ChangesToggle = config.getConfBool("feature-toggle.phase-2-changes", defBool = false)
 
   def authUrl = config.baseUrl("auth")
 

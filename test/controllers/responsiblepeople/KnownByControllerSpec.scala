@@ -16,16 +16,18 @@
 
 package controllers.responsiblepeople
 
+import config.AppConfig
 import connectors.DataCacheConnector
 import models.responsiblepeople.{KnownBy, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo}
+import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 
 class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
@@ -34,9 +36,12 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
     val request = addToken(self.authRequest)
     val RecordId = 1
 
+    val mockAppConfig = mock[AppConfig]
+
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[AppConfig].to(mockAppConfig))
       .build()
 
     lazy val controller = injector.instanceOf[KnownByController]
@@ -96,12 +101,14 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
     "post is called" must {
       "form is valid" must {
         "go to PersonResidentTypeController" when {
-          "edit is false" in new TestFixture {
+          "edit is false and phase-2-change feature toggle is false" in new TestFixture {
 
             val requestWithParams = request.withFormUrlEncodedBody(
               "hasOtherNames" -> "true",
               "otherNames" -> "otherName"
             )
+
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
 
             mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
             mockCacheSave[KnownBy]
@@ -109,6 +116,25 @@ class KnownByControllerSpec extends AmlsSpec with ScalaFutures {
             val result = controller.post(RecordId)(requestWithParams)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.PersonResidentTypeController.get(RecordId).url))
+          }
+        }
+
+        "go to DateOfBirthController" when {
+          "edit is false and phase-2-change feature toggle is true" in new TestFixture {
+
+            val requestWithParams = request.withFormUrlEncodedBody(
+              "hasOtherNames" -> "true",
+              "otherNames" -> "otherName"
+            )
+
+            when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+
+            mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson())))
+            mockCacheSave[KnownBy]
+
+            val result = controller.post(RecordId)(requestWithParams)
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) must be(Some(routes.DateOfBirthController.get(RecordId).url))
           }
         }
 
