@@ -136,18 +136,10 @@ class RenewalService @Inject()(dataCache: DataCacheConnector) {
     }
   }
 
-  private def amendmentDeclarationAvailable(sections: Seq[Section]) = {
-    sections.foldLeft((true, false)) { (acc, s) =>
-      (acc._1 && s.status == Completed, acc._2 || s.hasChanged)
-    } match {
-      case (true, true) => true
-      case _ => false
-    }
-  }
-
   def canSubmit(renewalSection: Section, variationSections: Seq[Section]) = {
-    !renewalSection.status.equals(Started) &&
-      ((renewalSection.status == Completed && renewalSection.hasChanged) || amendmentDeclarationAvailable(variationSections))
+    variationSections.forall(_.status == Completed) &&
+            !renewalSection.status.equals(Started) &&
+            (variationSections :+ renewalSection).exists(_.hasChanged)
   }
 
 }
