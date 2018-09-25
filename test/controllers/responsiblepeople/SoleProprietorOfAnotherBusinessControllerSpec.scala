@@ -56,8 +56,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
   "SoleProprietorOfAnotherBusinessController" when {
 
     "get is called" when {
-      "application status is other than NotCompleted" when {
-        "adding new Responsible Person" must {
+      "application status is PostSubmission" when {
+        "adding a new Responsible Person" must {
           "display empty Sole Proprietor view" in new Fixture {
 
             when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
@@ -75,6 +75,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
           }
         }
+
         "updating existing Responsible Person if there is some VAT data" must {
           "redirect to VATRegisteredController" in new Fixture {
 
@@ -96,6 +97,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1).url))
           }
         }
+
         "updating existing Responsible Person if there is no any VAT data" must {
           "redirect to SelfAssessmentController" in new Fixture {
 
@@ -117,10 +119,40 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
           }
         }
+
+        "display page and prepopulate data from save4later" in new Fixture {
+
+          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+          when(controller.statusService.isPreSubmission(any(), any(), any()))
+            .thenReturn(Future.successful(false))
+
+          val result = controller.get(1)(request)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
+          document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
+        }
+
+        "display page Not Found" when {
+          "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
+
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            when(controller.statusService.isPreSubmission(any(), any(), any()))
+              .thenReturn(Future.successful(false))
+
+            val result = controller.get(1)(request)
+            status(result) must be(NOT_FOUND)
+          }
+        }
       }
 
-      "application status is NotCompleted" when {
-        "adding new Responsible Person" must {
+      "application status is PreSubmission" when {
+        "adding a new Responsible Person" must {
           "display the Sole Proprietor view" in new Fixture {
 
             when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
@@ -138,52 +170,54 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
             document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
           }
         }
-      }
 
-      "display page" in new Fixture {
+        "adding a new Responsible Person" must {
+          "display page" in new Fixture {
 
-        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
-        when(controller.statusService.isPreSubmission(any(), any(), any()))
-          .thenReturn(Future.successful(true))
+            when(controller.statusService.isPreSubmission(any(), any(), any()))
+              .thenReturn(Future.successful(true))
 
-        val result = controller.get(1)(request)
+            val result = controller.get(1)(request)
 
-        status(result) must be(OK)
+            status(result) must be(OK)
 
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
-        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-      }
+            val document = Jsoup.parse(contentAsString(result))
+            document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
+            document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
+          }
+        }
 
-      "display page and prepopulate data from save4later" in new Fixture {
-
-        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
-        when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-          .thenReturn(Future.successful(emptyCache))
-        when(controller.statusService.isPreSubmission(any(), any(), any()))
-          .thenReturn(Future.successful(true))
-
-        val result = controller.get(1)(request)
-        status(result) must be(OK)
-
-        val document = Jsoup.parse(contentAsString(result))
-        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
-        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-      }
-
-      "display page Not Found" when {
-        "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
+        "display page and prepopulate data from save4later" in new Fixture {
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
+          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
           when(controller.statusService.isPreSubmission(any(), any(), any()))
             .thenReturn(Future.successful(true))
 
           val result = controller.get(1)(request)
-          status(result) must be(NOT_FOUND)
+          status(result) must be(OK)
+
+          val document = Jsoup.parse(contentAsString(result))
+          document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
+          document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
+        }
+
+        "display page Not Found" when {
+          "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
+
+            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
+            when(controller.statusService.isPreSubmission(any(), any(), any()))
+              .thenReturn(Future.successful(true))
+
+            val result = controller.get(1)(request)
+            status(result) must be(NOT_FOUND)
+          }
         }
       }
     }

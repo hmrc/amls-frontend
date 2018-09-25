@@ -37,12 +37,10 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
 
       implicit authContext => implicit request => {
         for {
-          isPreSubmission <- statusService.isPreSubmission
           responsiblePerson <- getData[ResponsiblePerson](index)
         } yield {
           responsiblePerson match {
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
-              if isPreSubmission
             => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
             => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
