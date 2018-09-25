@@ -20,11 +20,11 @@ import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResp
 import models.businessmatching.{BusinessActivities, BusinessActivity, MoneyServiceBusiness}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.tradingpremises.TradingPremises
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 import utils.AuthorisedFixture
 
-// TODO: Implement
 class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
 
     override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.phase-2-changes" -> true))
@@ -73,11 +73,12 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
     )
 
     val responsiblePeople = Some(Seq(
-        ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")))
+      ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName"))),
+      ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(true))
     ))
 
     val premises = Some(Seq(
-        // TODO: Populate with premises
+        TradingPremises()
     ))
 
   trait BreakdownRowsFixture extends AuthorisedFixture {
@@ -155,9 +156,10 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
       "set BreakdownRows for fit & proper charge" in new BreakdownRowsFixture {
         breakdownRowsSubscriptionShowBreakdown.filter(
           _.label == "confirmation.responsiblepeople.fp.passed"
-        ) mustEqual Seq.empty
+        ) mustEqual Seq(
+          BreakdownRow("confirmation.responsiblepeople.fp.passed", 1, Currency(0.00), Currency(0.00))
+        )
       }
-
       "set BreakdownRows for TradingPremises zero" in new BreakdownRowsFixture {
         breakdownRowsSubscriptionShowBreakdown.filter(
           _.label == "confirmation.tradingpremises.zero"
@@ -174,7 +176,7 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
         breakdownRowsSubscriptionShowBreakdown.filter(
           _.label == "confirmation.tradingpremises"
         ) mustEqual Seq(
-          BreakdownRow("confirmation.tradingpremises",0,Currency(5.00),Currency(4.00))
+          BreakdownRow("confirmation.tradingpremises",1,Currency(5.00),Currency(4.00))
         )
       }
     }

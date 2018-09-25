@@ -91,14 +91,14 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                     responsiblePeople
                 )
 
-        val breakdownRowsSubsciptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+        val breakdownRowsSubscriptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
                 responsiblePeopleRowsFromSubscription(
                     subscriptionResponse,
                     activities,
                     responsiblePeople
                 )
 
-        val breakdownRowsSubsciptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+        val breakdownRowsSubscriptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
                 responsiblePeopleRowsFromSubscription(
                     subscriptionResponseNoBreakdown,
                     activities,
@@ -143,7 +143,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
     "value is a SubscriptionResponse" when {
         "show breakdown" must {
             "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
-                breakdownRowsSubsciptionShowBreakdown.filter(
+                breakdownRowsSubscriptionShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq(
                     BreakdownRow("confirmation.responsiblepeople.fp.passed", 1, Currency(0), Currency(0))
@@ -151,7 +151,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
             }
 
             "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
-                breakdownRowsSubsciptionShowBreakdown.filter(
+                breakdownRowsSubscriptionShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq(
                     BreakdownRow("confirmation.responsiblepeople", 1, Currency(3), Currency(2))
@@ -161,13 +161,13 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
 
         "not show breakdown" must {
             "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
-                breakdownRowsSubsciptionNotShowBreakdown.filter(
+                breakdownRowsSubscriptionNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq.empty
             }
 
             "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
-                breakdownRowsSubsciptionNotShowBreakdown.filter(
+                breakdownRowsSubscriptionNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq.empty
             }
