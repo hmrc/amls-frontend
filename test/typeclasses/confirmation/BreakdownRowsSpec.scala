@@ -78,86 +78,40 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
     val premises = Some(Seq(
         // TODO: Populate with premises
     ))
-
-    // TODO: lets just make this phase 2 dependent given its coming in for that reason, discuss?
+    
     "value is a AmendVariationRenewalResponse" when {
-        "businessActivities contains MSB" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
-                        breakdownRowFromVariation(
-                            amendVariationRenewalResponse,
-                            Some(BusinessActivities(activities)),
-                            premises,
-                            responsiblePeople
-                        )
+        "set BreakdownRows for responsible people" in {
+            val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
+              breakdownRowFromVariation(
+                  amendVariationRenewalResponse,
+                  Some(BusinessActivities(activities)),
+                  premises,
+                  responsiblePeople
+              )
 
-                breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
+            breakdownRowsAmendVariationRenewalShowBreakdown mustEqual Seq.empty
         }
 
-        "businessActivities contains TCSP" must {
-            "set BreakdownRows for responsible people" in {
+        "set BreakdownRows for fit & proper charge" in {
 
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
-        }
-
-        "businessActivities contains neither MSB or TCSP" must {
-            "set BreakdownRows for responsible people" in {
-
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
         }
     }
 
     "value is a SubmissionResponse" when {
-        "businessActivities contains MSB" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsSubscriptionShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
-                        breakdownRowFromSubscription(
-                            subscriptionResponse,
-                            Some(BusinessActivities(activities)),
-                            premises,
-                            responsiblePeople
-                        )
+        "set BreakdownRows for responsible people" in {
+            val breakdownRowsSubscriptionShowBreakdown: Seq[BreakdownRow] = BreakdownRowInstances.
+                    breakdownRowFromSubscription(
+                        subscriptionResponse,
+                        Some(BusinessActivities(activities)),
+                        premises,
+                        responsiblePeople
+                    )
 
-                breakdownRowsSubscriptionShowBreakdown mustEqual Seq.empty
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
+            breakdownRowsSubscriptionShowBreakdown mustEqual Seq.empty
         }
 
-        "businessActivities contains TCSP" must {
-            "set BreakdownRows for responsible people" in {
+        "set BreakdownRows for fit & proper charge" in {
 
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
-        }
-
-        "businessActivities contains neither MSB or TCSP" must {
-            "set BreakdownRows for responsible people" in {
-
-            }
-
-            "set BreakdownRows for fit & proper charge" in {
-
-            }
         }
     }
-
 }
