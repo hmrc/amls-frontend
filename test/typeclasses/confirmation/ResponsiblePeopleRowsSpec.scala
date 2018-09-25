@@ -24,6 +24,8 @@ import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
 import utils.AuthorisedFixture
 
+// TODO: These tests are commented out for now due to uncertainity about whether this typeclass exhibits correct behaviour
+// TODO: Aim to uncomment the tests and verify behaviour when approval check is added to Fee Breakdown table
 class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
 
     override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.phase-2-changes" -> true))
