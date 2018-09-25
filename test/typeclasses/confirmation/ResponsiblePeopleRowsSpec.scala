@@ -22,8 +22,8 @@ import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeApplication
+import utils.AuthorisedFixture
 
-// TODO: why does this work?
 class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
 
     override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.phase-2-changes" -> true))
@@ -72,19 +72,43 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
     )
 
     val responsiblePeople = Some(Seq(
-        ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")))
+        ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName"))),
+        ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(true))
     ))
+
+    trait ResponsiblePeopleRowsFixture extends AuthorisedFixture {
+        val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+                responsiblePeopleRowsFromVariation(
+                    amendVariationRenewalResponse,
+                    activities,
+                    responsiblePeople
+                )
+
+        val breakdownRowsAmendVariationRenewalNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+                responsiblePeopleRowsFromVariation(
+                    amendVariationRenewalResponse.copy(fpFee = None),
+                    activities,
+                    responsiblePeople
+                )
+
+        val breakdownRowsSubsciptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+                responsiblePeopleRowsFromSubscription(
+                    subscriptionResponse,
+                    activities,
+                    responsiblePeople
+                )
+
+        val breakdownRowsSubsciptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
+                responsiblePeopleRowsFromSubscription(
+                    subscriptionResponseNoBreakdown,
+                    activities,
+                    responsiblePeople
+                )
+    }
 
     "value is a AmendVariationRenewalResponse" when {
         "show breakdown" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromVariation(
-                            amendVariationRenewalResponse,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsAmendVariationRenewalShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq(
@@ -92,14 +116,7 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
                 )
             }
 
-            "set BreakdownRows for fit & proper charge" in {
-                val breakdownRowsAmendVariationRenewalShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromVariation(
-                            amendVariationRenewalResponse,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsAmendVariationRenewalShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq(
@@ -109,27 +126,13 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
         }
 
         "not show breakdown" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsAmendVariationRenewalNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromVariation(
-                            amendVariationRenewalResponse.copy(fpFee = None),
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsAmendVariationRenewalNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq.empty
             }
 
-            "set BreakdownRows for fit & proper charge" in {
-                val breakdownRowsAmendVariationRenewalNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromVariation(
-                            amendVariationRenewalResponse.copy(fpFee = None),
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsAmendVariationRenewalNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq.empty
@@ -139,29 +142,15 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
 
     "value is a SubscriptionResponse" when {
         "show breakdown" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsSubsciptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromSubscription(
-                            subscriptionResponse,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsSubsciptionShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq(
-
+                    BreakdownRow("confirmation.responsiblepeople.fp.passed", 1, Currency(0), Currency(0))
                 )
             }
 
-            "set BreakdownRows for fit & proper charge" in {
-                val breakdownRowsSubsciptionShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromSubscription(
-                            subscriptionResponse,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsSubsciptionShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq(
@@ -171,27 +160,13 @@ class ResponsiblePeopleRowsSpec extends PlaySpec with OneAppPerSuite {
         }
 
         "not show breakdown" must {
-            "set BreakdownRows for responsible people" in {
-                val breakdownRowsSubsciptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromSubscription(
-                            subscriptionResponseNoBreakdown,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for responsible people" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsSubsciptionNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople.fp.passed"
                 ) mustEqual Seq.empty
             }
 
-            "set BreakdownRows for fit & proper charge" in {
-                val breakdownRowsSubsciptionNotShowBreakdown: Seq[BreakdownRow] = ResponsiblePeopleRowsInstances.
-                        responsiblePeopleRowsFromSubscription(
-                            subscriptionResponseNoBreakdown,
-                            activities,
-                            responsiblePeople
-                        )
-
+            "set BreakdownRows for fit & proper charge" in new ResponsiblePeopleRowsFixture {
                 breakdownRowsSubsciptionNotShowBreakdown.filter(
                     _.label == "confirmation.responsiblepeople"
                 ) mustEqual Seq.empty
