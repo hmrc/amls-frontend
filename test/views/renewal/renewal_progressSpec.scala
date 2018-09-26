@@ -33,7 +33,6 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
 
     val readyForRenewal = ReadyForRenewal(Some(renewalDate))
     val renewalSubmitted = RenewalSubmitted(Some(renewalDate))
-
   }
 
   "The renewal progress view" must {
@@ -52,26 +51,32 @@ class renewal_progressSpec extends AmlsSpec with MustMatchers{
       subHeading.html must include(Messages("summary.status"))
     }
 
-    "enable the submit registration button" in new ViewFixture {
-
-      override def view = views.html.renewal.renewal_progress(Seq.empty, true, true, readyForRenewal)
+    "enable the submit registration button when can submit and renewal section complete" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = true, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
 
       doc.select("form button[name=submit]").hasAttr("disabled") mustBe false
 
       doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
-
     }
 
-    "not have the submit registration button" in new ViewFixture {
+    "not have the submit registration button when cannot submit because renewal section not complete" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = false)
 
-      override def view = views.html.renewal.renewal_progress(Seq.empty, false, true, readyForRenewal)
-
-      doc.select("form button[name=submit]").isEmpty mustBe true
+      doc.select(".application-submit form button[name=submit]").isEmpty mustBe true
 
       doc.getElementsMatchingOwnText(Messages("renewal.progress.continue")).attr("href") must be(controllers.renewal.routes.WhatYouNeedController.get().url)
+    }
 
+    "disable the submit registration button when cannot submit and renewal section complete" in new ViewFixture {
+      override def view = views.html.renewal.renewal_progress(Seq.empty, canSubmit = false, msbOrTcspExists = true, readyForRenewal, renewalSectionCompleted = true)
+
+      doc.select("form button[name=submit]").hasAttr("disabled") mustBe true
+
+      doc.select(".application-submit").get(0).text() must include(Messages("renewal.progress.submit.intro"))
+
+      doc.getElementsMatchingOwnText(Messages("renewal.progress.edit")).attr("href") must be(controllers.renewal.routes.SummaryController.get().url)
     }
 
     "show intro for MSB and TCSP businesses" in new ViewFixture {

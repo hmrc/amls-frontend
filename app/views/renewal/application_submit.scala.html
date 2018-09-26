@@ -20,7 +20,7 @@
 @import views.html.helper.CSRF
 @import models.status.{Renewal, ReadyForRenewal, RenewalSubmitted}
 
-@(canSubmit: Boolean, renewal: Renewal)(implicit messages: Messages, request: Request[_])
+@(canSubmit: Boolean, renewal: Renewal, renewalSectionCompleted: Boolean = false)(implicit messages: Messages, request: Request[_])
 
 <div class="application-submit">
 
@@ -30,10 +30,10 @@
     <p>@messages("renewal.progress.submit.intro")</p>
 
 
-    @if(canSubmit){
+    @if(renewalSectionCompleted){
         <form method="post" action="@controllers.renewal.routes.RenewalProgressController.post().url" class="panel-indent--gutter">
             @CSRF.formField
-            <button id="renewal-progress-submit" type="submit" name="submit" class="button">
+            <button id="renewal-progress-submit" type="submit" name="submit" class="button" @if(!canSubmit) {disabled} >
                 @messages("renewal.progress.submit")
             </button>
         </form>
@@ -69,5 +69,4 @@
             }}
         </p>
     }
-
 </div>
