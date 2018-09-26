@@ -1115,6 +1115,8 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
         val rows = Seq(
           BreakdownRow("confirmation.submission", 1, 100, 100)
         ) ++ Seq(
+          BreakdownRow("confirmation.responsiblepeople",0, 100, 0)
+        ) ++ Seq(
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
@@ -1255,30 +1257,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           })
 
         }
-
-        "there is no fee returned in a amendment response because business type is not msb or tcsp" in new Fixture {
-
-          when {
-            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
-          } thenReturn Some(amendmentResponse)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
-
-          val result = await(TestConfirmationService.getAmendment)
-
-          result match {
-            case Some(rows) => rows foreach { row =>
-              row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.responsiblepeople.fp.passed"
-            }
-          }
-        }
       }
 
       "notify user of amendment fees to pay in breakdown" when {
@@ -1302,8 +1280,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           val result = await(TestConfirmationService.getAmendment)
-
-          println(result)
 
           result match {
             case Some(rows) => {
@@ -1780,33 +1756,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           }
         }
       }
-
-      "not include responsible people in breakdown" when {
-
-        "there is no fee returned in a subscription response because business type is not msb or tcsp" in new Fixture {
-
-          when {
-            cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
-          } thenReturn Some(subscriptionResponse)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
-
-          val result = await(TestConfirmationService.getSubscription)
-
-          result match {
-            case rows => rows foreach { row =>
-              row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.responsiblepeople.fp.passed"
-            }
-          }
-        }
-      }
     }
 
     "getSubmissionData is called" must {
@@ -1819,6 +1768,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 0, 0, 0),
+              BreakdownRow("confirmation.responsiblepeople",0, 100, 0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
@@ -1847,6 +1797,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 1, 100, 100),
+              BreakdownRow("confirmation.responsiblepeople",0, 100, 0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
