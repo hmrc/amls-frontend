@@ -97,7 +97,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
   }
 
   private def countNonFitandProperResponsiblePeople(responsiblepeople: Seq[ResponsiblePerson]) = {
-    responsiblepeople.count { responsiblePerson => !responsiblePerson.hasAlreadyPassedFitAndProper.contains(true) }
+    responsiblepeople.count { responsiblePerson => !responsiblePerson.approvalFlags.get.hasAlreadyPassedApprovalCheck.contains(true) }
   }
 
   private def getTotal(breakdownRows: Seq[BreakdownRow]): Int = {

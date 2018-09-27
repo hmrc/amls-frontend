@@ -43,7 +43,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
-                             hasAlreadyPassedFitAndProper: Option[Boolean] = None,
+                             approvalFlags: Option[ApprovalFlags] = None,
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false,
                              lineId: Option[Int] = None,
@@ -108,9 +108,9 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def hasAlreadyPassedFitAndProper(p: Option[Boolean]): ResponsiblePerson =
-    this.copy(hasAlreadyPassedFitAndProper = p, hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.equals(p),
-      hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.equals(p))
+  def approvalFlags(p: Option[ApprovalFlags]): ResponsiblePerson =
+    this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
+      hasAccepted = hasAccepted && this.approvalFlags.equals(p))
 
   def ukPassport(p: UKPassport): ResponsiblePerson =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
@@ -275,7 +275,7 @@ object ResponsiblePerson {
         (__ \ "vatRegistered").readNullable[VATRegistered] and
         (__ \ "experienceTraining").readNullable[ExperienceTraining] and
         (__ \ "training").readNullable[Training] and
-        (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
+        (__ \ "approvalFlags").readNullable[ApprovalFlags] and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "lineId").readNullable[Int] and
