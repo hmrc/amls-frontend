@@ -33,13 +33,8 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
                                                           val statusService: StatusService) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-
-
       implicit authContext => implicit request => {
-        for {
-          responsiblePerson <- getData[ResponsiblePerson](index)
-        } yield {
-          responsiblePerson match {
+          getData[ResponsiblePerson](index) map {
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, Some(soleProprietorOfAnotherBusiness)))
             => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
@@ -48,7 +43,6 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
               if rp.personName.nonEmpty
             => getViewForVat(rp.vatRegistered, index, edit, flow)
             case _ => NotFound(notFoundView)
-          }
         }
       }
     }
@@ -86,10 +80,9 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
   }
 
   def getViewForVat(vatReg: Option[VATRegistered], index: Int, edit: Boolean = false, flow: Option[String] = None) = {
-    if (vatReg.nonEmpty) {
-      Redirect(routes.VATRegisteredController.get(index, edit, flow))
-    } else {
-      Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
+    vatReg.nonEmpty match {
+      case true => Redirect(routes.VATRegisteredController.get(index, edit, flow))
+      case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
     }
   }
 }

@@ -54,7 +54,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
   val soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
 
   "SoleProprietorOfAnotherBusinessController" when {
-
     "get is called" when {
       "application status is PostSubmission" when {
         "adding a new Responsible Person" must {
@@ -223,7 +222,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
     }
 
     "post is called" when {
-
       "soleProprietorOfAnotherBusiness is set to true" must {
         "go to VATRegisteredController" in new Fixture {
 
@@ -253,10 +251,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       }
 
       "soleProprietorOfAnotherBusiness is set to false" when {
-
         "edit is true" must {
           "go to DetailedAnswersController" in new Fixture {
-
             val mockCacheMap = mock[CacheMap]
             val newRequest = request.withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
@@ -276,7 +272,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
         "edit is false" must {
           "go to RegisteredForSelfAssessmentController" in new Fixture {
-
             val mockCacheMap = mock[CacheMap]
             val newRequest = request.withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
@@ -302,7 +297,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with BAD_REQUEST" when {
         "given an invalid form" in new Fixture {
-
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "",
             "personName" -> "Person Name")
@@ -318,7 +312,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with NOT_FOUND" when {
         "ResponsiblePeople model cannot be found with given index" in new Fixture {
-
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
@@ -332,6 +325,5 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         }
       }
     }
-
   }
 }
