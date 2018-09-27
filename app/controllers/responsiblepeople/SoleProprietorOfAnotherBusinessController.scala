@@ -39,9 +39,10 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
             => Ok(sole_proprietor(Form2[SoleProprietorOfAnotherBusiness](soleProprietorOfAnotherBusiness), edit, index, flow, personName.titleName))
             case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, None, _, _, _))
             => Ok(sole_proprietor(EmptyForm, edit, index, flow, personName.titleName))
-            case Some(rp)
-              if rp.personName.nonEmpty
-            => getViewForVat(rp.vatRegistered, index, edit, flow)
+            case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, Some(vatRegistered), _, _, _, _, _, _, _, _, _))
+            => Redirect(routes.VATRegisteredController.get(index, edit, flow))
+            case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, None, _, _, _, _, _, _, _, _, _))
+            =>  Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
             case _ => NotFound(notFoundView)
         }
       }
@@ -77,12 +78,5 @@ class SoleProprietorOfAnotherBusinessController @Inject()(val dataCacheConnector
           case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
-  }
-
-  def getViewForVat(vatReg: Option[VATRegistered], index: Int, edit: Boolean = false, flow: Option[String] = None) = {
-    vatReg.nonEmpty match {
-      case true => Redirect(routes.VATRegisteredController.get(index, edit, flow))
-      case false => Redirect(routes.RegisteredForSelfAssessmentController.get(index, edit, flow))
-    }
   }
 }
