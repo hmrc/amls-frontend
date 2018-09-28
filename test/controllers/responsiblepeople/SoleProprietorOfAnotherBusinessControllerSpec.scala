@@ -19,16 +19,16 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegisteredNo}
-import models.status.{NotCompleted, SubmissionStatus}
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AuthorisedFixture, AmlsSpec}
 
 import scala.concurrent.Future
 
@@ -40,12 +40,8 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
 
-    val submissionStatus: SubmissionStatus = NotCompleted
-
-    val controller = new SoleProprietorOfAnotherBusinessController(
-      dataCacheConnector = mockDataCacheConnector,
-      authConnector = self.authConnector,
-      statusService = mock[StatusService])
+    val controller = new SoleProprietorOfAnotherBusinessController(dataCacheConnector = mockDataCacheConnector, authConnector = self.authConnector) {
+    }
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -54,174 +50,52 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
   val soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
 
   "SoleProprietorOfAnotherBusinessController" when {
-    "get is called" when {
-      "application status is PostSubmission" when {
-        "adding a new Responsible Person" must {
-          "display empty Sole Proprietor view" in new Fixture {
 
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, lineId = None)))))
+    "get is called" must {
+      "display page" in new Fixture {
 
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(false))
+        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
 
-            val result = controller.get(1)(request)
+        val result = controller.get(1)(request)
 
-            status(result) must be(OK)
+        status(result) must be(OK)
 
-            val document = Jsoup.parse(contentAsString(result))
-            document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
-            document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-          }
-        }
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
+        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
+      }
 
-        "updating existing Responsible Person if there is some VAT data" must {
-          "redirect to VATRegisteredController" in new Fixture {
+      "display page and prepopulate data from save4later" in new Fixture {
 
-            val mockCacheMap = mock[CacheMap]
+        when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
 
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, vatRegistered = Some(VATRegisteredNo), lineId = Some(44444))))))
+        val result = controller.get(1)(request)
+        status(result) must be(OK)
 
-            when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
+        val document = Jsoup.parse(contentAsString(result))
+        document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
+        document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
 
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(false))
+      }
 
-            val result = controller.get(1)(request)
-
-            status(result) must be(SEE_OTHER)
-
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.VATRegisteredController.get(1).url))
-          }
-        }
-
-        "updating existing Responsible Person if there is no any VAT data" must {
-          "redirect to SelfAssessmentController" in new Fixture {
-
-            val mockCacheMap = mock[CacheMap]
-
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = None, vatRegistered = None, lineId = Some(4444))))))
-
-            when(mockDataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(false))
-
-            val result = controller.get(1)(request)
-
-            status(result) must be(SEE_OTHER)
-
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.RegisteredForSelfAssessmentController.get(1).url))
-          }
-        }
-
-        "display page and prepopulate data from save4later" in new Fixture {
+      "display page Not Found" when {
+        "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
 
           when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.isPreSubmission(any(), any(), any()))
-            .thenReturn(Future.successful(false))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
 
           val result = controller.get(1)(request)
-          status(result) must be(OK)
+          status(result) must be(NOT_FOUND)
 
-          val document = Jsoup.parse(contentAsString(result))
-          document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
-          document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-        }
-
-        "display page Not Found" when {
-          "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
-
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(false))
-
-            val result = controller.get(1)(request)
-            status(result) must be(NOT_FOUND)
-          }
         }
       }
 
-      "application status is PreSubmission" when {
-        "adding a new Responsible Person" must {
-          "display the Sole Proprietor view" in new Fixture {
-
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, lineId = None)))))
-
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(true))
-
-            val result = controller.get(1)(request)
-
-            status(result) must be(OK)
-
-            val document = Jsoup.parse(contentAsString(result))
-            document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
-            document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-          }
-        }
-
-        "adding a new Responsible Person" must {
-          "display page" in new Fixture {
-
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName)))))
-
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(true))
-
-            val result = controller.get(1)(request)
-
-            status(result) must be(OK)
-
-            val document = Jsoup.parse(contentAsString(result))
-            document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(false)
-            document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-          }
-        }
-
-        "display page and prepopulate data from save4later" in new Fixture {
-
-          when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName, soleProprietorOfAnotherBusiness = soleProprietorOfAnotherBusiness)))))
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
-          when(controller.statusService.isPreSubmission(any(), any(), any()))
-            .thenReturn(Future.successful(true))
-
-          val result = controller.get(1)(request)
-          status(result) must be(OK)
-
-          val document = Jsoup.parse(contentAsString(result))
-          document.getElementById("soleProprietorOfAnotherBusiness-true").hasAttr("checked") must be(true)
-          document.getElementById("soleProprietorOfAnotherBusiness-false").hasAttr("checked") must be(false)
-        }
-
-        "display page Not Found" when {
-          "neither soleProprietorOfAnotherBusiness nor name is set" in new Fixture {
-
-            when(mockDataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-            when(controller.statusService.isPreSubmission(any(), any(), any()))
-              .thenReturn(Future.successful(true))
-
-            val result = controller.get(1)(request)
-            status(result) must be(NOT_FOUND)
-          }
-        }
-      }
     }
 
     "post is called" when {
+
       "soleProprietorOfAnotherBusiness is set to true" must {
         "go to VATRegisteredController" in new Fixture {
 
@@ -251,8 +125,10 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
       }
 
       "soleProprietorOfAnotherBusiness is set to false" when {
+
         "edit is true" must {
           "go to DetailedAnswersController" in new Fixture {
+
             val mockCacheMap = mock[CacheMap]
             val newRequest = request.withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
@@ -272,6 +148,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
         "edit is false" must {
           "go to RegisteredForSelfAssessmentController" in new Fixture {
+
             val mockCacheMap = mock[CacheMap]
             val newRequest = request.withFormUrlEncodedBody(
               "soleProprietorOfAnotherBusiness" -> "false",
@@ -297,6 +174,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with BAD_REQUEST" when {
         "given an invalid form" in new Fixture {
+
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "",
             "personName" -> "Person Name")
@@ -312,6 +190,7 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
 
       "respond with NOT_FOUND" when {
         "ResponsiblePeople model cannot be found with given index" in new Fixture {
+
           val newRequest = request.withFormUrlEncodedBody(
             "soleProprietorOfAnotherBusiness" -> "true",
             "personName" -> "Person Name")
@@ -325,5 +204,6 @@ class SoleProprietorOfAnotherBusinessControllerSpec extends AmlsSpec with Mockit
         }
       }
     }
+
   }
 }
