@@ -1198,7 +1198,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               unpaidRow.total.value mustBe 0
           }
         }
-
       }
 
       "not include deleted premises in the amendment confirmation table" in new Fixture {
@@ -1226,7 +1225,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
           }
         }
-
       }
 
       "not include responsible people in breakdown" when {
@@ -1259,7 +1257,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
         }
 
         "there is no fee returned in a amendment response" in new Fixture {
-//TODO
           val amendmentResponseNoFee = AmendVariationRenewalResponse(
             processingDate = "",
             etmpFormBundleNumber = "",
@@ -1318,15 +1315,12 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           val result = await(TestConfirmationService.getAmendment)
 
-          println(result)
-
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
-
         }
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
@@ -1923,8 +1917,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
         }
       }
-
     }
-
   }
 }
