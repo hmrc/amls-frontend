@@ -742,13 +742,13 @@ class ConfirmationServiceSpec extends PlaySpec
             etmpFormBundleNumber = "",
             amlsRefNo = amlsRegistrationNumber,
             Some(SubscriptionFees(
-            registrationFee = 100,
-            fpFee = Some(125.0),
-            fpFeeRate = Some(130.0),
-            premiseFee = 0,
-            premiseFeeRate = Some(125.0),
-            totalFees = 0,
-            paymentReference = ""
+              registrationFee = 100,
+              fpFee = Some(125.0),
+              fpFeeRate = Some(130.0),
+              premiseFee = 0,
+              premiseFeeRate = Some(125.0),
+              totalFees = 0,
+              paymentReference = ""
             ))
           )
 
@@ -896,9 +896,9 @@ class ConfirmationServiceSpec extends PlaySpec
               cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
             } thenReturn Some(Seq(TradingPremises()))
 
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+            when {
+              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+            } thenReturn Some(Seq(ResponsiblePerson()))
 
             val result = TestConfirmationService.getBreakdownRows(
               SubmissionReady,
@@ -920,9 +920,9 @@ class ConfirmationServiceSpec extends PlaySpec
               cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
             } thenReturn Some(amendmentResponse.copy(difference = Some(100)))
 
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+            when {
+              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+            } thenReturn Some(Seq(ResponsiblePerson()))
 
             val result = TestConfirmationService.getBreakdownRows(
               SubmissionReadyForReview,
@@ -1115,7 +1115,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
         val rows = Seq(
           BreakdownRow("confirmation.submission", 1, 100, 100)
         ) ++ Seq(
-          BreakdownRow("confirmation.responsiblepeople",0, 100, 0)
+          BreakdownRow("confirmation.responsiblepeople", 0, 100, 0)
         ) ++ Seq(
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
@@ -1198,7 +1198,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               unpaidRow.total.value mustBe 0
           }
         }
-
       }
 
       "not include deleted premises in the amendment confirmation table" in new Fixture {
@@ -1226,7 +1225,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
           }
         }
-
       }
 
       "not include responsible people in breakdown" when {
@@ -1255,7 +1253,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           whenReady(TestConfirmationService.getAmendment)(_ foreach {
             case rows => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
           })
-
         }
       }
 
@@ -1287,7 +1284,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
-
         }
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
@@ -1316,7 +1312,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
-
         }
       }
 
@@ -1527,7 +1522,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
-
         }
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
@@ -1562,7 +1556,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
-
         }
 
         "each of the categorised fees are in the response" in new Fixture {
@@ -1768,7 +1761,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 0, 0, 0),
-              BreakdownRow("confirmation.responsiblepeople",0, 100, 0),
+              BreakdownRow("confirmation.responsiblepeople",0,100,0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
@@ -1797,7 +1790,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 1, 100, 100),
-              BreakdownRow("confirmation.responsiblepeople",0, 100, 0),
+              BreakdownRow("confirmation.responsiblepeople",0,100,0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
@@ -1857,8 +1850,6 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
         }
       }
-
     }
-
   }
 }
