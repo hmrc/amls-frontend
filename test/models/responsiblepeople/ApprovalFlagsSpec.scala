@@ -16,9 +16,8 @@
 
 package models.responsiblepeople
 
-import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
-import play.api.libs.json.{JsPath, JsSuccess, Json}
+import play.api.libs.json.{JsSuccess, Json}
 
 class ApprovalFlagsSpec extends PlaySpec {
 
@@ -28,12 +27,15 @@ class ApprovalFlagsSpec extends PlaySpec {
 
       val json = Json.parse(
         """{
-          | "hasAlreadyPassedFitAndProper": false
+          | "hasAlreadyPassedFitAndProper": false,
+          | "hasAlreadyPaidApprovalCheck": false
           |}""".stripMargin
       )
 
+      val approvalFlagsModel = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
+
       ApprovalFlags.format.reads(json) must be(
-        JsSuccess(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), JsPath \ "hasAlreadyPassedFitAndProper")
+        JsSuccess(approvalFlagsModel)
       )
 
     }

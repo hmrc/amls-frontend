@@ -312,7 +312,7 @@ object ResponsiblePerson {
 
   implicit class FilterUtils(people: Seq[ResponsiblePerson]) {
     def filterEmpty: Seq[ResponsiblePerson] = people.filterNot {
-      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None), _, _, _, _, _, _) => true
+      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None, None), _, _, _, _, _, _) => true
       case _ => false
     }
   }
