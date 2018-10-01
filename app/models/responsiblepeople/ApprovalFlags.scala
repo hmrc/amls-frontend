@@ -16,11 +16,11 @@
 
 package models.responsiblepeople
 
-import play.api.libs.json.{Reads, Writes}
+import play.api.libs.json.{Json, Reads, Writes}
 
 final case class ApprovalFlags(
                                 hasAlreadyPassedFitAndProper: Option[Boolean] = None
-                        )
+                              )
 
 object ApprovalFlags {
 
@@ -38,4 +38,6 @@ object ApprovalFlags {
 
     (__ \ "hasAlreadyPassedFitAndProper").writeNullable[Boolean].contramap(unlift(ApprovalFlags.unapply))
   }
+
+  implicit val format = Json.format[ApprovalFlags]
 }
