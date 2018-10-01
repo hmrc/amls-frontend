@@ -25,7 +25,7 @@ import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision.Supervision
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -101,12 +101,12 @@ class RegisterServicesControllerSpec extends AmlsSpec
       controller.businessMatchingService.clearSection(any())(any(),any())
     } thenReturn Future.successful(mockCacheMap)
 
-    val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
+    val responsiblePerson = responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None))
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
     val fitAndProperResponsiblePeople = Seq(
-      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
-      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
+      responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))),
+      responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
     )
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePerson.key))

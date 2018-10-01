@@ -26,7 +26,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.{DateOfBirth, PersonName, ResponsiblePerson}
+import models.responsiblepeople.{ApprovalFlags, DateOfBirth, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -62,7 +62,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     )
 
     val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+
-      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
+      responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))) ++
       responsiblePeopleGen(2).sample.get
 
     val generateDOB = if(ApplicationConfig.phase2ChangesToggle) Some(DateOfBirth(new LocalDate(2001,12,2))) else None

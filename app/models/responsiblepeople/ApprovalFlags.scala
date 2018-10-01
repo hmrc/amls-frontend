@@ -19,23 +19,16 @@ package models.responsiblepeople
 import play.api.libs.json.{Reads, Writes}
 
 final case class ApprovalFlags(
-                          hasAlreadyPassedFitAndProper: Option[Boolean] = None
-//                          hasAlreadyPassedApprovalCheck: Option[Boolean] = None
+                                hasAlreadyPassedFitAndProper: Option[Boolean] = None
                         )
 
 object ApprovalFlags {
 
   implicit lazy val reads: Reads[ApprovalFlags] = {
 
-    import play.api.libs.functional.syntax._
     import play.api.libs.json._
 
     (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean].map(ApprovalFlags.apply)
-//
-//    (
-//        (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
-//        (__ \ "hasAlreadyPassedApprovalCheck").readNullable[Boolean]
-//      )(ApprovalFlags.apply _)
   }
 
   implicit lazy val writes: Writes[ApprovalFlags] = {
@@ -44,9 +37,5 @@ object ApprovalFlags {
     import play.api.libs.json._
 
     (__ \ "hasAlreadyPassedFitAndProper").writeNullable[Boolean].contramap(unlift(ApprovalFlags.unapply))
-//    (
-//        (__ \ "hasAlreadyPassedFitAndProper").writeNullable[Boolean] and
-//        (__ \ "hasAlreadyPassedApprovalCheck").writeNullable[Boolean]
-//      )(unlift(ApprovalFlags.unapply))
   }
 }

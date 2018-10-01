@@ -37,7 +37,7 @@ case class AddBusinessTypeFlowModel(
   def fitAndProperFromResponsiblePeople(p: Seq[ResponsiblePerson]): AddBusinessTypeFlowModel = {
     val fitAndProperInts: Set[Int] = p.zipWithIndex
             .collect({
-              case (person, index) if person.hasAlreadyPassedFitAndProper.getOrElse(false) => index
+              case (person, index) if person.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false) => index
             }).toSet
     val responsiblePeopleFitAndProper: Option[ResponsiblePeopleFitAndProper] = if (fitAndProperInts.nonEmpty) {
       Some(ResponsiblePeopleFitAndProper(fitAndProperInts))
@@ -52,8 +52,8 @@ case class AddBusinessTypeFlowModel(
   }
 
   def mayHavePassedFitAndProper(p: Seq[ResponsiblePerson]): Option[Boolean] = {
-    val hasTrues = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
-    val hasFalses = p.map (_.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
+    val hasTrues = p.map (_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(true)) > 0
+    val hasFalses = p.map (_.approvalFlags.hasAlreadyPassedFitAndProper).count(_.contains(false)) > 0
 
     if(!hasTrues && !hasFalses) {
       None

@@ -23,10 +23,11 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
+
 import models.businessactivities.BusinessActivities
 import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision.Supervision
 import services.StatusService
 import services.businessmatching.BusinessMatchingService
@@ -247,17 +248,17 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
     responsiblePeople.foldLeft(true){ (x, rp) =>
-      x & rp.hasAlreadyPassedFitAndProper.isEmpty
+      x & rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
     }
 
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
-      rp.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true)
+      rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
     }
 
   private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
-      rp.hasAlreadyPassedFitAndProper match {
+      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
         case None => rp.copy(hasAccepted = false)
         case _ => rp
       }

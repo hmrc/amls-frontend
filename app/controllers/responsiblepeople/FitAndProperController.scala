@@ -22,7 +22,7 @@ import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
@@ -41,11 +41,13 @@ class FitAndProperController @Inject()(
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
+
       getData[ResponsiblePerson](index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPassedFitAndProper.isDefined) =>
+          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
           Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        }
         case _ => NotFound(notFoundView)
       }
   }
@@ -61,7 +63,7 @@ class FitAndProperController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                rp.hasAlreadyPassedFitAndProper(Some(data))
+                rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data)))
               }
             } yield
               Redirect(routes.DetailedAnswersController.get(index, flow))

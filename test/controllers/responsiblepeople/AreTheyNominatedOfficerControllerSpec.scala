@@ -52,7 +52,7 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
     val responsiblePerson = ResponsiblePerson(
-      hasAlreadyPassedFitAndProper = Some(true),
+      approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
       lineId = Some(1),
       status = Some("")
     )

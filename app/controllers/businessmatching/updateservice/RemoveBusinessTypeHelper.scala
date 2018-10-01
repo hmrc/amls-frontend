@@ -21,6 +21,7 @@ import cats.implicits._
 import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+
 import models.asp.Asp
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, BusinessActivity => BMBusinessActivity, BusinessMatching => BMBusinessMatching, _}
 import models.estateagentbusiness.EstateAgentBusiness
@@ -28,7 +29,7 @@ import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBSection}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tcsp.Tcsp
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -140,7 +141,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       newResponsiblePeople <- {
         OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
-            rpList.map(_.hasAlreadyPassedFitAndProper(None).copy(hasAccepted = true))
+            rpList.map(_.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true))
           case Some(rpList) => rpList
           case _ => throw new RuntimeException("No responsible people found")
         })

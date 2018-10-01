@@ -74,7 +74,7 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     None,
     Some(ExperienceTrainingNo),
     Some(TrainingNo),
-    None,
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
     hasChanged = false,
     hasAccepted = true,
     None,

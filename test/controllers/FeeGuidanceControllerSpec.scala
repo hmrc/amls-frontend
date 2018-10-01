@@ -23,7 +23,7 @@ import generators.tradingpremises.TradingPremisesGenerator
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tradingpremises.TradingPremises
 import org.mockito.Matchers.{eq => eqTo}
 import org.mockito.Mockito.when
@@ -132,13 +132,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             val responsiblePeople = Seq(
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               )
             )
 
@@ -156,7 +156,6 @@ class FeeGuidanceControllerSpec extends AmlsSpec
             val result = controller invokePrivate privateGetBreakdownRows(HeaderCarrier(), mock[AuthContext])
 
             await(result) must be(breakdownRows)
-
           }
 
         }
@@ -178,13 +177,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             val responsiblePeople = Seq(
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               )
             )
 
@@ -221,13 +220,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             val responsiblePeople = Seq(
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               )
             )
 
@@ -271,13 +270,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
             val responsiblePeople = Seq(
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               ),
               ResponsiblePerson(
-                hasAlreadyPassedFitAndProper = Some(false)
+                approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
               )
             )
 
@@ -421,13 +420,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           val responsiblePeople = Seq(
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(true)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
             ),
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(true)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
             ),
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(true)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
             )
           )
 
@@ -464,13 +463,13 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
           val responsiblePeople = Seq(
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(false)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
             ),
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(false)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
             ),
             ResponsiblePerson(
-              hasAlreadyPassedFitAndProper = Some(false)
+              approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
             )
           )
 

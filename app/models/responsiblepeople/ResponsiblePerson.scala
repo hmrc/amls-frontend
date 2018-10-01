@@ -43,7 +43,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
-                             approvalFlags: Option[ApprovalFlags] = None,
+                             approvalFlags: ApprovalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false,
                              lineId: Option[Int] = None,
@@ -53,79 +53,79 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                             ) {
 
   def personName(p: PersonName): ResponsiblePerson =
-    this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
+    this.copy(personName = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
 
   def legalName(p: PreviousName): ResponsiblePerson =
-    this.copy(legalName = Some(p), hasChanged = hasChanged || !this.legalName.contains(p),
+    this.copy(legalName = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.legalName.contains(p),
       hasAccepted = hasAccepted && this.legalName.contains(p))
 
   def legalNameChangeDate(p: LocalDate): ResponsiblePerson =
-    this.copy(legalNameChangeDate = Some(p), hasChanged = hasChanged || !this.legalNameChangeDate.contains(p),
+    this.copy(legalNameChangeDate = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.legalNameChangeDate.contains(p),
       hasAccepted = hasAccepted && this.legalNameChangeDate.contains(p))
 
   def knownBy(p: KnownBy): ResponsiblePerson =
-    this.copy(knownBy = Some(p), hasChanged = hasChanged || !this.knownBy.contains(p),
+    this.copy(knownBy = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.knownBy.contains(p),
       hasAccepted = hasAccepted && this.knownBy.contains(Some(p)))
 
   def personResidenceType(p: PersonResidenceType): ResponsiblePerson =
-    this.copy(personResidenceType = Some(p), hasChanged = hasChanged || !this.personResidenceType.contains(p),
+    this.copy(personResidenceType = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.personResidenceType.contains(p),
       hasAccepted = hasAccepted && this.personResidenceType.contains(p))
 
   def personResidenceType(p: Option[PersonResidenceType]): ResponsiblePerson =
-    this.copy(personResidenceType = p, hasChanged = hasChanged || this.personResidenceType != p,
+    this.copy(personResidenceType = p, approvalFlags = approvalFlags, hasChanged = hasChanged || this.personResidenceType != p,
       hasAccepted = hasAccepted && this.personResidenceType.equals(p))
 
   def contactDetails(p: ContactDetails): ResponsiblePerson =
-    this.copy(contactDetails = Some(p), hasChanged = hasChanged || !this.contactDetails.contains(p),
+    this.copy(contactDetails = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.contactDetails.contains(p),
       hasAccepted = hasAccepted && this.contactDetails.contains(p))
 
   def saRegistered(p: SaRegistered): ResponsiblePerson =
-    this.copy(saRegistered = Some(p), hasChanged = hasChanged || !this.saRegistered.contains(p),
+    this.copy(saRegistered = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.saRegistered.contains(p),
       hasAccepted = hasAccepted && this.saRegistered.contains(p))
 
   def addressHistory(p: ResponsiblePersonAddressHistory): ResponsiblePerson =
-    this.copy(addressHistory = Some(p), hasChanged = hasChanged || !this.addressHistory.contains(p),
+    this.copy(addressHistory = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.addressHistory.contains(p),
       hasAccepted = hasAccepted && this.addressHistory.contains(p))
 
   def positions(p: Positions): ResponsiblePerson =
-    this.copy(positions = Some(p), hasChanged = hasChanged || !this.positions.contains(p),
+    this.copy(positions = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.positions.contains(p),
       hasAccepted = hasAccepted && this.positions.contains(p))
 
   def soleProprietorOfAnotherBusiness(p: SoleProprietorOfAnotherBusiness): ResponsiblePerson =
-    this.copy(soleProprietorOfAnotherBusiness = Some(p), hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p),
+    this.copy(soleProprietorOfAnotherBusiness = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.soleProprietorOfAnotherBusiness.contains(p),
       hasAccepted = hasAccepted && this.soleProprietorOfAnotherBusiness.contains(p))
 
   def vatRegistered(p: VATRegistered): ResponsiblePerson =
-    this.copy(vatRegistered = Some(p), hasChanged = hasChanged || !this.vatRegistered.contains(p),
+    this.copy(vatRegistered = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.vatRegistered.contains(p),
       hasAccepted = hasAccepted && this.vatRegistered.contains(p))
 
   def experienceTraining(p: ExperienceTraining): ResponsiblePerson =
-    this.copy(experienceTraining = Some(p), hasChanged = hasChanged || !this.experienceTraining.contains(p),
+    this.copy(experienceTraining = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.experienceTraining.contains(p),
       hasAccepted = hasAccepted && this.experienceTraining.contains(p))
 
   def training(p: Training): ResponsiblePerson =
-    this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
+    this.copy(training = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def approvalFlags(p: Option[ApprovalFlags]): ResponsiblePerson =
+  def approvalFlags(p: ApprovalFlags): ResponsiblePerson =
     this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
       hasAccepted = hasAccepted && this.approvalFlags.equals(p))
 
   def ukPassport(p: UKPassport): ResponsiblePerson =
-    this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
+    this.copy(ukPassport = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.ukPassport.contains(p),
       hasAccepted = hasAccepted && this.ukPassport.contains(p))
 
   def nonUKPassport(p: NonUKPassport): ResponsiblePerson =
-    this.copy(nonUKPassport = Some(p), hasChanged = hasChanged || !this.nonUKPassport.contains(p),
+    this.copy(nonUKPassport = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.nonUKPassport.contains(p),
       hasAccepted = hasAccepted && this.nonUKPassport.contains(p))
 
   def dateOfBirth(p: DateOfBirth): ResponsiblePerson =
-    this.copy(dateOfBirth = Some(p), hasChanged = hasChanged || !this.dateOfBirth.contains(p),
+    this.copy(dateOfBirth = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.dateOfBirth.contains(p),
       hasAccepted = hasAccepted && this.dateOfBirth.contains(p))
 
   def status(p: String): ResponsiblePerson =
-    this.copy(status = Some(p), hasChanged = hasChanged || !this.status.contains(p),
+    this.copy(status = Some(p), approvalFlags = approvalFlags, hasChanged = hasChanged || !this.status.contains(p),
       hasAccepted = hasAccepted && this.status.contains(p))
 
   def checkVatField(otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]): Boolean = {
@@ -141,10 +141,10 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
     this match {
-      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), Some(_), _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & ApplicationConfig.phase2ChangesToggle => true
-      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), Some(_), _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & ApplicationConfig.phase2ChangesToggle => true
+      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if approvalFlags.hasAlreadyPassedFitAndProper.isDefined & pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & ApplicationConfig.phase2ChangesToggle => true
+      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if approvalFlags.hasAlreadyPassedFitAndProper.isDefined & pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & ApplicationConfig.phase2ChangesToggle => true
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
         if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & !ApplicationConfig.phase2ChangesToggle => true
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
@@ -275,7 +275,7 @@ object ResponsiblePerson {
         (__ \ "vatRegistered").readNullable[VATRegistered] and
         (__ \ "experienceTraining").readNullable[ExperienceTraining] and
         (__ \ "training").readNullable[Training] and
-        (__ \ "approvalFlags").readNullable[ApprovalFlags] and
+        (__ \ "approvalFlags").readNullable[ApprovalFlags].map(_.getOrElse(ApprovalFlags())) and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "lineId").readNullable[Int] and
@@ -312,7 +312,7 @@ object ResponsiblePerson {
 
   implicit class FilterUtils(people: Seq[ResponsiblePerson]) {
     def filterEmpty: Seq[ResponsiblePerson] = people.filterNot {
-      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
+      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None), _, _, _, _, _, _) => true
       case _ => false
     }
   }

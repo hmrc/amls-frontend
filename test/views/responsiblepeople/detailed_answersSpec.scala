@@ -442,7 +442,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     saRegistered = Some(SaRegisteredYes("sa")),
     experienceTraining = Some(ExperienceTrainingYes("experience")),
     training = Some(TrainingYes("training")),
-    hasAlreadyPassedFitAndProper = Some(true),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
     soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(true))
   )
 }

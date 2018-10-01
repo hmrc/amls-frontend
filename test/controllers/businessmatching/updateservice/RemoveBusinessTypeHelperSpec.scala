@@ -24,7 +24,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness => MoneyServiceBusinessSection}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tcsp.Tcsp
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
 import org.scalatest.concurrent.ScalaFutures
@@ -509,7 +509,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
             hasAccepted = true,
             hasChanged = true))
 
@@ -523,7 +523,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
           mockCacheUpdate(Some(BusinessMatching.key), startResultMatching)
           mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
-          val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
+          val endResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
             hasAccepted = true,
             hasChanged = true))
 
@@ -533,7 +533,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "not remove the ResponsiblePeople fit and proper if there is TCSP and phase-2-changes toggle is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(MoneyServiceBusiness, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
             hasAccepted = true,
             hasChanged = true))
 
@@ -563,7 +563,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "remove the ResponsiblePeople fit and proper if there is no MSB and phase-2-changes toggle is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
             hasAccepted = true,
             hasChanged = true))
 
@@ -584,7 +584,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 
           mockCacheUpdate(Some(ResponsiblePerson.key), startResultRP)
 
-          val endResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = None,
+          val endResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
             hasAccepted = true,
             hasChanged = true))
 
@@ -594,7 +594,7 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
         "not remove the ResponsiblePeople fit and proper if there is MSB and phase-2-changes is false" in new Fixture {
           val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-          val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+          val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
             hasAccepted = true,
             hasChanged = true))
 
@@ -801,7 +801,7 @@ class RemoveBusinessTypeHelperSpecForPhase2 extends AmlsSpec with FutureAssertio
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true),
+        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
           hasAccepted = true,
           hasChanged = true))
 

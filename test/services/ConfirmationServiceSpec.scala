@@ -24,7 +24,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
 import models.renewal.Renewal
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
 import org.joda.time.{DateTime, LocalDate}
@@ -230,8 +230,8 @@ class ConfirmationServiceSpec extends PlaySpec
       "not show negative fees for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
-          ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), hasAlreadyPassedFitAndProper = Some(false)),
-          ResponsiblePerson(Some(PersonName("Fit", Some("and"), "Proper")), hasAlreadyPassedFitAndProper = Some(true))
+          ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
+          ResponsiblePerson(Some(PersonName("Fit", Some("and"), "Proper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
         )
 
         val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))

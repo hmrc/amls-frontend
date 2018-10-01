@@ -18,8 +18,9 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -38,9 +39,9 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
   def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int]): Seq[ResponsiblePerson] =
     responsiblePeople.zipWithIndex.map { case (rp, index) =>
       val updated = if (indices contains index) {
-        rp.hasAlreadyPassedFitAndProper(Some(true))
+        rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
       } else {
-        rp.hasAlreadyPassedFitAndProper(Some(false))
+        rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
       }
 
       updated.copy(hasAccepted = rp.hasAccepted)

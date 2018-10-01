@@ -74,7 +74,6 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
         }
 
         val submissionRow = BreakdownRow(Messages("confirmation.submission"), submissionCount, Currency(submissionFee), Currency(submissionCount * submissionFee))
-
         val peopleCount = appConfig.phase2ChangesToggle match {
           case true => countNonFitandProperResponsiblePeople(responsiblepeople)
           case false if activities.businessActivities.contains(MoneyServiceBusiness) || activities.businessActivities.contains(TrustAndCompanyServices) =>
@@ -97,7 +96,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
   }
 
   private def countNonFitandProperResponsiblePeople(responsiblepeople: Seq[ResponsiblePerson]) = {
-    responsiblepeople.count { responsiblePerson => !responsiblePerson.approvalFlags.get.hasAlreadyPassedApprovalCheck.contains(true) }
+    responsiblepeople.count { responsiblePerson => !responsiblePerson.approvalFlags.hasAlreadyPassedFitAndProper.contains(true) }
   }
 
   private def getTotal(breakdownRows: Seq[BreakdownRow]): Int = {

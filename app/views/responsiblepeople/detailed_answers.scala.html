@@ -417,11 +417,11 @@
             }</p>
         }
 
-        @person.hasAlreadyPassedFitAndProper.map { fp =>
+        @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
                 editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString(),
-                dataItem = person.hasAlreadyPassedFitAndProper
+                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper
             ) { fp2 =>
                 <p>@fp match {
                     case true => {@Messages("lbl.yes")}
