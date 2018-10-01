@@ -16,7 +16,6 @@
 
 package models.responsiblepeople
 
-import jto.validation.{Invalid, Path, Valid, ValidationError}
 import org.joda.time.LocalDate
 import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsPath, JsSuccess, Json}
@@ -25,17 +24,19 @@ class ApprovalFlagsSpec extends PlaySpec {
 
   "ApprovalFlags Json" must {
 
-//    "Read successfully" in {
-//
-//      ApprovalFlags.reads(ApprovalFlags.writes())
-//
-//      DateOfBirth.format.reads(
-//        DateOfBirth.format.writes(DateOfBirth(new LocalDate(1990, 2, 24)))
-//      ) must be(
-//        JsSuccess(DateOfBirth(new LocalDate(1990, 2, 24)), JsPath \ "dateOfBirth")
-//      )
-//
-//    }
+    "Read successfully" in {
+
+      val json = Json.parse(
+        """{
+          | "hasAlreadyPassedFitAndProper": false
+          |}""".stripMargin
+      )
+
+      ApprovalFlags.format.reads(json) must be(
+        JsSuccess(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), JsPath \ "hasAlreadyPassedFitAndProper")
+      )
+
+    }
 
     "write successfully" in {
       ApprovalFlags.format.writes(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) must be (
