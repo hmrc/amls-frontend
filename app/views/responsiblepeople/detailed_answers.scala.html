@@ -430,6 +430,19 @@
             }
         }
 
+        @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
+            @detailedAnswers(
+                question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
+                dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck
+            ) { fp2 =>
+                <p>@fp match {
+                    case true => {@Messages("lbl.yes")}
+                    case false => {@Messages("lbl.no")}
+                }</p>
+            }
+        }
+
     }
 
     @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, flow)) {

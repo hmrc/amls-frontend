@@ -24,7 +24,6 @@ import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
 import org.scalatest.MustMatchers
 import org.scalatest.prop.TableDrivenPropertyChecks
-import org.scalatest.prop.Tables.Table
 import play.api.i18n.Messages
 import uk.gov.hmrc.domain.Nino
 import utils.AmlsSpec
@@ -283,6 +282,31 @@ class detailed_answersSpec extends AmlsSpec
 
       }
 
+        "approval check was paid" in new ViewFixture {
+          val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
+            approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+          )
+
+          override val sectionChecks = Table[String, Element => Boolean](
+            ("title key", "check"),
+            (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
+          )
+
+          def view = {
+            views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName)
+          }
+
+          forAll(sectionChecks) { (key, check) => {
+            val headers = doc.select("section.check-your-answers h2")
+            val header = headers.toList.find(e => e.text() == key)
+
+            header must not be None
+            val section = header.get.parents().select("section").first()
+            check(section) must be(true)
+
+          }
+        }
+      }
     }
 
     "display address on separate lines" in new ViewFixture {

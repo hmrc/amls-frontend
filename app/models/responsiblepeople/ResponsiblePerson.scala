@@ -43,7 +43,9 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
-                             approvalFlags: ApprovalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None, hasAlreadyPaidApprovalCheck = None),
+                             approvalFlags: ApprovalFlags = ApprovalFlags(
+                               hasAlreadyPassedFitAndProper = None,
+                               hasAlreadyPaidApprovalCheck = None),
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false,
                              lineId: Option[Int] = None,
@@ -151,7 +153,6 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
         if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & !ApplicationConfig.phase2ChangesToggle => true
       case _ => false
     }
-
   }
 
   private def validateAddressHistory: Boolean = {
@@ -212,7 +213,6 @@ object ResponsiblePerson {
         }
       }
     }
-
   }
 
   def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePerson]): Option[(ResponsiblePerson, Int)] = {
