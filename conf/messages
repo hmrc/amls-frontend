@@ -1650,6 +1650,11 @@ responsiblepeople.fit_and_proper.phase_2_details2 = The test checks the details 
 responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
 responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
 responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
+
+responsiblepeople.approval_check.heading = Has {0} paid for the approval test?
+responsiblepeople.approval_check.title = The HMRC approval test does similar checks but is different to the fit and proper test.
+responsiblepeople.approval_check.text.details = If {0} has already paid for the test, they do not need to again.
+
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
 responsiblepeople.detailed_answers.previous_names.since = Since
