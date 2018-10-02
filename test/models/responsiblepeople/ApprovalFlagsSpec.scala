@@ -21,29 +21,64 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class ApprovalFlagsSpec extends PlaySpec {
 
-  "ApprovalFlags Json" must {
+  trait Fixture {
+    val approvalFlagsModel = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
+  }
 
-    "Read successfully" in {
+  "ApprovalFlags Json" when {
 
-      val json = Json.parse(
-        """{
-          | "hasAlreadyPassedFitAndProper": false,
-          | "hasAlreadyPaidApprovalCheck": false
-          |}""".stripMargin
-      )
+    "there are both flags provided" must {
 
-      val approvalFlagsModel = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = Some(false))
+      "Read successfully" in new Fixture {
 
-      ApprovalFlags.format.reads(json) must be(
-        JsSuccess(approvalFlagsModel)
-      )
+        val json = Json.parse(
+          """{
+            | "hasAlreadyPassedFitAndProper": false,
+            | "hasAlreadyPaidApprovalCheck": false
+            |}""".stripMargin
+        )
 
+        ApprovalFlags.format.reads(json) must be(
+          JsSuccess(approvalFlagsModel)
+        )
+      }
+
+      "write successfully" in new Fixture {
+
+        ApprovalFlags.format.writes(approvalFlagsModel) must be (
+          Json.obj(
+            "hasAlreadyPassedFitAndProper" -> false,
+            "hasAlreadyPaidApprovalCheck" -> false
+          )
+        )
+      }
     }
 
-    "write successfully" in {
-      ApprovalFlags.format.writes(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) must be (
-        Json.obj("hasAlreadyPassedFitAndProper" -> true)
-      )
+    "there is only one flag provided" must {
+
+      "Read successfully" in new Fixture {
+        override val approvalFlagsModel = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
+
+        val json = Json.parse(
+          """{
+            | "hasAlreadyPassedFitAndProper": true
+            |}""".stripMargin
+        )
+
+        ApprovalFlags.format.reads(json) must be(
+          JsSuccess(approvalFlagsModel)
+        )
+      }
+
+      "write successfully" in new Fixture {
+        override val approvalFlagsModel = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true))
+
+        ApprovalFlags.format.writes(approvalFlagsModel) must be (
+          Json.obj(
+            "hasAlreadyPaidApprovalCheck" -> true
+          )
+        )
+      }
     }
   }
 }
