@@ -31,7 +31,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
   val showBreakdown = (fpFee: Option[BigDecimal], activities: Set[BusinessActivity]) =>
     if (ApplicationConfig.phase2ChangesToggle) {
-      fpFee.isDefined
+      true
     } else {
       fpFee.fold(activities.exists(act => act == MSB || act == TrustAndCompanyServices)) { _ => true }
     }
