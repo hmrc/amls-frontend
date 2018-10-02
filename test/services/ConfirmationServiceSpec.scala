@@ -1170,8 +1170,8 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       "not show negative fees for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
-          ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), hasAlreadyPassedFitAndProper = Some(false)),
-          ResponsiblePerson(Some(PersonName("Fit", Some("and"), "Proper")), hasAlreadyPassedFitAndProper = Some(true))
+          ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
+          ResponsiblePerson(Some(PersonName("Fit", Some("and"), "Proper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
         )
 
         val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
