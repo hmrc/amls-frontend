@@ -142,16 +142,54 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
+    def hasToggleApprovalsDateVatAndAddress(pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.hasAlreadyPassedFitAndProper.isDefined &
+      approvalFlags.hasAlreadyPaidApprovalCheck.isDefined &
+      pos.startDate.isDefined &
+      checkVatField(otherBusinessSP) &
+      validateAddressHistory
+    }
+
+    def hasToggleApprovalsDateVatAddressAndNoPreviousName(pName: PreviousName, pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.hasAlreadyPassedFitAndProper.isDefined &
+      approvalFlags.hasAlreadyPaidApprovalCheck.isDefined &
+      pos.startDate.isDefined &
+      checkVatField(otherBusinessSP) &
+      validateAddressHistory &&
+      !pName.hasPreviousName.get
+    }
+
+    def hasNoToggle(pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
+      pos.startDate.isDefined &
+      checkVatField(otherBusinessSP) &
+      validateAddressHistory &
+      !ApplicationConfig.phase2ChangesToggle
+    }
+
+    def hasNoToggleAndNoPreviousName(pName: PreviousName, pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
+      pos.startDate.isDefined &
+      checkVatField(otherBusinessSP) &
+      validateAddressHistory &&
+      !pName.hasPreviousName.get &
+      !ApplicationConfig.phase2ChangesToggle
+    }
+
     this match {
 
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if ApplicationConfig.phase2ChangesToggle && approvalFlags.hasAlreadyPassedFitAndProper.isDefined & approvalFlags.hasAlreadyPaidApprovalCheck.isDefined & pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory => true
+        if hasToggleApprovalsDateVatAndAddress(pos, otherBusinessSP) => true
+
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if ApplicationConfig.phase2ChangesToggle && approvalFlags.hasAlreadyPassedFitAndProper.isDefined & approvalFlags.hasAlreadyPaidApprovalCheck.isDefined & pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get => true
+        if hasToggleApprovalsDateVatAddressAndNoPreviousName(pName, pos, otherBusinessSP) => true
+
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & !ApplicationConfig.phase2ChangesToggle => true
+        if hasNoToggle(pos, otherBusinessSP) => true
+
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & !ApplicationConfig.phase2ChangesToggle => true
+        if hasNoToggleAndNoPreviousName(pName, pos, otherBusinessSP) => true
+
       case _ => false
     }
   }
