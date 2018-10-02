@@ -94,6 +94,9 @@ POST        /training/:index/                                      @controllers.
 GET         /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
+GET         /approval-check/:index/                                @controllers.responsiblepeople.ApprovalCheckController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /approval-check/:index/                                @controllers.responsiblepeople.ApprovalCheckController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
 GET         /contacting-you/:index/                                controllers.responsiblepeople.ContactDetailsController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /contacting-you/:index/                                controllers.responsiblepeople.ContactDetailsController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
