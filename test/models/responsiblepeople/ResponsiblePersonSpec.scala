@@ -1228,7 +1228,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
@@ -1301,7 +1301,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
@@ -1381,7 +1381,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
@@ -1550,7 +1550,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
@@ -1558,6 +1558,160 @@ trait ResponsiblePeopleValues extends NinoUtil {
 
 
   val completeJsonPresentUkResident = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last"
+    ),
+    "legalName" -> Json.obj(
+      "hasPreviousName" -> true,
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24",
+    "KnownBy" -> Json.obj(
+      "hasOtherNames" -> true,
+      "otherName" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "true",
+      "nino" -> "AA111111A",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "03"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "hasAlreadyPassedFitAndProper" -> true,
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentUkResidentFitAndProperPhase2 = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last"
+    ),
+    "legalName" -> Json.obj(
+      "hasPreviousName" -> true,
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24",
+    "KnownBy" -> Json.obj(
+      "hasOtherNames" -> true,
+      "otherName" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "true",
+      "nino" -> "AA111111A",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "03"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentUkResidentFitAndProperApprovalPhase2 = Json.obj(
     "personName" -> Json.obj(
       "firstName" -> "first",
       "middleName" -> "middle",
@@ -1701,7 +1855,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
@@ -1767,12 +1921,11 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "soleProprietorOfAnotherBusiness" -> Json.obj(
       "soleProprietorOfAnotherBusiness" -> true
     ),
-    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasAlreadyPassedFitAndProper" -> true,
     "hasChanged" -> false,
     "lineId" -> 1,
     "status" -> "Unchanged"
   )
-
 }
 
 class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
@@ -1783,6 +1936,18 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
   "ResponsiblePeople" must {
     "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
+
+      "json is complete" when {
+        "Fit and proper only new format" in {
+          completeJsonPresentUkResidentFitAndProperPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+        }
+      }
+
+      "json is complete" when {
+        "Fit and proper and approval" in {
+          completeJsonPresentUkResidentFitAndProperApprovalPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+        }
+      }
 
       "the model is fully complete" in {
         completeModelUkResidentPhase2.copy(hasAccepted = true).isComplete must be(true)

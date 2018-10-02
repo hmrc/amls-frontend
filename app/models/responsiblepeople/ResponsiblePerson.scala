@@ -275,7 +275,12 @@ object ResponsiblePerson {
         (__ \ "vatRegistered").readNullable[VATRegistered] and
         (__ \ "experienceTraining").readNullable[ExperienceTraining] and
         (__ \ "training").readNullable[Training] and
-        (__ \ "approvalFlags").readNullable[ApprovalFlags].map(_.getOrElse(ApprovalFlags())) and
+        (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
+          fitAndProper =>
+            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
+        }
+          .orElse((__ \ "approvalFlags").read[ApprovalFlags])
+          .orElse(Reads.pure(ApprovalFlags(None, None))) and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "lineId").readNullable[Int] and
@@ -290,7 +295,9 @@ object ResponsiblePerson {
       } else {
         if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasDateOfBirth(r)) {
           r.copy(ukPassport = None, nonUKPassport = None)
-        } else r
+        } else {
+          r
+        }
       }
     }
   }
