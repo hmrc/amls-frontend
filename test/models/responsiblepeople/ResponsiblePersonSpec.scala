@@ -742,7 +742,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     vatRegistered = Some(DefaultValues.vatRegistered),
     experienceTraining = Some(DefaultValues.experienceTraining),
     training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(false)),
     hasChanged = false,
     hasAccepted = false,
     lineId = Some(1),
@@ -917,7 +917,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     vatRegistered = Some(DefaultValues.vatRegistered),
     experienceTraining = Some(DefaultValues.experienceTraining),
     training = Some(DefaultValues.training),
-    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
     hasChanged = false,
     hasAccepted = false,
     lineId = Some(1),
@@ -1938,8 +1938,15 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
     "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
 
       "json is complete" when {
-        "Fit and proper only new format" in {
+
+        "both Fit and proper and approval are both set only" in {
           completeJsonPresentUkResidentFitAndProperPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+        }
+
+        "will fail if at least one of the approval flags is not defined" in {
+          val model = completeModelUkResidentPhase2.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = None))
+
+          model.isComplete must be(false)
         }
       }
 
