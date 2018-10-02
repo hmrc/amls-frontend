@@ -287,10 +287,9 @@ class detailed_answersSpec extends AmlsSpec
             approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
           )
 
-          //TODO:change message reference to approval check message
           override val sectionChecks = Table[String, Element => Boolean](
             ("title key", "check"),
-            (Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"), checkElementTextIncludes(_, "Yes"))
+            (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
           )
 
           def view = {

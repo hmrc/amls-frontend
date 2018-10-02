@@ -430,12 +430,11 @@
             }
         }
 
-        @*TODO:change message reference to approval check message and uncomment and update controler link*@
         @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
             @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
-                //editUrl = controllers.responsiblepeople.routes.ApprovalCheckControler.get(idx, true, flow).toString(),
-                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper
+                question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
+                dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck
             ) { fp2 =>
                 <p>@fp match {
                     case true => {@Messages("lbl.yes")}
