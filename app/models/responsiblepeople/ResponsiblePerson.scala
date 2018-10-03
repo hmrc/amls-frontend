@@ -144,8 +144,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
 
     def hasToggleApprovalsDateVatAndAddress(pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
       ApplicationConfig.phase2ChangesToggle &&
-      approvalFlags.hasAlreadyPassedFitAndProper.isDefined &
-      approvalFlags.hasAlreadyPaidApprovalCheck.isDefined &
+      approvalFlags.isComplete()
       pos.startDate.isDefined &
       checkVatField(otherBusinessSP) &
       validateAddressHistory
@@ -153,8 +152,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
 
     def hasToggleApprovalsDateVatAddressAndNoPreviousName(pName: PreviousName, pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
       ApplicationConfig.phase2ChangesToggle &&
-      approvalFlags.hasAlreadyPassedFitAndProper.isDefined &
-      approvalFlags.hasAlreadyPaidApprovalCheck.isDefined &
+      approvalFlags.isComplete()
       pos.startDate.isDefined &
       checkVatField(otherBusinessSP) &
       validateAddressHistory &&

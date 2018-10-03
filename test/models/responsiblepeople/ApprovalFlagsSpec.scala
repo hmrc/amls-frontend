@@ -20,6 +20,27 @@ import org.scalatestplus.play.PlaySpec
 import play.api.libs.json.{JsSuccess, Json}
 
 class ApprovalFlagsSpec extends PlaySpec {
+  "ApprovalFlags" when {
+    "all flags are defined" must {
+      "be complete" in {
+        val approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true),
+          hasAlreadyPaidApprovalCheck = Some(false)
+        )
+
+        approvalFlags.isComplete() must be(true)
+      }
+    }
+
+    "not all flags are defined" must {
+      "no be complete" in {
+        val approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true),
+          hasAlreadyPaidApprovalCheck = None
+        )
+
+        approvalFlags.isComplete() must be(false)
+      }
+    }
+  }
 
   "ApprovalFlags Json" when {
 
