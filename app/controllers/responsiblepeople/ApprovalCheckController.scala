@@ -34,9 +34,9 @@ class ApprovalCheckController @Inject()(
                                          appConfig: AppConfig
                                        ) extends RepeatingSection with BaseController {
 
-  val FIELDNAME = "hasAlreadyPaidApprovalCheck"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.approval_check")
+  val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELD_NAME, "error.required.rp.approval_check")
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
@@ -61,7 +61,7 @@ class ApprovalCheckController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                rp.approvalFlags(ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(data)))
+                rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = Some(data)))
               }
             } yield
               Redirect(routes.DetailedAnswersController.get(index, flow))

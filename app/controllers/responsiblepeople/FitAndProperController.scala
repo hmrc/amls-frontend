@@ -63,7 +63,7 @@ class FitAndProperController @Inject()(
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data)))
+                rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
               }
             } yield
               Redirect(routes.DetailedAnswersController.get(index, flow))
