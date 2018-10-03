@@ -1653,7 +1653,7 @@ responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests b
 
 responsiblepeople.approval_check.heading = Has {0} paid for the approval check?
 responsiblepeople.approval_check.title = The HMRC approval test does similar checks but is different to the fit and proper test.
-responsiblepeople.approval_check.text.details = If {0} has already paid for the test, they do not need to again.
+responsiblepeople.approval_check.text.details = If {0} has already paid for the check, they do not need to again.
 
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
