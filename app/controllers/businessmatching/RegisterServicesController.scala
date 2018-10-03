@@ -253,7 +253,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
-      rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
+      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
     }
 
   private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
