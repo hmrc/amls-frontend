@@ -160,7 +160,8 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     def phase2IsOffAndWithCommonFields(pos: Positions,
                                        otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
                                       ): Boolean = {
-      !ApplicationConfig.phase2ChangesToggle && hasValidCommonFields(pos, otherBusinessSP)
+      !ApplicationConfig.phase2ChangesToggle &&
+      hasValidCommonFields(pos, otherBusinessSP)
     }
 
     def phase2IsOnAndValidCommonField(pos: Positions,
@@ -180,9 +181,11 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     }
 
     def phase2IsOffAndNoPreviousName(pName: PreviousName,
-                                     pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                     pos: Positions,
+                                     otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
                                     ): Boolean = {
-      !ApplicationConfig.phase2ChangesToggle && hasNoPreviousName(pName, pos, otherBusinessSP)
+      !ApplicationConfig.phase2ChangesToggle &&
+      hasNoPreviousName(pName, pos, otherBusinessSP)
     }
 
     this match {
