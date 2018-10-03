@@ -21,7 +21,13 @@ import play.api.libs.json.{Json, Reads, Writes}
 final case class ApprovalFlags(
                                 hasAlreadyPassedFitAndProper: Option[Boolean] = None,
                                 hasAlreadyPaidApprovalCheck: Option[Boolean] = None
-                              )
+                              ) {
+  def isComplete() = {
+    hasAlreadyPassedFitAndProper.isDefined &
+    hasAlreadyPaidApprovalCheck.isDefined
+  }
+
+}
 
 object ApprovalFlags {
 
