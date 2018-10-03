@@ -142,51 +142,62 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
-    def hasToggleApprovalsDateVatAndAddress(pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
-      ApplicationConfig.phase2ChangesToggle &&
-      approvalFlags.isComplete()
+    def hasValidCommonFields(pos: Positions,
+                             otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                            ): Boolean = {
       pos.startDate.isDefined &
       checkVatField(otherBusinessSP) &
       validateAddressHistory
     }
 
-    def hasToggleApprovalsDateVatAddressAndNoPreviousName(pName: PreviousName, pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
-      ApplicationConfig.phase2ChangesToggle &&
-      approvalFlags.isComplete()
-      pos.startDate.isDefined &
-      checkVatField(otherBusinessSP) &
-      validateAddressHistory &&
+    def hasNoPreviousName(pName: PreviousName, pos:
+                          Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                         ): Boolean = {
+      hasValidCommonFields(pos, otherBusinessSP) &&
       !pName.hasPreviousName.get
     }
 
-    def hasNoToggle(pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
-      pos.startDate.isDefined &
-      checkVatField(otherBusinessSP) &
-      validateAddressHistory &
-      !ApplicationConfig.phase2ChangesToggle
+    def phase2IsOffAndWithCommonFields(pos: Positions,
+                                       otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                      ): Boolean = {
+      !ApplicationConfig.phase2ChangesToggle && hasValidCommonFields(pos, otherBusinessSP)
     }
 
-    def hasNoToggleAndNoPreviousName(pName: PreviousName, pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]) = {
-      pos.startDate.isDefined &
-      checkVatField(otherBusinessSP) &
-      validateAddressHistory &&
-      !pName.hasPreviousName.get &
-      !ApplicationConfig.phase2ChangesToggle
+    def phase2IsOnAndValidCommonField(pos: Positions,
+                                      otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                     ): Boolean = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.isComplete() &
+      hasValidCommonFields(pos, otherBusinessSP)
+    }
+
+    def phase2IsOnAndNoPrevousName(pName: PreviousName,
+                                   pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                  ): Boolean = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.isComplete() &
+      hasNoPreviousName(pName, pos, otherBusinessSP)
+    }
+
+    def phase2IsOffAndNoPreviousName(pName: PreviousName,
+                                     pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                    ): Boolean = {
+      !ApplicationConfig.phase2ChangesToggle && hasNoPreviousName(pName, pos, otherBusinessSP)
     }
 
     this match {
 
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if hasToggleApprovalsDateVatAndAddress(pos, otherBusinessSP) => true
+        if phase2IsOnAndValidCommonField(pos, otherBusinessSP) => true
 
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if hasToggleApprovalsDateVatAddressAndNoPreviousName(pName, pos, otherBusinessSP) => true
+        if phase2IsOnAndNoPrevousName(pName, pos, otherBusinessSP) => true
 
       case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if hasNoToggle(pos, otherBusinessSP) => true
+        if phase2IsOffAndWithCommonFields(pos, otherBusinessSP) => true
 
       case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if hasNoToggleAndNoPreviousName(pName, pos, otherBusinessSP) => true
+        if phase2IsOffAndNoPreviousName(pName, pos, otherBusinessSP) => true
 
       case _ => false
     }
