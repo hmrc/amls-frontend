@@ -1653,8 +1653,9 @@ responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in you
 responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
 
 responsiblepeople.approval_check.heading = Has {0} paid for the approval check?
-responsiblepeople.approval_check.title = The HMRC approval test does similar checks but is different to the fit and proper test.
-responsiblepeople.approval_check.text.details = If {0} has already paid for the check, they do not need to again.
+responsiblepeople.approval_check.title = Has this person paid for the approval check?
+responsiblepeople.approval_check.text.details = The HMRC approval check does similar checks but is different to the fit and proper check.
+responsiblepeople.approval_check.text.details2 = If {0} has already paid for the check, they do not need to again.
 
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
