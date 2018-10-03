@@ -70,11 +70,11 @@ class FitAndProperController @Inject()(
             case ValidForm(_, data) => {
               for {
                 cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
-                  if (appConfig.phase2ChangesToggle && data == true) {
-                    rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data),
+                  (appConfig.phase2ChangesToggle, data) match {
+                    case (true, true) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
                       hasAlreadyPaidApprovalCheck = Some(data)))
-                  } else {
-                    rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data)))
+                    case (true, false) => rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data)))
+                    case _ => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
                   }
                 }
               } yield identifyRoutingTarget(index, edit, cacheMap, flow, data)
@@ -87,24 +87,26 @@ class FitAndProperController @Inject()(
 
   private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap],
                                     flow: Option[String], fitAndProperAnswer: Boolean): Result = {
-    (fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
-      case (_, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case (true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case (false, true) => routeMsbOrTcsb(index, edit, cacheMapOpt, flow)
+    (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
+      case (_, _, false) => Redirect(routes.DetailedAnswersController.get(index, flow))        // Pre-phase 2             => Check your ans
+      case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, flow)                     // Edit, no F&P, Phase 2   => Route based on business matching
+      case (true, true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))      // Edit, F&P, Either phase => Check your ans
+      case (false, true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))  // Create, F&P, Phase 2    => Check your ans
+      case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, flow)                    // Create, no F&P, Phase 2 => Route based on business matching
     }
   }
 
-  private def routeMsbOrTcsb(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], flow: Option[String]) :Result = {
+  private def routeMsbOrTcsb(index: Int, cacheMapOpt: Option[CacheMap], flow: Option[String]) :Result = {
     cacheMapOpt match {
       case Some(cacheMap) => {
-        (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-          case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-          case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)), _, _, _, _, _, _, _))) =>
+        (cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
+          case (Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)), _, _, _, _, _, _, _))) =>
             if (acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)) {
               Redirect(routes.DetailedAnswersController.get(index, flow))
+            } else {
+              Redirect(routes.ApprovalCheckController.get(index, false, flow))
             }
-            Redirect(routes.ApprovalCheckController.get(index, false, flow))
-          case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+          case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
       }
       case _ => Redirect(routes.DetailedAnswersController.get(index, flow))

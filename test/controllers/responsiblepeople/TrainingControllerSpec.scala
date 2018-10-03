@@ -207,10 +207,12 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
+
             when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
               .thenReturn(Some(
                 BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
               ))
+
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
 

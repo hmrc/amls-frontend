@@ -38,12 +38,7 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
 
   def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int]): Seq[ResponsiblePerson] =
     responsiblePeople.zipWithIndex.map { case (rp, index) =>
-      val updated = if (indices contains index) {
-        rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
-      } else {
-        rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
-      }
-
+      val updated = rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(indices contains index)))
       updated.copy(hasAccepted = rp.hasAccepted)
     }
 }
