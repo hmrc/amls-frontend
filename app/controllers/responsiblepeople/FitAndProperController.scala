@@ -45,10 +45,13 @@ class FitAndProperController @Inject()(
     implicit authContext => implicit request =>
 
       getData[ResponsiblePerson](index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPassedFitAndProper.isDefined) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
+          if (alreadyPassed.hasAlreadyPassedFitAndProper.isDefined) =>
+          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
+            edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName,
+            appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
         }
         case _ => NotFound(notFoundView)
       }
@@ -61,13 +64,15 @@ class FitAndProperController @Inject()(
           Form2[Boolean](request.body) match {
             case f: InvalidForm =>
               getData[ResponsiblePerson](index) map { rp =>
-                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow,
+                  ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
               }
             case ValidForm(_, data) => {
               for {
                 cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                   if (appConfig.phase2ChangesToggle && data == true) {
-                    rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data), hasAlreadyPaidApprovalCheck = Some(data)))
+                    rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data),
+                      hasAlreadyPaidApprovalCheck = Some(data)))
                   } else {
                     rp.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(data)))
                   }
@@ -80,25 +85,29 @@ class FitAndProperController @Inject()(
     }
   }
 
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], flow: Option[String], fitAndProperAnswer: Boolean): Result = {
+  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap],
+                                    flow: Option[String], fitAndProperAnswer: Boolean): Result = {
     (fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
       case (_, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
       case (true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      case (false, true) =>
-        cacheMapOpt match {
-          case Some(cacheMap) => {
-            (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-              case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-              case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)), _, _, _, _, _, _, _))) =>
-                if (acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices))
-                  Redirect(routes.DetailedAnswersController.get(index, flow))
+      case (false, true) => routeMsbOrTcsb(index, edit, cacheMapOpt, flow)
+    }
+  }
 
-                Redirect(routes.ApprovalCheckController.get(index, false, flow))
-              case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+  private def routeMsbOrTcsb(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap], flow: Option[String]) :Result = {
+    cacheMapOpt match {
+      case Some(cacheMap) => {
+        (edit, cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
+          case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+          case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)), _, _, _, _, _, _, _))) =>
+            if (acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)) {
+              Redirect(routes.DetailedAnswersController.get(index, flow))
             }
-          }
-          case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
+            Redirect(routes.ApprovalCheckController.get(index, false, flow))
+          case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
+      }
+      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
   }
 }
