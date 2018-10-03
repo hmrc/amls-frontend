@@ -801,7 +801,7 @@ class RemoveBusinessTypeHelperSpecForPhase2 extends AmlsSpec with FutureAssertio
 
         val model = RemoveBusinessTypeFlowModel(activitiesToRemove = Some(Set(TrustAndCompanyServices, BillPaymentServices)))
 
-        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+        val startResultRP = Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
           hasAccepted = true,
           hasChanged = true))
 
