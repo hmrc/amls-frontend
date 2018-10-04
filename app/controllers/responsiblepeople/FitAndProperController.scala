@@ -47,7 +47,7 @@ class FitAndProperController @Inject()(
 
       getData[ResponsiblePerson](index) map {
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
-          if (alreadyPassed.hasAlreadyPassedFitAndProper.isDefined) =>
+          if alreadyPassed.hasAlreadyPassedFitAndProper.isDefined =>
           Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
             edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
@@ -100,11 +100,7 @@ class FitAndProperController @Inject()(
     (data, msbOrTcsp) match {
       case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
         hasAlreadyPaidApprovalCheck = None))
-
-      case (true, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = Some(data)))
-
-      case (_, true) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+      case _ => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
         hasAlreadyPaidApprovalCheck = Some(data)))
     }
   }
@@ -113,16 +109,9 @@ class FitAndProperController @Inject()(
                                     fitAndProperAnswer: Boolean, msbOrTscp: Boolean, flow: Option[String])
                                    (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
     (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
-      // Pre-phase 2             => Check your ans
-      case (_, _, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      // Edit, no F&P, Phase 2   => Route based on business matching
       case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
-      // Edit, F&P, Either phase => Check your ans
-      case (true, true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      // Create, F&P, Phase 2    => Check your ans
-      case (false, true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
-      // Create, no F&P, Phase 2 => Route based on business matching
       case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
     }
   }
 
