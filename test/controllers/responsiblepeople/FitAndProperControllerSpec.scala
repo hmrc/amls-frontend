@@ -360,6 +360,12 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
+                  mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
+                    personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
+                  ))), Some(ResponsiblePerson.key))
+
+                  mockCacheSave[Seq[ResponsiblePerson]]
+
                   when(controller.dataCacheConnector.fetchAll(any(), any()))
                     .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -480,6 +486,12 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                   val newRequest = request.withFormUrlEncodedBody(
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
+
+                  mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
+                    personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
+                  ))), Some(ResponsiblePerson.key))
+
+                  mockCacheSave[Seq[ResponsiblePerson]]
 
                   when(controller.dataCacheConnector.fetchAll(any(), any()))
                     .thenReturn(Future.successful(Some(mockCacheMap)))
