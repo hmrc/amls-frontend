@@ -21,8 +21,8 @@ import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.businessmatching.{BusinessActivities, BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import models.businessmatching.BusinessMatching
+import models.responsiblepeople.ResponsiblePerson
 import play.api.mvc.{AnyContent, Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -69,15 +69,26 @@ class FitAndProperController @Inject()(
                   ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
               }
             case ValidForm(_, data) => {
-              for {
-                cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
-                  (appConfig.phase2ChangesToggle, data) match {
-                    case (true, _) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-                      hasAlreadyPaidApprovalCheck = Some(data)))
-                    case (false, _) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
+              dataCacheConnector.fetchAll flatMap { maybeCache =>
+
+                val businessMatching = for {
+                  cacheMap <- maybeCache
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                } yield bm
+
+                val msbOrTcsp = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
+                  ControllerHelper.isTCSPSelected(Some(businessMatching))
+
+                for {
+                  cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+                    if (appConfig.phase2ChangesToggle) {
+                      updateFitAndProperAndApproval(data, msbOrTcsp, rp)
+                    } else {
+                      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
+                    }
                   }
-                }
-              } yield identifyRoutingTarget(index, edit, cacheMap, flow, data)
+                } yield identifyRoutingTarget(index, edit, cacheMap, data, msbOrTcsp, flow)
+              }
             } recoverWith {
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
@@ -85,42 +96,43 @@ class FitAndProperController @Inject()(
     }
   }
 
-  private def resetApprovalCheck(index: Int)(implicit authContext: AuthContext, request: Request[AnyContent])= {
-    fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
-      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None))
+  private def updateFitAndProperAndApproval(data: Boolean, msbOrTcsp: Boolean, rp: ResponsiblePerson) = {
+    (data, msbOrTcsp) match {
+      case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = None))
+
+      case (true, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = Some(data)))
+
+      case (_, true) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = Some(data)))
     }
   }
 
   private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap],
-                                    flow: Option[String], fitAndProperAnswer: Boolean)
+                                    fitAndProperAnswer: Boolean, msbOrTscp: Boolean, flow: Option[String])
                                    (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
     (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
-      case (_, _, false) => Redirect(routes.DetailedAnswersController.get(index, flow))        // Pre-phase 2             => Check your ans
-      case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer,flow)  // Edit, no F&P, Phase 2   => Route based on business matching
-      case (true, true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))      // Edit, F&P, Either phase => Check your ans
-      case (false, true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))  // Create, F&P, Phase 2    => Check your ans
-      case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer,flow) // Create, no F&P, Phase 2 => Route based on business matching
+      // Pre-phase 2             => Check your ans
+      case (_, _, false) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      // Edit, no F&P, Phase 2   => Route based on business matching
+      case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+      // Edit, F&P, Either phase => Check your ans
+      case (true, true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      // Create, F&P, Phase 2    => Check your ans
+      case (false, true, true) => Redirect(routes.DetailedAnswersController.get(index, flow))
+      // Create, no F&P, Phase 2 => Route based on business matching
+      case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
     }
   }
 
-  private def routeMsbOrTcsb(index: Int, cacheMapOpt: Option[CacheMap], fitAndProperAnswer: Boolean, flow: Option[String])
+  private def routeMsbOrTcsb(index: Int, cacheMapOpt: Option[CacheMap], fitAndProperAnswer: Boolean,
+                             msbOrTscp: Boolean, flow: Option[String])
                             (implicit authContext: AuthContext, request: Request[AnyContent]):Result = {
-    cacheMapOpt match {
-      case Some(cacheMap) => {
-        (cacheMap.getEntry[BusinessMatching](BusinessMatching.key)) match {
-          case (Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)), _, _, _, _, _, _, _))) =>
-            if (acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)) {
-              Redirect(routes.DetailedAnswersController.get(index, flow))
-            } else {
-              //if (!fitAndProperAnswer) {
-              //  resetApprovalCheck(index)
-              //}
-              Redirect(routes.ApprovalCheckController.get(index, false, flow))
-            }
-          case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
-        }
-      }
-      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
+    if (msbOrTscp) {
+      Redirect(routes.DetailedAnswersController.get(index, flow))
+    } else {
+      Redirect(routes.ApprovalCheckController.get(index, false, flow))
     }
   }
 }

@@ -139,7 +139,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               approvalFlags = testFitAndProper
             ))))
 
-          mockCacheSave[Seq[ResponsiblePerson]]
+          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )))
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -176,7 +180,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               approvalFlags = testFitAndProper
             ))))
 
-          mockCacheSave[Seq[ResponsiblePerson]]
+          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -197,7 +205,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
               approvalFlags = testFitAndProper
             ))))
 
-          mockCacheSave[Seq[ResponsiblePerson]]
+          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )))
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
@@ -245,7 +257,11 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
               approvalFlags = testFitAndProper
             ))))
 
-          mockCacheSave[Seq[ResponsiblePerson]]
+          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )))
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -282,11 +298,19 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
               approvalFlags = testFitAndProper
             ))))
 
-          mockCacheSave[Seq[ResponsiblePerson]]
+          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+            .thenReturn(Some(BusinessMatching(
+              activities = Some(BusinessActivities(Set(HighValueDealing))),
+              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+            )))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
+        }
+
+        "updates approval flags correctly" when {
+
         }
 
         "routes correctly" when {
@@ -304,7 +328,11 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                   approvalFlags = testFitAndProper
                 ))))
 
-              mockCacheSave[Seq[ResponsiblePerson]]
+              when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(HighValueDealing))),
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+                )))
 
               val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
@@ -382,38 +410,6 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                   redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ApprovalCheckController.get(1, false, Some(flowFromDeclaration)).url))
                 }
               }
-
-              "given no business matching, and redirect to the DetailedAnswersController" in new Fixture {
-                val newRequest = request.withFormUrlEncodedBody(
-                  "hasAlreadyPassedFitAndProper" -> "false"
-                )
-
-                when(controller.dataCacheConnector.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                  .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-                status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
-              }
-
-              "given no cache map, and redirect to the DetailedAnswersController" in new Fixture {
-                val newRequest = request.withFormUrlEncodedBody(
-                  "hasAlreadyPassedFitAndProper" -> "false"
-                )
-
-                when(controller.dataCacheConnector.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(None))
-
-                when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                  .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
-                status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
-              }
             }
           }
 
@@ -431,7 +427,11 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                   approvalFlags = testFitAndProper
                 ))))
 
-              mockCacheSave[Seq[ResponsiblePerson]]
+              when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+                .thenReturn(Some(BusinessMatching(
+                  activities = Some(BusinessActivities(Set(HighValueDealing))),
+                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+                )))
 
               val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
@@ -508,38 +508,6 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                   status(result) must be(SEE_OTHER)
                   redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.ApprovalCheckController.get(1, false, Some(flowFromDeclaration)).url))
                 }
-              }
-
-              "given no business matching, and redirect to the DetailedAnswersController" in new Fixture {
-                val newRequest = request.withFormUrlEncodedBody(
-                  "hasAlreadyPassedFitAndProper" -> "false"
-                )
-
-                when(controller.dataCacheConnector.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                  .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-                status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
-              }
-
-              "given no cache map, and redirect to the DetailedAnswersController" in new Fixture {
-                val newRequest = request.withFormUrlEncodedBody(
-                  "hasAlreadyPassedFitAndProper" -> "false"
-                )
-
-                when(controller.dataCacheConnector.fetchAll(any(), any()))
-                  .thenReturn(Future.successful(None))
-
-                when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                  .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
-                status(result) must be(SEE_OTHER)
-                redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1, Some(flowFromDeclaration)).url))
               }
             }
           }
