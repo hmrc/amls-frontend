@@ -37,7 +37,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     }
 
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
-    ResponsiblePerson.filter(people).partition(_.hasAlreadyPassedFitAndProper.getOrElse(false))
+    ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
 }
 

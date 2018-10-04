@@ -18,7 +18,7 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
@@ -27,7 +27,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -47,7 +47,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
   }
 
-  val testFitAndProper = Some(true)
+  val testFitAndProper = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
 
   "BusinessRegisteredForVATController" when {
 
@@ -56,7 +56,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = testFitAndProper
+            personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = testFitAndProper
           ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
@@ -72,7 +72,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(false)
+            personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
           ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
@@ -88,7 +88,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = None
+            personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None)
           ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
@@ -106,7 +106,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         "there is no PersonName present" in new Fixture {
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            personName = None, hasAlreadyPassedFitAndProper = None
+            personName = None, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None)
           ))), Some(ResponsiblePerson.key))
 
           val result = controller.get(1)(request)
@@ -125,7 +125,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            hasAlreadyPassedFitAndProper = testFitAndProper
+            approvalFlags = testFitAndProper
           ))), Some(ResponsiblePerson.key))
 
           mockCacheSave[Seq[ResponsiblePerson]]
@@ -142,7 +142,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            hasAlreadyPassedFitAndProper = testFitAndProper
+            approvalFlags = testFitAndProper
           ))), Some(ResponsiblePerson.key))
 
           val result = controller.post(1)(newRequest)
@@ -158,7 +158,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            hasAlreadyPassedFitAndProper = testFitAndProper
+            approvalFlags = testFitAndProper
           ))), Some(ResponsiblePerson.key))
 
           mockCacheSave[Seq[ResponsiblePerson]]
@@ -175,7 +175,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           )
 
           mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            hasAlreadyPassedFitAndProper = testFitAndProper
+            approvalFlags = testFitAndProper
           ))), Some(ResponsiblePerson.key))
 
           mockCacheSave[Seq[ResponsiblePerson]]

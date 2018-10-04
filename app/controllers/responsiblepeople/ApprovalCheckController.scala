@@ -16,37 +16,35 @@
 
 package controllers.responsiblepeople
 
-import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
+import javax.inject.{Inject, Singleton}
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson }
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
 @Singleton
-class FitAndProperController @Inject()(
-                                        val dataCacheConnector: DataCacheConnector,
-                                        val authConnector: AuthConnector,
-                                        appConfig: AppConfig
-                                      ) extends RepeatingSection with BaseController {
+class ApprovalCheckController @Inject()(
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector,
+                                         appConfig: AppConfig
+                                       ) extends RepeatingSection with BaseController {
 
-  val FIELDNAME = "hasAlreadyPassedFitAndProper"
-  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELDNAME)
-  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELDNAME, "error.required.rp.fit_and_proper")
+  val FIELD_NAME = "hasAlreadyPaidApprovalCheck"
+  implicit val boolWrite = utils.BooleanFormReadWrite.formWrites(FIELD_NAME)
+  implicit val boolRead = utils.BooleanFormReadWrite.formRule(FIELD_NAME, "error.required.rp.approval_check")
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
-
       getData[ResponsiblePerson](index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPassedFitAndProper.isDefined) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_)) if (alreadyPassed.hasAlreadyPaidApprovalCheck.isDefined) =>
+          Ok(views.html.responsiblepeople.approval_check(Form2[Boolean](alreadyPassed.hasAlreadyPaidApprovalCheck.get), edit, index, flow, personName.titleName))
         case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+          Ok(views.html.responsiblepeople.approval_check(EmptyForm, edit, index, flow, personName.titleName))
         }
         case _ => NotFound(notFoundView)
       }
@@ -58,12 +56,12 @@ class FitAndProperController @Inject()(
         Form2[Boolean](request.body) match {
           case f: InvalidForm =>
             getData[ResponsiblePerson](index) map { rp =>
-              BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+              BadRequest(views.html.responsiblepeople.approval_check(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
             }
           case ValidForm(_, data) => {
             for {
               _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
+                rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPaidApprovalCheck = Some(data)))
               }
             } yield
               Redirect(routes.DetailedAnswersController.get(index, flow))
@@ -72,5 +70,4 @@ class FitAndProperController @Inject()(
           }
         }
     }
-
 }
