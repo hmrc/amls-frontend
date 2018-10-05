@@ -328,7 +328,11 @@ object ResponsiblePerson {
         (__ \ "training").readNullable[Training] and
         (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
           fitAndProper =>
-            ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
+            if(ApplicationConfig.phase2ChangesToggle) {
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(fitAndProper))
+            } else {
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
+            }
         }
           .orElse((__ \ "approvalFlags").read[ApprovalFlags])
           .orElse(Reads.pure(ApprovalFlags(None, None))) and
