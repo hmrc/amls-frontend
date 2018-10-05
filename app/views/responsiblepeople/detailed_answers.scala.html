@@ -22,7 +22,13 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(model: Option[ResponsiblePerson], idx: Int, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePerson],
+    idx: Int,
+    showHide: Boolean = false,
+    rpName: String = "",
+    flow: Option[String] = None,
+    showApprovalSection: Boolean = false
+)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
@@ -430,19 +436,20 @@
             }
         }
 
-        @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
-            @detailedAnswers(
-                question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
-                editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
-                dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck
-            ) { fp2 =>
-                <p>@fp match {
-                    case true => {@Messages("lbl.yes")}
-                    case false => {@Messages("lbl.no")}
-                }</p>
+        @if(showApprovalSection) {
+            @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
+                @detailedAnswers(
+                    question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                    editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
+                    dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck
+                ) { fp2 =>
+                    <p>@fp match {
+                        case true => {@Messages("lbl.yes")}
+                        case false => {@Messages("lbl.no")}
+                    }</p>
+                }
             }
         }
-
     }
 
     @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, flow)) {

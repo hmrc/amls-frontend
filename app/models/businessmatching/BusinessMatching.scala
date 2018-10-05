@@ -20,6 +20,7 @@ import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, UnincorporatedBody}
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.ControllerHelper
 
 case class BusinessMatching(
                              reviewDetails: Option[ReviewDetails] = None,
@@ -33,6 +34,22 @@ case class BusinessMatching(
                              preAppComplete: Boolean = false
 
                            ) {
+
+  def msbOrTcsp: Boolean = {
+    msb || tcsp
+  }
+
+  def msb: Boolean = {
+    activities.foldLeft(false) { (x, y) =>
+      y.businessActivities.contains(MoneyServiceBusiness)
+    }
+  }
+
+  def tcsp: Boolean = {
+    activities.foldLeft(false) { (x, y) =>
+      y.businessActivities.contains(TrustAndCompanyServices)
+    }
+  }
 
   def activities(p: BusinessActivities): BusinessMatching =
     this.copy(activities = Some(p), hasChanged = hasChanged || !this.activities.contains(p), hasAccepted = hasAccepted && this.activities.contains(p))
