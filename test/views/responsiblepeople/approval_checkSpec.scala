@@ -62,6 +62,7 @@ class approval_checkSpec extends AmlsSpec with MustMatchers {
 
         def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
         doc.body().html() must include(Messages("responsiblepeople.approval_check.text.details"))
+        doc.body().html() must include(Messages("responsiblepeople.approval_check.text.details2", "PersonName"))
       }
     }
 

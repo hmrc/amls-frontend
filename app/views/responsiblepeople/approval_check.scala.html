@@ -30,7 +30,9 @@
     heading = header
 ) {
 
-    <p>@Messages("responsiblepeople.approval_check.text.details")</p>
+    <p>@Messages("responsiblepeople.approval_check.text.details", personName)</p>
+
+    <p>@Messages("responsiblepeople.approval_check.text.details2", personName)</p>
 
     @form(f, controllers.responsiblepeople.routes.ApprovalCheckController.post(index, edit, flow)) {
 
