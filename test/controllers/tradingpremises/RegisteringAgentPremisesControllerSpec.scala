@@ -206,6 +206,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
 
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
         val result = controller.post(1,edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
@@ -229,6 +232,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model, model)))
 
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
+
         val result = controller.post(1,edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
@@ -250,6 +256,9 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
           .thenReturn(Future.successful(Some(mockCacheMap)))
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(model)))
+
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1,edit = false)(newRequest)
 

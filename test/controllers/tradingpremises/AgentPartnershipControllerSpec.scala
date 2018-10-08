@@ -106,6 +106,9 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
             "agentPartnership" -> "text"
           )
 
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.ConfirmAddressController.get(1).url))
@@ -116,6 +119,9 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
           val newRequest = request.withFormUrlEncodedBody(
             "agentPartnership" -> "text"
           )
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -141,6 +147,9 @@ class AgentPartnershipControllerSpec extends AmlsSpec with MockitoSugar with Sca
         val newRequest = request.withFormUrlEncodedBody("agentPartnership" -> "text")
         when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
           .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse, TradingPremises())))
+
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
 
