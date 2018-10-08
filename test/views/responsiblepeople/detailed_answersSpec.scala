@@ -282,28 +282,50 @@ class detailed_answersSpec extends AmlsSpec
 
       }
 
-        "approval check was paid" in new ViewFixture {
-          val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
-            approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
-          )
+      "approval check was paid" in new ViewFixture {
+        val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+        )
 
-          override val sectionChecks = Table[String, Element => Boolean](
-            ("title key", "check"),
-            (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
-          )
+        override val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
+        )
 
-          def view = {
-            views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName)
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = true)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must not be None
+          val section = header.get.parents().select("section").first()
+          check(section) must be(true)
           }
+        }
+      }
 
-          forAll(sectionChecks) { (key, check) => {
-            val headers = doc.select("section.check-your-answers h2")
-            val header = headers.toList.find(e => e.text() == key)
+      "approval check question is not shown if show flag" in new ViewFixture {
+        val responsiblePeopleModelWithApprovalCheck = responsiblePeopleModel.copy(
+          approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true))
+        )
 
-            header must not be None
-            val section = header.get.parents().select("section").first()
-            check(section) must be(true)
+        override val sectionChecks = Table[String, Element => Boolean](
+          ("title key", "check"),
+          (Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName.fullName), checkElementTextIncludes(_, "Yes"))
+        )
 
+        def view = {
+          views.html.responsiblepeople.detailed_answers(Some(responsiblePeopleModelWithApprovalCheck), 1, true, personName.fullName, showApprovalSection = false)
+        }
+
+        forAll(sectionChecks) { (key, check) => {
+          val headers = doc.select("section.check-your-answers h2")
+          val header = headers.toList.find(e => e.text() == key)
+
+          header must be(None)
           }
         }
       }
