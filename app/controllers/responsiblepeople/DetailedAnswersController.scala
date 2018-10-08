@@ -24,15 +24,16 @@ import controllers.BaseController
 import models.businessmatching.BusinessMatching
 import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
+import play.api.Play
+import play.api.mvc.{Action, AnyContent}
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DeclarationHelper, RepeatingSection}
-import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
-import play.api.Play
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait DetailedAnswersController extends BaseController with RepeatingSection {
 
@@ -47,14 +48,25 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
     }
   }
 
-  def get(index: Int, flow: Option[String] = None) =
+  def get(index: Int, flow: Option[String] = None): Action[AnyContent] =
     Authorised.async {
       implicit authContext => implicit request =>
         fetchModel flatMap {
           case Some(data) => {
             data.lift(index - 1) match {
-              case Some(x) => showHideAddressMove(x.lineId) map {showHide =>
-                Ok(views.html.responsiblepeople.detailed_answers(Some(x), index, showHide, ControllerHelper.rpTitleName(Some(x)), flow))
+              case Some(x) => showHideAddressMove(x.lineId) flatMap { showHide =>
+
+                isMsbOrTcsp().map {
+                  (msbOrTcsp: Option[Boolean]) =>
+                    val shouldShowApprovalSection = !(msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(true))
+                    Ok(views.html.responsiblepeople.detailed_answers(
+                      Some(x),
+                      index,
+                      showHide,
+                      ControllerHelper.rpTitleName(Some(x)),
+                      flow,
+                      shouldShowApprovalSection))
+                }
               }
               case _ => Future.successful(NotFound(notFoundView))
             }
@@ -74,6 +86,12 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
           case None => Future.successful(Redirect(controllers.responsiblepeople.routes.YourResponsiblePeopleController.get()))
         }
       }
+  }
+
+  private def isMsbOrTcsp()(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[Boolean]] = {
+    for {
+      businessmatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
+    } yield businessmatching.map(_.msbOrTcsp)
   }
 
   private def redirectFromDeclarationFlow()(implicit hc: HeaderCarrier, authContext: AuthContext) =
