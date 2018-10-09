@@ -53,7 +53,9 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[FitAndProperController]
 
-    def setupCache(approvalFlags: ApprovalFlags, personName: Option[PersonName]): Any = {
+    def setupCache(
+                    approvalFlags: ApprovalFlags,
+                    personName: Option[PersonName] = None): Unit = {
 
       mockCacheFetch[Seq[ResponsiblePerson]](
         item = Some(
@@ -66,6 +68,24 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
         ),
         key = Some(ResponsiblePerson.key)
       )
+
+      when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+        .thenReturn(Some(Seq(ResponsiblePerson(
+          personName = personName,
+          approvalFlags = approvalFlags
+        ))))
+
+      when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching(
+          activities = Some(BusinessActivities(Set(HighValueDealing))),
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+        )))
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
     }
 
   }
@@ -149,10 +169,10 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
       "respond with NOT_FOUND" when {
         "there is no PersonName present" in new Fixture {
-
-          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            personName = None, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None)
-          ))), Some(ResponsiblePerson.key))
+          setupCache(
+            ApprovalFlags(hasAlreadyPassedFitAndProper = None),
+            None
+          )
 
           val result = controller.get(1)(request)
           status(result) must be(NOT_FOUND)
@@ -165,25 +185,14 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with NOT_FOUND" when {
         "the index is out of bounds" in new Fixture {
 
+          setupCache(testFitAndProper)
+
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(
-              approvalFlags = testFitAndProper
-            ))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-            )))
-
           val result = controller.post(99)(newRequest)
+
           status(result) must be(NOT_FOUND)
         }
       }
@@ -193,10 +202,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "invalid"
           )
-
-          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            approvalFlags = testFitAndProper
-          ))), Some(ResponsiblePerson.key))
+          setupCache(testFitAndProper)
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -206,26 +212,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with SEE_OTHER" when {
         "given valid data and edit = false, and redirect to the DetailedAnswersController" in new Fixture {
 
+          setupCache(testFitAndProper)
+
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
-
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(
-              approvalFlags = testFitAndProper
-            ))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-            )))
-
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -234,26 +225,11 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "given valid data and edit = true, and redirect to the DetailedAnswersController" in new Fixture {
 
+          setupCache(testFitAndProper)
+
           val newRequest = request.withFormUrlEncodedBody(
             "hasAlreadyPassedFitAndProper" -> "true"
           )
-
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(
-              approvalFlags = testFitAndProper
-            ))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-            )))
-
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
           status(result) must be(SEE_OTHER)
@@ -280,6 +256,42 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[FitAndProperController]
 
+    def setupCache(
+                    approvalFlags: ApprovalFlags,
+                    personName: Option[PersonName] = None,
+                    activities: Option[BusinessActivities]): Unit = {
+
+      mockCacheFetch[Seq[ResponsiblePerson]](
+        item = Some(
+          Seq(
+            ResponsiblePerson(
+              personName = personName,
+              approvalFlags = approvalFlags
+            )
+          )
+        ),
+        key = Some(ResponsiblePerson.key)
+      )
+
+      when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+        .thenReturn(Some(Seq(ResponsiblePerson(
+          personName = personName,
+          approvalFlags = approvalFlags
+        ))))
+
+      when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
+        .thenReturn(Some(BusinessMatching(
+          activities = activities,
+          msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
+        )))
+
+      when(controller.dataCacheConnector.fetchAll(any(), any()))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+    }
+
   }
 
   val testFitAndProper = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))
@@ -293,19 +305,13 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(
-              approvalFlags = testFitAndProper
-            ))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-            )))
+          setupCache(testFitAndProper, Some(
+                        PersonName(
+                          firstName = "firstName",
+                          middleName = None,
+                          lastName = "lastName"
+                        )
+                      ), Some(BusinessActivities(Set(HighValueDealing))))
 
           val result = controller.post(99)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -318,9 +324,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
             "hasAlreadyPassedFitAndProper" -> "invalid"
           )
 
-          mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-            approvalFlags = testFitAndProper
-          ))), Some(ResponsiblePerson.key))
+          setupCache(
+            testFitAndProper,
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -334,22 +341,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
             "hasAlreadyPassedFitAndProper" -> "true"
           )
 
-          when(controller.dataCacheConnector.fetchAll(any(), any()))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(
-              approvalFlags = testFitAndProper
-            ))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-            .thenReturn(Some(BusinessMatching(
-              activities = Some(BusinessActivities(Set(HighValueDealing))),
-              msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-            )))
-
-          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(mockCacheMap))
+          setupCache(
+            testFitAndProper,
+            activities = Some(BusinessActivities(Set(HighValueDealing)))
+          )
 
           val result = controller.post(1)(newRequest)
           status(result) must be(SEE_OTHER)
@@ -367,22 +362,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                 "hasAlreadyPassedFitAndProper" -> "true"
               )
 
-              when(controller.dataCacheConnector.fetchAll(any(), any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-                .thenReturn(Some(Seq(ResponsiblePerson(
-                  approvalFlags = testFitAndProper
-                ))))
-
-              when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(HighValueDealing))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                )))
-
-              when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                .thenReturn(Future.successful(mockCacheMap))
+              setupCache(
+                testFitAndProper,
+                activities = Some(BusinessActivities(Set(HighValueDealing)))
+              )
 
               val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
@@ -396,19 +379,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing))))
-                    ))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing)))
+                  )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
@@ -420,19 +394,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
-                    ))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing)))
+                  )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
@@ -444,25 +409,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-                    personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
-                  ))), Some(ResponsiblePerson.key))
-
-                  mockCacheSave[Seq[ResponsiblePerson]]
-
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))
-                    ))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(HighValueDealing)))
+                  )
 
                   val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
@@ -478,22 +428,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                 "hasAlreadyPassedFitAndProper" -> "true"
               )
 
-              when(controller.dataCacheConnector.fetchAll(any(), any()))
-                .thenReturn(Future.successful(Some(mockCacheMap)))
-
-              when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-                .thenReturn(Some(Seq(ResponsiblePerson(
-                  approvalFlags = testFitAndProper
-                ))))
-
-              when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                .thenReturn(Some(BusinessMatching(
-                  activities = Some(BusinessActivities(Set(HighValueDealing))),
-                  msbServices = Some(BusinessMatchingMsbServices(Set(TransmittingMoney)))
-                )))
-
-              when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                .thenReturn(Future.successful(mockCacheMap))
+              setupCache(
+                testFitAndProper,
+                activities = Some(BusinessActivities(Set(HighValueDealing)))
+              )
 
               val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
               status(result) must be(SEE_OTHER)
@@ -507,19 +445,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing))))
-                    ))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(TrustAndCompanyServices,HighValueDealing)))
+                  )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
@@ -531,19 +460,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
-                    ))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing)))
+                  )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
@@ -555,25 +475,10 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
                     "hasAlreadyPassedFitAndProper" -> "false"
                   )
 
-                  mockCacheFetch[Seq[ResponsiblePerson]](Some(Seq(ResponsiblePerson(
-                    personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))
-                  ))), Some(ResponsiblePerson.key))
-
-                  mockCacheSave[Seq[ResponsiblePerson]]
-
-                  when(controller.dataCacheConnector.fetchAll(any(), any()))
-                    .thenReturn(Future.successful(Some(mockCacheMap)))
-
-                  when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
-                    .thenReturn(Some(
-                      BusinessMatching(activities = Some(BusinessActivities(Set(HighValueDealing))))
-                    ))
-
-                  when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-                    .thenReturn(Future.successful(mockCacheMap))
-
-                  when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
-                    .thenReturn(Some(Seq(ResponsiblePerson())))
+                  setupCache(
+                    testFitAndProper,
+                    activities = Some(BusinessActivities(Set(HighValueDealing)))
+                  )
 
                   val result = controller.post(1, false, Some(flowFromDeclaration))(newRequest)
                   status(result) must be(SEE_OTHER)
