@@ -58,14 +58,18 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
 
                 isMsbOrTcsp().map {
                   (msbOrTcsp: Option[Boolean]) =>
-                    val shouldShowApprovalSection = !(msbOrTcsp.contains(true) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(true))
-                    Ok(views.html.responsiblepeople.detailed_answers(
-                      Some(x),
-                      index,
-                      showHide,
-                      ControllerHelper.rpTitleName(Some(x)),
-                      flow,
-                      shouldShowApprovalSection))
+
+                    val shouldShowApprovalSection = !(msbOrTcsp.contains(true)) && x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false)
+                    Ok(
+                      views.html.responsiblepeople.detailed_answers(
+                        Some(x),
+                        index,
+                        showHide,
+                        ControllerHelper.rpTitleName(Some(x)),
+                        flow,
+                        shouldShowApprovalSection
+                      )
+                    )
                 }
               }
               case _ => Future.successful(NotFound(notFoundView))
