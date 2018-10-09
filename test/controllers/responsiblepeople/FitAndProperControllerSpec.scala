@@ -53,19 +53,13 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[FitAndProperController]
 
-    def setupCache(approvalFlags: ApprovalFlags) = {
+    def setupCache(approvalFlags: ApprovalFlags, personName: Option[PersonName]): Any = {
 
       mockCacheFetch[Seq[ResponsiblePerson]](
         item = Some(
           Seq(
             ResponsiblePerson(
-              personName = Some(
-                PersonName(
-                  firstName = "firstName",
-                  middleName = None,
-                  lastName = "lastName"
-                )
-              ),
+              personName = personName,
               approvalFlags = approvalFlags
             )
           )
@@ -83,7 +77,16 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
       "respond with OK" when {
         "there is a PersonName and value for hasAlreadyPassedFitAndProper present" in new Fixture {
 
-          setupCache(testFitAndProper)
+          setupCache(
+            testFitAndProper,
+            Some(
+              PersonName(
+                firstName = "firstName",
+                middleName = None,
+                lastName = "lastName"
+              )
+            )
+          )
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -97,7 +100,18 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "there is a PersonName but has not passed fit and proper" in new Fixture {
 
-          setupCache(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+          setupCache(
+            ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false)
+            ),
+            Some(
+              PersonName(
+                firstName = "firstName",
+                middleName = None,
+                lastName = "lastName"
+              )
+            )
+          )
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -111,7 +125,16 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
 
         "there is a PersonName but no value for hasAlreadyPassedFitAndProper" in new Fixture {
 
-          setupCache(ApprovalFlags(hasAlreadyPassedFitAndProper = None))
+          setupCache(
+            ApprovalFlags(hasAlreadyPassedFitAndProper = None),
+            Some(
+              PersonName(
+                firstName = "firstName",
+                middleName = None,
+                lastName = "lastName"
+              )
+            )
+          )
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
