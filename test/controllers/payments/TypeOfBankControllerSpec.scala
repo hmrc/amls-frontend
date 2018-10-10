@@ -65,6 +65,7 @@ class TypeOfBankControllerSpec extends PlaySpec with AmlsSpec with PaymentGenera
       amlsRegistrationNumber,
       100,
       None,
+      None,
       0,
       100,
       Some(paymentReferenceNumber),

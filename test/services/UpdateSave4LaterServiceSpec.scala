@@ -194,6 +194,8 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
       115.0,
       Some(125.0),
       Some(115.0),
+      None,
+      None,
       0,
       None,
       240.0,

@@ -66,6 +66,7 @@ class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with
       amlsRegistrationNumber,
       150.00,
       Some(100.0),
+      None,
       300.0,
       550.0,
       Some("XA000000000000"),

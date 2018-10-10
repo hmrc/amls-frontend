@@ -22,7 +22,7 @@ import play.api.libs.json.{JsSuccess, Json}
 
 class AmendVariationRenewalResponseSpec extends PlaySpec {
 
-  val response = AmendVariationRenewalResponse("pdate", "12345", 115.0, Some(125.0), Some(115.0), 0, None, 240.0, Some("ref"), None)
+  val response = AmendVariationRenewalResponse("pdate", "12345", 115.0, Some(125.0), Some(115.0), None, None, 0, None, 240.0, Some("ref"), None)
 
   "AmendVariationResponse" must {
 

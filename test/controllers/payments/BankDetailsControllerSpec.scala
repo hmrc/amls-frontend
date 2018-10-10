@@ -68,7 +68,7 @@ class BankDetailsControllerSpec extends AmlsSpec with PaymentGenerator {
           controller.feeResponseService.getFeeResponse(eqTo(amlsRegistrationNumber))(any(),any(),any())
         } thenReturn Future.successful(Some(FeeResponse(
           SubscriptionResponseType,
-          amlsRegistrationNumber, 100, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
+          amlsRegistrationNumber, 100, None, None, 0, 200, Some(paymentReferenceNumber), None, DateTime.now()))
         )
 
         when {
