@@ -21,7 +21,7 @@ import javax.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{NonUKPassport, ResponsiblePerson}
+import models.responsiblepeople.{NoPassport, NonUKPassport, NonUKPassportYes, ResponsiblePerson}
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap

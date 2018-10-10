@@ -24,6 +24,8 @@ case class AmendVariationRenewalResponse(
                                     registrationFee: BigDecimal,
                                     fpFee: Option[BigDecimal],
                                     fpFeeRate: Option[BigDecimal],
+                                    approvalCheckFee: Option[BigDecimal],
+                                    approvalCheckFeeRate: Option[BigDecimal],
                                     premiseFee: BigDecimal,
                                     premiseFeeRate: Option[BigDecimal],
                                     totalFees: BigDecimal,
@@ -43,6 +45,10 @@ case class AmendVariationRenewalResponse(
   override def getFpFeeRate: Option[BigDecimal] = fpFeeRate
 
   override def getFpFee: Option[BigDecimal] = fpFee
+
+  override def getApprovalCheckFee: Option[BigDecimal] = approvalCheckFee
+
+  override def getApprovalCheckFeeRate: Option[BigDecimal] = approvalCheckFeeRate
 
   override def getPremiseFee: BigDecimal = premiseFee
 

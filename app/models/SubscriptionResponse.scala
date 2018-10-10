@@ -34,6 +34,10 @@ case class SubscriptionResponse(
 
   override def getFpFee: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.fpFee)
 
+  override def getApprovalCheckFee: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.approvalCheckFee)
+
+  override def getApprovalCheckFeeRate: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.approvalCheckFeeRate)
+
   override def getPremiseFee: BigDecimal = subscriptionFees.fold(BigDecimal(0)) {
     _.premiseFee
   }
