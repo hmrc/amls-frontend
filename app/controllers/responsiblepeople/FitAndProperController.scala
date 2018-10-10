@@ -17,12 +17,15 @@
 package controllers.responsiblepeople
 
 import javax.inject.{Inject, Singleton}
-
 import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
+import models.businessmatching.BusinessMatching
 import models.responsiblepeople.ResponsiblePerson
+import play.api.mvc.{AnyContent, Request, Result}
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
@@ -41,34 +44,84 @@ class FitAndProperController @Inject()(
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
+
       getData[ResponsiblePerson](index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,Some(alreadyPassed),_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed), edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,alreadyPassed,_,_,_,_,_,_))
+          if alreadyPassed.hasAlreadyPassedFitAndProper.isDefined =>
+          Ok(views.html.responsiblepeople.fit_and_proper(Form2[Boolean](alreadyPassed.hasAlreadyPassedFitAndProper.get),
+            edit, index, flow, personName.titleName, appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) => {
+          Ok(views.html.responsiblepeople.fit_and_proper(EmptyForm, edit, index, flow, personName.titleName,
+            appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
+        }
         case _ => NotFound(notFoundView)
       }
   }
 
-  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) =
+  def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = {
     Authorised.async {
-      implicit authContext => implicit request =>
-        Form2[Boolean](request.body) match {
-          case f: InvalidForm =>
-            getData[ResponsiblePerson](index) map { rp =>
-              BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow, ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
-            }
-          case ValidForm(_, data) => {
-            for {
-              _ <- updateDataStrict[ResponsiblePerson](index) { rp =>
-                rp.hasAlreadyPassedFitAndProper(Some(data))
+      implicit authContext =>
+        implicit request =>
+          Form2[Boolean](request.body) match {
+            case f: InvalidForm =>
+              getData[ResponsiblePerson](index) map { rp =>
+                BadRequest(views.html.responsiblepeople.fit_and_proper(f, edit, index, flow,
+                  ControllerHelper.rpTitleName(rp), appConfig.showFeesToggle, appConfig.phase2ChangesToggle))
               }
-            } yield
-              Redirect(routes.DetailedAnswersController.get(index, flow))
-          } recoverWith {
-            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-          }
-        }
-    }
+            case ValidForm(_, data) => {
+              dataCacheConnector.fetchAll flatMap { maybeCache =>
 
+                val businessMatching = for {
+                  cacheMap <- maybeCache
+                  bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+                } yield bm
+
+                val msbOrTcsp = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
+                  ControllerHelper.isTCSPSelected(Some(businessMatching))
+
+                for {
+                  cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
+                    if (appConfig.phase2ChangesToggle) {
+                      updateFitAndProperAndApproval(data, msbOrTcsp, rp)
+                    } else {
+                      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
+                    }
+                  }
+                } yield identifyRoutingTarget(index, edit, cacheMap, data, msbOrTcsp, flow)
+              }
+            } recoverWith {
+              case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
+            }
+          }
+    }
+  }
+
+  private def updateFitAndProperAndApproval(data: Boolean, msbOrTcsp: Boolean, rp: ResponsiblePerson) = {
+    (data, msbOrTcsp) match {
+      case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = None))
+      case _ => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = Some(data)))
+    }
+  }
+
+  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap],
+                                    fitAndProperAnswer: Boolean, msbOrTscp: Boolean, flow: Option[String])
+                                   (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
+    (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
+      case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+      case (false, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
+      case _ => Redirect(routes.DetailedAnswersController.get(index, flow))
+    }
+  }
+
+  private def routeMsbOrTcsb(index: Int, cacheMapOpt: Option[CacheMap], fitAndProperAnswer: Boolean,
+                             msbOrTscp: Boolean, flow: Option[String])
+                            (implicit authContext: AuthContext, request: Request[AnyContent]):Result = {
+    if (msbOrTscp) {
+      Redirect(routes.DetailedAnswersController.get(index, flow))
+    } else {
+      Redirect(routes.ApprovalCheckController.get(index, false, flow))
+    }
+  }
 }

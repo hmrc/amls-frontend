@@ -43,7 +43,9 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              vatRegistered: Option[VATRegistered] = None,
                              experienceTraining: Option[ExperienceTraining] = None,
                              training: Option[Training] = None,
-                             hasAlreadyPassedFitAndProper: Option[Boolean] = None,
+                             approvalFlags: ApprovalFlags = ApprovalFlags(
+                               hasAlreadyPassedFitAndProper = None,
+                               hasAlreadyPaidApprovalCheck = None),
                              hasChanged: Boolean = false,
                              hasAccepted: Boolean = false,
                              lineId: Option[Int] = None,
@@ -108,9 +110,9 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def hasAlreadyPassedFitAndProper(p: Option[Boolean]): ResponsiblePerson =
-    this.copy(hasAlreadyPassedFitAndProper = p, hasChanged = hasChanged || !this.hasAlreadyPassedFitAndProper.equals(p),
-      hasAccepted = hasAccepted && this.hasAlreadyPassedFitAndProper.equals(p))
+  def approvalFlags(p: ApprovalFlags): ResponsiblePerson =
+    this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
+      hasAccepted = hasAccepted && this.approvalFlags.equals(p))
 
   def ukPassport(p: UKPassport): ResponsiblePerson =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
@@ -140,18 +142,68 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def isComplete: Boolean = {
     Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
-    this match {
-      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), Some(_), _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & ApplicationConfig.phase2ChangesToggle => true
-      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), Some(_), _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & ApplicationConfig.phase2ChangesToggle => true
-      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory & !ApplicationConfig.phase2ChangesToggle => true
-      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
-        if pos.startDate.isDefined & checkVatField(otherBusinessSP) & validateAddressHistory && !pName.hasPreviousName.get & !ApplicationConfig.phase2ChangesToggle => true
-      case _ => false
+    def hasValidCommonFields(pos: Positions,
+                             otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                            ): Boolean = {
+      pos.startDate.isDefined &
+      checkVatField(otherBusinessSP) &
+      validateAddressHistory
     }
 
+    def hasNoPreviousName(pName: PreviousName, pos:
+                          Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                         ): Boolean = {
+      hasValidCommonFields(pos, otherBusinessSP) &&
+      !pName.hasPreviousName.get
+    }
+
+    def phase2IsOffAndWithCommonFields(pos: Positions,
+                                       otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                      ): Boolean = {
+      !ApplicationConfig.phase2ChangesToggle &&
+      hasValidCommonFields(pos, otherBusinessSP)
+    }
+
+    def phase2IsOnAndValidCommonField(pos: Positions,
+                                      otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                     ): Boolean = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.isComplete() &
+      hasValidCommonFields(pos, otherBusinessSP)
+    }
+
+    def phase2IsOnAndNoPrevousName(pName: PreviousName,
+                                   pos: Positions, otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                  ): Boolean = {
+      ApplicationConfig.phase2ChangesToggle &&
+      approvalFlags.isComplete() &
+      hasNoPreviousName(pName, pos, otherBusinessSP)
+    }
+
+    def phase2IsOffAndNoPreviousName(pName: PreviousName,
+                                     pos: Positions,
+                                     otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]
+                                    ): Boolean = {
+      !ApplicationConfig.phase2ChangesToggle &&
+      hasNoPreviousName(pName, pos, otherBusinessSP)
+    }
+
+    this match {
+
+      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if phase2IsOnAndValidCommonField(pos, otherBusinessSP) => true
+
+      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, Some(_),Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if phase2IsOnAndNoPrevousName(pName, pos, otherBusinessSP) => true
+
+      case ResponsiblePerson(Some(_),Some(_),Some(_),Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if phase2IsOffAndWithCommonFields(pos, otherBusinessSP) => true
+
+      case ResponsiblePerson(Some(_),Some(pName),None,Some(_),Some(_), _, _, _,Some(_),Some(_), Some(pos),Some(_), _,Some(_),Some(_), _, _, true, _, _, _, otherBusinessSP)
+        if phase2IsOffAndNoPreviousName(pName, pos, otherBusinessSP) => true
+
+      case _ => false
+    }
   }
 
   private def validateAddressHistory: Boolean = {
@@ -212,7 +264,6 @@ object ResponsiblePerson {
         }
       }
     }
-
   }
 
   def findResponsiblePersonByName(name: String, responsiblePeople: Seq[ResponsiblePerson]): Option[(ResponsiblePerson, Int)] = {
@@ -275,7 +326,16 @@ object ResponsiblePerson {
         (__ \ "vatRegistered").readNullable[VATRegistered] and
         (__ \ "experienceTraining").readNullable[ExperienceTraining] and
         (__ \ "training").readNullable[Training] and
-        (__ \ "hasAlreadyPassedFitAndProper").readNullable[Boolean] and
+        (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
+          fitAndProper =>
+            if(ApplicationConfig.phase2ChangesToggle) {
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(fitAndProper))
+            } else {
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
+            }
+        }
+          .orElse((__ \ "approvalFlags").read[ApprovalFlags])
+          .orElse(Reads.pure(ApprovalFlags(None, None))) and
         (__ \ "hasChanged").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "hasAccepted").readNullable[Boolean].map(_.getOrElse(false)) and
         (__ \ "lineId").readNullable[Int] and
@@ -290,7 +350,9 @@ object ResponsiblePerson {
       } else {
         if (!hasUkPassportNumber(r) && !hasNonUkPassportNumber(r) && !hasDateOfBirth(r)) {
           r.copy(ukPassport = None, nonUKPassport = None)
-        } else r
+        } else {
+          r
+        }
       }
     }
   }
@@ -312,7 +374,7 @@ object ResponsiblePerson {
 
   implicit class FilterUtils(people: Seq[ResponsiblePerson]) {
     def filterEmpty: Seq[ResponsiblePerson] = people.filterNot {
-      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, _, _, _, _, _, _) => true
+      case _@ResponsiblePerson(None, None, None, None, None, None, None, None, None, None, None, None, None, None, None, ApprovalFlags(None, None), _, _, _, _, _, _) => true
       case _ => false
     }
   }

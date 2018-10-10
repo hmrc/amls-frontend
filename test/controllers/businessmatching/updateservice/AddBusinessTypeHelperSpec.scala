@@ -25,7 +25,7 @@ import models.businessactivities.{AccountantForAMLSRegulations, InvolvedInOtherN
 import models.businessmatching.updateservice.{ResponsiblePeopleFitAndProper, ServiceChangeRegister}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.flowmanagement.AddBusinessTypeFlowModel
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
@@ -247,10 +247,10 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "adding the TCSP business type and phase-2-change toggle is false" in new Fixture {
         when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+          _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
         }
 
-        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+        val updatedPeople = people map { _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) }
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
@@ -270,10 +270,10 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "adding the MSB business type and phase-2-change toggle is false" in new Fixture {
         when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+          _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
         }
 
-        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+        val updatedPeople = people map { _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) }
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
@@ -293,10 +293,10 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "adding a non TCSP and MSB business type and phase-2-change toggle is true" in new Fixture {
         when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+          _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
         }
 
-        val updatedPeople = people map { _.copy(hasAlreadyPassedFitAndProper = Some(true)) }
+        val updatedPeople = people map { _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))) }
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)
 
@@ -318,7 +318,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       "adding a business type that isn't TCSP and phase-2-change toggle is false" in new Fixture {
         when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
         val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
-          _.copy(hasAlreadyPassedFitAndProper = Some(false))
+          _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
         }
 
         mockCacheUpdate(Some(ResponsiblePerson.key), people)

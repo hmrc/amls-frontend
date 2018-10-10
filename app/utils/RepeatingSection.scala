@@ -87,18 +87,15 @@ trait RepeatingSection {
 
   def fetchAllAndUpdateStrict[T](index: Int)(fn: (CacheMap, T) => T)
                                 (implicit user: AuthContext, hc: HeaderCarrier, formats: Format[T], key: MongoKey[T], ec: ExecutionContext): Future[Option[CacheMap]] = {
-    dataCacheConnector.fetchAll.map[Option[CacheMap]] {
-      optionalCacheMap =>
-        optionalCacheMap.map[CacheMap] {
-          cacheMap => {
-            cacheMap.getEntry[Seq[T]](key()).map {
-              data => {
-                putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
-              }
-            }
-            cacheMap
-          }
-        }
+    dataCacheConnector.fetchAll.flatMap {
+      _.map {
+        cacheMap =>
+          cacheMap.getEntry[Seq[T]](key()).map {
+            data =>
+              putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
+                .map(Some.apply)
+          }.getOrElse(Future.successful(Some(cacheMap)))
+      }.getOrElse(Future.successful(None))
     }
   }
 

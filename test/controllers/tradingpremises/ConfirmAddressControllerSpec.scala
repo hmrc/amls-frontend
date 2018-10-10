@@ -121,6 +121,9 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
           mockCacheGetEntry(Some(bm), BusinessMatching.key)
 
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
           val result = controller.post(1)(newRequest)
 
           status(result) must be (SEE_OTHER)
@@ -139,6 +142,9 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
           mockCacheGetEntry(Some(Seq(TradingPremises(yourTradingPremises = Some(mock[YourTradingPremises])))), TradingPremises.key)
           mockCacheGetEntry(Some(bm), BusinessMatching.key)
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
           status(result) must be (SEE_OTHER)
