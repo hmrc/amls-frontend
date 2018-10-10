@@ -427,7 +427,8 @@
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
                 editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString(),
-                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper
+                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper,
+                editLinkTag = "fit-and-proper"
             ) { fp2 =>
                 <p>@fp match {
                     case true => {@Messages("lbl.yes")}
@@ -441,7 +442,8 @@
                 @detailedAnswers(
                     question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
                     editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
-                    dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck
+                    dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck,
+                    editLinkTag = "approval-check"
                 ) { fp2 =>
                     <p>@fp match {
                         case true => {@Messages("lbl.yes")}
