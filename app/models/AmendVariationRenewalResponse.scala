@@ -33,6 +33,7 @@ case class AmendVariationRenewalResponse(
                                     difference: Option[BigDecimal],
                                     addedResponsiblePeople: Int = 0,
                                     addedResponsiblePeopleFitAndProper: Int = 0,
+                                    addedResponsiblePeopleApprovalCheck: Int = 0,
                                     addedFullYearTradingPremises: Int = 0,
                                     halfYearlyTradingPremises: Int = 0,
                                     zeroRatedTradingPremises: Int = 0

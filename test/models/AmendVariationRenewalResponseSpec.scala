@@ -39,6 +39,7 @@ class AmendVariationRenewalResponseSpec extends PlaySpec {
   "paymentReference" : "ref",
   "addedResponsiblePeople" : 0,
   "addedResponsiblePeopleFitAndProper" : 0,
+  "addedResponsiblePeopleApprovalCheck": 0,
   "addedFullYearTradingPremises" : 0,
   "halfYearlyTradingPremises" : 0,
   "zeroRatedTradingPremises" : 0
@@ -60,6 +61,7 @@ class AmendVariationRenewalResponseSpec extends PlaySpec {
   "paymentReference" : "ref",
   "addedResponsiblePeople" : 0,
   "addedResponsiblePeopleFitAndProper" : 0,
+  "addedResponsiblePeopleApprovalCheck": 0,
   "addedFullYearTradingPremises" : 0,
   "halfYearlyTradingPremises" : 0,
   "zeroRatedTradingPremises" : 0

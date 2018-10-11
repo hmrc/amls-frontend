@@ -58,6 +58,8 @@ trait FeeCalculations {
 
   def renewalFitAndProperDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
+  def renewalApprovalCheckDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
+
   def renewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
   val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
