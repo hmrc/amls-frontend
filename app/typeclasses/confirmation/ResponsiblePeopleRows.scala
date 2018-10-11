@@ -39,6 +39,9 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
+  val splitPeopleByApprovalTest = (people: Seq[ResponsiblePerson]) =>
+    ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPaidApprovalCheck.getOrElse(false))
+
 }
 
 object ResponsiblePeopleRowsInstances {
@@ -47,7 +50,9 @@ object ResponsiblePeopleRowsInstances {
     new ResponsiblePeopleRows[SubmissionResponse] {
       def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
+
+
+        val firstSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
             splitPeopleByFitAndProperTest(responsiblePeople) match {
               case (passedFP, notFP) =>
@@ -66,6 +71,26 @@ object ResponsiblePeopleRowsInstances {
           }
         }
 
+        val secondSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
+          if (showBreakdown(value.getApprovalCheckFee, activities)) {
+            splitPeopleByApprovalTest(responsiblePeople) match {
+              case (passedApproval, notApproval) =>
+                Seq(
+                  BreakdownRow(peopleRow(value).message, notApproval.size, peopleRow(value).feePer, Currency.fromBD(value.getApprovalCheckFee.getOrElse(0)))
+                ) ++ (if (passedApproval.nonEmpty) {
+                  Seq(
+                    BreakdownRow(peopleApprovalCheckPassed.message, passedApproval.size, max(0, peopleApprovalCheckPassed.feePer), Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer)))
+                  )
+                } else {
+                  Seq.empty
+                })
+            }
+          } else {
+            Seq.empty
+          }
+        }
+
+        firstSeq ++ secondSeq
       }
     }
 
@@ -77,7 +102,7 @@ object ResponsiblePeopleRowsInstances {
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        if (showBreakdown(value.getFpFee, activities)) {
+        val firstSeq = if (showBreakdown(value.getFpFee, activities)) {
 
           val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
 
@@ -99,6 +124,30 @@ object ResponsiblePeopleRowsInstances {
         } else {
           Seq.empty
         }
+
+        val secondSeq = if (showBreakdown(value.getApprovalCheckFee, activities)) {
+
+          val (passedApprovalCheck, notApprovalCheck) = (value.addedResponsiblePeopleApprovalCheck, value.addedResponsiblePeople)
+
+          (if (notApprovalCheck > 0) {
+            Seq(BreakdownRow(
+              peopleVariationRow(value).message,
+              notApprovalCheck,
+              peopleVariationRow(value).feePer,
+              Currency.fromBD(value.getFpFee.getOrElse(0))
+            ))
+          } else {
+            Seq.empty
+          }) ++ (if (passedApprovalCheck > 0) {
+            Seq(BreakdownRow(peopleApprovalCheckPassed.message, passedApprovalCheck, max(0, peopleApprovalCheckPassed.feePer), Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer))))
+          } else {
+            Seq.empty
+          })
+
+        } else {
+          Seq.empty
+        }
+        firstSeq ++ secondSeq
       }
     }
   }
