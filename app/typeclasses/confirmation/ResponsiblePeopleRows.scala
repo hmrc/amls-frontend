@@ -90,7 +90,7 @@ object ResponsiblePeopleRowsInstances {
           }
         }
 
-        firstSeq ++ secondSeq
+        firstSeq
       }
     }
 
@@ -147,7 +147,7 @@ object ResponsiblePeopleRowsInstances {
         } else {
           Seq.empty
         }
-        firstSeq ++ secondSeq
+        firstSeq
       }
     }
   }
