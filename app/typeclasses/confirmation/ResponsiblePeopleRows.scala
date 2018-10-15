@@ -83,36 +83,7 @@ object ResponsiblePeopleRowsInstances {
           }
         }
 
-        val secondSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
-          if (showBreakdown(value.getApprovalCheckFee, activities)) {
-            splitPeopleByApprovalTest(responsiblePeople) match {
-              case (passedApproval, notApproval) =>
-                Seq(
-                  BreakdownRow(
-                    peopleRow(value).message,
-                    notApproval.size,
-                    peopleRow(value).feePer,
-                    Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-                  )
-                ) ++ (if (passedApproval.nonEmpty) {
-                  Seq(
-                    BreakdownRow(
-                      peopleApprovalCheckPassed.message,
-                      passedApproval.size,
-                      max(0, peopleApprovalCheckPassed.feePer),
-                      Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer))
-                    )
-                  )
-                } else {
-                  Seq.empty
-                })
-            }
-          } else {
-            Seq.empty
-          }
-        }
-
-        firstSeq // ++ secondSeq
+        firstSeq
       }
     }
 
