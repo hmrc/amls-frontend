@@ -64,36 +64,54 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
     val TestConfirmationService = new ConfirmationService(
       mock[DataCacheConnector]
     )
+  }
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
 
-    "responsible people rows with phase2 toggle" when {
-      "subscription with F&P and AP are used" in new Fixture {
+    "responsible people rows with phase2 toggle" should {
+      "return an approval check row" when {
+        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
+          pending
+        }
+      }
 
-        val paymentRefNo = "XA000000000000"
-        val subscriptionResponse = SubscriptionResponse(
-          etmpFormBundleNumber = "",
-          amlsRefNo = amlsRegistrationNumber,
-          Some(SubscriptionFees(
-            registrationFee = 0,
-            fpFee = None,
-            fpFeeRate = None,
-            approvalCheckFee = None,
-            approvalCheckFeeRate = None,
-            premiseFee = 0,
-            premiseFeeRate = None,
-            totalFees = 0,
-            paymentReference = paymentRefNo
-          )))
+      "not return an approval check row" when {
+        "The business is MSB or TCSP" in new Fixture {
+          pending
+        }
 
-        val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
-        val people: Option[Seq[ResponsiblePerson]] = None
+        "The business isn't HVD or EAB or ASP" in new Fixture {
+          pending
+        }
 
-        val result = ResponsiblePeopleRowsInstances.responsiblePeopleRowsFromSubscription(
-          subscriptionResponse,
-          activities = businessActivity,
-          people)
+        "The business has answered yes to Fit and Proper Question" in new Fixture {
+          pending
+        }
+
+        "The business has answered yes to Approval Check Question" in new Fixture {
+          pending
+        }
+      }
+      "return a Fit and Proper row" when {
+        "The business is MSB or TCSP along with HVD, EAB or ASP and hasn't passed F&P" in new Fixture {
+          pending
+        }
+
+        "The business is MSB or TCSP only and hasn't passed F&P" in new Fixture {
+          pending
+        }
+      }
+
+      "Not return a Fit and Proper row" when {
+        "The business has answered yes to Fit and Proper Question" in new Fixture {
+          pending
+        }
+        "The business doesn't have any business activities" in new Fixture {
+          pending
+        }
+        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
+          pending
+        }
       }
     }
-  }
 }
