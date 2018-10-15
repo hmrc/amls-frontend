@@ -76,9 +76,17 @@ class ConfirmationService @Inject()(
         businessActivities <- businessMatching.activities
       } yield {
         val filteredPremises = TradingPremises.filter(premises)
-        Future.successful(Some(
-          BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
-        ))
+
+        Future.successful(
+          Some(
+            BreakdownRows.generateBreakdownRows[SubmissionResponse](
+              amendmentResponse,
+              Some(businessActivities),
+              Some(filteredPremises),
+              Some(people)
+            )
+          )
+        )
       }) getOrElse OptionT.liftF(getSubscription).value
     }
   }

@@ -49,10 +49,27 @@ object BreakdownRowInstances {
 
             val subQuantity = subscriptionQuantity(subscription)
             val registrationFeeRow = submissionRow(subscription)
+
             Seq(
-              BreakdownRow(registrationFeeRow.message, subQuantity, registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer)
-            ) ++ ResponsiblePeopleRows[SubmissionResponse](subscription, activities.businessActivities, people) ++ Seq(
-              BreakdownRow(premisesRow(subscription).message, premises.getOrElse(Seq.empty).size, premisesRow(subscription).feePer, subscription.getPremiseFee)
+              BreakdownRow(
+                registrationFeeRow.message,
+                subQuantity,
+                registrationFeeRow.feePer,
+                subQuantity * registrationFeeRow.feePer
+              )
+            ) ++
+            ResponsiblePeopleRows[SubmissionResponse](
+              subscription,
+              activities.businessActivities,
+              people
+            ) ++
+            Seq(
+              BreakdownRow(
+                premisesRow(subscription).message,
+                premises.getOrElse(Seq.empty).size,
+                premisesRow(subscription).feePer,
+                subscription.getPremiseFee
+              )
             )
           case _ => Seq.empty[BreakdownRow]
         }
@@ -70,8 +87,8 @@ object BreakdownRowInstances {
                           value: AmendVariationRenewalResponse,
                           businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
-                          people: Option[Seq[ResponsiblePerson]]) = {
-
+                          people: Option[Seq[ResponsiblePerson]]
+                        ) = {
         businessActivities match {
           case Some(activities) =>
             ResponsiblePeopleRows[AmendVariationRenewalResponse](value, activities.businessActivities, None) ++ tradingPremisesVariationRows(value)

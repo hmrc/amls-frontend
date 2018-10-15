@@ -39,8 +39,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
-  val splitPeopleByApprovalTest = (people: Seq[ResponsiblePerson]) =>
-    ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPaidApprovalCheck.getOrElse(false))
+  val splitPeopleByApprovalTest: (Seq[ResponsiblePerson]) => (Seq[ResponsiblePerson], Seq[ResponsiblePerson]) = (people: Seq[ResponsiblePerson]) =>
+    ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPaidApprovalCheck.isDefined)
 
 }
 
@@ -48,19 +48,31 @@ object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
-
-
+      def apply(
+                 value: SubmissionResponse,
+                 activities: Set[BusinessActivity],
+                 people: Option[Seq[ResponsiblePerson]]
+               ): Seq[BreakdownRow] = {
 
         val firstSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
           if (showBreakdown(value.getFpFee, activities)) {
             splitPeopleByFitAndProperTest(responsiblePeople) match {
               case (passedFP, notFP) =>
                 Seq(
-                  BreakdownRow(peopleRow(value).message, notFP.size, peopleRow(value).feePer, Currency.fromBD(value.getFpFee.getOrElse(0)))
+                  BreakdownRow(
+                    peopleRow(value).message,
+                    notFP.size,
+                    peopleRow(value).feePer,
+                    Currency.fromBD(value.getFpFee.getOrElse(0))
+                  )
                 ) ++ (if (passedFP.nonEmpty) {
                   Seq(
-                    BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
+                    BreakdownRow(
+                      peopleFPPassed.message,
+                      passedFP.size,
+                      max(0, peopleFPPassed.feePer),
+                      Currency.fromBD(max(0, peopleFPPassed.feePer))
+                    )
                   )
                 } else {
                   Seq.empty
@@ -76,10 +88,20 @@ object ResponsiblePeopleRowsInstances {
             splitPeopleByApprovalTest(responsiblePeople) match {
               case (passedApproval, notApproval) =>
                 Seq(
-                  BreakdownRow(peopleRow(value).message, notApproval.size, peopleRow(value).feePer, Currency.fromBD(value.getApprovalCheckFee.getOrElse(0)))
+                  BreakdownRow(
+                    peopleRow(value).message,
+                    notApproval.size,
+                    peopleRow(value).feePer,
+                    Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+                  )
                 ) ++ (if (passedApproval.nonEmpty) {
                   Seq(
-                    BreakdownRow(peopleApprovalCheckPassed.message, passedApproval.size, max(0, peopleApprovalCheckPassed.feePer), Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer)))
+                    BreakdownRow(
+                      peopleApprovalCheckPassed.message,
+                      passedApproval.size,
+                      max(0, peopleApprovalCheckPassed.feePer),
+                      Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer))
+                    )
                   )
                 } else {
                   Seq.empty
@@ -90,7 +112,7 @@ object ResponsiblePeopleRowsInstances {
           }
         }
 
-        firstSeq
+        firstSeq // ++ secondSeq
       }
     }
 
@@ -147,6 +169,7 @@ object ResponsiblePeopleRowsInstances {
         } else {
           Seq.empty
         }
+
         firstSeq
       }
     }
