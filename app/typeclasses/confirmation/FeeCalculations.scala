@@ -41,6 +41,9 @@ trait FeeCalculations {
   def peopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
     response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
 
+  def approvalCheckPeopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople.ApprovalCheck.Passed",
+    response.getApprovalCheckFeeRate.getOrElse(ApplicationConfig.approvalCheckPeopleFee))
+
   def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
     variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
 

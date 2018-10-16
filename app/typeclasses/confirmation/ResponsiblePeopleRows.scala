@@ -53,7 +53,14 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  activities: Set[BusinessActivity],
                  people: Option[Seq[ResponsiblePerson]]
       ): Seq[BreakdownRow] = {
-        Seq.empty
+      Seq(
+        BreakdownRow(
+        approvalCheckPeopleRow(value).message,
+        1,
+        approvalCheckPeopleRow(value).feePer,
+        Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+        )
+      )
       }
     }
 }

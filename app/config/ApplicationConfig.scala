@@ -81,6 +81,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFee = getConfigInt("amounts.people")
+  lazy val approvalCheckPeopleFee = getConfigInt("amounts.approval-check")
 
   def amendmentsToggle: Boolean = {
     val value = getConfBool("feature-toggle.amendments", false)

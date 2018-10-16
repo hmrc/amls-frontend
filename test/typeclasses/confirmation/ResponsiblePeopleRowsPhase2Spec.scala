@@ -64,8 +64,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
               registrationFee = 0,
               fpFee = Some(100.00),
               fpFeeRate = None,
-              approvalCheckFee = None,
-              approvalCheckFeeRate = None,
+              approvalCheckFee = Some(200.00),
+              approvalCheckFeeRate = Some(100.00),
               premiseFee = 0,
               premiseFeeRate = None,
               totalFees = 0,
@@ -94,7 +94,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
               label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
               quantity = 1,
               perItm = Currency(100.00),
-              total = Currency(100.00)
+              total = Currency(200.00)
             )
           )
           result must be(expectedResult)
