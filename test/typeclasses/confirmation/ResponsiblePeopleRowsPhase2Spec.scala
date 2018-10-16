@@ -56,7 +56,6 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
     "responsible people rows with phase2 toggle" should {
 
       "return an approval check row" when {
-        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
           val subscriptionResponse = SubscriptionResponse(
             etmpFormBundleNumber = "",
             amlsRefNo = amlsRegistrationNumber,
@@ -71,6 +70,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
               totalFees = 0,
               paymentReference = "XA000000000000"
             )))
+        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
 
           val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
           val people: Option[Seq[ResponsiblePerson]] = Some(
@@ -99,21 +99,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           )
           result must be(expectedResult)
         }
+
         "The business is EAB and only one responsible person answered not to check approval question" in new Fixture {
-          val subscriptionResponse = SubscriptionResponse(
-            etmpFormBundleNumber = "",
-            amlsRefNo = amlsRegistrationNumber,
-            Some(SubscriptionFees(
-              registrationFee = 0,
-              fpFee = Some(100.00),
-              fpFeeRate = None,
-              approvalCheckFee = Some(200.00),
-              approvalCheckFeeRate = Some(100.00),
-              premiseFee = 0,
-              premiseFeeRate = None,
-              totalFees = 0,
-              paymentReference = "XA000000000000"
-            )))
 
           val businessActivity = Set[BusinessActivity](models.businessmatching.EstateAgentBusinessService)
           val people: Option[Seq[ResponsiblePerson]] = Some(
