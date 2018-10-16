@@ -46,7 +46,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
     val TestConfirmationService = new ConfirmationService(
       mock[DataCacheConnector]
-    )
+    ) 
   }
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
