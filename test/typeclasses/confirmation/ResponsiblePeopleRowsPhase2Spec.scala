@@ -247,9 +247,51 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           result must be(expectedResult)
         }
 
-        "The business has answered yes to Fit and Proper Question" in pending
+        "The business has answered yes to Fit and Proper Question" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(true)
+                )
+              )
+            )
+          )
 
-        "The business has answered yes to Approval Check Question" in pending
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+
+        }
+
+        "The business has answered yes to Approval Check Question" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+
+        }
       }
 
       "return a Fit and Proper row" when {
