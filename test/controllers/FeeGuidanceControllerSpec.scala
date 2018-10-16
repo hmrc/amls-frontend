@@ -69,7 +69,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
 
     val submissionFee = ApplicationConfig.regFee
     val premisesFee = ApplicationConfig.premisesFee
-    val peopleFee = ApplicationConfig.peopleFee
+    val peopleFee = ApplicationConfig.peopleFeeRate
 
     val breakdownRows = Seq(
       BreakdownRow(Messages("confirmation.submission"), 1, Currency(submissionFee), Currency(submissionFee)),

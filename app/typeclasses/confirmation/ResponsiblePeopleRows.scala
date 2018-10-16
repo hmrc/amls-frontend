@@ -57,7 +57,8 @@ object ResponsiblePeopleRowsInstancesPhase2 {
             approvalCheckPeopleRow(value).message,
             countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty)),
             approvalCheckPeopleRow(value).feePer,
-            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+            Currency.fromBD(
+              value.getApprovalCheckFee.getOrElse(0))
           )
         )
       }
