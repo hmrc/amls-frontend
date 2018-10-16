@@ -39,9 +39,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
-  val splitPeopleByApprovalTest: (Seq[ResponsiblePerson]) => (Seq[ResponsiblePerson], Seq[ResponsiblePerson]) = (people: Seq[ResponsiblePerson]) =>
-    ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPaidApprovalCheck.isDefined)
-
+  def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
+    people.filter(_.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false)).size
 }
 
 object ResponsiblePeopleRowsInstancesPhase2 {
@@ -53,14 +52,14 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  activities: Set[BusinessActivity],
                  people: Option[Seq[ResponsiblePerson]]
       ): Seq[BreakdownRow] = {
-      Seq(
-        BreakdownRow(
-        approvalCheckPeopleRow(value).message,
-        1,
-        approvalCheckPeopleRow(value).feePer,
-        Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+        Seq(
+          BreakdownRow(
+            approvalCheckPeopleRow(value).message,
+            countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty)),
+            approvalCheckPeopleRow(value).feePer,
+            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          )
         )
-      )
       }
     }
 }
