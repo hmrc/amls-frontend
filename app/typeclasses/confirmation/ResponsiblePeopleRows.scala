@@ -118,29 +118,6 @@ object ResponsiblePeopleRowsInstances {
           Seq.empty
         }
 
-        val secondSeq = if (showBreakdown(value.getApprovalCheckFee, activities)) {
-
-          val (passedApprovalCheck, notApprovalCheck) = (value.addedResponsiblePeopleApprovalCheck, value.addedResponsiblePeople)
-
-          (if (notApprovalCheck > 0) {
-            Seq(BreakdownRow(
-              peopleVariationRow(value).message,
-              notApprovalCheck,
-              peopleVariationRow(value).feePer,
-              Currency.fromBD(value.getFpFee.getOrElse(0))
-            ))
-          } else {
-            Seq.empty
-          }) ++ (if (passedApprovalCheck > 0) {
-            Seq(BreakdownRow(peopleApprovalCheckPassed.message, passedApprovalCheck, max(0, peopleApprovalCheckPassed.feePer), Currency.fromBD(max(0, peopleApprovalCheckPassed.feePer))))
-          } else {
-            Seq.empty
-          })
-
-        } else {
-          Seq.empty
-        }
-
         firstSeq
       }
     }
