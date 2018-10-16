@@ -223,10 +223,29 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
           val expectedResult = Seq.empty
           result must be(expectedResult)
-
         }
 
-        "The business isn't HVD or EAB or ASP" in pending
+        "The business is TCSP" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+        }
 
         "The business has answered yes to Fit and Proper Question" in pending
 
