@@ -41,6 +41,24 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
   def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
     people.filter(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false)).size
+
+  def createBreakdownRow(value: SubmissionResponse, people: Option[Seq[ResponsiblePerson]]) = {
+    val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+
+    if (approvalCheckCount > 0) {
+      Seq(
+        BreakdownRow(
+          approvalCheckPeopleRow(value).message,
+          approvalCheckCount,
+          approvalCheckPeopleRow(value).feePer,
+          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+        )
+      )
+    }
+    else {
+      Seq.empty
+    }
+  }
 }
 
 object ResponsiblePeopleRowsInstancesPhase2 {
@@ -53,21 +71,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
-        val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
-
-        if (approvalCheckCount > 0) {
-          Seq(
-            BreakdownRow(
-              approvalCheckPeopleRow(value).message,
-              approvalCheckCount,
-              approvalCheckPeopleRow(value).feePer,
-              Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-            )
-          )
-        }
-        else {
-          Seq.empty
-        }
+        createBreakdownRow(value, people)
       }
     }
 
@@ -78,21 +82,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
-
-        if (approvalCheckCount > 0) {
-          Seq(
-            BreakdownRow(
-              approvalCheckPeopleRow(value).message,
-              approvalCheckCount,
-              approvalCheckPeopleRow(value).feePer,
-              Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-            )
-          )
-        }
-        else {
-          Seq.empty
-        }
+        createBreakdownRow(value, people)
       }
     }
   }
