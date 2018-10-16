@@ -44,6 +44,19 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
 }
 
+object ResponsiblePeopleRowsInstancesPhase2 {
+
+  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
+    new ResponsiblePeopleRows[SubmissionResponse] {
+      def apply(
+                 value: SubmissionResponse,
+                 activities: Set[BusinessActivity],
+                 people: Option[Seq[ResponsiblePerson]]
+      ): Seq[BreakdownRow] = {
+        Seq.empty
+      }
+    }
+}
 object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =

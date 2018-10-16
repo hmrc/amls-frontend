@@ -13,12 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package typeclasses.confirmation
 
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businessmatching.BusinessActivity
-import models.responsiblepeople.ResponsiblePerson
+import models.confirmation.{BreakdownRow, Currency}
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.{SubscriptionFees, SubscriptionResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
@@ -52,9 +54,50 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
     implicit val headerCarrier = HeaderCarrier()
 
     "responsible people rows with phase2 toggle" should {
+
       "return an approval check row" when {
         "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
-          pending
+          val subscriptionResponse = SubscriptionResponse(
+            etmpFormBundleNumber = "",
+            amlsRefNo = amlsRegistrationNumber,
+            Some(SubscriptionFees(
+              registrationFee = 0,
+              fpFee = Some(100.00),
+              fpFeeRate = None,
+              approvalCheckFee = None,
+              approvalCheckFeeRate = None,
+              premiseFee = 0,
+              premiseFeeRate = None,
+              totalFees = 0,
+              paymentReference = "XA000000000000"
+            )))
+
+          val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
+          result must be(expectedResult)
         }
       }
       
