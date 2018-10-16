@@ -100,7 +100,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           result must be(expectedResult)
         }
 
-        "The business is EAB and only one responsible person answered not to check approval question" in new Fixture {
+        "The business is EAB and only one responsible person answered no to check approval question" in new Fixture {
 
           val businessActivity = Set[BusinessActivity](models.businessmatching.EstateAgentBusinessService)
           val people: Option[Seq[ResponsiblePerson]] = Some(
@@ -134,6 +134,49 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             )
           )
           result must be(expectedResult)
+        }
+
+        "The business is ASP and only two responsible persons answered no to check approval question" in new Fixture {
+
+          val businessActivity = Set[BusinessActivity](models.businessmatching.AccountancyServices)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = None
+                )
+              ),
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = None
+                )
+              ),
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = None
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              quantity = 2,
+              perItm = Currency(100.00),
+              total = Currency(200.00)
+            )
+          )
+          result must be(expectedResult)
+
         }
       }
       
