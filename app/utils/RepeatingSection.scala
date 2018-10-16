@@ -93,7 +93,8 @@ trait RepeatingSection {
           cacheMap.getEntry[Seq[T]](key()).map {
             data =>
               putData(data.patch(index - 1, Seq(fn(cacheMap, data(index - 1))), 1))
-                .map(Some.apply)
+                // TODO return the updated cacheMap - for the time being this code needs to return cacheMap until this has been addressed.
+                .map(_ => Some(cacheMap))
           }.getOrElse(Future.successful(Some(cacheMap)))
       }.getOrElse(Future.successful(None))
     }
