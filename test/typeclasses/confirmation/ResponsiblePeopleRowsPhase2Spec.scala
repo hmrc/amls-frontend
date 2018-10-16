@@ -181,7 +181,27 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       }
       
       "not return an approval check row" when {
-        "The business is MSB and HVD" in pending
+        "The business is MSB and HVD" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness, models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+        }
 
         "The business is MSB" in new Fixture {
           val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
@@ -189,7 +209,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             Seq(
               ResponsiblePerson(
                 approvalFlags = ApprovalFlags(
-                  hasAlreadyPaidApprovalCheck = None,
+                  hasAlreadyPaidApprovalCheck = Some(true),
                   hasAlreadyPassedFitAndProper = Some(false)
                 )
               )

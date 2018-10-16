@@ -40,7 +40,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
   def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
-    people.filter(_.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false)).size
+    people.filter(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false)).size
 }
 
 object ResponsiblePeopleRowsInstancesPhase2 {

@@ -329,7 +329,7 @@ object ResponsiblePerson {
         (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
           fitAndProper =>
             if(ApplicationConfig.phase2ChangesToggle) {
-              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(fitAndProper))
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(true))
             } else {
               ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
             }
