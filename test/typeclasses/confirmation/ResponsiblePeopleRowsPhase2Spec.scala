@@ -52,24 +52,24 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
   }
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
+    val subscriptionResponse = SubscriptionResponse(
+      etmpFormBundleNumber = "",
+      amlsRefNo = amlsRegistrationNumber,
+      Some(SubscriptionFees(
+        registrationFee = 0,
+        fpFee = Some(100.00),
+        fpFeeRate = None,
+        approvalCheckFee = Some(200.00),
+        approvalCheckFeeRate = Some(100.00),
+        premiseFee = 0,
+        premiseFeeRate = None,
+        totalFees = 0,
+        paymentReference = "XA000000000000"
+      )))
 
     "responsible people rows with phase2 toggle" should {
 
       "return an approval check row" when {
-          val subscriptionResponse = SubscriptionResponse(
-            etmpFormBundleNumber = "",
-            amlsRefNo = amlsRegistrationNumber,
-            Some(SubscriptionFees(
-              registrationFee = 0,
-              fpFee = Some(100.00),
-              fpFeeRate = None,
-              approvalCheckFee = Some(200.00),
-              approvalCheckFeeRate = Some(100.00),
-              premiseFee = 0,
-              premiseFeeRate = None,
-              totalFees = 0,
-              paymentReference = "XA000000000000"
-            )))
         "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
 
           val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
@@ -181,7 +181,30 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       }
       
       "not return an approval check row" when {
-        "The business is MSB or TCSP" in pending
+        "The business is MSB and HVD" in pending
+
+        "The business is MSB" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = None,
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+
+        }
 
         "The business isn't HVD or EAB or ASP" in pending
 

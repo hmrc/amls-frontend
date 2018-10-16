@@ -52,15 +52,22 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  activities: Set[BusinessActivity],
                  people: Option[Seq[ResponsiblePerson]]
       ): Seq[BreakdownRow] = {
-        Seq(
-          BreakdownRow(
-            approvalCheckPeopleRow(value).message,
-            countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty)),
-            approvalCheckPeopleRow(value).feePer,
-            Currency.fromBD(
-              value.getApprovalCheckFee.getOrElse(0))
+
+        val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+
+        if(approvalCheckCount > 0) {
+          Seq(
+            BreakdownRow(
+              approvalCheckPeopleRow(value).message,
+              approvalCheckCount,
+              approvalCheckPeopleRow(value).feePer,
+              Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+            )
           )
-        )
+        }
+        else {
+          Seq.empty
+        }
       }
     }
 }
