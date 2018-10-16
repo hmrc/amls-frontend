@@ -99,6 +99,55 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           )
           result must be(expectedResult)
         }
+        "The business is EAB and only one responsible person answered not to check approval question" in new Fixture {
+          val subscriptionResponse = SubscriptionResponse(
+            etmpFormBundleNumber = "",
+            amlsRefNo = amlsRegistrationNumber,
+            Some(SubscriptionFees(
+              registrationFee = 0,
+              fpFee = Some(100.00),
+              fpFeeRate = None,
+              approvalCheckFee = Some(200.00),
+              approvalCheckFeeRate = Some(100.00),
+              premiseFee = 0,
+              premiseFeeRate = None,
+              totalFees = 0,
+              paymentReference = "XA000000000000"
+            )))
+
+          val businessActivity = Set[BusinessActivity](models.businessmatching.EstateAgentBusinessService)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = None
+                )
+              ),
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = None
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(200.00)
+            )
+          )
+          result must be(expectedResult)
+        }
       }
       
       "not return an approval check row" when {
