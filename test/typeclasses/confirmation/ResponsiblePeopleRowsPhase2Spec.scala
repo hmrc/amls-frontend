@@ -21,7 +21,7 @@ import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businessmatching.BusinessActivity
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
-import models.{SubscriptionFees, SubscriptionResponse}
+import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -66,6 +66,21 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
         totalFees = 0,
         paymentReference = "XA000000000000"
       )))
+
+    val amendVariationRenewalResponse = AmendVariationRenewalResponse(
+      processingDate = "",
+      etmpFormBundleNumber = "",
+      registrationFee = 100,
+      fpFee = None,
+      fpFeeRate = None,
+      approvalCheckFee = None,
+      approvalCheckFeeRate = None,
+      premiseFee = 0,
+      premiseFeeRate = None,
+      totalFees = 100,
+      paymentReference = Some("XA000000000000"),
+      difference = Some(0)
+    )
 
     "responsible people rows with phase2 toggle" should {
 
@@ -203,7 +218,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           result must be(expectedResult)
         }
 
-        "The business is MSB" in new Fixture {
+        "The business is MSB SubscriptionResponse" in new Fixture {
           val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
           val people: Option[Seq[ResponsiblePerson]] = Some(
             Seq(
@@ -218,6 +233,28 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
           val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
             subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+        }
+
+        "The business is MSB for AmendVariationRenewalResponse" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(true)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromVariation(
+            amendVariationRenewalResponse,
             activities = businessActivity,
             people)
 

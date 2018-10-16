@@ -51,11 +51,11 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  value: SubmissionResponse,
                  activities: Set[BusinessActivity],
                  people: Option[Seq[ResponsiblePerson]]
-      ): Seq[BreakdownRow] = {
+               ): Seq[BreakdownRow] = {
 
         val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
 
-        if(approvalCheckCount > 0) {
+        if (approvalCheckCount > 0) {
           Seq(
             BreakdownRow(
               approvalCheckPeopleRow(value).message,
@@ -70,7 +70,34 @@ object ResponsiblePeopleRowsInstancesPhase2 {
         }
       }
     }
+
+  implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
+    new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
+      override def apply(
+                          value: AmendVariationRenewalResponse,
+                          activities: Set[BusinessActivity],
+                          people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
+
+        val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+
+        if (approvalCheckCount > 0) {
+          Seq(
+            BreakdownRow(
+              approvalCheckPeopleRow(value).message,
+              approvalCheckCount,
+              approvalCheckPeopleRow(value).feePer,
+              Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+            )
+          )
+        }
+        else {
+          Seq.empty
+        }
+      }
+    }
+  }
 }
+
 object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
