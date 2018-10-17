@@ -16,6 +16,21 @@
 
 package services
 
+/*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
@@ -46,7 +61,7 @@ import utils.StatusConstants
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
 
-class ConfirmationServiceSpec extends PlaySpec
+class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
   with MockitoSugar
   with ScalaFutures
   with IntegrationPatience
@@ -56,7 +71,7 @@ class ConfirmationServiceSpec extends PlaySpec
   with AmlsReferenceNumberGenerator {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 
   trait Fixture {
@@ -190,6 +205,8 @@ class ConfirmationServiceSpec extends PlaySpec
         val rows = Seq(
           BreakdownRow("confirmation.submission", 1, 100, 100)
         ) ++ Seq(
+          BreakdownRow("confirmation.responsiblepeople", 0, 100, 0)
+        ) ++ Seq(
           BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
         )
 
@@ -273,7 +290,6 @@ class ConfirmationServiceSpec extends PlaySpec
               unpaidRow.total.value mustBe 0
           }
         }
-
       }
 
       "not include deleted premises in the amendment confirmation table" in new Fixture {
@@ -301,7 +317,6 @@ class ConfirmationServiceSpec extends PlaySpec
               rows.filter(_.label == "confirmation.tradingpremises").head.quantity mustBe 1
           }
         }
-
       }
 
       "not include responsible people in breakdown" when {
@@ -330,31 +345,6 @@ class ConfirmationServiceSpec extends PlaySpec
           whenReady(TestConfirmationService.getAmendment)(_ foreach {
             case rows => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
           })
-
-        }
-
-        "there is no fee returned in a amendment response because business type is not msb or tcsp" in new Fixture {
-
-          when {
-            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
-          } thenReturn Some(amendmentResponse)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
-
-          val result = await(TestConfirmationService.getAmendment)
-
-          result match {
-            case Some(rows) => rows foreach { row =>
-              row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.responsiblepeople.fp.passed"
-            }
-          }
         }
       }
 
@@ -386,7 +376,6 @@ class ConfirmationServiceSpec extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
-
         }
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
@@ -415,7 +404,6 @@ class ConfirmationServiceSpec extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
-
         }
       }
 
@@ -630,7 +618,6 @@ class ConfirmationServiceSpec extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
-
         }
 
         "the business type is TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
@@ -667,7 +654,6 @@ class ConfirmationServiceSpec extends PlaySpec
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
-
         }
 
         "each of the categorised fees are in the response" in new Fixture {
@@ -863,33 +849,6 @@ class ConfirmationServiceSpec extends PlaySpec
           }
         }
       }
-
-      "not include responsible people in breakdown" when {
-
-        "there is no fee returned in a subscription response because business type is not msb or tcsp" in new Fixture {
-
-          when {
-            cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
-          } thenReturn Some(subscriptionResponse)
-
-          when {
-            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-          } thenReturn Some(Seq(TradingPremises()))
-
-          when {
-            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
-
-          val result = await(TestConfirmationService.getSubscription)
-
-          result match {
-            case rows => rows foreach { row =>
-              row.label must not equal "confirmation.responsiblepeople"
-              row.label must not equal "confirmation.responsiblepeople.fp.passed"
-            }
-          }
-        }
-      }
     }
 
     "getSubmissionData is called" must {
@@ -902,6 +861,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 0, 0, 0),
+              BreakdownRow("confirmation.responsiblepeople",0,100,0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
@@ -930,6 +890,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
             val submissionData = Seq(
               BreakdownRow("confirmation.submission", 1, 100, 100),
+              BreakdownRow("confirmation.responsiblepeople",0,100,0),
               BreakdownRow("confirmation.tradingpremises", 1, 115, 0)
             )
 
@@ -989,9 +950,6 @@ class ConfirmationServiceSpec extends PlaySpec
 
         }
       }
-
     }
-
   }
 }
-
