@@ -806,7 +806,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+          } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(true)))))
 
           when {
             activities.businessActivities
@@ -816,7 +816,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           result match {
             case rows => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
