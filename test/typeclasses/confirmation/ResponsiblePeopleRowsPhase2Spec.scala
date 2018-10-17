@@ -106,7 +106,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
           val expectedResult = Seq(
             BreakdownRow(
-              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 1,
               perItm = Currency(100.00),
               total = Currency(200.00)
@@ -142,7 +142,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
           val expectedResult = Seq(
             BreakdownRow(
-              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 1,
               perItm = Currency(100.00),
               total = Currency(200.00)
@@ -184,7 +184,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
           val expectedResult = Seq(
             BreakdownRow(
-              label = "confirmation.responsiblepeople.ApprovalCheck.Passed",
+              label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 2,
               perItm = Currency(100.00),
               total = Currency(200.00)

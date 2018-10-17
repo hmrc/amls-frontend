@@ -42,21 +42,33 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
     people.count(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false))
 
-  def createBreakdownRow(value: SubmissionResponse, people: Option[Seq[ResponsiblePerson]]) = {
-    val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+  def countPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
+    people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false))
 
-    if (approvalCheckCount > 0) {
-      Seq(
-        BreakdownRow(
-          approvalCheckPeopleRow(value).message,
-          approvalCheckCount,
-          approvalCheckPeopleRow(value).feePer,
-          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-        )
-      )
-    }
-    else {
-      Seq.empty
+  def createBreakdownRow(value: SubmissionResponse, people: Option[Seq[ResponsiblePerson]]) = {
+    val fitAndProperCount = countPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
+    val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+    (fitAndProperCount > 0, approvalCheckCount > 0) match {
+
+      case(true, _) =>
+        Seq(
+          BreakdownRow(
+            peopleRow(value).message,
+            fitAndProperCount,
+            peopleRow(value).feePer,
+            Currency.fromBD(value.getFpFee.getOrElse(0))
+          ))
+
+      case(_, true) =>
+        Seq(
+          BreakdownRow(
+            approvalCheckPeopleRow(value).message,
+            approvalCheckCount,
+            approvalCheckPeopleRow(value).feePer,
+            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          ))
+
+      case _ => Seq.empty
     }
   }
 }

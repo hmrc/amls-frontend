@@ -41,7 +41,7 @@ trait FeeCalculations {
   def peopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
     response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFeeRate))
 
-  def approvalCheckPeopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople.ApprovalCheck.Passed",
+  def approvalCheckPeopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed",
     response.getApprovalCheckFeeRate.getOrElse(ApplicationConfig.approvalCheckPeopleFeeRate))
 
   def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
@@ -68,7 +68,7 @@ trait FeeCalculations {
 
   val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
 
-  val peopleApprovalCheckPassed = RowEntity("confirmation.responsiblepeople.ApprovalCheck.Passed", 0)
+  val peopleApprovalCheckPassed = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed", 0)
 
   val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
 

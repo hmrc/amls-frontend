@@ -16,6 +16,7 @@
 
 package typeclasses.confirmation
 
+import config.ApplicationConfig
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePerson
@@ -57,12 +58,7 @@ object BreakdownRowInstances {
                 registrationFeeRow.feePer,
                 subQuantity * registrationFeeRow.feePer
               )
-            ) ++
-            ResponsiblePeopleRows[SubmissionResponse](
-              subscription,
-              activities.businessActivities,
-              people
-            ) ++
+            ) ++ ( responsiblePeopleRowsProxy(subscription, people, activities)) ++
             Seq(
               BreakdownRow(
                 premisesRow(subscription).message,
@@ -78,6 +74,22 @@ object BreakdownRowInstances {
       def subscriptionQuantity(subscription: SubmissionResponse): Int =
         if (subscription.getRegistrationFee == 0) 0 else 1
 
+    }
+  }
+
+  def responsiblePeopleRowsProxy(subscription: SubmissionResponse, people: Option[Seq[ResponsiblePerson]], activities: BusinessActivities) = {
+    if (ApplicationConfig.phase2ChangesToggle) {
+      ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+        subscription,
+        activities.businessActivities,
+        people
+      )
+    } else {
+      ResponsiblePeopleRows[SubmissionResponse](
+        subscription,
+        activities.businessActivities,
+        people
+      )
     }
   }
 
@@ -162,6 +174,9 @@ object BreakdownRows {
                                 businessActivities: Option[BusinessActivities],
                                 premises: Option[Seq[TradingPremises]],
                                 people: Option[Seq[ResponsiblePerson]]
-                              )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = b(value, businessActivities, premises, people)
+                              )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = {
+
+      b(value, businessActivities, premises, people)
+  }
 
 }

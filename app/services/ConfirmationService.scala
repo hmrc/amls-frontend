@@ -18,6 +18,7 @@ package services
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
@@ -29,7 +30,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.tradingpremises.TradingPremises
 import typeclasses.confirmation.BreakdownRowInstances._
-import typeclasses.confirmation.BreakdownRows
+import typeclasses.confirmation.{BreakdownRows, ResponsiblePeopleRowsInstancesPhase2}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -57,12 +58,18 @@ class ConfirmationService @Inject()(
           businessActivities <- businessMatching.activities
         } yield {
           Future.successful(
-            BreakdownRows.generateBreakdownRows[SubmissionResponse](
-              subscription,
-              Some(businessActivities),
-              Some(premises),
-              Some(people)
-            )
+
+            if (ApplicationConfig.phase2ChangesToggle) {
+              ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(subscription, businessActivities.businessActivities, Some(people))
+            }else{
+
+              BreakdownRows.generateBreakdownRows[SubmissionResponse](
+                subscription,
+                Some(businessActivities),
+                Some(premises),
+                Some(people)
+              )
+            }
           )
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
