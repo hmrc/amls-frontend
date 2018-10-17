@@ -58,7 +58,7 @@ object BreakdownRowInstances {
                 registrationFeeRow.feePer,
                 subQuantity * registrationFeeRow.feePer
               )
-            ) ++ ( responsiblePeopleRowsProxy(subscription, people, activities)) ++
+            ) ++ responsiblePeopleRowsProxy(subscription, people, activities) ++
             Seq(
               BreakdownRow(
                 premisesRow(subscription).message,

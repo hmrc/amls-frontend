@@ -36,7 +36,7 @@ import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models._
 import models.businesscustomer.ReviewDetails
-import models.businessmatching.{BusinessActivities, BusinessActivity, BusinessMatching, TrustAndCompanyServices}
+import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.renewal.Renewal
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
@@ -765,7 +765,8 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(responsiblePersonGen.sample.get, responsiblePersonGen.sample.get))
+          } thenReturn Some(Seq(responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(false))),
+            responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(false)))))
 
           val result = await(TestConfirmationService.getSubscription)
 

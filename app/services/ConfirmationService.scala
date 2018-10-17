@@ -46,7 +46,7 @@ class ConfirmationService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Seq[BreakdownRow]] =
+  ): Future[Seq[BreakdownRow]] = {
     cacheConnector.fetchAll flatMap {
       maybeCache =>
         (for {
@@ -58,21 +58,16 @@ class ConfirmationService @Inject()(
           businessActivities <- businessMatching.activities
         } yield {
           Future.successful(
-
-            if (ApplicationConfig.phase2ChangesToggle) {
-              ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(subscription, businessActivities.businessActivities, Some(people))
-            }else{
-
               BreakdownRows.generateBreakdownRows[SubmissionResponse](
                 subscription,
                 Some(businessActivities),
                 Some(premises),
                 Some(people)
               )
-            }
           )
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
+  }
 
   def getAmendment
   (implicit
