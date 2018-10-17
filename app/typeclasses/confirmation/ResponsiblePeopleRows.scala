@@ -40,7 +40,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
   def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
-    people.filter(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false)).size
+    people.count(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false))
 
   def createBreakdownRow(value: SubmissionResponse, people: Option[Seq[ResponsiblePerson]]) = {
     val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
@@ -77,7 +77,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
 
   implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
     new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
-      override def apply(
+      def apply(
                           value: AmendVariationRenewalResponse,
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
