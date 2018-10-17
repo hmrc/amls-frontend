@@ -709,7 +709,12 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
     "getSubscription is called" must {
       "notify user of subscription fees to pay in breakdown" when {
 
-        "there is a Responsible People fee to pay" in new Fixture {
+        "there is a TCSP Responsible People fee to pay" in new Fixture {
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices)
+
 
           when {
             TestConfirmationService.cacheConnector.fetchAll(any(), any())
@@ -737,7 +742,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           }
         }
 
-        "there is a Responsible People fee to pay and fpRate should be read dynamically" in new Fixture {
+        "there is a MSB Responsible People fee to pay and fpRate should be read dynamically" in new Fixture {
 
           val subscriptionResponseWithFeeRate = SubscriptionResponse(
             etmpFormBundleNumber = "",
@@ -754,6 +759,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
               paymentReference = ""
             ))
           )
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           when {
             cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
