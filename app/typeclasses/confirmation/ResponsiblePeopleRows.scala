@@ -17,8 +17,10 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
+import models.businessmatching.{AccountancyServices, BusinessActivity, EstateAgentBusinessService, HighValueDealing, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
+import models.estateagentbusiness.EstateAgentBusiness
+import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
 
@@ -45,27 +47,34 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def countPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
     people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false))
 
-  def createBreakdownRow(value: SubmissionResponse, people: Option[Seq[ResponsiblePerson]]) = {
+  def createBreakdownRow(
+                          value: SubmissionResponse,
+                          people: Option[Seq[ResponsiblePerson]],
+                          activities: Set[BusinessActivity]
+                        ) = {
     val fitAndProperCount = countPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
     (fitAndProperCount > 0, approvalCheckCount > 0) match {
 
-      case(true, _) =>
-        Seq(
-          BreakdownRow(
-            peopleRow(value).message,
-            fitAndProperCount,
-            peopleRow(value).feePer,
-            Currency.fromBD(value.getFpFee.getOrElse(0))
-          ))
-
-      case(_, true) =>
+      case(_, true) if (activities.contains(AccountancyServices) ||
+                        activities.contains(EstateAgentBusinessService) ||
+                        activities.contains(HighValueDealing)
+                        ) =>
         Seq(
           BreakdownRow(
             approvalCheckPeopleRow(value).message,
             approvalCheckCount,
             approvalCheckPeopleRow(value).feePer,
             Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          ))
+
+      case(true, _) if (activities.contains(MSB) || activities.contains(TrustAndCompanyServices)) =>
+        Seq(
+          BreakdownRow(
+            peopleRow(value).message,
+            fitAndProperCount,
+            peopleRow(value).feePer,
+            Currency.fromBD(value.getFpFee.getOrElse(0))
           ))
 
       case _ => Seq.empty
@@ -83,7 +92,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
-        createBreakdownRow(value, people)
+        createBreakdownRow(value, people, activities)
       }
     }
 
@@ -94,7 +103,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        createBreakdownRow(value, people)
+        createBreakdownRow(value, people, activities)
       }
     }
   }

@@ -214,7 +214,14 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             activities = businessActivity,
             people)
 
-          val expectedResult = Seq.empty
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
           result must be(expectedResult)
         }
 
@@ -236,7 +243,14 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             activities = businessActivity,
             people)
 
-          val expectedResult = Seq.empty
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
           result must be(expectedResult)
         }
 
@@ -280,11 +294,18 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             activities = businessActivity,
             people)
 
-          val expectedResult = Seq.empty
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
           result must be(expectedResult)
         }
 
-        "The business has answered yes to Fit and Proper Question" in new Fixture {
+        "HVD business has answered yes to Fit and Proper Question" in new Fixture {
           val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
           val people: Option[Seq[ResponsiblePerson]] = Some(
             Seq(
@@ -307,7 +328,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
         }
 
-        "The business has answered yes to Approval Check Question" in new Fixture {
+        "HVD business has answered yes to Approval Check Question" in new Fixture {
           val businessActivity = Set[BusinessActivity](models.businessmatching.HighValueDealing)
           val people: Option[Seq[ResponsiblePerson]] = Some(
             Seq(
@@ -331,6 +352,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
         }
       }
 
+      "ADD TESTS around BPS, TDI should not outut either FP or Approvals" in pending
+
       "return a Fit and Proper row" when {
         "The business is MSB or TCSP along with HVD, EAB or ASP and hasn't passed F&P" in pending
 
@@ -338,7 +361,34 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       }
 
       "Not return a Fit and Proper row" when {
-        "The business has answered yes to Fit and Proper Question" in pending
+        "MSB business has answered yes to Fit and Proper Question" in new Fixture {
+
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(true)
+                )
+              ),
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(true)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq.empty
+          result must be(expectedResult)
+        }
 
         "The business doesn't have any business activities" in pending
 
