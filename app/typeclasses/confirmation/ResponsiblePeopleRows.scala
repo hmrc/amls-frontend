@@ -23,6 +23,7 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import utils.StatusConstants
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -41,19 +42,19 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
-  def countPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
-    people.count(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false))
+  def countNonDeletedPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
+    people.count(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false) && !x.status.contains(StatusConstants.Deleted))
 
-  def countPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
-    people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false))
+  def countNonDeletedPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
+    people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) && !x.status.contains(StatusConstants.Deleted))
 
   def createBreakdownRow(
                           value: SubmissionResponse,
                           people: Option[Seq[ResponsiblePerson]],
                           activities: Set[BusinessActivity]
                         ) = {
-    val fitAndProperCount = countPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
-    val approvalCheckCount = countPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+    val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
+    val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
     (fitAndProperCount > 0, approvalCheckCount > 0) match {
 
       case(_, true) if (activities.contains(AccountancyServices) ||

@@ -30,6 +30,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import services.ConfirmationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.StatusConstants
 
 class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
   with MockitoSugar
@@ -521,7 +522,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
           result must be(expectedResult)
         }
 
-        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question" in new Fixture {
+        "The business is HVD, EAB or ASP and has answered no to both the approvals question and F&P question and ignores a deleted RP" in new Fixture {
 
           val businessActivity = Set[BusinessActivity](models.businessmatching.EstateAgentBusinessService)
           val people: Option[Seq[ResponsiblePerson]] = Some(
@@ -531,6 +532,13 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
                   hasAlreadyPaidApprovalCheck = Some(false),
                   hasAlreadyPassedFitAndProper = Some(false)
                 )
+              ),
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                ),
+                status = Some(StatusConstants.Deleted)
               )
             )
           )

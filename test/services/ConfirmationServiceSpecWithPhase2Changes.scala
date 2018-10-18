@@ -289,31 +289,35 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
       "not include responsible people in breakdown" when {
 
-//        "they have been deleted" in new Fixture {
-//
-//          val people = Seq(
-//            ResponsiblePerson(Some(PersonName("Valid", None, "Person"))),
-//            ResponsiblePerson(Some(PersonName("Deleted", None, "Person")), status = Some(StatusConstants.Deleted))
-//          )
-//
-//          val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
-//
-//          when {
-//            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-//          } thenReturn Some(Seq(TradingPremises()))
-//
-//          when {
-//            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
-//          } thenReturn Some(amendResponseWithRPFees)
-//
-//          when(cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())) thenReturn Some(people)
-//
-//          val result = await(TestConfirmationService.getAmendment)
-//
-//          whenReady(TestConfirmationService.getAmendment)(_ foreach {
-//            case rows => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
-//          })
-//        }
+        "they have been deleted" in new Fixture {
+
+          val people = Seq(
+            ResponsiblePerson(Some(PersonName("Valid", None, "Person")), approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(false))),
+            ResponsiblePerson(Some(PersonName("Deleted", None, "Person")), status = Some(StatusConstants.Deleted), approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(false)))
+          )
+
+          val amendResponseWithRPFees = amendmentResponse.copy(fpFee = Some(100))
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(amendResponseWithRPFees)
+
+          when(cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())) thenReturn Some(people)
+
+          val result = await(TestConfirmationService.getAmendment)
+
+          whenReady(TestConfirmationService.getAmendment)(_ foreach {
+            case rows => rows.filter(_.label == "confirmation.responsiblepeople").head.quantity mustBe 1
+          })
+        }
       }
 
 //      "notify user of amendment fees to pay in breakdown" when {
