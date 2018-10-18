@@ -334,7 +334,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+          } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = Some(true), hasAlreadyPassedFitAndProper = Some(false)))))
 
           when {
             activities.businessActivities
