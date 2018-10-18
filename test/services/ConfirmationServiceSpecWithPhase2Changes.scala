@@ -320,35 +320,35 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
         }
       }
 
-//      "notify user of amendment fees to pay in breakdown" when {
-//
-////        "the business type is MSB and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
-////
-////          when {
-////            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
-////          } thenReturn Some(amendmentResponse)
-////
-////          when {
-////            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
-////          } thenReturn Some(Seq(TradingPremises()))
-////
-////          when {
-////            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-////          } thenReturn Some(Seq(ResponsiblePerson()))
-////
-////          when {
-////            activities.businessActivities
-////          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
-////
-////          val result = await(TestConfirmationService.getAmendment)
-////
-////          result match {
-////            case Some(rows) => {
-////              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
-////              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
-////            }
-////          }
-////        }
+      "notify user of amendment fees to pay in breakdown" when {
+
+        "the business type is MSB and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(amendmentResponse)
+
+          when {
+            cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+          } thenReturn Some(Seq(TradingPremises()))
+
+          when {
+            cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+          } thenReturn Some(Seq(ResponsiblePerson()))
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+
+          val result = await(TestConfirmationService.getAmendment)
+
+          result match {
+            case Some(rows) => {
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
+            }
+          }
+        }
 //
 //        "the business type is TCSP and there is not a Responsible Persons fee to pay from am amendment" in new Fixture {
 //
@@ -377,7 +377,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 //            }
 //          }
 //        }
-//      }
+      }
 
       "fall back to getting the subscription response, if the amendment response isn't available" in new Fixture {
         when {

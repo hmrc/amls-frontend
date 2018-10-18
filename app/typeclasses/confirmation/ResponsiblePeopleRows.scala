@@ -48,7 +48,12 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def countNonDeletedPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
     people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) && !x.status.contains(StatusConstants.Deleted))
 
-  def createBreakdownRow(
+  def createBreakdownRowForAmendVariationRenewalResponse(value: AmendVariationRenewalResponse,
+                                                         people: Option[Seq[ResponsiblePerson]],
+                                                         activities: Set[BusinessActivity]
+                                                        ) = ???
+
+  def createBreakdownRowForSubmissionResponse(
                           value: SubmissionResponse,
                           people: Option[Seq[ResponsiblePerson]],
                           activities: Set[BusinessActivity]
@@ -93,7 +98,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
-        createBreakdownRow(value, people, activities)
+        createBreakdownRowForSubmissionResponse(value, people, activities)
       }
     }
 
@@ -104,7 +109,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        createBreakdownRow(value, people, activities)
+        createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
       }
     }
   }
