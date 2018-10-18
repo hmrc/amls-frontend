@@ -31,9 +31,9 @@ case class AmendVariationRenewalResponse(
                                     totalFees: BigDecimal,
                                     paymentReference: Option[String],
                                     difference: Option[BigDecimal],
-                                    addedResponsiblePeople: Int = 0,
-                                    addedResponsiblePeopleFitAndProper: Int = 0,
-                                    addedResponsiblePeopleApprovalCheck: Int = 0,
+                                    addedResponsiblePeople: Int = 0,  // fps + aps
+                                    addedResponsiblePeopleFitAndProper: Int = 0, // fps who has f&p flag = false
+                                    addedResponsiblePeopleApprovalCheck: Int = 0, // fps who has Ap flag = false
                                     addedFullYearTradingPremises: Int = 0,
                                     halfYearlyTradingPremises: Int = 0,
                                     zeroRatedTradingPremises: Int = 0

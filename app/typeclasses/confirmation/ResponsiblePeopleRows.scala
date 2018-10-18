@@ -51,7 +51,28 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def createBreakdownRowForAmendVariationRenewalResponse(value: AmendVariationRenewalResponse,
                                                          people: Option[Seq[ResponsiblePerson]],
                                                          activities: Set[BusinessActivity]
-                                                        ) = ???
+                                                        ): Seq[BreakdownRow] = {
+      val (notPassedFP, notPassedApprovalCheck) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeopleApprovalCheck)
+
+      (notPassedFP > 0, notPassedApprovalCheck > 0) match {
+        case (true, _) =>  Seq(
+          BreakdownRow(
+            peopleRow(value).message,
+            value.addedResponsiblePeopleFitAndProper,
+            peopleRow(value).feePer,
+            Currency.fromBD(value.getFpFee.getOrElse(0))
+          ))
+        case (_, true) => Seq(
+          BreakdownRow(
+            approvalCheckPeopleRow(value).message,
+            value.addedResponsiblePeopleApprovalCheck,
+            approvalCheckPeopleRow(value).feePer,
+            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          ))
+        case (_, _) => Seq.empty
+      }
+    }
+
 
   def createBreakdownRowForSubmissionResponse(
                           value: SubmissionResponse,
