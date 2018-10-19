@@ -139,20 +139,6 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       (removing.contains(TrustAndCompanyServices) && !hasMSB)
     }
 
-    def resetResponsiblePerson(rp: ResponsiblePerson): ResponsiblePerson = {
-      (ApplicationConfig.phase2ChangesToggle, rp.approvalFlags) match {
-        case (false, _) => rp.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
-        case (_, ApprovalFlags(Some(true), _)) => rp
-        case _ => rp.copy(
-          hasAccepted = true,
-          approvalFlags = ApprovalFlags(
-            hasAlreadyPaidApprovalCheck = None,
-            hasAlreadyPassedFitAndProper = Some(false)
-          )
-        )
-      }
-    }
-
     for {
       activitiesToRemove <- OptionT.fromOption[Future](model.activitiesToRemove)
       currentBusinessMatching <- OptionT(dataCacheConnector.fetch[BMBusinessMatching](BMBusinessMatching.key))
@@ -160,7 +146,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       newResponsiblePeople <- {
         OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
-            rpList.map(resetResponsiblePerson)
+            rpList.map(rp => rp.resetBasedOnApprovalFlags())
           case Some(rpList) => rpList
           case _ => throw new RuntimeException("No responsible people found")
         })
