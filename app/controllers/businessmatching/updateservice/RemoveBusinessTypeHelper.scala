@@ -127,15 +127,30 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
-    val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
+
+    val canRemoveFitProper = (
+      current: Set[BMBusinessActivity],
+      removing: Set[BMBusinessActivity]
+    ) => {
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
-      !ApplicationConfig.phase2ChangesToggle &&
-      (
-        (removing.contains(MoneyServiceBusiness) && !hasTCSP) ||
-        (removing.contains(TrustAndCompanyServices) && !hasMSB)
-      )
+      (removing.contains(MoneyServiceBusiness) && !hasTCSP) ||
+      (removing.contains(TrustAndCompanyServices) && !hasMSB)
+    }
+
+    def resetResponsiblePerson(rp: ResponsiblePerson): ResponsiblePerson = {
+      (ApplicationConfig.phase2ChangesToggle, rp.approvalFlags) match {
+        case (false, _) => rp.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
+        case (_, ApprovalFlags(Some(true), _)) => rp
+        case _ => rp.copy(
+          hasAccepted = true,
+          approvalFlags = ApprovalFlags(
+            hasAlreadyPaidApprovalCheck = None,
+            hasAlreadyPassedFitAndProper = Some(false)
+          )
+        )
+      }
     }
 
     for {
@@ -145,12 +160,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       newResponsiblePeople <- {
         OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
-            rpList.map(rp => {
-              val newApprovalFlags = rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)
-              rp.copy(hasAccepted = true,
-                      approvalFlags = newApprovalFlags
-              )
-            })
+            rpList.map(resetResponsiblePerson)
           case Some(rpList) => rpList
           case _ => throw new RuntimeException("No responsible people found")
         })
