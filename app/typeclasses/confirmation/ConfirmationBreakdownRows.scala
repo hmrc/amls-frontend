@@ -125,7 +125,12 @@ object BreakdownRowInstances {
 
             def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
-            rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+            if (ApplicationConfig.phase2ChangesToggle) {
+              rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+            } else {
+              rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+            }
+
         }
 
       }

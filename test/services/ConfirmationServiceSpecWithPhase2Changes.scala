@@ -33,16 +33,13 @@ package services
  */
 import connectors.DataCacheConnector
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
-import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models._
 import models.businesscustomer.ReviewDetails
 import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
-import models.renewal.Renewal
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.TradingPremises
-import org.joda.time.{DateTime, LocalDate}
+import org.joda.time.DateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
@@ -417,7 +414,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(
             fpFee = Some(100),
-            addedResponsiblePeople = 1
+            addedResponsiblePeopleFitAndProper = 1
           ))
 
           val result = await(TestConfirmationService.getVariation)
@@ -466,7 +463,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeople = 1
+            addedResponsiblePeopleFitAndProper = 1
           )
 
           when {
@@ -571,7 +568,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeopleFitAndProper = 1
+            addedResponsiblePeople = 1
           )
 
           when {
@@ -587,7 +584,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -607,7 +604,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             totalFees = 100,
             paymentReference = Some(""),
             difference = Some(0),
-            addedResponsiblePeopleFitAndProper = 1
+            addedResponsiblePeople = 1
           )
 
           when {
@@ -623,7 +620,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
         }
@@ -647,25 +644,22 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           whenReady(TestConfirmationService.getVariation) {
             case Some(breakdownRows) =>
+              breakdownRows.size mustBe 4
+
               breakdownRows.head.label mustBe "confirmation.responsiblepeople"
               breakdownRows.head.quantity mustBe 1
               breakdownRows.head.perItm mustBe Currency(rpFee)
               breakdownRows.head.total mustBe Currency(rpFee)
 
-              breakdownRows(1).label mustBe "confirmation.responsiblepeople.fp.passed"
+              breakdownRows(1).label mustBe "confirmation.tradingpremises.zero"
               breakdownRows(1).quantity mustBe 1
               breakdownRows(1).perItm mustBe Currency(0)
               breakdownRows(1).total mustBe Currency(0)
 
-              breakdownRows(2).label mustBe "confirmation.tradingpremises.zero"
+              breakdownRows(2).label mustBe "confirmation.tradingpremises.half"
               breakdownRows(2).quantity mustBe 1
-              breakdownRows(2).perItm mustBe Currency(0)
-              breakdownRows(2).total mustBe Currency(0)
-
-              breakdownRows(3).label mustBe "confirmation.tradingpremises.half"
-              breakdownRows(3).quantity mustBe 1
-              breakdownRows(3).perItm mustBe Currency(tpHalfFee)
-              breakdownRows(3).total mustBe Currency(tpHalfFee)
+              breakdownRows(2).perItm mustBe Currency(tpHalfFee)
+              breakdownRows(2).total mustBe Currency(tpHalfFee)
 
               breakdownRows.last.label mustBe "confirmation.tradingpremises"
               breakdownRows.last.quantity mustBe 1
