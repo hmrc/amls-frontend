@@ -54,6 +54,21 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              soleProprietorOfAnotherBusiness: Option[SoleProprietorOfAnotherBusiness] = None
                             ) {
 
+  def resetBasedOnApprovalFlags(): ResponsiblePerson = {
+
+    (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
+      case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
+      case (_, ApprovalFlags(Some(true), _)) => this
+      case _ => this.copy(
+        hasAccepted = true,
+        approvalFlags = ApprovalFlags(
+          hasAlreadyPaidApprovalCheck = None,
+          hasAlreadyPassedFitAndProper = Some(false)
+        )
+      )
+    }
+  }
+
   def personName(p: PersonName): ResponsiblePerson =
     this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
