@@ -41,6 +41,44 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   "ResponsiblePeople" must {
 
+          "phase 1 is true" when {
+
+            "fitAndProper is true and approval is none" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck =  None),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+
+            "fitAndProper is true and approval is true" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck = Some(true)),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+          }
+
+
     "serialise correctly" when {
       "residence and passport type is in current format" in {
         Json.toJson(completeModelNonUkResidentNonUkPassport) must be(completeJsonPresentNonUkResidentNonUkPassport)
