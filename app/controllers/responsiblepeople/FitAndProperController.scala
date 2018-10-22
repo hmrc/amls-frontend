@@ -100,8 +100,10 @@ class FitAndProperController @Inject()(
     (data, msbOrTcsp) match {
       case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
         hasAlreadyPaidApprovalCheck = None))
-      case _ => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = Some(data)))
+      case (true, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = Some(true)))
+      case (_, true) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
+        hasAlreadyPaidApprovalCheck = Some(true)))
     }
   }
 
