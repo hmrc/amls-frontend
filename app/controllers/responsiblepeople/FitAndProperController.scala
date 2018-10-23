@@ -82,7 +82,7 @@ class FitAndProperController @Inject()(
                 for {
                   cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                     if (appConfig.phase2ChangesToggle) {
-                      updateFitAndProperAndApproval(data, msbOrTcsp, rp)
+                      rp.updateFitAndProperAndApproval(data, msbOrTcsp)
                     } else {
                       rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
                     }
@@ -93,19 +93,6 @@ class FitAndProperController @Inject()(
               case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
             }
           }
-    }
-  }
-
-  private def updateFitAndProperAndApproval(data: Boolean,
-                                            msbOrTcsp: Boolean,
-                                            rp: ResponsiblePerson): ResponsiblePerson = {
-    (data, msbOrTcsp) match {
-      case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = None))
-      case (true, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = Some(true)))
-      case (_, true) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = Some(true)))
     }
   }
 
