@@ -57,9 +57,24 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def updateFitAndProperAndApproval(fitAndPropperChoice: Boolean,
                                     msbOrTcsp: Boolean): ResponsiblePerson = {
     (fitAndPropperChoice, msbOrTcsp) match {
-      case (false, false) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = None))
-      case (true, false) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = Some(true)))
-      case (_, true) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = Some(true)))
+      case (false, false) => this.copy(
+        approvalFlags = ApprovalFlags(
+          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+          hasAlreadyPaidApprovalCheck = None
+        )
+      )
+      case (true, false) => this.copy(
+        approvalFlags = ApprovalFlags(
+          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+          hasAlreadyPaidApprovalCheck = Some(true)
+        )
+      )
+      case (_, true) => this.copy(
+        approvalFlags = ApprovalFlags(
+          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+          hasAlreadyPaidApprovalCheck = Some(true)
+        )
+      )
     }
   }
 
