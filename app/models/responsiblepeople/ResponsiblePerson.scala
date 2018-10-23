@@ -54,6 +54,15 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              soleProprietorOfAnotherBusiness: Option[SoleProprietorOfAnotherBusiness] = None
                             ) {
 
+  def updateFitAndProperAndApproval(fitAndPropperChoice: Boolean,
+                                    msbOrTcsp: Boolean): ResponsiblePerson = {
+    (fitAndPropperChoice, msbOrTcsp) match {
+      case (false, false) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = None))
+      case (true, false) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = Some(true)))
+      case (_, true) => this.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice), hasAlreadyPaidApprovalCheck = Some(true)))
+    }
+  }
+
   def resetBasedOnApprovalFlags(): ResponsiblePerson = {
 
     (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
