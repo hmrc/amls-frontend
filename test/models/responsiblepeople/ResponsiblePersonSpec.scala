@@ -1977,6 +1977,36 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
     "calling updateFitAndProperAndApproval" must {
 
       "set FitAndProper to match the incoming choice" when {
+        val choice = true
+
+        "and Approval is set to have the same value" when {
+
+          "msbOrTcsp is false" in {
+
+            val isMsbOrTcsp = false
+
+            val inputRp = ResponsiblePerson(
+              approvalFlags = ApprovalFlags(
+                hasAlreadyPassedFitAndProper = Some(true),
+                hasAlreadyPaidApprovalCheck = Some(true)
+              )
+            )
+
+            val expectedRp = ResponsiblePerson(
+              approvalFlags = ApprovalFlags(
+                hasAlreadyPassedFitAndProper = Some(true),
+                hasAlreadyPaidApprovalCheck = Some(true)
+              )
+            )
+
+            val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = choice, msbOrTcsp = isMsbOrTcsp)
+
+            outputRp mustEqual (expectedRp)
+          }
+        }
+      }
+
+      "set FitAndProper to match the incoming choice" when {
 
         val choice = false
 
