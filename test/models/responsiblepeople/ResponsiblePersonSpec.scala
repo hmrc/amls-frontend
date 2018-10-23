@@ -1978,64 +1978,51 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
       val inputRp = ResponsiblePerson()
 
-      "set FitAndPrpoer to match the incoming choice" when {
+      "set Approval flag to None" when {
 
-        "and Approval to have the same value" when {
+        "only if both choice and msbOrTcsp are false so the answer to the approval question is needed" in {
 
-          "msbOrTcsp is true" in {
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = false)
 
-            val expectedRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = Some(true),
-                hasAlreadyPaidApprovalCheck = Some(true)
-              )
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = None
             )
+          )
 
-            val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = true, msbOrTcsp = true)
-
-            outputRp mustEqual (expectedRp)
-
-          }
+          outputRp mustEqual (expectedRp)
         }
       }
 
-      "set FitAndProper to match the incoming choice" when {
+      "set Approval to match the incoming fitAndProper flag" when {
 
-        "and Approval is set to have the same value" when {
+        "choice is true, and msbOrTcsp is false so the answer to the approval question in not required" in {
 
-          "msbOrTcsp is false" in {
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = true, msbOrTcsp = false)
 
-            val expectedRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = Some(true),
-                hasAlreadyPaidApprovalCheck = Some(true)
-              )
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(true),
+              hasAlreadyPaidApprovalCheck = Some(true)
             )
+          )
 
-            val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = true, msbOrTcsp = false)
-
-            outputRp mustEqual (expectedRp)
-          }
+          outputRp mustEqual (expectedRp)
         }
-      }
 
-      "set FitAndProper to match the incoming choice" when {
+        "choice is false, and msbOrTcsp is true so the answer to the approval question is not needed" in {
 
-        "and reset Approval to None" when {
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = true)
 
-          "msbOrTcsp is false" in {
-
-            val expectedRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = Some(false),
-                hasAlreadyPaidApprovalCheck = None
-              )
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = Some(true)
             )
+          )
 
-            val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = false)
-
-            outputRp mustEqual (expectedRp)
-          }
+          outputRp mustEqual (expectedRp)
         }
       }
     }
@@ -2072,10 +2059,8 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             hasChanged = true)
 
           inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)
-
         }
       }
-
     }
 
     "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
