@@ -1976,6 +1976,13 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
     "calling updateFitAndProperAndApproval" must {
 
+      val inputRp = ResponsiblePerson(
+        approvalFlags = ApprovalFlags(
+          hasAlreadyPassedFitAndProper = None,
+          hasAlreadyPaidApprovalCheck = None
+        )
+      )
+
       "set FitAndPrpoer to match the incoming choide" when {
 
         val choice = true
@@ -1986,12 +1993,6 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
             val isMsbOrTcsp = true
 
-            val inputRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = None,
-                hasAlreadyPaidApprovalCheck = None
-              )
-            )
 
             val expectedRp = ResponsiblePerson(
               approvalFlags = ApprovalFlags(
@@ -2017,13 +2018,6 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
             val isMsbOrTcsp = false
 
-            val inputRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = Some(true),
-                hasAlreadyPaidApprovalCheck = Some(true)
-              )
-            )
-
             val expectedRp = ResponsiblePerson(
               approvalFlags = ApprovalFlags(
                 hasAlreadyPassedFitAndProper = Some(true),
@@ -2047,13 +2041,6 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
           "msbOrTcsp is false" in {
 
             val isMsbOrTcsp = false
-
-            val inputRp = ResponsiblePerson(
-              approvalFlags = ApprovalFlags(
-                hasAlreadyPassedFitAndProper = Some(true),
-                hasAlreadyPaidApprovalCheck = Some(true)
-              )
-            )
 
             val expectedRp = ResponsiblePerson(
               approvalFlags = ApprovalFlags(
