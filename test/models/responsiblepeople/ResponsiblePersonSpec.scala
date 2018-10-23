@@ -1978,7 +1978,7 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
 
       val inputRp = ResponsiblePerson()
 
-      "set FitAndPrpoer to match the incoming choide" when {
+      "set FitAndPrpoer to match the incoming choice" when {
 
         "and Approval to have the same value" when {
 
