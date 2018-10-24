@@ -184,7 +184,7 @@ object ResponsiblePeopleRowsInstances {
 
           val firstSeq = if (showBreakdown(value.getFpFee, activities)) {
 
-            val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
+            val notFP = value.addedResponsiblePeople
 
             if (notFP > 0) {
               Seq(BreakdownRow(
