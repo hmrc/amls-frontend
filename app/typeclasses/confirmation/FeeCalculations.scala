@@ -66,8 +66,6 @@ trait FeeCalculations {
 
   def renewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
-  val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
-
   val peopleApprovalCheckPassed = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed", 0)
 
   val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y

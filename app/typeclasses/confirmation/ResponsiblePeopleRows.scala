@@ -23,6 +23,8 @@ import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import utils.StatusConstants
 
+import scala.collection.JavaConverters._
+
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
              value: A,
@@ -157,25 +159,12 @@ object ResponsiblePeopleRowsInstances {
                       notFP.size,
                       peopleRow(value).feePer,
                       Currency.fromBD(value.getFpFee.getOrElse(0))
-                    )
-                  ) ++ (if (passedFP.nonEmpty) {
-                    Seq(
-                      BreakdownRow(
-                        peopleFPPassed.message,
-                        passedFP.size,
-                        max(0, peopleFPPassed.feePer),
-                        Currency.fromBD(max(0, peopleFPPassed.feePer))
-                      )
-                    )
-                  } else {
-                    Seq.empty
-                  })
+                    ))
               }
             } else {
               Seq.empty
             }
           }
-
           firstSeq
         } else {
           createBreakdownRowForSubmissionResponse(value, people, activities)
@@ -197,7 +186,7 @@ object ResponsiblePeopleRowsInstances {
 
             val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
 
-            (if (notFP > 0) {
+            if (notFP > 0) {
               Seq(BreakdownRow(
                 peopleVariationRow(value).message,
                 notFP,
@@ -206,16 +195,10 @@ object ResponsiblePeopleRowsInstances {
               ))
             } else {
               Seq.empty
-            }) ++ (if (passedFP > 0) {
-              Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
-            } else {
-              Seq.empty
-            })
-
+            }
           } else {
             Seq.empty
           }
-
           firstSeq
         } else {
           createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
@@ -224,6 +207,7 @@ object ResponsiblePeopleRowsInstances {
     }
   }
 }
+
 
 object ResponsiblePeopleRows {
   def apply[A](

@@ -117,19 +117,13 @@ object BreakdownRowInstances {
 
             def rpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeople, peopleVariationRow(value), renewalPeopleFee)
 
-            def fpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
-
             def tpFullYearRow: Seq[BreakdownRow] = renewalRow(value.addedFullYearTradingPremises, premisesVariationRow(value), fullPremisesFee)
 
             def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(value.halfYearlyTradingPremises, premisesHalfYear(value), renewalHalfYearPremisesFee)
 
             def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
-            if (ApplicationConfig.phase2ChangesToggle) {
               rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-            } else {
-              rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-            }
 
         }
 

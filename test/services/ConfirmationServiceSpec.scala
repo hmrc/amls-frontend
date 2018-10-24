@@ -242,7 +242,7 @@ class ConfirmationServiceSpec extends PlaySpec
         }
       }
 
-      "not show negative fees for responsible people who have already been paid for" in new Fixture {
+      "not show a row for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
           ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
@@ -268,9 +268,7 @@ class ConfirmationServiceSpec extends PlaySpec
         whenReady(TestConfirmationService.getAmendment) {
           _ foreach {
             case rows =>
-              val unpaidRow = rows.filter(_.label == "confirmation.responsiblepeople.fp.passed").head
-              unpaidRow.perItm.value mustBe 0
-              unpaidRow.total.value mustBe 0
+              Seq.empty
           }
         }
 
@@ -627,7 +625,6 @@ class ConfirmationServiceSpec extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -664,7 +661,6 @@ class ConfirmationServiceSpec extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -694,20 +690,15 @@ class ConfirmationServiceSpec extends PlaySpec
               breakdownRows.head.perItm mustBe Currency(rpFee)
               breakdownRows.head.total mustBe Currency(rpFee)
 
-              breakdownRows(1).label mustBe "confirmation.responsiblepeople.fp.passed"
+              breakdownRows(2).label mustBe "confirmation.tradingpremises.half"
+              breakdownRows(2).quantity mustBe 1
+              breakdownRows(2).perItm mustBe Currency(tpHalfFee)
+              breakdownRows(2).total mustBe Currency(tpHalfFee)
+
+              breakdownRows(1).label mustBe "confirmation.tradingpremises.zero"
               breakdownRows(1).quantity mustBe 1
               breakdownRows(1).perItm mustBe Currency(0)
               breakdownRows(1).total mustBe Currency(0)
-
-              breakdownRows(2).label mustBe "confirmation.tradingpremises.zero"
-              breakdownRows(2).quantity mustBe 1
-              breakdownRows(2).perItm mustBe Currency(0)
-              breakdownRows(2).total mustBe Currency(0)
-
-              breakdownRows(3).label mustBe "confirmation.tradingpremises.half"
-              breakdownRows(3).quantity mustBe 1
-              breakdownRows(3).perItm mustBe Currency(tpHalfFee)
-              breakdownRows(3).total mustBe Currency(tpHalfFee)
 
               breakdownRows.last.label mustBe "confirmation.tradingpremises"
               breakdownRows.last.quantity mustBe 1
