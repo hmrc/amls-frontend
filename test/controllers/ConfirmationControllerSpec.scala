@@ -74,9 +74,10 @@ class ConfirmationControllerSpec extends AmlsSpec
     val response = subscriptionResponseGen(hasFees = true).sample.get
 
     protected val mockCacheMap = mock[CacheMap]
-    val companyName = "My Test Company"
+    val companyNameFromCache = "My Test Company Name From Cache"
+    val companyNameFromRegistration = "My Test Company Name From Registration"
 
-    setupBusinessMatching(companyName)
+    setupBusinessMatching(companyNameFromCache)
 
     when {
       controller.authenticator.refreshProfile(any(), any())
@@ -112,7 +113,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.amlsConnector.registrationDetails(any())(any(), any(), any())
-    } thenReturn Future.successful(RegistrationDetails(companyName, isIndividual = false))
+    } thenReturn Future.successful(RegistrationDetails(companyNameFromRegistration, isIndividual = false))
 
     when {
       controller.dataCacheConnector.fetch[SubmissionRequestStatus](eqTo(SubmissionRequestStatus.key))(any(),any(),any())
@@ -370,7 +371,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+        contentAsString(result) must include(companyNameFromRegistration)
       }
 
       "has no payment reference" in new Fixture {
@@ -390,7 +391,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         Jsoup.parse(contentAsString(result)).title must include(Messages("confirmation.variation.title"))
         contentAsString(result) must include(Messages("confirmation.no.fee"))
-        contentAsString(result) must include(companyName)
+        contentAsString(result) must include(companyNameFromRegistration)
       }
     }
 
@@ -445,7 +446,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
       }
 
       "the application status is 'new submission' and has been previously registered" in new Fixture {
@@ -490,7 +491,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
@@ -511,7 +512,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
@@ -532,7 +533,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
@@ -553,7 +554,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         doc.title must include(Messages("confirmation.payment.renewal.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.renewal.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
@@ -574,7 +575,7 @@ class ConfirmationControllerSpec extends AmlsSpec
         doc.title must include(Messages("confirmation.payment.amendvariation.title"))
         doc.select("h1.heading-large").text mustBe Messages("confirmation.payment.amendvariation.lede")
         doc.select(".confirmation").text must include(paymentReferenceNumber)
-        doc.select(".confirmation").text must include(companyName)
+        doc.select(".confirmation").text must include(companyNameFromRegistration)
         contentAsString(result) must include(Messages("confirmation.payment.amendvariation.info.keep_up_to_date"))
       }
 
