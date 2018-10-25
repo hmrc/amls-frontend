@@ -829,7 +829,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
 
-          val result = controller invokePrivate promptFitAndProper(Seq(responsiblePerson, responsiblePerson))
+          val result = controller invokePrivate promptFitAndProper(responsiblePerson)
 
           result must be(true)
 
@@ -840,7 +840,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
 
-          val result = controller invokePrivate promptFitAndProper(fitAndProperResponsiblePeople)
+          val result = controller invokePrivate promptFitAndProper(responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
 
           result must be(false)
 

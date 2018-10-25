@@ -282,25 +282,27 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+
+  private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
+    if (!appConfig.phase2ChangesToggle) {
+
+      (businessActivities.businessActivities, businessActivities.additionalActivities) match {
+        case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
+        case (a, _) => containsTcspOrMsb(a)
+      }
+    } else {
+      true
+    }
+  }
+
+  private def promptFitAndProper(rp: ResponsiblePerson) =
+    rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
+
   val shouldPromptForFitAndProper:
     (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
 
-      def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
-      def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
-        if (!appConfig.phase2ChangesToggle) {
-
-          (businessActivities.businessActivities, businessActivities.additionalActivities) match {
-            case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
-            case (a, _) => containsTcspOrMsb(a)
-          }
-        } else {
-          true
-        }
-      }
-
-      def promptFitAndProper(responsiblePeople: ResponsiblePerson) =
-        rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
       def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
         rp.approvalFlags.hasAlreadyPassedFitAndProper match {
