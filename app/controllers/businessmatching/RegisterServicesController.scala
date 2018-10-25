@@ -79,8 +79,20 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               } yield {
                 businessActivities.businessActivities
               }).value map { activities =>
-                val (newActivities, existing) = getActivityValues(invalidForm, isPreSubmission, activities)
-                BadRequest(register_services(invalidForm, edit, newActivities, existing, isPreSubmission))
+                val (newActivities, existing) = getActivityValues(
+                  invalidForm,
+                  isPreSubmission,
+                  activities
+                )
+                BadRequest(
+                  register_services(
+                    invalidForm,
+                    edit,
+                    newActivities,
+                    existing,
+                    isPreSubmission
+                  )
+                )
               }
             }
           case ValidForm(_, data) =>
@@ -89,35 +101,32 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               businessMatching <- businessMatchingService.getModel.value
               savedModel <- updateModel(
                 businessMatching,
-                newModel(businessMatching.activities, data, isPreSubmission),
+                newModel(businessMatching.activities,
+                  data,
+                  isPreSubmission
+                ),
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- clearRemovedSections(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                  savedModel.businessActivities)
+              _ <- clearRemovedSections(
+                businessMatching.activities.getOrElse(
+                  BusinessMatchingActivities(
+                    Set()
+                  )
+                ).businessActivities,
+                savedModel.businessActivities
+              )
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
 
-                val rps = if(approvalIsRequired(responsiblePeople, savedActivities)) {
-                  setResponsiblePeopleForApproval(responsiblePeople)
-                } else {
-                  responsiblePeople
-                }
+                val workFlow =
+                  shouldPromptForApproval.tupled andThen
+                  shouldPromptForFitAndProper.tupled
 
-                if(fitAndProperRequired(savedActivities)) {
-                  if(promptFitAndProper(rps)) {
-                    updateResponsiblePeople(resetHasAccepted(rps)) map { _ =>
-                      redirectTo(data.businessActivities)
-                    }
-                  } else {
-                    updateResponsiblePeople(rps) map { _ =>
-                      redirectTo(data.businessActivities)
-                    }
-                  }
-                } else {
-                  updateResponsiblePeople(removeFitAndProper(rps)) map { _ =>
-                    redirectTo(data.businessActivities)
-                  }
+                val rps = responsiblePeople.map(workFlow(_, savedActivities))
+
+                updateResponsiblePeople(rps) map { _ =>
+                  redirectTo(data.businessActivities)
                 }
               }
             }
@@ -155,8 +164,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def clearSupervisionIfNoLongerRequired(previousBusinessActivities: Set[BusinessActivity],
-                                    currentBusinessActivities: Set[BusinessActivity]
-                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+                                                 currentBusinessActivities: Set[BusinessActivity]
+                                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
     if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
       dataCacheConnector.save[Supervision](Supervision.key, Supervision())
     } else {
@@ -207,8 +216,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def newModel(existingActivities: Option[BusinessMatchingActivities],
-                           added: BusinessMatchingActivities,
-                           isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
+                       added: BusinessMatchingActivities,
+                       isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
     if (isPreSubmission) {
       added
     } else {
@@ -233,7 +242,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def hasASPorTCSP(activities:Set[BusinessActivity]) = {
+  private def hasASPorTCSP(activities: Set[BusinessActivity]) = {
     val containsASP = activities.contains(AccountancyServices)
     val containsTCSP = activities.contains(TrustAndCompanyServices)
     containsASP | containsTCSP
@@ -242,56 +251,71 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
-  private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
-    if (!appConfig.phase2ChangesToggle) {
-      def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+  val shouldPromptForApproval:
+  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities) => {
 
-      (businessActivities.businessActivities, businessActivities.additionalActivities) match {
-        case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
-        case (a, _) => containsTcspOrMsb(a)
-      }
-    } else {
-     true
-    }
-  }
-
-  private def approvalIsRequired(responsiblePeople: Seq[ResponsiblePerson], businessActivities: BusinessMatchingActivities) = {
-
-    def containsTcspOrMsb(activities: Set[BusinessActivity]) = {
+    def containsTcspOrMsb(activities: Set[BusinessActivity]) =
       (activities contains MoneyServiceBusiness) |
       (activities contains TrustAndCompanyServices)
+
+    def approvalIsRequired(responsiblePeople: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
+      !(containsTcspOrMsb(businessActivities.businessActivities))
+
+    def setResponsiblePeopleForApproval(responsiblePeople: ResponsiblePerson)
+    : ResponsiblePerson = {
+      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper match {
+        case Some(false) => responsiblePeople.copy(
+          approvalFlags = ApprovalFlags(
+            hasAlreadyPassedFitAndProper = Some(false),
+            hasAlreadyPaidApprovalCheck = None)
+        )
+        case _ => responsiblePeople
+      }
     }
 
-    val msbOrTcsp = containsTcspOrMsb(businessActivities.businessActivities)
-    val rpWithTrueFitAndProper = responsiblePeople.count(_.approvalFlags.hasAlreadyPassedFitAndProper.contains(false))
-
-    rpWithTrueFitAndProper > 0 & !msbOrTcsp
+    if (approvalIsRequired(rp, activities)) {
+      (setResponsiblePeopleForApproval(rp), activities)
+    } else {
+      (rp, activities)
+    }
   }
 
-  private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
-    responsiblePeople.foldLeft(true){ (x, rp) =>
-      x & rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
-    }
+  val shouldPromptForFitAndProper:
+    (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
+    (rp, activities) => {
 
-  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
-    responsiblePeople map { rp =>
-      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
-    }
+      def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+      def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
+        if (!appConfig.phase2ChangesToggle) {
 
-  private def setResponsiblePeopleForApproval(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
-    responsiblePeople map { rp =>
-      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case Some(false) => rp.copy(hasAccepted = false, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None))
-        case _ => rp
+          (businessActivities.businessActivities, businessActivities.additionalActivities) match {
+            case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
+            case (a, _) => containsTcspOrMsb(a)
+          }
+        } else {
+          true
+        }
       }
 
-    }
+      def promptFitAndProper(responsiblePeople: ResponsiblePerson) =
+        rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
-  private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
-    responsiblePeople map { rp =>
-      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case None => rp.copy(hasAccepted = false)
-        case _ => rp
+      def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
+        rp.approvalFlags.hasAlreadyPassedFitAndProper match {
+          case None => rp.copy(hasAccepted = false)
+          case _ => rp
+        }
+
+      if(fitAndProperRequired(activities)) {
+        if(promptFitAndProper(rp)) {
+          resetHasAccepted(rp)
+        } else {
+          rp
+        }
+      } else {
+        rp
       }
     }
 
