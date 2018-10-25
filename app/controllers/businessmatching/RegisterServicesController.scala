@@ -97,16 +97,25 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   savedModel.businessActivities)
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
-                if(fitAndProperRequired(savedActivities)){
-                  if(promptFitAndProper(responsiblePeople)){
-                    updateResponsiblePeople(resetHasAccepted(responsiblePeople)) map { _ =>
+
+                val rps = if(approvalIsRequired(responsiblePeople, savedActivities)) {
+                  setResponsiblePeopleForApproval(responsiblePeople)
+                } else {
+                  responsiblePeople
+                }
+
+                if(fitAndProperRequired(savedActivities)) {
+                  if(promptFitAndProper(rps)) {
+                    updateResponsiblePeople(resetHasAccepted(rps)) map { _ =>
                       redirectTo(data.businessActivities)
                     }
                   } else {
-                    Future.successful(redirectTo(data.businessActivities))
+                    updateResponsiblePeople(rps) map { _ =>
+                      redirectTo(data.businessActivities)
+                    }
                   }
                 } else {
-                  updateResponsiblePeople(removeFitAndProper(responsiblePeople)) map { _ =>
+                  updateResponsiblePeople(removeFitAndProper(rps)) map { _ =>
                     redirectTo(data.businessActivities)
                   }
                 }
@@ -246,6 +255,19 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     }
   }
 
+  private def approvalIsRequired(responsiblePeople: Seq[ResponsiblePerson], businessActivities: BusinessMatchingActivities) = {
+
+    def containsTcspOrMsb(activities: Set[BusinessActivity]) = {
+      (activities contains MoneyServiceBusiness) |
+      (activities contains TrustAndCompanyServices)
+    }
+
+    val msbOrTcsp = containsTcspOrMsb(businessActivities.businessActivities)
+    val rpWithTrueFitAndProper = responsiblePeople.count(_.approvalFlags.hasAlreadyPassedFitAndProper.contains(false))
+
+    rpWithTrueFitAndProper > 0 & !msbOrTcsp
+  }
+
   private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
     responsiblePeople.foldLeft(true){ (x, rp) =>
       x & rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
@@ -254,6 +276,15 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
     responsiblePeople map { rp =>
       rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
+    }
+
+  private def setResponsiblePeopleForApproval(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
+    responsiblePeople map { rp =>
+      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
+        case Some(false) => rp.copy(hasAccepted = false, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false), hasAlreadyPaidApprovalCheck = None))
+        case _ => rp
+      }
+
     }
 
   private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
