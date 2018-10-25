@@ -303,6 +303,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
 
+      def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
+        rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
 
       def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
         rp.approvalFlags.hasAlreadyPassedFitAndProper match {
@@ -317,7 +319,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
           rp
         }
       } else {
-        rp
+        removeFitAndProper(rp)
       }
     }
 
