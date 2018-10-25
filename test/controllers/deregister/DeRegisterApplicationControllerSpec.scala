@@ -18,22 +18,19 @@ package controllers.deregister
 
 import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
-import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity, BusinessMatching}
 import models.deregister.DeRegisterSubscriptionResponse
-import models.status.SubmissionDecisionApproved
-import org.joda.time.{LocalDate, LocalDateTime}
-import org.jsoup.Jsoup
+import models.registrationdetails.RegistrationDetails
+import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -44,6 +41,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
 
     val businessName = "Test Business"
     val applicationReference = "SUIYD3274890384"
+    val safeId = "X87FUDIKJJKJH87364"
     val registrationDate = LocalDateTime.now()
     val reviewDetails = mock[ReviewDetails]
     val activities = mock[BusinessActivities]
@@ -57,7 +55,11 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
       dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some, activities.some).some)
 
-    when(reviewDetails.businessName).thenReturn(businessName)
+    when(reviewDetails.safeId).thenReturn(safeId)
+
+    when {
+      amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+    } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
     when(activities.businessActivities).thenReturn(Set[BusinessActivity](AccountancyServices))
 
