@@ -123,7 +123,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
                   shouldPromptForApproval.tupled andThen
                   shouldPromptForFitAndProper.tupled
 
-                val rps = responsiblePeople.map(workFlow(_, savedActivities))
+                val rps = responsiblePeople.map(rp => workFlow((rp, savedActivities)))
 
                 updateResponsiblePeople(rps) map { _ =>
                   redirectTo(data.businessActivities)
