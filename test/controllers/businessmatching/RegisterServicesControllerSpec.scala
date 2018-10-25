@@ -959,6 +959,31 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
       }
     }
-  }
+    "shouldPromptForApproval" must {
+      "reset approval flag to none" when {
+        "business activity is not MSB or TCSP and Fit and Proper flag is false" in new Fixture {
 
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck= Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+
+          val result = controller.shouldPromptForApproval(rp, bm)
+
+          val expectedRp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper=Some(false),
+              hasAlreadyPaidApprovalCheck = None
+            )
+          )
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
+    }
+  }
 }
