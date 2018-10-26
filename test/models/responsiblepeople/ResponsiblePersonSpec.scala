@@ -1988,10 +1988,11 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             approvalFlags = ApprovalFlags(
               hasAlreadyPassedFitAndProper = Some(false),
               hasAlreadyPaidApprovalCheck = None
-            )
+            ),
+            hasChanged = true
           )
 
-          outputRp mustEqual (expectedRp)
+          outputRp.approvalFlags mustEqual (expectedRp.approvalFlags)
         }
       }
 
@@ -2005,7 +2006,8 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             approvalFlags = ApprovalFlags(
               hasAlreadyPassedFitAndProper = Some(true),
               hasAlreadyPaidApprovalCheck = Some(true)
-            )
+            ),
+            hasChanged = true
           )
 
           outputRp mustEqual (expectedRp)
@@ -2019,7 +2021,8 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             approvalFlags = ApprovalFlags(
               hasAlreadyPassedFitAndProper = Some(false),
               hasAlreadyPaidApprovalCheck = Some(true)
-            )
+            ),
+            hasChanged = true
           )
 
           outputRp mustEqual (expectedRp)
