@@ -251,33 +251,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
-  val shouldPromptForApproval:
-  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
-  (rp, activities) => {
-
-    def approvalIsRequired(responsiblePeople: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
-      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
-      !(containsTcspOrMsb(businessActivities.businessActivities))
-
-    def setResponsiblePeopleForApproval(responsiblePeople: ResponsiblePerson)
-    : ResponsiblePerson = {
-      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case Some(false) => responsiblePeople.copy(
-          approvalFlags = ApprovalFlags(
-            hasAlreadyPassedFitAndProper = Some(false),
-            hasAlreadyPaidApprovalCheck = None)
-        )
-        case _ => responsiblePeople
-      }
-    }
-
-    if (approvalIsRequired(rp, activities)) {
-      (setResponsiblePeopleForApproval(rp), activities)
-    } else {
-      (rp, activities)
-    }
-  }
-
   private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
   private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
@@ -304,6 +277,9 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       case _ => rp
     }
 
+  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
+    dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
+
   val shouldPromptForFitAndProper:
     (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
@@ -319,6 +295,30 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
       }
     }
 
-  private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
-    dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
+  val shouldPromptForApproval:
+  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities) => {
+
+    def approvalIsRequired(responsiblePeople: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
+      !(containsTcspOrMsb(businessActivities.businessActivities))
+
+    def setResponsiblePeopleForApproval(responsiblePeople: ResponsiblePerson)
+    : ResponsiblePerson = {
+      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper match {
+        case Some(false) => responsiblePeople.copy(
+          approvalFlags = ApprovalFlags(
+            hasAlreadyPassedFitAndProper = Some(false),
+            hasAlreadyPaidApprovalCheck = None)
+        )
+        case _ => responsiblePeople
+      }
+    }
+
+    if (approvalIsRequired(rp, activities)) {
+      (setResponsiblePeopleForApproval(rp), activities)
+    } else {
+      (rp, activities)
+    }
+  }
 }
