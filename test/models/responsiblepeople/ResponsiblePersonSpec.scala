@@ -1992,7 +1992,7 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             hasChanged = true
           )
 
-          outputRp.approvalFlags mustEqual (expectedRp.approvalFlags)
+          outputRp mustEqual (expectedRp)
         }
       }
 
