@@ -306,11 +306,14 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
     def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
       rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case Some(false) => rp.copy(
-          approvalFlags = ApprovalFlags(
-            hasAlreadyPassedFitAndProper = Some(false),
-            hasAlreadyPaidApprovalCheck = None)
-        )
+        case Some(false) =>
+          rp.approvalFlags(
+            rp.approvalFlags.copy(
+              hasAlreadyPaidApprovalCheck = None
+            )
+          ).copy(
+            hasAccepted = false
+          )
         case _ => rp
       }
     }
