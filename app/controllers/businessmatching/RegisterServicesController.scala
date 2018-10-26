@@ -299,18 +299,18 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def promptFitAndProper(rp: ResponsiblePerson) =
     rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
+  private def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
+    rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
+
+  private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
+    rp.approvalFlags.hasAlreadyPassedFitAndProper match {
+      case None => rp.copy(hasAccepted = false)
+      case _ => rp
+    }
+
   val shouldPromptForFitAndProper:
     (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
     (rp, activities) => {
-
-      def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
-        rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
-
-      def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
-        rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-          case None => rp.copy(hasAccepted = false)
-          case _ => rp
-        }
 
       if(fitAndProperRequired(activities)) {
         if(promptFitAndProper(rp)) {
