@@ -986,6 +986,27 @@ class RegisterServicesControllerSpec extends AmlsSpec
           result mustEqual((expectedRp, expectedBm))
         }
       }
+
+      "not handle any approvalFlags" when {
+        "the toggle is off" in new Fixture {
+
+          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+
+          val result = controller.shouldPromptForApproval(rp, bm)
+
+          val expectedRp = rp
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
     }
   }
 }

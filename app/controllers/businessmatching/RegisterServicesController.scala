@@ -305,8 +305,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
     def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
-      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case Some(false) =>
+      (rp.approvalFlags.hasAlreadyPassedFitAndProper, rp.approvalFlags.hasAlreadyPaidApprovalCheck) match {
+        case (Some(false), Some(_)) =>
           rp.approvalFlags(
             rp.approvalFlags.copy(
               hasAlreadyPaidApprovalCheck = None
