@@ -100,5 +100,18 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
       filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
       filtered.collect { case (p, _) if !p.isComplete => p } mustBe empty
     }
+
+    "be filtered to only include people not deleted" in new Fixture {
+
+      val people = responsiblePeople.patch(0, Seq(
+        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+        responsiblePersonGen.sample.get.copy(personName = None)),
+        2).zipWithIndex
+
+      val filtered = people.exceptDeleted
+
+      filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
+      filtered.collect { case (p, _) if !p.isComplete => p } must not be empty
+    }
   }
 }

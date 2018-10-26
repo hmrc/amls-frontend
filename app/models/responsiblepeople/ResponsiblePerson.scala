@@ -73,18 +73,14 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   }
 
   def resetBasedOnApprovalFlags(): ResponsiblePerson = {
-
     (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
       case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
       case (_, ApprovalFlags(Some(true), _)) => this
-      case _ => this.copy(
-        hasAccepted = true,
-        // TODO - do we need to set the changed flag here also?
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPaidApprovalCheck = None,
-          hasAlreadyPassedFitAndProper = Some(false)
+      case _ =>
+        this.approvalFlags(
+          this.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None,
+            hasAlreadyPassedFitAndProper = Some(false))
         )
-      )
     }
   }
 
@@ -145,13 +141,6 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
       hasAccepted = hasAccepted && this.training.contains(p))
 
   def approvalFlags(p: ApprovalFlags): ResponsiblePerson = {
-    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - this.approvalFlags.ne(p): " + this.approvalFlags.ne(p))
-    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - !this.approvalFlags.eq(p): " + !this.approvalFlags.eq(p))
-    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - !this.approvalFlags.equals(p): " + !this.approvalFlags.equals(p))
-
-    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - : this.approvalFlags" + this.approvalFlags + " and p: " + p)
-
-
     this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
       hasAccepted = hasAccepted && this.approvalFlags.equals(p))
   }

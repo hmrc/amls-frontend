@@ -2058,7 +2058,7 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
             approvalFlags = ApprovalFlags(
               hasAlreadyPassedFitAndProper = Some(false),
               hasAlreadyPaidApprovalCheck = None),
-            hasAccepted = true,
+            hasAccepted = false,
             hasChanged = true)
 
           inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)

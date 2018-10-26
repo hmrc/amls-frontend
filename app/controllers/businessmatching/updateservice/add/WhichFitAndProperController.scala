@@ -54,7 +54,7 @@ class WhichFitAndProperController @Inject()(
           rp <- OptionT.liftF(responsiblePeopleService.getAll)
           flowModel <- OptionT(dataCacheConnector.fetch[AddBusinessTypeFlowModel](AddBusinessTypeFlowModel.key))
         } yield {
-          val indexedRp = rp.zipWithIndex.exceptInactive
+          val indexedRp = rp.zipWithIndex.exceptDeleted
           val form = flowModel.responsiblePeople.fold[Form2[ResponsiblePeopleFitAndProper]](EmptyForm)(Form2[ResponsiblePeopleFitAndProper])
           Ok(which_fit_and_proper(form, edit, indexedRp))
         }) getOrElse InternalServerError("")
