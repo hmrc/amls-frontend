@@ -367,4 +367,72 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
       }
     }
   }
+
+  "updateApprovalMsbOrTcsp" must {
+    "be true for MSB and phase 2" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(MoneyServiceBusiness))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe true
+    }
+
+    "be true for TCSP and phase 2" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(TrustAndCompanyServices))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe true
+    }
+
+    "be false for non MSB or TCSP and phase 2" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(HighValueDealing))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe false
+    }
+
+    "be false for non phase 2 and MSB" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(MoneyServiceBusiness))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe false
+    }
+
+    "be false for non phase 2 and TCSP" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(TrustAndCompanyServices))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe false
+    }
+
+    "be false for non phase 2 and non TCSP and non MSB" in new Fixture {
+      when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+      val people = Gen.listOfN(5, responsiblePersonGen).sample.get map {
+        _.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+      }
+
+      mockCacheUpdate(Some(ResponsiblePerson.key), people)
+      val model = AddBusinessTypeFlowModel(Some(HighValueDealing))
+      SUT.updateApprovalMsbOrTcsp(model) mustBe false
+    }
+  }
 }

@@ -140,10 +140,9 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def approvalFlags(p: ApprovalFlags): ResponsiblePerson = {
+  def approvalFlags(p: ApprovalFlags): ResponsiblePerson =
     this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
       hasAccepted = hasAccepted && this.approvalFlags.equals(p))
-  }
 
   def ukPassport(p: UKPassport): ResponsiblePerson =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
