@@ -48,13 +48,10 @@ class DeRegisterApplicationController @Inject()
             amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
             ba <- OptionT.fromOption[Future](bm.activities)
             name <- BusinessName.getNameFromAmls(details.safeId)
-
-            //BusinessName.getBusinessNameFromAmls()
           } yield {
             val activities = ba.businessActivities map {
               _.getMessage()
             }
-
             Ok(deregister_application(name, activities, amlsRegNumber))
           }) getOrElse InternalServerError("Could not show the de-register page")
     }

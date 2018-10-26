@@ -21,16 +21,15 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import models.registrationdetails.RegistrationDetails
 import models.status.SubmissionReadyForReview
-import models.withdrawal.WithdrawSubscriptionResponse
 import org.joda.time.LocalDateTime
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
-import services.{AuthEnrolmentsService, StatusService}
-import utils.{AuthorisedFixture, DateHelper, AmlsSpec}
+import services.StatusService
+import utils.{AmlsSpec, AuthorisedFixture, DateHelper}
 
 import scala.concurrent.Future
 
@@ -47,6 +46,7 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, cacheConnector, statusService)
 
     val amlsRegistrationNumber = "XA1234567890L"
+    val safeId = "X87FUDIKJJKJH87364"
     val businessName = "Test Business"
     val reviewDetails = mock[ReviewDetails]
 
@@ -54,7 +54,11 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     val processingDate = new LocalDateTime(2002, 1, 1, 12, 0, 0)
     val statusResponse = ReadStatusResponse(processingDate, "", None, None, None, None, renewalConFlag = false)
 
-    when(reviewDetails.businessName).thenReturn(businessName)
+    when(reviewDetails.safeId).thenReturn(safeId)
+
+    when {
+      amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+    } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
     when {
       cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
