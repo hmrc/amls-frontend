@@ -255,10 +255,6 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
   (rp, activities) => {
 
-    def containsTcspOrMsb(activities: Set[BusinessActivity]) =
-      (activities contains MoneyServiceBusiness) |
-      (activities contains TrustAndCompanyServices)
-
     def approvalIsRequired(responsiblePeople: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
       responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
       !(containsTcspOrMsb(businessActivities.businessActivities))
