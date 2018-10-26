@@ -299,19 +299,19 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
   (rp, activities) => {
 
-    def approvalIsRequired(responsiblePeople: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
-      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
+    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+      rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
       !(containsTcspOrMsb(businessActivities.businessActivities))
 
-    def setResponsiblePeopleForApproval(responsiblePeople: ResponsiblePerson)
+    def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
     : ResponsiblePerson = {
-      responsiblePeople.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case Some(false) => responsiblePeople.copy(
+      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
+        case Some(false) => rp.copy(
           approvalFlags = ApprovalFlags(
             hasAlreadyPassedFitAndProper = Some(false),
             hasAlreadyPaidApprovalCheck = None)
         )
-        case _ => responsiblePeople
+        case _ => rp
       }
     }
 
