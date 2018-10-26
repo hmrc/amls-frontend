@@ -261,7 +261,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
         )
 
         when {
-          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+          responsiblePeopleService.updateFitAndProperFlag(any(), any(), any())
         } thenReturn updatedPeople
 
         SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
@@ -284,7 +284,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
         )
 
         when {
-          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+          responsiblePeopleService.updateFitAndProperFlag(any(), any(), any())
         } thenReturn updatedPeople
 
         SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
@@ -307,7 +307,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
         )
 
         when {
-          responsiblePeopleService.updateFitAndProperFlag(any(), any())
+          responsiblePeopleService.updateFitAndProperFlag(any(), any(), any())
         } thenReturn updatedPeople
 
         SUT.updateResponsiblePeople(model).returnsSome(updatedPeople)
@@ -327,7 +327,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
         SUT.updateResponsiblePeople(model).returnsSome(people)
 
-        verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any())
+        verify(responsiblePeopleService, never).updateFitAndProperFlag(any(), any(), any())
       }
     }
   }

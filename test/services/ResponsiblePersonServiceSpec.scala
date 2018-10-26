@@ -60,7 +60,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
         "a single selection is made" in new Fixture {
           val indices = Set(1)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
             responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
@@ -73,7 +73,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
         "multiple selections are made" in new Fixture {
           val indices = Set(0, 3, 4)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
               responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),

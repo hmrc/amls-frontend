@@ -85,6 +85,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
       case (_, ApprovalFlags(Some(true), _)) => this
       case _ => this.copy(
         hasAccepted = true,
+        // TODO - do we need to set the changed flag here also?
         approvalFlags = ApprovalFlags(
           hasAlreadyPaidApprovalCheck = None,
           hasAlreadyPassedFitAndProper = Some(false)
@@ -149,9 +150,17 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
     this.copy(training = Some(p), hasChanged = hasChanged || !this.training.contains(p),
       hasAccepted = hasAccepted && this.training.contains(p))
 
-  def approvalFlags(p: ApprovalFlags): ResponsiblePerson =
+  def approvalFlags(p: ApprovalFlags): ResponsiblePerson = {
+    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - this.approvalFlags.ne(p): " + this.approvalFlags.ne(p))
+    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - !this.approvalFlags.eq(p): " + !this.approvalFlags.eq(p))
+    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - !this.approvalFlags.equals(p): " + !this.approvalFlags.equals(p))
+
+    Logger.debug("ACHI [ResponsiblePeople][approvalFlags] - : this.approvalFlags" + this.approvalFlags + " and p: " + p)
+
+
     this.copy(approvalFlags = p, hasChanged = hasChanged || !this.approvalFlags.equals(p),
       hasAccepted = hasAccepted && this.approvalFlags.equals(p))
+  }
 
   def ukPassport(p: UKPassport): ResponsiblePerson =
     this.copy(ukPassport = Some(p), hasChanged = hasChanged || !this.ukPassport.contains(p),
