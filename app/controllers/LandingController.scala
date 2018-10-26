@@ -19,8 +19,9 @@ package controllers
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import javax.inject.{Inject, Singleton}
+import models._
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -34,19 +35,17 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models._
+import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import services.AuthService
-import play.api.Logger
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.BusinessName
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-
 import scala.util.{Success, Try}
 
 @Singleton
@@ -54,8 +53,10 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val enrolmentsService: AuthEnrolmentsService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
-                                  val cacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                  implicit val cacheConnector: DataCacheConnector,
+                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                  implicit val amlsConnector: AmlsConnector,
+                                  implicit val statusService: StatusService
                                 ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
@@ -101,11 +102,12 @@ class LandingController @Inject()(val landingService: LandingService,
         for {
           reviewDetails <- landingService.reviewDetails
           amlsRef <- amlsReferenceNumber
-        } yield (reviewDetails, amlsRef) match {
-          case (Some(rd), None) =>
+          businessName <- BusinessName.getName(Some(reviewDetails.get.safeId)).value
+        } yield (reviewDetails, amlsRef, businessName) match {
+          case (Some(rd), None, name) =>
             Logger.debug("LandingController:getWithoutAmendments: " + rd)
             landingService.updateReviewDetails(rd) map { _ => {
-              auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
+              auditConnector.sendExtendedEvent(ServiceEntrantEvent(businessName.getOrElse(""), rd.utr.getOrElse(""), rd.safeId))
 
               FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
                 case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
@@ -113,16 +115,17 @@ class LandingController @Inject()(val landingService: LandingService,
               }
             }
             }
-          case (None, None) =>
+          case (None, None, _) =>
             Logger.debug("LandingController:getWithoutAmendments - (None, None)")
             Future.successful(Redirect(Call("GET", ApplicationConfig.businessCustomerUrl)))
-          case (_, Some(_)) =>
+          case (_, Some(_), _) =>
             Logger.debug("LandingController:getWithoutAmendments: " + amlsRef)
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
     }
   }
+
 
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
 

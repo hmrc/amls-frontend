@@ -18,8 +18,8 @@ package controllers
 
 import java.net.URLEncoder
 
-import config.{AmlsShortLivedCache, ApplicationConfig}
-import connectors.DataCacheConnector
+import config.ApplicationConfig
+import connectors.{AmlsConnector, DataCacheConnector}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -29,6 +29,7 @@ import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
+import models.registrationdetails.RegistrationDetails
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
@@ -42,21 +43,19 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import play.api.libs.json.JsResultException
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import play.api.libs.json.JsResultException
-import services.AuthService
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
@@ -73,7 +72,9 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
-      cacheConnector = mock[DataCacheConnector]
+      cacheConnector = mock[DataCacheConnector],
+      amlsConnector = mock[AmlsConnector],
+      statusService = mock[StatusService]
     ){
       override val shortLivedCache = mock[ShortLivedCache]
     }
@@ -155,15 +156,19 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
         "the landing service has valid review details" in new Fixture {
 
+          val safeId = "X87FUDIKJJKJH87364"
+
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
             businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
-            safeId = ""))
+            safeId = safeId))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
+          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -173,16 +178,19 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
         }
 
         "the landing service has review details with invalid postcode" in new Fixture {
+          val safeId = "X87FUDIKJJKJH87364"
 
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
             businessAddress = Address("Line 1", "Line 2", None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
-            safeId = ""))
+            safeId = safeId))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
+          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -190,9 +198,14 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
         }
 
         "the landing service has no valid review details" in new Fixture {
+          val safeId = "X87FUDIKJJKJH87364"
+
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
+          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
+
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
@@ -305,7 +318,9 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
-      cacheConnector = mock[DataCacheConnector]
+      cacheConnector = mock[DataCacheConnector],
+      amlsConnector = mock[AmlsConnector],
+      statusService = mock[StatusService]
     ) {
       override val shortLivedCache = mock[ShortLivedCache]
     }
