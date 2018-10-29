@@ -16,27 +16,31 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
+import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{BusinessName, RepeatingSection}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector)
+                                         implicit val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector,
+                                         implicit val statusService: StatusService,
+                                         implicit val amlsConnector: AmlsConnector)
   extends RepeatingSection with BaseController {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
@@ -61,7 +65,7 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
       } getOrElse redirect
   }
 
-  def updateAddressFromBM(maybeYtp: Option[YourTradingPremises], maybeBm: Option[BusinessMatching]): Option[YourTradingPremises] = {
+  def updateAddressFromBM(bname: String, maybeYtp: Option[YourTradingPremises], maybeBm: Option[BusinessMatching]): Option[YourTradingPremises] = {
     val f: ReviewDetails => (String, Address) = { r =>
       (r.businessName, Address(r.businessAddress.line_1,
         r.businessAddress.line_2,
@@ -73,21 +77,43 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
     (maybeBm, maybeYtp) match {
       case (Some(bm), Some(ytp)) => bm.reviewDetails.fold(maybeYtp) { r =>
         f(r) match {
-          case (name, address) => Some(ytp.copy(name, address))
+          case (name, address) => Some(ytp.copy(bname, address))
         }
       }
       case (Some(bm), _) => bm.reviewDetails.fold(maybeYtp) { r =>
         f(r) match {
-          case (name, address) => Some(YourTradingPremises(name, address))
+          case (name, address) => Some(YourTradingPremises(bname, address))
         }
       }
       case _ => maybeYtp
     }
   }
 
+  def getCompanyName()(implicit hc: HeaderCarrier, ac: AuthContext) = {
+    for {
+      cache <- OptionT(dataCacheConnector.fetchAll)
+      bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      rd <- OptionT.fromOption[Future](bm.reviewDetails)
+      name <- BusinessName.getNameFromAmls(rd.safeId)
+    } yield name
+  }
+
+  def companyName(safeId: String) = Authorised.async {
+    implicit authContext => implicit request =>
+      AmlsConnector.registrationDetails(safeId) map { details =>
+        Ok(details.companyName)
+      } recover {
+        case _ => Ok("Failed to fetch registration details")
+      }
+  }
+
   def post(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
+        val name: OptionT[Future, String] = for {
+          bname <- getCompanyName()
+        } yield bname
+
         Form2[ConfirmAddress](request.body) match {
           case f: InvalidForm => {
             for {
@@ -99,8 +125,9 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
             data.confirmAddress match {
               case true => {
                 for {
+                  bname <- name.value
                   _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
-                    tp.copy(yourTradingPremises = updateAddressFromBM(tp.yourTradingPremises, cache.getEntry[BusinessMatching](BusinessMatching.key)))
+                    tp.copy(yourTradingPremises = updateAddressFromBM(bname.get, tp.yourTradingPremises, cache.getEntry[BusinessMatching](BusinessMatching.key)))
                   }
                 } yield Redirect(routes.ActivityStartDateController.get(index))
               }

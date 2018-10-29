@@ -16,21 +16,20 @@
 
 package controllers.tradingpremises
 
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.Country
-import models.businesscustomer.{ReviewDetails, Address => BCAddress}
-import models.businessmatching.{BusinessMatching, BusinessType}
-import models.tradingpremises.{Address, AgentCompanyDetails, TradingPremises, YourTradingPremises}
+import models.businesscustomer.ReviewDetails
+import models.businessmatching.BusinessMatching
+import models.registrationdetails.RegistrationDetails
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import play.api.test.Helpers._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, RepeatingSection}
+import play.api.test.Helpers._
+import services.StatusService
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
@@ -40,7 +39,16 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
     self =>
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mockCacheConnector
-    val controller = new ConfirmAddressController(messagesApi, self.dataCache, self.authConnector)
+    val reviewDetails = mock[ReviewDetails]
+    val statusService = mock[StatusService]
+    val amls = mock[AmlsConnector]
+    val controller = new ConfirmAddressController(
+      messagesApi,
+      self.dataCache,
+      self.authConnector,
+      statusService,
+      amls
+    )
 
     mockCacheFetchAll
   }
@@ -113,6 +121,13 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       "successfully redirect to next page" when {
 
         "option is 'Yes' is selected confirming the mentioned address is the trading premises address" in new Fixture {
+          val safeId = "X87FUDIKJJKJH87364"
+
+          when(reviewDetails.safeId).thenReturn(safeId)
+
+          when {
+            amls.registrationDetails(meq(safeId))(any(), any(), any())
+          } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
 
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "true"
