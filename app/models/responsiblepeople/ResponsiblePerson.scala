@@ -73,17 +73,14 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   }
 
   def resetBasedOnApprovalFlags(): ResponsiblePerson = {
-
     (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
       case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
       case (_, ApprovalFlags(Some(true), _)) => this
-      case _ => this.copy(
-        hasAccepted = true,
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPaidApprovalCheck = None,
-          hasAlreadyPassedFitAndProper = Some(false)
+      case _ =>
+        this.approvalFlags(
+          this.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None,
+            hasAlreadyPassedFitAndProper = Some(false))
         )
-      )
     }
   }
 
