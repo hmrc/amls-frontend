@@ -17,7 +17,9 @@
 package controllers
 
 import audit.ServiceEntrantEvent
+import cats.data.OptionT
 import cats.data.Validated.{Invalid, Valid}
+import cats.implicits._
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import connectors.{AmlsConnector, DataCacheConnector}
 import javax.inject.{Inject, Singleton}
@@ -93,7 +95,7 @@ class LandingController @Inject()(val landingService: LandingService,
         }
   }
 
-  def getWithoutAmendments(implicit authContext: AuthContext, request: Request[_]) = {
+  def getWithoutAmendments(implicit authContext: AuthContext,request: Request[_]) = {
     val amlsReferenceNumber = enrolmentsService.amlsRegistrationNumber
     Logger.debug("getWithoutAmendments:AMLSReference:" + amlsReferenceNumber)
     landingService.cacheMap flatMap {
@@ -107,13 +109,6 @@ class LandingController @Inject()(val landingService: LandingService,
           case (Some(rd), None) =>
             Logger.debug("LandingController:getWithoutAmendments: " + rd)
             landingService.updateReviewDetails(rd) map { _ => {
-              for {
-                name <- BusinessName.getName(getSafeId(Some(rd))).value
-              } yield name match {
-                case Some(name) => auditConnector.sendExtendedEvent(ServiceEntrantEvent(name, rd.utr.getOrElse(""), rd.safeId))
-                case _ => auditConnector.sendExtendedEvent(ServiceEntrantEvent("", rd.utr.getOrElse(""), rd.safeId))
-              }
-
                 FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
                   case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
                   case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
@@ -129,6 +124,15 @@ class LandingController @Inject()(val landingService: LandingService,
         }
       }.flatMap(identity)
     }
+  }
+
+  private def businessName(rd: ReviewDetails)(implicit hc: HeaderCarrier, ac: AuthContext): OptionT[Future, String] = for {
+    bName <- BusinessName.getName(getSafeId(Some(rd)))
+  } yield bName
+
+  private def sendAuditEvent(businessName: String,
+                             rd: ReviewDetails)(implicit request: Request[_]) = {
+    auditConnector.sendExtendedEvent(ServiceEntrantEvent(businessName, rd.utr.getOrElse(""), rd.safeId))
   }
 
   private def getSafeId(rd: Option[ReviewDetails]): Option[String] = {
