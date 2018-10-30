@@ -19,10 +19,11 @@ package controllers.tradingpremises
 import connectors.{AmlsConnector, DataCacheConnector}
 import generators.businessmatching.BusinessMatchingGenerator
 import generators.tradingpremises.TradingPremisesGenerator
-import models.businesscustomer.ReviewDetails
-import models.businessmatching.BusinessMatching
+import models.Country
+import models.businesscustomer.{Address, ReviewDetails}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.registrationdetails.RegistrationDetails
-import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
+import models.tradingpremises.{TradingPremises, YourTradingPremises}
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -49,7 +50,6 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       statusService,
       amls
     )
-
     mockCacheFetchAll
   }
 
@@ -105,10 +105,16 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
     "Post" must {
 
-      val ytp = (bm.reviewDetails map { rd =>
+      val safeId = "X87FUDIKJJKJH87364"
+
+      val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
+      val reviewDetailsModel = ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)
+      val bmWithNewReviewDetails = bm.copy(reviewDetails = Some(reviewDetailsModel))
+
+      val ytp = (bmWithNewReviewDetails.reviewDetails map { rd =>
         YourTradingPremises(
-          rd.businessName,
-          Address(
+          "Business Name from registration",
+          models.tradingpremises.Address(
             rd.businessAddress.line_1,
             rd.businessAddress.line_2,
             rd.businessAddress.line_3,
@@ -121,20 +127,25 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
       "successfully redirect to next page" when {
 
         "option is 'Yes' is selected confirming the mentioned address is the trading premises address" in new Fixture {
-          val safeId = "X87FUDIKJJKJH87364"
 
-          when(reviewDetails.safeId).thenReturn(safeId)
+          val model = BusinessMatching(
+            reviewDetails = Some(reviewDetailsModel)
+          )
 
           when {
-            amls.registrationDetails(meq(safeId))(any(), any(), any())
-          } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
+            controller.dataCacheConnector.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any())
+          } thenReturn Future.successful(Some(model))
+
+          when {
+            controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())
+          } thenReturn Future.successful(RegistrationDetails("Business Name from registration", isIndividual = false))
 
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "true"
           )
 
           mockCacheGetEntry(Some(Seq(TradingPremises())), TradingPremises.key)
-          mockCacheGetEntry(Some(bm), BusinessMatching.key)
+          mockCacheGetEntry(Some(model), BusinessMatching.key)
 
           when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
             .thenReturn(Future.successful(mockCacheMap))
