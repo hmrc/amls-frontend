@@ -37,10 +37,10 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{status => _, _}
 import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito
 import org.mockito.Mockito._
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
-import org.mockito.{Matchers, Mockito}
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.JsResultException
@@ -50,7 +50,8 @@ import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 
@@ -157,36 +158,24 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
         "the landing service has valid review details" in new Fixture {
 
-          val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
-          val reviewDetailsModel = ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)
-          val applicationReference = "SUIYD3274890384"
-
-          val model = BusinessMatching(
-            reviewDetails = Some(reviewDetailsModel)
-          )
-
-          when {
-            controller.cacheConnector.fetch[BusinessMatching](meq(BusinessMatching.key))(any(), any(), any())
-          } thenReturn Future.successful(Some(model))
-
-          when {
-            controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())
-          } thenReturn Future.successful(RegistrationDetails("Business Name from registration", isIndividual = false))
-
+          val details = Some(ReviewDetails(businessName = "Test",
+            businessType = None,
+            businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
+            safeId = safeId))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(Some(reviewDetailsModel)))
-          when(controller.landingService.updateReviewDetails(meq(reviewDetailsModel))(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
+          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
+          when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
-          when(controller.auditConnector.sendExtendedEvent(Matchers.any())(Matchers.any(), Matchers.any()))
-            .thenReturn(Future.successful(AuditResult.Success))
+          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(
+            Future.successful(RegistrationDetails("Test Business from API 1", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.businessmatching.routes.BusinessTypeController.get().url)
 
-          //verify(controller.auditConnector).sendExtendedEvent(any())(any(), any())
+          verify(controller.auditConnector).sendExtendedEvent(any[ExtendedDataEvent])(any(), any())
         }
 
         "the landing service has review details with invalid postcode" in new Fixture {
@@ -200,8 +189,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any()))
-            .thenReturn(Future.successful(RegistrationDetails("Test Business from API 1", isIndividual = false)))
+          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
