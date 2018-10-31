@@ -16,24 +16,22 @@
 
 package services
 
-import java.lang.RuntimeException
-
 import connectors.AmlsConnector
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, NotStarted, Section}
 import models.status._
 import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Call
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
@@ -200,5 +198,14 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
       }
     }
 
+    "return SafeId" in {
+      val safeId = "J4JF8EJ3NDJWI32W"
+      when(TestStatusService.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsref")))
+      when(TestStatusService.progressService.sections(any(), any(), any())).thenReturn(Future.successful(Seq(Section("test", Completed, false, Call("", "")))))
+      when(TestStatusService.amlsConnector.status(any())(any(), any(), any(), any())).thenReturn(Future.successful(readStatusResponse.copy(safeId = Some(safeId))))
+      whenReady(TestStatusService.getSafeIdFromReadStatus("amlsref")) {
+        _ mustEqual Some(safeId)
+      }
+    }
   }
 }
