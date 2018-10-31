@@ -156,7 +156,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
       "the landing service has no saved form and " when {
 
         "the landing service has valid review details" in new Fixture {
-          //val safeId = "X87FUDIKJJKJH87364"
 
           val businessAddress = Address("line1", "line2", Some("line3"), Some("line4"), Some("AA11 1AA"), Country("United Kingdom", "GB"))
           val reviewDetailsModel = ReviewDetails("Business name from review details", Some(BusinessType.SoleProprietor), businessAddress, safeId)

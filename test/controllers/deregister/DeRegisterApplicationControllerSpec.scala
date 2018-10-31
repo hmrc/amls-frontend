@@ -39,7 +39,7 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
   trait TestFixture extends AuthorisedFixture { self =>
     val request = addToken(authRequest)
 
-    val businessName = "Test Business"
+    val businessName = "Business Name from registration details"
     val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"
     val registrationDate = LocalDateTime.now()
@@ -55,11 +55,9 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
       dataCache.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
     } thenReturn Future.successful(BusinessMatching(reviewDetails.some, activities.some).some)
 
-    when(reviewDetails.safeId).thenReturn(safeId)
-
     when {
       amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
-    } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
+    } thenReturn Future.successful(RegistrationDetails(businessName, isIndividual = false))
 
     when(activities.businessActivities).thenReturn(Set[BusinessActivity](AccountancyServices))
 
@@ -70,6 +68,10 @@ class DeRegisterApplicationControllerSpec extends AmlsSpec with MustMatchers wit
     when {
       amlsConnector.deregister(any(), any())(any(), any(), any())
     } thenReturn Future.successful(DeRegisterSubscriptionResponse("Some date"))
+
+    when {
+      controller.statusService.getSafeIdFromReadStatus(any())(any(), any(), any())
+    } thenReturn Future.successful(Some(safeId))
 
 
   }

@@ -44,10 +44,10 @@ class DeRegisterApplicationController @Inject()
         implicit request =>
           (for {
             bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
-            details <- OptionT.fromOption[Future](bm.reviewDetails)
-            amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+            amlsRegNumber: String <- OptionT(enrolments.amlsRegistrationNumber)
             ba <- OptionT.fromOption[Future](bm.activities)
-            name <- BusinessName.getNameFromAmls(details.safeId)
+            id: String <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
+            name <- BusinessName.getNameFromAmls(id)
           } yield {
             val activities = ba.businessActivities map {
               _.getMessage()
