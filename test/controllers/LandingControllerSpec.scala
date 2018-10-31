@@ -127,7 +127,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, 1.0, None, 1.0)))))
+            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -424,6 +424,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "TESTAMLSREFNNO", Some(SubscriptionFees(
             "TESTPAYMENTREF",
             100.45,
+            None,
+            None,
             None,
             None,
             123.78,

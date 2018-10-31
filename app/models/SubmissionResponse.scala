@@ -22,6 +22,8 @@ trait SubmissionResponse {
   def getPremiseFeeRate: Option[BigDecimal]
   def getFpFeeRate: Option[BigDecimal]
   def getFpFee: Option[BigDecimal]
+  def getApprovalCheckFee: Option[BigDecimal]
+  def getApprovalCheckFeeRate: Option[BigDecimal]
   def getPremiseFee: BigDecimal
   def getPaymentReference: String
   def getTotalFees: BigDecimal

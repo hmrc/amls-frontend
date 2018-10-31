@@ -181,7 +181,8 @@
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
                 editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
-                dataItem = Some(ukPassport)
+                dataItem = Some(ukPassport),
+                editLinkTag = "uk-passport"
             ) { pp =>
                 @pp match {
                     case UKPassportYes(ukPassportNumber) => {

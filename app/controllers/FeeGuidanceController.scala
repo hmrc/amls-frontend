@@ -55,7 +55,7 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
 
     val submissionFee = ApplicationConfig.regFee
     val premisesFee = ApplicationConfig.premisesFee
-    val peopleFee = ApplicationConfig.peopleFee
+    val peopleFee = ApplicationConfig.peopleFeeRate
 
     dataCacheConnector.fetchAll map { optCacheMap =>
       (for {

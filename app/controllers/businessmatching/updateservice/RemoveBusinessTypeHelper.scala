@@ -127,15 +127,16 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                         (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[ResponsiblePerson]] = {
 
     val emptyActivities = BMBusinessActivities(Set.empty[BMBusinessActivity])
-    val canRemoveFitProper = (current: Set[BMBusinessActivity], removing: Set[BMBusinessActivity]) => {
+
+    val canRemoveFitProper = (
+      current: Set[BMBusinessActivity],
+      removing: Set[BMBusinessActivity]
+    ) => {
       val hasTCSP = current.contains(TrustAndCompanyServices)
       val hasMSB = current.contains(MoneyServiceBusiness)
 
-      !ApplicationConfig.phase2ChangesToggle &&
-      (
-        (removing.contains(MoneyServiceBusiness) && !hasTCSP) ||
-        (removing.contains(TrustAndCompanyServices) && !hasMSB)
-      )
+      (removing.contains(MoneyServiceBusiness) && !hasTCSP) ||
+      (removing.contains(TrustAndCompanyServices) && !hasMSB)
     }
 
     for {
@@ -145,12 +146,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
       newResponsiblePeople <- {
         OptionT(dataCacheConnector.update[Seq[ResponsiblePerson]](ResponsiblePerson.key) {
           case Some(rpList) if canRemoveFitProper(currentActivities.businessActivities, activitiesToRemove) =>
-            rpList.map(rp => {
-              val newApprovalFlags = rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)
-              rp.copy(hasAccepted = true,
-                      approvalFlags = newApprovalFlags
-              )
-            })
+            rpList.map(rp => rp.resetBasedOnApprovalFlags())
           case Some(rpList) => rpList
           case _ => throw new RuntimeException("No responsible people found")
         })

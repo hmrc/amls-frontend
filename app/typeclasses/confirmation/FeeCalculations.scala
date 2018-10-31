@@ -39,10 +39,14 @@ trait FeeCalculations {
   val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
 
   def peopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
-    response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
+    response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFeeRate))
+
+  def approvalCheckPeopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed",
+    response.getApprovalCheckFeeRate.getOrElse(ApplicationConfig.approvalCheckPeopleFeeRate))
 
   def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
-    variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFee))
+    variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFeeRate))
+
 
   def renewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =
     (premisesRow(renewal).feePer * renewal.addedFullYearTradingPremises) + renewalHalfYearPremisesFee(renewal)
@@ -58,9 +62,13 @@ trait FeeCalculations {
 
   def renewalFitAndProperDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
+  def renewalApprovalCheckDeduction(renewal: AmendVariationRenewalResponse): BigDecimal = 0
+
   def renewalZeroPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal = 0
 
   val peopleFPPassed = RowEntity("confirmation.responsiblepeople.fp.passed", 0)
+
+  val peopleApprovalCheckPassed = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed", 0)
 
   val max = (x: BigDecimal, y: BigDecimal) => if (x > y) x else y
 

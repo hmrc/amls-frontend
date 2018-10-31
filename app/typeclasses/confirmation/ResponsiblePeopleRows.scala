@@ -17,10 +17,11 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
+import models.businessmatching.{AccountancyServices, BusinessActivity, EstateAgentBusinessService, HighValueDealing, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import utils.StatusConstants
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -39,33 +40,146 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
   val splitPeopleByFitAndProperTest = (people: Seq[ResponsiblePerson]) =>
     ResponsiblePerson.filter(people).partition(_.approvalFlags.hasAlreadyPassedFitAndProper.getOrElse(false))
 
+  def countNonDeletedPeopleWhoHaventPassedApprovalCheck(people: Seq[ResponsiblePerson]) =
+    people.count(x => x.approvalFlags.hasAlreadyPaidApprovalCheck.contains(false) && !x.status.contains(StatusConstants.Deleted))
+
+  def countNonDeletedPeopleWhoHaventPassedFitAndProper(people: Seq[ResponsiblePerson]) :Int =
+    people.count(x => x.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) && !x.status.contains(StatusConstants.Deleted))
+
+  def createBreakdownRowForAmendVariationRenewalResponse(value: AmendVariationRenewalResponse,
+                                                         people: Option[Seq[ResponsiblePerson]],
+                                                         activities: Set[BusinessActivity]
+                                                        ): Seq[BreakdownRow] = {
+
+      val (notPassedFP, notPassedApprovalCheck) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeopleApprovalCheck)
+
+      (notPassedFP > 0, notPassedApprovalCheck > 0) match {
+        case (true, _) =>  Seq(
+          BreakdownRow(
+            peopleRow(value).message,
+            value.addedResponsiblePeopleFitAndProper,
+            peopleRow(value).feePer,
+            Currency.fromBD(value.getFpFee.getOrElse(0))
+          ))
+        case (_, true) => Seq(
+          BreakdownRow(
+            approvalCheckPeopleRow(value).message,
+            value.addedResponsiblePeopleApprovalCheck,
+            approvalCheckPeopleRow(value).feePer,
+            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          ))
+        case (_, _) => Seq.empty
+      }
+    }
+
+
+  def createBreakdownRowForSubmissionResponse(
+                          value: SubmissionResponse,
+                          people: Option[Seq[ResponsiblePerson]],
+                          activities: Set[BusinessActivity]
+                        ) = {
+    val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
+    val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+    (fitAndProperCount > 0, approvalCheckCount > 0) match {
+
+      case(_, true) if (activities.contains(AccountancyServices) ||
+                        activities.contains(EstateAgentBusinessService) ||
+                        activities.contains(HighValueDealing)
+                        ) =>
+        Seq(
+          BreakdownRow(
+            approvalCheckPeopleRow(value).message,
+            approvalCheckCount,
+            approvalCheckPeopleRow(value).feePer,
+            Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+          ))
+
+      case(true, _) if (activities.contains(MSB) || activities.contains(TrustAndCompanyServices)) =>
+        Seq(
+          BreakdownRow(
+            peopleRow(value).message,
+            fitAndProperCount,
+            peopleRow(value).feePer,
+            Currency.fromBD(value.getFpFee.getOrElse(0))
+          ))
+
+      case _ => Seq.empty
+    }
+  }
+}
+
+object ResponsiblePeopleRowsInstancesPhase2 {
+
+  implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
+    new ResponsiblePeopleRows[SubmissionResponse] {
+      def apply(
+                 value: SubmissionResponse,
+                 activities: Set[BusinessActivity],
+                 people: Option[Seq[ResponsiblePerson]]
+               ): Seq[BreakdownRow] = {
+
+        createBreakdownRowForSubmissionResponse(value, people, activities)
+      }
+    }
+
+  implicit val responsiblePeopleRowsFromVariation: ResponsiblePeopleRows[AmendVariationRenewalResponse] = {
+    new ResponsiblePeopleRows[AmendVariationRenewalResponse] {
+      def apply(
+                          value: AmendVariationRenewalResponse,
+                          activities: Set[BusinessActivity],
+                          people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
+
+        createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
+      }
+    }
+  }
 }
 
 object ResponsiblePeopleRowsInstances {
 
   implicit val responsiblePeopleRowsFromSubscription: ResponsiblePeopleRows[SubmissionResponse] =
     new ResponsiblePeopleRows[SubmissionResponse] {
-      def apply(value: SubmissionResponse, activities: Set[BusinessActivity], people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
+      def apply(
+                 value: SubmissionResponse,
+                 activities: Set[BusinessActivity],
+                 people: Option[Seq[ResponsiblePerson]]
+               ): Seq[BreakdownRow] = {
 
-        people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
-          if (showBreakdown(value.getFpFee, activities)) {
-            splitPeopleByFitAndProperTest(responsiblePeople) match {
-              case (passedFP, notFP) =>
-                Seq(
-                  BreakdownRow(peopleRow(value).message, notFP.size, peopleRow(value).feePer, Currency.fromBD(value.getFpFee.getOrElse(0)))
-                ) ++ (if (passedFP.nonEmpty) {
+        if (!ApplicationConfig.phase2ChangesToggle) {
+
+          val firstSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
+            if (showBreakdown(value.getFpFee, activities)) {
+              splitPeopleByFitAndProperTest(responsiblePeople) match {
+                case (passedFP, notFP) =>
                   Seq(
-                    BreakdownRow(peopleFPPassed.message, passedFP.size, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer)))
-                  )
-                } else {
-                  Seq.empty
-                })
+                    BreakdownRow(
+                      peopleRow(value).message,
+                      notFP.size,
+                      peopleRow(value).feePer,
+                      Currency.fromBD(value.getFpFee.getOrElse(0))
+                    )
+                  ) ++ (if (passedFP.nonEmpty) {
+                    Seq(
+                      BreakdownRow(
+                        peopleFPPassed.message,
+                        passedFP.size,
+                        max(0, peopleFPPassed.feePer),
+                        Currency.fromBD(max(0, peopleFPPassed.feePer))
+                      )
+                    )
+                  } else {
+                    Seq.empty
+                  })
+              }
+            } else {
+              Seq.empty
             }
-          } else {
-            Seq.empty
           }
-        }
 
+          firstSeq
+        } else {
+          createBreakdownRowForSubmissionResponse(value, people, activities)
+        }
       }
     }
 
@@ -77,27 +191,34 @@ object ResponsiblePeopleRowsInstances {
                           activities: Set[BusinessActivity],
                           people: Option[Seq[ResponsiblePerson]]): Seq[BreakdownRow] = {
 
-        if (showBreakdown(value.getFpFee, activities)) {
+        if (!ApplicationConfig.phase2ChangesToggle) {
 
-          val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
+          val firstSeq = if (showBreakdown(value.getFpFee, activities)) {
 
-          (if (notFP > 0) {
-            Seq(BreakdownRow(
-              peopleVariationRow(value).message,
-              notFP,
-              peopleVariationRow(value).feePer,
-              Currency.fromBD(value.getFpFee.getOrElse(0))
-            ))
+            val (passedFP, notFP) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeople)
+
+            (if (notFP > 0) {
+              Seq(BreakdownRow(
+                peopleVariationRow(value).message,
+                notFP,
+                peopleVariationRow(value).feePer,
+                Currency.fromBD(value.getFpFee.getOrElse(0))
+              ))
+            } else {
+              Seq.empty
+            }) ++ (if (passedFP > 0) {
+              Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
+            } else {
+              Seq.empty
+            })
+
           } else {
             Seq.empty
-          }) ++ (if (passedFP > 0) {
-            Seq(BreakdownRow(peopleFPPassed.message, passedFP, max(0, peopleFPPassed.feePer), Currency.fromBD(max(0, peopleFPPassed.feePer))))
-          } else {
-            Seq.empty
-          })
+          }
 
+          firstSeq
         } else {
-          Seq.empty
+          createBreakdownRowForAmendVariationRenewalResponse(value, people, activities)
         }
       }
     }

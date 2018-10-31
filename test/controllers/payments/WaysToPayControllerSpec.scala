@@ -56,7 +56,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 
-    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
+    val fees = FeeResponse(SubscriptionResponseType, amlsRegistrationNumber, 100, None, None, 0, 100, Some(paymentReferenceNumber), None, DateTime.now())
 
     when {
       controller.paymentsService.updateBacsStatus(any(), any())(any(), any(), any())
