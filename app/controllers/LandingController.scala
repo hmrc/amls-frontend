@@ -19,14 +19,13 @@ package controllers
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
 import models.businessactivities.BusinessActivities
-import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
@@ -38,13 +37,12 @@ import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, AuthService, LandingService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.BusinessName
 
 import scala.concurrent.Future
 import scala.util.{Success, Try}
@@ -54,11 +52,9 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val enrolmentsService: AuthEnrolmentsService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
-                                  implicit val cacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector,
-                                  implicit val amlsConnector: AmlsConnector,
-                                  implicit val statusService: StatusService
-                                ) extends BaseController {
+                                  val cacheConnector: DataCacheConnector,
+                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                 ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
@@ -101,24 +97,19 @@ class LandingController @Inject()(val landingService: LandingService,
         preApplicationComplete(cache)
       case None => {
         for {
-          reviewDetails: Option[ReviewDetails] <- landingService.reviewDetails
+          reviewDetails <- landingService.reviewDetails
           amlsRef <- amlsReferenceNumber
         } yield (reviewDetails, amlsRef) match {
           case (Some(rd), None) =>
             Logger.debug("LandingController:getWithoutAmendments: " + rd)
             landingService.updateReviewDetails(rd) map { _ => {
-              for {
-                name <- BusinessName.getName(getSafeId(Some(rd))).value
-              } yield name match {
-                case Some(name) => auditConnector.sendExtendedEvent(ServiceEntrantEvent(name, rd.utr.getOrElse(""), rd.safeId))
-                case _ => auditConnector.sendExtendedEvent(ServiceEntrantEvent("", rd.utr.getOrElse(""), rd.safeId))
-              }
+              auditConnector.sendExtendedEvent(ServiceEntrantEvent(rd.businessName, rd.utr.getOrElse(""), rd.safeId))
 
-                FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
-                  case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
-                  case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
-                }
+              FormTypes.postcodeType.validate(rd.businessAddress.postcode.getOrElse("")) match {
+                case Valid(_) => Redirect(controllers.businessmatching.routes.BusinessTypeController.get())
+                case Invalid(_) => Redirect(controllers.businessmatching.routes.ConfirmPostCodeController.get())
               }
+            }
             }
           case (None, None) =>
             Logger.debug("LandingController:getWithoutAmendments - (None, None)")
@@ -128,13 +119,6 @@ class LandingController @Inject()(val landingService: LandingService,
             Future.successful(Redirect(controllers.routes.StatusController.get()))
         }
       }.flatMap(identity)
-    }
-  }
-
-  private def getSafeId(rd: Option[ReviewDetails]): Option[String] = {
-    rd match {
-      case Some(reviewDetails) => Some(reviewDetails.safeId)
-      case _ => throw new Exception("Review details not available - no safeId")
     }
   }
 
