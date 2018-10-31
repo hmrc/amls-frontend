@@ -19,7 +19,7 @@ package controllers
 import java.net.URLEncoder
 
 import config.ApplicationConfig
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -29,7 +29,6 @@ import models.businessmatching._
 import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
-import models.registrationdetails.RegistrationDetails
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
@@ -47,7 +46,7 @@ import play.api.libs.json.JsResultException
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
-import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
+import services.{AuthEnrolmentsService, AuthService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -72,14 +71,10 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
-      cacheConnector = mock[DataCacheConnector],
-      amlsConnector = mock[AmlsConnector],
-      statusService = mock[StatusService]
+      cacheConnector = mock[DataCacheConnector]
     ){
       override val shortLivedCache = mock[ShortLivedCache]
     }
-
-    val safeId = "X87FUDIKJJKJH87364"
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())
@@ -161,15 +156,12 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
             businessAddress = Address("Line 1", "Line 2", None, None, Some("AA11AA"), Country("United Kingdom", "GB")),
-            safeId = safeId))
+            safeId = ""))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-
-          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(
-            Future.successful(RegistrationDetails("Test Business from API 1", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -183,13 +175,12 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           val details = Some(ReviewDetails(businessName = "Test",
             businessType = None,
             businessAddress = Address("Line 1", "Line 2", None, None, Some("aa1 $ aa156"), Country("United Kingdom", "GB")),
-            safeId = safeId))
+            safeId = ""))
 
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(details))
           when(controller.landingService.updateReviewDetails(any())(any(), any(), any())).thenReturn(Future.successful(mock[CacheMap]))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -200,7 +191,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
           when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
@@ -313,14 +303,10 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       authConnector = self.authConnector,
       auditConnector = mock[AuditConnector],
       authService = mock[AuthService],
-      cacheConnector = mock[DataCacheConnector],
-      amlsConnector = mock[AmlsConnector],
-      statusService = mock[StatusService]
+      cacheConnector = mock[DataCacheConnector]
     ) {
       override val shortLivedCache = mock[ShortLivedCache]
     }
-
-    val safeId = "X87FUDIKJJKJH87364"
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())
@@ -357,7 +343,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "Business Name",
         None,
         Address("Line1", "Line2", None, None, Some("AA11AA"), Country("United Kingdom", "UK")),
-        safeId)
+        "testSafeId")
 
       when(controller.landingService.reviewDetails(any[HeaderCarrier], any[ExecutionContext], any[Request[_]]))
         .thenReturn(Future.successful(Some(reviewDetails)))
@@ -652,9 +638,6 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForNoEnrolment(controller)
             setUpMocksForNoDataInSaveForLater(controller)
             val reviewDetails = setUpMocksForDataExistsInKeystore(controller)
-
-            when(controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())).thenReturn(
-              Future.successful(RegistrationDetails("Test Business", isIndividual = false)))
 
             when(controller.landingService.updateReviewDetails(any[ReviewDetails])(any[HeaderCarrier], any[ExecutionContext], any[AuthContext]))
               .thenReturn(Future.successful(mock[CacheMap]))
