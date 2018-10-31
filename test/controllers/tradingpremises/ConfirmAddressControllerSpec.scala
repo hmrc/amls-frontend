@@ -29,7 +29,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
@@ -38,18 +38,27 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
+    val applicationReference = "SUIYD3274890384"
+
     val request = addToken(authRequest)
     val dataCache: DataCacheConnector = mockCacheConnector
     val reviewDetails = mock[ReviewDetails]
     val statusService = mock[StatusService]
+    val enrolments = mock[AuthEnrolmentsService]
     val amls = mock[AmlsConnector]
     val controller = new ConfirmAddressController(
       messagesApi,
       self.dataCache,
       self.authConnector,
+      enrolments,
       statusService,
       amls
     )
+
+    when {
+      enrolments.amlsRegistrationNumber(any(), any(), any())
+    } thenReturn Future.successful(Some(applicationReference))
+
     mockCacheFetchAll
   }
 
@@ -139,6 +148,10 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar with Tradi
           when {
             controller.amlsConnector.registrationDetails(meq(safeId))(any(), any(), any())
           } thenReturn Future.successful(RegistrationDetails("Business Name from registration", isIndividual = false))
+
+          when {
+            controller.statusService.getSafeIdFromReadStatus(any())(any(), any(), any())
+          } thenReturn Future.successful(Some(safeId))
 
           val newRequest = request.withFormUrlEncodedBody(
             "confirmAddress" -> "true"

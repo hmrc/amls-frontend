@@ -26,7 +26,7 @@ import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -39,6 +39,7 @@ import scala.concurrent.Future
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
                                          implicit val dataCacheConnector: DataCacheConnector,
                                          val authConnector: AuthConnector,
+                                         enrolments: AuthEnrolmentsService,
                                          implicit val statusService: StatusService,
                                          implicit val amlsConnector: AmlsConnector)
   extends RepeatingSection with BaseController {
@@ -111,7 +112,9 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
     implicit authContext =>
       implicit request =>
         val name: OptionT[Future, String] = for {
-          bName <- getCompanyName()
+          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
+          bName <- BusinessName.getNameFromAmls(id)
         } yield bName
 
         Form2[ConfirmAddress](request.body) match {
