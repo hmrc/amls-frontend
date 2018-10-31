@@ -28,7 +28,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.test.Helpers._
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import utils.{AmlsSpec, AuthorisedFixture, DateHelper}
 
 import scala.concurrent.Future
@@ -42,12 +42,13 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     val amlsConnector = mock[AmlsConnector]
     val cacheConnector = mock[DataCacheConnector]
     val statusService = mock[StatusService]
+    val enrolments = mock[AuthEnrolmentsService]
 
-    lazy val controller = new WithdrawApplicationController(authConnector, amlsConnector, cacheConnector, statusService)
+    val controller = new WithdrawApplicationController(self.authConnector, amlsConnector, cacheConnector, enrolments, statusService)
 
-    val amlsRegistrationNumber = "XA1234567890L"
+    val applicationReference = "SUIYD3274890384"
     val safeId = "X87FUDIKJJKJH87364"
-    val businessName = "Test Business"
+    val businessName = "Business Name from registration details"
     val reviewDetails = mock[ReviewDetails]
 
     //noinspection ScalaStyle
@@ -57,8 +58,12 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     when(reviewDetails.safeId).thenReturn(safeId)
 
     when {
+      enrolments.amlsRegistrationNumber(any(), any(), any())
+    } thenReturn Future.successful(applicationReference.some)
+
+    when {
       amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
-    } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
+    } thenReturn Future.successful(RegistrationDetails(businessName, isIndividual = false))
 
     when {
       cacheConnector.fetch[BusinessMatching](eqTo(BusinessMatching.key))(any(), any(), any())
@@ -67,7 +72,13 @@ class WithdrawApplicationControllerSpec extends AmlsSpec with OneAppPerSuite {
     when {
       statusService.getDetailedStatus(any(), any(), any())
     } thenReturn Future.successful(SubmissionReadyForReview, statusResponse.some)
+
+    when {
+      controller.statusService.getSafeIdFromReadStatus(any())(any(), any(), any())
+    } thenReturn Future.successful(Some(safeId))
   }
+
+
 
   "The WithdrawApplication controller" when {
     "the get method is called" must {

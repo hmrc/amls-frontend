@@ -22,7 +22,7 @@ import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import javax.inject.Inject
 import models.businessmatching.BusinessMatching
-import services.StatusService
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.BusinessName
 import views.html.withdrawal.withdraw_application
@@ -33,7 +33,8 @@ class WithdrawApplicationController @Inject()(
                                                val authConnector: AuthConnector,
                                                implicit val amls: AmlsConnector,
                                                implicit val dc: DataCacheConnector,
-                                               statusService: StatusService) extends BaseController {
+                                               enrolments: AuthEnrolmentsService,
+                                               implicit val statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext =>
@@ -47,7 +48,9 @@ class WithdrawApplicationController @Inject()(
           cache <- OptionT(dc.fetch[BusinessMatching](BusinessMatching.key))
           details <- OptionT.fromOption[Future](cache.reviewDetails)
           processingDate <- maybeProcessingDate
-          name <- BusinessName.getNameFromAmls(details.safeId)
+          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
+          name <- BusinessName.getNameFromAmls(id)
         } yield Ok(withdraw_application(name, processingDate))) getOrElse InternalServerError("Unable to show the withdrawal page")
   }
 
