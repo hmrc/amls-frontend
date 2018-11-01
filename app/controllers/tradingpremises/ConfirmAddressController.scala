@@ -27,8 +27,6 @@ import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
 import services.{AuthEnrolmentsService, StatusService}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{BusinessName, RepeatingSection}
 
@@ -99,22 +97,13 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
     }
   }
 
-  def getCompanyName()(implicit hc: HeaderCarrier, ac: AuthContext) = {
-    for {
-      cache <- OptionT(dataCacheConnector.fetchAll)
-      bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-      rd <- OptionT.fromOption[Future](bm.reviewDetails)
-      name <- BusinessName.getName(Some(rd.safeId))
-    } yield name
-  }
-
   def post(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
         val name: OptionT[Future, String] = for {
           amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
           id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
-          bName <- BusinessName.getNameFromAmls(id)
+          bName <- BusinessName.getName(Some(id))
         } yield bName
 
         Form2[ConfirmAddress](request.body) match {
