@@ -23,8 +23,6 @@ import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
 import utils.StatusConstants
 
-import scala.collection.JavaConverters._
-
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
              value: A,
@@ -152,14 +150,9 @@ object ResponsiblePeopleRowsInstances {
           val firstSeq = people.fold(Seq.empty[BreakdownRow]) { responsiblePeople =>
             if (showBreakdown(value.getFpFee, activities)) {
               splitPeopleByFitAndProperTest(responsiblePeople) match {
-                case (passedFP, notFP) =>
-                  Seq(
-                    BreakdownRow(
-                      peopleRow(value).message,
-                      notFP.size,
-                      peopleRow(value).feePer,
-                      Currency.fromBD(value.getFpFee.getOrElse(0))
-                    ))
+                case (_, notFP) if notFP.nonEmpty =>
+                  Seq(BreakdownRow(peopleRow(value).message, notFP.size, peopleRow(value).feePer, Currency.fromBD(value.getFpFee.getOrElse(0))))
+                case (_, _) => Seq.empty
               }
             } else {
               Seq.empty

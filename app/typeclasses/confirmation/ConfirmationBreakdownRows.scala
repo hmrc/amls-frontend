@@ -49,24 +49,18 @@ object BreakdownRowInstances {
           case Some(activities) if people.isDefined =>
 
             val subQuantity = subscriptionQuantity(subscription)
-            val registrationFeeRow = submissionRow(subscription)
 
-            Seq(
-              BreakdownRow(
-                registrationFeeRow.message,
-                subQuantity,
-                registrationFeeRow.feePer,
-                subQuantity * registrationFeeRow.feePer
-              )
-            ) ++ responsiblePeopleRowsProxy(subscription, people, activities) ++
-            Seq(
-              BreakdownRow(
-                premisesRow(subscription).message,
-                premises.getOrElse(Seq.empty).size,
-                premisesRow(subscription).feePer,
-                subscription.getPremiseFee
-              )
-            )
+            val registrationFeeRow = submissionRow(subscription)
+            val registrationFeeBreakdownRow = Seq(BreakdownRow(registrationFeeRow.message, subQuantity,
+              registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer))
+
+            val responsiblePeopleBreakdownRows = responsiblePeopleRowsProxy(subscription, people, activities)
+
+            val tradingPremisesBreakdownRows = Seq(BreakdownRow(premisesRow(subscription).message,
+              premises.getOrElse(Seq.empty).size, premisesRow(subscription).feePer, subscription.getPremiseFee))
+
+            registrationFeeBreakdownRow ++ responsiblePeopleBreakdownRows ++ tradingPremisesBreakdownRows
+
           case _ => Seq.empty[BreakdownRow]
         }
       }
