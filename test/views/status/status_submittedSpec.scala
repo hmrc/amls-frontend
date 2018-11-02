@@ -36,6 +36,7 @@ class status_submittedSpec extends AmlsSpec with MustMatchers with AmlsReference
       amlsRegistrationNumber,
       150.00,
       Some(100.0),
+      None,
       300.0,
       550.0,
       Some("XA000000000000"),

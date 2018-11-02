@@ -124,6 +124,7 @@ class ConfirmationControllerSpec extends AmlsSpec
       amlsRegistrationNumber,
       100,
       None,
+      None,
       0,
       200,
       Some(paymentReferenceNumber),

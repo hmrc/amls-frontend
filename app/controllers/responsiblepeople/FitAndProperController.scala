@@ -82,7 +82,7 @@ class FitAndProperController @Inject()(
                 for {
                   cacheMap <- fetchAllAndUpdateStrict[ResponsiblePerson](index) { (_, rp) =>
                     if (appConfig.phase2ChangesToggle) {
-                      updateFitAndProperAndApproval(data, msbOrTcsp, rp)
+                      rp.updateFitAndProperAndApproval(data, msbOrTcsp)
                     } else {
                       rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data)))
                     }
@@ -96,17 +96,12 @@ class FitAndProperController @Inject()(
     }
   }
 
-  private def updateFitAndProperAndApproval(data: Boolean, msbOrTcsp: Boolean, rp: ResponsiblePerson) = {
-    (data, msbOrTcsp) match {
-      case (false, false) => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = None))
-      case _ => rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(data),
-        hasAlreadyPaidApprovalCheck = Some(data)))
-    }
-  }
-
-  private def identifyRoutingTarget(index: Int, edit: Boolean, cacheMapOpt: Option[CacheMap],
-                                    fitAndProperAnswer: Boolean, msbOrTscp: Boolean, flow: Option[String])
+  private def identifyRoutingTarget(index: Int,
+                                    edit: Boolean,
+                                    cacheMapOpt: Option[CacheMap],
+                                    fitAndProperAnswer: Boolean,
+                                    msbOrTscp: Boolean,
+                                    flow: Option[String])
                                    (implicit authContext: AuthContext, request: Request[AnyContent]): Result = {
     (edit, fitAndProperAnswer, appConfig.phase2ChangesToggle) match {
       case (true, false, true) => routeMsbOrTcsb(index, cacheMapOpt, fitAndProperAnswer, msbOrTscp, flow)
@@ -115,8 +110,11 @@ class FitAndProperController @Inject()(
     }
   }
 
-  private def routeMsbOrTcsb(index: Int, cacheMapOpt: Option[CacheMap], fitAndProperAnswer: Boolean,
-                             msbOrTscp: Boolean, flow: Option[String])
+  private def routeMsbOrTcsb(index: Int,
+                             cacheMapOpt: Option[CacheMap],
+                             fitAndProperAnswer: Boolean,
+                             msbOrTscp: Boolean,
+                             flow: Option[String])
                             (implicit authContext: AuthContext, request: Request[AnyContent]):Result = {
     if (msbOrTscp) {
       Redirect(routes.DetailedAnswersController.get(index, flow))

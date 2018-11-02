@@ -79,8 +79,20 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               } yield {
                 businessActivities.businessActivities
               }).value map { activities =>
-                val (newActivities, existing) = getActivityValues(invalidForm, isPreSubmission, activities)
-                BadRequest(register_services(invalidForm, edit, newActivities, existing, isPreSubmission))
+                val (newActivities, existing) = getActivityValues(
+                  invalidForm,
+                  isPreSubmission,
+                  activities
+                )
+                BadRequest(
+                  register_services(
+                    invalidForm,
+                    edit,
+                    newActivities,
+                    existing,
+                    isPreSubmission
+                  )
+                )
               }
             }
           case ValidForm(_, data) =>
@@ -89,26 +101,32 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
               businessMatching <- businessMatchingService.getModel.value
               savedModel <- updateModel(
                 businessMatching,
-                newModel(businessMatching.activities, data, isPreSubmission),
+                newModel(businessMatching.activities,
+                  data,
+                  isPreSubmission
+                ),
                 isMsb(data, businessMatching.activities)
               )
               _ <- maybeRemoveAccountantForAMLSRegulations(savedModel)
-              _ <- clearRemovedSections(businessMatching.activities.getOrElse(BusinessMatchingActivities(Set())).businessActivities,
-                  savedModel.businessActivities)
+              _ <- clearRemovedSections(
+                businessMatching.activities.getOrElse(
+                  BusinessMatchingActivities(
+                    Set()
+                  )
+                ).businessActivities,
+                savedModel.businessActivities
+              )
             } yield savedModel) flatMap { savedActivities =>
               getData[ResponsiblePerson] flatMap { responsiblePeople =>
-                if(fitAndProperRequired(savedActivities)){
-                  if(promptFitAndProper(responsiblePeople)){
-                    updateResponsiblePeople(resetHasAccepted(responsiblePeople)) map { _ =>
-                      redirectTo(data.businessActivities)
-                    }
-                  } else {
-                    Future.successful(redirectTo(data.businessActivities))
-                  }
-                } else {
-                  updateResponsiblePeople(removeFitAndProper(responsiblePeople)) map { _ =>
-                    redirectTo(data.businessActivities)
-                  }
+
+                val workFlow =
+                  shouldPromptForApproval.tupled andThen
+                  shouldPromptForFitAndProper.tupled
+
+                val rps = responsiblePeople.map(rp => workFlow((rp, savedActivities)))
+
+                updateResponsiblePeople(rps) map { _ =>
+                  redirectTo(data.businessActivities)
                 }
               }
             }
@@ -146,8 +164,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def clearSupervisionIfNoLongerRequired(previousBusinessActivities: Set[BusinessActivity],
-                                    currentBusinessActivities: Set[BusinessActivity]
-                                   )(implicit ac: AuthContext, hc: HeaderCarrier) = {
+                                                 currentBusinessActivities: Set[BusinessActivity]
+                                                )(implicit ac: AuthContext, hc: HeaderCarrier) = {
     if (hasASPorTCSP(previousBusinessActivities) && !hasASPorTCSP(currentBusinessActivities)) {
       dataCacheConnector.save[Supervision](Supervision.key, Supervision())
     } else {
@@ -198,8 +216,8 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   }
 
   private def newModel(existingActivities: Option[BusinessMatchingActivities],
-                           added: BusinessMatchingActivities,
-                           isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
+                       added: BusinessMatchingActivities,
+                       isPreSubmission: Boolean) = existingActivities.fold[BusinessMatchingActivities](added) { existing =>
     if (isPreSubmission) {
       added
     } else {
@@ -224,7 +242,7 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
 
   }
 
-  private def hasASPorTCSP(activities:Set[BusinessActivity]) = {
+  private def hasASPorTCSP(activities: Set[BusinessActivity]) = {
     val containsASP = activities.contains(AccountancyServices)
     val containsTCSP = activities.contains(TrustAndCompanyServices)
     containsASP | containsTCSP
@@ -233,37 +251,77 @@ class RegisterServicesController @Inject()(val authConnector: AuthConnector,
   private def isMsb(added: BusinessMatchingActivities, existing: Option[BusinessMatchingActivities]): Boolean =
     added.businessActivities.contains(MoneyServiceBusiness) | existing.fold(false)(act => act.businessActivities.contains(MoneyServiceBusiness))
 
+  private def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
+
   private def fitAndProperRequired(businessActivities: BusinessMatchingActivities): Boolean = {
     if (!appConfig.phase2ChangesToggle) {
-      def containsTcspOrMsb(activities: Set[BusinessActivity]) = (activities contains MoneyServiceBusiness) | (activities contains TrustAndCompanyServices)
 
       (businessActivities.businessActivities, businessActivities.additionalActivities) match {
         case (a, Some(e)) => containsTcspOrMsb(a) | containsTcspOrMsb(e)
         case (a, _) => containsTcspOrMsb(a)
       }
     } else {
-     true
+      true
     }
   }
 
-  private def promptFitAndProper(responsiblePeople: Seq[ResponsiblePerson]) =
-    responsiblePeople.foldLeft(true){ (x, rp) =>
-      x & rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
-    }
+  private def promptFitAndProper(rp: ResponsiblePerson) =
+    rp.approvalFlags.hasAlreadyPassedFitAndProper.isEmpty
 
-  private def removeFitAndProper(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
-    responsiblePeople map { rp =>
-      rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
-    }
+  private def removeFitAndProper(rp: ResponsiblePerson): ResponsiblePerson =
+    rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = None)).copy(hasAccepted = true)
 
-  private def resetHasAccepted(responsiblePeople: Seq[ResponsiblePerson]): Seq[ResponsiblePerson] =
-    responsiblePeople map { rp =>
-      rp.approvalFlags.hasAlreadyPassedFitAndProper match {
-        case None => rp.copy(hasAccepted = false)
-        case _ => rp
-      }
+  private def resetHasAccepted(rp: ResponsiblePerson): ResponsiblePerson =
+    rp.approvalFlags.hasAlreadyPassedFitAndProper match {
+      case None => rp.copy(hasAccepted = false)
+      case _ => rp
     }
 
   private def updateResponsiblePeople(responsiblePeople: Seq[ResponsiblePerson])(implicit ac: AuthContext, hc: HeaderCarrier): Future[_] =
     dataCacheConnector.save[Seq[ResponsiblePerson]](ResponsiblePerson.key, responsiblePeople)
+
+  val shouldPromptForFitAndProper:
+    (ResponsiblePerson, BusinessMatchingActivities) => ResponsiblePerson =
+    (rp, activities) => {
+
+      if(fitAndProperRequired(activities)) {
+        if(promptFitAndProper(rp)) {
+          resetHasAccepted(rp)
+        } else {
+          rp
+        }
+      } else {
+        removeFitAndProper(rp)
+      }
+    }
+
+  val shouldPromptForApproval:
+  (ResponsiblePerson, BusinessMatchingActivities) => (ResponsiblePerson, BusinessMatchingActivities) =
+  (rp, activities) => {
+
+    def approvalIsRequired(rp: ResponsiblePerson, businessActivities: BusinessMatchingActivities) =
+      rp.approvalFlags.hasAlreadyPassedFitAndProper.contains(false) &
+      !(containsTcspOrMsb(businessActivities.businessActivities))
+
+    def setResponsiblePeopleForApproval(rp: ResponsiblePerson)
+    : ResponsiblePerson = {
+      (rp.approvalFlags.hasAlreadyPassedFitAndProper, rp.approvalFlags.hasAlreadyPaidApprovalCheck) match {
+        case (Some(false), Some(_)) =>
+          rp.approvalFlags(
+            rp.approvalFlags.copy(
+              hasAlreadyPaidApprovalCheck = None
+            )
+          ).copy(
+            hasAccepted = false
+          )
+        case _ => rp
+      }
+    }
+
+    if (approvalIsRequired(rp, activities)) {
+      (setResponsiblePeopleForApproval(rp), activities)
+    } else {
+      (rp, activities)
+    }
+  }
 }

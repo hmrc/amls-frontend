@@ -18,6 +18,7 @@ package services
 
 import cats.data.OptionT
 import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
@@ -29,7 +30,7 @@ import models.responsiblepeople.ResponsiblePerson
 import models.status._
 import models.tradingpremises.TradingPremises
 import typeclasses.confirmation.BreakdownRowInstances._
-import typeclasses.confirmation.BreakdownRows
+import typeclasses.confirmation.{BreakdownRows, ResponsiblePeopleRowsInstancesPhase2}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -45,7 +46,7 @@ class ConfirmationService @Inject()(
    ec: ExecutionContext,
    hc: HeaderCarrier,
    ac: AuthContext
-  ): Future[Seq[BreakdownRow]] =
+  ): Future[Seq[BreakdownRow]] = {
     cacheConnector.fetchAll flatMap {
       maybeCache =>
         (for {
@@ -56,9 +57,17 @@ class ConfirmationService @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          Future.successful(BreakdownRows.generateBreakdownRows[SubmissionResponse](subscription, Some(businessActivities), Some(premises), Some(people)))
+          Future.successful(
+              BreakdownRows.generateBreakdownRows[SubmissionResponse](
+                subscription,
+                Some(businessActivities),
+                Some(premises),
+                Some(people)
+              )
+          )
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
+  }
 
   def getAmendment
   (implicit
@@ -66,20 +75,28 @@ class ConfirmationService @Inject()(
    hc: HeaderCarrier,
    ac: AuthContext
   ): Future[Option[Seq[BreakdownRow]]] = {
-    cacheConnector.fetchAll flatMap { maybeCache =>
-      (for {
-        cache <- maybeCache
-        amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
-        premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
-        people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
-        businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-        businessActivities <- businessMatching.activities
-      } yield {
-        val filteredPremises = TradingPremises.filter(premises)
-        Future.successful(Some(
-          BreakdownRows.generateBreakdownRows[SubmissionResponse](amendmentResponse, Some(businessActivities), Some(filteredPremises), Some(people))
-        ))
-      }) getOrElse OptionT.liftF(getSubscription).value
+    cacheConnector.fetchAll flatMap {
+      maybeCache =>
+        (for {
+          cache <- maybeCache
+          amendmentResponse <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          premises <- cache.getEntry[Seq[TradingPremises]](TradingPremises.key)
+          people <- cache.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
+        } yield {
+          val filteredPremises = TradingPremises.filter(premises)
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[SubmissionResponse](
+                amendmentResponse,
+                Some(businessActivities),
+                Some(filteredPremises),
+                Some(people)
+              )
+            )
+          )
+        }) getOrElse OptionT.liftF(getSubscription).value
     }
   }
 
@@ -97,9 +114,16 @@ class ConfirmationService @Inject()(
           businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
           businessActivities <- businessMatching.activities
         } yield {
-          Future.successful(Some(
-            BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](variationResponse, Some(businessActivities), None, None)
-          ))
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
+                variationResponse,
+                Some(businessActivities),
+                None,
+                None
+              )
+            )
+          )
         }) getOrElse Future.failed(new Exception("Cannot get subscription response"))
     }
   }
@@ -116,9 +140,16 @@ class ConfirmationService @Inject()(
           cache <- maybeCache
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
         } yield {
-          Future.successful(Some(
-            BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](renewal, None, None, None)
-          ))
+          Future.successful(
+            Some(
+              BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
+                renewal,
+                None,
+                None,
+                None
+              )
+            )
+          )
         }) getOrElse Future.failed(new Exception("Cannot get amendment response"))
     }
   }

@@ -31,13 +31,15 @@ class SubscriptionResponseSpec extends PlaySpec {
           |"registrationFee":0,
           |"fpFee":100,
           |"fpFeeRate":100,
+          |"approvalCheckFee": 150,
+          |"approvalCheckFeeRate": 150,
           |"premiseFee":345,
           |"premiseFeeRate":115,
           |"totalFees":445,
           |"paymentReference":"XT000000000000"}""".stripMargin
 
       val response = SubscriptionResponse("bundle", "XDML00000000000",
-        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), 345, Some(115), 445)))
+        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), Some(150), Some(150), 345, Some(115), 445)))
 
       SubscriptionResponse.reads.reads(Json.parse(previousJson)) must be(JsSuccess(response))
 
@@ -59,7 +61,7 @@ class SubscriptionResponseSpec extends PlaySpec {
           |}}""".stripMargin
 
       val response = SubscriptionResponse("bundle", "XDML00000000000",
-        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), 345, Some(115), 445)))
+        Some(SubscriptionFees("XT000000000000", 0, Some(100), Some(100), None, None, 345, Some(115), 445)))
 
       SubscriptionResponse.reads.reads(Json.parse(previousJson)) must be(JsSuccess(response))
 

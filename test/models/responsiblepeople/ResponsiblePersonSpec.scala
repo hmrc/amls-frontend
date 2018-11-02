@@ -41,6 +41,44 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   "ResponsiblePeople" must {
 
+          "phase 1 is true" when {
+
+            "fitAndProper is true and approval is none" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck =  None),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+
+            "fitAndProper is true and approval is true" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck = Some(true)),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+          }
+
+
     "serialise correctly" when {
       "residence and passport type is in current format" in {
         Json.toJson(completeModelNonUkResidentNonUkPassport) must be(completeJsonPresentNonUkResidentNonUkPassport)
@@ -1935,6 +1973,99 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
     .build()
 
   "ResponsiblePeople" must {
+
+    "calling updateFitAndProperAndApproval" must {
+
+      val inputRp = ResponsiblePerson()
+
+      "set Approval flag to None" when {
+
+        "only if both choice and msbOrTcsp are false so the answer to the approval question is needed" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = false)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = None
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+      }
+
+      "set Approval to match the incoming fitAndProper flag" when {
+
+        "choice is true, and msbOrTcsp is false so the answer to the approval question in not required" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = true, msbOrTcsp = false)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(true),
+              hasAlreadyPaidApprovalCheck = Some(true)
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+
+        "choice is false, and msbOrTcsp is true so the answer to the approval question is not needed" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = true)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = Some(true)
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+      }
+    }
+
+    "reset when resetBasedOnApprovalFlags is called" when {
+
+      "phase 2 feature toggle is true" when {
+
+        "fitAndProper is true and approval is true" in {
+          val inputRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(true),
+              hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true)
+
+          inputRp.resetBasedOnApprovalFlags() mustBe(inputRp)
+
+        }
+
+        "fitAndProper is false and approval is true" in {
+          val inputRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = None),
+            hasAccepted = false,
+            hasChanged = true)
+
+          inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)
+        }
+      }
+    }
+
     "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
 
       "json is complete" when {

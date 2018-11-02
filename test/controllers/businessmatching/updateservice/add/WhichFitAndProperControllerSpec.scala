@@ -167,7 +167,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     }
   }
 
-  "Inactive people" must {
+  "deleted people" must {
     "be hidden from the selection list" when {
       "showing the page on a GET request" in new Fixture {
         when {
@@ -179,8 +179,8 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         status(result) must be(OK)
 
         contentAsString(result) must include("Person 1")
+        contentAsString(result) must include("Person 3")
         contentAsString(result) must not include "Person 2"
-        contentAsString(result) must not include "Person 3"
       }
 
       "showing the page having POSTed with validation errors" in new Fixture {

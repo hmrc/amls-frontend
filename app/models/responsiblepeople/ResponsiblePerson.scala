@@ -54,6 +54,36 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
                              soleProprietorOfAnotherBusiness: Option[SoleProprietorOfAnotherBusiness] = None
                             ) {
 
+  def updateFitAndProperAndApproval(fitAndPropperChoice: Boolean,
+                                    msbOrTcsp: Boolean): ResponsiblePerson = {
+    (fitAndPropperChoice, msbOrTcsp) match {
+      case (false, false) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = None)
+      )
+      case (true, false) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = Some(true))
+      )
+      case (_, true) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = Some(true))
+      )
+    }
+  }
+
+  def resetBasedOnApprovalFlags(): ResponsiblePerson = {
+    (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
+      case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
+      case (_, ApprovalFlags(Some(true), _)) => this
+      case _ =>
+        this.approvalFlags(
+          this.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None,
+            hasAlreadyPassedFitAndProper = Some(false))
+        )
+    }
+  }
+
   def personName(p: PersonName): ResponsiblePerson =
     this.copy(personName = Some(p), hasChanged = hasChanged || !this.personName.contains(p),
       hasAccepted = hasAccepted && this.personName.contains(p))
@@ -329,7 +359,7 @@ object ResponsiblePerson {
         (__ \ "hasAlreadyPassedFitAndProper").read[Boolean].map {
           fitAndProper =>
             if(ApplicationConfig.phase2ChangesToggle) {
-              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(fitAndProper))
+              ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = Some(true))
             } else {
               ApprovalFlags(hasAlreadyPassedFitAndProper = Some(fitAndProper), hasAlreadyPaidApprovalCheck = None)
             }

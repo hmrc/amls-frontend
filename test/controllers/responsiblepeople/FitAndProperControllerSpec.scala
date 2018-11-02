@@ -351,10 +351,6 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(1).url))
         }
 
-        "updates approval flags correctly" when {
-
-        }
-
         "routes correctly" when {
           "given edit = true" when {
             "given fit and proper true, and redirect to the DetailedAnswersController" in new Fixture {

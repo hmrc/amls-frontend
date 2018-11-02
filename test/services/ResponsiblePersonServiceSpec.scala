@@ -60,7 +60,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
         "a single selection is made" in new Fixture {
           val indices = Set(1)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
             responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
@@ -73,7 +73,7 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
         "multiple selections are made" in new Fixture {
           val indices = Set(0, 3, 4)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
               responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
@@ -99,6 +99,19 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
       filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
       filtered.collect { case (p, _) if !p.isComplete => p } mustBe empty
+    }
+
+    "be filtered to only include people not deleted" in new Fixture {
+
+      val people = responsiblePeople.patch(0, Seq(
+        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+        responsiblePersonGen.sample.get.copy(personName = None)),
+        2).zipWithIndex
+
+      val filtered = people.exceptDeleted
+
+      filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
+      filtered.collect { case (p, _) if !p.isComplete => p } must not be empty
     }
   }
 }
