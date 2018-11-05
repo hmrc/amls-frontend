@@ -801,6 +801,11 @@ table.summary ul li {
   margin-bottom: 0;
 }
 
+table caption {
+  font-weight: inherit;
+  text-align: left;
+}
+
 .panel-indent {
   /*margin-bottom: 40px;*/
 }
