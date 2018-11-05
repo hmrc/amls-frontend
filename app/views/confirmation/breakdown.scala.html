@@ -14,7 +14,7 @@
  * limitations under the License.
  *@
 
-@import models.confirmation._
+
 
 @(amount: Currency, breakdown: Seq[BreakdownRow], summary: String)(implicit messages: Messages, request: Request[_])
 
@@ -26,7 +26,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th>@Messages("confirmation.item")</th>
                         <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
                         <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
                         <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
