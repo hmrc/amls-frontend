@@ -66,7 +66,7 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
+      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
     }
 
   }
