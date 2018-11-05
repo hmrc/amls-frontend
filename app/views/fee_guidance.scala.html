@@ -16,7 +16,7 @@
 
 @import include._
 @import include.forms2._
-@import models.confirmation.{BreakdownRow, Currency}
+@import models.confirmation.{ BreakdownRow, Currency }
 
 @(feeTotal: Currency, rows: Seq[BreakdownRow])(implicit request: Request[_], m:Messages)
 

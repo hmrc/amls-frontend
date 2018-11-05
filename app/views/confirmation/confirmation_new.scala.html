@@ -15,7 +15,9 @@
  *@
 
 @import include._
+@import forms2._
 @import models.confirmation._
+@import config.ApplicationConfig
 
 @(paymentReference: Option[String], total: Currency, maybeBreakdownRows: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_],m:Messages)
 
