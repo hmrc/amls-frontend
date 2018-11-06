@@ -61,7 +61,7 @@ object BusinessName {
     for {
       (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
       businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
-        BusinessName.getNameFromAmls(r.safeId.get)
+        BusinessName.getName(r.safeId)
       } orElse OptionT.some("")
     } yield businessName
   }
