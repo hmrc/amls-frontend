@@ -85,7 +85,7 @@ trait StatusService {
     amlsConnector.status(mlrRegNumber) map {
       response =>
         Logger.debug("StatusService:etmpStatusInformation:response:" + response)
-        response.safeId
+        Option(response.safeId.getOrElse(""))
     }
   }
 

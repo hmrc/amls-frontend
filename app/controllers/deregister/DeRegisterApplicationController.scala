@@ -47,7 +47,7 @@ class DeRegisterApplicationController @Inject()
             amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
             ba <- OptionT.fromOption[Future](bm.activities)
             id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
-            name <- BusinessName.getNameFromAmls(id)
+            name <- BusinessName.getName(Some(id))
           } yield {
             val activities = ba.businessActivities map {
               _.getMessage()

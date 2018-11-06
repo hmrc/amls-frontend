@@ -35,7 +35,10 @@ object BusinessName {
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
-    } yield rd.businessName
+    } yield {
+      Logger.debug(s"Found business name in cache: ${rd.businessName}")
+      rd.businessName
+    }
 
   def getNameFromAmls(safeId: String)
                      (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
