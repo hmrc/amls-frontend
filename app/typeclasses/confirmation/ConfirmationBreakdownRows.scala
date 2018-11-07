@@ -51,22 +51,28 @@ object BreakdownRowInstances {
             val subQuantity = subscriptionQuantity(subscription)
             val registrationFeeRow = submissionRow(subscription)
 
-            Seq(
-              BreakdownRow(
-                registrationFeeRow.message,
-                subQuantity,
-                registrationFeeRow.feePer,
-                subQuantity * registrationFeeRow.feePer
-              )
-            ) ++ responsiblePeopleRowsProxy(subscription, people, activities) ++
-            Seq(
-              BreakdownRow(
-                premisesRow(subscription).message,
-                premises.getOrElse(Seq.empty).size,
-                premisesRow(subscription).feePer,
-                subscription.getPremiseFee
-              )
-            )
+            val registrationFeeBreakdownRow =
+              Seq(
+                BreakdownRow(
+                  registrationFeeRow.message,
+                  subQuantity,
+                  registrationFeeRow.feePer,
+                  subQuantity * registrationFeeRow.feePer
+                ))
+
+            val responsiblePeopleBreakdownRows = responsiblePeopleRowsProxy(subscription, people, activities)
+
+            val tradingPremisesBreakdownRows =
+              Seq(
+                BreakdownRow(
+                  premisesRow(subscription).message,
+                  premises.getOrElse(Seq.empty).size,
+                  premisesRow(subscription).feePer,
+                  subscription.getPremiseFee
+                ))
+
+            registrationFeeBreakdownRow ++ responsiblePeopleBreakdownRows ++ tradingPremisesBreakdownRows
+
           case _ => Seq.empty[BreakdownRow]
         }
       }
@@ -117,19 +123,13 @@ object BreakdownRowInstances {
 
             def rpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeople, peopleVariationRow(value), renewalPeopleFee)
 
-            def fpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
-
             def tpFullYearRow: Seq[BreakdownRow] = renewalRow(value.addedFullYearTradingPremises, premisesVariationRow(value), fullPremisesFee)
 
             def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(value.halfYearlyTradingPremises, premisesHalfYear(value), renewalHalfYearPremisesFee)
 
             def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
-            if (ApplicationConfig.phase2ChangesToggle) {
-              rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-            } else {
-              rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
-            }
+            rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
         }
 
@@ -181,7 +181,7 @@ object BreakdownRows {
                                 people: Option[Seq[ResponsiblePerson]]
                               )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = {
 
-      b(value, businessActivities, premises, people)
+    b(value, businessActivities, premises, people)
   }
 
 }
