@@ -16,27 +16,30 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
-import connectors.DataCacheConnector
+import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businesscustomer.{ReviewDetails, Address => BCAddress}
 import models.businessmatching.BusinessMatching
 import models.tradingpremises.{Address, ConfirmAddress, TradingPremises, YourTradingPremises}
 import play.api.i18n.MessagesApi
+import services.{AuthEnrolmentsService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{BusinessName, RepeatingSection}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
 @Singleton
 class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
-                                         val dataCacheConnector: DataCacheConnector,
-                                         val authConnector: AuthConnector)
+                                         implicit val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector,
+                                         enrolments: AuthEnrolmentsService,
+                                         implicit val statusService: StatusService,
+                                         implicit val amlsConnector: AmlsConnector)
   extends RepeatingSection with BaseController {
 
   def getAddress(businessMatching: BusinessMatching): Option[BCAddress] =
@@ -61,13 +64,22 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
       } getOrElse redirect
   }
 
-  def updateAddressFromBM(maybeYtp: Option[YourTradingPremises], maybeBm: Option[BusinessMatching]): Option[YourTradingPremises] = {
+  def updateAddressFromBM(bname: Option[String], maybeYtp: Option[YourTradingPremises], maybeBm: Option[BusinessMatching]): Option[YourTradingPremises] = {
     val f: ReviewDetails => (String, Address) = { r =>
-      (r.businessName, Address(r.businessAddress.line_1,
-        r.businessAddress.line_2,
-        r.businessAddress.line_3,
-        r.businessAddress.line_4,
-        r.businessAddress.postcode.getOrElse("")))
+      {
+        val address = Address(r.businessAddress.line_1,
+          r.businessAddress.line_2,
+          r.businessAddress.line_3,
+          r.businessAddress.line_4,
+          r.businessAddress.postcode.getOrElse(""))
+
+        bname match {
+          case Some(n) =>
+            (n, address)
+          case None =>
+            (r.businessName, address)
+        }
+      }
     }
 
     (maybeBm, maybeYtp) match {
@@ -88,6 +100,12 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
   def post(index: Int) = Authorised.async {
     implicit authContext =>
       implicit request =>
+        val name: OptionT[Future, String] = for {
+          amlsRegNumber <- OptionT(enrolments.amlsRegistrationNumber)
+          id <- OptionT(statusService.getSafeIdFromReadStatus(amlsRegNumber))
+          bName <- BusinessName.getName(Some(id))
+        } yield bName
+
         Form2[ConfirmAddress](request.body) match {
           case f: InvalidForm => {
             for {
@@ -99,8 +117,9 @@ class ConfirmAddressController @Inject()(override val messagesApi: MessagesApi,
             data.confirmAddress match {
               case true => {
                 for {
+                  bName <- name.value
                   _ <- fetchAllAndUpdateStrict[TradingPremises](index) { (cache, tp) =>
-                    tp.copy(yourTradingPremises = updateAddressFromBM(tp.yourTradingPremises, cache.getEntry[BusinessMatching](BusinessMatching.key)))
+                    tp.copy(yourTradingPremises = updateAddressFromBM(bName, tp.yourTradingPremises, cache.getEntry[BusinessMatching](BusinessMatching.key)))
                   }
                 } yield Redirect(routes.ActivityStartDateController.get(index))
               }

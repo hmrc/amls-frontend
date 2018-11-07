@@ -21,6 +21,7 @@ import cats.implicits._
 import connectors.{AmlsConnector, DataCacheConnector}
 import models.businessmatching.BusinessMatching
 import play.api.Logger
+import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -34,7 +35,10 @@ object BusinessName {
     for {
       bm <- OptionT(cache.fetch[BusinessMatching](BusinessMatching.key))
       rd <- OptionT.fromOption[Future](bm.reviewDetails)
-    } yield rd.businessName
+    } yield {
+      Logger.debug(s"Found business name in cache: ${rd.businessName}")
+      rd.businessName
+    }
 
   def getNameFromAmls(safeId: String)
                      (implicit hc: HeaderCarrier, ac: AuthContext, amls: AmlsConnector, ec: ExecutionContext, dc: DataCacheConnector) = {
@@ -50,4 +54,18 @@ object BusinessName {
   def getName(safeId: Option[String])
              (implicit hc: HeaderCarrier, ac: AuthContext, ec: ExecutionContext, cache: DataCacheConnector, amls: AmlsConnector) =
     safeId.fold(getNameFromCache)(v => getNameFromAmls(v) orElse getNameFromCache)
+
+  def getBusinessNameFromAmls()(implicit hc: HeaderCarrier,
+                                context: AuthContext,
+                                amls: AmlsConnector,
+                                ec: ExecutionContext,
+                                dc: DataCacheConnector,
+                                statusService: StatusService) = {
+    for {
+      (_, detailedStatus) <- OptionT.liftF(statusService.getDetailedStatus)
+      businessName <- detailedStatus.fold[OptionT[Future, String]](OptionT.some("")) { r =>
+        BusinessName.getName(r.safeId)
+      } orElse OptionT.some("")
+    } yield businessName
+  }
 }

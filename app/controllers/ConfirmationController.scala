@@ -24,7 +24,6 @@ import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector, PayApiC
 import javax.inject.{Inject, Singleton}
 import models.ResponseType.AmendOrVariationResponseType
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredYes}
-import models.businessmatching.BusinessMatching
 import models.confirmation.{BreakdownRow, Currency}
 import models.payments._
 import models.renewal.Renewal
@@ -48,7 +47,7 @@ class ConfirmationController @Inject()(
                                         private[controllers] val keystoreConnector: KeystoreConnector,
                                         private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                         private[controllers] implicit val amlsConnector: AmlsConnector,
-                                        private[controllers] val statusService: StatusService,
+                                        private[controllers] implicit val statusService: StatusService,
                                         private[controllers] val authenticator: AuthenticatorConnector,
                                         private[controllers] val feeResponseService: FeeResponseService,
                                         private[controllers] val authEnrolmentsService: AuthEnrolmentsService,
@@ -189,10 +188,10 @@ class ConfirmationController @Inject()(
   }
 
   private def showAmendmentVariationConfirmation(
-                                                        fees: FeeResponse,
-                                                        breakdownRows: Future[Option[Seq[BreakdownRow]]],
-                                                        status: SubmissionStatus,
-                                                        submissionRequestStatus: Option[SubmissionRequestStatus])
+                                                fees: FeeResponse,
+                                                breakdownRows: Future[Option[Seq[BreakdownRow]]],
+                                                status: SubmissionStatus,
+                                                submissionRequestStatus: Option[SubmissionRequestStatus])
                                                 (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]) = {
     breakdownRows map { maybeRows =>
       val amount = fees.toPay(status, submissionRequestStatus)
@@ -206,7 +205,10 @@ class ConfirmationController @Inject()(
   }
 
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
-                              (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent]): Future[Result] = {
+                              (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
+
+    def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
+      maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getNameFromAmls(r.safeId.get) }
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
@@ -225,11 +227,11 @@ class ConfirmationController @Inject()(
         }
 
       case _ => for {
-        bm <- OptionT(dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key))
-      } yield Ok(confirmation_no_fee(bm.reviewDetails.get.businessName))
+        name <- BusinessName.getBusinessNameFromAmls()
+      } yield {
+        Ok(confirmation_no_fee(name))}
 
     } getOrElse InternalServerError("Could not determine a response")
-
   }
 
   private def doAudit(paymentStatus: PaymentStatus)(implicit hc: HeaderCarrier, ac: AuthContext) = {
@@ -245,5 +247,4 @@ class ConfirmationController @Inject()(
       amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
     } yield fees).value
-
 }

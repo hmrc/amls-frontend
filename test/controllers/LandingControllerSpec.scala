@@ -18,7 +18,7 @@ package controllers
 
 import java.net.URLEncoder
 
-import config.{AmlsShortLivedCache, ApplicationConfig}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -42,21 +42,19 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import play.api.libs.json.JsResultException
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import play.api.libs.json.JsResultException
-import services.AuthService
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
