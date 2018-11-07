@@ -242,7 +242,7 @@ class ConfirmationServiceSpec extends PlaySpec
         }
       }
 
-      "not show negative fees for responsible people who have already been paid for" in new Fixture {
+      "not show a row for responsible people who have already been paid for" in new Fixture {
 
         val people = Seq(
           ResponsiblePerson(Some(PersonName("Unfit", Some("and"), "Unproper")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))),
@@ -268,9 +268,7 @@ class ConfirmationServiceSpec extends PlaySpec
         whenReady(TestConfirmationService.getAmendment) {
           _ foreach {
             case rows =>
-              val unpaidRow = rows.filter(_.label == "confirmation.responsiblepeople.fp.passed").head
-              unpaidRow.perItm.value mustBe 0
-              unpaidRow.total.value mustBe 0
+              Seq.empty
           }
         }
 
@@ -382,7 +380,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -411,7 +409,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -627,7 +625,6 @@ class ConfirmationServiceSpec extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -664,7 +661,6 @@ class ConfirmationServiceSpec extends PlaySpec
           result match {
             case Some(rows) => {
               rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
-              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(1)
             }
           }
 
@@ -694,20 +690,15 @@ class ConfirmationServiceSpec extends PlaySpec
               breakdownRows.head.perItm mustBe Currency(rpFee)
               breakdownRows.head.total mustBe Currency(rpFee)
 
-              breakdownRows(1).label mustBe "confirmation.responsiblepeople.fp.passed"
+              breakdownRows(2).label mustBe "confirmation.tradingpremises.half"
+              breakdownRows(2).quantity mustBe 1
+              breakdownRows(2).perItm mustBe Currency(tpHalfFee)
+              breakdownRows(2).total mustBe Currency(tpHalfFee)
+
+              breakdownRows(1).label mustBe "confirmation.tradingpremises.zero"
               breakdownRows(1).quantity mustBe 1
               breakdownRows(1).perItm mustBe Currency(0)
               breakdownRows(1).total mustBe Currency(0)
-
-              breakdownRows(2).label mustBe "confirmation.tradingpremises.zero"
-              breakdownRows(2).quantity mustBe 1
-              breakdownRows(2).perItm mustBe Currency(0)
-              breakdownRows(2).total mustBe Currency(0)
-
-              breakdownRows(3).label mustBe "confirmation.tradingpremises.half"
-              breakdownRows(3).quantity mustBe 1
-              breakdownRows(3).perItm mustBe Currency(tpHalfFee)
-              breakdownRows(3).total mustBe Currency(tpHalfFee)
 
               breakdownRows.last.label mustBe "confirmation.tradingpremises"
               breakdownRows.last.quantity mustBe 1
@@ -723,7 +714,38 @@ class ConfirmationServiceSpec extends PlaySpec
     "getSubscription is called" must {
       "notify user of subscription fees to pay in breakdown" when {
 
-        "there is a Responsible People fee to pay" in new Fixture {
+        "there is a Responsible People fee to pay" when {
+
+          "responsible person hasn't passed fit and proper test" in new Fixture {
+
+            when {
+              TestConfirmationService.cacheConnector.fetchAll(any(), any())
+            } thenReturn Future.successful(Some(cache))
+
+            when {
+              cache.getEntry[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any())
+            } thenReturn Some(subscriptionResponse.copy(subscriptionFees=Some(subscriptionResponse.subscriptionFees.get.copy(fpFee = Some(100)))))
+
+            when {
+              cache.getEntry[Seq[TradingPremises]](eqTo(TradingPremises.key))(any())
+            } thenReturn Some(Seq(TradingPremises()))
+
+            when {
+              cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+            } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))))
+
+            val result = await(TestConfirmationService.getSubscription)
+
+            result match {
+              case rows => {
+                rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+                rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
+              }
+            }
+          }
+        }
+
+        "there is a Responsible People fee to pay " in new Fixture {
 
           when {
             TestConfirmationService.cacheConnector.fetchAll(any(), any())
@@ -739,7 +761,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+          } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))))
 
           val result = await(TestConfirmationService.getSubscription)
 
@@ -819,7 +841,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+          } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))))
 
           when {
             activities.businessActivities
@@ -829,7 +851,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           result match {
             case rows => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -847,7 +869,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           when {
             cache.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
-          } thenReturn Some(Seq(ResponsiblePerson()))
+          } thenReturn Some(Seq(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))))
 
           when {
             activities.businessActivities
@@ -857,7 +879,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
           result match {
             case rows => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
