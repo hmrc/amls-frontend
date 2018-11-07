@@ -57,39 +57,30 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   def updateFitAndProperAndApproval(fitAndPropperChoice: Boolean,
                                     msbOrTcsp: Boolean): ResponsiblePerson = {
     (fitAndPropperChoice, msbOrTcsp) match {
-      case (false, false) => this.copy(
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
-          hasAlreadyPaidApprovalCheck = None
-        )
+      case (false, false) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = None)
       )
-      case (true, false) => this.copy(
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
-          hasAlreadyPaidApprovalCheck = Some(true)
-        )
+      case (true, false) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = Some(true))
       )
-      case (_, true) => this.copy(
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
-          hasAlreadyPaidApprovalCheck = Some(true)
-        )
+      case (_, true) => this.approvalFlags(
+        this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
+        hasAlreadyPaidApprovalCheck = Some(true))
       )
     }
   }
 
   def resetBasedOnApprovalFlags(): ResponsiblePerson = {
-
     (ApplicationConfig.phase2ChangesToggle, approvalFlags) match {
       case (false, _) => this.copy(hasAccepted = true, approvalFlags = ApprovalFlags())
       case (_, ApprovalFlags(Some(true), _)) => this
-      case _ => this.copy(
-        hasAccepted = true,
-        approvalFlags = ApprovalFlags(
-          hasAlreadyPaidApprovalCheck = None,
-          hasAlreadyPassedFitAndProper = Some(false)
+      case _ =>
+        this.approvalFlags(
+          this.approvalFlags.copy(hasAlreadyPaidApprovalCheck = None,
+            hasAlreadyPassedFitAndProper = Some(false))
         )
-      )
     }
   }
 
