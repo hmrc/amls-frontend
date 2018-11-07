@@ -49,15 +49,27 @@ object BreakdownRowInstances {
           case Some(activities) if people.isDefined =>
 
             val subQuantity = subscriptionQuantity(subscription)
-
             val registrationFeeRow = submissionRow(subscription)
-            val registrationFeeBreakdownRow = Seq(BreakdownRow(registrationFeeRow.message, subQuantity,
-              registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer))
+
+            val registrationFeeBreakdownRow =
+              Seq(
+                BreakdownRow(
+                  registrationFeeRow.message,
+                  subQuantity,
+                  registrationFeeRow.feePer,
+                  subQuantity * registrationFeeRow.feePer
+                ))
 
             val responsiblePeopleBreakdownRows = responsiblePeopleRowsProxy(subscription, people, activities)
 
-            val tradingPremisesBreakdownRows = Seq(BreakdownRow(premisesRow(subscription).message,
-              premises.getOrElse(Seq.empty).size, premisesRow(subscription).feePer, subscription.getPremiseFee))
+            val tradingPremisesBreakdownRows =
+              Seq(
+                BreakdownRow(
+                  premisesRow(subscription).message,
+                  premises.getOrElse(Seq.empty).size,
+                  premisesRow(subscription).feePer,
+                  subscription.getPremiseFee
+                ))
 
             registrationFeeBreakdownRow ++ responsiblePeopleBreakdownRows ++ tradingPremisesBreakdownRows
 
@@ -117,7 +129,7 @@ object BreakdownRowInstances {
 
             def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
-              rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+            rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
 
         }
 
@@ -169,7 +181,7 @@ object BreakdownRows {
                                 people: Option[Seq[ResponsiblePerson]]
                               )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = {
 
-      b(value, businessActivities, premises, people)
+    b(value, businessActivities, premises, people)
   }
 
 }
