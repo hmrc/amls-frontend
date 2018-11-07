@@ -15,9 +15,7 @@
  *@
 
 @import include._
-@import forms2._
 @import models.confirmation._
-@import config.ApplicationConfig
 @import views.html.confirmation.{breakdown => breakdown_display}
 
 @(paymentReference: Option[String], total: Currency, amountToPay: Currency, maybeBreakdown: Option[Seq[BreakdownRow]], paymentsUrl: String)(implicit request: Request[_], m:Messages)
@@ -48,6 +46,6 @@
         @breakdown_display(total, breakdown, Messages("confirmation.amendment.summary"))
     }
 
-    <p><a id='confirm-continue' class="button" href="@paymentsUrl">@Messages("button.continue")</a></p>
+    <p><a id='continue-pay' class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 
 }

@@ -18,7 +18,6 @@ package views.confirmation
 
 import generators.PaymentGenerator
 import models.confirmation.Currency
-import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
@@ -66,7 +65,7 @@ class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
+      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
     }
 
   }

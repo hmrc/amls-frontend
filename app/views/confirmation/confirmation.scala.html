@@ -14,6 +14,7 @@
  * limitations under the License.
  *@
 
+@import config.ApplicationConfig
 @import include._
 @import forms2._
 @import models.confirmation._
@@ -58,7 +59,7 @@
     <table>
         <thead>
             <tr>
-                <th>&nbsp;</th>
+                <th>@Messages("confirmation.item")</th>
                 <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
                 <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
                 <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>

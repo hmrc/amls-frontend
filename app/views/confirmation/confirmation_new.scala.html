@@ -47,12 +47,11 @@
         @detailsSummary(
             summary = Messages("confirmation.breakdown.details")
         ) {
-            <p>@Messages("confirmation.breakdown")</p>
-
             <table>
+                <caption>@Messages("confirmation.breakdown")</caption>
                 <thead>
                     <tr>
-                        <th>&nbsp;</th>
+                        <th>@Messages("confirmation.item")</th>
                         <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
                         <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
                         <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
