@@ -25,7 +25,7 @@ import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision.Supervision
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
@@ -101,12 +101,12 @@ class RegisterServicesControllerSpec extends AmlsSpec
       controller.businessMatchingService.clearSection(any())(any(),any())
     } thenReturn Future.successful(mockCacheMap)
 
-    val responsiblePerson = responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = None)
+    val responsiblePerson = responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None))
     val responsiblePersonChanged = responsiblePerson.copy(hasChanged = true, hasAccepted = true)
 
     val fitAndProperResponsiblePeople = Seq(
-      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(true)),
-      responsiblePerson.copy(hasAlreadyPassedFitAndProper = Some(false))
+      responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true))),
+      responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
     )
 
     mockCacheFetch[Seq[ResponsiblePerson]](Some(fitAndProperResponsiblePeople), Some(ResponsiblePerson.key))
@@ -829,7 +829,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
 
-          val result = controller invokePrivate promptFitAndProper(Seq(responsiblePerson, responsiblePerson))
+          val result = controller invokePrivate promptFitAndProper(responsiblePerson)
 
           result must be(true)
 
@@ -840,7 +840,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
           val promptFitAndProper = PrivateMethod[Boolean]('promptFitAndProper)
 
-          val result = controller invokePrivate promptFitAndProper(fitAndProperResponsiblePeople)
+          val result = controller invokePrivate promptFitAndProper(responsiblePerson.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
 
           result must be(false)
 
@@ -959,6 +959,54 @@ class RegisterServicesControllerSpec extends AmlsSpec
 
       }
     }
-  }
+    "shouldPromptForApproval" must {
+      "reset approval flag to none" when {
+        "business activity is changes to not have MSB or TCSP and FitandProper flag has a value of false" in new Fixture {
 
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck= Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+
+          val result = controller.shouldPromptForApproval(rp, bm)
+
+          val expectedRp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper=Some(false),
+              hasAlreadyPaidApprovalCheck = None
+            ),
+            hasAccepted = false,
+            hasChanged = true
+          )
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
+
+      "not handle any approvalFlags" when {
+        "the toggle is off" in new Fixture {
+
+          when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
+
+          val rp = responsiblePerson.copy(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false)
+            )
+          )
+          val bm = BMBusinessActivities(businessActivities=Set(HighValueDealing))
+
+          val result = controller.shouldPromptForApproval(rp, bm)
+
+          val expectedRp = rp
+          val expectedBm = bm
+
+          result mustEqual((expectedRp, expectedBm))
+        }
+      }
+    }
+  }
 }

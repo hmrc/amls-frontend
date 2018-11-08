@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
@@ -27,7 +27,7 @@ import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
 import org.scalatest.{Pending, WordSpecLike}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.mvc.Call
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -53,7 +53,7 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
       if (requiredCount == acc.size) {
         acc
       } else {
-        buildTestSequence(requiredCount, acc :+ ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(false)))
+        buildTestSequence(requiredCount, acc :+ ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false))))
       }
     }
 

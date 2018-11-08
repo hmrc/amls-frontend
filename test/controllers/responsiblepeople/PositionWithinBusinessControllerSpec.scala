@@ -60,7 +60,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       val hasNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant, NominatedOfficer), startDate)
     }
     val responsiblePerson = ResponsiblePerson(
-      hasAlreadyPassedFitAndProper = Some(true),
+      approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
       lineId = Some(1)
     )
     val noNominatedOfficer = responsiblePerson.copy(positions = Some(DefaultValues.noNominatedOfficerPositions))

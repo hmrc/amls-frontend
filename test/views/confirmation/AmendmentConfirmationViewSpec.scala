@@ -74,7 +74,7 @@ class AmendmentConfirmationViewSpec extends AmlsSpec with MustMatchers  with Pay
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
+      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {

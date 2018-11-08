@@ -16,6 +16,7 @@
 
 package typeclasses.confirmation
 
+import config.ApplicationConfig
 import models.businessmatching.BusinessActivities
 import models.confirmation.{BreakdownRow, Currency, RowEntity}
 import models.responsiblepeople.ResponsiblePerson
@@ -49,11 +50,29 @@ object BreakdownRowInstances {
 
             val subQuantity = subscriptionQuantity(subscription)
             val registrationFeeRow = submissionRow(subscription)
-            Seq(
-              BreakdownRow(registrationFeeRow.message, subQuantity, registrationFeeRow.feePer, subQuantity * registrationFeeRow.feePer)
-            ) ++ ResponsiblePeopleRows[SubmissionResponse](subscription, activities.businessActivities, people) ++ Seq(
-              BreakdownRow(premisesRow(subscription).message, premises.getOrElse(Seq.empty).size, premisesRow(subscription).feePer, subscription.getPremiseFee)
-            )
+
+            val registrationFeeBreakdownRow =
+              Seq(
+                BreakdownRow(
+                  registrationFeeRow.message,
+                  subQuantity,
+                  registrationFeeRow.feePer,
+                  subQuantity * registrationFeeRow.feePer
+                ))
+
+            val responsiblePeopleBreakdownRows = responsiblePeopleRowsProxy(subscription, people, activities)
+
+            val tradingPremisesBreakdownRows =
+              Seq(
+                BreakdownRow(
+                  premisesRow(subscription).message,
+                  premises.getOrElse(Seq.empty).size,
+                  premisesRow(subscription).feePer,
+                  subscription.getPremiseFee
+                ))
+
+            registrationFeeBreakdownRow ++ responsiblePeopleBreakdownRows ++ tradingPremisesBreakdownRows
+
           case _ => Seq.empty[BreakdownRow]
         }
       }
@@ -64,14 +83,30 @@ object BreakdownRowInstances {
     }
   }
 
+  def responsiblePeopleRowsProxy(subscription: SubmissionResponse, people: Option[Seq[ResponsiblePerson]], activities: BusinessActivities) = {
+    if (ApplicationConfig.phase2ChangesToggle) {
+      ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+        subscription,
+        activities.businessActivities,
+        people
+      )
+    } else {
+      ResponsiblePeopleRows[SubmissionResponse](
+        subscription,
+        activities.businessActivities,
+        people
+      )
+    }
+  }
+
   implicit val breakdownRowFromVariation: ConfirmationBreakdownRows[AmendVariationRenewalResponse] = {
     new ConfirmationBreakdownRows[AmendVariationRenewalResponse] {
       override def apply(
                           value: AmendVariationRenewalResponse,
                           businessActivities: Option[BusinessActivities],
                           premises: Option[Seq[TradingPremises]],
-                          people: Option[Seq[ResponsiblePerson]]) = {
-
+                          people: Option[Seq[ResponsiblePerson]]
+                        ) = {
         businessActivities match {
           case Some(activities) =>
             ResponsiblePeopleRows[AmendVariationRenewalResponse](value, activities.businessActivities, None) ++ tradingPremisesVariationRows(value)
@@ -88,15 +123,14 @@ object BreakdownRowInstances {
 
             def rpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeople, peopleVariationRow(value), renewalPeopleFee)
 
-            def fpRow: Seq[BreakdownRow] = renewalRow(value.addedResponsiblePeopleFitAndProper, peopleFPPassed, renewalFitAndProperDeduction)
-
             def tpFullYearRow: Seq[BreakdownRow] = renewalRow(value.addedFullYearTradingPremises, premisesVariationRow(value), fullPremisesFee)
 
             def tpHalfYearRow: Seq[BreakdownRow] = renewalRow(value.halfYearlyTradingPremises, premisesHalfYear(value), renewalHalfYearPremisesFee)
 
             def tpZeroRow: Seq[BreakdownRow] = renewalRow(value.zeroRatedTradingPremises, PremisesZero, renewalZeroPremisesFee)
 
-            rpRow ++ fpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+            rpRow ++ tpZeroRow ++ tpHalfYearRow ++ tpFullYearRow
+
         }
 
       }
@@ -145,6 +179,9 @@ object BreakdownRows {
                                 businessActivities: Option[BusinessActivities],
                                 premises: Option[Seq[TradingPremises]],
                                 people: Option[Seq[ResponsiblePerson]]
-                              )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = b(value, businessActivities, premises, people)
+                              )(implicit b: ConfirmationBreakdownRows[A]): Seq[BreakdownRow] = {
+
+    b(value, businessActivities, premises, people)
+  }
 
 }

@@ -41,6 +41,44 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
   "ResponsiblePeople" must {
 
+          "phase 1 is true" when {
+
+            "fitAndProper is true and approval is none" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck =  None),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+
+            "fitAndProper is true and approval is true" in {
+              val inputRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPassedFitAndProper = Some(true),
+                  hasAlreadyPaidApprovalCheck = Some(true)),
+                hasAccepted = true,
+                hasChanged = true)
+
+              val expectedRp = ResponsiblePerson(
+                approvalFlags = ApprovalFlags(),
+                hasAccepted = true,
+                hasChanged = true)
+
+              inputRp.resetBasedOnApprovalFlags() mustBe (expectedRp)
+
+            }
+          }
+
+
     "serialise correctly" when {
       "residence and passport type is in current format" in {
         Json.toJson(completeModelNonUkResidentNonUkPassport) must be(completeJsonPresentNonUkResidentNonUkPassport)
@@ -258,8 +296,8 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "Merged with FitAndProper" must {
         "return ResponsiblePeople with correct hasAlreadyPassedFitAndProper" in {
-          val result = ResponsiblePerson.default(EmptyResponsiblePeople).hasAlreadyPassedFitAndProper(Some(true))
-          result must be(ResponsiblePerson(hasAlreadyPassedFitAndProper = Some(true), hasChanged = true))
+          val result = ResponsiblePerson.default(EmptyResponsiblePeople).approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
+          result must be(ResponsiblePerson(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasChanged = true))
         }
       }
 
@@ -510,7 +548,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
     "hasAlreadyPassedFitAndProper value is set" which {
       "is the same as before" must {
         "leave the object unchanged" in {
-          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(Some(true))
+          val result = completeModelNonUkResidentNonUkPassport.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
           result must be(completeModelNonUkResidentNonUkPassport)
           result.hasChanged must be(false)
         }
@@ -518,8 +556,8 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
       "is different" must {
         "set the hasChanged & previouslyRegisterd Properties" in {
-          val result = completeModelNonUkResidentNonUkPassport.hasAlreadyPassedFitAndProper(Some(false))
-          result must be(completeModelNonUkResidentNonUkPassport.copy(hasAlreadyPassedFitAndProper = Some(false), hasChanged = true))
+          val result = completeModelNonUkResidentNonUkPassport.approvalFlags(ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)))
+          result must be(completeModelNonUkResidentNonUkPassport.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasChanged = true))
           result.hasChanged must be(true)
         }
       }
@@ -678,278 +716,278 @@ trait ResponsiblePeopleValues extends NinoUtil {
   }
 
   val completeModelUkResident = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    None,
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
   val incompleteModelUkResidentNoDOBPhase2 = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    None,
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentPhase2 = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.noKnownBy),
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = Some(DefaultValues.noKnownBy),
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(false)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentForOldData = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    None,
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentForOldDataPhase2 = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentForOldDataNoPrevious = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    None,
-    None,
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    None,
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = None,
+    legalNameChangeDate = None,
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentForOldDataNoPreviousPhase2 = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    None,
-    None,
-    None,
-    Some(DefaultValues.personResidenceTypeUk),
-    None,
-    None,
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = None,
+    legalNameChangeDate = None,
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelNonUkResidentNonUkPassport = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.knownBy),
-    Some(DefaultValues.personResidenceTypeNonUk),
-    Some(DefaultValues.ukPassportNo),
-    Some(DefaultValues.nonUKPassportYes),
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = Some(DefaultValues.knownBy),
+    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
+    ukPassport = Some(DefaultValues.ukPassportNo),
+    nonUKPassport = Some(DefaultValues.nonUKPassportYes),
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelNonUkResidentNonUkPassportNoPreviousName = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.knownBy),
-    Some(DefaultValues.personResidenceTypeNonUk),
-    Some(DefaultValues.ukPassportNo),
-    Some(DefaultValues.nonUKPassportYes),
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = Some(DefaultValues.knownBy),
+    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
+    ukPassport = Some(DefaultValues.ukPassportNo),
+    nonUKPassport = Some(DefaultValues.nonUKPassportYes),
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelUkResidentNoPreviousNamePhase2 = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.knownBy),
-    Some(DefaultValues.personResidenceTypeUk),
-    Some(DefaultValues.ukPassportYes),
-    None,
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = Some(DefaultValues.knownBy),
+    personResidenceType = Some(DefaultValues.personResidenceTypeUk),
+    ukPassport = Some(DefaultValues.ukPassportYes),
+    nonUKPassport = None,
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
 
   val completeModelNonUkResidentNoPassport = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
-    Some(DefaultValues.personResidenceTypeNonUk),
-    Some(DefaultValues.ukPassportNo),
-    Some(DefaultValues.nonUKPassportNo),
-    Some(DefaultValues.dateOfBirth),
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory),
-    Some(DefaultValues.positions),
-    Some(DefaultValues.saRegistered),
-    Some(DefaultValues.vatRegistered),
-    Some(DefaultValues.experienceTraining),
-    Some(DefaultValues.training),
-    Some(true),
-    false,
-    false,
-    Some(1),
-    Some(StatusConstants.Unchanged),
-    None,
-    Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
+    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
+    ukPassport = Some(DefaultValues.ukPassportNo),
+    nonUKPassport = Some(DefaultValues.nonUKPassportNo),
+    dateOfBirth = Some(DefaultValues.dateOfBirth),
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory),
+    positions = Some(DefaultValues.positions),
+    saRegistered = Some(DefaultValues.saRegistered),
+    vatRegistered = Some(DefaultValues.vatRegistered),
+    experienceTraining = Some(DefaultValues.experienceTraining),
+    training = Some(DefaultValues.training),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+    hasChanged = false,
+    hasAccepted = false,
+    lineId = Some(1),
+    status = Some(StatusConstants.Unchanged),
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
   )
 
   val completeModelNonUkResidentUkPassport = ResponsiblePerson(
@@ -968,7 +1006,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
     Some(DefaultValues.vatRegistered),
     Some(DefaultValues.experienceTraining),
     Some(DefaultValues.training),
-    Some(true),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
     false,
     false,
     Some(1),
@@ -984,50 +1022,50 @@ trait ResponsiblePeopleValues extends NinoUtil {
     )))
 
   val incompleteResponsiblePeople = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    Some(DefaultValues.knownBy),
-    Some(DefaultValues.personResidenceTypeNonUk),
-    None,
-    None,
-    None,
-    Some(DefaultValues.contactDetails),
-    Some(DefaultValues.addressHistory)
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = Some(DefaultValues.knownBy),
+    personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(DefaultValues.contactDetails),
+    addressHistory = Some(DefaultValues.addressHistory)
   )
 
   val incompleteResponsiblePeopleUpToUkResident = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeNonUk)
   )
 
   val incompleteResponsiblePeopleUpToUkPassportNumber = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
     ukPassport = Some(DefaultValues.ukPassportYes)
   )
 
   val incompleteResponsiblePeopleUpToNonUkPassportNumber = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
     ukPassport = None,
     nonUKPassport = Some(DefaultValues.nonUKPassportYes)
   )
 
   val incompleteResponsiblePeopleUpToNoNonUkPassportDateOfBirth = ResponsiblePerson(
-    Some(DefaultValues.personName),
-    Some(DefaultValues.legalName),
-    Some(new LocalDate(1990, 2, 24)),
-    None,
+    personName = Some(DefaultValues.personName),
+    legalName = Some(DefaultValues.legalName),
+    legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+    knownBy = None,
     personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
     ukPassport = None,
     nonUKPassport = Some(DefaultValues.nonUKPassportNo),
@@ -1464,7 +1502,7 @@ trait ResponsiblePeopleValues extends NinoUtil {
       "training" -> true,
       "information" -> "test"
     ),
-    "hasAlreadyPassedFitAndProper" -> true,
+    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
     "hasChanged" -> false,
     "hasAccepted" -> false,
     "lineId" -> 1,
@@ -1634,6 +1672,160 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "status" -> "Unchanged"
   )
 
+  val completeJsonPresentUkResidentFitAndProperPhase2 = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last"
+    ),
+    "legalName" -> Json.obj(
+      "hasPreviousName" -> true,
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24",
+    "KnownBy" -> Json.obj(
+      "hasOtherNames" -> true,
+      "otherName" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "true",
+      "nino" -> "AA111111A",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "03"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
+  val completeJsonPresentUkResidentFitAndProperApprovalPhase2 = Json.obj(
+    "personName" -> Json.obj(
+      "firstName" -> "first",
+      "middleName" -> "middle",
+      "lastName" -> "last"
+    ),
+    "legalName" -> Json.obj(
+      "hasPreviousName" -> true,
+      "firstName" -> "oldFirst",
+      "middleName" -> "oldMiddle",
+      "lastName" -> "oldLast"
+    ),
+    "legalNameChangeDate" -> "1990-02-24",
+    "KnownBy" -> Json.obj(
+      "hasOtherNames" -> true,
+      "otherName" -> "name"
+    ),
+    "personResidenceType" -> Json.obj(
+      "isUKResidence" -> "true",
+      "nino" -> "AA111111A",
+      "countryOfBirth" -> "GB",
+      "nationality" -> "GB"
+    ),
+    "contactDetails" -> Json.obj(
+      "phoneNumber" -> "07702743555",
+      "emailAddress" -> "test@test.com"
+    ),
+    "addressHistory" -> Json.obj(
+      "currentAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA111AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "01"
+        )
+      ),
+      "additionalAddress" -> Json.obj(
+        "personAddress" -> Json.obj(
+          "personAddressLine1" -> "Line 1",
+          "personAddressLine2" -> "Line 2",
+          "personAddressPostCode" -> "AA11AA"
+        ),
+        "timeAtAddress" -> Json.obj(
+          "timeAtAddress" -> "03"
+        )
+      )
+    ),
+    "positions" -> Json.obj(
+      "positions" -> Seq("01", "03"),
+      "startDate" -> startDate.get.toString("yyyy-MM-dd")
+    ),
+    "saRegistered" -> Json.obj(
+      "saRegistered" -> true,
+      "utrNumber" -> "0123456789"
+    ),
+    "vatRegistered" -> Json.obj(
+      "registeredForVAT" -> false
+    ),
+    "experienceTraining" -> Json.obj(
+      "experienceTraining" -> true,
+      "experienceInformation" -> "Some training"
+    ),
+    "training" -> Json.obj(
+      "training" -> true,
+      "information" -> "test"
+    ),
+    "soleProprietorOfAnotherBusiness" -> Json.obj(
+      "soleProprietorOfAnotherBusiness" -> true
+    ),
+    "approvalFlags" -> Json.obj("hasAlreadyPassedFitAndProper" -> true),
+    "hasChanged" -> false,
+    "lineId" -> 1,
+    "status" -> "Unchanged"
+  )
+
   val completeOldJsonPresentUkResident = Json.obj(
     "personName" -> Json.obj(
       "firstName" -> "first",
@@ -1772,7 +1964,6 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "lineId" -> 1,
     "status" -> "Unchanged"
   )
-
 }
 
 class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
@@ -1782,7 +1973,119 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
     .build()
 
   "ResponsiblePeople" must {
+
+    "calling updateFitAndProperAndApproval" must {
+
+      val inputRp = ResponsiblePerson()
+
+      "set Approval flag to None" when {
+
+        "only if both choice and msbOrTcsp are false so the answer to the approval question is needed" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = false)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = None
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+      }
+
+      "set Approval to match the incoming fitAndProper flag" when {
+
+        "choice is true, and msbOrTcsp is false so the answer to the approval question in not required" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = true, msbOrTcsp = false)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(true),
+              hasAlreadyPaidApprovalCheck = Some(true)
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+
+        "choice is false, and msbOrTcsp is true so the answer to the approval question is not needed" in {
+
+          val outputRp = inputRp.updateFitAndProperAndApproval(fitAndPropperChoice = false, msbOrTcsp = true)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = Some(true)
+            ),
+            hasChanged = true
+          )
+
+          outputRp mustEqual (expectedRp)
+        }
+      }
+    }
+
+    "reset when resetBasedOnApprovalFlags is called" when {
+
+      "phase 2 feature toggle is true" when {
+
+        "fitAndProper is true and approval is true" in {
+          val inputRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(true),
+              hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true)
+
+          inputRp.resetBasedOnApprovalFlags() mustBe(inputRp)
+
+        }
+
+        "fitAndProper is false and approval is true" in {
+          val inputRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = Some(true)),
+            hasAccepted = true,
+            hasChanged = true)
+
+          val expectedRp = ResponsiblePerson(
+            approvalFlags = ApprovalFlags(
+              hasAlreadyPassedFitAndProper = Some(false),
+              hasAlreadyPaidApprovalCheck = None),
+            hasAccepted = false,
+            hasChanged = true)
+
+          inputRp.resetBasedOnApprovalFlags() mustBe(expectedRp)
+        }
+      }
+    }
+
     "Successfully validate if the model is complete when phase 2 feature toggle is true" when {
+
+      "json is complete" when {
+
+        "both Fit and proper and approval are both set only" in {
+          completeJsonPresentUkResidentFitAndProperPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+        }
+
+        "will fail if at least one of the approval flags is not defined" in {
+          val model = completeModelUkResidentPhase2.copy(approvalFlags = ApprovalFlags(hasAlreadyPaidApprovalCheck = None))
+
+          model.isComplete must be(false)
+        }
+      }
+
+      "json is complete" when {
+        "Fit and proper and approval" in {
+          completeJsonPresentUkResidentFitAndProperApprovalPhase2.as[ResponsiblePerson] must be(completeModelUkResident)
+        }
+      }
 
       "the model is fully complete" in {
         completeModelUkResidentPhase2.copy(hasAccepted = true).isComplete must be(true)

@@ -18,7 +18,7 @@ package typeclasses.confirmation
 
 import models.businessmatching.{BusinessActivities, BusinessActivity, MoneyServiceBusiness}
 import models.confirmation.BreakdownRow
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
+import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import models.tradingpremises.TradingPremises
 import models.{AmendVariationRenewalResponse, SubscriptionFees, SubscriptionResponse}
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
@@ -37,6 +37,8 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
         registrationFee = 1.0,
         fpFee = Some(2.0),
         fpFeeRate = Some(3.0),
+        approvalCheckFee = None,
+        approvalCheckFeeRate = None,
         premiseFee = 4.0,
         premiseFeeRate = Some(5.0),
         totalFees = 6.0,
@@ -53,6 +55,8 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
         registrationFee = 1.0,
         fpFee = Some(2.0),
         fpFeeRate = Some(3.0),
+        approvalCheckFee = None,
+        approvalCheckFeeRate = None,
         premiseFee = 4.0,
         premiseFeeRate = Some(5.0),
         totalFees = 6.0,
@@ -76,7 +80,7 @@ class BreakdownRowsSpec extends PlaySpec with OneAppPerSuite {
 
     val responsiblePeople = Some(Seq(
       ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName"))),
-      ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")), hasAlreadyPassedFitAndProper = Some(true))
+      ResponsiblePerson(personName = Some(PersonName("firstName", None, "lastName")), approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))
     ))
 
     val premises = Some(Seq(

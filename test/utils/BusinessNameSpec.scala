@@ -16,22 +16,25 @@
 
 package utils
 
-import connectors.{AmlsConnector, DataCacheConnector}
-import models.registrationdetails.RegistrationDetails
-import org.scalatest.MustMatchers
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.inject.guice.GuiceApplicationBuilder
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
 import cats.implicits._
+import connectors.{AmlsConnector, DataCacheConnector}
+import models.ReadStatusResponse
 import models.businesscustomer.ReviewDetails
 import models.businessmatching.BusinessMatching
+import models.registrationdetails.RegistrationDetails
+import models.status.SubmissionReady
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
+import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.mock.MockitoSugar
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite with MockitoSugar with ScalaFutures {
 
@@ -40,6 +43,8 @@ class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite wi
     implicit val cacheConnector = mock[DataCacheConnector]
     implicit val headerCarrier = HeaderCarrier()
     implicit val authContext = mock[AuthContext]
+    implicit val statusResponse = mock[ReadStatusResponse]
+    implicit val statusService = mock[StatusService]
 
     val safeId = "X87FUDIKJJKJH87364"
   }
@@ -67,6 +72,25 @@ class BusinessNameSpec extends PlaySpec with MustMatchers with OneAppPerSuite wi
 
         whenReady(BusinessName.getName(None).value) { result =>
           result mustBe "Test Business from the cache".some
+        }
+      }
+    }
+
+    "get the name from amls" when {
+      "the safeId comes from API9" in new Fixture {
+
+        when(statusResponse.safeId) thenReturn Some(safeId)
+
+        when {
+          statusService.getDetailedStatus(any(), any(), any())
+        } thenReturn Future.successful((SubmissionReady, Some(statusResponse)))
+
+        when {
+          amlsConnector.registrationDetails(eqTo(safeId))(any(), any(), any())
+        } thenReturn Future.successful(RegistrationDetails("Test Business", isIndividual = false))
+
+        whenReady(BusinessName.getBusinessNameFromAmls().value) { result =>
+          result mustBe "Test Business".some
         }
       }
     }

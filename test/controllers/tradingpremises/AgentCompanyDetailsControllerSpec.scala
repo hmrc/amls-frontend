@@ -116,6 +116,9 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(tradingPremisesGen.sample.get)))
 
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
+
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -133,6 +136,9 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
           when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
             .thenReturn(Some(Seq(TradingPremises())))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -177,6 +183,9 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
         when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1)(newRequest)
 

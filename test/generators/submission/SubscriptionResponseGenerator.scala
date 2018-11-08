@@ -30,7 +30,7 @@ trait SubscriptionResponseGenerator extends BaseGenerator
     paymentReference <- paymentRefGen
     fees <- Gen.choose(100, 500)
   } yield {
-    SubscriptionFees(paymentReference, BigDecimal(100), Some(115), Some(115), BigDecimal(130), Some(130), BigDecimal(fees))
+    SubscriptionFees(paymentReference, BigDecimal(100), Some(115), Some(115), None, None, BigDecimal(130), Some(130), BigDecimal(fees))
   }
 
   def subscriptionResponseGen(hasFees: Boolean = false): Gen[SubscriptionResponse] = for {

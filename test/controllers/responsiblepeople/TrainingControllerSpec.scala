@@ -165,6 +165,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(emptyCache)))
 
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
@@ -190,6 +193,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
 
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
+
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
@@ -207,12 +213,17 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
+
             when(mockCacheMap.getEntry[BusinessMatching](meq(BusinessMatching.key))(any()))
               .thenReturn(Some(
                 BusinessMatching(activities = Some(BusinessActivities(Set(MoneyServiceBusiness,HighValueDealing))))
               ))
+
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
+
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -237,6 +248,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
               ))
             when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any()))
               .thenReturn(Some(Seq(ResponsiblePerson())))
+
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)

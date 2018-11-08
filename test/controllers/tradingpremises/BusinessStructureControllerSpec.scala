@@ -105,6 +105,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
@@ -129,6 +132,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.save[TradingPremises](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
 
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
@@ -149,6 +155,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
@@ -168,6 +177,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1,false)(newRequest)
 
@@ -190,6 +202,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
@@ -209,6 +224,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
 
@@ -230,6 +248,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
       val result = controller.post(1,edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
@@ -246,6 +267,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1)(newRequest)
 

@@ -21,10 +21,9 @@ import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
 import org.joda.time.LocalDate
-import play.api.{Mode, Play}
+import play.api.{Logger, Mode, Play}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -78,6 +77,15 @@ trait StatusService {
         val status = getETMPStatus(response)
         Logger.debug("StatusService:etmpStatusInformation:status:" + status)
         (status, Some(response))
+    }
+  }
+
+  def getSafeIdFromReadStatus(mlrRegNumber: String)(implicit hc: HeaderCarrier,
+                                                          auth: AuthContext, ec: ExecutionContext) = {
+    amlsConnector.status(mlrRegNumber) map {
+      response =>
+        Logger.debug("StatusService:etmpStatusInformation:response:" + response)
+        Option(response.safeId.getOrElse(""))
     }
   }
 

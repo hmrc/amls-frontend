@@ -18,8 +18,9 @@ package services
 
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -35,14 +36,14 @@ class ResponsiblePeopleService @Inject()(val dataCacheConnector: DataCacheConnec
       _.getOrElse(Seq.empty)
     }
 
-  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int]): Seq[ResponsiblePerson] =
+  def updateFitAndProperFlag(responsiblePeople: Seq[ResponsiblePerson], indices: Set[Int], setApprovalFlag: Boolean): Seq[ResponsiblePerson] =
     responsiblePeople.zipWithIndex.map { case (rp, index) =>
-      val updated = if (indices contains index) {
-        rp.hasAlreadyPassedFitAndProper(Some(true))
+      val updated = if(setApprovalFlag) {
+        rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(indices contains index),
+          hasAlreadyPaidApprovalCheck = Some(indices contains index)))
       } else {
-        rp.hasAlreadyPassedFitAndProper(Some(false))
+        rp.approvalFlags(rp.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(indices contains index)))
       }
-
       updated.copy(hasAccepted = rp.hasAccepted)
     }
 }
@@ -51,9 +52,16 @@ object ResponsiblePeopleService {
 
   def isActive(person: ResponsiblePerson) = !person.status.contains(StatusConstants.Deleted) && person.isComplete
 
+  def nonDeleted(person: ResponsiblePerson) = !person.status.contains(StatusConstants.Deleted)
+
   implicit class ResponsiblePeopleZipListHelpers(people: Seq[(ResponsiblePerson, Int)]) {
     def exceptInactive = people filter {
       case (person, _) if isActive(person) => true
+      case _ => false
+    }
+
+    def exceptDeleted = people filter {
+      case (person, _) if nonDeleted(person) => true
       case _ => false
     }
   }

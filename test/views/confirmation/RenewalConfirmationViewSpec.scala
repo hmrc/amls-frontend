@@ -22,7 +22,6 @@ import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-//TODO: Implement tests
 class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
 
   trait ViewFixture extends Fixture {
@@ -73,7 +72,7 @@ class RenewalConfirmationViewSpec extends AmlsSpec with PaymentGenerator {
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continue")
+      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {

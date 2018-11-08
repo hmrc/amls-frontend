@@ -22,7 +22,13 @@
 @import forms.EmptyForm
 @import config.ApplicationConfig
 
-@(model: Option[ResponsiblePerson], idx: Int, showHide: Boolean = false, rpName: String = "", flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
+@(model: Option[ResponsiblePerson],
+    idx: Int,
+    showHide: Boolean = false,
+    rpName: String = "",
+    flow: Option[String] = None,
+    showApprovalSection: Boolean = false
+)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @detailedAnswers[T](
     question: String = "",
@@ -175,7 +181,8 @@
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.uk.passport", personName),
                 editUrl = controllers.responsiblepeople.routes.PersonUKPassportController.get(idx, true, flow).toString(),
-                dataItem = Some(ukPassport)
+                dataItem = Some(ukPassport),
+                editLinkTag = "uk-passport"
             ) { pp =>
                 @pp match {
                     case UKPassportYes(ukPassportNumber) => {
@@ -417,11 +424,12 @@
             }</p>
         }
 
-        @person.hasAlreadyPassedFitAndProper.map { fp =>
+        @person.approvalFlags.hasAlreadyPassedFitAndProper.map { fp =>
             @detailedAnswers(
                 question = Messages("responsiblepeople.detailed_answers.already_passed_fit_and_proper"),
                 editUrl = controllers.responsiblepeople.routes.FitAndProperController.get(idx, true, flow).toString(),
-                dataItem = person.hasAlreadyPassedFitAndProper
+                dataItem = person.approvalFlags.hasAlreadyPassedFitAndProper,
+                editLinkTag = "fit-and-proper"
             ) { fp2 =>
                 <p>@fp match {
                     case true => {@Messages("lbl.yes")}
@@ -430,6 +438,21 @@
             }
         }
 
+        @if(showApprovalSection) {
+            @person.approvalFlags.hasAlreadyPaidApprovalCheck.map { fp =>
+                @detailedAnswers(
+                    question = Messages("responsiblepeople.detailed_answers.already_paid_approval_check", personName),
+                    editUrl = controllers.responsiblepeople.routes.ApprovalCheckController.get(idx, true, flow).toString(),
+                    dataItem = person.approvalFlags.hasAlreadyPaidApprovalCheck,
+                    editLinkTag = "approval-check"
+                ) { fp2 =>
+                    <p>@fp match {
+                        case true => {@Messages("lbl.yes")}
+                        case false => {@Messages("lbl.no")}
+                    }</p>
+                }
+            }
+        }
     }
 
     @form(EmptyForm, controllers.responsiblepeople.routes.DetailedAnswersController.post(idx, flow)) {

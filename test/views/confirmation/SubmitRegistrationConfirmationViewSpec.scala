@@ -31,19 +31,17 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     val continueHref = "http://google.co.uk"
 
     val fee = 100
-
     override def view = views.html.confirmation.confirmation_new(
-      Some(paymentReferenceNumber),
-      Currency(fee),
-      Some(Seq(
+      paymentReference = Some(paymentReferenceNumber),
+      total = Currency(fee),
+      maybeBreakdownRows = Some(Seq(
         BreakdownRow("confirmation.submission", 1, Currency(10), Currency(110)),
         BreakdownRow("confirmation.tradingpremises", 2, Currency(20), Currency(120)),
         BreakdownRow("confirmation.tradingpremises.half", 3, Currency(30), Currency(130)),
         BreakdownRow("confirmation.tradingpremises.zero", 4, Currency(40), Currency(140)),
-        BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150)),
-        BreakdownRow("confirmation.responsiblepeople.fp.passed", 6, Currency(60), Currency(160))
+        BreakdownRow("confirmation.responsiblepeople", 5, Currency(50), Currency(150))
       )),
-      continueHref
+      paymentsUrl = continueHref
     )
   }
 
@@ -78,7 +76,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     }
 
     "show the breakdown row table when a non-empty sequence of breakdown rows" in new ViewFixture {
-      Option(doc.getElementsByClass("details").first()) mustBe defined
+      Option(doc.getElementsByClass("details__inner").first()) mustBe defined
     }
 
     "not show the breakdown row table when breakdown rows is None" in new ViewFixture {
@@ -89,18 +87,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
         continueHref
       )
 
-      Option(doc.getElementsByClass("details").first()) mustNot be(defined)
-    }
-
-    "show the breakdown row table when a nempty sequence of breakdown rows" in new ViewFixture {
-      override def view = views.html.confirmation.confirmation_new(
-        Some(paymentReferenceNumber),
-        Currency(fee),
-        Some(Seq.empty),
-        continueHref
-      )
-
-      Option(doc.getElementsByClass("details").first()) mustBe defined
+      Option(doc.getElementsByClass("details__inner").first()) mustNot be(defined)
     }
 
   }

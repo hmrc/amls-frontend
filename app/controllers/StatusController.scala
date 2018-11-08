@@ -18,7 +18,7 @@ package controllers
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, _}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.{BusinessActivities, BusinessMatching}
@@ -199,8 +199,7 @@ class StatusController @Inject()(val landingService: LandingService,
           businessNameOption,
           renewalDate,
           ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-        )
-        ))
+        )))
       case (ReadyForRenewal(renewalDate), _) => {
         renewalService.getRenewal flatMap {
           case Some(r) =>
@@ -211,15 +210,13 @@ class StatusController @Inject()(val landingService: LandingService,
                   businessNameOption,
                   renewalDate,
                   ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-                )
-                ))
+                )))
               } else {
                 Future.successful(Ok(status_renewal_incomplete(
                   mlrRegNumber.getOrElse(""),
                   businessNameOption,
                   renewalDate,
-                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople)
-                )))
+                  ControllerHelper.nominatedOfficerTitleName(responsiblePeople))))
               }
             }
           case _ => Future.successful(Ok(
@@ -228,8 +225,7 @@ class StatusController @Inject()(val landingService: LandingService,
               renewalDate,
               true,
               ControllerHelper.nominatedOfficerTitleName(responsiblePeople),
-              activities
-            )))
+              activities)))
         }
       }
     }

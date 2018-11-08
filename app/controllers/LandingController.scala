@@ -21,6 +21,7 @@ import cats.data.Validated.{Invalid, Valid}
 import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
+import models._
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -34,19 +35,16 @@ import models.responsiblepeople.ResponsiblePerson
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import models._
+import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import services.AuthService
-import play.api.Logger
-
-import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
+import scala.concurrent.Future
 import scala.util.{Success, Try}
 
 @Singleton
@@ -56,7 +54,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val authService: AuthService,
                                   val cacheConnector: DataCacheConnector,
                                   val authConnector: AuthConnector = AMLSAuthConnector
-                                ) extends BaseController {
+                                 ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 

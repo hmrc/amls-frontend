@@ -26,7 +26,7 @@ import generators.businessmatching.BusinessMatchingGenerator
 import models.businessmatching._
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
 import models.flowmanagement.{AddBusinessTypeFlowModel, WhichFitAndProperPageId}
-import models.responsiblepeople.{DateOfBirth, PersonName, ResponsiblePerson}
+import models.responsiblepeople.{ApprovalFlags, DateOfBirth, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -62,13 +62,13 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     )
 
     val responsiblePeople: List[ResponsiblePerson] = (responsiblePeopleGen(2).sample.get :+
-      responsiblePersonGen.sample.get.copy(hasAlreadyPassedFitAndProper = Some(true))) ++
+      responsiblePersonGen.sample.get.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)))) ++
       responsiblePeopleGen(2).sample.get
 
     val generateDOB = if(ApplicationConfig.phase2ChangesToggle) Some(DateOfBirth(new LocalDate(2001,12,2))) else None
 
     var peopleMixedWithInactive = Seq(
-      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1")), dateOfBirth = generateDOB ),
+      responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "1")), dateOfBirth = generateDOB, approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true), hasAlreadyPaidApprovalCheck = Some(false))),
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "2")), status = Some(StatusConstants.Deleted)), // Deleted
       responsiblePersonGen.sample.get.copy(Some(PersonName("Person", None, "3")), None) // isComplete = false
     )
@@ -167,7 +167,7 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
     }
   }
 
-  "Inactive people" must {
+  "deleted people" must {
     "be hidden from the selection list" when {
       "showing the page on a GET request" in new Fixture {
         when {
@@ -179,8 +179,8 @@ class WhichFitAndProperControllerSpec extends AmlsSpec with MockitoSugar with Re
         status(result) must be(OK)
 
         contentAsString(result) must include("Person 1")
+        contentAsString(result) must include("Person 3")
         contentAsString(result) must not include "Person 2"
-        contentAsString(result) must not include "Person 3"
       }
 
       "showing the page having POSTed with validation errors" in new Fixture {

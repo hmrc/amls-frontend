@@ -22,19 +22,17 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
-import models.renewal.Renewal
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
 import play.api.Play
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{RenewalService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.StatusConstants
 import views.html.declaration.{who_is_registering_this_registration, who_is_registering_this_renewal, who_is_registering_this_update}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhoIsRegisteringController extends BaseController {
 
@@ -76,9 +74,10 @@ trait WhoIsRegisteringController extends BaseController {
                     redirectToAddPersonPage
                   case _ =>
                     getAddPerson(data, ResponsiblePerson.filter(responsiblePeople)) map { addPerson =>
-                      dataCacheConnector.save[AddPerson](AddPerson.key, addPerson)
-                    }
-                    redirectToDeclarationPage
+                      dataCacheConnector.save[AddPerson](AddPerson.key, addPerson) flatMap {
+                        _ => redirectToDeclarationPage
+                      }
+                    } getOrElse Future.successful(NotFound(notFoundView))
                 }
               }) getOrElse redirectToDeclarationPage
           }

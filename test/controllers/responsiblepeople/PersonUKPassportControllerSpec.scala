@@ -141,8 +141,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -168,8 +168,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -194,8 +194,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, false)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -225,8 +225,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true)(newRequest)
             status(result) must be(SEE_OTHER)
@@ -256,8 +256,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
@@ -284,8 +284,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
             when(controller.dataCacheConnector.fetchAll(any(), any()))
               .thenReturn(Future.successful(Some(mockCacheMap)))
 
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(emptyCache))
+            when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+              .thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(1, true, Some(flowFromDeclaration))(newRequest)
             status(result) must be(SEE_OTHER)
@@ -314,8 +314,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetchAll(any(), any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(1)(newRequest)
           status(result) must be(BAD_REQUEST)
@@ -341,8 +341,8 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
           when(controller.dataCacheConnector.fetchAll(any(), any()))
             .thenReturn(Future.successful(Some(mockCacheMap)))
 
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-            .thenReturn(Future.successful(emptyCache))
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           val result = controller.post(10)(newRequest)
           status(result) must be(NOT_FOUND)
@@ -381,6 +381,9 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1, true)(newRequest)
         status(result) must be(SEE_OTHER)
@@ -422,6 +425,9 @@ class PersonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
         when(controller.dataCacheConnector.fetchAll(any(), any()))
           .thenReturn(Future.successful(Some(mockCacheMap)))
+
+        when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(mockCacheMap))
 
         val result = controller.post(1, true)(newRequest)
         status(result) must be(SEE_OTHER)

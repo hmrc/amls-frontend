@@ -18,7 +18,7 @@ package controllers
 
 import java.net.URLEncoder
 
-import config.{AmlsShortLivedCache, ApplicationConfig}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
@@ -42,21 +42,19 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
+import play.api.libs.json.JsResultException
 import play.api.mvc.Request
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
-import services.{AuthEnrolmentsService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService}
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import play.api.libs.json.JsResultException
-import services.AuthService
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
 
@@ -127,7 +125,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
 
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
-            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, 1.0, None, 1.0)))))
+            .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
           when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
 
@@ -424,6 +422,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "TESTAMLSREFNNO", Some(SubscriptionFees(
             "TESTPAYMENTREF",
             100.45,
+            None,
+            None,
             None,
             None,
             123.78,

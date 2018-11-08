@@ -18,12 +18,12 @@ package services
 
 import generators.ResponsiblePersonGenerator
 import models.businessmatching.updateservice.ResponsiblePeopleFitAndProper
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import org.scalacheck.Gen
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.PlaySpec
 import play.api.test.Helpers._
-import utils.{DependencyMocks, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, DependencyMocks, StatusConstants}
 import org.mockito.Mockito.verify
 import org.mockito.Matchers.{any, eq => eqTo}
 import ResponsiblePeopleService._
@@ -57,29 +57,30 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
   "updateResponsiblePeople" must {
     "save fit and proper as true to responsible people to those matched by index" which {
       "will save fit and proper as false to responsible people to those not matched by index" when {
+
         "a single selection is made" in new Fixture {
           val indices = Set(1)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
-            responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-            responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-            responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true)
+            responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
+            responsiblePeople(1).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
+            responsiblePeople(2).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
+            responsiblePeople(3).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
+            responsiblePeople.last.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true)
           )
         }
 
         "multiple selections are made" in new Fixture {
           val indices = Set(0, 3, 4)
-          val result = service.updateFitAndProperFlag(responsiblePeople, indices)
+          val result = service.updateFitAndProperFlag(responsiblePeople, indices, false)
 
           result mustBe Seq(
-              responsiblePeople.head.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-              responsiblePeople(1).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-              responsiblePeople(2).copy(hasAlreadyPassedFitAndProper = Some(false), hasAccepted = true, hasChanged = true),
-              responsiblePeople(3).copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true),
-              responsiblePeople.last.copy(hasAlreadyPassedFitAndProper = Some(true), hasAccepted = true, hasChanged = true)
+              responsiblePeople.head.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
+              responsiblePeople(1).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
+              responsiblePeople(2).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(false)), hasAccepted = true, hasChanged = true),
+              responsiblePeople(3).copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true),
+              responsiblePeople.last.copy(approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)), hasAccepted = true, hasChanged = true)
           )
         }
       }
@@ -98,6 +99,19 @@ class ResponsiblePersonServiceSpec extends AmlsSpec with ResponsiblePersonGenera
 
       filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
       filtered.collect { case (p, _) if !p.isComplete => p } mustBe empty
+    }
+
+    "be filtered to only include people not deleted" in new Fixture {
+
+      val people = responsiblePeople.patch(0, Seq(
+        responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+        responsiblePersonGen.sample.get.copy(personName = None)),
+        2).zipWithIndex
+
+      val filtered = people.exceptDeleted
+
+      filtered.collect { case (p, _) if p.status.contains(StatusConstants.Deleted) => p } mustBe empty
+      filtered.collect { case (p, _) if !p.isComplete => p } must not be empty
     }
   }
 }

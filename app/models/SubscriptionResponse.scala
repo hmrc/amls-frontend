@@ -34,6 +34,10 @@ case class SubscriptionResponse(
 
   override def getFpFee: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.fpFee)
 
+  override def getApprovalCheckFee: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.approvalCheckFee)
+
+  override def getApprovalCheckFeeRate: Option[BigDecimal] = subscriptionFees.flatMap(fees => fees.approvalCheckFeeRate)
+
   override def getPremiseFee: BigDecimal = subscriptionFees.fold(BigDecimal(0)) {
     _.premiseFee
   }
@@ -64,6 +68,8 @@ object SubscriptionResponse {
         (__ \ 'subscriptionFees \ 'registrationFee).json.copyFrom((__ \ 'registrationFee).json.pick) and
         (__ \ 'subscriptionFees \ 'fpFee).json.copyFrom((__ \ 'fpFee).json.pick) and
         (__ \ 'subscriptionFees \ 'fpFeeRate).json.copyFrom((__ \ 'fpFeeRate).json.pick) and
+        (__ \ 'subscriptionFees \ 'approvalCheckFee).json.copyFrom((__ \ 'approvalCheckFee).json.pick) and
+        (__ \ 'subscriptionFees \ 'approvalCheckFeeRate).json.copyFrom((__ \ 'approvalCheckFeeRate).json.pick) and
         (__ \ 'subscriptionFees \ 'premiseFee).json.copyFrom((__ \ 'premiseFee).json.pick) and
         (__ \ 'subscriptionFees \ 'premiseFeeRate).json.copyFrom((__ \ 'premiseFeeRate).json.pick) and
         (__ \ 'subscriptionFees \ 'totalFees).json.copyFrom((__ \ 'totalFees).json.pick)

@@ -42,6 +42,24 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCache: DataCacheConnector = mock[DataCacheConnector]
     val controller = new ConfirmAddressController(messagesApi, self.dataCache, self.authConnector)
 
+    def setupCacheMap(cachedResponsiblePerson: Option[Seq[ResponsiblePerson]],
+                      cachedBusinessMatching: Option[BusinessMatching] = None
+                     ): Unit = {
+
+      val mockCacheMap: CacheMap = mock[CacheMap]
+
+      when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
+        .thenReturn(cachedResponsiblePerson)
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(cachedBusinessMatching)
+
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+    }
   }
 
   "ConfirmAddress" when {
@@ -66,16 +84,11 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
     "Get is called" must {
 
       "Load Confirm address page successfully" in new Fixture {
-        val mockCacheMap = mock[CacheMap]
 
-        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-          .thenReturn(Some(responsiblePerson))
-
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(bm))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        setupCacheMap(
+          Some(responsiblePerson),
+          Some(bm)
+        )
 
         val result = controller.get(1)(request)
         status(result) must be(OK)
@@ -84,59 +97,39 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       "redirect to current address page" when {
         "business matching model does not exist" in new Fixture {
-          val mockCacheMap = mock[CacheMap]
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson())))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(None)
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          setupCacheMap(Some(Seq(ResponsiblePerson())))
 
           val result = controller.get(1)(request)
+
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
         }
 
         "business matching ->review details is empty" in new Fixture {
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson())))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm.copy(reviewDetails = None)))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          setupCacheMap(
+            Some(Seq(ResponsiblePerson())),
+            Some(bm.copy(reviewDetails = None))
+          )
 
           val result = controller.get(1)(request)
+
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
         }
 
         "current address is defined" in new Fixture {
 
-          val mockCacheMap = mock[CacheMap]
-
           val ukAddress = PersonAddressUK("Line 1", "Line 2", Some("Line 3"), None, "AA11AA")
           val additionalAddress = ResponsiblePersonCurrentAddress(ukAddress, Some(ZeroToFiveMonths))
           val history = ResponsiblePersonAddressHistory(currentAddress = Some(additionalAddress))
           val responsiblePeople = ResponsiblePerson(addressHistory = Some(history), lineId = Some(1))
 
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(responsiblePeople)))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm.copy(reviewDetails = None)))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          setupCacheMap(Some(Seq(responsiblePeople)), Some(bm.copy(reviewDetails = None)))
 
           val result = controller.get(1)(request)
+
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
         }
@@ -158,21 +151,15 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "confirmAddress" -> "true"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson())))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          setupCacheMap(
+            Some(Seq(ResponsiblePerson())),
+            Some(bm)
+          )
 
           val result = controller.post(1)(newRequest)
+
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.TimeAtCurrentAddressController.get(1).url))
-
           verify(controller.dataCacheConnector).save[Seq[ResponsiblePerson]](
             any(),
             meq(Seq(rp))
@@ -184,18 +171,13 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
             "confirmAddress" -> "false"
           )
 
-          val mockCacheMap = mock[CacheMap]
-
-          when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-            .thenReturn(Some(Seq(ResponsiblePerson(addressHistory = Some(mock[ResponsiblePersonAddressHistory])))))
-
-          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-            .thenReturn(Some(bm))
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(Some(mockCacheMap)))
+          setupCacheMap(
+            Some(Seq(ResponsiblePerson(addressHistory = Some(mock[ResponsiblePersonAddressHistory])))),
+            Some(bm)
+          )
 
           val result = controller.post(1)(newRequest)
+
           status(result) must be (SEE_OTHER)
           redirectLocation(result) must be(Some(routes.CurrentAddressController.get(1).url))
 
@@ -211,18 +193,13 @@ class ConfirmAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val newRequest = request.withFormUrlEncodedBody(
         )
 
-        val mockCacheMap = mock[CacheMap]
-
-        when(mockCacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
-          .thenReturn(Some(responsiblePerson))
-
-        when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-          .thenReturn(Some(bm))
-
-        when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-          .thenReturn(Future.successful(Some(mockCacheMap)))
+        setupCacheMap(
+          Some(responsiblePerson),
+          Some(bm)
+        )
 
         val result = controller.post(1)(newRequest)
+
         status(result) must be(BAD_REQUEST)
         contentAsString(result) must include(Messages("error.required.rp.confirm.address", personName.titleName))
       }
