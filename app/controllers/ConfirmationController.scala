@@ -29,6 +29,7 @@ import models.payments._
 import models.renewal.Renewal
 import models.status._
 import models.{FeeResponse, ReadStatusResponse, SubmissionRequestStatus}
+import play.api.Logger
 import play.api.mvc.{AnyContent, Request, Result}
 import services.{AuthEnrolmentsService, FeeResponseService, PaymentsService, StatusService, _}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -57,7 +58,10 @@ class ConfirmationController @Inject()(
                                         private[controllers] val auditConnector: AuditConnector
                                       ) extends BaseController {
 
+  val prefix = "[ConfirmationController]"
+
   def get() = Authorised.async {
+    Logger.debug(s"[$prefix] - begin get()...")
     implicit authContext =>
       implicit request =>
         for {
@@ -207,13 +211,17 @@ class ConfirmationController @Inject()(
   private def resultFromStatus(status: SubmissionStatus, submissionRequestStatus: Option[SubmissionRequestStatus])
                               (implicit hc: HeaderCarrier, context: AuthContext, request: Request[AnyContent], statusService: StatusService): Future[Result] = {
 
+    Logger.debug(s"[$prefix][resultFromStatus] - Begin get fee response...)")
+
     def companyName(maybeStatus: Option[ReadStatusResponse]): OptionT[Future, String] =
       maybeStatus.fold[OptionT[Future, String]](OptionT.some("")) { r => BusinessName.getNameFromAmls(r.safeId.get) }
 
     OptionT.liftF(retrieveFeeResponse) flatMap {
       case Some(fees) if fees.paymentReference.isDefined && fees.toPay(status, submissionRequestStatus) > 0 =>
-
+        Logger.debug(s"[$prefix][resultFromStatus] - Fee found)")
         lazy val breakdownRows = confirmationService.getBreakdownRows(status, fees)
+
+        Logger.debug(s"[$prefix][resultFromStatus] - fees: $fees")
 
         status match {
           case SubmissionReadyForReview | SubmissionDecisionApproved if fees.responseType equals AmendOrVariationResponseType =>
@@ -226,11 +234,12 @@ class ConfirmationController @Inject()(
             }
         }
 
-      case _ => for {
-        name <- BusinessName.getBusinessNameFromAmls()
+      case _ =>
+        Logger.debug(s"[$prefix][resultFromStatus] - No fee found)")
+        for {
+          name <- BusinessName.getBusinessNameFromAmls()
       } yield {
         Ok(confirmation_no_fee(name))}
-
     } getOrElse InternalServerError("Could not determine a response")
   }
 
