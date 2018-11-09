@@ -33,20 +33,25 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
 
   private val amlsKey = "HMRC-MLR-ORG"
   private val amlsNumberKey = "MLRRefNumber"
+  private val prefix = "AuthEnrolmentsService"
 
   def amlsRegistrationNumber(implicit authContext: AuthContext,
                              headerCarrier: HeaderCarrier,
                              ec: ExecutionContext): Future[Option[String]] = {
 
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - Begin...)")
+
     val authEnrolments = authContext.enrolmentsUri map { uri =>
       authConnector.enrolments(uri)
     } getOrElse Future.successful(Seq.empty)
 
+    Logger.debug(s"[$prefix][amlsRegistrationNumber] - config.enrolmentStubsEnabled: ${config.enrolmentStubsEnabled})")
     lazy val stubbedEnrolments = if (config.enrolmentStubsEnabled) {
       authConnector.userDetails flatMap { details =>
         stubConnector.enrolments(details.groupIdentifier.getOrElse(throw new Exception("Group ID is unavailable")))
       }
     } else {
+      Logger.debug(s"[$prefix][amlsRegistrationNumber] - Return empty sequence...)")
       Future.successful(Seq.empty)
     }
 
@@ -56,12 +61,13 @@ class AuthEnrolmentsService @Inject()(val authConnector: AuthConnector,
     }
 
     enrolmentQuery map { enrolmentsList =>
+      Logger.debug(s"[$prefix][amlsRegistrationNumber] - enrolmentsList: $enrolmentsList)")
       for {
         amlsEnrolment <- enrolmentsList.find(enrolment => enrolment.key == amlsKey)
         amlsIdentifier <- amlsEnrolment.identifiers.find(identifier => identifier.key == amlsNumberKey)
       } yield {
-        val prefix = "[AuthEnrolmentsService][amlsRegistrationNumber]"
-        Logger.debug(s"$prefix : ${amlsIdentifier.value}")
+        Logger.debug(s"[$prefix][amlsRegistrationNumber] - amlsEnrolment: $amlsEnrolment)")
+        Logger.debug(s"[$prefix][amlsRegistrationNumber] : ${amlsIdentifier.value}")
         amlsIdentifier.value
       }
     }

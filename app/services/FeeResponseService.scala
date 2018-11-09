@@ -21,6 +21,7 @@ import connectors.FeeConnector
 import models.FeeResponse
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models.status.RenewalSubmitted
+import play.api.Logger
 import uk.gov.hmrc.http.{HeaderCarrier, NotFoundException}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
@@ -28,9 +29,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class FeeResponseService @Inject()(val feeConnector: FeeConnector) {
 
+  private val prefix = "FeeResponseService"
+
   def getFeeResponse(amlsReferenceNumber: String)
                     (implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[FeeResponse]] = {
 
+    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     feeConnector.feeResponse(amlsReferenceNumber) map ( feeResponse =>
       feeResponse.responseType match {
         case AmendOrVariationResponseType
