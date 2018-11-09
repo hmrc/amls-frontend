@@ -251,9 +251,11 @@ class ConfirmationController @Inject()(
     } yield result
   }
 
-  private def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] =
+  private def retrieveFeeResponse(implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[FeeResponse]] = {
+    Logger.debug(s"[$prefix][retrieveFeeResponse] - Begin...)")
     (for {
       amlsRegistrationNumber <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
       fees <- OptionT(feeResponseService.getFeeResponse(amlsRegistrationNumber))
     } yield fees).value
+  }
 }
