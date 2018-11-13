@@ -33,7 +33,12 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class TaxEnrolmentsConnector @Inject()(http: WSHttp, appConfig: AppConfig, auth: AuthConnector, audit: AuditConnector) {
 
-  lazy val baseUrl = s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+  lazy val baseUrl = if (appConfig.enrolmentStubsEnabled) {
+    s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
+  } else {
+    s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+  }
+
   val warn: String => Unit = msg => Logger.warn(s"[TaxEnrolmentsConnector] $msg")
 
   object ResponseCodes {

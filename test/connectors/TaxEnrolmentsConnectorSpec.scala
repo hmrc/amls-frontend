@@ -23,7 +23,7 @@ import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsExcep
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
 import models.auth.UserDetails
-import models.enrolment.{AmlsEnrolmentKey, TaxEnrolment, ErrorResponse}
+import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
 import org.scalatest.MustMatchers
@@ -81,6 +81,24 @@ class TaxEnrolmentsConnectorSpec extends PlaySpec
 
     def jsonError(code: String, message: String): String = Json.toJson(ErrorResponse(code, message)).toString
 
+  }
+
+  "configuration" when {
+    "stubbed" must {
+      "return stubs base url" in new Fixture {
+        when {
+          appConfig.enrolmentStubsEnabled
+        } thenReturn true
+
+        connector.baseUrl mustBe s"${appConfig.enrolmentStubsUrl}/tax-enrolments"
+      }
+    }
+
+    "not stubbed" must {
+      "return tax enrolments base url" in new Fixture {
+        connector.baseUrl mustBe s"${appConfig.enrolmentStoreUrl}/tax-enrolments"
+      }
+    }
   }
 
   "enrol" when {
