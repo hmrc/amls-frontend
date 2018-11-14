@@ -41,5 +41,4 @@ class bad_requestSpec extends AmlsSpec with MustMatchers {
       validateParagraphizedContent("error.submission.badrequest.content")
     }
   }
-
 }

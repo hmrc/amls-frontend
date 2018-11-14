@@ -20,7 +20,7 @@ import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
 import javax.inject.{Inject, Singleton}
-import models.status.{_}
+import models.status._
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
 import services.{RenewalService, StatusService, SubmissionService}
