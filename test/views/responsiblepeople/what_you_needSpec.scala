@@ -55,6 +55,9 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("responsiblepeople.whatyouneed.line_6"))
       html must include(Messages("responsiblepeople.whatyouneed.line_7"))
       html must include(Messages("responsiblepeople.whatyouneed.line_8"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_9"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_10"))
+      html must include(Messages("responsiblepeople.whatyouneed.line_11"))
     }
   }
 }
