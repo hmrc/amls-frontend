@@ -20,11 +20,11 @@ import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
 import javax.inject.{Inject, Singleton}
-import models.status._
+import models.status.{_}
 import models.{SubmissionResponse, SubscriptionResponse}
 import play.api.Logger
 import services.{RenewalService, StatusService, SubmissionService}
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.{BadRequestException, HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
@@ -67,6 +67,9 @@ class SubmissionController @Inject()(
         case _: InvalidEnrolmentCredentialsException =>
           Logger.info("[SubmissionController][post] handling InvalidEnrolmentCredentialsException")
           Future.successful(Ok(views.html.submission.wrong_credential_type()))
+        case _: BadRequestException =>
+          Logger.info("[SubmissionController][post] handling BadRequestException")
+          Future.successful(Ok(views.html.submission.bad_request()))
       }
   }
 

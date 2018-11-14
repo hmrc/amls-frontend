@@ -29,8 +29,9 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService, SubmissionService}
-import uk.gov.hmrc.http.{HttpResponse, Upstream5xxResponse}
-import utils.{AuthorisedFixture, AmlsSpec}
+import uk.gov.hmrc.http
+import uk.gov.hmrc.http.{BadRequestException, HttpResponse, Upstream4xxResponse, Upstream5xxResponse}
+import utils.{AmlsSpec, AuthorisedFixture}
 import views.ParagraphHelpers
 
 import scala.concurrent.Future
@@ -185,6 +186,25 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
       implicit val doc = Jsoup.parse(contentAsString(result))
       validateParagraphizedContent("error.submission.wrong_credentials.content")
     }
+
+    "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+      val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+
+      when {
+        controller.subscriptionService.subscribe(any(), any(), any())
+      } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+
+      when {
+        controller.statusService.getStatus(any(), any(), any())
+      } thenReturn Future.successful(SubmissionReady)
+
+      val result = controller.post()(request)
+
+      status(result) mustBe OK
+
+      implicit val doc = Jsoup.parse(contentAsString(result))
+      validateParagraphizedContent("error.submission.badrequest.content")
+    }
   }
 
   it when {
@@ -215,6 +235,25 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get.url)
+      }
+
+      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+
+        when {
+          controller.subscriptionService.variation(any(), any(), any())
+        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+
+        when {
+          controller.statusService.getStatus(any(), any(), any())
+        } thenReturn Future.successful(SubmissionDecisionApproved)
+
+        val result = controller.post()(request)
+
+        status(result) mustBe OK
+
+        implicit val doc = Jsoup.parse(contentAsString(result))
+        validateParagraphizedContent("error.submission.badrequest.content")
       }
     }
 
@@ -261,6 +300,29 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
         verify(controller.subscriptionService).variation(any(), any(), any())
         verify(controller.subscriptionService, never()).renewal(any())(any(), any(), any())
       }
+
+      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+
+        when {
+          controller.subscriptionService.variation(any(), any(), any())
+        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+
+        when {
+          controller.statusService.getStatus(any(), any(), any())
+        } thenReturn Future.successful(ReadyForRenewal(Some(LocalDate.now.plusDays(15))))
+
+        when {
+          controller.renewalService.getRenewal(any(), any(), any())
+        } thenReturn Future.successful(None)
+
+        val result = controller.post()(request)
+
+        status(result) mustBe OK
+
+        implicit val doc = Jsoup.parse(contentAsString(result))
+        validateParagraphizedContent("error.submission.badrequest.content")
+      }
     }
 
     "Submission is in renewal amendment status" must {
@@ -282,6 +344,29 @@ class SubmissionControllerSpec extends AmlsSpec with ScalaFutures with AmlsRefer
 
         status(result) mustBe SEE_OTHER
         redirectLocation(result) mustBe Some(controllers.routes.ConfirmationController.get().url)
+      }
+
+      "show the correct help page when a bad request error is encountered" in new Fixture with ParagraphHelpers {
+        val msg = "Non-recoverable Error - The request could not be understood by the server due to malformed syntax"
+
+        when {
+          controller.subscriptionService.renewalAmendment(any())(any(), any(), any())
+        } thenReturn Future.failed(new BadRequestException("[amls][HttpStatusException][status] - API call failed with http response code: 400"))
+
+        when {
+          controller.statusService.getStatus(any(), any(), any())
+        } thenReturn Future.successful(RenewalSubmitted(Some(LocalDate.now.plusDays(15))))
+
+        when {
+          controller.renewalService.getRenewal(any(), any(), any())
+        } thenReturn Future.successful(Some(mock[Renewal]))
+
+        val result = controller.post()(request)
+
+        status(result) mustBe OK
+
+        implicit val doc = Jsoup.parse(contentAsString(result))
+        validateParagraphizedContent("error.submission.badrequest.content")
       }
     }
   }

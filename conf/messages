@@ -82,6 +82,11 @@ error.invalid.year.post1900 = The year can’t be before 1900
 
 error.submission.problem.title = There’s a problem with your application
 error.submission.duplicate.title = There is a problem
+error.submission.badrequest.title = Sorry, there is a problem
+
+error.submission.badrequest.content = We cannot update your information.\n\
+  We have saved your information. Do not try and send it again.\n\
+  Send us your name and email address and we will find out what caused the problem. We will reply within 2 working days.
 
 error.submission.duplicate.content = We’re sorry that there’s a problem. Please give us some details and an adviser will contact you to fix it.\n\
   Please don’t try to resubmit your application, as this won’t work.
