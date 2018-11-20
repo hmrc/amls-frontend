@@ -20,6 +20,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
+import jto.validation.{Path, ValidationError}
 import models.businessmatching.HighValueDealing
 import models.hvd.{Hvd, PaymentMethods}
 import services.StatusService
@@ -59,7 +60,16 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthCo
   def post(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       Form2[PaymentMethods](request.body) match {
-        case f: InvalidForm => Future.successful(BadRequest(expect_to_receive(f, edit)))
+        case f: InvalidForm =>
+          val message = "error.required.hvd.choose.option"
+          findValidationMessage(f.errors, message) match {
+            case true =>
+              val paymentMethodsNotSelected = f.copy(errors = Seq((Path("paymentMethods"), Seq(ValidationError(Seq(message))))))
+              Future.successful(BadRequest(expect_to_receive(paymentMethodsNotSelected, edit)))
+            case _ =>
+              Future.successful(BadRequest(expect_to_receive(f, edit)))
+          }
+
         case ValidForm(_, data) =>
           for {
             hvd <- cacheConnector.fetch[Hvd](Hvd.key)
@@ -72,4 +82,7 @@ class ExpectToReceiveCashPaymentsController @Inject()( val authConnector: AuthCo
           }
       }
   }
+
+  def findValidationMessage(formErrors: Seq[(Path, Seq[ValidationError])], message: String) =
+    formErrors.flatMap(errors => errors._2.map(_.message == message)).contains(true)
 }
