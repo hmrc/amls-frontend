@@ -116,6 +116,17 @@ class ExpectToReceiveCashPaymentsControllerSpec extends AmlsSpec with MockitoSug
           status(result) must be(BAD_REQUEST)
 
         }
+        "check that error message -no option selected- exists in the request" in new Fixture {
+          val message = Messages("error.required.hvd.choose.option")
+
+          val result = controller.post(true)(request.withFormUrlEncodedBody())
+
+          val content = contentAsString(result)
+
+          status(result) must be(BAD_REQUEST)
+          Jsoup.parse(content).body().getElementsByClass("validation-summary-message").first().html() must include(message)
+          Jsoup.parse(content).body().getElementById("paymentMethods").html() must include(message)
+        }
       }
     }
 
