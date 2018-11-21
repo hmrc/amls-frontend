@@ -1,0 +1,62 @@
+@*
+ * Copyright 2018 HM Revenue & Customs
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *@
+
+@import include._
+@import models.notifications.NotificationParams
+
+@(notificationParams: NotificationParams)(implicit request: Request[_],m:Messages)
+
+@header = {
+    <header class="page-header">
+        <h1 class="heading-xlarge">Refusal being considered</h1>
+        <p class="heading-secondary"><span class="visuallyhidden">This section is: </span>Your registration</p>
+    </header>
+}
+
+@main(
+    title = "Refusal being considered - Your registration",
+    heading = header
+)  {
+
+    @notificationParams.safeId.map{ safeId =>
+        <p>Your reference: @safeId</p>
+    }
+    <p>Your application to register @{notificationParams.businessName.map{d => d}} for supervision under The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017 has been considered and we currently believe it should be refused.</p>
+    <p>If we do reject your application, you’ll not be supervised and may be subject to penalties and civil proceedings if you trade in activities covered by The Money Laundering, Terrorist Financing and Transfer of Funds (Information on the Payer) Regulations 2017.<p>
+
+    <h2 class="heading-medium">Reason for considering refusal</h2>
+    <p>@Html(notificationParams.msgContent)</p>
+
+    <p>You can view the regulations at <a href="http://www.legislation.gov.uk/search">www.legislation.gov.uk</a>.</p>
+
+    <h2 class="heading-medium">If you disagree with this decision</h2>
+    <p>You have 30 days to provide reasons why you disagree with this decision. Write to:</p>
+
+    <div class="panel-indent panel-border-wide">
+
+        <div class="panel panel-border-wide">
+            Anti-Money Laundering Supervision<br>
+            7th Floor<br>
+            Alexander House<br>
+            21 Victoria Avenue<br>
+            Southend-on-Sea<br>
+            SS99 1AG<br>
+        </div>
+
+    </div>
+
+    <a href="@controllers.routes.NotificationController.getMessages().url" id="back-link" class="back-link">Back</a>
+}

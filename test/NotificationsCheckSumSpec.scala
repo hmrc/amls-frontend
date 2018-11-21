@@ -26,7 +26,7 @@ class NotificationsCheckSumSpec extends AmlsSpec with MustMatchers {
 
     trait NotificationsCheckSumFixture extends AuthorisedFixture {
         val versionNumbers: Seq[String] = Seq(
-            "v1m0"
+            "v1m0", "v2m0"
         )
         val checkSumRoute: String = "./conf/notifications/"
         def generateCheckSum(s: String): String =
