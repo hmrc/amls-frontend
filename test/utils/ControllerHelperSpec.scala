@@ -16,16 +16,44 @@
 
 package utils
 
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
-class ControllerHelperSpec  extends PlaySpec with MockitoSugar {
+class ControllerHelperSpec  extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
 
   def createResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = {
+
+    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
+    val completeRP = ResponsiblePerson(
+      personName = Some(DefaultValues.personName),
+      legalName = Some(DefaultValues.legalName),
+      legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
+      knownBy = Some(DefaultValues.knownBy),
+      personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
+      ukPassport = Some(DefaultValues.ukPassportNo),
+      nonUKPassport = Some(DefaultValues.nonUKPassportYes),
+      dateOfBirth = Some(DefaultValues.dateOfBirth),
+      contactDetails = Some(DefaultValues.contactDetails),
+      addressHistory = Some(DefaultValues.addressHistory),
+      positions = Some(DefaultValues.positions),
+      saRegistered = Some(DefaultValues.saRegistered),
+      vatRegistered = Some(DefaultValues.vatRegistered),
+      experienceTraining = Some(DefaultValues.experienceTraining),
+      training = Some(DefaultValues.training),
+      approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
+      hasChanged = false,
+      hasAccepted = false,
+      lineId = Some(1),
+      status = Some(StatusConstants.Unchanged),
+      endDate = None,
+      soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
+    )
+
     Some(
       Seq(
-        ResponsiblePerson()
+        completeRP
       )
     )
   }
@@ -40,8 +68,17 @@ class ControllerHelperSpec  extends PlaySpec with MockitoSugar {
         }
       }
 
-      "return true" when {
+      "return false" when {
         "a responsiblePerson seq is supplied" in {
+          val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
+          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
+
+          hasIncomplete mustEqual false
+        }
+      }
+
+      "return false" when {
+        "a responsiblePerson seq has is supplied" in {
           val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
           val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
 
