@@ -25,35 +25,9 @@ class ControllerHelperSpec  extends PlaySpec with MockitoSugar with ResponsibleP
 
   def createResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = {
 
-    val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-    val completeRP = ResponsiblePerson(
-      personName = Some(DefaultValues.personName),
-      legalName = Some(DefaultValues.legalName),
-      legalNameChangeDate = Some(new LocalDate(1990, 2, 24)),
-      knownBy = Some(DefaultValues.knownBy),
-      personResidenceType = Some(DefaultValues.personResidenceTypeNonUk),
-      ukPassport = Some(DefaultValues.ukPassportNo),
-      nonUKPassport = Some(DefaultValues.nonUKPassportYes),
-      dateOfBirth = Some(DefaultValues.dateOfBirth),
-      contactDetails = Some(DefaultValues.contactDetails),
-      addressHistory = Some(DefaultValues.addressHistory),
-      positions = Some(DefaultValues.positions),
-      saRegistered = Some(DefaultValues.saRegistered),
-      vatRegistered = Some(DefaultValues.vatRegistered),
-      experienceTraining = Some(DefaultValues.experienceTraining),
-      training = Some(DefaultValues.training),
-      approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = Some(true)),
-      hasChanged = false,
-      hasAccepted = false,
-      lineId = Some(1),
-      status = Some(StatusConstants.Unchanged),
-      endDate = None,
-      soleProprietorOfAnotherBusiness = Some(DefaultValues.soleProprietorOfAnotherBusiness)
-    )
-
     Some(
       Seq(
-        completeRP
+        completeModelUkResidentPhase2
       )
     )
   }
