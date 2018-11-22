@@ -16,16 +16,22 @@
 
 package utils
 
+import models.responsiblepeople.ResponsiblePerson
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 
 class ControllerHelperSpec  extends PlaySpec with MockitoSugar {
 
+  def createResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = {
+    None
+  }
+
   "ControllerHelper" must {
     "hasIncompleteResponsiblePerson" must {
       "return true" when {
         "at least one responsiblePerson is in complete" in {
-          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson
+          val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
+          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
 
           hasIncomplete mustEqual false
         }
