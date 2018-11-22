@@ -39,7 +39,7 @@ object ControllerHelper {
 
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean = {
     rps.map {
-      case data => ???
+      case data => true
     }.contains(false)
   }
 
