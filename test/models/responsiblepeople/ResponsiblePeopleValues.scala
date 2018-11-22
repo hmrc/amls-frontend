@@ -1337,4 +1337,29 @@ trait ResponsiblePeopleValues extends NinoUtil {
     "lineId" -> 1,
     "status" -> "Unchanged"
   )
+
+  val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
+    Some(PersonName("ANSTY", Some("EMIDLLE"), "DAVID")),
+    Some(PreviousName(Some(false), None, None, None)),
+    None,
+    Some(KnownBy(Some(false), None)),
+    Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
+    Some(UKPassportNo),
+    Some(NoPassport),
+    Some(DateOfBirth(new LocalDate(1990, 2, 24))),
+    Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
+    Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+    Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(new LocalDate(2002, 2, 2)))),
+    Some(SaRegisteredNo),
+    Some(VATRegisteredNo),
+    Some(ExperienceTrainingNo),
+    Some(TrainingNo),
+    ApprovalFlags(Some(true), Some(true)),
+    false,
+    true,
+    Some(2),
+    None,
+    None,
+    None
+  )
 }

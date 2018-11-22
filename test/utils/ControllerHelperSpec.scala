@@ -17,46 +17,47 @@
 package utils
 
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
+import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Application
+import play.api.inject.guice.GuiceApplicationBuilder
 
-class ControllerHelperSpec  extends PlaySpec with MockitoSugar with ResponsiblePeopleValues {
+class ControllerHelperSpec  extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
 
-  def createResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = {
+  override lazy val app: Application = new GuiceApplicationBuilder()
+    .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
+    .build()
+
+  def createCompleteResponsiblePersonSeq: Option[Seq[ResponsiblePerson]] = Some(Seq(completeResponsiblePerson))
+
+  def createRPsWithMissingDoB: Option[Seq[ResponsiblePerson]] = {
+    val inCompleteResponsiblePerson: ResponsiblePerson = completeResponsiblePerson.copy(dateOfBirth = None)
 
     Some(
       Seq(
-        completeModelUkResidentPhase2
+        completeResponsiblePerson,
+        inCompleteResponsiblePerson,
+        completeResponsiblePerson
       )
     )
   }
 
   "ControllerHelper" must {
     "hasIncompleteResponsiblePerson" must {
-      "return false" when {
-        "no responsiblePerson is supplied" in {
-          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(None)
 
-          hasIncomplete mustEqual false
+      "return false" when {
+        "responsiblePerson seq is None" in {
+            ControllerHelper.hasIncompleteResponsiblePerson(None) mustEqual false
+        }
+
+        "all responsiblePerson are complete" in {
+          ControllerHelper.hasIncompleteResponsiblePerson(createCompleteResponsiblePersonSeq) mustEqual false
         }
       }
 
-      "return false" when {
-        "a responsiblePerson seq is supplied" in {
-          val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
-          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
-
-          hasIncomplete mustEqual false
-        }
-      }
-
-      "return false" when {
-        "a responsiblePerson seq has is supplied" in {
-          val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
-          val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
-
-          hasIncomplete mustEqual false
+      "return true" when {
+        "any responsiblePerson is not complete" in {
+          ControllerHelper.hasIncompleteResponsiblePerson(createRPsWithMissingDoB) mustEqual true
         }
       }
     }

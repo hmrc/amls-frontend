@@ -39,8 +39,8 @@ object ControllerHelper {
 
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean = {
     rps.map {
-      case data => true
-    }.contains(false)
+      case data => ResponsiblePerson.filter(data).exists(_.isComplete == false)
+    }.contains(true)
   }
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
