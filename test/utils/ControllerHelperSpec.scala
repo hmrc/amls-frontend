@@ -25,7 +25,7 @@ class ControllerHelperSpec  extends PlaySpec with MockitoSugar {
     "hasIncompleteResponsiblePerson" must {
       "return true" when {
         "at least one responsiblePerson is in complete" in {
-          true mustEqual true
+          ControllerHelper.hasIncompleteResponsiblePerson
         }
       }
     }

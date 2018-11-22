@@ -37,6 +37,9 @@ import scala.concurrent.Future
 
 object ControllerHelper {
 
+  def hasIncompleteResponsiblePerson(): Unit = ???
+
+
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
       bm.reviewDetails match {
