@@ -28,8 +28,8 @@ class ControllerHelperSpec  extends PlaySpec with MockitoSugar {
 
   "ControllerHelper" must {
     "hasIncompleteResponsiblePerson" must {
-      "return true" when {
-        "at least one responsiblePerson is in complete" in {
+      "return false" when {
+        "no responsiblePerson is supplied" in {
           val rp: Option[Seq[ResponsiblePerson]] = createResponsiblePersonSeq
           val hasIncomplete = ControllerHelper.hasIncompleteResponsiblePerson(rp)
 

@@ -38,7 +38,9 @@ import scala.concurrent.Future
 object ControllerHelper {
 
   def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean = {
-    false
+    rps.map {
+      case data => ???
+    }.contains(false)
   }
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
