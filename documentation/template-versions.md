@@ -46,6 +46,10 @@ $ upversion-templates.sh minor
 * update the magic number in the relevant file in ./conf/notifications/`{ versionNumber }` with the checksum and rerun the test
 
 
+**Finally :-**
+* The package numbers located at the top of each file need to be amended to whichever new package you have created, this will need to be done in any new spec files, the view files and finally the message details service. "All of these being the specific files you created using the script above"
+
+
 Deployment considerations
 =============
 
