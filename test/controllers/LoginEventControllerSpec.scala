@@ -19,10 +19,17 @@ package controllers
 import connectors.DataCacheConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.mvc.Result
+import play.api.test.FakeRequest
+import play.api.test.Helpers.{OK, status}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+import play.api.test.Helpers._
+
+import scala.concurrent.Future
 
 class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -30,20 +37,21 @@ class LoginEventControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
 
     val request = addToken(authRequest)
 
-    lazy val defaultBuilder = new GuiceApplicationBuilder()
+    lazy val defaultBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
 
-
-    val builder = defaultBuilder
-    lazy val app = builder.build()
-    lazy val controller = app.injector.instanceOf[LoginEventController]
+    val builder: GuiceApplicationBuilder = defaultBuilder
+    lazy val app: Application = builder.build()
+    lazy val controller: LoginEventController = app.injector.instanceOf[LoginEventController]
   }
 
   "LoginEventController" must {
     "show login event page" in new Fixture {
-      1 mustEqual 2
+      val result: Future[Result] = controller.get()(request)
+
+      status(result) must be(OK)
     }
   }
 }
