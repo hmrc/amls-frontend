@@ -30,11 +30,13 @@ import models.estateagentbusiness.EstateAgentBusiness
 import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
-import models.responsiblepeople.ResponsiblePerson
+import models.responsiblepeople.TimeAtAddress.OneToThreeYears
+import models.responsiblepeople._
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import models.{status => _, _}
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito
 import org.mockito.Mockito._
@@ -91,6 +93,30 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
     } thenReturn Future.successful(mock[CacheMap])
 
     val completeATB = mock[AboutTheBusiness]
+    val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
+      personName = Some(PersonName("ANSTY", Some("EMIDLLE"), "DAVID")),
+      legalName = Some(PreviousName(Some(false), None, None, None)),
+      legalNameChangeDate = None,
+      knownBy = Some(KnownBy(Some(false), None)),
+      personResidenceType = Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
+      ukPassport = Some(UKPassportNo),
+      nonUKPassport = Some(NoPassport),
+      dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
+      contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(new LocalDate(2002, 2, 2)))),
+      saRegistered = Some(SaRegisteredNo),
+      vatRegistered = Some(VATRegisteredNo),
+      experienceTraining = Some(ExperienceTrainingNo),
+      training = Some(TrainingNo),
+      approvalFlags = ApprovalFlags(Some(true), Some(true)),
+      hasChanged = false,
+      hasAccepted = true,
+      lineId = Some(2),
+      status = None,
+      endDate = None,
+      soleProprietorOfAnotherBusiness = None
+    )
   }
 
   "LandingController" must {
@@ -109,6 +135,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(complete.isComplete) thenReturn true
           when(emptyCacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(emptyCacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+          when(emptyCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -123,7 +150,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           when(complete.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
           when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
-
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
           when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
             .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
@@ -132,6 +159,34 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+        }
+
+        "redirect to login event page" when {
+          "responsible persons is not complete" in new Fixture {
+            val inCompleteResponsiblePeople = completeResponsiblePerson.copy(
+              dateOfBirth = None
+            )
+            val cacheMap = mock[CacheMap]
+
+            val complete = mock[BusinessMatching]
+
+            when(complete.isComplete) thenReturn true
+            when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+            when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+            when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+            when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+              .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+            when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+            when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+            when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+            when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+
+            val result = controller.get()(request)
+
+            status(result) must be(SEE_OTHER)
+            redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+          }
         }
       }
 
@@ -625,6 +680,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           when(businessMatching.isComplete) thenReturn true
           when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(businessMatching))
           when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+          when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
 
           val result = controller.get()(request)
 

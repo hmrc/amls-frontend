@@ -43,6 +43,7 @@ import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 import scala.util.{Success, Try}
@@ -122,6 +123,17 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
+  private def redirectToStatusOrLoginEvent(fromDuplicate: Boolean = false)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
+
+    landingService.cacheMap.map {
+      cache =>
+        val hasIncompleteRps: Option[Boolean] = for {
+          rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+        } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
+        hasIncompleteRps.contains(true)
+    }
+  }
+
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
 
     val deleteAndRedirect = () => cacheConnector.remove map { _ =>
@@ -131,8 +143,12 @@ class LandingController @Inject()(val landingService: LandingService,
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
         case (true, Some(abt)) =>
-          landingService.setAltCorrespondenceAddress(abt) map { _ =>
-            Redirect(controllers.routes.StatusController.get())
+          landingService.setAltCorrespondenceAddress(abt) flatMap { _ =>
+            val result: Future[Boolean] = redirectToStatusOrLoginEvent()
+            result.map {
+              case true => Redirect(controllers.routes.LoginEventController.get())
+              case _ => Redirect(controllers.routes.StatusController.get())
+            }
           }
 
         case (true, _) => Future.successful(Redirect(controllers.routes.StatusController.get()))

@@ -105,6 +105,10 @@ class StatusController @Inject()(val landingService: LandingService,
                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
                                    activities: Option[BusinessActivities])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
+    val incompleteRPs: Boolean = responsiblePeople.map {
+      case rps => ResponsiblePerson.filter(rps).exists(_.isComplete == false)
+    }.contains(true)
+
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
         getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
@@ -168,10 +172,14 @@ class StatusController @Inject()(val landingService: LandingService,
         }
       }
 
-      case (SubmissionDecisionRejected, _) => Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionDecisionRevoked, _) => Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionDecisionExpired, _) => Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
-      case (SubmissionWithdrawn, _) => Ok(status_withdrawn(businessNameOption))
+      case (SubmissionDecisionRejected, _) =>
+        Ok(status_rejected(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionRevoked, _) =>
+        Ok(status_revoked(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionDecisionExpired, _) =>
+        Ok(status_expired(mlrRegNumber.getOrElse(""), businessNameOption))
+      case (SubmissionWithdrawn, _) =>
+        Ok(status_withdrawn(businessNameOption))
       case (DeRegistered, _) =>
         val deregistrationDate = for {
           info <- statusInfo._2

@@ -70,8 +70,32 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
     )
 
     val positions = Positions(Set(BeneficialOwner, Partner, NominatedOfficer), Some(new LocalDate()))
-    val rp1 = ResponsiblePerson(Some(PersonName("first1", Some("middle"), "last1")), None, None, None, None, None, None, None, None, None, Some(positions))
-    val rp2 = ResponsiblePerson(Some(PersonName("first2", None, "last2")), None, None, None, None, None, None, None, None, None, Some(positions))
+    val rp1 = ResponsiblePerson(
+      personName = Some(PersonName("first1",Some("middle"), "last1")),
+      legalName = None,
+      legalNameChangeDate = None,
+      knownBy = None,
+      personResidenceType = None,
+      ukPassport = None,
+      nonUKPassport = None,
+      dateOfBirth = None,
+      contactDetails = None,
+      addressHistory = None,
+      positions = Some(positions)
+    )
+    val rp2 = ResponsiblePerson(
+      personName = Some(PersonName("first2", None, "last2")),
+      legalName = None,
+      legalNameChangeDate = None,
+      knownBy = None,
+      personResidenceType = None,
+      ukPassport = None,
+      nonUKPassport = None,
+      dateOfBirth = None,
+      contactDetails = None,
+      addressHistory = None,
+      positions = Some(positions)
+    )
     val responsiblePeople = Seq(rp1, rp2)
 
     when(controller.statusService.getDetailedStatus(any(), any(), any()))
