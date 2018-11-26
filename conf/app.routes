@@ -38,6 +38,8 @@ POST        /application-status/new-submission                                  
 GET         /your-registration/your-messages/:id/:contactType/:amlsRegNo/:templateVersion              @controllers.NotificationController.messageDetails(id : String, contactType:models.notifications.ContactType, amlsRegNo: String, templateVersion: String)
 GET         /your-registration/your-messages                                          @controllers.NotificationController.getMessages()
 
+GET         /your-registration/amount-owed                                            @controllers.AmountOwedController.get()
+
 GET         /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.get()
 POST        /your-registration/withdraw-application                                   @controllers.withdrawal.WithdrawApplicationController.post()
 

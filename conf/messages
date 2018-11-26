@@ -837,6 +837,11 @@ payments.bankdetails.sortcode.value = 08 32 10
 payments.bankdetails.fee.name = Fee
 payments.bankdetails.reference.name = Reference
 
+payments.you.owe.title = Owe amount
+payments.you.owe.heading = You owe £
+payments.you.owe.info = HM Revenue and Customs will review your application after you have paid your fees. You must pay your fees within 28 days of making a change.
+payments.you.owe.info2 = The amount shown is for changes we have processed but it may not be up to date. It can take up to 3 days to update after Bacs transfers, debit card and credit card payments.
+payments.you.owe.button = Pay what you owe
 
 ############################### Individual pages ###############################
 summary.title = Your AMLS registration
