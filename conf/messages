@@ -2123,3 +2123,5 @@ urr.nothanks = No thanks
 ############################### LoginEvents ###############################
 login-event.title = You must provide new information for each responsible person
 login-event.heading = You must provide new information for each responsible person
+login-event.update-responsible-people = Update your responsible people now
+login-event.skip-for-now = Skip for now and continue to the service

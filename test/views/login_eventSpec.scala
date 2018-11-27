@@ -38,5 +38,12 @@ class LoginEventSpec extends AmlsSpec with MustMatchers {
 
       heading.html must be(Messages("login-event.heading"))
     }
+
+    "contain the expected link elements" in new ViewFixture {
+      def view = views.html.login_event()
+
+      html must include(Messages("login-event.update-responsible-people"))
+//      html must include(Messages("login-event.skip-for-now"))
+    }
   }
 }
