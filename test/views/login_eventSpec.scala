@@ -29,7 +29,9 @@ class LoginEventSpec extends AmlsSpec with MustMatchers {
   "Login Event Page View" must {
 
     "Have the correct title" in new ViewFixture {
-      def view = views.html.start()
+      def view = views.html.login_event()
+
+      doc.title must startWith(Messages("login-event.title"))
     }
   }
 }

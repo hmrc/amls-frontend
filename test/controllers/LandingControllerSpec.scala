@@ -636,7 +636,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
-            
+
             when {
               controller.cacheConnector.save[TradingPremises](meq(TradingPremises.key), any())(any(), any(), any())
             } thenReturn Future.successful(fixedCacheMap)
