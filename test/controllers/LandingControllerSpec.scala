@@ -616,6 +616,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val testCacheMap = buildTestCacheMap(false, false)
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
             when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None, Some(true))))
+            when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
 
             val result = controller.get()(request)
 
@@ -634,7 +635,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             val fixedCacheMap = buildTestCacheMap(false, false)
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
-
+            when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
+            
             when {
               controller.cacheConnector.save[TradingPremises](meq(TradingPremises.key), any())(any(), any(), any())
             } thenReturn Future.successful(fixedCacheMap)

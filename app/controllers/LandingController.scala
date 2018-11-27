@@ -165,7 +165,7 @@ class LandingController @Inject()(val landingService: LandingService,
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
       case _ =>
-        landingService.refreshCache(amlsRegistrationNumber) map {
+        landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
             Try {
               val fromDuplicate = maybeCacheMap match {
@@ -175,12 +175,16 @@ class LandingController @Inject()(val landingService: LandingService,
                 case _ => false
               }
 
-              Redirect(controllers.routes.StatusController.get(fromDuplicate))
+              val result: Future[Boolean] = redirectToStatusOrLoginEvent()
+              result.map {
+                case true if fromDuplicate == false => Redirect(controllers.routes.LoginEventController.get())
+                case _ => Redirect(controllers.routes.StatusController.get(fromDuplicate))
+              }
             }
           } match {
             case Success(r) => r
             case _ =>
-              Redirect(controllers.routes.StatusController.get())
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
           }
         }
     }
