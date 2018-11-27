@@ -1467,4 +1467,44 @@ li.autocomplete__option {
   margin: 0;
 }
 
+/* login event */
+.login-event {
+  background-color: #005ea5;
+  color: white;
+  padding: 25px 15px 15px;
+  margin-bottom: 30px;
+  margin-top: 2em;
+}
 
+.login-event a {
+  color: white;
+}
+
+.login-event header {
+  margin-top: 0;
+}
+
+.login-event h1 {
+  font-size: 36px;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+.login-event header + p {
+  margin-top: 1em;
+}
+
+.login-event .button {
+  background-color: white;
+  margin-bottom: .5em;
+  color: #005ea5;
+  box-shadow: 0 2px 0 #004172;
+}
+
+.login-event .button:hover {
+  background-color: #d8eeff;
+}
+
+.login-event .button:focus {
+  background-color: #ffbf47;
+}

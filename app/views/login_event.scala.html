@@ -18,37 +18,34 @@
 @import forms2._
 @()(implicit request: Request[_],m:Messages)
 
-@header = {
-    @heading("login-event.heading")
-}
 
 @main(
- title = Messages("login-event.title"),
- heading = header
+ title = Messages("login-event.title")
 ) {
- <p>@Messages("login-event.event-messages-header")</p>
+ <div class="login-event">
+     <header class="page-header">
+         <h1>@Messages("login-event.heading")</h1>
+     </header>
+   <p>@Messages("login-event.event-messages-header")</p>
 
- <ul class="list list-bullet">
-  <li>@Messages("login-event.date-of-birth-message")</li>
-  <li>@Messages("login-event.fit-and-proper-message")</li>
-  <li>@Messages("login-event.approval-check-charge-message")</li>
- </ul>
+   <ul class="list list-bullet">
+    <li>@Messages("login-event.date-of-birth-message")</li>
+    <li>@Messages("login-event.fit-and-proper-message")</li>
+    <li>@Messages("login-event.approval-check-charge-message")</li>
+   </ul>
 
+   @anchor(
+    attrHref = controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().toString,
+    attrRole = true,
+    linkText = Messages("login-event.update-responsible-people"),
+    visuallyhidden = Messages("login-event.update-responsible-people"),
+    id=Some("who-must-register-link")
+   )
 
- @anchor(
-  attrHref = controllers.responsiblepeople.routes.YourResponsiblePeopleController.get().toString,
-  attrRole = true,
-  linkText = Messages("login-event.update-responsible-people"),
-  visuallyhidden = Messages("login-event.update-responsible-people"),
-  id=Some("who-must-register-link")
- )
-
- <ul>
-  <li>
-   <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()">
-   @Messages("login-event.skip-for-now")
-   </a>
-  </li>
- </ul>
-
+   <p>
+     <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()">
+        @Messages("login-event.skip-for-now")
+     </a>
+   </p>
+ </div>
 }
