@@ -2120,3 +2120,6 @@ urr.title = Help improve GOV.UK
 urr.bannertext = Get involved in making government services better (opens in a new window)
 urr.nothanks = No thanks
 
+############################### LoginEvents ###############################
+login-event.title = You must provide new information for each responsible person
+login-event.heading = You must provide new information for each responsible person
