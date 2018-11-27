@@ -43,7 +43,7 @@ class LoginEventSpec extends AmlsSpec with MustMatchers {
       def view = views.html.login_event()
 
       html must include(Messages("login-event.update-responsible-people"))
-//      html must include(Messages("login-event.skip-for-now"))
+      html must include(Messages("login-event.skip-for-now"))
     }
   }
 }
