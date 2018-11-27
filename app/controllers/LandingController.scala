@@ -123,7 +123,7 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def redirectToStatusOrLoginEvent(fromDuplicate: Boolean = false)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
+  private def redirectToStatusOrLoginEvent()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
 
     landingService.cacheMap.map {
       cache =>
