@@ -123,7 +123,7 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
-  private def redirectToStatusOrLoginEvent()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
+  private def hasIncompleteResponsiblePeople()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
 
     landingService.cacheMap.map {
       cache =>
@@ -144,7 +144,7 @@ class LandingController @Inject()(val landingService: LandingService,
       (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt) flatMap { _ =>
-            val result: Future[Boolean] = redirectToStatusOrLoginEvent()
+            val result: Future[Boolean] = hasIncompleteResponsiblePeople()
             result.map {
               case true => Redirect(controllers.routes.LoginEventController.get())
               case _ => Redirect(controllers.routes.StatusController.get())
@@ -175,7 +175,7 @@ class LandingController @Inject()(val landingService: LandingService,
                 case _ => false
               }
 
-              val result: Future[Boolean] = redirectToStatusOrLoginEvent()
+              val result: Future[Boolean] = hasIncompleteResponsiblePeople()
               result.map {
                 case true if fromDuplicate == false => Redirect(controllers.routes.LoginEventController.get())
                 case _ => Redirect(controllers.routes.StatusController.get(fromDuplicate))
