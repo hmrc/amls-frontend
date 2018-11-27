@@ -43,11 +43,12 @@
   id=Some("who-must-register-link")
  )
 
- @anchor(
-   attrHref = controllers.routes.StatusController.get().toString,
-   attrRole = true,
-   linkText = Messages("login-event.skip-for-now"),
-   visuallyhidden = Messages("login-event.skip-for-now"),
-   id=Some("skip-to-service-link")
-  )
+ <ul>
+  <li>
+   <a id="skip-to-service-link" href="@controllers.routes.StatusController.get()">
+   @Messages("login-event.skip-for-now")
+   </a>
+  </li>
+ </ul>
+
 }
