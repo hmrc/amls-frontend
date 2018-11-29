@@ -105,10 +105,6 @@ class StatusController @Inject()(val landingService: LandingService,
                                    responsiblePeople: Option[Seq[ResponsiblePerson]],
                                    activities: Option[BusinessActivities])
                                   (implicit request: Request[AnyContent], authContext: AuthContext) = {
-    val incompleteRPs: Boolean = responsiblePeople.map {
-      case rps => ResponsiblePerson.filter(rps).exists(_.isComplete == false)
-    }.contains(true)
-
     statusInfo match {
       case (NotCompleted, _) | (SubmissionReady, _) | (SubmissionReadyForReview, _) =>
         getInitialSubmissionPage(mlrRegNumber, statusInfo._1, businessNameOption, feeResponse, fromDuplicateSubmission)
