@@ -67,7 +67,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
       )
       case (_, true) => this.approvalFlags(
         this.approvalFlags.copy(hasAlreadyPassedFitAndProper = Some(fitAndPropperChoice),
-        hasAlreadyPaidApprovalCheck = Some(true))
+        hasAlreadyPaidApprovalCheck = Some(fitAndPropperChoice))
       )
     }
   }

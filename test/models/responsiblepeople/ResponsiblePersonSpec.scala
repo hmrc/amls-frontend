@@ -2020,7 +2020,7 @@ class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar 
           val expectedRp = ResponsiblePerson(
             approvalFlags = ApprovalFlags(
               hasAlreadyPassedFitAndProper = Some(false),
-              hasAlreadyPaidApprovalCheck = Some(true)
+              hasAlreadyPaidApprovalCheck = Some(false)
             ),
             hasChanged = true
           )
