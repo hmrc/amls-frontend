@@ -187,6 +187,7 @@ error.required.tp.trading.name = Enter the trading name you use for this premise
 error.invalid.tp.trading.name = You can’t enter more than 120 characters
 error.expected.jodadate.format = Enter a valid date. The day must be a number between 1 and 31. The month must be a number between 1 and 12. The year must be a 4-digit number.
 error.future.date = The date can’t be in the future
+error.allowed.start.date = The year can’t be before 1900
 error.required.tp.date = Enter a date.
 error.invalid.tp.date = Enter a valid date. It must be a number between 1 and 31.
 error.required.tp.month = Enter a month.
