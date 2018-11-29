@@ -21,6 +21,7 @@ import connectors.DataCacheConnector
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.renewal.CustomersOutsideUK
+import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
 import play.api.Play.current
@@ -37,11 +38,8 @@ import scala.concurrent.Future
 
 object ControllerHelper {
 
-  def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean = {
-    rps.map {
-      case data => ResponsiblePerson.filter(data).exists(_.isComplete == false)
-    }.contains(true)
-  }
+  def hasIncompleteResponsiblePerson(rps: Option[Seq[ResponsiblePerson]]): Boolean =
+    rps.exists((data: Seq[ResponsiblePerson]) => filter(data).exists(_.isComplete equals false))
 
   def getBusinessType(matching: Option[BusinessMatching]): Option[BusinessType] = {
     matching flatMap { bm =>
