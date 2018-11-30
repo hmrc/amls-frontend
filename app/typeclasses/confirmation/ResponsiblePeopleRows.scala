@@ -54,7 +54,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     val notPassedFP = value.addedResponsiblePeopleFitAndProper
     val notPassedApprovalCheck = value.addedResponsiblePeopleApprovalCheck
     val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) || activities.contains(EstateAgentBusinessService))
+    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) ||
+      activities.contains(EstateAgentBusinessService))
 
     if (fpSectors && (notPassedFP > 0) ) {
       Seq(
@@ -85,7 +86,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
     val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) || activities.contains(EstateAgentBusinessService))
+    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) ||
+      activities.contains(EstateAgentBusinessService))
 
     if (fpSectors && (fitAndProperCount > 0)) {
       Seq(
