@@ -411,6 +411,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           } thenReturn Future.successful(Some(cache))
 
           when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+
+          when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponse.copy(
             fpFee = Some(100),
@@ -473,6 +477,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponseWithRate)
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           whenReady(TestConfirmationService.getVariation) {
             case Some(breakdownRows) =>
@@ -641,6 +649,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             halfYearlyTradingPremises = 1,
             zeroRatedTradingPremises = 1
           ))
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           whenReady(TestConfirmationService.getVariation) {
             case Some(breakdownRows) =>

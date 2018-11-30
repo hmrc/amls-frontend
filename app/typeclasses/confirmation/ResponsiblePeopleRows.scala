@@ -17,8 +17,7 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB,
-  BillPaymentServices => BPS, TelephonePaymentService => TPS}
+import models.businessmatching.{AccountancyServices, BusinessActivity, EstateAgentBusinessService, HighValueDealing, TrustAndCompanyServices, BillPaymentServices => BPS, MoneyServiceBusiness => MSB, TelephonePaymentService => TPS}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
@@ -52,29 +51,29 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                                          activities: Set[BusinessActivity]
                                                         ): Seq[BreakdownRow] = {
 
-    val (notPassedFP, notPassedApprovalCheck) = (value.addedResponsiblePeopleFitAndProper, value.addedResponsiblePeopleApprovalCheck)
-    val msbOrTcsp = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val bpsTdi = (activities.contains(BPS) || activities.contains(TPS))
+    val notPassedFP = value.addedResponsiblePeopleFitAndProper
+    val notPassedApprovalCheck = value.addedResponsiblePeopleApprovalCheck
+    val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
+    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) || activities.contains(EstateAgentBusinessService))
 
-    (notPassedFP > 0, notPassedApprovalCheck > 0, msbOrTcsp, bpsTdi) match {
-
-      case (_, true, false, false) => Seq(
-        BreakdownRow(
-          approvalCheckPeopleRow(value).message,
-          value.addedResponsiblePeopleApprovalCheck,
-          approvalCheckPeopleRow(value).feePer,
-          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-        ))
-
-      case (true, _, _, false) => Seq(
+    if (fpSectors && (notPassedFP > 0) ) {
+      Seq(
         BreakdownRow(
           peopleRow(value).message,
           value.addedResponsiblePeopleFitAndProper,
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-
-      case (_, _, _, _) => Seq.empty
+    } else if (acSectors && (notPassedApprovalCheck > 0)) {
+      Seq(
+        BreakdownRow(
+          approvalCheckPeopleRow(value).message,
+          value.addedResponsiblePeopleApprovalCheck,
+          approvalCheckPeopleRow(value).feePer,
+          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+        ))
+    } else {
+      Seq.empty
     }
   }
 
@@ -85,28 +84,27 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                              ) = {
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
-    val msbOrTcsp = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val bpsTdi = (activities.contains(BPS) || activities.contains(TPS))
+    val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
+    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) || activities.contains(EstateAgentBusinessService))
 
-    (fitAndProperCount > 0, approvalCheckCount > 0, msbOrTcsp, bpsTdi) match {
-
-      case (_, true, false, false) =>  Seq(
-        BreakdownRow(
-          approvalCheckPeopleRow(value).message,
-          approvalCheckCount,
-          approvalCheckPeopleRow(value).feePer,
-          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
-        ))
-
-      case (true, _, true, false) =>  Seq(
+    if (fpSectors && (fitAndProperCount > 0)) {
+      Seq(
         BreakdownRow(
           peopleRow(value).message,
           fitAndProperCount,
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-
-      case (_, _, _, _) => Seq.empty
+    } else if (acSectors && (approvalCheckCount > 0)) {
+      Seq(
+        BreakdownRow(
+          approvalCheckPeopleRow(value).message,
+          approvalCheckCount,
+          approvalCheckPeopleRow(value).feePer,
+          Currency.fromBD(value.getApprovalCheckFee.getOrElse(0))
+        ))
+    } else {
+      Seq.empty
     }
   }
 }
