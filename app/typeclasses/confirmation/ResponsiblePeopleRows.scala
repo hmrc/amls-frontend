@@ -17,11 +17,11 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
-import models.businessmatching.{AccountancyServices, BusinessActivity, EstateAgentBusinessService, HighValueDealing, TrustAndCompanyServices, BillPaymentServices => BPS, MoneyServiceBusiness => MSB, TelephonePaymentService => TPS}
+import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB }
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
-import utils.StatusConstants
+import utils.{ActivitiesHelper, StatusConstants}
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
   def apply(
@@ -53,11 +53,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
     val notPassedFP = value.addedResponsiblePeopleFitAndProper
     val notPassedApprovalCheck = value.addedResponsiblePeopleApprovalCheck
-    val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) ||
-      activities.contains(EstateAgentBusinessService))
 
-    if (fpSectors && (notPassedFP > 0) ) {
+    if (ActivitiesHelper.fpSectors(activities) && (notPassedFP > 0) ) {
       Seq(
         BreakdownRow(
           peopleRow(value).message,
@@ -65,7 +62,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-    } else if (acSectors && (notPassedApprovalCheck > 0)) {
+    } else if (ActivitiesHelper.acSectors(activities) && (notPassedApprovalCheck > 0)) {
       Seq(
         BreakdownRow(
           approvalCheckPeopleRow(value).message,
@@ -85,11 +82,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                              ) = {
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
-    val fpSectors = (activities.contains(MSB) || activities.contains(TrustAndCompanyServices))
-    val acSectors = (activities.contains(HighValueDealing) || activities.contains(AccountancyServices) ||
-      activities.contains(EstateAgentBusinessService))
 
-    if (fpSectors && (fitAndProperCount > 0)) {
+    if (ActivitiesHelper.fpSectors(activities) && (fitAndProperCount > 0)) {
       Seq(
         BreakdownRow(
           peopleRow(value).message,
@@ -97,7 +91,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-    } else if (acSectors && (approvalCheckCount > 0)) {
+    } else if (ActivitiesHelper.acSectors(activities) && (approvalCheckCount > 0)) {
       Seq(
         BreakdownRow(
           approvalCheckPeopleRow(value).message,
