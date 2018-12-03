@@ -128,7 +128,11 @@ class LandingController @Inject()(val landingService: LandingService,
   private def hasIncompleteResponsiblePeople()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
 
     statusService.getDetailedStatus.flatMap {
-      case (SubmissionDecisionRejected | SubmissionDecisionRevoked | DeRegistered | SubmissionDecisionExpired | SubmissionWithdrawn, _) =>
+      case (SubmissionDecisionRejected |
+            SubmissionDecisionRevoked |
+            DeRegistered |
+            SubmissionDecisionExpired |
+            SubmissionWithdrawn, _) =>
         Future.successful(false)
       case _ =>
         landingService.cacheMap.map {
