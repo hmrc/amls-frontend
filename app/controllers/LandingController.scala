@@ -32,12 +32,13 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
+import models.status._
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, AuthService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -54,7 +55,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
                                   val cacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                  val statusService: StatusService
                                  ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
@@ -125,12 +127,17 @@ class LandingController @Inject()(val landingService: LandingService,
 
   private def hasIncompleteResponsiblePeople()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
 
-    landingService.cacheMap.map {
-      cache =>
-        val hasIncompleteRps: Option[Boolean] = for {
-          rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
-        } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
-        hasIncompleteRps.contains(true)
+    statusService.getDetailedStatus.flatMap {
+      case (SubmissionDecisionRejected | SubmissionDecisionRevoked | DeRegistered | SubmissionDecisionExpired | SubmissionWithdrawn, _) =>
+        Future.successful(false)
+      case _ =>
+        landingService.cacheMap.map {
+          cache =>
+            val hasIncompleteRps: Option[Boolean] = for {
+              rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+            } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
+            hasIncompleteRps.contains(true)
+        }
     }
   }
 
