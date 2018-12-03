@@ -20,7 +20,7 @@ import java.net.URLEncoder
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import generators.BaseGenerator
+import generators.{BaseGenerator, StatusGenerator}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -58,29 +58,8 @@ import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
 import org.scalacheck.Gen
+
 import scala.concurrent.{ExecutionContext, Future}
-
-trait StatusGenerator extends BaseGenerator {
-
-  def rejectedStatusGen: Gen[SubmissionStatus] = Gen.oneOf(
-    Seq(DeRegistered,
-      SubmissionDecisionRejected,
-      SubmissionDecisionRevoked,
-      SubmissionDecisionExpired,
-      SubmissionWithdrawn,
-      DeRegistered
-    )
-  )
-
-  def activeStatusGen: Gen[SubmissionStatus] = Gen.oneOf(
-    Seq(
-      NotCompleted,
-      SubmissionReady,
-      SubmissionReadyForReview,
-      SubmissionDecisionApproved
-    )
-  )
-}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
