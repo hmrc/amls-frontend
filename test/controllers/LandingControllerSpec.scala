@@ -20,6 +20,7 @@ import java.net.URLEncoder
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
+import generators.{BaseGenerator, StatusGenerator}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -56,10 +57,11 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
+import org.scalacheck.Gen
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
+class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
@@ -142,7 +144,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
         when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(DeRegistered, None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
 
         val result: Future[Result] = controller.get()(request)
 
@@ -171,7 +173,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
         when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
         when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
-        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReady, None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(activeStatusGen.sample.get, None))
 
         val result: Future[Result] = controller.get()(request)
 
@@ -374,7 +376,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec {
   }
 }
 
-class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers {
+class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
 
@@ -383,6 +385,31 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
   ))
 
   trait Fixture extends AuthorisedFixture { self =>
+
+    val completeResponsiblePerson: ResponsiblePerson = ResponsiblePerson(
+      personName = Some(PersonName("ANSTY", Some("EMIDLLE"), "DAVID")),
+      legalName = Some(PreviousName(Some(false), None, None, None)),
+      legalNameChangeDate = None,
+      knownBy = Some(KnownBy(Some(false), None)),
+      personResidenceType = Some(PersonResidenceType(NonUKResidence, Some(Country("Antigua and Barbuda", "bb")), Some(Country("United Kingdom", "GB")))),
+      ukPassport = Some(UKPassportNo),
+      nonUKPassport = Some(NoPassport),
+      dateOfBirth = Some(DateOfBirth(LocalDate.parse("2000-01-01"))),
+      contactDetails = Some(ContactDetails("0912345678", "TEST@EMAIL.COM")),
+      addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(PersonAddressUK("add1", "add2", Some("add3"), Some("add4"), "de4 5tg"), Some(OneToThreeYears), None)), None, None)),
+      positions = Some(Positions(Set(NominatedOfficer, SoleProprietor), Some(new LocalDate(2002, 2, 2)))),
+      saRegistered = Some(SaRegisteredNo),
+      vatRegistered = Some(VATRegisteredNo),
+      experienceTraining = Some(ExperienceTrainingNo),
+      training = Some(TrainingNo),
+      approvalFlags = ApprovalFlags(Some(true), Some(true)),
+      hasChanged = false,
+      hasAccepted = true,
+      lineId = Some(2),
+      status = None,
+      endDate = None,
+      soleProprietorOfAnotherBusiness = None
+    )
 
     val request = addToken(authRequest)
 
@@ -547,6 +574,64 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
   }
 
   "Landing Controller" when {
+
+    "redirect to status page" when {
+      "submission status is DeRegistered and responsible person is not complete" in new Fixture {
+        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+          dateOfBirth = None
+        )
+        val cacheMap: CacheMap = mock[CacheMap]
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
+
+        val result: Future[Result] = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+      }
+    }
+
+    "redirect to login event page" when {
+      "responsible persons is not complete" in new Fixture {
+        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+          dateOfBirth = None
+        )
+        val cacheMap: CacheMap = mock[CacheMap]
+
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key))
+          .thenReturn(Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0)))))
+
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(activeStatusGen.sample.get, None))
+
+        val result: Future[Result] = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+      }
+    }
+
     "an enrolment exists and" when {
       "there is data in S4L and" when {
         "the Save 4 Later data does not contain any sections" when {
