@@ -109,7 +109,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fpFee = None,
+      fpFee = Some(120),
       fpFeeRate = None,
       approvalCheckFee = None,
       approvalCheckFeeRate = None,

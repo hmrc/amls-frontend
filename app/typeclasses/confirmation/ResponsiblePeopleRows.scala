@@ -88,8 +88,10 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
+    val hasApprovalFee = (value.getApprovalCheckFee.nonEmpty && value.getApprovalCheckFee.get > 0)
+    val hasFpFee = (value.getFpFee.nonEmpty && value.getFpFee.get > 0)
 
-    if (ActivitiesHelper.fpSectors(activities) && (fitAndProperCount > 0)) {
+    if (ActivitiesHelper.fpSectors(activities) && (fitAndProperCount > 0) && (hasFpFee) ) {
       Seq(
         BreakdownRow(
           peopleRow(value).message,
@@ -97,7 +99,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-    } else if (ActivitiesHelper.acSectors(activities) && (approvalCheckCount > 0)) {
+    } else if (ActivitiesHelper.acSectors(activities) && (approvalCheckCount > 0) && (hasApprovalFee)) {
       Seq(
         BreakdownRow(
           approvalCheckPeopleRow(value).message,
@@ -121,11 +123,7 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
-        if(value.isInstanceOf[AmendVariationRenewalResponse]) {
-          createBreakdownRowForAmendVariationRenewalResponse(value.asInstanceOf[AmendVariationRenewalResponse], people, activities)
-        } else {
-          createBreakdownRowForSubmissionResponse(value, people, activities)
-        }
+        createBreakdownRowForSubmissionResponse(value, people, activities)
       }
     }
 
