@@ -41,13 +41,39 @@ class ActivityStartDateSpec extends PlaySpec {
       }
     }
 
-    "fail validation" when {
-      "given a future date" in {
-
-       val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
-        ActivityStartDate.formRule.validate(data) must be(Valid(ActivityStartDate(LocalDate.now().plusDays(1))))
-      }
+  "fail validation" when {
+    "given a day in future beyond end of 2099" in {
+      val model = Map(
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("2100")
+      )
+      ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
+        Path \ "startDate" -> Seq(ValidationError("error.future.date"))
+      )))
     }
+  }
+
+  "fail validation" when {
+    "given a day in the past before start of 1900" in {
+      val model = Map(
+        "startDate.day" -> Seq("31"),
+        "startDate.month" -> Seq("12"),
+        "startDate.year" -> Seq("1899")
+      )
+      ActivityStartDate.formRule.validate(model) must be(Invalid(Seq(
+        Path \ "startDate" -> Seq(ValidationError("error.allowed.start.date"))
+      )))
+    }
+  }
+
+  "fail validation" when {
+    "given a future date" in {
+
+     val data = ActivityStartDate.formWrites.writes(ActivityStartDate(LocalDate.now().plusDays(1)))
+      ActivityStartDate.formRule.validate(data) must be(Valid(ActivityStartDate(LocalDate.now().plusDays(1))))
+    }
+  }
 
     "fail validation" when {
       "given a day value with too many numerical characters" in {

@@ -56,6 +56,25 @@ class CashPaymentSpec extends PlaySpec with MockitoSugar {
           )))
       }
 
+      "fail validation" when {
+        "given a day in future beyond end of 2099" in {
+          val model = CashPayment.formWrites.writes(CashPaymentYes(new LocalDate(2100, 1, 1)))
+
+          CashPayment.formRule.validate(model) must be(Invalid(Seq(
+            Path \ "paymentDate" -> Seq(ValidationError("error.future.date"))
+          )))
+        }
+      }
+
+      "fail validation" when {
+        "given a day in the past before start of 1900" in {
+          val model = CashPayment.formWrites.writes(CashPaymentYes(new LocalDate(1089, 12, 31)))
+
+          CashPayment.formRule.validate(model) must
+            be(Invalid(Seq(Path \ "paymentDate" -> Seq(ValidationError("error.allowed.start.date")))))
+        }
+      }
+
       "fail to validate given an invalid date" in {
 
         val data = Map(

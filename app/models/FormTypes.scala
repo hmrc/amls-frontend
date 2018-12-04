@@ -67,6 +67,7 @@ object FormTypes {
   def required(msg: String) = notEmpty.withMessage(msg)
 
   def maxDateWithMsg(maxDate: LocalDate, msg: String) = max(maxDate).withMessage(msg)
+  def minDateWithMsg (minDate: LocalDate, msg: String) = min(minDate).withMessage(msg)
 
   val notEmptyStrip = Rule.zero[String] map {
     _.trim
@@ -185,7 +186,10 @@ object FormTypes {
     }
 
   val futureDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(LocalDate.now, "error.future.date")
-  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen futureDateRule
+  val endOfCenturyDateRule: Rule[LocalDate, LocalDate] = maxDateWithMsg(new LocalDate(2099, 12, 31), "error.future.date")
+  val pastStartDateRule: Rule[LocalDate, LocalDate] = minDateWithMsg(new LocalDate(1900, 1, 1), "error.allowed.start.date")
+  val localDateFutureRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen futureDateRule
+  val allowedPastAndFutureDateRule: Rule[UrlFormEncoded, LocalDate] = localDateRuleWithPattern andThen pastStartDateRule andThen endOfCenturyDateRule
 
   val dateOfChangeActivityStartDateRuleMapping = Rule.fromMapping[(Option[LocalDate], LocalDate), LocalDate] {
     case (Some(d1), d2) if d2.isAfter(d1) => Valid(d2)
