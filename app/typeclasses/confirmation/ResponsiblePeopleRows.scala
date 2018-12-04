@@ -88,10 +88,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
 
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
-    val hasApprovalFee = (value.getApprovalCheckFee.nonEmpty && value.getApprovalCheckFee.get > 0)
-    val hasFpFee = (value.getFpFee.nonEmpty && value.getFpFee.get > 0)
 
-    if (ActivitiesHelper.fpSectors(activities) && (fitAndProperCount > 0) && (hasFpFee) ) {
+    if (ActivitiesHelper.fpSectors(activities) && (fitAndProperCount > 0) && (hasFpFee(value))) {
       Seq(
         BreakdownRow(
           peopleRow(value).message,
@@ -99,7 +97,7 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
           peopleRow(value).feePer,
           Currency.fromBD(value.getFpFee.getOrElse(0))
         ))
-    } else if (ActivitiesHelper.acSectors(activities) && (approvalCheckCount > 0) && (hasApprovalFee)) {
+    } else if (ActivitiesHelper.acSectors(activities) && (approvalCheckCount > 0) && (hasApprovalFee(value))) {
       Seq(
         BreakdownRow(
           approvalCheckPeopleRow(value).message,
@@ -110,6 +108,14 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
     } else {
       Seq.empty
     }
+  }
+
+  def hasApprovalFee(value: SubmissionResponse): Boolean = {
+    value.getApprovalCheckFee.nonEmpty && value.getApprovalCheckFee.get > 0
+  }
+
+  def hasFpFee(value: SubmissionResponse): Boolean = {
+    value.getFpFee.nonEmpty && value.getFpFee.get > 0
   }
 }
 
