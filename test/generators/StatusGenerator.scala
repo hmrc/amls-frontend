@@ -17,6 +17,7 @@
 package generators
 
 import models.status._
+import org.joda.time.LocalDate
 import org.scalacheck.Gen
 
 trait StatusGenerator extends BaseGenerator {
@@ -36,7 +37,8 @@ trait StatusGenerator extends BaseGenerator {
       NotCompleted,
       SubmissionReady,
       SubmissionReadyForReview,
-      SubmissionDecisionApproved
+      SubmissionDecisionApproved,
+      ReadyForRenewal(Some(LocalDate.now()))
     )
   )
 }
