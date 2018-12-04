@@ -109,7 +109,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fpFee = Some(120),
+      fpFee = None,
       fpFeeRate = None,
       approvalCheckFee = None,
       approvalCheckFeeRate = None,
@@ -341,7 +341,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -369,7 +369,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
