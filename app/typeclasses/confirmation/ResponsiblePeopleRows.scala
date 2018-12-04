@@ -17,10 +17,11 @@
 package typeclasses.confirmation
 
 import config.ApplicationConfig
-import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB }
+import models.businessmatching.{BusinessActivity, TrustAndCompanyServices, MoneyServiceBusiness => MSB}
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.ResponsiblePerson
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import play.api.Logger
 import utils.{ActivitiesHelper, StatusConstants}
 
 trait ResponsiblePeopleRows[A] extends FeeCalculations {
@@ -51,6 +52,8 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                                          activities: Set[BusinessActivity]
                                                         ): Seq[BreakdownRow] = {
 
+    Logger.debug(s"[createBreakdownRowForAmendVariationRenewalResponse] - value: ${value}")
+
     val notPassedFP = value.addedResponsiblePeopleFitAndProper
     val notPassedApprovalCheck = value.addedResponsiblePeopleApprovalCheck
 
@@ -80,6 +83,9 @@ trait ResponsiblePeopleRows[A] extends FeeCalculations {
                                                people: Option[Seq[ResponsiblePerson]],
                                                activities: Set[BusinessActivity]
                                              ) = {
+
+    Logger.debug(s"[createBreakdownRowForSubmissionResponse] - value: ${value}")
+
     val fitAndProperCount = countNonDeletedPeopleWhoHaventPassedFitAndProper(people.getOrElse(Seq.empty))
     val approvalCheckCount = countNonDeletedPeopleWhoHaventPassedApprovalCheck(people.getOrElse(Seq.empty))
 
@@ -115,7 +121,11 @@ object ResponsiblePeopleRowsInstancesPhase2 {
                  people: Option[Seq[ResponsiblePerson]]
                ): Seq[BreakdownRow] = {
 
-        createBreakdownRowForSubmissionResponse(value, people, activities)
+        if(value.isInstanceOf[AmendVariationRenewalResponse]) {
+          createBreakdownRowForAmendVariationRenewalResponse(value.asInstanceOf[AmendVariationRenewalResponse], people, activities)
+        } else {
+          createBreakdownRowForSubmissionResponse(value, people, activities)
+        }
       }
     }
 
