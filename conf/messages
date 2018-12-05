@@ -507,9 +507,9 @@ unauthorised.role.content = Your account doesn’t have enough access rights to 
 start.title = Manage your anti-money laundering supervision
 start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
 start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
-start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration.
+start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration. Keep your Government Gateway ID number in a safe place as you will need it each time you use the service.
 
-start.button.text = Start now
+start.button.text = Sign in
 start.before.heading = Before you register
 start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">a fee</a> when you apply, renew, or make changes to your registration. You can pay by Bacs or by debit or credit card when you complete your submission. We will not be able to process your submission until you have paid the registration fees.
 start.utr.heading = Unique Taxpayer Reference (UTR) number
