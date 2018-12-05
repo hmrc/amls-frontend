@@ -32,17 +32,19 @@ import models.hvd.Hvd
 import models.moneyservicebusiness.MoneyServiceBusiness
 import models.renewal.Renewal
 import models.responsiblepeople.ResponsiblePerson
+import models.status._
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
 import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
-import services.{AuthEnrolmentsService, AuthService, LandingService}
+import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 
 import scala.concurrent.Future
 import scala.util.{Success, Try}
@@ -53,7 +55,8 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
                                   val cacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                  val statusService: StatusService
                                  ) extends BaseController {
 
   val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
@@ -122,6 +125,26 @@ class LandingController @Inject()(val landingService: LandingService,
     }
   }
 
+  private def hasIncompleteResponsiblePeople()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
+
+    statusService.getDetailedStatus.flatMap {
+      case (SubmissionDecisionRejected |
+            SubmissionDecisionRevoked |
+            DeRegistered |
+            SubmissionDecisionExpired |
+            SubmissionWithdrawn, _) =>
+        Future.successful(false)
+      case _ =>
+        landingService.cacheMap.map {
+          cache =>
+            val hasIncompleteRps: Option[Boolean] = for {
+              rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
+            } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
+            hasIncompleteRps.contains(true)
+        }
+    }
+  }
+
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
 
     val deleteAndRedirect = () => cacheConnector.remove map { _ =>
@@ -131,8 +154,12 @@ class LandingController @Inject()(val landingService: LandingService,
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
       (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
         case (true, Some(abt)) =>
-          landingService.setAltCorrespondenceAddress(abt) map { _ =>
-            Redirect(controllers.routes.StatusController.get())
+          landingService.setAltCorrespondenceAddress(abt) flatMap { _ =>
+            val result: Future[Boolean] = hasIncompleteResponsiblePeople()
+            result.map {
+              case true => Redirect(controllers.routes.LoginEventController.get())
+              case _ => Redirect(controllers.routes.StatusController.get())
+            }
           }
 
         case (true, _) => Future.successful(Redirect(controllers.routes.StatusController.get()))
@@ -149,7 +176,7 @@ class LandingController @Inject()(val landingService: LandingService,
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
       case _ =>
-        landingService.refreshCache(amlsRegistrationNumber) map {
+        landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
             Try {
               val fromDuplicate = maybeCacheMap match {
@@ -159,12 +186,16 @@ class LandingController @Inject()(val landingService: LandingService,
                 case _ => false
               }
 
-              Redirect(controllers.routes.StatusController.get(fromDuplicate))
+              val result: Future[Boolean] = hasIncompleteResponsiblePeople()
+              result.map {
+                case true if fromDuplicate == false => Redirect(controllers.routes.LoginEventController.get())
+                case _ => Redirect(controllers.routes.StatusController.get(fromDuplicate))
+              }
             }
           } match {
             case Success(r) => r
             case _ =>
-              Redirect(controllers.routes.StatusController.get())
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
           }
         }
     }

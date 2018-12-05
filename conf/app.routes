@@ -111,3 +111,5 @@ GET         /confirmation                                                       
 
 GET         /confirmation/payment-complete                                            @controllers.ConfirmationController.paymentConfirmation(reference: String)
 POST        /confirmation/payment/retry                                               @controllers.ConfirmationController.retryPayment()
+
+GET         /login-event/update-responsible-people                                    @controllers.LoginEventController.get()

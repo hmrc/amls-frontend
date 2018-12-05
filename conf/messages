@@ -2121,3 +2121,12 @@ urr.title = Help improve GOV.UK
 urr.bannertext = Get involved in making government services better (opens in a new window)
 urr.nothanks = No thanks
 
+############################### LoginEvents ###############################
+login-event.title = New information needed for each responsible person
+login-event.heading = New information needed for each responsible person
+login-event.update-responsible-people = Update your responsible people now
+login-event.skip-for-now = Skip for now and continue to the service
+login-event.date-of-birth-message = their date of birth
+login-event.fit-and-proper-message = if they have passed the fit and proper test
+login-event.approval-check-charge-message = if they have been charged for the approval check
+login-event.event-messages-header = For each responsible person, you must tell us:
