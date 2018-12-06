@@ -23,7 +23,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.Future
 
 class AuditEventsController @Inject()(val authConnector: AuthConnector, auditConnector: AuditConnector)
   extends BaseController {
@@ -31,11 +31,11 @@ class AuditEventsController @Inject()(val authConnector: AuthConnector, auditCon
   def sendAuditEvent(): Action[AnyContent] = Authorised.async {
     implicit authContext =>
       implicit request =>
-        sendEvent2
+        doSendEvent
   }
 
-  def sendEvent2(implicit hc: HeaderCarrier) =  {
-    auditConnector.sendEvent(DataEvent("auditSource", "auditType"))
+  private def doSendEvent(implicit hc: HeaderCarrier) =  {
+    auditConnector.sendEvent(DataEvent("Amls-frontend", "timeout event"))
     Future(Ok)
   }
 }

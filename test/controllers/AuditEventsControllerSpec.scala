@@ -17,22 +17,18 @@
 package controllers
 
 import connectors.DataCacheConnector
+import org.mockito.Matchers.any
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.time.{Minute, Span}
 import play.api.Application
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Result
-import play.api.test.Helpers.{OK, status}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import play.api.test.Helpers._
-import org.mockito.Mockito._
-import org.mockito.Matchers.{any, eq => eqTo}
-import uk.gov.hmrc.http.HttpResponse
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import uk.gov.hmrc.play.audit.model.DataEvent
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -57,14 +53,16 @@ class AuditEventsControllerSpec  extends AmlsSpec with MockitoSugar with ScalaFu
   }
 
   "AuditEventsController" must {
-    "sends a timeout audit even to " in new Fixture {
+    "sends a timeout audit even via audit connector" in new Fixture {
 
       when {
         auditConnector.sendEvent(any())(any(), any())
       } thenReturn Future.successful(Success)
 
-      val result: Future[Result] = controller.sendAuditEvent()(request)
-      verify(auditConnector, times(1)).sendEvent(DataEvent("auditSource", "auditType"))
+
+      whenReady(controller.sendAuditEvent()(request), timeout(Span(1, Minute))) { _ =>
+        verify(auditConnector, times(1)).sendEvent(any())(any(), any())
+      }
     }
   }
 }
