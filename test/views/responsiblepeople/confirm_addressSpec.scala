@@ -41,6 +41,8 @@ class confirm_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.confirm_address(form2, address, 1, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(Messages("responsiblepeople.confirmaddress.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +

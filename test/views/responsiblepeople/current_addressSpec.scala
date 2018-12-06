@@ -38,6 +38,13 @@ class current_addressSpec extends AmlsSpec with MustMatchers {
   }
 
   "current_address view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2 = EmptyForm
+      def view = views.html.responsiblepeople.current_address(form2, true, 1, None, name, countries)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 

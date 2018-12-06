@@ -16,9 +16,9 @@
 
 package views.responsiblepeople
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.ContactDetails
-import org.scalatest.{MustMatchers}
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
@@ -29,6 +29,12 @@ class contact_detailsSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+  }
+
+  "have a back link" in new ViewFixture {
+    val form2: ValidForm[ContactDetails] = Form2(ContactDetails("0987654", "email.com"))
+    def view = views.html.responsiblepeople.contact_details(form2, true, 1, None, "firstName lastName")
+    doc.getElementsByAttributeValue("class", "link-back") must not be empty
   }
 
   "contact_details view" must {

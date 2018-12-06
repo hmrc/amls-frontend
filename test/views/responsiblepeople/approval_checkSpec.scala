@@ -29,6 +29,12 @@ class approval_checkSpec extends AmlsSpec with MustMatchers {
     implicit val requestWithToken = addToken(request)
   }
 
+  "have a back link" in new ViewFixture {
+    val form2: Form2[_] = EmptyForm
+    def view = views.html.responsiblepeople.approval_check(form2, true, 0, None, "PersonName")
+    doc.getElementsByAttributeValue("class", "link-back") must not be empty
+  }
+
   "approval_check view" must {
     "have correct title" in new ViewFixture {
 
