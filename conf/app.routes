@@ -113,3 +113,5 @@ GET         /confirmation/payment-complete                                      
 POST        /confirmation/payment/retry                                               @controllers.ConfirmationController.retryPayment()
 
 GET         /login-event/update-responsible-people                                    @controllers.LoginEventController.get()
+
+GET         /timeout-audit-event                                                      @controllers.AuditEventsController.sendAuditEvent()
