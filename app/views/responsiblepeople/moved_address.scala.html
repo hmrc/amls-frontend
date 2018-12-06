@@ -23,6 +23,7 @@
 @(f: Form2[_], model: PersonAddress, index: Int, personName: String)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummaryWithPlaceholder(f, personName)
     @headingWithPlaceholder(("responsiblepeople.movedaddress.heading", personName), "summary.responsiblepeople")
 }

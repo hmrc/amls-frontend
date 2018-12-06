@@ -20,6 +20,14 @@ $(window).load(function () {
             // Otherwise, set focus to the field with the error
             $('.error input:first').focus()
         }
+
+        // =====================================================
+        // Back link mimics browser back functionality
+        // =====================================================
+        $('#back-link').on('click', function(e){
+          e.preventDefault();
+          window.history.back();
+        })
 })
 
 $(function () {

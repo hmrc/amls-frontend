@@ -23,6 +23,7 @@
 @(f: Form2[_], bamodel : BusinessActivities, edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.experiencetraining.heading", personName), "summary.responsiblepeople")
 }
