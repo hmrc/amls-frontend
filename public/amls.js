@@ -26,7 +26,7 @@ $(window).load(function () {
         // =====================================================
         $('#back-link').on('click', function(e){
           e.preventDefault();
-          window.history.back();
+          history.go(-1); // go(-1) needed for mobile browsers!
         })
 })
 
