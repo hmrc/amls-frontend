@@ -18,16 +18,24 @@ package controllers
 
 import javax.inject.Inject
 import play.api.mvc.{Action, AnyContent}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-import scala.concurrent.Future
+import scala.concurrent.{ExecutionContext, Future}
 
-class AuditEventsController @Inject()(val authConnector: AuthConnector) extends BaseController {
+class AuditEventsController @Inject()(val authConnector: AuthConnector, auditConnector: AuditConnector)
+  extends BaseController {
 
   def sendAuditEvent(): Action[AnyContent] = Authorised.async {
     implicit authContext =>
       implicit request =>
-        Future(Ok)
+        sendEvent2
   }
 
+  def sendEvent2(implicit hc: HeaderCarrier) =  {
+    auditConnector.sendEvent(DataEvent("auditSource", "auditType"))
+    Future(Ok)
+  }
 }

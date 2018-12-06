@@ -27,6 +27,13 @@ import play.api.test.Helpers.{OK, status}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 import play.api.test.Helpers._
+import org.mockito.Mockito._
+import org.mockito.Matchers.{any, eq => eqTo}
+import uk.gov.hmrc.http.HttpResponse
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.audit.model.DataEvent
+
 import scala.concurrent.{ExecutionContext, Future}
 
 class AuditEventsControllerSpec  extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -34,22 +41,30 @@ class AuditEventsControllerSpec  extends AmlsSpec with MockitoSugar with ScalaFu
 
     val request = addToken(authRequest)
 
+    val auditConnector = mock[AuditConnector]
+
     lazy val defaultBuilder: GuiceApplicationBuilder = new GuiceApplicationBuilder()
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+      .overrides(bind[AuditConnector].to(auditConnector))
 
     val builder: GuiceApplicationBuilder = defaultBuilder
     lazy val app: Application = builder.build()
     lazy val controller: AuditEventsController = app.injector.instanceOf[AuditEventsController]
+    //val auditConnector: AuditConnector = app.injector.instanceOf[AuditConnector]
+    implicit val ec: ExecutionContext = mock[ExecutionContext]
   }
 
   "AuditEventsController" must {
-    "sends amls reference number to audit connector" in new Fixture {
-      val result: Future[Result] = controller.sendAuditEvent()(request)
+    "sends a timeout audit even to " in new Fixture {
 
-      status(result) must be(OK)
+      when {
+        auditConnector.sendEvent(any())(any(), any())
+      } thenReturn Future.successful(Success)
+
+      val result: Future[Result] = controller.sendAuditEvent()(request)
+      verify(auditConnector, times(1)).sendEvent(DataEvent("auditSource", "auditType"))
     }
   }
-
 }
