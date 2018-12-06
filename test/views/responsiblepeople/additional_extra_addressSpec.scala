@@ -17,15 +17,13 @@
 package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK, ResponsiblePersonAddress}
+import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
-import models.Country
 import models.autocomplete.NameValuePair
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import views.Fixture
 
 

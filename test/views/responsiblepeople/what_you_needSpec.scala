@@ -29,6 +29,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
   }
 
   "What you need View" must {
+
     "Have the correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.what_you_need(1)
 

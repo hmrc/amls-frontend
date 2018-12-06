@@ -16,8 +16,7 @@
 
 package views.responsiblepeople
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
+import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path

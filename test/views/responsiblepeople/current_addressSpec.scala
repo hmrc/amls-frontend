@@ -19,7 +19,6 @@ package views.responsiblepeople
 import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
-import models.businessmatching.BusinessType
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec

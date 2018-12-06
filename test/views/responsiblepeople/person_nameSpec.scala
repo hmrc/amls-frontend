@@ -36,6 +36,8 @@ class person_nameSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.person_name(form2, true, 1, None)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.personName.title"))
       heading.html must be(Messages("responsiblepeople.personName.title"))
       subHeading.html must include(Messages("summary.responsiblepeople"))

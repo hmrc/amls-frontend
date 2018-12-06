@@ -42,6 +42,8 @@ class new_home_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.new_home_address(form2, 1, name, countries)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(Messages("responsiblepeople.new.home.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +

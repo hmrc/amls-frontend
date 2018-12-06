@@ -16,8 +16,8 @@
 
 package views.responsiblepeople
 
-import forms.{EmptyForm, InvalidForm, ValidForm, Form2}
-import org.scalatest.{MustMatchers}
+import forms.{EmptyForm, InvalidForm}
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
@@ -32,6 +32,14 @@ class trainingSpec extends AmlsSpec with MustMatchers {
   }
 
   "training view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2 = EmptyForm
+
+      def view = views.html.responsiblepeople.training(form2, false, 0, None, "Person Name")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2 = EmptyForm

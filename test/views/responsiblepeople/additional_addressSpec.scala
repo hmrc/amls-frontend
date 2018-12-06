@@ -21,7 +21,6 @@ import jto.validation.{Path, ValidationError}
 import models.autocomplete.NameValuePair
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 
