@@ -139,12 +139,14 @@ class ConfirmationService @Inject()(
         (for {
           cache <- maybeCache
           renewal <- cache.getEntry[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key)
+          businessMatching <- cache.getEntry[BusinessMatching](BusinessMatching.key)
+          businessActivities <- businessMatching.activities
         } yield {
           Future.successful(
             Some(
               BreakdownRows.generateBreakdownRows[AmendVariationRenewalResponse](
                 renewal,
-                None,
+                Some(businessActivities),
                 None,
                 None
               )
