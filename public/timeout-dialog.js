@@ -21,8 +21,8 @@ function secondsToTime (secs) {
 
     $.timeoutDialog = function (options) {
     var settings = {
-        timeout: 900,
-        countdown: 120,
+        timeout: 1,
+        countdown: 1,
         time: 'minutes',
         title: 'You’re about to be signed out',
         message: 'For security reasons, you will be signed out of this service in',
@@ -45,13 +45,19 @@ function secondsToTime (secs) {
 
         setupDialogTimer: function () {
             var self = this
-            self.dialogOpen = false
+            self.dialogOpen = true
+
+            console.log("---- setting up the timer ----" + settings.timeout + ", " + settings.countdown)
+
             window.setTimeout(function () {
                 self.setupDialog()
             }, ((settings.timeout) - (settings.countdown)) * 1000)
         },
 
         setupDialog: function () {
+
+            (async() => fetch('/anti-money-laundering/timeout-audit-event'))()
+
             var self = this
             window.dialogOpen = true
             self.startTime = Math.round(Date.now() / 1000, 0)
