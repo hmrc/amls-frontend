@@ -17,6 +17,7 @@
 package controllers
 
 import javax.inject.Inject
+import play.api.Logger
 import play.api.mvc.{Action, AnyContent}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -36,6 +37,10 @@ class AuditEventsController @Inject()(val authConnector: AuthConnector, auditCon
 
   private def doSendEvent(implicit hc: HeaderCarrier) =  {
     auditConnector.sendEvent(DataEvent("Amls-frontend", "timeout event"))
+      .onFailure {
+        case _: Throwable => Logger.info("[AuditEventController][sendAuditEvent] error - failed to send the logging event to the audit service!")
+      }
+
     Future(Ok)
   }
 }

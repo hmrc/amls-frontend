@@ -51,7 +51,7 @@ function secondsToTime (secs) {
 
             window.setTimeout(function () {
                 self.setupDialog()
-            }, ((settings.timeout) - (settings.countdown)) * 1000)
+            }, Math.abs(((settings.timeout) - (settings.countdown)) * 1000))
         },
 
         setupDialog: function () {
