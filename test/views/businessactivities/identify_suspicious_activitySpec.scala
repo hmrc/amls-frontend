@@ -76,5 +76,11 @@ class identify_suspicious_activitySpec extends AmlsSpec with MustMatchers {
       errorSummary.html() must include("not a message Key")
 
     }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.identify_suspicious_activity(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }
