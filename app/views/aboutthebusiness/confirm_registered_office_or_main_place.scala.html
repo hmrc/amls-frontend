@@ -23,6 +23,7 @@
 @(f: Form2[_], model: RegisteredOffice, edit: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("aboutthebusiness.confirmingyouraddress.title", "summary.aboutbusiness")
 }

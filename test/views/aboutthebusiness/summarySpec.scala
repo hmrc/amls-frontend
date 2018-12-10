@@ -16,16 +16,15 @@
 
 package views.aboutthebusiness
 
+import forms.EmptyForm
 import models.aboutthebusiness._
-import models.businessmatching.BusinessType
 import org.joda.time.LocalDate
 import org.jsoup.nodes.Element
-import org.scalatest.prop.TableDrivenPropertyChecks
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
+import org.scalatest.prop.TableDrivenPropertyChecks
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.{Fixture, HtmlAssertions}
-import forms.EmptyForm
 
 import scala.collection.JavaConversions._
 
