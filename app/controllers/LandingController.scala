@@ -148,23 +148,34 @@ class LandingController @Inject()(val landingService: LandingService,
   private def preApplicationComplete(cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
 
     val deleteAndRedirect = () => cacheConnector.remove map { _ =>
+      Logger.debug(s"[AMLSLandingController][preApplicationComplete]: removed cache and redirect to landingController.get")
       Redirect(controllers.routes.LandingController.get())
     }
 
     cache.getEntry[BusinessMatching](BusinessMatching.key) map { bm =>
+      Logger.debug(s"[AMLSLandingController][preApplicationComplete]: found BusinessMatching key")
       (bm.isComplete, cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)) match {
         case (true, Some(abt)) =>
           landingService.setAltCorrespondenceAddress(abt) flatMap { _ =>
+            Logger.debug(s"[AMLSLandingController][preApplicationComplete]: landingService.setAltCorrespondenceAddress returned")
             val result: Future[Boolean] = hasIncompleteResponsiblePeople()
             result.map {
-              case true => Redirect(controllers.routes.LoginEventController.get())
-              case _ => Redirect(controllers.routes.StatusController.get())
+              case true =>
+                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has Incomplete RPs - redirecting to LoginEvent")
+                Redirect(controllers.routes.LoginEventController.get())
+              case _ =>
+                Logger.debug(s"[AMLSLandingController][preApplicationComplete]: has complete RPs - redirecting to status")
+                Redirect(controllers.routes.StatusController.get())
             }
           }
 
-        case (true, _) => Future.successful(Redirect(controllers.routes.StatusController.get()))
+        case (true, _) =>
+          Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is true but no cache Entry for AboutTheBusiness - redirecting to status")
+          Future.successful(Redirect(controllers.routes.StatusController.get()))
 
-        case (false, _) => deleteAndRedirect()
+        case (false, _) =>
+          Logger.debug(s"[AMLSLandingController][preApplicationComplete]: bm.isComplete is false")
+          deleteAndRedirect()
       }
     } getOrElse deleteAndRedirect()
   }
@@ -173,9 +184,11 @@ class LandingController @Inject()(val landingService: LandingService,
                                 (implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
     maybeCacheMap match {
       case Some(c) if c.getEntry[DataImport](DataImport.key).isDefined =>
+        Logger.debug("[AMLSLandingController][refreshAndRedirect]: dataImport is defined")
         Future.successful(Redirect(controllers.routes.StatusController.get()))
 
       case _ =>
+        Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
         landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
             Try {
@@ -188,13 +201,20 @@ class LandingController @Inject()(val landingService: LandingService,
 
               val result: Future[Boolean] = hasIncompleteResponsiblePeople()
               result.map {
-                case true if fromDuplicate == false => Redirect(controllers.routes.LoginEventController.get())
-                case _ => Redirect(controllers.routes.StatusController.get(fromDuplicate))
+                case true if fromDuplicate == false =>
+                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: fromDuplicate = $fromDuplicate and redirecting to LoginEvent")
+                  Redirect(controllers.routes.LoginEventController.get())
+                case _ =>
+                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: fromDuplicate = $fromDuplicate and redirecting to StatusController")
+                  Redirect(controllers.routes.StatusController.get(fromDuplicate))
               }
             }
           } match {
-            case Success(r) => r
+            case Success(r) =>
+              Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
+              r
             case _ =>
+              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: refresh cache returned _ and redirecting to StatusController")
               Future.successful(Redirect(controllers.routes.StatusController.get()))
           }
         }
