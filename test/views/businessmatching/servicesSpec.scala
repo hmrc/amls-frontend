@@ -98,6 +98,18 @@ class servicesSpec extends AmlsSpec with MustMatchers  {
         checkboxes.get(i).attr("checked") mustEqual (if (i == 0) "checked" else "")
       }
     }
+
+    "have a back link in pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.services(EmptyForm, edit = true, isPreSubmission = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
+    "have a back link in non pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.services(EmptyForm, edit = true, isPreSubmission = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }
 
