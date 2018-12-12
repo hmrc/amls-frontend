@@ -133,13 +133,17 @@ class LandingController @Inject()(val landingService: LandingService,
             DeRegistered |
             SubmissionDecisionExpired |
             SubmissionWithdrawn, _) =>
+        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is negative, returning false")
         Future.successful(false)
       case _ =>
+        Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: status is positive, will call the landingService.cachMap")
         landingService.cacheMap.map {
           cache =>
+            Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: checking cacheMap for InComplete ResponsiblePeople")
             val hasIncompleteRps: Option[Boolean] = for {
               rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
             } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
+            Logger.debug(s"[AMLSLandingController][hasIncompleteResponsiblePeople]: Rps.isComplete = ${hasIncompleteRps.contains(true)}")
             hasIncompleteRps.contains(true)
         }
     }
@@ -196,7 +200,9 @@ class LandingController @Inject()(val landingService: LandingService,
                 case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
                   _.previouslySubmitted.contains(true)
                 }
-                case _ => false
+                case _ =>
+                  Logger.debug("[AMLSLandingController][refreshAndRedirect]: returning fromDuplicate equal to false")
+                  false
               }
 
               val result: Future[Boolean] = hasIncompleteResponsiblePeople()
