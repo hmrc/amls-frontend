@@ -47,7 +47,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
-import scala.util.{Success, Try}
+import scala.util.{Failure, Success, Try}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -126,7 +126,7 @@ class LandingController @Inject()(val landingService: LandingService,
   }
 
   private def hasIncompleteResponsiblePeople()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
-
+    Logger.debug("[AMLSLandingController][hasIncompleteResponsiblePeople]: calling statusService.getDetailedStatus")
     statusService.getDetailedStatus.flatMap {
       case (SubmissionDecisionRejected |
             SubmissionDecisionRevoked |
@@ -219,6 +219,9 @@ class LandingController @Inject()(val landingService: LandingService,
             case Success(r) =>
               Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
               r
+            case Failure(ex) =>
+              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op fialed with ${ex.getMessage} - redirecting to StatusController")
+              Future.successful(Redirect(controllers.routes.StatusController.get()))
             case _ =>
               Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: refresh cache returned _ and redirecting to StatusController")
               Future.successful(Redirect(controllers.routes.StatusController.get()))
