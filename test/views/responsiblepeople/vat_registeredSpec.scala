@@ -16,8 +16,8 @@
 
 package views.responsiblepeople
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.responsiblepeople.{VATRegisteredYes, VATRegistered, VATRegisteredNo}
+import forms.{Form2, InvalidForm, ValidForm}
+import models.responsiblepeople.{VATRegistered, VATRegisteredNo, VATRegisteredYes}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -33,6 +33,14 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers {
   }
 
   "vat_registered view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2: ValidForm[VATRegistered] = Form2(VATRegisteredNo)
+
+      def view = views.html.responsiblepeople.vat_registered(form2, true, 1, None, "Person Name")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredNo)

@@ -17,7 +17,7 @@
 package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.businessmatching.{AccountancyServices, BusinessActivities, BusinessActivity}
+import models.businessmatching.{AccountancyServices, BusinessActivities}
 import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
 import org.scalatest.{MustMatchers}
 import  utils.AmlsSpec
@@ -33,6 +33,14 @@ class experience_trainingSpec extends AmlsSpec with MustMatchers  {
   }
 
   "experience_training view" must {
+
+    "have a back link" in new ViewFixture {
+      val businessActivities = BusinessActivities(Set(AccountancyServices))
+      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
+      def view: _root_.play.twirl.api.HtmlFormat.Appendable =
+        views.html.responsiblepeople.experience_training(form2, businessActivities, false, 0, None, "FirstName LastName")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
     "have correct title" in new ViewFixture {
 

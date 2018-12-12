@@ -2130,3 +2130,6 @@ login-event.date-of-birth-message = their date of birth
 login-event.fit-and-proper-message = if they have passed the fit and proper test
 login-event.approval-check-charge-message = if they have been charged for the approval check
 login-event.event-messages-header = For each responsible person, you must tell us:
+
+############################### SiteBack ###############################
+site.back = Back

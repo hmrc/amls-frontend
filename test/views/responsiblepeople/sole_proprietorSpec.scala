@@ -18,7 +18,7 @@ package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.responsiblepeople.{SoleProprietorOfAnotherBusiness, ResponsiblePerson}
+import models.responsiblepeople.{SoleProprietorOfAnotherBusiness}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -32,6 +32,14 @@ class sole_proprietorSpec extends AmlsSpec with MustMatchers {
   }
 
   "sole_proprietor view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))
+
+      def view = views.html.responsiblepeople.sole_proprietor(form2, true, 1, None, "Person Name")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[SoleProprietorOfAnotherBusiness] = Form2(SoleProprietorOfAnotherBusiness(true))

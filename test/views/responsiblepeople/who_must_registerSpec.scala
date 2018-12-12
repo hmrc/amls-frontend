@@ -29,6 +29,12 @@ class who_must_registerSpec extends AmlsSpec with MustMatchers {
   }
 
   "who_must_register View" must {
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.responsiblepeople.who_must_register(1)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "Have the correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.who_must_register(1)
 

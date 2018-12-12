@@ -22,6 +22,7 @@
 @(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages, lang:Lang)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.contact_details.heading", personName), "summary.responsiblepeople")
 }

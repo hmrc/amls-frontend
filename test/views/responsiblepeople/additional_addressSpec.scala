@@ -37,10 +37,13 @@ class additional_addressSpec extends AmlsSpec with MustMatchers {
   }
 
   "current_address view" must {
+
     "have correct title, headings and form fields" in new ViewFixture {
       val form2 = EmptyForm
 
       def view = views.html.responsiblepeople.additional_address(form2, true, 1, None, name, countries)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
       doc.title must be(Messages("responsiblepeople.additional_address.title") +
         " - " + Messages("summary.responsiblepeople") +

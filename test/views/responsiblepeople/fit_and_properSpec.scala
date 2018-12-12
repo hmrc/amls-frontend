@@ -16,7 +16,7 @@
 
 package views.responsiblepeople
 
-import forms.{EmptyForm, InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, InvalidForm, Form2}
 import org.scalatest.{MustMatchers}
 import utils.AmlsSpec
 import jto.validation.Path
@@ -31,6 +31,14 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
   }
 
   "fit_and_proper view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.responsiblepeople.fit_and_proper(form2, true, 0, None, "PersonName", true, false)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: Form2[_] = EmptyForm
