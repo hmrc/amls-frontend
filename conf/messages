@@ -507,9 +507,9 @@ unauthorised.role.content = Your account doesn’t have enough access rights to 
 start.title = Manage your anti-money laundering supervision
 start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
 start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
-start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration.
+start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration. Keep your Government Gateway ID number in a safe place as you will need it each time you use the service.
 
-start.button.text = Start now
+start.button.text = Sign in
 start.before.heading = Before you register
 start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">a fee</a> when you apply, renew, or make changes to your registration. You can pay by Bacs or by debit or credit card when you complete your submission. We will not be able to process your submission until you have paid the registration fees.
 start.utr.heading = Unique Taxpayer Reference (UTR) number
@@ -1301,8 +1301,8 @@ bankdetails.accounttype.nonuk.lbl.02 = A non UK business bank account belonging 
 bankdetails.accounttype.nonuk.lbl.03 = A non UK business bank account belonging to another business
 bankdetails.accounttype.nonuk.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account is this?
-bankdetails.bankaccount.accountname.title = Give this bank account a name
-bankdetails.bankaccount.accountname = Give this bank account a name
+bankdetails.bankaccount.accountname.title = Give this bank account an informal name to help you identify it
+bankdetails.bankaccount.accountname = Give this bank account an informal name to help you identify it
 bankdetails.bankaccount.accounttype.title = Is this a UK bank account?
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
 bankdetails.bankaccount.accounttype.uk.lbl = UK Bank Account
@@ -1508,16 +1508,16 @@ responsiblepeople.personName.middlename = Middle name, if applicable
 responsiblepeople.personName.lastname = Last name
 responsiblepeople.personName.isknownbyothernames = Has this person ever legally changed their name?
 responsiblepeople.personName.hasOtherNames = Is this person known by any other names?
-responsiblepeople.personName.otherfirstnames = Previous first names
-responsiblepeople.personName.othermiddlenames = Previous middle names
-responsiblepeople.personName.otherlastnames = Previous last names
+responsiblepeople.personName.otherfirstnames = Previous first name
+responsiblepeople.personName.othermiddlenames = Previous middle name
+responsiblepeople.personName.otherlastnames = Previous last name
 responsiblepeople.personName.previous.date.lbl = When did their name legally change?
 responsiblepeople.personName.alternativeName = Alternative name
 responsiblepeople.legalName.title = Has this person ever legally changed their name?
 responsiblepeople.legalName.heading = Has {0} ever legally changed their name?
 responsiblepeople.legalnamechangedate.title = When did this person's name change?
 responsiblepeople.legalnamechangedate.heading = When did {0}'s name change?
-responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll.
+responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll. If they have changed their name more than once, give the most recent change.
 responsiblepeople.knownby.title = Is this person known by any other names?
 responsiblepeople.knownby.heading = Is {0} known by any other names?
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
@@ -1998,7 +1998,7 @@ notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
 notifications.subject.NoLongerMindedToReject = No longer considering refusal
 notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
-notifications.subject.Others = Generic communication
+notifications.subject.Others = Action required for your supervision
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed

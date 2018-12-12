@@ -49,7 +49,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
     val TestConfirmationService = new ConfirmationService(
       mock[DataCacheConnector]
-    ) 
+    )
   }
     implicit val authContext = mock[AuthContext]
     implicit val headerCarrier = HeaderCarrier()
@@ -198,36 +198,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       
       "not return an approval check row" when {
         "The business is MSB and HVD" in new Fixture {
-          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness, models.businessmatching.HighValueDealing)
-          val people: Option[Seq[ResponsiblePerson]] = Some(
-            Seq(
-              ResponsiblePerson(
-                approvalFlags = ApprovalFlags(
-                  hasAlreadyPaidApprovalCheck = Some(true),
-                  hasAlreadyPassedFitAndProper = Some(false)
-                )
-              )
-            )
-          )
-
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
-            subscriptionResponse,
-            activities = businessActivity,
-            people)
-
-          val expectedResult = Seq(
-            BreakdownRow(
-              label = "confirmation.responsiblepeople",
-              quantity = 1,
-              perItm = Currency(100.00),
-              total = Currency(100.00)
-            )
-          )
-          result must be(expectedResult)
-        }
-
-        "The business is MSB SubscriptionResponse" in new Fixture {
-          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness,
+            models.businessmatching.HighValueDealing)
           val people: Option[Seq[ResponsiblePerson]] = Some(
             Seq(
               ResponsiblePerson(
@@ -274,35 +246,6 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             people)
 
           val expectedResult = Seq.empty
-          result must be(expectedResult)
-        }
-
-        "The business is TCSP" in new Fixture {
-          val businessActivity = Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices)
-          val people: Option[Seq[ResponsiblePerson]] = Some(
-            Seq(
-              ResponsiblePerson(
-                approvalFlags = ApprovalFlags(
-                  hasAlreadyPaidApprovalCheck = Some(true),
-                  hasAlreadyPassedFitAndProper = Some(false)
-                )
-              )
-            )
-          )
-
-          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
-            subscriptionResponse,
-            activities = businessActivity,
-            people)
-
-          val expectedResult = Seq(
-            BreakdownRow(
-              label = "confirmation.responsiblepeople",
-              quantity = 1,
-              perItm = Currency(100.00),
-              total = Currency(100.00)
-            )
-          )
           result must be(expectedResult)
         }
 
@@ -354,7 +297,6 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       }
 
       "BPS should not output either FP or Approvals" in new Fixture {
-
         val businessActivity = Set[BusinessActivity](models.businessmatching.BillPaymentServices)
         val people: Option[Seq[ResponsiblePerson]] = Some(
           Seq(
@@ -403,6 +345,124 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
 
 
       "return a Fit and Proper row" when {
+        "The business is MSB SubscriptionResponse" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
+          result must be(expectedResult)
+        }
+
+        "The business is TCSP" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
+          result must be(expectedResult)
+        }
+
+        "The business is HVD and TCSP and has answered no to F&P" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices,
+            models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(true),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
+          result must be(expectedResult)
+        }
+
+        "The business is HVD and TCSP and has answered no to f&p and Approval" in new Fixture {
+          val businessActivity = Set[BusinessActivity](models.businessmatching.TrustAndCompanyServices,
+            models.businessmatching.HighValueDealing)
+          val people: Option[Seq[ResponsiblePerson]] = Some(
+            Seq(
+              ResponsiblePerson(
+                approvalFlags = ApprovalFlags(
+                  hasAlreadyPaidApprovalCheck = Some(false),
+                  hasAlreadyPassedFitAndProper = Some(false)
+                )
+              )
+            )
+          )
+
+          val result = ResponsiblePeopleRowsInstancesPhase2.responsiblePeopleRowsFromSubscription(
+            subscriptionResponse,
+            activities = businessActivity,
+            people)
+
+          val expectedResult = Seq(
+            BreakdownRow(
+              label = "confirmation.responsiblepeople",
+              quantity = 1,
+              perItm = Currency(100.00),
+              total = Currency(100.00)
+            )
+          )
+          result must be(expectedResult)
+        }
+
         "The business is MSB or TCSP along with HVD, EAB or ASP and hasn't passed F&P" in new Fixture {
         val businessActivity = Set[BusinessActivity](EstateAgentBusinessService, TrustAndCompanyServices)
         val people: Option[Seq[ResponsiblePerson]] = Some(

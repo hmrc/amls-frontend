@@ -711,6 +711,275 @@ class ConfirmationServiceSpec extends PlaySpec
       }
     }
 
+    "getRenewal is called" must {
+
+      "notify user of renewal fees to pay in breakdown" when {
+        "there is a Responsible People fee to pay" in new Fixture {
+
+          when {
+            TestConfirmationService.cacheConnector.fetchAll(any(), any())
+          } thenReturn Future.successful(Some(cache))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(
+            fpFee = Some(100),
+            addedResponsiblePeople = 1
+          ))
+
+          val result = await(TestConfirmationService.getRenewal)
+
+          result match {
+            case Some(rows) => {
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
+            }
+          }
+        }
+      }
+
+
+      "not include responsible people in breakdown" when {
+        "there is no fee returned in a variation response because business type is not msb or tcsp" in new Fixture {
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(fpFee = None))
+
+          val result = await(TestConfirmationService.getRenewal)
+
+          result match {
+            case Some(rows) => rows foreach { row =>
+              row.label must not equal "confirmation.responsiblepeople"
+              row.label must not equal "confirmation.responsiblepeople.fp.passed"
+            }
+          }
+        }
+      }
+
+      "notify user of amendment fees to pay in breakdown" when {
+        "there is a Responsible Persons fee to pay with dynamic fpFeeRate" in new Fixture {
+
+          val variationResponseWithRate = AmendVariationRenewalResponse(
+            processingDate = "",
+            etmpFormBundleNumber = "",
+            registrationFee = 100,
+            fpFee = Some(130.0),
+            fpFeeRate = Some(130),
+            approvalCheckFee = None,
+            approvalCheckFeeRate = None,
+            premiseFee = 0,
+            premiseFeeRate = Some(125),
+            totalFees = 100,
+            paymentReference = Some(""),
+            difference = Some(0),
+            addedResponsiblePeople = 1
+          )
+
+          when {
+            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponseWithRate)
+
+          whenReady(TestConfirmationService.getRenewal) {
+            case Some(breakdownRows) =>
+              breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+              breakdownRows.head.quantity mustBe 1
+              breakdownRows.head.perItm mustBe Currency(rpFeeWithRate)
+              breakdownRows.head.total mustBe Currency(rpFeeWithRate)
+              breakdownRows.length mustBe 1
+
+              breakdownRows.count(row => row.label.equals("confirmation.responsiblepeople.fp.passed")) mustBe 0
+            case _ => false
+          }
+        }
+      }
+
+      "notify user of variation fees to pay" when {
+
+        "a Trading Premises has been added with a full year fee" in new Fixture {
+
+          when {
+            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(addedFullYearTradingPremises = 1))
+
+          whenReady(TestConfirmationService.getRenewal) {
+            case Some(breakdownRows) =>
+              breakdownRows.head.label mustBe "confirmation.tradingpremises"
+              breakdownRows.head.quantity mustBe 1
+              breakdownRows.head.perItm mustBe Currency(tpFee)
+              breakdownRows.head.total mustBe Currency(tpFee)
+              breakdownRows.length mustBe 1
+            case _ => false
+          }
+        }
+
+        "a Trading Premises has been added with a half year fee" in new Fixture {
+
+          when {
+            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(halfYearlyTradingPremises = 1))
+
+          whenReady(TestConfirmationService.getRenewal) {
+            case Some(breakdownRows) =>
+              breakdownRows.head.label mustBe "confirmation.tradingpremises.half"
+              breakdownRows.head.quantity mustBe 1
+              breakdownRows.head.perItm mustBe Currency(tpHalfFee)
+              breakdownRows.head.total mustBe Currency(tpHalfFee)
+              breakdownRows.length mustBe 1
+            case _ => false
+          }
+        }
+
+        "a Trading Premises has been added with a zero fee" in new Fixture {
+
+          when {
+            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(zeroRatedTradingPremises = 1))
+
+          whenReady(TestConfirmationService.getRenewal) {
+            case Some(breakdownRows) =>
+              breakdownRows.head.label mustBe "confirmation.tradingpremises.zero"
+              breakdownRows.head.quantity mustBe 1
+              breakdownRows.head.perItm mustBe Currency(0)
+              breakdownRows.head.total mustBe Currency(0)
+              breakdownRows.length mustBe 1
+            case _ => false
+          }
+        }
+
+        "the business type is MSB and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
+
+          val testVariationResponse = AmendVariationRenewalResponse(
+            processingDate = "",
+            etmpFormBundleNumber = "",
+            registrationFee = 100,
+            fpFee = None,
+            fpFeeRate = None,
+            approvalCheckFee = None,
+            approvalCheckFeeRate = None,
+            premiseFee = 0,
+            premiseFeeRate = None,
+            totalFees = 100,
+            paymentReference = Some(""),
+            difference = Some(0),
+            addedResponsiblePeopleFitAndProper = 1
+          )
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(testVariationResponse)
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
+
+          val result = await(TestConfirmationService.getRenewal)
+
+          result match {
+            case Some(rows) => {
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
+            }
+          }
+
+        }
+
+        "the business type is TCSP and there is not a Responsible Persons fee to pay from an variation" in new Fixture {
+
+          val testVariationResponse = AmendVariationRenewalResponse(
+            processingDate = "",
+            etmpFormBundleNumber = "",
+            registrationFee = 100,
+            fpFee = None,
+            fpFeeRate = None,
+            approvalCheckFee = None,
+            approvalCheckFeeRate = None,
+            premiseFee = 0,
+            premiseFeeRate = None,
+            totalFees = 100,
+            paymentReference = Some(""),
+            difference = Some(0),
+            addedResponsiblePeopleFitAndProper = 1
+          )
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(testVariationResponse)
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](TrustAndCompanyServices)
+
+          val result = await(TestConfirmationService.getRenewal)
+
+          result match {
+            case Some(rows) => {
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
+            }
+          }
+
+        }
+
+        "each of the categorised fees are in the response" in new Fixture {
+
+          when {
+            TestConfirmationService.cacheConnector.save[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key), any())(any(), any(), any())
+          } thenReturn Future.successful(CacheMap("", Map.empty))
+
+          when {
+            cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
+          } thenReturn Some(variationResponse.copy(
+            fpFee = Some(rpFee),
+            addedResponsiblePeople = 1,
+            addedResponsiblePeopleFitAndProper = 1,
+            addedFullYearTradingPremises = 1,
+            halfYearlyTradingPremises = 1,
+            zeroRatedTradingPremises = 1
+          ))
+
+          whenReady(TestConfirmationService.getRenewal) {
+            case Some(breakdownRows) =>
+              breakdownRows.head.label mustBe "confirmation.responsiblepeople"
+              breakdownRows.head.quantity mustBe 1
+              breakdownRows.head.perItm mustBe Currency(rpFee)
+              breakdownRows.head.total mustBe Currency(rpFee)
+
+              breakdownRows(2).label mustBe "confirmation.tradingpremises.half"
+              breakdownRows(2).quantity mustBe 1
+              breakdownRows(2).perItm mustBe Currency(tpHalfFee)
+              breakdownRows(2).total mustBe Currency(tpHalfFee)
+
+              breakdownRows(1).label mustBe "confirmation.tradingpremises.zero"
+              breakdownRows(1).quantity mustBe 1
+              breakdownRows(1).perItm mustBe Currency(0)
+              breakdownRows(1).total mustBe Currency(0)
+
+              breakdownRows.last.label mustBe "confirmation.tradingpremises"
+              breakdownRows.last.quantity mustBe 1
+              breakdownRows.last.perItm mustBe Currency(tpFee)
+              breakdownRows.last.total mustBe Currency(tpFee)
+
+            case _ => false
+          }
+        }
+      }
+    }
+
     "getSubscription is called" must {
       "notify user of subscription fees to pay in breakdown" when {
 

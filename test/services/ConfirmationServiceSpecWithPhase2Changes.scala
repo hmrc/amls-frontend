@@ -341,7 +341,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -369,7 +369,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
 
           result match {
             case Some(rows) => {
-              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(1)
+              rows.count(_.label.equals("confirmation.responsiblepeople")) must be(0)
               rows.count(_.label.equals("confirmation.responsiblepeople.fp.passed")) must be(0)
             }
           }
@@ -409,6 +409,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           when {
             TestConfirmationService.cacheConnector.fetchAll(any(), any())
           } thenReturn Future.successful(Some(cache))
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
@@ -473,6 +477,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
           when {
             cache.getEntry[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any())
           } thenReturn Some(variationResponseWithRate)
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           whenReady(TestConfirmationService.getVariation) {
             case Some(breakdownRows) =>
@@ -641,6 +649,10 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
             halfYearlyTradingPremises = 1,
             zeroRatedTradingPremises = 1
           ))
+
+          when {
+            activities.businessActivities
+          } thenReturn Set[BusinessActivity](models.businessmatching.MoneyServiceBusiness)
 
           whenReady(TestConfirmationService.getVariation) {
             case Some(breakdownRows) =>
