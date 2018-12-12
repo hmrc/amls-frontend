@@ -25,4 +25,6 @@ addSbtPlugin("ch.epfl.scala" % "sbt-scalafix" % "0.5.2")
 
 addSbtPlugin("uk.gov.hmrc" % "sbt-artifactory" % "0.13.0")
 
+addSbtPlugin("com.typesafe.sbt" % "sbt-digest" % "1.1.1")
+
 
