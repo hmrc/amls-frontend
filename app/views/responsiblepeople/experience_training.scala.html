@@ -70,13 +70,14 @@
 
         @fieldset(
             legend = "responsiblepeople.experiencetraining.information.lbl",
-            jsHidden = true,
+            jsHidden = false,
             classes = Seq("more-information"),
             hint = "responsiblepeople.experiencetraining.information.hint",
             f = f("experienceInformation-fieldset")
         ) {
             @textarea(
                 field = f("experienceInformation"),
+                hintText = "hint.255.chars",
                 bold = false,
                 largeWidth = true,
                 cols = "30",

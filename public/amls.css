@@ -696,6 +696,12 @@ select {
   width: 70px;
 }
 
+form .form-label,
+form .form-hint,
+form .error-notification {
+  display: block;
+}
+
 form .form-label-bold {
   font-size: 19px;
   line-height: 1.31579;
