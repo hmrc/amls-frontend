@@ -40,6 +40,7 @@ import play.api.mvc.Request
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import play.api.Logger
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -95,8 +96,9 @@ trait LandingService {
         ))
         cacheConnector.save[Renewal](Renewal.key, renewal)
       }
-      case _ => Future.successful(cacheMap)
-
+      case _ =>
+        Logger.debug("[AMLSLandingService][saveRenewalData]: cache is saved")
+        Future.successful(cacheMap)
     }
 
   }
