@@ -195,36 +195,19 @@ class LandingController @Inject()(val landingService: LandingService,
         Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
         landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
-            Try {
-              val fromDuplicate = maybeCacheMap match {
-                case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
-                  _.previouslySubmitted.contains(true)
-                }
-                case _ =>
-                  Logger.debug("[AMLSLandingController][refreshAndRedirect]: returning fromDuplicate equal to false")
-                  false
+            val loginEvent = for {
+              dupe <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None } map {
+                case Some(x) => x.previouslySubmitted.contains(true)
+                case _ => false
               }
+              incomplete <- hasIncompleteResponsiblePeople()
+            } yield (incomplete, dupe)
 
-              val result: Future[Boolean] = hasIncompleteResponsiblePeople()
-              result.map {
-                case true if fromDuplicate == false =>
-                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: fromDuplicate = $fromDuplicate and redirecting to LoginEvent")
-                  Redirect(controllers.routes.LoginEventController.get())
-                case _ =>
-                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: fromDuplicate = $fromDuplicate and redirecting to StatusController")
-                  Redirect(controllers.routes.StatusController.get(fromDuplicate))
-              }
+            loginEvent.map {
+              case (true, false) => Redirect(controllers.routes.LoginEventController.get())
+              case (_, true) => Redirect(controllers.routes.StatusController.get(true))
+              case (_, false) => Redirect(controllers.routes.StatusController.get(false))
             }
-          } match {
-            case Success(r) =>
-              Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
-              r
-            case Failure(ex) =>
-              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op fialed with ${ex.getMessage} - redirecting to StatusController")
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
-            case _ =>
-              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: refresh cache returned _ and redirecting to StatusController")
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
           }
         }
     }
