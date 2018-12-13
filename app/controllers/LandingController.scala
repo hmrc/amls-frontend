@@ -221,6 +221,7 @@ class LandingController @Inject()(val landingService: LandingService,
               Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
               r
             case Failure(ex) =>
+              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op failed with ${ex.getMessage} - redirecting to StatusController")
               hasIncompleteResponsiblePeople() map {
                 case true =>
                   Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: got a future.Failure with incomplete RPs, redirecting to LoginEvent")
