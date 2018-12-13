@@ -196,6 +196,7 @@ class LandingController @Inject()(val landingService: LandingService,
         landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
             Try {
+              Logger.debug("[AMLSLandingController][refreshAndRedirect]: attempting to find fromDuplicate status value")
               val fromDuplicate = maybeCacheMap match {
                 case Some(map) => map.getEntry[SubscriptionResponse](SubscriptionResponse.key).fold(false) {
                   _.previouslySubmitted.contains(true)
@@ -220,7 +221,7 @@ class LandingController @Inject()(val landingService: LandingService,
               Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
               r
             case Failure(ex) =>
-              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op fialed with ${ex.getMessage} - redirecting to StatusController")
+              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op failed with ${ex.getMessage} - redirecting to StatusController")
               Future.successful(Redirect(controllers.routes.StatusController.get()))
             case _ =>
               Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: refresh cache returned _ and redirecting to StatusController")
