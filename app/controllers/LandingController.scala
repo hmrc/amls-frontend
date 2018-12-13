@@ -143,7 +143,7 @@ class LandingController @Inject()(val landingService: LandingService,
             val hasIncompleteRps: Option[Boolean] = for {
               rps <- cache.map(_.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key))
             } yield ControllerHelper.hasIncompleteResponsiblePerson(rps)
-            Logger.debug(s"[AMLSLandingController][hasIncompleteResponsiblePeople]: Rps.isComplete = ${hasIncompleteRps.contains(true)}")
+            Logger.debug(s"[AMLSLandingController][hasIncompleteResponsiblePeople]: hasInCompleteResponsbilePeople = ${hasIncompleteRps.contains(true)}")
             hasIncompleteRps.contains(true)
         }
     }
@@ -221,11 +221,14 @@ class LandingController @Inject()(val landingService: LandingService,
               Logger.debug("[AMLSLandingController][refreshAndRedirect]: redirect is successful()")
               r
             case Failure(ex) =>
-              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: op failed with ${ex.getMessage} - redirecting to StatusController")
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
-            case _ =>
-              Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: refresh cache returned _ and redirecting to StatusController")
-              Future.successful(Redirect(controllers.routes.StatusController.get()))
+              hasIncompleteResponsiblePeople() map {
+                case true =>
+                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: got a future.Failure with incomplete RPs, redirecting to LoginEvent")
+                  Redirect(controllers.routes.LoginEventController.get())
+                case false =>
+                  Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: got a future.Failure with complete RPs, redirecting to StatusController")
+                  Redirect(controllers.routes.StatusController.get())
+              }
           }
         }
     }

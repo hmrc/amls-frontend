@@ -601,9 +601,58 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         status(result) must be(SEE_OTHER)
         redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
       }
+
+      "call to getEntry[SubscriptionResponse] throw an error and responsible person is complete" in new Fixture {
+        val cacheMap: CacheMap = mock[CacheMap]
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(completeResponsiblePerson)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key)).thenThrow(JsResultException(Seq.empty))
+
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(rejectedStatusGen.sample.get, None))
+
+        val result: Future[Result] = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
+      }
     }
 
     "redirect to login event page" when {
+
+      "call to getEntry[SubscriptionResponse] throw an error and responsible person is incomplete" in new Fixture {
+        val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+          dateOfBirth = None
+        )
+
+        val cacheMap: CacheMap = mock[CacheMap]
+        val complete: BusinessMatching = mock[BusinessMatching]
+
+        when(complete.isComplete) thenReturn true
+        when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
+        when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
+        when(cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+        when(cacheMap.getEntry[SubscriptionResponse](SubscriptionResponse.key)).thenThrow(JsResultException(Seq.empty))
+
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
+        when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(None))
+        when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(activeStatusGen.sample.get, None))
+
+        val result: Future[Result] = controller.get()(request)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) mustBe Some(controllers.routes.LoginEventController.get().url)
+      }
+
       "responsible persons is not complete" in new Fixture {
         val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
           dateOfBirth = None
@@ -639,6 +688,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             "refresh from API5 and redirect to status controller" in new Fixture {
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
+              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
               val result = controller.get()(request)
 
@@ -686,6 +736,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 includesResponse = false,
                 includeSubmissionStatus = true))
 
+              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
               val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
 
               status(result) must be(SEE_OTHER)
@@ -723,6 +775,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "refresh from API5 and redirect to status controller" in new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
             setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(false, false))
+
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             val result = controller.get()(request)
 
@@ -766,6 +820,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               controller.cacheConnector.save[ResponsiblePerson](meq(ResponsiblePerson.key), any())(any(), any(), any())
             } thenReturn Future.successful(fixedCacheMap)
 
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
@@ -780,6 +836,8 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "refresh from API5 and redirect to status controller" in new Fixture {
           setUpMocksForAnEnrolmentExists(controller)
           setUpMocksForNoDataInSaveForLater(controller)
+
+          when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
           val result = controller.get()(request)
 
