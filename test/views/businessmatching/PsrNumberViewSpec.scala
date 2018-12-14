@@ -104,5 +104,17 @@ class PsrNumberViewSpec extends AmlsSpec {
             doc.body().text() must include("Yes")
             doc.body().text() must include("No")
         }
+
+        "have a back link in pre-submission mode" in new ViewFixture {
+            def view = views.html.businessmatching.psr_number(EmptyForm, edit = false, isPreSubmission = true)
+
+            doc.getElementsByAttributeValue("class", "link-back") must not be empty
+        }
+
+        "have a back link in non pre-submission mode" in new ViewFixture {
+            def view = views.html.businessmatching.psr_number(EmptyForm, edit = true, isPreSubmission = false)
+
+            doc.getElementsByAttributeValue("class", "link-back") must not be empty
+        }
     }
 }
