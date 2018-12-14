@@ -640,6 +640,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
+              when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                .thenReturn(Future.successful(
+                  Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                ))
+
+              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
               val result = controller.get()(request)
 
               status(result) must be(SEE_OTHER)
@@ -686,6 +693,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
                 includesResponse = false,
                 includeSubmissionStatus = true))
 
+              when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                .thenReturn(Future.successful(
+                  Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                ))
+
+              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
               val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
 
               status(result) must be(SEE_OTHER)
@@ -724,6 +738,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForAnEnrolmentExists(controller)
             setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(false, false))
 
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+              ))
+
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
             val result = controller.get()(request)
 
             status(result) must be(SEE_OTHER)
@@ -733,9 +754,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", None, Some(true)))
+              ))
+
             val testCacheMap = buildTestCacheMap(false, false)
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
-            when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None, Some(true))))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
             when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
@@ -754,6 +780,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
             val fixedCacheMap = buildTestCacheMap(false, false)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", None))
+              ))
+
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
@@ -780,6 +813,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "refresh from API5 and redirect to status controller" in new Fixture {
           setUpMocksForAnEnrolmentExists(controller)
           setUpMocksForNoDataInSaveForLater(controller)
+
+          when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+            .thenReturn(Future.successful(
+              Some(SubscriptionResponse("", "", None))
+            ))
+
+          when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
           val result = controller.get()(request)
 
