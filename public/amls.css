@@ -1523,6 +1523,7 @@ li.autocomplete__option {
   text-decoration: none;
   border-bottom: 1px solid #0b0c0c;
   font-size: 16px;
+  margin-bottom: 8px
 }
 
 .link-back:link,
