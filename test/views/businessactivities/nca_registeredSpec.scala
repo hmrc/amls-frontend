@@ -16,12 +16,11 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, EmptyForm}
-import jto.validation.{ValidationError, Path}
-import models.businessactivities.NCARegistered
-import org.scalatest.{MustMatchers}
-import utils.AmlsSpec
+import forms.{EmptyForm, InvalidForm}
+import jto.validation.{Path, ValidationError}
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -76,6 +75,12 @@ class nca_registeredSpec extends AmlsSpec with MustMatchers {
 
       errorSummary.html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.nca_registered(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

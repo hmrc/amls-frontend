@@ -16,13 +16,12 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.businessactivities.{UkAccountantsAddress, AccountantsAddress, WhoIsYourAccountant}
-import org.scalatest.{MustMatchers}
-import utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.businessactivities.{UkAccountantsAddress, WhoIsYourAccountant}
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -107,6 +106,12 @@ class who_is_your_accountantSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("country").parent
         .getElementsByClass("error-notification").first().html() must include("ninth not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.who_is_your_accountant(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

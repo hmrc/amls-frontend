@@ -16,9 +16,9 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.TaxMatters
-import org.scalatest.{MustMatchers}
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
@@ -67,6 +67,12 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("manageYourTaxAffairs")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.tax_matters(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

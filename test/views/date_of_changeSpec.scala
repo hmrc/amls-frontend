@@ -16,14 +16,13 @@
 
 package views
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 
 class date_of_changeSpec extends AmlsSpec with MustMatchers {
 
@@ -84,6 +83,16 @@ class date_of_changeSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("dateOfChange")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.date_of_change(
+        EmptyForm,
+        "testSubheadingMessage",
+        controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+      )
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }
