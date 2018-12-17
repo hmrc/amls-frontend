@@ -60,3 +60,5 @@ POST        /remove/:index                                           controllers
 
 GET         /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
+
+GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get()

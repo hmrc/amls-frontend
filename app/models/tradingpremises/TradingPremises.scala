@@ -120,6 +120,9 @@ object TradingPremises {
 
   def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
 
+  def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =
+    rp.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == TradingPremises())
+
   def section(implicit cache: CacheMap): Section = {
 
     val messageKey = "tradingpremises"

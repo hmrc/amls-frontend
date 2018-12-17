@@ -1060,6 +1060,14 @@ tradingpremises.remove_reasons.agent.premises.lbl.06 = Other
 tradingpremises.remove_reasons.agent.other.missing = Enter a reason for removing this trading premises
 tradingpremises.remove_reasons.missing = Select one option to show why you’re removing this trading premises
 tradingpremises.confirmaddress.title = Is this your trading premises address?
+tradingpremises.yourpremises.title = Your trading premises
+tradingpremises.yourpremises.line_1 = You must add every premises where you trade in activities that are supervised under the Money Laundering Regulations.
+tradingpremises.yourpremises.line_2 = You will need to pay a fee for each trading premises you register.
+tradingpremises.yourpremises.line_3 = You currently have no trading premises registered.
+tradingpremises.yourpremises.incomplete = Incomplete
+tradingpremises.yourpremises.complete = Complete
+tradingpremises.subheading = Trading premises
+
 
 estateagentbusiness.whatyouneed.subheading = In this section, you’ll be asked for things like:
 estateagentbusiness.whatyouneed.line_1 = what services you provide
