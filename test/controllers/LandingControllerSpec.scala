@@ -659,12 +659,21 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "data has just been imported" should {
 
           def runImportTest(hasChanged: Boolean): Unit = new Fixture {
-            setUpMocksForAnEnrolmentExists(controller)
-            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
+            val testCacheMap = buildTestCacheMap(
               hasChanged = hasChanged,
               includesResponse = false,
               includeSubmissionStatus = true,
-              includeDataImport = true))
+              includeDataImport = true)
+
+            setUpMocksForAnEnrolmentExists(controller)
+            setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+            when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+              ))
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             val result = controller.get()(request)
 
@@ -685,50 +694,133 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "data has changed and" when {
-          "the user has just submitted" should {
-            "refresh from API5 and redirect to status controller" in new Fixture {
-              setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
-                hasChanged = true,
-                includesResponse = false,
-                includeSubmissionStatus = true))
+          "the user has just submitted" when {
+            "there are no incomplete responsible people" should {
+              "refresh from API5 and redirect to status controller" in new Fixture {
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
 
-              when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
-                .thenReturn(Future.successful(
-                  Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
-                ))
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
 
-              val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
 
-              verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
+
+            "there are incomplete responsible people" should {
+              "refresh from API5 and redirect to login events controller" in new Fixture {
+                val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+                  dateOfBirth = None
+                )
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
+
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
+
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+
+                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+
+                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
             }
           }
 
-          "the user has not just submitted" should {
-            "redirect to status controller without refreshing API5" in new Fixture {
-              val testCacheMap = buildTestCacheMap(
-                hasChanged = true,
-                includesResponse = false
-              )
+          "the user has not just submitted" when {
+            "there are no incomplete responsible people" should {
+              "redirect to status controller without refreshing API5" in new Fixture {
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false
+                )
 
-              when {
-                controller.landingService.setAltCorrespondenceAddress(any(), any())(any(),any(),any())
-              } thenReturn Future.successful(testCacheMap)
+                when {
+                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                } thenReturn Future.successful(testCacheMap)
 
-              setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-              val result = controller.get()(request)
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
 
-              verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
+
+            "there are incomplete responsible people" should {
+              "redirect to login events" in new Fixture {
+                val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+                  dateOfBirth = None
+                )
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false
+                )
+
+                when {
+                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                } thenReturn Future.successful(testCacheMap)
+
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
+
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
             }
           }
         }
