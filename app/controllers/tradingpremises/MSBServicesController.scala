@@ -16,22 +16,17 @@
 
 package controllers.tradingpremises
 
-import cats.data.OptionT
 import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.{BusinessActivity, BusinessMatching, BusinessMatchingMsbService => BMMsbServices}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises}
-import play.api.mvc.Result
+import models.businessmatching.BusinessMatching
+import models.status.SubmissionStatus
+import models.tradingpremises.TradingPremisesMsbServices._
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
-import models.tradingpremises.TradingPremisesMsbServices._
 
 import scala.concurrent.Future
 
@@ -88,7 +83,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
       edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
         case false => Redirect(routes.PremisesRegisteredController.get(index))
       }
     }

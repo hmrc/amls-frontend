@@ -16,23 +16,42 @@
 
 package controllers.tradingpremises
 
+import cats.data.OptionT
+import cats.implicits._
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.Inject
-import models.tradingpremises.TradingPremises
+import models.businessmatching.BusinessMatching
+import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
+import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
-import views.html.tradingpremises.your_trading_premises
+import utils.{ControllerHelper, RepeatingSection}
+import views.html.tradingpremises.{summary_details, your_trading_premises}
+
+import scala.concurrent.Future
 
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
                                               val authConnector: AuthConnector
                                              ) extends RepeatingSection with BaseController {
 
-  def get() = Authorised.async {
+  private def updateTradingPremises(tradingPremises: Option[Seq[TradingPremises]]) : Future[Option[Seq[TradingPremises]]] = {
+    tradingPremises match {
+      case Some(tpSeq) => {
+        val updatedList = tpSeq.filterEmpty.map { premises =>
+          premises.copy(hasAccepted = true)
+        }
+        Future.successful(Some(updatedList))
+      }
+      case _ => Future.successful(tradingPremises)
+    }
+  }
+
+  def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       (for {
         status <- statusService.getStatus
@@ -48,10 +67,60 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
           val (completeTp, incompleteTp) = TradingPremises.filterWithIndex(data)
             .partition(_._1.isComplete)
 
-          Ok(your_trading_premises(EmptyForm, false, status, completeTp, incompleteTp))
+          Ok(your_trading_premises(EmptyForm, edit, status, completeTp, incompleteTp))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
 
+  def post = Authorised.async {
+    implicit authContext => implicit request =>
+      (for {
+        tp <- dataCacheConnector.fetch[Seq[TradingPremises]](TradingPremises.key)
+        tpNew <- updateTradingPremises(tp)
+        _ <- dataCacheConnector.save[Seq[TradingPremises]](TradingPremises.key, tpNew.getOrElse(Seq.empty))
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) recoverWith {
+        case _: Throwable => Future.successful(InternalServerError("Unable to save data and get redirect link"))
+      }
+  }
+
+  def post(index: Int) = Authorised.async{
+    implicit authContext => implicit request =>
+      for {
+        _ <- updateDataStrict[TradingPremises](index){ tp =>
+          tp.copy(hasAccepted = true, hasChanged = true)
+        }
+      } yield Redirect(controllers.tradingpremises.routes.YourTradingPremisesController.get())
+  }
+
+  def answers = get(true)
+
+  def getIndividual(index: Int) = Authorised.async {
+    implicit authContext => implicit request =>
+
+      (for {
+        cache <- OptionT(dataCacheConnector.fetchAll)
+        tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
+        bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
+      } yield {
+        val hasOneService = bm.activities.fold(false)(_.businessActivities.size == 1)
+        val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
+
+        Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
+      }).getOrElse(NotFound(notFoundView))
+  }
+}
+
+object ModelHelpers {
+  implicit class removeUrl(model: TradingPremises) {
+
+    private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady, SubmissionReadyForReview).contains(status)
+
+    def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
+      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) && model.lineId.isDefined =>
+        controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
+      case _ =>
+        controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url
+    }
+  }
 }

@@ -141,7 +141,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           val result = controller.post(1, true)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
 
         }
 

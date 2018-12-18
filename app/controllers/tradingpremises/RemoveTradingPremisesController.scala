@@ -57,13 +57,13 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
 
       statusService.getStatus flatMap {
         case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](index) map { _ =>
-          Redirect(routes.SummaryController.get(complete))
+          Redirect(routes.YourTradingPremisesController.get(complete))
         }
         case SubmissionReadyForReview => for {
           _ <- updateDataStrict[TradingPremises](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
           }
-        } yield Redirect(routes.SummaryController.get(complete))
+        } yield Redirect(routes.YourTradingPremisesController.get(complete))
         case _ =>
           getData[TradingPremises](index) flatMap { premises =>
             premises.lineId match {
@@ -80,7 +80,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
                       _ <- updateDataStrict[TradingPremises](index) { tp =>
                         tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                       }
-                    } yield Redirect(routes.SummaryController.get(complete))
+                    } yield Redirect(routes.YourTradingPremisesController.get(complete))
                   }
                 }
 
@@ -88,7 +88,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
                 updateDataStrict[TradingPremises](index) {
                   _.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
                 } map { _ =>
-                  Redirect(routes.SummaryController.get(complete))
+                  Redirect(routes.YourTradingPremisesController.get(complete))
                 }
             }
           }

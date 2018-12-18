@@ -63,7 +63,7 @@
             @tp.yourTradingPremises.map { ytp =>
                 @checkYourAnswersListing(
                     item = ytp.tradingPremisesAddress.toLines.mkString(", ").toString,
-                    editUrl = controllers.tradingpremises.routes.SummaryController.getIndividual(y + 1).toString,
+                    editUrl = controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(y + 1).toString,
                     removeUrl = tp.removeUrl(y + 1, add, status)
                 )
             }
@@ -71,7 +71,7 @@
     }
     </ul>
 
-    @form(f, controllers.tradingpremises.routes.SummaryController.post()) {
+    @form(f, controllers.routes.RegistrationProgressController.get()) {
         @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
     }
 }

@@ -83,7 +83,7 @@ class  IsResidentialController @Inject()(
                     }
                   }
                 } yield edit match {
-                  case true => Redirect(routes.SummaryController.getIndividual(index))
+                  case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
                   case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
                 }
               }) getOrElse Future.successful(InternalServerError("Cannot update Trading Premises"))

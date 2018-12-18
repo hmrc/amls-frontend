@@ -68,7 +68,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
             }
           } yield (data.agentPremises, edit) match {
             case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
-            case (false, true) => Redirect(routes.SummaryController.getIndividual(index))
+            case (false, true) => Redirect(routes.YourTradingPremisesController.getIndividual(index))
             case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
           }
         }.recoverWith {

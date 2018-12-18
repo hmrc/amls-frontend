@@ -218,7 +218,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
       }
 
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -250,7 +250,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
       }
 
     }
@@ -282,7 +282,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
             val result = controller.post(1, edit = true)(newRequest)
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+            redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
         }
       }
 
@@ -380,7 +380,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
       }
     }
 

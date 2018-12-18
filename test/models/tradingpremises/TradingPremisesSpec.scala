@@ -19,13 +19,12 @@ package models.tradingpremises
 import models.businessmatching._
 import models.registrationprogress.{Completed, NotStarted, Started}
 import org.joda.time.LocalDate
-import org.mockito.Matchers._
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
-import play.api.libs.json.{JsSuccess, Json}
+import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.StatusConstants
 
@@ -253,7 +252,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
       }
     }
 
@@ -267,7 +266,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(false)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
       }
     }
 
@@ -285,7 +284,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.SummaryController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
       }
     }
   }

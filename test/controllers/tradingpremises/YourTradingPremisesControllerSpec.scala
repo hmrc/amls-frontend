@@ -16,6 +16,213 @@
 
 package controllers.tradingpremises
 
-class YourTradingPremisesControllerSpec {
+import java.util.UUID
 
+import connectors.DataCacheConnector
+import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
+import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
+import org.joda.time.LocalDate
+import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
+import play.api.i18n.Messages
+import play.api.test.FakeRequest
+import play.api.test.Helpers._
+import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.{AmlsSpec, AuthorisedFixture}
+
+import scala.concurrent.Future
+
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
+
+  implicit val request = FakeRequest
+  val userId = s"user-${UUID.randomUUID()}"
+  val mockDataCacheConnector = mock[DataCacheConnector]
+  val mockStatusService = mock[StatusService]
+  val mockCacheMap = mock[CacheMap]
+
+  trait Fixture extends AuthorisedFixture {
+    self => val request = addToken(authRequest)
+
+    val ytpController = new YourTradingPremisesController(
+      mockDataCacheConnector,
+      mockStatusService,
+      self.authConnector
+    )
+
+    when(ytpController.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+
+    val model = TradingPremises()
+
+    val models = Seq(TradingPremises())
+  }
+
+  "YourTradingPremisesController" must {
+
+    "load the summary page when the model is present" in new Fixture {
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+      val result = ytpController.get()(request)
+      status(result) must be(OK)
+    }
+
+    "redirect to the main amls summary page when section data is unavailable" in new Fixture {
+
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
+
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(None)
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+      val result = ytpController.get()(request)
+      redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
+      status(result) must be(SEE_OTHER)
+    }
+
+    "for an individual display the trading premises summary page for individual" in new Fixture {
+
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+
+      val businessMatchingMsbServices = BusinessMatchingMsbServices(
+        Set(TransmittingMoney, CurrencyExchange))
+
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices))))
+
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
+        (any())).thenReturn(Some(Seq(TradingPremises())))
+
+      val result = ytpController.getIndividual(1)(request)
+
+      status(result) must be(OK)
+    }
+
+
+    "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
+        (any())).thenReturn(None)
+      val result = ytpController.getIndividual(1)(request)
+      status(result) must be(NOT_FOUND)
+    }
+
+    "direct to your answers when the model is present" in new Fixture {
+      val businessMatchingActivitiesAll = BusinessMatchingActivities(
+        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
+
+      when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
+
+      val result = ytpController.answers()(request)
+      status(result) must be(OK)
+      contentAsString(result) must include(Messages("tradingpremises.yourpremises.title"))
+    }
+
+  }
+
+  "post is called" must {
+    "redirect to the progress page" when {
+
+      "all questions are complete" in new Fixture {
+
+        val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+        val ytp = Some(ytpModel)
+
+        val emptyCache = CacheMap("", Map.empty)
+
+        val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
+
+        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(emptyCache))
+
+        val result = ytpController.post()(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
+      }
+
+    }
+  }
+
+  "ModelHelpers" must {
+
+    import controllers.tradingpremises.ModelHelpers._
+
+    "return the correct removal url" when {
+
+      "the trading premises is an Agent trading premises" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), lineId = Some(1234))
+
+        tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
+          controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(1).url)
+
+      }
+
+      "the trading premises is an agent but the status is an amendment" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), lineId = Some(1234))
+
+        tradingPremises.removeUrl(1, status = SubmissionReadyForReview) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url)
+
+      }
+
+      "the trading premises is not an Agent trading premises" in {
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(false)))
+
+        tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
+        )
+      }
+
+      "the status is a new submission" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)))
+
+        tradingPremises.removeUrl(1, status = SubmissionReady) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
+        )
+
+      }
+
+      "the status is a variation but the trading premises has no line Id" in {
+
+        val tradingPremises = TradingPremises(Some(RegisteringAgentPremises(true)), lineId = None)
+
+        tradingPremises.removeUrl(1, status = SubmissionDecisionApproved) must be(
+          controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url
+        )
+
+      }
+
+    }
+
+  }
 }

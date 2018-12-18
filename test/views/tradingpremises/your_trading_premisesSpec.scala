@@ -97,21 +97,21 @@ class your_trading_premisesSpec extends AmlsSpec with MustMatchers with TradingP
       doc.getElementById("complete-header").text must include(Messages("tradingpremises.yourpremises.complete"))
 
       doc.getElementById("complete-detail-0").text must include("CPLT 1")
-      doc.getElementById("detail-edit-0").attr("href") must be(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url)
+      doc.getElementById("detail-edit-0").attr("href") must be(controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(1).url)
       doc.getElementById("detail-remove-0").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1).url)
 
       doc.getElementById("complete-detail-1").text must include("CPLT 2")
-      doc.getElementById("detail-edit-1").attr("href") must be(controllers.tradingpremises.routes.SummaryController.getIndividual(2).url)
+      doc.getElementById("detail-edit-1").attr("href") must be(controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(2).url)
       doc.getElementById("detail-remove-1").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(2).url)
 
       doc.getElementById("incomplete-header").text must include(Messages("tradingpremises.yourpremises.incomplete"))
 
       doc.getElementById("incomplete-detail-2").text must include("INCPLT 1")
-      doc.getElementById("detail-edit-2").attr("href") must be(controllers.tradingpremises.routes.SummaryController.getIndividual(3).url)
+      doc.getElementById("detail-edit-2").attr("href") must be(controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(3).url)
       doc.getElementById("detail-remove-2").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(3).url)
 
       doc.getElementById("incomplete-detail-3").text must include("INCPLT 2")
-      doc.getElementById("detail-edit-3").attr("href") must be(controllers.tradingpremises.routes.SummaryController.getIndividual(4).url)
+      doc.getElementById("detail-edit-3").attr("href") must be(controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(4).url)
       doc.getElementById("detail-remove-3").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(4).url)
 
     }

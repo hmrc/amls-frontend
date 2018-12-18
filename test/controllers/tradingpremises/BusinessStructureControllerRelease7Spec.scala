@@ -257,7 +257,7 @@ class BusinessStructureControllerRelease7Spec extends AmlsSpec with ScalaFutures
       val result = controller.post(1,edit = true)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+      redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
     }
 
     "set the hasChanged flag to true" in new Fixture {

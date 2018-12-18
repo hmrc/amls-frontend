@@ -53,7 +53,7 @@ class PremisesRegisteredController @Inject()(
         case ValidForm(_, data) =>
           data.registerAnotherPremises match {
             case true => Future.successful(Redirect(routes.TradingPremisesAddController.get(false)))
-            case false => Future.successful(Redirect(routes.SummaryController.get()))
+            case false => Future.successful(Redirect(routes.YourTradingPremisesController.getIndividual(index)))
           }
       }
   }

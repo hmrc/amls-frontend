@@ -16,27 +16,26 @@
 
 package controllers.tradingpremises
 
+import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data._
+import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
+import models.status.SubmissionStatus
 import models.tradingpremises._
 import org.joda.time.LocalDate
+import play.api.mvc.Request
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
 import views.html.tradingpremises._
-import audit.AddressConversions._
-import cats.data._
-import cats.implicits._
-import play.api.mvc.Request
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
@@ -104,7 +103,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {
       edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
         case _ => Redirect(routes.ActivityStartDateController.get(index, edit))
       }
     }
@@ -137,7 +136,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
                   )))
               }
             } map { _ =>
-              Redirect(routes.SummaryController.get())
+              Redirect(routes.YourTradingPremisesController.get())
             }
         }
       }

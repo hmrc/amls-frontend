@@ -16,6 +16,7 @@
 
 @import include._
 @import forms2._
+@import forms.EmptyForm
 @import models.tradingpremises._
 @import models.businessmatching.MoneyServiceBusiness
 @import utils._
@@ -180,9 +181,7 @@
 
     }
 
-    @anchor(
-        attrHref = controllers.tradingpremises.routes.SummaryController.get().toString,
-        attrRole = true,
-        linkText = Messages("button.confirmandcontinue")
-    )
+    @form(EmptyForm, controllers.tradingpremises.routes.YourTradingPremisesController.post(index)) {
+        @submit(false, Some(Messages("button.confirmandcontinue")), false)
+    }
 }

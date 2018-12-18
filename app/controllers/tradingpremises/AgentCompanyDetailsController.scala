@@ -16,16 +16,15 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
-import config.{ApplicationConfig}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, FeatureToggle, RepeatingSection}
+import utils.{FeatureToggle, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -67,7 +66,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                   tp.msbServices, true, tp.lineId, tp.status, tp.endDate)
               }
             } yield edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
+              case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
               case false => TPControllerHelper.redirectToNextPage(result, index, edit)
             }
           }.recoverWith {

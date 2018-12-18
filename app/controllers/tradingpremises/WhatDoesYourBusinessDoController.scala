@@ -22,18 +22,18 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import models.status.SubmissionStatus
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.mvc.Result
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
 
@@ -107,7 +107,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
         data.activities.contains(MoneyServiceBusiness) match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
           case _ => edit match {
-            case true => Redirect(routes.SummaryController.getIndividual(index))
+            case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
             case false => Redirect(routes.PremisesRegisteredController.get(index))
           }
         }
@@ -176,7 +176,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
                   tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.SummaryController.get())
+              } yield Redirect(routes.YourTradingPremisesController.get())
           }
         }
   }

@@ -18,21 +18,19 @@ package controllers.tradingpremises
 
 import connectors.DataCacheConnector
 import models.TradingPremisesSection
+import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -212,7 +210,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
         val result = controller.post(1,edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
       }
 
       "redirect to the Trading Premises details page on submitting false and edit false" in new Fixture {

@@ -20,15 +20,13 @@ import connectors.DataCacheConnector
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -118,7 +116,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
         val result = controller.post(1, true)(postRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
+        redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
 
       }
 

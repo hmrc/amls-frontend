@@ -89,7 +89,7 @@ class AgentNameController @Inject()(
               case SubmissionDecisionApproved if redirectToAgentNameDateOfChange(getTradingPremises(result, index), data) =>
                 Redirect(routes.AgentNameController.dateOfChange(index))
               case _ => edit match {
-                case true => Redirect(routes.SummaryController.getIndividual(index))
+                case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
                 case false => TPControllerHelper.redirectToNextPage(result, index, edit)
               }
             }
@@ -123,7 +123,7 @@ class AgentNameController @Inject()(
                 _ <- updateDataStrict[TradingPremises](index) { tp =>
                   tp.agentName(tradingPremises.agentName.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.SummaryController.get())
+              } yield Redirect(routes.YourTradingPremisesController.get())
           }
         }
   }

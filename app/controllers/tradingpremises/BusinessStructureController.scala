@@ -16,18 +16,17 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
@@ -55,7 +54,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
       case LimitedLiabilityPartnership | IncorporatedBody if ApplicationConfig.release7 => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
+        case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
         case false => TPControllerHelper.redirectToNextPage(result, index, edit)
       }
       case _ => Redirect(routes.AgentCompanyNameController.get(index, edit))

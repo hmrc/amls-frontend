@@ -1,4 +1,4 @@
-GET         /what-you-need/:index                                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
+GET         /what-you-need/:index                                    @controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
 GET         /add                                                     @controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
 
@@ -40,11 +40,11 @@ POST        /msb-activities/:index                                   controllers
 GET         /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
-GET         /check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
-POST        /check-your-answers                                      controllers.tradingpremises.SummaryController.post()
+GET         /check-your-answers                                      @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
+POST        /check-your-answers                                      @controllers.tradingpremises.YourTradingPremisesController.post(index: Int)
 
-GET         /your-answers                                            controllers.tradingpremises.SummaryController.answers()
-GET         /trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /your-answers                                            @controllers.tradingpremises.YourTradingPremisesController.answers()
+GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int)
 
 GET         /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
 POST        /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
@@ -61,4 +61,4 @@ POST        /remove/:index                                           controllers
 GET         /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
 
-GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get()
+GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
