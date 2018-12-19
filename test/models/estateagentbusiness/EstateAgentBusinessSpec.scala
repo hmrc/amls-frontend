@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
   val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
