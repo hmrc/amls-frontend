@@ -56,7 +56,7 @@
                 <div>
                     <div id="incomplete-detail-@index">@tpDetail(tp)</div>
                     <div id="incompleted-action-panel-@index">
-                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index + 1, false).url">@Messages("button.edit")</a>
+                        <a id="detail-edit-@index" href="@controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(index + 1).url">@Messages("button.edit")</a>
                         @Messages("lbl.or")
                         <a id="detail-remove-@index" href="@tp.removeUrl(index + 1, add, status)">@Messages("button.remove")</a>
                     </div>

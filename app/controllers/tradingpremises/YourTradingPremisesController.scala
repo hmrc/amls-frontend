@@ -22,7 +22,7 @@ import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
@@ -34,6 +34,7 @@ import views.html.tradingpremises.{summary_details, your_trading_premises}
 
 import scala.concurrent.Future
 
+@Singleton
 class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheConnector,
                                               val statusService: StatusService,
                                               val authConnector: AuthConnector

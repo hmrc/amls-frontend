@@ -235,7 +235,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Started)
-        section.call must be(controllers.tradingpremises.routes.WhatYouNeedController.get(3))
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
       }
     }
 
@@ -334,7 +334,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
             TradingPremises(hasAccepted = true),
             incompleteModel)))
 
-        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.WhatYouNeedController.get(2).url)
+        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers().url)
       }
     }
 
