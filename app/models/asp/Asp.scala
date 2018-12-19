@@ -35,8 +35,6 @@ case class Asp(
     this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p), hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
-    case Asp(Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
-    case Asp(Some(_), Some(_), _, false) if ApplicationConfig.hasAcceptedToggle => false
     case Asp(Some(_), Some(_), _, _) => true
     case _ => false
   }

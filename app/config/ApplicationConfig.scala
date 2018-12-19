@@ -32,8 +32,6 @@ trait ApplicationConfig {
   def refreshProfileToggle: Boolean
 
   def frontendBaseUrl: String
-
-  def hasAcceptedToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -104,8 +102,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
     s"$scheme://$host"
   }
-
-  override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 }
 
 class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration) {
