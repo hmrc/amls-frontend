@@ -75,7 +75,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   lazy val enrolUrl = s"$ggUrl/enrol"
   
-  lazy val save4LaterUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
+  lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
   lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   lazy val regFee = getConfigInt("amounts.registration")

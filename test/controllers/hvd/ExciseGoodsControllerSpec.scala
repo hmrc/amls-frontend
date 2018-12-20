@@ -57,7 +57,7 @@ class ExciseGoodsControllerSpec extends AmlsSpec {
       htmlValue.title mustBe Messages("hvd.excise.goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
     }
 
-    "successfully load UI from save4later" in new Fixture {
+    "successfully load UI from mongoCache" in new Fixture {
 
       mockCacheFetch(Some(Hvd(exciseGoods = Some(ExciseGoods(true)))))
 

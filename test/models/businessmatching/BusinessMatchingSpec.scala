@@ -344,7 +344,7 @@ class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatch
 
     "section" must {
 
-      "return `NotStarted` section when there is no section in Save4Later" in {
+      "return `NotStarted` section when there is no section in mongoCache" in {
         implicit val cache = CacheMap("", Map.empty)
         BusinessMatching.section mustBe Section("businessmatching", NotStarted, false, controllers.businessmatching.routes.RegisterServicesController.get())
       }

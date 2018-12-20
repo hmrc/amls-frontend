@@ -103,7 +103,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(NOT_FOUND)
       }
 
-      "display the persons page when no existing data in save4later" in new Fixture {
+      "display the persons page when no existing data in mongoCache" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 

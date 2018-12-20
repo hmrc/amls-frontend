@@ -16,20 +16,19 @@
 
 package controllers.testonly
 
-import config.{AmlsShortLivedCache, BusinessCustomerSessionCache}
-import connectors.cache.{MongoCacheConnector, Save4LaterCacheConnector}
+import config.{BusinessCustomerSessionCache}
+import connectors.cache.MongoCacheConnector
 import connectors.{AmlsConnector, DataCacheConnector, TestOnlyStubConnector}
 import controllers.BaseController
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.{HighValueDealing, MoneyServiceBusiness}
+import models.businessmatching.{HighValueDealing}
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import play.api.libs.json.Json
-import services.UpdateSave4LaterService
+import services.UpdateMongoCacheService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.status.status_submitted
 import views.html.submission.duplicate_submission
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -39,12 +38,11 @@ import scala.concurrent.Future
 class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val dataCacheConnector: DataCacheConnector,
                                    val mongoCacheConnector: MongoCacheConnector,
-                                   val save4LaterConnector: Save4LaterCacheConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
-                                   val stubsService: UpdateSave4LaterService) extends BaseController {
+                                   val stubsService: UpdateMongoCacheService) extends BaseController {
 
 
-  def dropSave4Later = Authorised.async {
+  def dropMongoCache = Authorised.async {
     implicit user =>
       implicit request =>
         removeCacheData map { _ =>
@@ -55,14 +53,13 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
     _ <- BusinessCustomerSessionCache.remove()
     _ <- mongoCacheConnector.remove
-    _ <- save4LaterConnector.remove
     response <- testOnlyStubConnector.clearState()
   } yield response
 
-  def updateSave4Later(fileName:String)  = Authorised.async {
+  def updateMongo(fileName:String)  = Authorised.async {
     implicit user =>
       implicit request =>
-        stubsService.getSaveForLaterData(fileName) flatMap {
+        stubsService.getMongoCacheData(fileName) flatMap {
           case Some(data) =>
             removeCacheData flatMap { _ =>
               stubsService.update(data) map { _ =>

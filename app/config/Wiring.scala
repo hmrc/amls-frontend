@@ -108,19 +108,6 @@ object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever 
   override lazy val httpGet: HttpGet = WSHttp
 }
 
-object AmlsShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with ServicesConfig {
-  override lazy val http = WSHttp
-  override lazy val defaultSource = appName
-  override lazy val baseUri = baseUrl("cachable.short-lived-cache")
-  override lazy val domain = getConfString("cachable.short-lived-cache.domain",
-    throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
-}
-
-object AmlsShortLivedCache extends ShortLivedCache {
-  override implicit lazy val crypto = ApplicationCrypto.JsonCrypto
-  override lazy val shortLiveCache = AmlsShortLivedHttpCaching
-}
-
 object WhitelistFilter extends AkamaiWhitelistFilter with MicroserviceFilterSupport{
   override def whitelist: Seq[String] = ApplicationConfig.whitelist
   override def destination: Call = Call("GET", "https://www.gov.uk")

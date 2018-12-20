@@ -16,14 +16,15 @@
 
 package connectors.cache
 
-import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
+import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.prop.PropertyChecks
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.Json
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
+import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
+import uk.gov.hmrc.http.{HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
 
 import scala.concurrent.Future
@@ -31,8 +32,10 @@ import scala.concurrent.Future
 class DataCacheConnectorSpec
   extends PlaySpec
     with OneAppPerSuite
+    with Conversions
     with MockitoSugar
     with ScalaFutures
+    with PropertyChecks
     with IntegrationPatience {
 
   case class Model(value: String)
@@ -41,86 +44,79 @@ class DataCacheConnectorSpec
   }
 
   trait Fixture {
-
     implicit val headerCarrier = HeaderCarrier()
     implicit val authContext = mock[AuthContext]
     implicit val user = mock[LoggedInUser]
-    val oid = "user_oid"
     val key = "key"
+    val cacheId = arbitrary[String].sample.get
+    val cache = Cache(cacheId, referenceMap())
 
     when(authContext.user) thenReturn user
-    when(user.oid) thenReturn oid
+    when(user.oid) thenReturn cacheId
   }
 
-  val emptyCache = CacheMap("", Map.empty)
+  val factory = mock[MongoCacheClientFactory]
+  val client = mock[MongoCacheClient]
+  when(factory.createClient) thenReturn client
 
-  object DataCacheConnector extends Save4LaterCacheConnector {
-    override lazy val shortLivedCache: ShortLivedCache = mock[ShortLivedCache]
+  def referenceMap(str1: String = "", str2: String = ""): Map[String, JsValue] = Map(
+    "dataKey" -> JsBoolean(true),
+    "name" -> JsString(str1),
+    "obj" -> Json.obj(
+      "prop1" -> str2,
+      "prop2" -> 12
+    )
+  )
+
+  object DataCacheConnector extends MongoCacheConnector(factory) {
+    override lazy val mongoCache: MongoCacheClient = mock[MongoCacheClient]
   }
 
   "DataCacheConnector" must {
 
-    "save data to save4later" in new Fixture {
+    "save data to Mongo" in new Fixture {
 
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.cache(eqTo(oid), eqTo(key), eqTo(model))(any(), any(), any())
-      } thenReturn Future.successful(emptyCache)
+        DataCacheConnector.mongoCache.createOrUpdate(cacheId, model, key)
+      } thenReturn Future.successful(cache)
 
-      val result = DataCacheConnector.save(key, model)
-
-      whenReady(result) {
-        result =>
-          result must be (emptyCache)
-      }
+      whenReady(DataCacheConnector.save(key, model)) { _ mustBe toCacheMap(cache) }
     }
 
-    "fetch saved data from save4later" in new Fixture {
+    "fetch saved data from Mongo" in new Fixture {
 
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.fetchAndGetEntry[Model](eqTo(oid), eqTo(key))(any(), any(), any())
+        DataCacheConnector.mongoCache.find[Model](cacheId, key)
       } thenReturn Future.successful(Some(model))
 
-      val result = DataCacheConnector.fetch[Model](key)
-
-      whenReady (result) {
-        result =>
-          result must be (Some(model))
-      }
+      whenReady(DataCacheConnector.fetch[Model](key)) { _ mustBe Some(model) }
     }
 
-    "fetch all data from save4later" in new Fixture {
+    "fetch all data from Mongo" in new Fixture {
 
       val model = Model("data")
 
       when {
-        DataCacheConnector.shortLivedCache.fetch(eqTo(oid))(any(), any())
-      } thenReturn Future.successful(Some(emptyCache))
+        DataCacheConnector.mongoCache.fetchAll(cacheId)
+      } thenReturn Future.successful(Some(cache))
 
-      val result = DataCacheConnector.fetchAll
-
-      whenReady(result) {
-        result =>
-          result must be (Some(emptyCache))
-      }
+      whenReady(DataCacheConnector.fetchAll) { _ mustBe Some(toCacheMap(cache)) }
     }
 
-    "remove data from save4later" in new Fixture {
+    "remove data from Mongo" in new Fixture {
 
-      val response = mock[HttpResponse]
+      forAll(arbitrary[Boolean]) { v =>
+        when {
+          DataCacheConnector.mongoCache.removeById(cacheId)
+        } thenReturn Future.successful(v)
 
-      when {
-        DataCacheConnector.shortLivedCache.remove(any())(any(), any())
-      } thenReturn Future.successful(response)
-
-      val result = DataCacheConnector.shortLivedCache.remove(eqTo(key))(any(), any())
-
-      whenReady(result) {
-        result =>
-          result must be (response)
+        whenReady(DataCacheConnector.remove) {
+          _ mustBe (v)
+        }
       }
     }
   }

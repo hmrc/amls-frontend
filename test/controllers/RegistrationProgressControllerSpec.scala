@@ -101,7 +101,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
         }
       }
 
-      "status is ReadyForRenewal and renewal data exists in save4later" must {
+      "status is ReadyForRenewal and renewal data exists in mongoCache" must {
         "redirect to renewal registration progress" in new Fixture {
 
             mockCacheFetch[Renewal](Some(Renewal(Some(InvolvedInOtherNo))))
@@ -113,7 +113,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             redirectLocation(responseF) must be(Some(renewal.routes.RenewalProgressController.get().url))
           }
         }
-        "status is renewal submitted and renewal data exists in save4later" must {
+        "status is renewal submitted and renewal data exists in mongoCache" must {
           "show the registration amendment page" in new Fixture {
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))

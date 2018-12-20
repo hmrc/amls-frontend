@@ -169,7 +169,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   "section" must {
 
-    "return `NotStarted` section when there is no section in Save4Later" in {
+    "return `NotStarted` section when there is no section in mongoCache" in {
       implicit val cache = CacheMap("", Map.empty)
       EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
     }

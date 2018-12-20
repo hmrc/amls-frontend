@@ -59,7 +59,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         htmlValue.getElementById("ncaRegistered-false").hasAttr("checked") must be(false)
       }
 
-      "load Yes when ncaRegistered from save4later returns True" in new Fixture {
+      "load Yes when ncaRegistered from mongoCache returns True" in new Fixture {
 
         val ncaRegistered = Some(NCARegistered(true))
         val activities = BusinessActivities(ncaRegistered = ncaRegistered)
