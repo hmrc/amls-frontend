@@ -35,6 +35,18 @@ trait DataCacheConnector {
   def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
 
+  def updateCacheEntity[T](
+                            targetCache: Option[CacheMap],
+                            cacheId: String,
+                            data: T
+                          )
+                          (
+                            implicit authContext: AuthContext,
+                            hc: HeaderCarrier,
+                            format: Format[T]
+                          ): CacheMap =
+    cacheConnector.updateCacheEntity(targetCache, cacheId, data)
+
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
@@ -43,6 +55,9 @@ trait DataCacheConnector {
 
   def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
+
+  def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
+    cacheConnector.saveAll(cacheMap)
 }
 
 object DataCacheConnector extends DataCacheConnector {

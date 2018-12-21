@@ -119,6 +119,28 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     }
   }
 
+  //TODO - ACHI - verify (Should this method be an upsert method on the cache class itself (above)?)
+  /**
+    * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
+    */
+  def createOrUpdateCacheEntity[T](targetCache: Option[CacheMap], id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
+    val jsonData = if (appConfig.mongoEncryptionEnabled) {
+      val jsonEncryptor = new JsonEncryptor[T]()
+      Json.toJson(Protected(data))(jsonEncryptor)
+    } else {
+      Json.toJson(data)
+    }
+
+    val someCache = targetCache.getOrElse(CacheMap(id, Map.empty)) // Can we write a fetch all that handles the default?
+    val cache = Cache(someCache)
+
+    val updatedCache = cache.copy(
+      data = cache.data + (key -> jsonData),
+      lastUpdated = DateTime.now(DateTimeZone.UTC)
+    )
+    toCacheMap(updatedCache)
+  }
+
   /**
     * Finds an item in the cache with the specified key. If the item cannot be found, None is returned.
     */
@@ -152,6 +174,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
 
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(cache.id, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
+      debug("[MongoCacheClient][saveAll] - key: " + value._1.toString)
+      debug("[MongoCacheClient][saveAll] - value: " + value._2.toString)
+
       val plainText = tryDecrypt(Crypted(value._2.toString))
 
       if (appConfig.mongoEncryptionEnabled) {

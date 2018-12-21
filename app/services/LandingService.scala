@@ -63,7 +63,9 @@ trait LandingService {
     import models.hvd.{PercentageOfCashPaymentOver15000 => HvdRPercentageOfCashPaymentOver15000, ReceiveCashPayments => HvdReceiveCashPayments}
     import models.moneyservicebusiness.{WhichCurrencies => MsbWhichCurrencies}
 
-    statusService.getStatus flatMap {
+    for {
+      renewalStatus <- statusService.getStatus
+    } yield renewalStatus match {
       case RenewalSubmitted(_) => {
         val renewal = Some(Renewal(
           involvedInOtherActivities = viewResponse.businessActivitiesSection.involvedInOther.map(i => BAInvolvedInOther.convert(i)),
@@ -94,13 +96,10 @@ trait LandingService {
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
-        cacheConnector.save[Renewal](Renewal.key, renewal)
+        cacheConnector.updateCacheEntity[Renewal](Some(cacheMap), Renewal.key, renewal)
       }
-      case _ =>
-        Logger.debug("[AMLSLandingService][saveRenewalData]: cache is saved")
-        Future.successful(cacheMap)
+      case _ => cacheMap
     }
-
   }
 
   private def fixAddress(model: AboutTheBusiness) = (model.correspondenceAddress, model.altCorrespondenceAddress) match {
@@ -133,29 +132,36 @@ trait LandingService {
   }
 
   def refreshCache(amlsRefNumber: String)
-                  (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = for {
-    viewResponse <- desConnector.view(amlsRefNumber)
-    subscriptionResponse <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
-    amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
-    _ <- cacheConnector.remove
-    _ <- cacheConnector.save[Option[ViewResponse]](ViewResponse.key, Some(viewResponse))
-    _ <- cacheConnector.save[BusinessMatching](BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
-    _ <- cacheConnector.save[Option[EstateAgentBusiness]](EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[Seq[TradingPremises]]](TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection))
-    _ <- cacheConnector.save[AboutTheBusiness](AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
-    _ <- cacheConnector.save[Seq[BankDetails]](BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
-    _ <- cacheConnector.save[AddPerson](AddPerson.key, viewResponse.aboutYouSection)
-    _ <- cacheConnector.save[BusinessActivities](BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[Tcsp]](Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[Asp]](Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[MoneyServiceBusiness]](MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[Hvd]](Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[Supervision]](Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
-    _ <- cacheConnector.save[Option[SubscriptionResponse]](SubscriptionResponse.key, subscriptionResponse)
-    _ <- cacheConnector.save[Option[AmendVariationRenewalResponse]](AmendVariationRenewalResponse.key, amendVariationResponse)
-    cache1 <- cacheConnector.save[Option[Seq[ResponsiblePerson]]](ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
-    cache2 <- saveRenewalData(viewResponse, cache1)
-  } yield cache2
+                  (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
+    for {
+      // MUST clear cash first to remove stale data and reload from API5
+      viewResponse           <- desConnector.view(amlsRefNumber)
+      subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
+      amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
+      isReset                <- cacheConnector.remove
+      appCache               <- cacheConnector.fetchAll
+      refreshedCache         <- {
+        val cache1  = cacheConnector.updateCacheEntity[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
+        val cache2  = cacheConnector.updateCacheEntity[BusinessMatching](Some(cache1), BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
+        val cache3  = cacheConnector.updateCacheEntity[Option[EstateAgentBusiness]](Some(cache2), EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
+        val cache4  = cacheConnector.updateCacheEntity[Option[Seq[TradingPremises]]](Some(cache3), TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection))
+        val cache5  = cacheConnector.updateCacheEntity[AboutTheBusiness](Some(cache4), AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
+        val cache6  = cacheConnector.updateCacheEntity[Seq[BankDetails]](Some(cache5), BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
+        val cache7  = cacheConnector.updateCacheEntity[AddPerson](Some(cache6), AddPerson.key, viewResponse.aboutYouSection)
+        val cache8  = cacheConnector.updateCacheEntity[BusinessActivities](Some(cache7), BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))
+        val cache9  = cacheConnector.updateCacheEntity[Option[Tcsp]](Some(cache8), Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
+        val cache10 = cacheConnector.updateCacheEntity[Option[Asp]](Some(cache9), Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
+        val cache11 = cacheConnector.updateCacheEntity[Option[MoneyServiceBusiness]](Some(cache10), MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
+        val cache12 = cacheConnector.updateCacheEntity[Option[Hvd]](Some(cache11), Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
+        val cache13 = cacheConnector.updateCacheEntity[Option[Supervision]](Some(cache12), Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
+        val cache14 = cacheConnector.updateCacheEntity[Option[SubscriptionResponse]](Some(cache13), SubscriptionResponse.key, subscriptionResponse)
+        val cache15 = cacheConnector.updateCacheEntity[Option[AmendVariationRenewalResponse]](Some(cache14), AmendVariationRenewalResponse.key, amendVariationResponse)
+        val cache16 = cacheConnector.updateCacheEntity[Option[Seq[ResponsiblePerson]]](Some(cache15), ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
+        val cache17 = saveRenewalData(viewResponse, cache16)
+        cacheConnector.saveAll(cache17)
+      }
+    } yield refreshedCache
+  }
 
   def businessMatchingSection(viewResponse: BusinessMatching): BusinessMatching = {
     viewResponse.copy(
