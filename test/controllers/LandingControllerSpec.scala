@@ -63,8 +63,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
-
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -286,70 +284,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
         }
-
-        "the user has an AMLS enrolment" in new Fixture {
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsRegNo")))
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
-        }
-
-      }
-
-      "go to the beginning of pre-application" when {
-        "there is no data in BusinessMatching" in new Fixture {
-
-          val emptyCacheMap = mock[CacheMap]
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
-        }
-      }
-
-      "go to the beginning of pre-application" when {
-        "there is data in BusinessMatching but the pre-application is incomplete" in new Fixture {
-
-          val testBusinessMatching = BusinessMatching()
-
-          val emptyCacheMap = mock[CacheMap]
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
-        }
-      }
-
-      "pre application must remove save4later" when {
-        "the business matching is incomplete" in new Fixture {
-          val cacheMap = mock[CacheMap]
-          val httpResponse = mock[HttpResponse]
-          val complete = mock[BusinessMatching]
-
-          when(httpResponse.status) thenReturn NO_CONTENT
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
-          when(complete.isComplete) thenReturn false
-          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-          when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-        }
       }
 
       "pre application must throw an exception" when {
@@ -379,10 +313,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.amendments" -> true
-  ))
 
   trait Fixture extends AuthorisedFixture { self =>
 
