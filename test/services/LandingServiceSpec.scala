@@ -237,37 +237,37 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
 
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(ViewResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BusinessMatching.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(EstateAgentBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
         eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(TradingPremises.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AboutTheBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
         eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BankDetails.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AddPerson.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AddPerson.key),
         eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BusinessActivities.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
         eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Tcsp.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Tcsp.key),
         eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Asp.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Asp.key),
         eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(MoneyServiceBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
         eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Hvd.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Hvd.key),
         eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Supervision.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Supervision.key),
         eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(SubscriptionResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
         eqTo(Some(subscriptionResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AmendVariationRenewalResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
         eqTo(Some(amendVariationResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(ResponsiblePerson.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
         eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
     }
   }
@@ -364,37 +364,37 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
 
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(ViewResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BusinessMatching.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(EstateAgentBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
         eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(TradingPremises.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AboutTheBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
         eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BankDetails.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AddPerson.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AddPerson.key),
         eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(BusinessActivities.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
         eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Tcsp.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Tcsp.key),
         eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Asp.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Asp.key),
         eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(MoneyServiceBusiness.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
         eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Hvd.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Hvd.key),
         eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(Supervision.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Supervision.key),
         eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(SubscriptionResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
         eqTo(None))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(AmendVariationRenewalResponse.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
         eqTo(None))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).updateCacheEntity(any(), eqTo(ResponsiblePerson.key),
+      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
         eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
     }
   }

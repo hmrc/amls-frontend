@@ -123,7 +123,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
-  def createOrUpdateCacheEntity[T](targetCache: Option[CacheMap], id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
+  def createOrupsert[T](targetCache: Option[CacheMap], id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)

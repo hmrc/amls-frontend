@@ -96,7 +96,7 @@ trait LandingService {
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
-        cacheConnector.updateCacheEntity[Renewal](Some(cacheMap), Renewal.key, renewal)
+        cacheConnector.upsert[Renewal](Some(cacheMap), Renewal.key, renewal)
       }
       case _ => cacheMap
     }
@@ -134,31 +134,62 @@ trait LandingService {
   def refreshCache(amlsRefNumber: String)
                   (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
     for {
-      // MUST clear cash first to remove stale data and reload from API5
       viewResponse           <- desConnector.view(amlsRefNumber)
       subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
       amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
-      isReset                <- cacheConnector.remove
+      _                      <- cacheConnector.remove // MUST clear cash first to remove stale data and reload from API5
       appCache               <- cacheConnector.fetchAll
       refreshedCache         <- {
-        val cache1  = cacheConnector.updateCacheEntity[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
-        val cache2  = cacheConnector.updateCacheEntity[BusinessMatching](Some(cache1), BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection)))
-        val cache3  = cacheConnector.updateCacheEntity[Option[EstateAgentBusiness]](Some(cache2), EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true)))
-        val cache4  = cacheConnector.updateCacheEntity[Option[Seq[TradingPremises]]](Some(cache3), TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection))
-        val cache5  = cacheConnector.updateCacheEntity[AboutTheBusiness](Some(cache4), AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true))
-        val cache6  = cacheConnector.updateCacheEntity[Seq[BankDetails]](Some(cache5), BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection))
-        val cache7  = cacheConnector.updateCacheEntity[AddPerson](Some(cache6), AddPerson.key, viewResponse.aboutYouSection)
-        val cache8  = cacheConnector.updateCacheEntity[BusinessActivities](Some(cache7), BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))
-        val cache9  = cacheConnector.updateCacheEntity[Option[Tcsp]](Some(cache8), Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true)))
-        val cache10 = cacheConnector.updateCacheEntity[Option[Asp]](Some(cache9), Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true)))
-        val cache11 = cacheConnector.updateCacheEntity[Option[MoneyServiceBusiness]](Some(cache10), MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true)))
-        val cache12 = cacheConnector.updateCacheEntity[Option[Hvd]](Some(cache11), Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true)))
-        val cache13 = cacheConnector.updateCacheEntity[Option[Supervision]](Some(cache12), Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true)))
-        val cache14 = cacheConnector.updateCacheEntity[Option[SubscriptionResponse]](Some(cache13), SubscriptionResponse.key, subscriptionResponse)
-        val cache15 = cacheConnector.updateCacheEntity[Option[AmendVariationRenewalResponse]](Some(cache14), AmendVariationRenewalResponse.key, amendVariationResponse)
-        val cache16 = cacheConnector.updateCacheEntity[Option[Seq[ResponsiblePerson]]](Some(cache15), ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
-        val cache17 = saveRenewalData(viewResponse, cache16)
-        cacheConnector.saveAll(cache17)
+        val cachedViewResponse = cacheConnector.upsert[Option[ViewResponse]](
+          appCache, ViewResponse.key, Some(viewResponse)
+        )
+        val cachedBusinessMatching = cacheConnector.upsert[BusinessMatching](
+          Some(cachedViewResponse), BusinessMatching.key, Some(businessMatchingSection(viewResponse.businessMatchingSection))
+        )
+        val cachedEstateAgentBusiness = cacheConnector.upsert[Option[EstateAgentBusiness]](
+          Some(cachedBusinessMatching), EstateAgentBusiness.key, Some(viewResponse.eabSection.copy(hasAccepted = true))
+        )
+        val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](
+          Some(cachedEstateAgentBusiness), TradingPremises.key, tradingPremisesSection(viewResponse.tradingPremisesSection)
+        )
+        val cachedAboutTheBusiness = cacheConnector.upsert[AboutTheBusiness](
+          Some(cachedTradingPremises), AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)
+        )
+        val cachedBankDetails = cacheConnector.upsert[Seq[BankDetails]](
+          Some(cachedAboutTheBusiness), BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
+        )
+        val cachedAddPerson = cacheConnector.upsert[AddPerson](
+          Some(cachedBankDetails), AddPerson.key, viewResponse.aboutYouSection
+        )
+        val cachedBusinessActivities = cacheConnector.upsert[BusinessActivities](
+          Some(cachedAddPerson), BusinessActivities.key, Some(viewResponse.businessActivitiesSection.copy(hasAccepted = true))
+        )
+        val cachedTcsp = cacheConnector.upsert[Option[Tcsp]](
+          Some(cachedBusinessActivities), Tcsp.key, Some(viewResponse.tcspSection.copy(hasAccepted = true))
+        )
+        val cachedAsp = cacheConnector.upsert[Option[Asp]](
+          Some(cachedTcsp), Asp.key, Some(viewResponse.aspSection.copy(hasAccepted = true))
+        )
+        val cachedMoneyServiceBusiness = cacheConnector.upsert[Option[MoneyServiceBusiness]](
+          Some(cachedAsp), MoneyServiceBusiness.key, Some(viewResponse.msbSection.copy(hasAccepted = true))
+        )
+        val cachedHvd = cacheConnector.upsert[Option[Hvd]](
+          Some(cachedMoneyServiceBusiness), Hvd.key, Some(viewResponse.hvdSection.copy(hasAccepted = true))
+        )
+        val cachedSupervision = cacheConnector.upsert[Option[Supervision]](
+          Some(cachedHvd), Supervision.key, Some(viewResponse.supervisionSection.copy(hasAccepted = true))
+        )
+        val cachedSubscriptionResponse = cacheConnector.upsert[Option[SubscriptionResponse]](
+          Some(cachedSupervision), SubscriptionResponse.key, subscriptionResponse
+        )
+        val cachedAmendVariationRenewalResponse = cacheConnector.upsert[Option[AmendVariationRenewalResponse]](
+          Some(cachedSubscriptionResponse), AmendVariationRenewalResponse.key, amendVariationResponse
+        )
+        val cachedResponsiblePerson = cacheConnector.upsert[Option[Seq[ResponsiblePerson]]](
+          Some(cachedAmendVariationRenewalResponse), ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection)
+        )
+        val cachedRenewal = saveRenewalData(viewResponse, cachedResponsiblePerson)
+        cacheConnector.saveAll(cachedRenewal)
       }
     } yield refreshedCache
   }

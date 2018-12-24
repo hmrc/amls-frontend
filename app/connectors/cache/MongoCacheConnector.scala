@@ -45,11 +45,11 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Saves the data item in the in-memory cache with the specified key
     */
-  def updateCacheEntity[T](targetCache: Option[CacheMap],
+  def upsert[T](targetCache: Option[CacheMap],
                            key: String,
                            data: T)
                           (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap = {
-    mongoCache.createOrUpdateCacheEntity(targetCache, authContext.user.oid, data, key)
+    mongoCache.createOrupsert(targetCache, authContext.user.oid, data, key)
   }
 
   /**

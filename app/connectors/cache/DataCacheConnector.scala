@@ -35,7 +35,7 @@ trait DataCacheConnector {
   def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
 
-  def updateCacheEntity[T](
+  def upsert[T](
                             targetCache: Option[CacheMap],
                             cacheId: String,
                             data: T
@@ -45,13 +45,18 @@ trait DataCacheConnector {
                             hc: HeaderCarrier,
                             format: Format[T]
                           ): CacheMap =
-    cacheConnector.updateCacheEntity(targetCache, cacheId, data)
+    cacheConnector.upsert(targetCache, cacheId, data)
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
     cacheConnector.remove
+
+  def reset (implicit hc: HeaderCarrier, ac: AuthContext): Future[Option[CacheMap]] = {
+    cacheConnector.remove
+    cacheConnector.fetchAll
+  }
 
   def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
