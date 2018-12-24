@@ -17,7 +17,6 @@
 package controllers.asp
 
 import models.asp.Asp
-import models.status.SubmissionDecisionApproved
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
@@ -39,10 +38,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     when {
       mockStatusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
-
-    when {
-      mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
   }
 
   "Get" must {
@@ -79,29 +74,5 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
       verify(mockCacheConnector).save[Asp](eqTo(Asp.key), eqTo(model.copy(hasAccepted = true)))(any(), any(), any())
     }
-
-    "redirect to the New Service Information controller" when {
-      "status is Approved and this service has just been added" in new Fixture {
-        val postRequest = request.withFormUrlEncodedBody()
-
-        mockApplicationStatus(SubmissionDecisionApproved)
-
-        when {
-          mockStatusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        when {
-          mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
-
-        val model = Asp(None, None)
-        mockCacheFetch(Some(model))
-
-        val result = controller.post()(postRequest)
-        status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
-      }
-    }
-
   }
 }

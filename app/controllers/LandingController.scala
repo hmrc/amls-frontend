@@ -79,14 +79,8 @@ class LandingController @Inject()(val landingService: LandingService,
     implicit authContext =>
       implicit request =>
         authService.validateCredentialRole flatMap {
-          case true =>
-            if (AmendmentsToggle.feature) {
-              getWithAmendments
-            } else {
-              getWithoutAmendments
-            }
-          case _ =>
-            Future.successful(Redirect(authService.signoutUrl))
+          case true => getWithAmendments
+          case _ => Future.successful(Redirect(authService.signoutUrl))
         }
   }
 

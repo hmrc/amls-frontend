@@ -27,7 +27,6 @@ import utils.{ControllerHelper, FeatureToggle}
 trait BaseController extends FrontendController with Actions  with I18nSupport {
 
   protected def Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
-  protected def AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
 
   def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
 

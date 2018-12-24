@@ -25,8 +25,6 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 
 trait ApplicationConfig {
 
-  def amendmentsToggle: Boolean
-
   def release7: Boolean
 
   def refreshProfileToggle: Boolean
@@ -82,11 +80,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
-
-  def amendmentsToggle: Boolean = {
-    val value = getConfBool("feature-toggle.amendments", false)
-    value
-  }
 
   override def release7: Boolean = {
     val value = getConfBool("feature-toggle.release7", false)

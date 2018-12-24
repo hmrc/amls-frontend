@@ -21,8 +21,7 @@ import javax.inject.{Inject, Singleton}
 import com.typesafe.config.Config
 import play.api.Play
 import play.api.mvc.Call
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
+import uk.gov.hmrc.http.cache.client.{SessionCache}
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -102,7 +101,6 @@ object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSu
   override def controllerNeedsLogging(controllerName: String): Boolean =
     AMLSControllerConfig.paramsForController(controllerName).needsLogging
 }
-
 
 object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever {
   override lazy val httpGet: HttpGet = WSHttp

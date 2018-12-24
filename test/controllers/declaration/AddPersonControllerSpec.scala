@@ -45,7 +45,6 @@ import scala.concurrent.Future
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.amendments" -> true,
     "microservice.services.feature-toggle.release7" -> true)
   )
 
@@ -516,7 +515,6 @@ class AddPersonControllerWithoutRelease7Spec extends AmlsSpec with MockitoSugar 
 class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar {
 
   override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.amendments" -> false,
     "microservice.services.feature-toggle.release7" -> false)
   )
 
@@ -553,79 +551,6 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
           document.title() must be(Messages("declaration.addperson.title") + " - " + Messages("title.amls") + " - " + Messages("title.gov"))
 
           contentAsString(result) must include(Messages("submit.amendment.application"))
-        }
-      }
-    }
-
-
-    "post is called" must {
-      "must pass on post with all the mandatory parameters supplied" when {
-        "status is pending" in new Fixture {
-
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "roleWithinBusiness" -> "03"
-          )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
-        }
-      }
-    }
-  }
-}
-
-class AddPersonControllerWithoutAmendmentSpecRelease7 extends AmlsSpec with MockitoSugar {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.amendments" -> false,
-    "microservice.services.feature-toggle.release7" -> true)
-  )
-
-  val userId = s"user-${UUID.randomUUID()}"
-  val mockDataCacheConnector = mock[DataCacheConnector]
-
-  trait Fixture extends AuthorisedFixture {
-    self => val request = addToken(authRequest)
-
-    val addPersonController = new AddPersonController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
-  }
-
-  val emptyCache = CacheMap("", Map.empty)
-
-  "AddPersonController (release 7)" when {
-
-    "post is called" must {
-      "must pass on post with all the mandatory parameters supplied" when {
-        "status is pending" in new Fixture {
-
-          val requestWithParams = request.withFormUrlEncodedBody(
-            "firstName" -> "firstName",
-            "lastName" -> "lastName",
-            "positions[]" -> "08"
-          )
-
-          when(addPersonController.dataCacheConnector.save[AddPerson](any(), any())
-            (any(), any(), any())).thenReturn(Future.successful(emptyCache))
-
-          when(addPersonController.statusService.getStatus(any(), any(), any()))
-            .thenReturn(Future.successful(SubmissionReadyForReview))
-
-          val result = addPersonController.post()(requestWithParams)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(routes.DeclarationController.get().url)
         }
       }
     }
