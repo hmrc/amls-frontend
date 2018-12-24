@@ -31,7 +31,6 @@ import play.api.inject.guice.GuiceApplicationBuilder
 class BusinessMatchingSpec extends PlaySpec with MockitoSugar with BusinessMatchingGenerator with OneAppPerSuite {
 
   override lazy val app = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.has-accepted" -> true)
     .build()
 
   "BusinessMatchingSpec" must {

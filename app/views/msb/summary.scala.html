@@ -241,18 +241,9 @@
             }
         }
     }
-
-    @if(ApplicationConfig.hasAcceptedToggle) {
         @form(EmptyForm, controllers.msb.routes.SummaryController.post()) {
             @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
         }
-    } else {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.checkyouranswers.acceptandcomplete")
-        )
-    }
 }
 
 @whoUsesCurrencies(wc: WhichCurrencies) = {

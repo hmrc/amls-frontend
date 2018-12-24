@@ -71,7 +71,7 @@ trait AspValues {
 
 class AspSpec extends PlaySpec with MockitoSugar with AspValues with OneAppPerSuite{
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
 
   "None" when {
