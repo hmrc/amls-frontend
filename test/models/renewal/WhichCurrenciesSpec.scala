@@ -22,11 +22,8 @@ import models.moneyservicebusiness.{BankMoneySource, WholesalerMoneySource}
 import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 
 class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   "Which Currencies" when {
     "data is complete" should {
