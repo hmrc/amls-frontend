@@ -85,7 +85,7 @@ trait LandingService {
       subscriptionResponse   <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None }
       amendVariationResponse <- cacheConnector.fetch[AmendVariationRenewalResponse](AmendVariationRenewalResponse.key) recover { case _ => None }
       _                      <- cacheConnector.remove // MUST clear cash first to remove stale data and reload from API5
-      appCache               <- cacheConnector.fetchAll
+      appCache               <- cacheConnector.fetchAllWithDefault
       refreshedCache         <- {
        upsertCacheEntries(appCache, viewResponse, subscriptionResponse, amendVariationResponse)
       }
@@ -125,46 +125,47 @@ trait LandingService {
    * Privates *
    ************/
 
-  private def upsertCacheEntries(appCache: Option[CacheMap], viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
+  private def upsertCacheEntries(appCache: CacheMap, viewResponse: ViewResponse, subscriptionResponse: Option[SubscriptionResponse],
                                  amendVariationResponse: Option[AmendVariationRenewalResponse])
                                 (implicit authContext: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): Future[CacheMap] = {
-    val cachedViewResponse = cacheConnector.upsert[Option[ViewResponse]]( appCache, ViewResponse.key, Some(viewResponse))
 
-    val cachedBusinessMatching = cacheConnector.upsert[BusinessMatching](Some(cachedViewResponse), BusinessMatching.key,
+    val cachedViewResponse = cacheConnector.upsert[Option[ViewResponse]](appCache, ViewResponse.key, Some(viewResponse))
+
+    val cachedBusinessMatching = cacheConnector.upsert[BusinessMatching](cachedViewResponse, BusinessMatching.key,
       viewResponseSection(viewResponse))
 
-    val cachedEstateAgentBusiness = cacheConnector.upsert[Option[EstateAgentBusiness]](Some(cachedBusinessMatching),
+    val cachedEstateAgentBusiness = cacheConnector.upsert[Option[EstateAgentBusiness]](cachedBusinessMatching,
       EstateAgentBusiness.key, eabSection(viewResponse))
 
-    val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](Some(cachedEstateAgentBusiness), TradingPremises.key,
+    val cachedTradingPremises = cacheConnector.upsert[Option[Seq[TradingPremises]]](cachedEstateAgentBusiness, TradingPremises.key,
       tradingPremisesSection(viewResponse.tradingPremisesSection))
 
-    val cachedAboutTheBusiness = cacheConnector.upsert[AboutTheBusiness](Some(cachedTradingPremises), AboutTheBusiness.key, aboutSection(viewResponse))
+    val cachedAboutTheBusiness = cacheConnector.upsert[AboutTheBusiness](cachedTradingPremises, AboutTheBusiness.key, aboutSection(viewResponse))
 
     val cachedBankDetails = cacheConnector.upsert[Seq[BankDetails]](
-      Some(cachedAboutTheBusiness), BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
+      cachedAboutTheBusiness, BankDetails.key, writeEmptyBankDetails(viewResponse.bankDetailsSection)
     )
-    val cachedAddPerson = cacheConnector.upsert[AddPerson](Some(cachedBankDetails), AddPerson.key, viewResponse.aboutYouSection)
+    val cachedAddPerson = cacheConnector.upsert[AddPerson](cachedBankDetails, AddPerson.key, viewResponse.aboutYouSection)
 
-    val cachedBusinessActivities = cacheConnector.upsert[BusinessActivities](Some(cachedAddPerson), BusinessActivities.key, activitySection(viewResponse))
+    val cachedBusinessActivities = cacheConnector.upsert[BusinessActivities](cachedAddPerson, BusinessActivities.key, activitySection(viewResponse))
 
-    val cachedTcsp = cacheConnector.upsert[Option[Tcsp]](Some(cachedBusinessActivities), Tcsp.key, tcspSection(viewResponse))
+    val cachedTcsp = cacheConnector.upsert[Option[Tcsp]](cachedBusinessActivities, Tcsp.key, tcspSection(viewResponse))
 
-    val cachedAsp = cacheConnector.upsert[Option[Asp]](Some(cachedTcsp), Asp.key, aspSection(viewResponse))
+    val cachedAsp = cacheConnector.upsert[Option[Asp]](cachedTcsp, Asp.key, aspSection(viewResponse))
 
-    val cachedMoneyServiceBusiness = cacheConnector.upsert[Option[MoneyServiceBusiness]](Some(cachedAsp), MoneyServiceBusiness.key, msbSection(viewResponse))
+    val cachedMoneyServiceBusiness = cacheConnector.upsert[Option[MoneyServiceBusiness]](cachedAsp, MoneyServiceBusiness.key, msbSection(viewResponse))
 
-    val cachedHvd = cacheConnector.upsert[Option[Hvd]](Some(cachedMoneyServiceBusiness), Hvd.key, hvdSection(viewResponse))
+    val cachedHvd = cacheConnector.upsert[Option[Hvd]](cachedMoneyServiceBusiness, Hvd.key, hvdSection(viewResponse))
 
-    val cachedSupervision = cacheConnector.upsert[Option[Supervision]](Some(cachedHvd), Supervision.key, supervisionSection(viewResponse))
+    val cachedSupervision = cacheConnector.upsert[Option[Supervision]](cachedHvd, Supervision.key, supervisionSection(viewResponse))
 
-    val cachedSubscriptionResponse = cacheConnector.upsert[Option[SubscriptionResponse]](Some(cachedSupervision),
+    val cachedSubscriptionResponse = cacheConnector.upsert[Option[SubscriptionResponse]](cachedSupervision,
       SubscriptionResponse.key, subscriptionResponse)
 
-    val cachedAmendVariationRenewalResponse = cacheConnector.upsert[Option[AmendVariationRenewalResponse]](Some(cachedSubscriptionResponse),
+    val cachedAmendVariationRenewalResponse = cacheConnector.upsert[Option[AmendVariationRenewalResponse]](cachedSubscriptionResponse,
       AmendVariationRenewalResponse.key, amendVariationResponse)
 
-    val cachedResponsiblePerson = cacheConnector.upsert[Option[Seq[ResponsiblePerson]]](Some(cachedAmendVariationRenewalResponse),
+    val cachedResponsiblePerson = cacheConnector.upsert[Option[Seq[ResponsiblePerson]]](cachedAmendVariationRenewalResponse,
       ResponsiblePerson.key, responsiblePeopleSection(viewResponse.responsiblePeopleSection))
 
     val cachedRenewal = saveRenewalData(viewResponse, cachedResponsiblePerson)
@@ -269,7 +270,7 @@ trait LandingService {
           ceTransactionsInLast12Months = viewResponse.msbSection.fold[Option[CETransactionsInLast12Months]](None)
             (_.ceTransactionsInNext12Months.map(t => CETransactionsInLast12Months(t.ceTransaction)))
         ))
-        cacheConnector.upsert[Renewal](Some(cacheMap), Renewal.key, renewal)
+        cacheConnector.upsert[Renewal](cacheMap, Renewal.key, renewal)
       }
       case _ => cacheMap
     }

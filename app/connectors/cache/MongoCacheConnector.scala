@@ -45,11 +45,11 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Saves the data item in the in-memory cache with the specified key
     */
-  def upsert[T](targetCache: Option[CacheMap],
+  def upsert[T](targetCache: CacheMap,
                            key: String,
                            data: T)
                           (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap = {
-    mongoCache.createOrupsert(targetCache, authContext.user.oid, data, key)
+    mongoCache.upsert(targetCache, authContext.user.oid, data, key)
   }
 
   /**
@@ -57,6 +57,12 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     */
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
+
+  /**
+    * Fetches the entire cache from the mongo store and returns an empty cache where not exists
+    */
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    mongoCache.fetchAllWithDefault(authContext.user.oid).map(toCacheMap)
 
   /**
     * Removes the entire cache from the mongo store

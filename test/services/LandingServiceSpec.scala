@@ -217,8 +217,8 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
       when {
-        TestLandingService.cacheConnector.fetchAll
-      } thenReturn Future.successful(Some(cacheMap))
+        TestLandingService.cacheConnector.fetchAllWithDefault
+      } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
@@ -337,8 +337,8 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
-        TestLandingService.cacheConnector.fetchAll
-      } thenReturn Future.successful(Some(cacheMap))
+        TestLandingService.cacheConnector.fetchAllWithDefault
+      } thenReturn Future.successful(cacheMap)
 
       when {
         TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])

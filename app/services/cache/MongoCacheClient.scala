@@ -41,7 +41,18 @@ import scala.util.{Failure, Success, Try}
 // $COVERAGE-OFF$
 // Coverage has been turned off for these types, as the only things we can really do with them
 // is mock out the mongo connection, which is bad craic. This has all been manually tested in the running application.
-case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC))
+case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
+
+  /**
+    * Upsert a value into the cache given its key
+    */
+  def upsert[T](key: String, data: JsValue)(implicit ev: Writes[T]) = {
+    this.copy(
+      data = this.data + (key -> data),
+      lastUpdated = DateTime.now(DateTimeZone.UTC)
+    )
+  }
+}
 
 object Cache {
   implicit val dateFormat = ReactiveMongoFormats.dateTimeFormats
@@ -119,26 +130,17 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     }
   }
 
-  //TODO - ACHI - verify (Should this method be an upsert method on the cache class itself (above)?)
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
-  def createOrupsert[T](targetCache: Option[CacheMap], id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
+  def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
       val jsonEncryptor = new JsonEncryptor[T]()
       Json.toJson(Protected(data))(jsonEncryptor)
     } else {
       Json.toJson(data)
     }
-
-    val someCache = targetCache.getOrElse(CacheMap(id, Map.empty)) // Can we write a fetch all that handles the default?
-    val cache = Cache(someCache)
-
-    val updatedCache = cache.copy(
-      data = cache.data + (key -> jsonData),
-      lastUpdated = DateTime.now(DateTimeZone.UTC)
-    )
-    toCacheMap(updatedCache)
+    toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
   }
 
   /**
@@ -160,6 +162,13 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   def fetchAll(id: String): Future[Option[Cache]] = collection.find(bsonIdQuery(id)).one[Cache] map {
     case Some(c) if appConfig.mongoEncryptionEnabled => Some(new CryptoCache(c, compositeSymmetricCrypto))
     case c => c
+  }
+
+  /**
+    * Fetches the whole cache and returns default where not exists
+    */
+  def fetchAllWithDefault(id: String): Future[Cache] = fetchAll(id).map {
+    _.getOrElse(Cache(id, Map.empty))
   }
 
   /**

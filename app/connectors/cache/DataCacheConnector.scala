@@ -36,7 +36,7 @@ trait DataCacheConnector {
     cacheConnector.save(cacheId, data)
 
   def upsert[T](
-                            targetCache: Option[CacheMap],
+                            targetCache: CacheMap,
                             cacheId: String,
                             data: T
                           )
@@ -49,6 +49,9 @@ trait DataCacheConnector {
 
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
+
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    cacheConnector.fetchAllWithDefault
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
     cacheConnector.remove
