@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-// TODO: Rename this to the connectors.cache package
 package connectors
 
-import connectors.cache.CacheConnector
+import connectors.cache.MongoCacheConnector
 import play.api.Play
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-// TODO: Remove this and replace it with the new DataCache orchestrator type
 trait DataCacheConnector {
 
-  def cacheConnector: CacheConnector
+  def cacheConnector: MongoCacheConnector
 
   def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
@@ -48,5 +46,5 @@ trait DataCacheConnector {
 }
 
 object DataCacheConnector extends DataCacheConnector {
-  def cacheConnector: CacheConnector = Play.current.injector.instanceOf[CacheConnector]
+  def cacheConnector: MongoCacheConnector = Play.current.injector.instanceOf[MongoCacheConnector]
 }

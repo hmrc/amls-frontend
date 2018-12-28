@@ -58,7 +58,6 @@ class MongoCacheConnectorSpec extends FreeSpec
 
     when(ac.user) thenReturn user
     when(user.oid) thenReturn cacheId
-
     when(factory.createClient) thenReturn client
 
     val connector = new MongoCacheConnector(factory)

@@ -34,7 +34,7 @@ import play.api.libs.json._
 import scala.collection.Seq
 import play.api.libs.functional.syntax._
 
-case class UpdateSave4LaterResponse(dataImport: Option[DataImport],
+case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     view: Option[ViewResponse],
                                     businessMatching: Option[BusinessMatching],
                                     estateAgencyBusiness: Option[EstateAgentBusiness],
@@ -53,17 +53,17 @@ case class UpdateSave4LaterResponse(dataImport: Option[DataImport],
                                     amendVariationResponse: Option[AmendVariationRenewalResponse]
                                    )
 
-object UpdateSave4LaterResponse {
+object UpdateMongoCacheResponse {
 
   import utils.MappingUtils.constant
-  implicit val writes = Json.writes[UpdateSave4LaterResponse]
+  implicit val writes = Json.writes[UpdateMongoCacheResponse]
 
   def readLegacyField[T](key: String, oldKey: String)(implicit r: Reads[T]): Reads[Option[T]] =
       {
         (__ \ key).read[T] orElse (__ \ oldKey).read[T]
       }.map(Option(_)) orElse constant[Option[T]](None)
 
-  implicit val reads: Reads[UpdateSave4LaterResponse] = {
+  implicit val reads: Reads[UpdateMongoCacheResponse] = {
     (
       (__ \ DataImport.key).readNullable[DataImport] ~
         readLegacyField[ViewResponse](ViewResponse.key, "view") ~
@@ -82,7 +82,7 @@ object UpdateSave4LaterResponse {
         (__ \ Supervision.key).readNullable[Supervision] ~
         (__ \ SubscriptionResponse.key).readNullable[SubscriptionResponse] ~
         (__ \ AmendVariationRenewalResponse.key).readNullable[AmendVariationRenewalResponse]
-      ) (UpdateSave4LaterResponse.apply _)
+      ) (UpdateMongoCacheResponse.apply _)
   }
 }
 
