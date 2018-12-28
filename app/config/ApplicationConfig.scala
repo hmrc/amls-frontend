@@ -25,15 +25,11 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 
 trait ApplicationConfig {
 
-  def amendmentsToggle: Boolean
-
   def release7: Boolean
 
   def refreshProfileToggle: Boolean
 
   def frontendBaseUrl: String
-
-  def hasAcceptedToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -83,11 +79,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
 
-  def amendmentsToggle: Boolean = {
-    val value = getConfBool("feature-toggle.amendments", false)
-    value
-  }
-
   override def release7: Boolean = {
     val value = getConfBool("feature-toggle.release7", false)
     value
@@ -104,8 +95,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
     s"$scheme://$host"
   }
-
-  override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 }
 
 class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration) {

@@ -40,8 +40,6 @@ import scala.concurrent.Future
 
 class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
-
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)

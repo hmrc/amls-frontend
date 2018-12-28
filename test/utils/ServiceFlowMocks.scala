@@ -28,11 +28,6 @@ trait ServiceFlowMocks extends MockitoSugar {
 
   implicit val mockServiceFlow = mock[ServiceFlow]
 
-  def setupInServiceFlow(inFlow: Boolean, activity: Option[BusinessActivity] = None) =
-    activity map { a =>
-      when(mockServiceFlow.inNewServiceFlow(eqTo(a))(any(), any(), any())) thenReturn Future.successful(inFlow)
-    } getOrElse when(mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())) thenReturn Future.successful(inFlow)
-
   def mockIsNewActivity(value: Boolean, activity: Option[BusinessActivity] = None) =
     activity map { a =>
       when(mockServiceFlow.isNewActivity(eqTo(a))(any(), any(), any())) thenReturn Future.successful(value)
