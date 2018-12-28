@@ -170,7 +170,7 @@ case class ResponsiblePerson(personName: Option[PersonName] = None,
   }
 
   def isComplete: Boolean = {
-    Logger.debug(s"[ResponsiblePeople][isComplete] $this")
+    //Logger.debug(s"[ResponsiblePeople][isComplete] $this")
 
     def hasValidCommonFields(pos: Positions,
                              otherBusinessSP: Option[SoleProprietorOfAnotherBusiness]

@@ -62,7 +62,10 @@ trait AmlsConnector {
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(subscriptionRequest)}")
     httpPost.POST[SubscriptionRequest, SubscriptionResponse](postUrl, subscriptionRequest) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // We do not need the logging here as AMLS (middle) logs the response.
+        // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+        // Only uncomment if needed!
+        // Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
   }
@@ -82,7 +85,10 @@ trait AmlsConnector {
 
     httpGet.GET[ReadStatusResponse](getUrl) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // We do not need the logging here as AMLS (middle) logs the response.
+        // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+        // Only uncomment if needed!
+        // Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
   }
@@ -103,7 +109,10 @@ trait AmlsConnector {
 
     httpGet.GET[ViewResponse](getUrl) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // We do not need the logging here as AMLS (middle) logs the response.
+        // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+        // Only uncomment if needed!
+        //Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
 
@@ -124,7 +133,10 @@ trait AmlsConnector {
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // We do not need the logging here as AMLS (middle) logs the response.
+        // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+        // Only uncomment if needed!
+        // Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
   }
@@ -144,7 +156,10 @@ trait AmlsConnector {
     Logger.debug(s"$prefix - Request Body: ${Json.toJson(updateRequest)}")
     httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, updateRequest) map {
       response =>
-        Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
+        // We do not need the logging here as AMLS (middle) logs the response.
+        // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+        // Only uncomment if needed!
+        //Logger.debug(s"$prefix - Response Body: ${Json.toJson(response)}")
         response
     }
   }
@@ -163,7 +178,10 @@ trait AmlsConnector {
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
     httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
-      log(s"Response body: ${Json.toJson(response)}")
+      // We do not need the logging here as AMLS (middle) logs the response.
+      // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+      // Only uncomment if needed!
+      //log(s"Response body: ${Json.toJson(response)}")
       response
     }
   }
@@ -182,7 +200,10 @@ trait AmlsConnector {
     log(s"Request body: ${Json.toJson(subscriptionRequest)}")
 
     httpPost.POST[SubscriptionRequest, AmendVariationRenewalResponse](postUrl, subscriptionRequest) map { response =>
-      log(s"Response body: ${Json.toJson(response)}")
+      // We do not need the logging here as AMLS (middle) logs the response.
+      // This simply fills up the logs for large payloads and grinds the service to a halt in local debug.
+      // Only uncomment if needed!
+      // log(s"Response body: ${Json.toJson(response)}")
       response
     }
   }

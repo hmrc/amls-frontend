@@ -82,7 +82,7 @@ object BankDetails {
   }
 
   def section(implicit cache: CacheMap): Section = {
-    Logger.debug(s"[BankDetails][section] $cache")
+    //Logger.debug(s"[BankDetails][section] $cache")
 
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())

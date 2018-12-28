@@ -180,12 +180,8 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     * Saves the cache data into the database
     */
   def saveAll(cache: Cache): Future[Boolean] = {
-
     // Rebuild the cache and decrypt each key if necessary
     val rebuiltCache = Cache(cache.id, cache.data.foldLeft(Map.empty[String, JsValue]) { (acc, value) =>
-      debug("[MongoCacheClient][saveAll] - key: " + value._1.toString)
-      debug("[MongoCacheClient][saveAll] - value: " + value._2.toString)
-
       val plainText = tryDecrypt(Crypted(value._2.toString))
 
       if (appConfig.mongoEncryptionEnabled) {
@@ -196,7 +192,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     })
 
     collection.update(bsonIdQuery(cache.id), BSONDocument("$set" -> Json.toJson(rebuiltCache)), upsert = true) map handleWriteResult
-
   }
 
   /**
