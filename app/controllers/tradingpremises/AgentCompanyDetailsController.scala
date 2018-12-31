@@ -34,7 +34,7 @@ class AgentCompanyDetailsController @Inject()(val dataCacheConnector: DataCacheC
                                               val authConnector: AuthConnector,
                                               override val messagesApi: MessagesApi) extends RepeatingSection with BaseController {
 
-  def get(index: Int, edit: Boolean = false) = FeatureToggle(ApplicationConfig.release7) {
+  def get(index: Int, edit: Boolean = false) = {
     Authorised.async {
       implicit authContext =>
         implicit request =>
