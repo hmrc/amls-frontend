@@ -29,7 +29,6 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,10 +38,6 @@ import scala.concurrent.Future
 
 
 class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.release7" -> true)
-  )
 
   trait Fixture extends AuthorisedFixture {
     self =>

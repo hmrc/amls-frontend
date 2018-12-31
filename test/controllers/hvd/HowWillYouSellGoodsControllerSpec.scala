@@ -21,14 +21,11 @@ import models.hvd.{HowWillYouSellGoods, Hvd, Retail, Wholesale}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers.{BAD_REQUEST, OK, SEE_OTHER, contentAsString, redirectLocation, status, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self =>
