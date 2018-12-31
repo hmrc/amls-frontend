@@ -16,16 +16,14 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
-import config.{ApplicationConfig}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, FeatureToggle, RepeatingSection}
+import utils.RepeatingSection
 
 import scala.concurrent.Future
 
