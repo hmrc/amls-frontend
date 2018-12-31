@@ -195,7 +195,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           }
         }
 
-        "redirect to the 'Activity Start Date' page when no data in save4later" in new Fixture {
+        "redirect to the 'Activity Start Date' page when no data in mongoCache" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",

@@ -20,7 +20,7 @@ import java.net.URLEncoder
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import generators.{BaseGenerator, StatusGenerator}
+import generators.{StatusGenerator}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -51,13 +51,12 @@ import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
-import org.scalacheck.Gen
 
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -76,9 +75,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
-    ){
-      override val shortLivedCache = mock[ShortLivedCache]
-    }
+    )
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())
@@ -294,9 +291,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           val complete = mock[BusinessMatching]
 
           when(httpResponse.status) thenReturn (BAD_REQUEST)
-
-          when(controller.shortLivedCache.remove(any())(any(), any())) thenReturn Future.successful(httpResponse)
-
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
           when(complete.isComplete) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
@@ -351,9 +345,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
-    ) {
-      override val shortLivedCache = mock[ShortLivedCache]
-    }
+    )
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())

@@ -32,7 +32,7 @@ trait Conversions {
   }
 
   /**
-    * Converts a new Cache object to an old Save4Later CacheMap type, for compatibility reasons
+    * Converts a new Cache object to an old CacheMap type, for compatibility reasons
     * @param cache The cache object to convert
     * @return The CacheMap instance
     */

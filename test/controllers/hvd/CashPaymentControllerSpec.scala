@@ -57,7 +57,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar {
         htmlValue.title mustBe Messages("hvd.cash.payment.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
       }
 
-      "load Yes when Cash payment from save4later returns True" in new Fixture {
+      "load Yes when Cash payment from mongoCache returns True" in new Fixture {
         // scalastyle:off magic.number
         val cashPayment = Some(CashPaymentYes(new LocalDate(1990, 2, 24)))
         val activities = Hvd(cashPayment = cashPayment)
@@ -74,7 +74,7 @@ class CashPaymentControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
 
-      "load No when cashPayment from save4later returns No" in new Fixture {
+      "load No when cashPayment from mongoCache returns No" in new Fixture {
 
         val cashPayment = Some(CashPaymentNo)
         val activities = Hvd(cashPayment = cashPayment)

@@ -56,7 +56,7 @@ class HowWillYouSellGoodsControllerSpec extends AmlsSpec {
     htmlValue.title mustBe Messages("hvd.how-will-you-sell-goods.title") + " - " + Messages("summary.hvd") + " - " + Messages("title.amls") + " - " + Messages("title.gov")
   }
 
-  "load UI from save4later" in new Fixture {
+  "load UI from mongoCache" in new Fixture {
     mockCacheFetch(Some(Hvd(howWillYouSellGoods = Some(HowWillYouSellGoods(Seq(Retail))))))
 
     val result = controller.get()(request)

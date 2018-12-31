@@ -56,7 +56,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
     "Get:" must {
       "successfully load when the person moved to new address page" when {
-        "date of change model exists in save4later" in new Fixture {
+        "date of change model exists in mongoCache" in new Fixture {
 
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -68,7 +68,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
         }
 
-        "date of change model in not persisted in save4later" in new Fixture {
+        "date of change model in not persisted in mongoCache" in new Fixture {
 
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
