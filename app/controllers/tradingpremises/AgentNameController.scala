@@ -16,12 +16,10 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
+import javax.inject.{Inject, Singleton}
 import models.DateOfChange
 import models.status.SubmissionDecisionApproved
 import models.tradingpremises._
@@ -33,7 +31,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
@@ -100,7 +98,7 @@ class AgentNameController @Inject()(
       }
   }
 
-  def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
+  def dateOfChange(index: Int) = {
     Authorised {
       implicit authContext =>
         implicit request =>
@@ -129,6 +127,6 @@ class AgentNameController @Inject()(
   }
 
   private def redirectToAgentNameDateOfChange(tradingPremises: TradingPremises, name: AgentName) = {
-    ApplicationConfig.release7 && !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
+    !tradingPremises.agentName.contains(name) && tradingPremises.lineId.isDefined
   }
 }
