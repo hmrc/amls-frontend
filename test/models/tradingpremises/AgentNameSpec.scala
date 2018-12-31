@@ -24,9 +24,7 @@ import jto.validation.ValidationError
 import play.api.libs.json.{JsPath, JsSuccess}
 import play.api.test.FakeApplication
 
-class AgentNameSpec extends PlaySpec with OneAppPerSuite {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
+class AgentNaRoleWithinBusinessRelease7SpemeSpec extends PlaySpec with OneAppPerSuite {
 
   "AgentName" must {
 

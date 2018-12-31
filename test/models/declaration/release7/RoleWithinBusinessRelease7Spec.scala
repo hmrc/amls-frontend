@@ -26,9 +26,6 @@ import play.api.test.FakeApplication
 
 class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSuite{
 
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
-
   "RoleWithinBusiness" must {
 
     "validate model with few check box selected" in {
