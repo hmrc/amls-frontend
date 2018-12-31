@@ -35,7 +35,7 @@ import utils.AuthorisedFixture
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-class BusinessStructureControllerRelease7Spec extends AmlsSpec with ScalaFutures with MockitoSugar {
+class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
