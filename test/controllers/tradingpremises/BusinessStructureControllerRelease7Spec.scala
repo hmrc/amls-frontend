@@ -37,8 +37,6 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessStructureControllerRelease7Spec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
-
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
