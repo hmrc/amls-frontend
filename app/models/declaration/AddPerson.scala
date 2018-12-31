@@ -52,10 +52,7 @@ object AddPerson {
     import jto.validation.forms.Rules._
 
     val roleReader: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] = {
-      ApplicationConfig.release7 match {
-        case false => __.read[RoleWithinBusiness] map { v => RoleWithinBusinessRelease7.apply(Set(v)) }
-        case _ => __.read[RoleWithinBusinessRelease7]
-      }
+        __.read[RoleWithinBusinessRelease7]
     }
 
     (
