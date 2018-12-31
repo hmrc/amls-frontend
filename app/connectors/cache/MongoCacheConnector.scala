@@ -43,10 +43,26 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
     mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
 
   /**
+    * Saves the data item in the in-memory cache with the specified key
+    */
+  def upsert[T](targetCache: CacheMap,
+                           key: String,
+                           data: T)
+                          (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap = {
+    mongoCache.upsert(targetCache, authContext.user.oid, data, key)
+  }
+
+  /**
     * Fetches the entire cache from the mongo store
     */
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
+
+  /**
+    * Fetches the entire cache from the mongo store and returns an empty cache where not exists
+    */
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    mongoCache.fetchAllWithDefault(authContext.user.oid).map(toCacheMap)
 
   /**
     * Removes the entire cache from the mongo store
@@ -57,13 +73,16 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
   /**
     * Saves the given cache map into the mongo store
     */
-  def saveAll(cacheMap: CacheMap): Future[Cache] = {
-    val cache = Cache(cacheMap)
-    mongoCache.saveAll(cache) map { _ => cache }
+  def saveAll(cacheMap: Future[CacheMap]): Future[CacheMap] = {
+    cacheMap.flatMap { updateCache =>
+      val cache = Cache(updateCache)
+      mongoCache.saveAll(cache) map { _ => toCacheMap(cache) }
+    }
   }
 
   /**
     * Performs a data fetch and then a save, transforming the model using the given function 'f' between the load and the save.
+    *
     * @return The model after it has been transformed
     */
   def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
@@ -72,3 +91,4 @@ class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory)
       mongoCache.createOrUpdate(ac.user.oid, transformed, key) map { _ => Some(transformed) }
     }
 }
+
