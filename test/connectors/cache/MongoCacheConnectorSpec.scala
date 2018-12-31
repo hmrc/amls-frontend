@@ -129,7 +129,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
         val cacheMap = CacheMap("test", referenceMap(str1, str2))
 
-        whenReady(connector.saveAll(cacheMap)) { cache =>
+        whenReady(connector.saveAll(Future.successful(cacheMap))) { cache =>
           cache.data mustBe referenceMap(str1, str2)
         }
       }
