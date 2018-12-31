@@ -32,7 +32,7 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
-  
+
   "which_currencies view" must {
     "have correct title" in new ViewFixture {
 
