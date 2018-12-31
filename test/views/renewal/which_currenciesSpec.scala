@@ -32,9 +32,7 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
-
+  
   "which_currencies view" must {
     "have correct title" in new ViewFixture {
 
