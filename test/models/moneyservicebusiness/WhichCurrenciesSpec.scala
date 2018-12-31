@@ -16,17 +16,13 @@
 
 package models.moneyservicebusiness
 
-import org.scalatest.{MustMatchers, WordSpec}
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.CharacterSets
+import org.scalatest.{MustMatchers, WordSpec}
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 
 class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   "Which Currencies" when {
     "data is complete" should {

@@ -16,24 +16,24 @@
 
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import models.status.SubmissionStatus
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
 import play.api.mvc.Result
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
 
@@ -185,7 +185,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
     tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) { _.activities != model.activities }
 
   def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo, status: SubmissionStatus) =
-    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
+    tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
 }

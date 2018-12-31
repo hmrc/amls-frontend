@@ -20,27 +20,23 @@ import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, _}
-
-import scala.collection.JavaConversions._
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
@@ -59,7 +55,6 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       controller.auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
   }
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   val emptyCache = CacheMap("", Map.empty)
 

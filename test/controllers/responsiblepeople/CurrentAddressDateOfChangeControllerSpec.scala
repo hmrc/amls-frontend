@@ -18,25 +18,21 @@ package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
 import models.DateOfChange
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ThreeYearsPlus, OneToThreeYears, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ThreeYearsPlus, ZeroToFiveMonths}
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 
 class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSugar {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
