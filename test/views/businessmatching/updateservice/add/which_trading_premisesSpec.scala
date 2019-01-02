@@ -39,6 +39,10 @@ class which_trading_premisesSpec extends AmlsSpec with TradingPremisesGenerator 
 
   "The which_trading_premises view" must {
 
+    "have the back link button" in new ViewFixture{
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have the correct title" in new ViewFixture {
       doc.title must startWith(Messages("businessmatching.updateservice.whichtradingpremises.title") + " - " + Messages("summary.updateservice"))
     }
