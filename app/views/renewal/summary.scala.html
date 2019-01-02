@@ -1,5 +1,5 @@
 @*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -194,31 +194,27 @@
                     editLinkTag = "msbwhichcurrencies-edit",
                     editUrl = controllers.renewal.routes.WhichCurrenciesController.get(edit = true).toString
                 ) {
-                <ul class="list list--comma">
-                    @wc.currencies.map { cur =>
-                        <li>@cur</li>
-                    }
-                </ul>
+                    <ul class="list list--comma">
+                        @wc.currencies.map { cur =>
+                            <li>@cur</li>
+                        }
+                    </ul>
 
-                @if(config.ApplicationConfig.release7) {
                     @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
-                    @checkYourAnswersExtra(
-                        question = Messages("renewal.msb.which_currencies.foreign_currencies_question")
-                    ) {
-                        <p>@usesForeignCurrencies match {
-                            case true => {@Messages("lbl.yes")}
-                            case _ => {@Messages("lbl.no")}
-                        }</p>
-                    }
+                        @checkYourAnswersExtra(
+                            question = Messages("renewal.msb.which_currencies.foreign_currencies_question")
+                        ) {
+                            <p>@usesForeignCurrencies match {
+                                case true => {@Messages("lbl.yes")}
+                                case _ => {@Messages("lbl.no")}
+                            }</p>
+                        }
 
-                    @if(usesForeignCurrencies) {
-                        @whoUsesCurrencies(wc)
+                        @if(usesForeignCurrencies) {
+                            @whoUsesCurrencies(wc)
+                        }
                     }
                 }
-                } else {
-                    @whoUsesCurrencies(wc)
-                }
-            }
             }
         }
         @if(services.msbServices.contains(ForeignExchange)) {

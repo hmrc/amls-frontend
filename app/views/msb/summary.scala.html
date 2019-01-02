@@ -1,5 +1,5 @@
 @*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -20,7 +20,6 @@
 @import models.businessmatching._
 @import models.Country
 @import forms.EmptyForm
-@import config.ApplicationConfig
 @import models.businessmatching.updateservice.ServiceChangeRegister
 
 @(model: MoneyServiceBusiness, bmMsbServices: Option[BusinessMatchingMsbServices], isEditable:Boolean, register: ServiceChangeRegister)(implicit request: Request[_],m:Messages, lang: Lang)
@@ -205,23 +204,19 @@
                         }
                     </ul>
 
-                    @if(config.ApplicationConfig.release7) {
-                        @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
-                            @checkYourAnswersExtra(
-                                question = Messages("msb.which_currencies.foreign_currencies_question")
-                            ) {
-                                <p>@usesForeignCurrencies match {
-                                    case true => {@Messages("lbl.yes")}
-                                    case _ => {@Messages("lbl.no")}
-                                }</p>
-                            }
-
-                            @if(usesForeignCurrencies) {
-                                @whoUsesCurrencies(wc)
-                            }
+                    @wc.usesForeignCurrencies.map { usesForeignCurrencies =>
+                        @checkYourAnswersExtra(
+                            question = Messages("msb.which_currencies.foreign_currencies_question")
+                        ) {
+                            <p>@usesForeignCurrencies match {
+                                case true => {@Messages("lbl.yes")}
+                                case _ => {@Messages("lbl.no")}
+                            }</p>
                         }
-                    } else {
-                        @whoUsesCurrencies(wc)
+
+                        @if(usesForeignCurrencies) {
+                            @whoUsesCurrencies(wc)
+                        }
                     }
                 }
             }

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -52,10 +52,7 @@ object AddPerson {
     import jto.validation.forms.Rules._
 
     val roleReader: Rule[UrlFormEncoded, RoleWithinBusinessRelease7] = {
-      ApplicationConfig.release7 match {
-        case false => __.read[RoleWithinBusiness] map { v => RoleWithinBusinessRelease7.apply(Set(v)) }
-        case _ => __.read[RoleWithinBusinessRelease7]
-      }
+        __.read[RoleWithinBusinessRelease7]
     }
 
     (

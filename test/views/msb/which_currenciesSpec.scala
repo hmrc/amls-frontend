@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,12 +17,10 @@
 package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
-import jto.validation.ValidationError
-import jto.validation.Path
+import jto.validation.{Path, ValidationError}
 import models.moneyservicebusiness.WhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import utils.AmlsSpec
 import views.Fixture
 
@@ -32,8 +30,6 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
 
   "which_currencies view" must {
     "have correct title" in new ViewFixture {

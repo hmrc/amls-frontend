@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package controllers.aboutthebusiness
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -24,7 +24,7 @@ import models.DateOfChange
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
-import utils.{DateOfChangeHelper, FeatureToggle}
+import utils.DateOfChangeHelper
 
 import scala.concurrent.Future
 
@@ -33,7 +33,7 @@ trait RegisteredOfficeDateOfChangeController extends BaseController with DateOfC
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
 
-  def get = FeatureToggle(ApplicationConfig.release7) {
+  def get = {
     Authorised {
       implicit authContext => implicit request =>
         Ok(views.html.date_of_change(
