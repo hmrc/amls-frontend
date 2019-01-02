@@ -25,6 +25,7 @@
 }
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.training.heading", personName), "summary.responsiblepeople")
 }
@@ -72,6 +73,7 @@
         ) {
             @textarea(
                 field = f("information"),
+                hintText = "hint.255.chars",
                 bold = false,
                 largeWidth = true,
                 cols = "30",

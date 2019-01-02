@@ -52,10 +52,6 @@ class SummaryControllerSpec extends AmlsSpec {
     )
 
     when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
-
-    when {
       controller.statusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(false)
   }
@@ -81,9 +77,7 @@ class SummaryControllerSpec extends AmlsSpec {
   }
 
   "POST" must {
-
     "redirect to RegistrationProgressController" when {
-
       "the model has been updated with hasAccepted" in new Fixture {
 
         mockCacheFetch[Tcsp](Some(model))
@@ -94,27 +88,6 @@ class SummaryControllerSpec extends AmlsSpec {
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
 
         verify(controller.dataCache).save[Tcsp](any(), eqTo(model.copy(hasAccepted = true)))(any(),any(),any())
-
-      }
-    }
-
-    "redirect to NewServiceInformationController" when {
-      "status is not pre-submission and activity has just been added" in new Fixture {
-
-        mockCacheFetch[Tcsp](Some(model))
-        mockCacheSave[Tcsp]
-
-        when {
-          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
-
-        when {
-          controller.statusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        val result = controller.post()(request)
-
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
 
       }
     }

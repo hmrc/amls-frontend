@@ -230,9 +230,9 @@ error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
-error.required.rp.experiencetraining.information = Enter a brief description of this person's experience
+error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
-error.required.rp.training.information = Enter a brief description of this person's training
+error.required.rp.training.information = Enter a brief description of this person’s training
 error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
 error.required.rp.approval_check = Select yes if this person has already been charged for the approval check
 error.invalid.length.rp.training.information = You can’t enter more than 255 characters
@@ -483,7 +483,7 @@ services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 hint.8.digits = It’s either 8 numbers, or a mix of 15 letters and numbers.
 hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
-hint.255.chars = Enter 255 characters or less.
+hint.255.chars = Enter 255 characters or less
 
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
@@ -2130,3 +2130,6 @@ login-event.date-of-birth-message = their date of birth
 login-event.fit-and-proper-message = if they have passed the fit and proper test
 login-event.approval-check-charge-message = if they have been charged for the approval check
 login-event.event-messages-header = For each responsible person, you must tell us:
+
+############################### SiteBack ###############################
+site.back = Back

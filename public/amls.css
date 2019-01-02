@@ -696,6 +696,12 @@ select {
   width: 70px;
 }
 
+form .form-label,
+form .form-hint,
+form .error-notification {
+  display: block;
+}
+
 form .form-label-bold {
   font-size: 19px;
   line-height: 1.31579;
@@ -1507,4 +1513,36 @@ li.autocomplete__option {
 
 .login-event .button:focus {
   background-color: #ffbf47;
+}
+
+.link-back {
+  display: inline-block;
+  position: relative;
+  padding-left: 14px;
+  color: #0b0c0c;
+  text-decoration: none;
+  border-bottom: 1px solid #0b0c0c;
+  font-size: 16px;
+  margin-bottom: 8px
+}
+
+.link-back:link,
+.link-back:visited,
+.link-back:hover,
+.link-back:active {
+  color: #0b0c0c;
+}
+
+.link-back::before {
+  content: '';
+  display: block;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-right: 6px solid #0b0c0c;
+  border-bottom: 5px solid transparent;
+  position: absolute;
+  left: 0;
+  top: 50%;
+  margin-top: -6px;
 }

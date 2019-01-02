@@ -28,7 +28,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
   val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
@@ -169,7 +169,7 @@ class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerS
 
   "section" must {
 
-    "return `NotStarted` section when there is no section in Save4Later" in {
+    "return `NotStarted` section when there is no section in mongoCache" in {
       implicit val cache = CacheMap("", Map.empty)
       EstateAgentBusiness.section mustBe Section("eab", NotStarted, false,  controllers.estateagentbusiness.routes.WhatYouNeedController.get)
     }

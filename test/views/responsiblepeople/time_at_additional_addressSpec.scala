@@ -33,6 +33,13 @@ class time_at_additional_addressSpec extends AmlsSpec with MustMatchers  {
 
   "time_at_additional_address view" must {
 
+    "have a back link" in new ViewFixture {
+      val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)
+
+      def view = views.html.responsiblepeople.time_at_additional_address(form2, false, 0, None, "FirstName LastName")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[TimeAtAddress] = Form2(ZeroToFiveMonths)

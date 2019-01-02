@@ -35,7 +35,6 @@ import play.api.test.Helpers._
 import scala.concurrent.Future
 
 class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
   trait Fixture extends AuthorisedFixture {
     self =>

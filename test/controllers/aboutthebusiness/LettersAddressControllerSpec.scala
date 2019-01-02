@@ -60,7 +60,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(OK)
       }
 
-      "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
+      "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())(any(),any(),any()))
           .thenReturn(Future.successful(None))

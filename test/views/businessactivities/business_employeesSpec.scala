@@ -16,10 +16,10 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.HowManyEmployees
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -67,6 +67,12 @@ class business_employeesSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("employeeCount")
         .parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.business_employees(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

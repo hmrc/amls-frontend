@@ -16,7 +16,7 @@
 
 package views.aboutthebusiness
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness.ActivityStartDate
 import org.joda.time.LocalDate
@@ -65,6 +65,14 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("startDate")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.activity_start_date(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

@@ -86,5 +86,17 @@ class register_servicesSpec extends AmlsSpec with MustMatchers  {
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
+
+    "have a back link in pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.register_services(EmptyForm, edit = true, Set("01"), Set.empty, isPreSubmission = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
+    "have a back link in non pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.register_services(EmptyForm, edit = true, Set("01"), Set.empty, isPreSubmission = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

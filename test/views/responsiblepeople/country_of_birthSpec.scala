@@ -36,6 +36,13 @@ class country_of_birthSpec extends AmlsSpec with MustMatchers {
   }
 
   "country_of_birth view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2 =  EmptyForm
+      def view = views.html.responsiblepeople.country_of_birth(form2, edit = true, 1, None, "Person Name", locations)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2 =  EmptyForm

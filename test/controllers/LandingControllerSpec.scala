@@ -20,7 +20,7 @@ import java.net.URLEncoder
 
 import config.ApplicationConfig
 import connectors.DataCacheConnector
-import generators.{BaseGenerator, StatusGenerator}
+import generators.{StatusGenerator}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -51,19 +51,16 @@ import play.api.mvc.{Request, Result}
 import play.api.test.Helpers._
 import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture}
-import org.scalacheck.Gen
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.amendments" -> false))
 
   trait Fixture extends AuthorisedFixture {
     self =>
@@ -78,9 +75,7 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
-    ){
-      override val shortLivedCache = mock[ShortLivedCache]
-    }
+    )
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())
@@ -286,70 +281,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           status(result) must be(SEE_OTHER)
           redirectLocation(result) mustBe Some(ApplicationConfig.businessCustomerUrl)
         }
-
-        "the user has an AMLS enrolment" in new Fixture {
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(None)
-          when(controller.landingService.reviewDetails(any(), any(), any())).thenReturn(Future.successful(None))
-          when(controller.enrolmentsService.amlsRegistrationNumber(any(), any(), any())).thenReturn(Future.successful(Some("amlsRegNo")))
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.StatusController.get().url)
-        }
-
-      }
-
-      "go to the beginning of pre-application" when {
-        "there is no data in BusinessMatching" in new Fixture {
-
-          val emptyCacheMap = mock[CacheMap]
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(None)
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
-        }
-      }
-
-      "go to the beginning of pre-application" when {
-        "there is data in BusinessMatching but the pre-application is incomplete" in new Fixture {
-
-          val testBusinessMatching = BusinessMatching()
-
-          val emptyCacheMap = mock[CacheMap]
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(CacheMap("", Map.empty)))
-          when(emptyCacheMap.getEntry[BusinessMatching](BusinessMatching.key)).thenReturn(Some(testBusinessMatching))
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-
-        }
-      }
-
-      "pre application must remove save4later" when {
-        "the business matching is incomplete" in new Fixture {
-          val cacheMap = mock[CacheMap]
-          val httpResponse = mock[HttpResponse]
-          val complete = mock[BusinessMatching]
-
-          when(httpResponse.status) thenReturn NO_CONTENT
-          when(controller.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
-
-          when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cacheMap))
-          when(complete.isComplete) thenReturn false
-          when(cacheMap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
-          when(cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)).thenReturn(Some(completeATB))
-
-          val result = controller.get()(request)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) mustBe Some(controllers.routes.LandingController.get().url)
-        }
       }
 
       "pre application must throw an exception" when {
@@ -360,9 +291,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
           val complete = mock[BusinessMatching]
 
           when(httpResponse.status) thenReturn (BAD_REQUEST)
-
-          when(controller.shortLivedCache.remove(any())(any(), any())) thenReturn Future.successful(httpResponse)
-
           when(controller.landingService.cacheMap(any(), any(), any())) thenReturn Future.successful(Some(cachmap))
           when(complete.isComplete) thenReturn false
           when(cachmap.getEntry[BusinessMatching](any())(any())).thenReturn(Some(complete))
@@ -379,10 +307,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
 
   val businessCustomerUrl = "TestUrl"
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map(
-    "microservice.services.feature-toggle.amendments" -> true
-  ))
 
   trait Fixture extends AuthorisedFixture { self =>
 
@@ -421,9 +345,7 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
       authService = mock[AuthService],
       cacheConnector = mock[DataCacheConnector],
       statusService = mock[StatusService]
-    ) {
-      override val shortLivedCache = mock[ShortLivedCache]
-    }
+    )
 
     when {
       controller.authService.validateCredentialRole(any(), any(), any())
@@ -640,6 +562,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
               setUpMocksForAnEnrolmentExists(controller)
               setUpMocksForDataExistsInSaveForLater(controller, emptyCacheMap)
 
+              when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                .thenReturn(Future.successful(
+                  Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                ))
+
+              when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
               val result = controller.get()(request)
 
               status(result) must be(SEE_OTHER)
@@ -652,12 +581,21 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "data has just been imported" should {
 
           def runImportTest(hasChanged: Boolean): Unit = new Fixture {
-            setUpMocksForAnEnrolmentExists(controller)
-            setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
+            val testCacheMap = buildTestCacheMap(
               hasChanged = hasChanged,
               includesResponse = false,
               includeSubmissionStatus = true,
-              includeDataImport = true))
+              includeDataImport = true)
+
+            setUpMocksForAnEnrolmentExists(controller)
+            setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+            when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+              ))
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             val result = controller.get()(request)
 
@@ -678,43 +616,133 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         }
 
         "data has changed and" when {
-          "the user has just submitted" should {
-            "refresh from API5 and redirect to status controller" in new Fixture {
-              setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(
-                hasChanged = true,
-                includesResponse = false,
-                includeSubmissionStatus = true))
+          "the user has just submitted" when {
+            "there are no incomplete responsible people" should {
+              "refresh from API5 and redirect to status controller" in new Fixture {
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
 
-              val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
 
-              verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
+
+                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
+
+            "there are incomplete responsible people" should {
+              "refresh from API5 and redirect to login events controller" in new Fixture {
+                val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+                  dateOfBirth = None
+                )
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false,
+                  includeSubmissionStatus = true)
+
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
+
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+
+                val result = controller.get()(request.withHeaders("test-context" -> "ESCS"))
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+
+                verify(controller.landingService).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
             }
           }
 
-          "the user has not just submitted" should {
-            "redirect to status controller without refreshing API5" in new Fixture {
-              val testCacheMap = buildTestCacheMap(
-                hasChanged = true,
-                includesResponse = false
-              )
+          "the user has not just submitted" when {
+            "there are no incomplete responsible people" should {
+              "redirect to status controller without refreshing API5" in new Fixture {
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false
+                )
 
-              when {
-                controller.landingService.setAltCorrespondenceAddress(any(), any())(any(),any(),any())
-              } thenReturn Future.successful(testCacheMap)
+                when {
+                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                } thenReturn Future.successful(testCacheMap)
 
-              setUpMocksForAnEnrolmentExists(controller)
-              setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
-              val result = controller.get()(request)
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
 
-              status(result) must be(SEE_OTHER)
-              redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(List()))
 
-              verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.StatusController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
+            }
+
+            "there are incomplete responsible people" should {
+              "redirect to login events" in new Fixture {
+                val inCompleteResponsiblePeople: ResponsiblePerson = completeResponsiblePerson.copy(
+                  dateOfBirth = None
+                )
+
+                val testCacheMap = buildTestCacheMap(
+                  hasChanged = true,
+                  includesResponse = false
+                )
+
+                when {
+                  controller.landingService.setAltCorrespondenceAddress(any(), any())(any(), any(), any())
+                } thenReturn Future.successful(testCacheMap)
+
+                setUpMocksForAnEnrolmentExists(controller)
+                setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
+
+                when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+                  .thenReturn(Future.successful(
+                    Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+                  ))
+
+                when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
+                when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(Some(Seq(inCompleteResponsiblePeople)))
+
+                val result = controller.get()(request)
+
+                status(result) must be(SEE_OTHER)
+                redirectLocation(result) must be(Some(controllers.routes.LoginEventController.get().url))
+
+                verify(controller.landingService, never()).refreshCache(any())(any[AuthContext], any[HeaderCarrier], any[ExecutionContext])
+              }
             }
           }
         }
@@ -723,6 +751,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
           "refresh from API5 and redirect to status controller" in new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
             setUpMocksForDataExistsInSaveForLater(controller, buildTestCacheMap(false, false))
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", Some(SubscriptionFees("", 1.0, None, None, None, None, 1.0, None, 1.0))))
+              ))
+
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             val result = controller.get()(request)
 
@@ -733,9 +768,14 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
 
           "refresh from API5 and redirect to status controller with duplicate submission flag set" in new Fixture {
             setUpMocksForAnEnrolmentExists(controller)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", None, Some(true)))
+              ))
+
             val testCacheMap = buildTestCacheMap(false, false)
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
-            when(testCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None, Some(true))))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
             when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
@@ -754,6 +794,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
             setUpMocksForDataExistsInSaveForLater(controller, testCacheMap)
 
             val fixedCacheMap = buildTestCacheMap(false, false)
+
+            when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+              .thenReturn(Future.successful(
+                Some(SubscriptionResponse("", "", None))
+              ))
+
+            when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
             when(fixedCacheMap.getEntry[SubscriptionResponse](meq(SubscriptionResponse.key))(any())).thenReturn(Some(SubscriptionResponse("", "", None)))
             when(testCacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())).thenReturn(None)
@@ -780,6 +827,13 @@ class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar wit
         "refresh from API5 and redirect to status controller" in new Fixture {
           setUpMocksForAnEnrolmentExists(controller)
           setUpMocksForNoDataInSaveForLater(controller)
+
+          when(controller.cacheConnector.fetch[SubscriptionResponse](any())(any(), any(), any()))
+            .thenReturn(Future.successful(
+              Some(SubscriptionResponse("", "", None))
+            ))
+
+          when(controller.statusService.getDetailedStatus(any(), any(), any())).thenReturn(Future.successful(NotCompleted, None))
 
           val result = controller.get()(request)
 

@@ -40,6 +40,8 @@ class nationalitySpec extends AmlsSpec with MustMatchers {
         val form2 = EmptyForm
         def view = views.html.responsiblepeople.nationality(form2, true, 1, None, "firstName lastName", countries)
 
+        doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
         doc.title must be(Messages("responsiblepeople.nationality.title") +
           " - " + Messages("summary.responsiblepeople") +
           " - " + Messages("title.amls") +

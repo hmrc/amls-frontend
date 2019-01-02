@@ -25,7 +25,7 @@ import models.businessmatching.{BusinessActivities => ba, _}
 
 class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
   val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
   val DefaultSoftwareName = "DEFAULT SOFTWARE"

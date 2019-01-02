@@ -25,6 +25,7 @@
 }
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("businessactivities.involved.other.title", "summary.businessactivities")
 }
@@ -85,6 +86,7 @@
             @textarea(
                 field = f("details"),
                 labelText = "businessactivities.confirm-activities.lbl.details",
+                hintText = "hint.255.chars",
                 bold = false,
                 largeWidth = true,
                 rows = "6",

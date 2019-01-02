@@ -16,12 +16,12 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, EmptyForm}
+import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.BusinessMatching
-import org.scalatest.{MustMatchers}
-import utils.AmlsSpec
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -81,6 +81,12 @@ class involved_in_other_nameSpec extends AmlsSpec with MustMatchers {
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.involved_in_other_name(EmptyForm, true, bmModel, None)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }
