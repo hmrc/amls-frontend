@@ -33,6 +33,15 @@ class business_servicessSpec extends AmlsSpec with MustMatchers  {
   }
 
   "business_servicess view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[Services] = Form2(Services(Set()))
+
+      def view = views.html.estateagentbusiness.business_servicess(form2, edit = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[Services] = Form2(Services(Set()))
