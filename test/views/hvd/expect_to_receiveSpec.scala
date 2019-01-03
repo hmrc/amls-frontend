@@ -31,6 +31,16 @@ class expect_to_receiveSpec extends AmlsSpec with MustMatchers  {
     }
 
     "expect_to_receive view" must {
+
+      "have the back link button" in new ViewFixture {
+
+        val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
+
+        def view = views.html.hvd.expect_to_receive(form2, true)
+
+        doc.getElementsByAttributeValue("class", "link-back") must not be empty
+      }
+
       "have correct title" in new ViewFixture {
 
         val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
