@@ -34,6 +34,16 @@ class cash_paymentSpec extends AmlsSpec with MustMatchers  {
   }
 
   "cash_payment view" must {
+
+    "have the back link button" in new ViewFixture {
+
+      val form2: ValidForm[CashPayment] = Form2(CashPaymentYes(LocalDate.parse("2016-3-20")))
+
+      def view = views.html.hvd.cash_payment(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[CashPayment] = Form2(CashPaymentYes(LocalDate.parse("2016-3-20")))
