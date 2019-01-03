@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,7 @@ package controllers
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
@@ -40,14 +40,13 @@ import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -59,7 +58,6 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val statusService: StatusService
                                  ) extends BaseController {
 
-  val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -81,14 +79,8 @@ class LandingController @Inject()(val landingService: LandingService,
     implicit authContext =>
       implicit request =>
         authService.validateCredentialRole flatMap {
-          case true =>
-            if (AmendmentsToggle.feature) {
-              getWithAmendments
-            } else {
-              getWithoutAmendments
-            }
-          case _ =>
-            Future.successful(Redirect(authService.signoutUrl))
+          case true => getWithAmendments
+          case _ => Future.successful(Redirect(authService.signoutUrl))
         }
   }
 
@@ -184,6 +176,22 @@ class LandingController @Inject()(val landingService: LandingService,
     } getOrElse deleteAndRedirect()
   }
 
+  private def preFlightChecksAndRedirect(implicit authContext: AuthContext, headerCarrier: HeaderCarrier):  Future[Result] = {
+    val loginEvent = for {
+      dupe <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None } map {
+        case Some(x) => x.previouslySubmitted.contains(true)
+        case _ => false
+      }
+      incomplete <- hasIncompleteResponsiblePeople()
+    } yield (incomplete, dupe)
+
+    loginEvent.map {
+      case (true, false) => Redirect(controllers.routes.LoginEventController.get())
+      case (_, true) => Redirect(controllers.routes.StatusController.get(true))
+      case (_, false) => Redirect(controllers.routes.StatusController.get(false))
+    }
+  }
+
   private def refreshAndRedirect(amlsRegistrationNumber: String, maybeCacheMap: Option[CacheMap])
                                 (implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Result] = {
     maybeCacheMap match {
@@ -195,19 +203,7 @@ class LandingController @Inject()(val landingService: LandingService,
         Logger.debug(s"[AMLSLandingController][refreshAndRedirect]: calling refreshCache with ${amlsRegistrationNumber}")
         landingService.refreshCache(amlsRegistrationNumber) flatMap {
           _ => {
-            val loginEvent = for {
-              dupe <- cacheConnector.fetch[SubscriptionResponse](SubscriptionResponse.key).recover { case _ => None } map {
-                case Some(x) => x.previouslySubmitted.contains(true)
-                case _ => false
-              }
-              incomplete <- hasIncompleteResponsiblePeople()
-            } yield (incomplete, dupe)
-
-            loginEvent.map {
-              case (true, false) => Redirect(controllers.routes.LoginEventController.get())
-              case (_, true) => Redirect(controllers.routes.StatusController.get(true))
-              case (_, false) => Redirect(controllers.routes.StatusController.get(false))
-            }
+            preFlightChecksAndRedirect
           }
         }
     }
@@ -274,11 +270,10 @@ class LandingController @Inject()(val landingService: LandingService,
               Logger.debug("Data has changed in getWithAmendments()")
               cacheMap.getEntry[SubmissionRequestStatus](SubmissionRequestStatus.key) collect {
                 case SubmissionRequestStatus(true, _) => refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
-              } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) map { _=>
-                Redirect(controllers.routes.StatusController.get())
+              } getOrElse landingService.setAltCorrespondenceAddress(amlsRegistrationNumber, Some(cacheMap)) flatMap { _=>
+                preFlightChecksAndRedirect
               }
             } else {
-              //DataHasNotChanged
               Logger.debug("Data has not changed route in getWithAmendments()")
               refreshAndRedirect(amlsRegistrationNumber, Some(cacheMap))
             }

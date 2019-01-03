@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -195,7 +195,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
           }
         }
 
-        "redirect to the 'Activity Start Date' page when no data in save4later" in new Fixture {
+        "redirect to the 'Activity Start Date' page when no data in mongoCache" in new Fixture {
 
           val newRequest = request.withFormUrlEncodedBody(
             "tradingName" -> "Trading Name",

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -96,7 +96,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       }
 
-      "save the reason data to Save4Later" in new Fixture {
+      "save the reason data to mongoCache" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
           "removalReason" -> Form.OTHER,

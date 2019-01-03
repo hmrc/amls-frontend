@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
 
           }
 
-          "load Yes when save4later returns true" in new Fixture {
+          "load Yes when mongoCache returns true" in new Fixture {
 
             val model = TradingPremises(
               registeringAgentPremises = Some(
@@ -113,7 +113,7 @@ class RegisteringAgentPremisesControllerSpec extends AmlsSpec with MockitoSugar 
             htmlValue.getElementById("agentPremises-true").attr("checked") mustBe "checked"
 
           }
-          "load No when save4later returns false" in new Fixture {
+          "load No when mongoCache returns false" in new Fixture {
 
             val model = TradingPremises(
               registeringAgentPremises = Some(

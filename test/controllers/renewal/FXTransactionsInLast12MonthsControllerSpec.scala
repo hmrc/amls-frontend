@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -111,7 +111,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
               .thenReturn(Future.successful(mock[CacheMap]))
     }
 
-    "Successfully save data in save4later and navigate to Next page" when {
+    "Successfully save data in mongoCache and navigate to Next page" when {
 
       "business activities does not contain HVD or ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
@@ -142,7 +142,7 @@ class FXTransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       }
     }
 
-    "Successfully save data in save4later and navigate to Summary page in edit mode" when {
+    "Successfully save data in mongoCache and navigate to Summary page in edit mode" when {
       "business activities does not contain HVD or ASP" in new FlowFixture {
         setupBusinessMatching(activities = Set(MoneyServiceBusiness))
         val result = controller.post(true)(newRequest)

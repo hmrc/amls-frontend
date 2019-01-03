@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ class AdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
     "get is called" must {
 
-      "display the persons page when no existing data in save4later" in new Fixture {
+      "display the persons page when no existing data in mongoCache" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 

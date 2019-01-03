@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,9 +35,7 @@ case class Asp(
     this.copy(otherBusinessTaxMatters = Some(p), hasChanged = hasChanged || !this.otherBusinessTaxMatters.contains(p), hasAccepted = hasAccepted && this.otherBusinessTaxMatters.contains(p))
 
   def isComplete: Boolean = this match {
-    case Asp(Some(_), Some(_), _, true) if ApplicationConfig.hasAcceptedToggle => true
-    case Asp(Some(_), Some(_), _, false) if ApplicationConfig.hasAcceptedToggle => false
-    case Asp(Some(_), Some(_), _, _) => true
+    case Asp(Some(_), Some(_), _, accepted) => accepted
     case _ => false
   }
 }

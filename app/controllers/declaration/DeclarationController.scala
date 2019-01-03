@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -46,7 +46,7 @@ trait DeclarationController extends BaseController {
           } yield status match {
             case ReadyForRenewal(_) => Ok(
               views.html.declaration.declare("declaration.declaration.amendment.title", "submit.renewal.application", name, false))
-            case SubmissionReadyForReview if AmendmentsToggle.feature => Ok(
+            case SubmissionReadyForReview => Ok(
               views.html.declaration.declare("declaration.declaration.amendment.title", "submit.amendment.application", name, true))
             case _ => Ok(
               views.html.declaration.declare("declaration.declaration.amendment.title", "submit.registration", name, false))
@@ -57,10 +57,7 @@ trait DeclarationController extends BaseController {
     }
   }
 
-  def getWithAmendment = AmendmentsToggle.feature match {
-    case b@true => declarationView("declaration.declaration.amendment.title", "submit.amendment.application", b)
-    case _ => defaultView
-  }
+  def getWithAmendment = declarationView("declaration.declaration.amendment.title", "submit.amendment.application", true)
 
   private def declarationView(title: String, subtitle: String, isAmendment: Boolean) = Authorised.async {
     implicit authcontext => implicit request =>
@@ -74,7 +71,7 @@ trait DeclarationController extends BaseController {
 
   private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
+      case SubmissionReadyForReview => Redirect(routes.AddPersonController.getWithAmendment())
       case _ => Redirect(routes.AddPersonController.get())
     }
 

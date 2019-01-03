@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -26,49 +26,69 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends CacheConnector with Conversions {
+class MongoCacheConnector @Inject()(cacheClientFactory: MongoCacheClientFactory) extends Conversions {
 
   lazy val mongoCache: MongoCacheClient = cacheClientFactory.createClient
 
   /**
     * Fetches the data item with the specified key from the mongo store
     */
-  override def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
+  def fetch[T](key: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     mongoCache.find(authContext.user.oid, key)
 
   /**
     * Saves the data item in the mongo store with the specified key
     */
-  override def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
+  def save[T](key: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     mongoCache.createOrUpdate(authContext.user.oid, data, key).map(toCacheMap)
+
+  /**
+    * Saves the data item in the in-memory cache with the specified key
+    */
+  def upsert[T](targetCache: CacheMap,
+                           key: String,
+                           data: T)
+                          (implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): CacheMap = {
+    mongoCache.upsert(targetCache, authContext.user.oid, data, key)
+  }
 
   /**
     * Fetches the entire cache from the mongo store
     */
-  override def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
+  def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     mongoCache.fetchAll(authContext.user.oid).map(_.map(toCacheMap))
+
+  /**
+    * Fetches the entire cache from the mongo store and returns an empty cache where not exists
+    */
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    mongoCache.fetchAllWithDefault(authContext.user.oid).map(toCacheMap)
 
   /**
     * Removes the entire cache from the mongo store
     */
-  override def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
+  def remove(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Boolean] =
     mongoCache.removeById(authContext.user.oid)
 
   /**
     * Saves the given cache map into the mongo store
     */
-  def saveAll(cacheMap: CacheMap): Future[Cache] = {
-    val cache = Cache(cacheMap)
-    mongoCache.saveAll(cache) map { _ => cache }
+  def saveAll(cacheMap: Future[CacheMap]): Future[CacheMap] = {
+    cacheMap.flatMap { updateCache =>
+      val cache = Cache(updateCache)
+      mongoCache.saveAll(cache) map { _ => toCacheMap(cache) }
+    }
   }
 
   /**
     * Performs a data fetch and then a save, transforming the model using the given function 'f' between the load and the save.
+    *
     * @return The model after it has been transformed
     */
-  override def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
+  def update[T](key: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     mongoCache.find[T](ac.user.oid, key) flatMap { maybeModel =>
       val transformed = f(maybeModel)
       mongoCache.createOrUpdate(ac.user.oid, transformed, key) map { _ => Some(transformed) }
     }
 }
+

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ trait AspValues {
 
 class AspSpec extends PlaySpec with MockitoSugar with AspValues with OneAppPerSuite{
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
 
   "None" when {

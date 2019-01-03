@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -51,7 +51,7 @@ class BusinessStructureController @Inject()(val dataCacheConnector: DataCacheCon
   def redirectToPage(data: BusinessStructure, edit: Boolean, index: Int, result: Option[CacheMap])(implicit request: Request[AnyContent]) = {
     data match {
       case SoleProprietor => Redirect(routes.AgentNameController.get(index, edit))
-      case LimitedLiabilityPartnership | IncorporatedBody if ApplicationConfig.release7 => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
+      case LimitedLiabilityPartnership | IncorporatedBody => Redirect(routes.AgentCompanyDetailsController.get(index, edit))
       case Partnership => Redirect(routes.AgentPartnershipController.get(index, edit))
       case UnincorporatedBody => edit match {
         case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))

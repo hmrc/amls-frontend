@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,7 +19,6 @@ package modules
 import com.google.inject.{AbstractModule, Provider, TypeLiteral}
 import config.{AMLSAuditConnector, AppConfig, WSHttp}
 import connectors._
-import connectors.cache.{CacheConnector, DataCacheConnectorMigrator, MongoCacheConnector, Save4LaterCacheConnector}
 import javax.inject.Inject
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
@@ -29,25 +28,6 @@ import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-
-class CacheMigratorProvider @Inject()(app: Application) extends Provider[DataCacheConnectorMigrator] {
-  override def get(): DataCacheConnectorMigrator = {
-    new DataCacheConnectorMigrator(
-      app.injector.instanceOf(classOf[MongoCacheConnector]),
-      app.injector.instanceOf(classOf[Save4LaterCacheConnector])
-    )
-  }
-}
-
-class CacheConnectorProvider @Inject()(appConfig: AppConfig, app: Application) extends Provider[CacheConnector] {
-  override def get(): CacheConnector = {
-    if (appConfig.mongoAppCacheEnabled) {
-      app.injector.instanceOf(classOf[DataCacheConnectorMigrator])
-    } else {
-      app.injector.instanceOf(classOf[Save4LaterCacheConnector])
-    }
-  }
-}
 
 class Module extends AbstractModule {
 
@@ -73,7 +53,5 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
-    bind(classOf[CacheConnector]).toProvider(classOf[CacheConnectorProvider])
-    bind(classOf[DataCacheConnectorMigrator]).toProvider(classOf[CacheMigratorProvider])
   }
 }

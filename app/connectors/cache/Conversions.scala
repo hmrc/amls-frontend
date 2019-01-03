@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -32,7 +32,7 @@ trait Conversions {
   }
 
   /**
-    * Converts a new Cache object to an old Save4Later CacheMap type, for compatibility reasons
+    * Converts a new Cache object to an old CacheMap type, for compatibility reasons
     * @param cache The cache object to convert
     * @return The CacheMap instance
     */

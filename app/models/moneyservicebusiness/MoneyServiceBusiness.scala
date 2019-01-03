@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -84,7 +84,7 @@ case class MoneyServiceBusiness(
 
   private def mtComplete(mtFlag: Boolean): Boolean =
     if (mtFlag) {
-        this.businessUseAnIPSP.isDefined &&
+      this.businessUseAnIPSP.isDefined &&
         this.fundsTransfer.isDefined &&
         this.transactionsInNext12Months.isDefined &&
         (
@@ -112,10 +112,8 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = {
     allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
-  } else {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag)
   }
 }
 

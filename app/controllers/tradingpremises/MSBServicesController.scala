@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
@@ -117,7 +117,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean = false, status: SubmissionStatus) =
-    ApplicationConfig.release7 && (!tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force)
+    !tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force
 }
 
 object MSBServicesController extends MSBServicesController {

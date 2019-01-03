@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -93,7 +93,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
 
       }
 
-      "display the country of birth page successfully with data from save4later" in new Fixture {
+      "display the country of birth page successfully with data from mongoCache" in new Fixture {
 
         when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
@@ -106,7 +106,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
         document.select("select[name=country] > option[value=ES]").hasAttr("selected") must be(true)
       }
 
-      "display the country of birth page successfully with data from save4later for the option 'Yes'" in new Fixture {
+      "display the country of birth page successfully with data from mongoCache for the option 'Yes'" in new Fixture {
 
         when(controllers.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
           (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople.copy(personResidenceType = Some(updtdPersonResidenceTypeYes))))))

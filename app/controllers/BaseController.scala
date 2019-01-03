@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,7 +27,6 @@ import utils.{ControllerHelper, FeatureToggle}
 trait BaseController extends FrontendController with Actions  with I18nSupport {
 
   protected def Authorised = AuthorisedFor(AmlsRegime, pageVisibility = GGConfidence)
-  protected def AmendmentsToggle = FeatureToggle(ApplicationConfig.amendmentsToggle)
 
   def notFoundView(implicit request: Request[_]) = ControllerHelper.notFoundView(request)
 

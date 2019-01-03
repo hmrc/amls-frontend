@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,15 +25,9 @@ import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 
 trait ApplicationConfig {
 
-  def amendmentsToggle: Boolean
-
-  def release7: Boolean
-
   def refreshProfileToggle: Boolean
 
   def frontendBaseUrl: String
-
-  def hasAcceptedToggle: Boolean
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
@@ -75,23 +69,13 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   lazy val enrolUrl = s"$ggUrl/enrol"
   
-  lazy val save4LaterUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
+  lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
   lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFeeRate = getConfigInt("amounts.people")
   lazy val approvalCheckPeopleFeeRate = getConfigInt("amounts.approval-check-rate")
-
-  def amendmentsToggle: Boolean = {
-    val value = getConfBool("feature-toggle.amendments", false)
-    value
-  }
-
-  override def release7: Boolean = {
-    val value = getConfBool("feature-toggle.release7", false)
-    value
-  }
 
   def phase2ChangesToggle: Boolean = getConfBool("feature-toggle.phase-2-changes", false)
 
@@ -104,8 +88,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
     s"$scheme://$host"
   }
-
-  override def hasAcceptedToggle = getConfBool("feature-toggle.has-accepted", false)
 }
 
 class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration) {

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,22 +14,20 @@
  * limitations under the License.
  */
 
-// TODO: Rename this to the connectors.cache package
 package connectors
 
-import connectors.cache.CacheConnector
+import connectors.cache.MongoCacheConnector
 import play.api.Play
 import play.api.libs.json.Format
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.{HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-// TODO: Remove this and replace it with the new DataCache orchestrator type
 trait DataCacheConnector {
 
-  def cacheConnector: CacheConnector
+  def cacheConnector: MongoCacheConnector
 
   def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
@@ -37,16 +35,34 @@ trait DataCacheConnector {
   def save[T](cacheId: String, data: T)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] =
     cacheConnector.save(cacheId, data)
 
+  def upsert[T](
+                            targetCache: CacheMap,
+                            cacheId: String,
+                            data: T
+                          )
+                          (
+                            implicit authContext: AuthContext,
+                            hc: HeaderCarrier,
+                            format: Format[T]
+                          ): CacheMap =
+    cacheConnector.upsert(targetCache, cacheId, data)
+
   def fetchAll(implicit hc: HeaderCarrier, authContext: AuthContext): Future[Option[CacheMap]] =
     cacheConnector.fetchAll
+
+  def fetchAllWithDefault(implicit hc: HeaderCarrier, authContext: AuthContext): Future[CacheMap] =
+    cacheConnector.fetchAllWithDefault
 
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
     cacheConnector.remove
 
   def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
+
+  def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
+    cacheConnector.saveAll(cacheMap)
 }
 
 object DataCacheConnector extends DataCacheConnector {
-  def cacheConnector: CacheConnector = Play.current.injector.instanceOf[CacheConnector]
+  def cacheConnector: MongoCacheConnector = Play.current.injector.instanceOf[MongoCacheConnector]
 }

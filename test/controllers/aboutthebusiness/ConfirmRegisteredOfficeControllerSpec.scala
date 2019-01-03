@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -71,7 +71,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
       }
 
-      "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
+      "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
         val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 

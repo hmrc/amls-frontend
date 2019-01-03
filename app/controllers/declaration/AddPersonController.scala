@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -55,7 +55,7 @@ trait AddPersonController extends BaseController {
               case _ if isResponsiblePerson(data) => {
                 Redirect(routes.RegisterResponsiblePersonController.get())
               }
-              case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
+              case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
               case _ => Redirect(routes.DeclarationController.get())
             }
           }

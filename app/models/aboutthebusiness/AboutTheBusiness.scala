@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -62,14 +62,7 @@ case class AboutTheBusiness(
 
   def isComplete: Boolean =
     this match {
-      case AboutTheBusiness(
-      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_), _,_, true
-      ) if ApplicationConfig.hasAcceptedToggle => true
-      case AboutTheBusiness(
-      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_), _, _, false
-      ) if ApplicationConfig.hasAcceptedToggle => false
-      case AboutTheBusiness(
-      Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _, _) => true
+      case AboutTheBusiness(Some(_), _, _, _, Some(ContactingYou(Some(_),Some(_))), Some(_), Some(_),_, _, true) => true
       case _ => false
     }
 }

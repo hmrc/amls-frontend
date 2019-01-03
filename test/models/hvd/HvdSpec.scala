@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -185,54 +185,6 @@ class HvdSpec extends PlaySpec with MockitoSugar {
         when(cache.getEntry[Hvd]("hvd")) thenReturn Some(incompleteTcsp)
 
         Hvd.section must be(startedSection)
-      }
-    }
-  }
-}
-
-class HvdWithHasAcceptedSpec extends PlaySpec with MustMatchers with OneAppPerSuite with MockitoSugar {
-  override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .configure("microservice.services.feature-toggle.has-accepted" -> true)
-    .build()
-
-  "HVD" when {
-    "isComplete is called" must {
-      "return true if the model has been accepted" in new HvdTestFixture {
-        completeModel.copy(hasAccepted = true).isComplete mustBe true
-      }
-
-      "return false if the model has not been accepted" in new HvdTestFixture {
-        completeModel.copy(hasAccepted = false).isComplete mustBe false
-      }
-    }
-
-    "a field is changed" must {
-
-      val tests = Seq[(Hvd => Hvd, String)](
-        (_.cashPayment(CashPaymentNo), "cashPayment"),
-        (_.products(Products(Set(ScrapMetals))), "products"),
-        (_.receiveCashPayments(false), "receiveCashPayments"),
-        (_.cashPaymentMethods(PaymentMethods(false, false, None)), "cashPaymentMethods"),
-        (_.exciseGoods(ExciseGoods(false)), "exciseGoods"),
-        (_.linkedCashPayment(LinkedCashPayments(true)), "linkedCashPayments"),
-        (_.howWillYouSellGoods(HowWillYouSellGoods(Seq(Wholesale))), "howWillYouSellGoods"),
-        (_.percentageOfCashPaymentOver15000(PercentageOfCashPaymentOver15000.Second), "percentageOfCashPaymentOver15000")
-      )
-
-      "reset hasAccepted back to false" when {
-        tests foreach { test =>
-          s"${test._2} is changed" in new HvdTestFixture {
-            test._1(completeModel.copy(hasAccepted = true)).hasAccepted mustBe false
-          }
-        }
-      }
-
-      "leave hasAccepted as false when something has changed and hasAccepted is already false" when {
-        tests foreach { test =>
-          s"${test._2} is changed" in new HvdTestFixture {
-            test._1(completeModel.copy(hasAccepted = false)).hasAccepted mustBe false
-          }
-        }
       }
     }
   }

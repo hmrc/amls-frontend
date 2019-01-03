@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -47,7 +47,7 @@ import utils.{AmlsSpec, DependencyMocks}
 import scala.collection.Seq
 import scala.concurrent.ExecutionContext.Implicits.global
 
-class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
+class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
   with ScalaFutures
   with BusinessMatchingGenerator
   with TradingPremisesGenerator
@@ -56,7 +56,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
   trait Fixture extends DependencyMocks {
 
     val http = mock[WSHttp]
-    val updateSave4LaterService = new UpdateSave4LaterService(http, mockCacheConnector)
+    val updateMongoCacheService = new UpdateMongoCacheService(http, mockCacheConnector)
 
     val viewResponse = ViewResponse(
       etmpFormBundleNumber = "FORMBUNDLENUMBER",
@@ -205,7 +205,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
 
     val dataImport = DataImport("test.json")
 
-    val updateSave4LaterResponse = UpdateSave4LaterResponse(
+    val updateMongoCacheResponse = UpdateMongoCacheResponse(
       Some(dataImport),
       Some(viewResponse),
       Some(businessMatching),
@@ -226,7 +226,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
 
   }
 
-  "UpdateSave4LaterService" when {
+  "UpdateMongoCacheService" when {
 
     "update is called" must {
       "retrieve the specified file from stubs and update save for later with the contents" in new Fixture {
@@ -249,7 +249,7 @@ class UpdateSave4LaterServiceSpec extends AmlsSpec with MockitoSugar
         mockCacheSave[AmendVariationRenewalResponse]
         mockCacheSave[DataImport]
 
-        await(updateSave4LaterService.update(updateSave4LaterResponse))
+        await(updateMongoCacheService.update(updateMongoCacheResponse))
 
         verify(mockCacheConnector).save[ViewResponse](eqTo(ViewResponse.key), any())(any(), any(), any())
         verify(mockCacheConnector).save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())

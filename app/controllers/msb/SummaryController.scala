@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -61,12 +61,7 @@ class SummaryController @Inject()
       (for {
         model <- OptionT(dataCache.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key))
         _ <- OptionT.liftF(dataCache.save[MoneyServiceBusiness](MoneyServiceBusiness.key, model.copy(hasAccepted = true)))
-        preSubmission <- OptionT.liftF(statusService.isPreSubmission)
-        isNewActivity <- OptionT.liftF(serviceFlow.inNewServiceFlow(models.businessmatching.MoneyServiceBusiness))
-      } yield (preSubmission, isNewActivity) match {
-        case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update MoneyServiceBusiness")
   }
 
 }

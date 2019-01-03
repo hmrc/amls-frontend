@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -88,7 +88,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
     }
 
-    "Successfully save data in save4later and navigate to Next page" in new Fixture {
+    "Successfully save data in mongoCache and navigate to Next page" in new Fixture {
       val newRequest = request.withFormUrlEncodedBody (
         "ceTransaction" -> "12345678963"
       )
@@ -104,7 +104,7 @@ class CETransactionsInLast12MonthsControllerSpec extends AmlsSpec with MockitoSu
       redirectLocation(result) must be(Some(controllers.renewal.routes.WhichCurrenciesController.get().url))
     }
 
-    "Successfully save data in save4later and navigate to Summary page in edit mode" in new Fixture {
+    "Successfully save data in mongoCache and navigate to Summary page in edit mode" in new Fixture {
 
       val incomingModel = Renewal(
       )

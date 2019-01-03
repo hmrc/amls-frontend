@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -59,7 +59,7 @@ class NCARegisteredControllerSpec extends AmlsSpec with MockitoSugar {
         htmlValue.getElementById("ncaRegistered-false").hasAttr("checked") must be(false)
       }
 
-      "load Yes when ncaRegistered from save4later returns True" in new Fixture {
+      "load Yes when ncaRegistered from mongoCache returns True" in new Fixture {
 
         val ncaRegistered = Some(NCARegistered(true))
         val activities = BusinessActivities(ncaRegistered = ncaRegistered)

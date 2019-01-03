@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,8 +25,6 @@ import play.api.test.FakeApplication
 
 
 class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with CharacterSets {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
 
   "When the user inputs the data that is posted in the form, the role within business" must {
 

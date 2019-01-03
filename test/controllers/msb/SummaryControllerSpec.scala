@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -57,10 +57,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       ceTransactionsInNext12Months = Some(CETransactionsInNext12Months("12345678963")),
       fxTransactionsInNext12Months = Some(FXTransactionsInNext12Months("3242342442"))
     )
-
-    when {
-      mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
 
     when {
       mockStatusService.isPreSubmission(any(), any(), any())
@@ -178,7 +174,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   "Post" must {
-
     "redirect to RegistrationProgressController" when {
       "model has been saved with hasAccepted set to true" in new Fixture {
         mockIsNewActivity(false)
@@ -192,26 +187,5 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         verify(controller.dataCache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any(),any())
       }
     }
-
-    "redirect to NewServiceInformationController" when {
-      "status is not pre-submission and activity has just been added" in new Fixture {
-        mockCacheFetch[MoneyServiceBusiness](Some(completeModel))
-        mockCacheSave[MoneyServiceBusiness]
-
-        when {
-          mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
-
-        when {
-          controller.statusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        val result = controller.post()(request)
-
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
-
-      }
-    }
-
   }
 }

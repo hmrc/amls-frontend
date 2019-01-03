@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -56,7 +56,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
     "Get:" must {
       "successfully load when the person moved to new address page" when {
-        "date of change model exists in save4later" in new Fixture {
+        "date of change model exists in mongoCache" in new Fixture {
 
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))
@@ -68,7 +68,7 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
 
         }
 
-        "date of change model in not persisted in save4later" in new Fixture {
+        "date of change model in not persisted in mongoCache" in new Fixture {
 
           when(cacheMap.getEntry[Seq[ResponsiblePerson]](any())(any()))
             .thenReturn(Some(Seq(responsiblePeople)))

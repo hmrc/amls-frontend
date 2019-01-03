@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -82,8 +82,6 @@ object BankDetails {
   }
 
   def section(implicit cache: CacheMap): Section = {
-    Logger.debug(s"[BankDetails][section] $cache")
-
     val msgKey = "bankdetails"
     val defaultSection = Section(msgKey, NotStarted, false, controllers.bankdetails.routes.WhatYouNeedController.get())
 

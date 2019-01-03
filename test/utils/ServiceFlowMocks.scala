@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -27,11 +27,6 @@ import scala.concurrent.Future
 trait ServiceFlowMocks extends MockitoSugar {
 
   implicit val mockServiceFlow = mock[ServiceFlow]
-
-  def setupInServiceFlow(inFlow: Boolean, activity: Option[BusinessActivity] = None) =
-    activity map { a =>
-      when(mockServiceFlow.inNewServiceFlow(eqTo(a))(any(), any(), any())) thenReturn Future.successful(inFlow)
-    } getOrElse when(mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())) thenReturn Future.successful(inFlow)
 
   def mockIsNewActivity(value: Boolean, activity: Option[BusinessActivity] = None) =
     activity map { a =>

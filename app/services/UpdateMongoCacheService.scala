@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -42,9 +42,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, HttpGet, NotFoundException}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataCacheConnector) {
+class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataCacheConnector) {
 
-  def update(response: UpdateSave4LaterResponse)
+  def update(response: UpdateMongoCacheResponse)
             (implicit hc: HeaderCarrier, authContext: AuthContext, ex: ExecutionContext): Future[Any] = {
 
     for {
@@ -73,10 +73,10 @@ class UpdateSave4LaterService @Inject()(http: HttpGet, val cacheConnector: DataC
     case _ => Future.successful(CacheMap("", Map.empty))
   }
 
-  def getSaveForLaterData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateSave4LaterResponse]] = {
-    val requestUrl = s"${ApplicationConfig.save4LaterUpdateUrl}$fileName"
+  def getMongoCacheData(fileName: String)(implicit hc: HeaderCarrier, ac: AuthContext, ex: ExecutionContext): Future[Option[UpdateMongoCacheResponse]] = {
+    val requestUrl = s"${ApplicationConfig.mongoCacheUpdateUrl}$fileName"
 
-    http.GET[UpdateSave4LaterResponse](requestUrl)
+    http.GET[UpdateMongoCacheResponse](requestUrl)
       .map { r =>
         import utils.Strings._
         println(Json.prettyPrint(Json.toJson(r)) in Console.YELLOW)

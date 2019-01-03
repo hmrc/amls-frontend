@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,11 +16,11 @@
 
 package controllers.responsiblepeople
 
-import audit.AddressCreatedEvent
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
+import models.autocomplete.NameValuePair
+import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReadyForReview}
 import org.jsoup.Jsoup
@@ -30,24 +30,18 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
-
-import scala.collection.JavaConversions._
 import play.api.test.Helpers._
 import services.{AutoCompleteService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AuthorisedFixture
-import audit.AddressConversions._
-import models.autocomplete.NameValuePair
-import uk.gov.hmrc.play.audit.AuditExtensions._
+import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -78,8 +72,6 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
     ))
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true))
-
   val emptyCache = CacheMap("", Map.empty)
   val outOfBounds = 99
 
@@ -103,7 +95,7 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
         status(result) must be(NOT_FOUND)
       }
 
-      "display the persons page when no existing data in save4later" in new Fixture {
+      "display the persons page when no existing data in mongoCache" in new Fixture {
 
         val responsiblePeople = ResponsiblePerson(personName)
 
