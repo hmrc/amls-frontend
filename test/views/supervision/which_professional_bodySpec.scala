@@ -34,6 +34,13 @@ class which_professional_bodySpec extends AmlsSpec with MustMatchers  {
 
   "which_professional_body view" must {
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.supervision.which_professional_body(EmptyForm, edit = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       def view = views.html.supervision.which_professional_body(EmptyForm, false)
