@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,7 +18,6 @@ package controllers.tradingpremises
 
 import cats.data.OptionT
 import cats.implicits._
-import config.ApplicationConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
@@ -118,7 +117,7 @@ object ModelHelpers {
     private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady, SubmissionReadyForReview).contains(status)
 
     def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
-      case Some(RegisteringAgentPremises(true)) if ApplicationConfig.release7 && !isSubmission(status) && model.lineId.isDefined =>
+      case Some(RegisteringAgentPremises(true)) if !isSubmission(status) && model.lineId.isDefined =>
         controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
       case _ =>
         controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url

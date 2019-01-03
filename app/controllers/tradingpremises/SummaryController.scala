@@ -21,16 +21,16 @@ import cats.implicits._
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
+import forms.EmptyForm
 import models.businessmatching.BusinessMatching
-import models.status._
-import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
+import models.tradingpremises.TradingPremises
+import models.tradingpremises.TradingPremises.FilterUtils
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.tradingpremises._
-import models.tradingpremises.TradingPremises.FilterUtils
+
 import scala.concurrent.Future
-import forms.EmptyForm
 
 trait SummaryController extends RepeatingSection with BaseController {
 
@@ -92,20 +92,6 @@ trait SummaryController extends RepeatingSection with BaseController {
 
         Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
       }).getOrElse(NotFound(notFoundView))
-  }
-}
-
-object ModelHelpers {
-  implicit class removeUrl(model: TradingPremises) {
-
-    private def isSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady, SubmissionReadyForReview).contains(status)
-
-    def removeUrl(index: Int, complete: Boolean = false, status: SubmissionStatus): String = model.registeringAgentPremises match {
-      case Some(RegisteringAgentPremises(true)) if !isSubmission(status) && model.lineId.isDefined =>
-        controllers.tradingpremises.routes.RemoveAgentPremisesReasonsController.get(index, complete).url
-      case _ =>
-        controllers.tradingpremises.routes.RemoveTradingPremisesController.get(index, complete).url
-    }
   }
 }
 

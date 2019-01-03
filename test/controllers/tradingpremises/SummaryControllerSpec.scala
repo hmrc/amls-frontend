@@ -19,26 +19,23 @@ package controllers.tradingpremises
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService}
+import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import org.mockito.Matchers.{eq => meq}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
