@@ -33,6 +33,16 @@ class excise_goodsSpec extends AmlsSpec with MustMatchers  {
   }
 
   "excise_goods view" must {
+
+    "have the back link button" in new ViewFixture {
+
+      val form2: ValidForm[ExciseGoods] = Form2(ExciseGoods(true))
+
+      def view = views.html.hvd.excise_goods(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ExciseGoods] = Form2(ExciseGoods(true))
