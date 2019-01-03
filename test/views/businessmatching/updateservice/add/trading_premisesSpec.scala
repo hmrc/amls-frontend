@@ -38,10 +38,6 @@ class trading_premisesSpec extends AmlsSpec with MustMatchers {
 
   "The trading_premises view" must {
 
-    "have the back link button" in new ViewFixture{
-      doc.getElementsByAttributeValue("class", "link-back") must not be empty
-    }
-
     "have the correct title" in new ViewFixture {
       doc.title must startWith(Messages("businessmatching.updateservice.tradingpremises.title") + " - " + Messages("summary.updateservice"))
     }
