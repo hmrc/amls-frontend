@@ -33,6 +33,21 @@ class services_of_businessSpec extends AmlsSpec with MustMatchers  {
   }
 
   "services_of_business view" must {
+
+    "have a back link" in new ViewFixture {
+
+      val form2: ValidForm[ServicesOfBusiness] = Form2(ServicesOfBusiness(
+        Set(Accountancy,
+          PayrollServices,
+          BookKeeping,
+          Auditing,
+          FinancialOrTaxAdvice)))
+
+      def view = views.html.asp.services_of_business(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ServicesOfBusiness] = Form2(ServicesOfBusiness(
