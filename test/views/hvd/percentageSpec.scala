@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,6 +34,16 @@ class percentageSpec extends AmlsSpec with MustMatchers  {
   }
 
   "percentage view" must {
+
+    "have the back link button" in new ViewFixture {
+
+      val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Second)
+
+      def view = views.html.hvd.percentage(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Second)

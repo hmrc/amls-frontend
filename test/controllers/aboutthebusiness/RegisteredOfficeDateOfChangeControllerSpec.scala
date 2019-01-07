@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -17,25 +17,21 @@
 package controllers.aboutthebusiness
 
 import connectors.DataCacheConnector
-import models.{Country, DateOfChange}
 import models.aboutthebusiness._
+import models.{Country, DateOfChange}
 import org.joda.time.LocalDate
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoSugar{
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> true) )
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

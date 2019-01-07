@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -110,7 +110,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
     }
   }
 
-  def dateOfChange(index: Int) = FeatureToggle(ApplicationConfig.release7) {
+  def dateOfChange(index: Int) = {
     Authorised {
       implicit authContext => implicit request =>
         Ok(views.html.date_of_change(Form2[DateOfChange](DateOfChange(LocalDate.now)),
@@ -144,12 +144,12 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], premises: YourTradingPremises) =
-    ApplicationConfig.release7 && (for {
-      tp <- tradingPremises
-      ytp <- tp.yourTradingPremises
-    } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
-      ).getOrElse(false)
-
+    (
+      for {
+        tp <- tradingPremises
+        ytp <- tp.yourTradingPremises
+      } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
+    ).getOrElse(false)
 }
 
 object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {

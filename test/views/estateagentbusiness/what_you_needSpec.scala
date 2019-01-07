@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,14 @@ class what_you_needSpec extends AmlsSpec with MustMatchers  {
   }
 
   "what_you_need view" must {
+
+    "have the back link button" in new ViewFixture {
+
+      def view = views.html.estateagentbusiness.what_you_need()
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       def view = views.html.estateagentbusiness.what_you_need()

@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -33,6 +33,13 @@ class which_professional_bodySpec extends AmlsSpec with MustMatchers  {
   }
 
   "which_professional_body view" must {
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.supervision.which_professional_body(EmptyForm, edit = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
     "have correct title" in new ViewFixture {
 

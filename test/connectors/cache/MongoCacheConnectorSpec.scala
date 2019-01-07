@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -129,7 +129,7 @@ class MongoCacheConnectorSpec extends FreeSpec
       forAll(arbitrary[String], arbitrary[String]) { (str1, str2) =>
         val cacheMap = CacheMap("test", referenceMap(str1, str2))
 
-        whenReady(connector.saveAll(cacheMap)) { cache =>
+        whenReady(connector.saveAll(Future.successful(cacheMap))) { cache =>
           cache.data mustBe referenceMap(str1, str2)
         }
       }

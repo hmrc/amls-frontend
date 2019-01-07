@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -37,14 +37,12 @@ import uk.gov.hmrc.http.HeaderCarrier
 
 class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
-
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new BusinessStructureController (self.cache, self.authConnector, messagesApi)
+    val controller = new BusinessStructureController(self.cache, self.authConnector, messagesApi)
   }
 
   "BusinessStructureController" must {
@@ -60,6 +58,9 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       status(result) mustBe OK
 
+      document.select("input[type=radio]").size mustBe 5
+      document.select("input[type=radio][checked]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 0
     }
 
     "Load Business Structure page with pre-populatd data" in new Fixture {
@@ -88,6 +89,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val document = Jsoup.parse(contentAsString(result))
 
       status(result) mustBe BAD_REQUEST
+
+      document.select("input[type=radio]").size mustBe 5
+      document.select("input[type=radio][selected]").size mustBe 0
+      document.select(".amls-error-summary").size mustBe 1
     }
 
     "successfully submit and navigate to next page when user selects the option SoleProprietor" in new Fixture {
@@ -98,7 +103,6 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val model = TradingPremises(
         businessStructure = Some(SoleProprietor)
       )
-
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(model)))
 
@@ -129,16 +133,13 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      when(controller.dataCacheConnector.save[TradingPremises](any(), any())
-        (any(), any(), any())).thenReturn(Future.successful(new CacheMap("", Map.empty)))
-
       when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1, false).url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1, false).url)
     }
 
     "successfully submit and navigate to next page when user selects the option Partnership" in new Fixture {
@@ -181,34 +182,10 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
         .thenReturn(Future.successful(mockCacheMap))
 
-      val result = controller.post(1,false)(newRequest)
-
-      status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.AgentCompanyNameController.get(1).url)
-    }
-
-    "successfully submit and navigate to next page when user selects the option" +
-      " UnincorporatedBody without edit and is the first Trading premises" in new Fixture {
-
-      val newRequest = request.withFormUrlEncodedBody(
-        "agentsBusinessStructure" -> "05"
-      )
-      val model = TradingPremises(
-        businessStructure = Some(SoleProprietor)
-      )
-      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-        .thenReturn(Some(Seq(model)))
-
-      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-        .thenReturn(Future.successful(Some(mockCacheMap)))
-
-      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
-        .thenReturn(Future.successful(mockCacheMap))
-
       val result = controller.post(1, false)(newRequest)
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(routes.ConfirmAddressController.get(1).url)
+      redirectLocation(result) mustBe Some(routes.AgentCompanyDetailsController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option UnincorporatedBody without edit" in new Fixture {
@@ -232,6 +209,30 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
       status(result) mustBe SEE_OTHER
       redirectLocation(result) mustBe Some(routes.WhereAreTradingPremisesController.get(1, false).url)
+    }
+
+    "successfully submit and navigate to next page when user selects the option UnincorporatedBody" +
+      " without edit and is the First Trading Premises" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "agentsBusinessStructure" -> "05"
+      )
+      val model = TradingPremises(
+        businessStructure = Some(SoleProprietor)
+      )
+      when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+        .thenReturn(Some(Seq(model)))
+
+      when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
+        .thenReturn(Future.successful(Some(mockCacheMap)))
+
+      when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+        .thenReturn(Future.successful(mockCacheMap))
+
+      val result = controller.post(1, false)(newRequest)
+
+      status(result) mustBe SEE_OTHER
+      redirectLocation(result) mustBe Some(routes.ConfirmAddressController.get(1).url)
     }
 
     "successfully submit and navigate to next page when user selects the option UnincorporatedBody with edit" in new Fixture {
@@ -262,6 +263,7 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val newRequest = request.withFormUrlEncodedBody(
         "agentsBusinessStructure" -> "02"
       )
+
       when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
         .thenReturn(Some(Seq(TradingPremisesSection.tradingPremisesWithHasChangedFalse)))
 
@@ -274,7 +276,7 @@ class BusinessStructureControllerSpec extends AmlsSpec with ScalaFutures with Mo
       val result = controller.post(1)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.AgentCompanyNameController.get(1, false).url))
+      redirectLocation(result) must be(Some(routes.AgentCompanyDetailsController.get(1, false).url))
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),

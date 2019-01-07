@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -16,16 +16,14 @@
 
 package models.tradingpremises
 
-import cats.data.Validated.Valid
-import models.FormTypes._
-import models.DateOfChange
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms.UrlFormEncoded
-import org.joda.time.{DateTimeFieldType, LocalDate}
+import models.DateOfChange
+import models.FormTypes._
+import org.joda.time.LocalDate
 import play.api.libs.json._
 import typeclasses.MongoKey
-import config.ApplicationConfig
 
 case class AgentName(agentName: String,
                      dateOfChange: Option[DateOfChange] = None,
@@ -52,11 +50,10 @@ object AgentName {
 
   implicit def formReads: Rule[UrlFormEncoded, AgentName] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "agentName").read(agentNameType) ~
-      {ApplicationConfig.release7 match {
-      case true => (__ \ "agentDateOfBirth").read(localDateFutureRule).map(x=>Some(x))
-      case false => Rule[UrlFormEncoded, Option[LocalDate]](_ => Valid(None))
-    }}) (AgentName.applyWithoutDateOfChange _)
+    (
+      (__ \ "agentName").read(agentNameType) ~
+      (__ \ "agentDateOfBirth").read(localDateFutureRule).map(x=>Some(x))
+    ) (applyWithoutDateOfChange)
   }
 
   implicit val formWrites: Write[AgentName, UrlFormEncoded] = Write {
