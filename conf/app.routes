@@ -16,7 +16,7 @@
 ->          /business-matching                                                        businessMatching.Routes
 
 GET         /assets/countries                                                         @controllers.AssetsController.countries()
-GET         /assets/*file                                                             @controllers.AssetsController.at(path="/public", file)
+GET         /assets/*file                                                             controllers.Assets.versioned(path="/public", file: Asset)
 
 GET         /                                                                         @controllers.LandingController.start(allowRedirect: Boolean ?= true)
 GET         /start/bta                                                                @controllers.LandingController.start(allowRedirect: Boolean ?= false)
