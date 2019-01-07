@@ -42,7 +42,7 @@
 
     <p>@Messages("tradingpremises.yourpremises.line_2")</p>
 
-    <p><a id="addTradingPremises" href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(false)">@Messages("tradingpremises.summary.addanother")</a></p>
+    <p><a id="addTradingPremises" href="@controllers.tradingpremises.routes.TradingPremisesAddController.get(true)">@Messages("tradingpremises.summary.addanother")</a></p>
 
     @if(completeTp.isEmpty & incompleteTp.isEmpty) {
         <p>@Messages("tradingpremises.yourpremises.line_3")</p>
