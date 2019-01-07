@@ -34,6 +34,14 @@ class other_business_tax_mattersSpec extends AmlsSpec with MustMatchers  {
 
   "other_business_tax_matters view" must {
 
+    "have a back link" in new ViewFixture {
+
+      val form2: ValidForm[OtherBusinessTaxMatters] = Form2(OtherBusinessTaxMattersYes)
+
+      def view = views.html.asp.other_business_tax_matters(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
     "have correct title" in new ViewFixture {
 
