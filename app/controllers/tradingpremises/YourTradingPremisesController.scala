@@ -28,8 +28,8 @@ import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
-import views.html.tradingpremises.{summary_details, your_trading_premises}
+import utils.RepeatingSection
+import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
 
@@ -106,7 +106,8 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         val hasOneService = bm.activities.fold(false)(_.businessActivities.size == 1)
         val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
 
-        Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
+        //Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
+        Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
       }).getOrElse(NotFound(notFoundView))
   }
 }
