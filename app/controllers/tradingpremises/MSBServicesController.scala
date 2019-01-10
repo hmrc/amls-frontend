@@ -82,7 +82,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       && edit && tradingPremises.lineId.isDefined) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
-      Redirect(routes.YourTradingPremisesController.getIndividual(index))
+      Redirect(routes.YourTradingPremisesController.getIndividual(index, true))
     }
   }
 
