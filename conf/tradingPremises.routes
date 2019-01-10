@@ -44,7 +44,7 @@ GET         /check-your-answers                                      @controller
 POST        /check-your-answers                                      @controllers.tradingpremises.YourTradingPremisesController.post(index: Int)
 
 GET         /your-answers                                            @controllers.tradingpremises.YourTradingPremisesController.answers()
-GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int)
+GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int, edit: Boolean ?= false)
 
 GET         /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
 POST        /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
