@@ -30,7 +30,7 @@ object BacsPaymentEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "bacsPayment",
       tags = hc.toAuditTags("Bacs Payment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

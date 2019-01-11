@@ -33,7 +33,7 @@ object ServiceEntrantEvent {
     )
 
     ExtendedDataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend", //ppName.appName,
       auditType = "userEnteredService",
       tags = hc.toAuditTags("userEnteredService", request.path),
       detail = data

@@ -28,7 +28,7 @@ object CreatePaymentFailureEvent {
   def apply(paymentRef: String, status: Int, message: String, request: CreatePaymentRequest)
            (implicit hc: HeaderCarrier, requestWrites: Writes[CreatePaymentRequest]): ExtendedDataEvent = {
     ExtendedDataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "createPaymentFailureEvent",
       tags = hc.toAuditTags("Create Payment", "n/a"),
       detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(

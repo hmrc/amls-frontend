@@ -20,7 +20,7 @@ import config.AppConfig
 import connectors.cache.Conversions
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.Logger
+import play.api.{Configuration, Logger, Play}
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.modules.reactivemongo.MongoDbConnection
@@ -37,6 +37,7 @@ import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
+import uk.gov.hmrc.crypto.ApplicationCrypto
 
 // $COVERAGE-OFF$
 // Coverage has been turned off for these types, as the only things we can really do with them
@@ -97,8 +98,9 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
   private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
   private def error(msg: String) = Logger.error(s"$logPrefix $msg")
+  private val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
 
-  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = ApplicationCrypto.JsonCrypto
+  implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
   val cacheExpiryInSeconds: Int = appConfig.cacheExpiryInSeconds
 

@@ -32,7 +32,7 @@ object PaymentConfirmationEvent {
                                                                            reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "paymentConfirm",
       tags = hc.toAuditTags("Payment Confirmation", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

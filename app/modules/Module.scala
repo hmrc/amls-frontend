@@ -16,13 +16,14 @@
 
 package modules
 
-import com.google.inject.{AbstractModule, Provider, TypeLiteral}
+import com.google.inject.{AbstractModule, Provider, Provides, TypeLiteral}
+import com.typesafe.config.Config
 import config.{AMLSAuditConnector, AppConfig, WSHttp}
 import connectors._
 import javax.inject.Inject
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
-import play.api.Application
+import play.api.{Application, Configuration}
 import services._
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
@@ -54,4 +55,8 @@ class Module extends AbstractModule {
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeSubSectorFlowModel]] {}).to(classOf[ChangeSubSectorRouter])
   }
+
+  @Provides
+  def configProvider(configuration: Configuration): Config =
+    configuration.underlying
 }

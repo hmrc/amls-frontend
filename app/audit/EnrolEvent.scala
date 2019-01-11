@@ -31,7 +31,7 @@ object EnrolEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "OutboundCall",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

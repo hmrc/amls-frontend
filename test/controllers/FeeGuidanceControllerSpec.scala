@@ -45,7 +45,6 @@ import scala.concurrent.Future
 
 class FeeGuidanceControllerSpec extends AmlsSpec
   with PrivateMethodTester
-  with ServicesConfig
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 

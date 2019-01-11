@@ -32,7 +32,7 @@ object SurveyEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "SurveyCompleted",
       tags = hc.toAuditTags("SatisfactionSurvey", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

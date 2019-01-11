@@ -29,7 +29,7 @@ object CreatePaymentEvent {
             requestWrites: Writes[CreatePaymentRequest],
             responseWrites: Writes[CreatePaymentResponse]): ExtendedDataEvent = {
     ExtendedDataEvent(
-      auditSource = AppName.appName,
+      auditSource = "amls-frontend",
       auditType = "createPaymentFailureEvent",
       tags = hc.toAuditTags("Create Payment", "n/a"),
       detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(

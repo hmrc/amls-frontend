@@ -17,9 +17,11 @@
 package connectors
 
 import config.WSHttp
-import play.api.Logger
+import play.api.Mode.Mode
+import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.Json
 import play.api.mvc.Request
+import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
@@ -90,5 +92,10 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
 
 object BusinessMatchingConnector extends BusinessMatchingConnector {
   override val http = WSHttp
-  override val crypto = SessionCookieCryptoFilter.encrypt _
+  lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
+  val sessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
+  override val crypto = sessionCookieCryptoFilter.encrypt _
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

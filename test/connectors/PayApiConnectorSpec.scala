@@ -16,7 +16,7 @@
 
 package connectors
 
-import config.{ApplicationConfig, WSHttp}
+import config.WSHttp
 import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
 import org.mockito.Matchers.{eq => eqTo, _}
@@ -25,6 +25,8 @@ import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.{Configuration, Play}
+import play.api.Mode.Mode
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
@@ -32,7 +34,7 @@ import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.inject.ServicesConfig
+import uk.gov.hmrc.play.config.ServicesConfig
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -59,7 +61,6 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
     val payApiUrl = "http://localhost:9021"
 
     val config = new ServicesConfig {
-      override protected def environment = mock[play.api.Environment]
 
       override def getConfString(confKey: String, defString: => String) = confKey match {
         case _ => super.getConfString(confKey, defString)
@@ -68,6 +69,9 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
       override def baseUrl(serviceName: String) = serviceName match {
         case "pay-api" => payApiUrl
       }
+
+      override protected def mode: Mode = Play.current.mode
+      override protected def runModeConfiguration: Configuration = Play.current.configuration
     }
 
     val auditConnector = mock[AuditConnector]

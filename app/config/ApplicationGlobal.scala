@@ -17,7 +17,7 @@
 package config
 
 import play.api.mvc.{EssentialAction, Filters, Request, WithFilters}
-import play.api.{Application, Configuration}
+import play.api.{Application, Configuration, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
 import play.twirl.api.Html
@@ -42,9 +42,10 @@ abstract class ApplicationGlobal extends DefaultFrontendGlobal {
 }
 
 object ApplicationGlobal extends ApplicationGlobal {
+  override lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
   override def onStart(app: Application) {
     super.onStart(app)
-    ApplicationCrypto.verifyConfiguration()
+    applicationCrypto.verifyConfiguration()
   }
 }
 
