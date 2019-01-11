@@ -44,6 +44,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockStatusService = mock[StatusService]
   val mockCacheMap = mock[CacheMap]
+  val mockYtp = mock[TradingPremises]
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -95,7 +96,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(SEE_OTHER)
     }
 
-    "for an individual display the trading premises summary page for individual" in new Fixture {
+    "for an individual display the trading premises check your answers page for individual" in new Fixture {
 
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -112,7 +113,7 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
         (any())).thenReturn(Some(Seq(TradingPremises())))
 
-      val result = ytpController.getIndividual(1)(request)
+      val result = ytpController.getIndividual(1, true)(request)
 
       status(result) must be(OK)
     }

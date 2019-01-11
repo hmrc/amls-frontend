@@ -129,7 +129,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         }
       }
 
-      "redirect to Premises registered page" when {
+      "redirect to Your Answers Page page" when {
         "only one activity is selected in Business Matching business activities page" in new Fixture {
           val tradingPremises = TradingPremises()
 
@@ -146,7 +146,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val result = whatDoesYourBusinessDoController.get(recordId1)(request)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(recordId1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1, true).url))
         }
       }
 
@@ -210,11 +210,11 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1, true).url))
         }
 
 
-        "given a Valid Request with multiple ACTIVITIES and show the 'premises registered' page" in new Fixture {
+        "given a Valid Request with multiple ACTIVITIES and show the 'Your Answers' page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
@@ -234,7 +234,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1).url))
         }
 
         "given a valid request and money services were specified" must {
@@ -337,7 +337,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(recordId1, true).url))
         }
       }
 
@@ -361,7 +361,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = whatDoesYourBusinessDoController.post(1)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+        redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
 
         verify(mockDataCacheConnector).save[Seq[TradingPremises]](
           any(),

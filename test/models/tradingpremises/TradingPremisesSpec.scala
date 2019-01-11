@@ -67,7 +67,6 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     Some("Added"),
     Some(ActivityEndDate(new LocalDate(1999, 1, 1))),
     hasAccepted = true
-
   )
 
   val incompleteModel = TradingPremises(Some(RegisteringAgentPremises(true)),
