@@ -143,7 +143,7 @@ error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter a valid account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number
-error.max.length.bankdetails.accountnumber = Enter a valid account number=
+error.max.length.bankdetails.accountnumber = Enter a valid account number
 error.required.bankdetails.iban.account = Enter either an IBAN number or an account number
 
 error.invalid.bankdetails.iban = Enter a valid IBAN number
