@@ -73,12 +73,14 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             // 'what does your business do' page.
             updateDataStrict[TradingPremises](index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-            }
-            Future.successful {
-              activities.contains(MoneyServiceBusiness) match {
-                case true => Redirect(routes.MSBServicesController.get(index))
-                case false => Redirect(routes.PremisesRegisteredController.get(index))
-              }
+            } flatMap {
+              _ =>
+                Future.successful {
+                  activities.contains(MoneyServiceBusiness) match {
+                    case true => Redirect(routes.MSBServicesController.get(index))
+                    case false => Redirect(routes.PremisesRegisteredController.get(index))
+                  }
+                }
             }
           } else {
             val ba = BusinessActivities(activities)
