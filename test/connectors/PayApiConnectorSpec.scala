@@ -58,27 +58,12 @@ class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures w
 
     val validResponse = CreatePaymentResponse(PayApiLinks(paymentUrl))
     val http = mock[WSHttp]
-    val payApiUrl = "http://localhost:9021"
-
-    val config = new ServicesConfig {
-
-      override def getConfString(confKey: String, defString: => String) = confKey match {
-        case _ => super.getConfString(confKey, defString)
-      }
-
-      override def baseUrl(serviceName: String) = serviceName match {
-        case "pay-api" => payApiUrl
-      }
-
-      override protected def mode: Mode = Play.current.mode
-      override protected def runModeConfiguration: Configuration = Play.current.configuration
-    }
+    val payApiUrl = "http://localhost:9057"
 
     val auditConnector = mock[AuditConnector]
 
     val injector = new GuiceInjectorBuilder()
       .overrides(bind[WSHttp].to(http))
-      .bindings(bind[ServicesConfig].to(config))
       .bindings(bind[AuditConnector].to(auditConnector))
       .build()
 

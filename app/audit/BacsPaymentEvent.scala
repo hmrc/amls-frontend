@@ -21,8 +21,8 @@ import models.governmentgateway.EnrolmentRequest
 import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.AppHelper
 
 object BacsPaymentEvent {
   def apply(ukBank: Boolean, amlsRef: String, payRef: String, amount: Currency)(implicit
@@ -30,7 +30,7 @@ object BacsPaymentEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = "amls-frontend",
+      auditSource = AppHelper.getName,
       auditType = "bacsPayment",
       tags = hc.toAuditTags("Bacs Payment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

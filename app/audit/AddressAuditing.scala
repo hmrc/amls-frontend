@@ -22,13 +22,12 @@ import cats.implicits._
 import models.aboutthebusiness._
 import models.responsiblepeople.{PersonAddress, PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
-import play.api.Mode.Mode
-import play.api.{Configuration, Play}
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.AppHelper
 
 case class AuditAddress(addressLine1: String, addressLine2: String, addressLine3: Option[String], country: String, postCode: Option[String])
 
@@ -38,7 +37,7 @@ object AuditAddress {
 
 object AddressCreatedEvent {
   def apply(address: AuditAddress)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
-    auditSource = "amls-frontend",
+    auditSource = AppHelper.getName,
     auditType = "manualAddressSubmitted",
     tags = hc.toAuditTags("manualAddressSubmitted", request.path),
     detail = hc.toAuditDetails() ++ toMap(address)
@@ -74,7 +73,7 @@ object AddressModifiedEvent {
 object AddressConversions {
 
   implicit def toDataEvent(event: AddressModifiedEvent)(implicit hc: HeaderCarrier, request: Request[_]): DataEvent = DataEvent(
-    auditSource = "amls-frontend",
+    auditSource = AppHelper.getName,
     auditType = "addressModified",
     tags = hc.toAuditTags("addressModified", request.path),
     detail = hc.toAuditDetails() ++ toMap(event)

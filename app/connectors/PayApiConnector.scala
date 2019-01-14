@@ -19,10 +19,10 @@ package connectors
 import javax.inject.Inject
 import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
-import config.{ApplicationConfig, WSHttp}
+import config.{WSHttp}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
 import play.api.Mode.Mode
-import play.api.{Configuration, Environment, Logger, Play}
+import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -33,11 +33,10 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
                                  http: WSHttp,
-                                 auditConnector: AuditConnector,
-                                 config: ServicesConfig
-                               ) extends HttpResponseHelper {
+                                 auditConnector: AuditConnector
+                               ) extends HttpResponseHelper with ServicesConfig {
 
-  lazy val payBaseUrl = s"${config.baseUrl("pay-api")}/pay-api"
+  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
 
@@ -61,4 +60,7 @@ class PayApiConnector @Inject()(
         None
     }
   }
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

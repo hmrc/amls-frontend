@@ -16,19 +16,18 @@
 
 package audit
 
-import config.ApplicationConfig
 import models.payments.CreatePaymentRequest
 import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
-import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
 import uk.gov.hmrc.play.audit.AuditExtensions._
+import utils.AppHelper
 
 object CreatePaymentFailureEvent {
   def apply(paymentRef: String, status: Int, message: String, request: CreatePaymentRequest)
            (implicit hc: HeaderCarrier, requestWrites: Writes[CreatePaymentRequest]): ExtendedDataEvent = {
     ExtendedDataEvent(
-      auditSource = "amls-frontend",
+      auditSource = AppHelper.getName,
       auditType = "createPaymentFailureEvent",
       tags = hc.toAuditTags("Create Payment", "n/a"),
       detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(
