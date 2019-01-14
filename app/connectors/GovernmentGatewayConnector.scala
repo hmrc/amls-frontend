@@ -19,11 +19,10 @@ package connectors
 import audit.EnrolEvent
 import config.{AMLSAuditConnector, ApplicationConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
-import models.governmentgateway.{EnrolmentRequest, EnrolmentResponse}
+import models.governmentgateway.{EnrolmentRequest}
 import play.api.Logger.{debug, warn}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.Audit
-import uk.gov.hmrc.play.config.AppName
 
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
