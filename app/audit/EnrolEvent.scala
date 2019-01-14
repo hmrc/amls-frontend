@@ -21,7 +21,7 @@ import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
-import utils.AppHelper
+import utils.AuditHelper
 
 object EnrolEvent {
   def apply
@@ -31,7 +31,7 @@ object EnrolEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "OutboundCall",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

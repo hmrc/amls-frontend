@@ -22,7 +22,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AppHelper
+import utils.AuditHelper
 
 object BacsPaymentEvent {
   def apply(ukBank: Boolean, amlsRef: String, payRef: String, amount: Currency)(implicit
@@ -30,7 +30,7 @@ object BacsPaymentEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "bacsPayment",
       tags = hc.toAuditTags("Bacs Payment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

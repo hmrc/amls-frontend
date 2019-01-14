@@ -22,7 +22,7 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent
 import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import utils.AppHelper
+import utils.AuditHelper
 
 object CreatePaymentEvent {
   def apply(request: CreatePaymentRequest, response: CreatePaymentResponse)
@@ -30,7 +30,7 @@ object CreatePaymentEvent {
             requestWrites: Writes[CreatePaymentRequest],
             responseWrites: Writes[CreatePaymentResponse]): ExtendedDataEvent = {
     ExtendedDataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "createPaymentFailureEvent",
       tags = hc.toAuditTags("Create Payment", "n/a"),
       detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(

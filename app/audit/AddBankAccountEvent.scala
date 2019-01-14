@@ -24,7 +24,7 @@ import Utils._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AppHelper
+import utils.AuditHelper
 
 object AddBankAccountEvent {
 
@@ -74,7 +74,7 @@ object AddBankAccountEvent {
   }
 
   def apply(bankAccount: BankDetails)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
-    auditSource = AppHelper.getName,
+    auditSource = AuditHelper.appName,
     auditType = "manualBankAccountSubmitted",
     tags = hc.toAuditTags("manualBankAccountSubmitted", request.path),
     detail = hc.toAuditDetails() ++ (convert(bankAccount) match {

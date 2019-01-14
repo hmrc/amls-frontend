@@ -22,7 +22,7 @@ import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AppHelper
+import utils.AuditHelper
 
 object PaymentConfirmationEvent {
   def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit
@@ -30,7 +30,7 @@ object PaymentConfirmationEvent {
                                                                            reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "paymentConfirm",
       tags = hc.toAuditTags("Payment Confirmation", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

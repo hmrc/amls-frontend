@@ -90,10 +90,6 @@ object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
 
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 
-  override def appName: String = {
-    appName
-  }
-
   override protected def appNameConfiguration: Configuration = Play.current.configuration
   override protected def mode: Mode = Play.current.mode
   override protected def runModeConfiguration: Configuration = Play.current.configuration

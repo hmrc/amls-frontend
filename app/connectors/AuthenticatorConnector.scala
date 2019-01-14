@@ -26,7 +26,9 @@ import uk.gov.hmrc.play.config.ServicesConfig
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class AuthenticatorConnector @Inject()(http: HttpPost, environment: Environment, val runModeConfiguration: Configuration) extends ServicesConfig {
+class AuthenticatorConnector @Inject()(http: HttpPost,
+                                       environment: Environment,
+                                       val runModeConfiguration: Configuration) extends ServicesConfig {
 
   val serviceUrl = baseUrl("government-gateway-authentication")
 

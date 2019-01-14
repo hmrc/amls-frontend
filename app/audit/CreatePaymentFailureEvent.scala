@@ -21,13 +21,13 @@ import play.api.libs.json.{JsObject, Json, Writes}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import utils.AppHelper
+import utils.AuditHelper
 
 object CreatePaymentFailureEvent {
   def apply(paymentRef: String, status: Int, message: String, request: CreatePaymentRequest)
            (implicit hc: HeaderCarrier, requestWrites: Writes[CreatePaymentRequest]): ExtendedDataEvent = {
     ExtendedDataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "createPaymentFailureEvent",
       tags = hc.toAuditTags("Create Payment", "n/a"),
       detail = Json.toJson(hc.toAuditDetails()).as[JsObject] ++ Json.obj(

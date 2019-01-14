@@ -22,7 +22,7 @@ import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.http.HeaderCarrier
-import utils.AppHelper
+import utils.AuditHelper
 
 object SurveyEvent {
   def apply
@@ -32,7 +32,7 @@ object SurveyEvent {
    reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppHelper.getName,
+      auditSource = AuditHelper.appName,
       auditType = "SurveyCompleted",
       tags = hc.toAuditTags("SatisfactionSurvey", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
