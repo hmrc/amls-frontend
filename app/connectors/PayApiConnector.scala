@@ -17,27 +17,26 @@
 package connectors
 
 import javax.inject.Inject
-
 import audit.{CreatePaymentEvent, CreatePaymentFailureEvent}
 import cats.implicits._
-import config.{ApplicationConfig, WSHttp}
+import config.{WSHttp}
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse}
-import play.api.Logger
+import play.api.Mode.Mode
+import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.{JsSuccess, Json}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.inject.ServicesConfig
+import uk.gov.hmrc.play.config.ServicesConfig
 import utils.HttpResponseHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class PayApiConnector @Inject()(
                                  http: WSHttp,
-                                 config: ServicesConfig,
                                  auditConnector: AuditConnector
-                               ) extends HttpResponseHelper {
+                               ) extends HttpResponseHelper with ServicesConfig {
 
-  lazy val baseUrl = s"${config.baseUrl("pay-api")}/pay-api"
+  lazy val payBaseUrl = s"${baseUrl("pay-api")}/pay-api"
   private val logDebug = (msg: String) => Logger.debug(s"[PayApiConnector] $msg")
   private val logError = (msg: String) => Logger.error(s"[PayApiConnector] $msg")
 
@@ -46,7 +45,7 @@ class PayApiConnector @Inject()(
     val bodyParser = JsonParsed[CreatePaymentResponse]
 
     logDebug(s"Creating payment: ${Json.toJson(request)}")
-    http.POST[CreatePaymentRequest, HttpResponse](s"$baseUrl/payment", request) map {
+    http.POST[CreatePaymentRequest, HttpResponse](s"$payBaseUrl/payment", request) map {
       case response & bodyParser(JsSuccess(body: CreatePaymentResponse, _)) =>
         val responseModel = body.copy(
           paymentId = response.header("Location").map(_.split("/").last)
@@ -61,4 +60,7 @@ class PayApiConnector @Inject()(
         None
     }
   }
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }

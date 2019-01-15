@@ -17,14 +17,12 @@
 package audit
 
 import models.governmentgateway.EnrolmentRequest
-import models.payments
-import models.payments.PaymentStatuses._
-import models.payments.{PaymentStatus, PaymentStatusResult, PaymentStatuses}
+import models.payments.{PaymentStatus, PaymentStatuses}
 import play.api.libs.json.Writes
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.config.AppName
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.AuditHelper
 
 object PaymentConfirmationEvent {
   def apply(amlsRef: String, payRef: String, paymentStatus: PaymentStatus)(implicit
@@ -32,7 +30,7 @@ object PaymentConfirmationEvent {
                                                                            reqW: Writes[EnrolmentRequest]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "paymentConfirm",
       tags = hc.toAuditTags("Payment Confirmation", "N/A"),
       detail = hc.toAuditDetails() ++ Map(

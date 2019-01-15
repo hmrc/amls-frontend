@@ -18,10 +18,10 @@ package audit
 
 import models.enrolment.{EnrolmentKey, TaxEnrolment}
 import play.api.libs.json.{Json, Writes}
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.config.AppName
+import utils.AuditHelper
 
 object ESEnrolEvent {
   def apply
@@ -31,7 +31,7 @@ object ESEnrolEvent {
    reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "OutboundCall",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
@@ -50,7 +50,7 @@ object ESDeEnrolEvent {
    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "OutboundCall",
       tags = hc.toAuditTags("DeEnrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
@@ -68,7 +68,7 @@ object ESRemoveKnownFactsEvent {
    hc: HeaderCarrier
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "OutboundCall",
       tags = hc.toAuditTags("RemoveKnownFacts", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
@@ -88,7 +88,7 @@ object ESEnrolFailureEvent {
    reqW: Writes[TaxEnrolment]
   ): DataEvent =
     DataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "OutboundCall",
       tags = hc.toAuditTags("Enrolment", "N/A"),
       detail = hc.toAuditDetails() ++ Map(
