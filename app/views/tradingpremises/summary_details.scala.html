@@ -24,10 +24,10 @@
 @(model: TradingPremises, isMsb: Boolean, index: Int, hasOneService: Boolean, hasOneMsbService: Boolean = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
-    @heading("summary.detailedanswers.title", "summary.tradingpremises")
+    @heading("summary.checkyouranswers.title", "summary.tradingpremises")
 }
 @main(
-    title = Messages("summary.detailedanswers.title") + " - " + Messages("summary.tradingpremises"),
+    title = Messages("summary.checkyouranswers.title") + " - " + Messages("summary.tradingpremises"),
     heading = header
 ) {
     @model.yourTradingPremises.map { yta =>
@@ -181,7 +181,7 @@
 
     }
 
-    @form(EmptyForm, controllers.tradingpremises.routes.YourTradingPremisesController.post(index)) {
+    @form(EmptyForm, controllers.tradingpremises.routes.DetailedAnswersController.post(index)) {
         @submit(false, Some(Messages("button.confirmandcontinue")), false)
     }
 }

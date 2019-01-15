@@ -106,10 +106,10 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         val hasOneService = bm.activities.fold(false)(_.businessActivities.size == 1)
         val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
 
-        if (tp.isComplete || edit) {
-          Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
-        } else {
+        if (!tp.isComplete) {
           Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
+        } else {
+          Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
         }
       }).getOrElse(NotFound(notFoundView))
   }

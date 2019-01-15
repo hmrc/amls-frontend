@@ -77,13 +77,14 @@ class  IsResidentialController @Inject()(
                   _ <- updateData[TradingPremises](cache, index) { tpO =>
                     tpO map { tp =>
                       val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None) { yourTradingPremises =>
+
                         Some(yourTradingPremises.copy(isResidential = Some(data.isResidential)))
                       }
                       tp.yourTradingPremises(ytp)
                     }
                   }
                 } yield edit match {
-                  case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
+                  case true => Redirect(routes.DetailedAnswersController.get(index))
                   case false => Redirect(routes.WhatDoesYourBusinessDoController.get(index, edit))
                 }
               }) getOrElse Future.successful(InternalServerError("Cannot update Trading Premises"))

@@ -136,13 +136,13 @@ object TradingPremises {
         tp match {
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
-          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
           case _ =>
             val index = tp.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
         }
       }
 

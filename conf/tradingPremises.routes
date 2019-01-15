@@ -40,9 +40,6 @@ POST        /msb-activities/:index                                   controllers
 GET         /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
-GET         /check-your-answers                                      @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
-POST        /check-your-answers                                      @controllers.tradingpremises.YourTradingPremisesController.post(index: Int)
-
 GET         /your-answers                                            @controllers.tradingpremises.YourTradingPremisesController.answers()
 GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int, edit: Boolean ?= false)
 
@@ -62,3 +59,6 @@ GET         /remove/:index/reasons                                   controllers
 POST        /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
 
 GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
+
+GET         /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.get(index: Int)
+POST        /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.post(index: Int)

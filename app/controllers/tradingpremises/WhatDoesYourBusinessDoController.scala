@@ -86,7 +86,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                   updateDataStrict[TradingPremises](index) {
                     tp => tp.copy(hasAccepted = true)
                   }
-                  Redirect(routes.YourTradingPremisesController.getIndividual(index, true))
+                  Redirect(routes.DetailedAnswersController.get(index))
                 }
               }
             }
@@ -116,7 +116,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       } else {
         data.activities.contains(MoneyServiceBusiness) match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-          case _ => Redirect(routes.YourTradingPremisesController.getIndividual(index, edit))
+          case _ => Redirect(routes.DetailedAnswersController.get(index))
         }
       }
   }

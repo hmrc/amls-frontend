@@ -20,7 +20,7 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data._
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector, ApplicationConfig}
+import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
@@ -32,7 +32,7 @@ import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
-import utils.{DateOfChangeHelper, FeatureToggle, RepeatingSection}
+import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
@@ -103,7 +103,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
       Redirect(routes.WhereAreTradingPremisesController.dateOfChange(index))
     } else {
       edit match {
-        case true => Redirect(routes.YourTradingPremisesController.getIndividual(index))
+        case true => Redirect(routes.DetailedAnswersController.get(index))
         case _ => Redirect(routes.ActivityStartDateController.get(index, edit))
       }
     }
