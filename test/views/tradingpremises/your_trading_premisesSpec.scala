@@ -88,7 +88,7 @@ class your_trading_premisesSpec extends AmlsSpec with MustMatchers with TradingP
       def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
 
       doc.getElementById("addTradingPremises").text must be(Messages("tradingpremises.summary.addanother"))
-      doc.getElementById("addTradingPremises").attr("href") must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(false).url)
+      doc.getElementById("addTradingPremises").attr("href") must be(controllers.tradingpremises.routes.TradingPremisesAddController.get(true).url)
     }
 
     "have an incomplete/complete sections with addresses displayed and edit/remove links" in new ViewFixture {

@@ -22,14 +22,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
-import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection}
-import views.html.tradingpremises.{summary_details, your_trading_premises}
+import utils.RepeatingSection
+import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
 
@@ -101,15 +100,13 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
       (for {
         cache <- OptionT(dataCacheConnector.fetchAll)
         tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
-        bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
       } yield {
-        val hasOneService = bm.activities.fold(false)(_.businessActivities.size == 1)
-        val hasOneMsbService = bm.msbServices.fold(false)(_.msbServices.size == 1)
-
-        if (!tp.isComplete) {
-          Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
-        } else {
-          Ok(summary_details(tp, ControllerHelper.isMSBSelected(Some(bm)), index, hasOneService, hasOneMsbService))
+        edit match {
+          case true if tp.isComplete & tp.hasAccepted =>
+            Redirect(controllers.tradingpremises.routes.DetailedAnswersController.get(index))
+          case true if !tp.isComplete =>
+            Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
+          case _ => Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
         }
       }).getOrElse(NotFound(notFoundView))
   }

@@ -21,7 +21,7 @@ import java.util.UUID
 import connectors.DataCacheConnector
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
+import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
@@ -33,17 +33,17 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, CacheMocks}
 
 import scala.concurrent.Future
 
-class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with CacheMocks with generators.tradingpremises.TradingPremisesGenerator {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
   val mockStatusService = mock[StatusService]
-  val mockCacheMap = mock[CacheMap]
+  //val mockCacheMap = mock[CacheMap]
   val mockYtp = mock[TradingPremises]
 
   trait Fixture extends AuthorisedFixture {
@@ -96,26 +96,21 @@ class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
       status(result) must be(SEE_OTHER)
     }
 
-    "for an individual display the trading premises check your answers page for individual" in new Fixture {
+    "for a complete individual display the trading premises check your answers page" in new Fixture {
 
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivitiesAll = BusinessMatchingActivities(
-        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-
-      val businessMatchingMsbServices = BusinessMatchingMsbServices(
-        Set(TransmittingMoney, CurrencyExchange))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices))))
+      val ytp = tradingPremisesGen.sample.get.copy(whatDoesYourBusinessDoAtThisAddress =
+        Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing, TelephonePaymentService),None)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
-        (any())).thenReturn(Some(Seq(TradingPremises())))
+       (any())).thenReturn(Some(Seq(ytp)))
 
       val result = ytpController.getIndividual(1, true)(request)
 
-      status(result) must be(OK)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
     }
 
 

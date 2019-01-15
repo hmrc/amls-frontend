@@ -123,7 +123,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           redirectLocation(result) must be(Some(routes.WhatDoesYourBusinessDoController.get(1).url))
         }
 
-        "redirect to SummaryController in edit mode" in new Fixture {
+        "redirect to DetailedAnswersController in edit mode" in new Fixture {
           val postRequest = request.withFormUrlEncodedBody(
             "isResidential" -> "false"
           )
@@ -141,7 +141,7 @@ class IsResidentialControllerSpec extends AmlsSpec with ScalaFutures with Mockit
           val result = controller.post(1, true)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
         }
 

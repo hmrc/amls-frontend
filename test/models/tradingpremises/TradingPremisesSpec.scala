@@ -220,7 +220,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
     }
 
     "the section is complete with all the trading premises being removed and has one incomplete model" must {
-      "successfully redirect to what you need page" in {
+      "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
@@ -234,12 +234,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Started)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
       }
     }
 
     "the section is complete with one of the trading premises object being removed" must {
-      "successfully redirect to check your answers page" in {
+      "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
@@ -251,12 +251,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
       }
     }
 
     "the section is complete with all the trading premises unchanged" must {
-      "successfully redirect to check your answers page" in {
+      "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
@@ -265,12 +265,12 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(false)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
       }
     }
 
     "the section is complete with all the trading premises being modified" must {
-      "successfully redirect to check your answers page" in {
+      "successfully redirect to your trading premises page" in {
         val mockCacheMap = mock[CacheMap]
 
         when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))(any()))
@@ -283,7 +283,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
 
         section.hasChanged must be(true)
         section.status must be(Completed)
-        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers())
+        section.call must be(controllers.tradingpremises.routes.YourTradingPremisesController.get())
       }
     }
   }
@@ -333,7 +333,7 @@ class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar w
             TradingPremises(hasAccepted = true),
             incompleteModel)))
 
-        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.YourTradingPremisesController.answers().url)
+        TradingPremises.section(mockCacheMap).call.url must be(controllers.tradingpremises.routes.YourTradingPremisesController.get().url)
       }
     }
 

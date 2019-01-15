@@ -162,7 +162,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     }
 
-    "redirect to PremisesRegisteredController" when {
+    "redirect to DetailedAnswersController" when {
 
       "on valid submission" in new Fixture {
 
@@ -181,7 +181,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
     }
@@ -218,7 +218,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -250,7 +250,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
     }
@@ -282,7 +282,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
             val result = controller.post(1, edit = true)(newRequest)
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+            redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
         }
       }
 
@@ -354,7 +354,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     }
 
-    "redirect to the SummaryController" when {
+    "redirect to the CheckYourAnswersController" when {
       "editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
 
         val tpNone = TradingPremises(
@@ -380,7 +380,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.YourTradingPremisesController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
     }
 
@@ -401,7 +401,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       val result = controller.post(1)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),
