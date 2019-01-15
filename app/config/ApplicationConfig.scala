@@ -16,12 +16,11 @@
 
 package config
 
-import config.ApplicationConfig.{baseUrl, getConfBool}
 import javax.inject.Inject
-import play.api.{Configuration, Play}
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment, Play}
 import play.api.Play.current
 import uk.gov.hmrc.play.config.ServicesConfig
-import uk.gov.hmrc.play.config.inject.{ServicesConfig => iServicesConfig}
 
 trait ApplicationConfig {
 
@@ -31,6 +30,9 @@ trait ApplicationConfig {
 }
 
 object ApplicationConfig extends ApplicationConfig with ServicesConfig {
+
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 
   private def getConfigString(key: String) = getConfString(key, throw new Exception(s"Could not find config '$key'"))
   private def getConfigInt(key: String) = getConfInt(key, throw new Exception(s"Could not find config '$key'"))
@@ -90,25 +92,27 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 }
 
-class AppConfig @Inject()(val config: iServicesConfig, baseConfig: Configuration) {
+class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration) extends ServicesConfig {
+
+  override protected def mode: Mode = environment.mode
 
   def amlsUrl = baseUrl("amls")
 
-  def showFeesToggle = config.getConfBool("feature-toggle.show-fees", defBool = false)
+  def showFeesToggle = getConfBool("feature-toggle.show-fees", defBool = false)
 
-  def enrolmentStoreToggle = config.getConfBool("feature-toggle.enrolment-store", defBool = false)
+  def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
 
-  def fxEnabledToggle = config.getConfBool("feature-toggle.fx-enabled", defBool = false)
+  def fxEnabledToggle = getConfBool("feature-toggle.fx-enabled", defBool = false)
 
-  def phase2ChangesToggle = config.getConfBool("feature-toggle.phase-2-changes", defBool = false)
+  def phase2ChangesToggle = getConfBool("feature-toggle.phase-2-changes", defBool = false)
 
-  def authUrl = config.baseUrl("auth")
+  def authUrl = baseUrl("auth")
 
-  def enrolmentStoreUrl = config.baseUrl("tax-enrolments")
+  def enrolmentStoreUrl = baseUrl("tax-enrolments")
 
   def enrolmentStubsEnabled: Boolean = getConfBool("enrolment-stubs.enabled", defBool = false)
 
-  def enrolmentStubsUrl = config.baseUrl("enrolment-stubs")
+  def enrolmentStubsUrl = baseUrl("enrolment-stubs")
 
   def feePaymentUrl = s"$amlsUrl/amls/payment"
 

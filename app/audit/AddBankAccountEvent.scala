@@ -18,13 +18,13 @@ package audit
 
 import cats.implicits._
 import models.bankdetails._
-import play.api.libs.json.{JsObject, JsString, Json, Writes}
+import play.api.libs.json.{JsString, Writes}
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.config.AppName
 import Utils._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.model.DataEvent
+import utils.AuditHelper
 
 object AddBankAccountEvent {
 
@@ -74,7 +74,7 @@ object AddBankAccountEvent {
   }
 
   def apply(bankAccount: BankDetails)(implicit hc: HeaderCarrier, request: Request[_]) = DataEvent(
-    auditSource = AppName.appName,
+    auditSource = AuditHelper.appName,
     auditType = "manualBankAccountSubmitted",
     tags = hc.toAuditTags("manualBankAccountSubmitted", request.path),
     detail = hc.toAuditDetails() ++ (convert(bankAccount) match {
