@@ -16,12 +16,12 @@
 
 package audit
 
-import uk.gov.hmrc.play.audit.model.{DataEvent, ExtendedDataEvent}
-import uk.gov.hmrc.play.config.AppName
+import uk.gov.hmrc.play.audit.model.{ExtendedDataEvent}
 import uk.gov.hmrc.play.audit.AuditExtensions._
 import play.api.libs.json._
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import utils.AuditHelper
 
 object ServiceEntrantEvent {
 
@@ -33,7 +33,7 @@ object ServiceEntrantEvent {
     )
 
     ExtendedDataEvent(
-      auditSource = AppName.appName,
+      auditSource = AuditHelper.appName,
       auditType = "userEnteredService",
       tags = hc.toAuditTags("userEnteredService", request.path),
       detail = data

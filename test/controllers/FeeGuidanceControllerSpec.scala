@@ -16,7 +16,7 @@
 
 package controllers
 
-import config.{AppConfig, ApplicationConfig}
+import config.ApplicationConfig
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -25,18 +25,13 @@ import models.businessmatching._
 import models.confirmation.{BreakdownRow, Currency}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tradingpremises.TradingPremises
-import org.mockito.Matchers.{eq => eqTo}
-import org.mockito.Mockito.when
 import org.scalacheck.Gen
 import org.scalatest.PrivateMethodTester
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.config.ServicesConfig
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -45,7 +40,6 @@ import scala.concurrent.Future
 
 class FeeGuidanceControllerSpec extends AmlsSpec
   with PrivateMethodTester
-  with ServicesConfig
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 

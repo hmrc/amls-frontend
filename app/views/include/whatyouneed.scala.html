@@ -33,14 +33,14 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
-    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("amls.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("amls.css")" rel="stylesheet"/>
     @linkElement
 }
 
 @scripts = {
-    <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
-    <script src="@routes.AssetsController.at("amls.js")"></script>
+    <script src="@routes.Assets.versioned("jquery-ui.min.js")"></script>
+    <script src="@routes.Assets.versioned("amls.js")"></script>
     @scriptElem
 }
 

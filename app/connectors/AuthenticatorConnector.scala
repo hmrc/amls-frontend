@@ -17,22 +17,25 @@
 package connectors
 
 import javax.inject.{Inject, Singleton}
-
-import play.api.Logger
-import uk.gov.hmrc.play.config.inject.ServicesConfig
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment, Logger}
 import play.api.http.Status._
+import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.play.config.ServicesConfig
+
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpPost, HttpResponse }
 
 @Singleton
-class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
+class AuthenticatorConnector @Inject()(http: HttpPost,
+                                       environment: Environment,
+                                       val runModeConfiguration: Configuration) extends ServicesConfig {
 
-  val serviceUrl = config.baseUrl("government-gateway-authentication")
+  val serviceUrl = baseUrl("government-gateway-authentication")
 
   def refreshProfile(implicit hc: HeaderCarrier, ec: ExecutionContext) = {
 
     //noinspection SimplifyBooleanMatch
-    config.getConfBool("feature-toggle.refresh-profile", defBool = false) match {
+    getConfBool("feature-toggle.refresh-profile", defBool = false) match {
       case true =>
         http.POSTEmpty(s"$serviceUrl/government-gateway-authentication/refresh-profile") map { response =>
           Logger.info("[AuthenticatorConnector] Current user profile was refreshed")
@@ -43,4 +46,5 @@ class AuthenticatorConnector @Inject()(http: HttpPost, config: ServicesConfig) {
 
   }
 
+  override protected def mode: Mode = environment.mode
 }

@@ -16,16 +16,8 @@
 
 package utils
 
-import config.AppConfig
-import org.scalatest.mock.MockitoSugar
-import uk.gov.hmrc.play.config.inject.ServicesConfig
-import org.mockito.Mockito.when
-
-trait AppConfigSetup extends MockitoSugar {
-
-  val appConfig = mock[AppConfig]
-  val servicesConfig = mock[ServicesConfig]
-
-  when(appConfig.config) thenReturn servicesConfig
-
+object AuditHelper {
+  def appName = {
+    "amls-frontend"
+  }
 }

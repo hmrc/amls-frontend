@@ -20,13 +20,16 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.Mode.Mode
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, HttpGet, NotFoundException}
+import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, NotFoundException}
+import play.api.{Configuration, Play}
+import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 
 class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneAppPerSuite {
 
@@ -62,7 +65,12 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector {
       override val http = mock[CoreGet]
-      override val crypto = SessionCookieCryptoFilter.encrypt _
+      lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
+      val sessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
+      override val crypto = sessionCookieCryptoFilter.encrypt _
+
+      override protected def mode: Mode = Play.current.mode
+      override protected def runModeConfiguration: Configuration = Play.current.configuration
     }
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")

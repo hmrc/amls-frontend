@@ -33,16 +33,16 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
-    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("amls.css")?v=1277522676382" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("print.css")?v=1277522676378" **media="screen"** rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("amls.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("print.css")" **media="screen"** rel="stylesheet"/>
     @linkElement
 }
 
 @scripts = {
-    <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
-    <script src="@routes.AssetsController.at("amls.js")?v=1277522676381"></script>
-    <script src="@routes.AssetsController.at("timeout-dialog.js?v=123456799")"></script>
+    <script src="@routes.Assets.versioned("jquery-ui.min.js")"></script>
+    <script src="@routes.Assets.versioned("amls.js")"></script>
+    <script src="@routes.Assets.versioned("timeout-dialog.js")"></script>
     @scriptElem
     <script>
     @if(userLoggedIn) {
