@@ -71,25 +71,19 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             // If there is only one activity in the data from the pre-reg,
             // then save that and redirect immediately without showing the
             // 'what does your business do' page.
-            updateDataStrict[TradingPremises](index) { tp =>
-                Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-              //Some(tp.copy(hasAccepted = true))
-            }
-
-
-
-
-            Future.successful {
+            val redirect = Future.successful {
               activities.contains(MoneyServiceBusiness) match {
                 case true => Redirect(routes.MSBServicesController.get(index))
-                case false => {
-                  updateDataStrict[TradingPremises](index) {
-                    tp => tp.copy(hasAccepted = true)
-                  }
-                  Redirect(routes.DetailedAnswersController.get(index))
-                }
+                case false => Redirect(routes.DetailedAnswersController.get(index))
               }
             }
+            for {
+              update <- updateDataStrict[TradingPremises](index) { tp =>
+                Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
+              }
+              redirectAfterUpdate <- redirect
+            } yield redirectAfterUpdate
+
           } else {
             val ba = BusinessActivities(activities)
             Future.successful {
