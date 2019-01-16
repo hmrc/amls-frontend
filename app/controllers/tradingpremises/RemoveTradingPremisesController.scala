@@ -55,6 +55,10 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
   def remove(index: Int, complete: Boolean = false, tradingName: String) = Authorised.async {
     implicit authContext => implicit request =>
 
+      def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
+        Redirect(routes.YourTradingPremisesController.get())
+      }
+
       statusService.getStatus flatMap {
         case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](index) map { _ =>
           Redirect(routes.YourTradingPremisesController.get(complete))
@@ -62,6 +66,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
         case SubmissionReadyForReview => for {
           _ <- updateDataStrict[TradingPremises](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+
           }
         } yield Redirect(routes.YourTradingPremisesController.get(complete))
         case _ =>
@@ -84,12 +89,7 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
                   }
                 }
 
-              case _ =>
-                updateDataStrict[TradingPremises](index) {
-                  _.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-                } map { _ =>
-                  Redirect(routes.YourTradingPremisesController.get(complete))
-                }
+              case _ => removeWithoutDate
             }
           }
       }
