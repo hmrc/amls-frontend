@@ -32,7 +32,88 @@
 ) {
     @model.yourTradingPremises.map { yta =>
 
-        <h2 class="heading-large">@yta.tradingName</h2>
+    @if(isMsb) {
+        @model.registeringAgentPremises.map { agentPremises =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.agent.premises.title"),
+                editLinkTag = "tradingpremisessummarywho-edit",
+                editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
+            ) {
+                @if(agentPremises.agentPremises) {
+                    <p>@Messages("lbl.yes")</p>
+                } else {
+                    <p>@Messages("lbl.no")</p>
+                }
+            }
+        }
+    }
+
+    @model.businessStructure.map { x =>
+        @checkYourAnswers(
+            question = Messages("tradingpremises.businessStructure.title"),
+            editLinkTag = "tradingpremisesbusinessstructure-edit",
+            editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
+        ) {
+            <p>@Messages(x.message)</p>
+        }
+    }
+
+    @model.agentCompanyDetails.map { x =>
+        @checkYourAnswers(
+            question = Messages("tradingpremises.agentcompanyname.title"),
+            editLinkTag = "tradingpremisesagentcompanyname-edit",
+            editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+        ) {
+            <p>@x.agentCompanyName</p>
+        }
+    }
+
+    @model.agentName.map { x =>
+        @checkYourAnswers(
+            question = Messages("tradingpremises.agentname.title"),
+            editLinkTag = "tradingpremisesagentnametitle-edit",
+            editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
+        ) {
+
+            <p>@x.agentName,
+                @x.agentDateOfBirth match {
+                    case Some(y) => {born @DateHelper.formatDate(y)}
+            case None => {}
+            }
+            </p>
+
+        }
+    }
+
+    @model.agentPartnership.map { x =>
+        @checkYourAnswers(
+            question = Messages("tradingpremises.agentpartnership.title"),
+            editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
+            editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
+        ) {
+            <p>@x.agentPartnership</p>
+        }
+    }
+
+    @model.agentCompanyDetails.map { x =>
+        @x.companyRegistrationNumber.map { crn =>
+            @checkYourAnswers(
+                question = Messages("tradingpremises.youragent.crn"),
+                editLinkTag = "tradingpremisesyouragentcrn-edit",
+                editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
+            ) {
+                <p>@crn</p>
+            }
+        }
+    }
+
+    @checkYourAnswers(
+        question = Messages("tradingpremises.summary.tradingname"),
+        editLinkTag = "tradingpremisedsummaryaddress-edit",
+        editUrl = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index, true).toString
+    ) {
+        <p>@yta.tradingName</p>
+    }
 
         @checkYourAnswers(
             question = Messages("tradingpremises.summary.address"),
@@ -46,7 +127,7 @@
 
         @yta.startDate.map {startDate =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.summary.tradingstartdate"),
+                question = Messages("tradingpremises.startDate.title"),
                 editLinkTag = "tradingprmisedsummarystartdate-edit",
                 editUrl = controllers.tradingpremises.routes.ActivityStartDateController.get(index, true).toString
             ) {
@@ -55,7 +136,7 @@
         }
         @yta.isResidential.map {residential =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.summary.residential"),
+                question = Messages("tradingpremises.isResidential.title"),
                 editLinkTag = "tradingpremisessummaryresidential-edit",
                 editUrl = controllers.tradingpremises.routes.IsResidentialController.get(index, true).toString
             ) {
@@ -68,7 +149,7 @@
 
         @model.whatDoesYourBusinessDoAtThisAddress.map { ba =>
             @checkYourAnswers(
-                question = Messages("tradingpremises.summary.services"),
+                question = Messages("tradingpremises.whatdoesyourbusinessdo.title"),
                 editLinkTag = "tradingpremisedsummaryservices-edit",
                 editUrl = if(!hasOneService){controllers.tradingpremises.routes.WhatDoesYourBusinessDoController.get(index, true).toString} else ""
             ) {
@@ -101,83 +182,6 @@
                 </ul>
             }
         }
-
-        @if(isMsb) {
-            @model.registeringAgentPremises.map { agentPremises =>
-                @checkYourAnswers(
-                    question = Messages("tradingpremises.summary.who-uses"),
-                    editLinkTag = "tradingpremisessummarywho-edit",
-                    editUrl = controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index, true).toString
-                ) {
-                    @if(agentPremises.agentPremises) {
-                    <p>@Messages("tradingpremises.summary.agents")</p>
-                    } else {
-                    <p>@Messages("tradingpremises.summary.mybusiness")</p>
-                    }
-                }
-            }
-        }
-
-        @model.businessStructure.map { x =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.businessStructure.title"),
-                editLinkTag = "tradingpremisesbusinessstructure-edit",
-                editUrl = controllers.tradingpremises.routes.BusinessStructureController.get(index, true).toString
-            ) {
-                <p>@Messages(x.message)</p>
-            }
-        }
-
-        @model.agentName.map { x =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.agentname.title"),
-                editLinkTag = "tradingpremisesagentnametitle-edit",
-                editUrl = controllers.tradingpremises.routes.AgentNameController.get(index, true).toString
-            ) {
-
-            <p>@x.agentName,
-            @x.agentDateOfBirth match {
-                case Some(y) => {born @DateHelper.formatDate(y)}
-                case None => {}
-            }
-            </p>
-
-            }
-        }
-
-        @model.agentPartnership.map { x =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.agentpartnership.title"),
-                editLinkTag = "tradingpremisesagentpartnershiptitle-edit",
-                editUrl = controllers.tradingpremises.routes.AgentPartnershipController.get(index, true).toString
-            ) {
-                <p>@x.agentPartnership</p>
-            }
-        }
-
-        @model.agentCompanyDetails.map { x =>
-            @checkYourAnswers(
-                question = Messages("tradingpremises.agentcompanyname.title"),
-                editLinkTag = "tradingpremisesagentcompanyname-edit",
-                editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
-            ) {
-                <p>@x.agentCompanyName</p>
-            }
-        }
-
-        @model.agentCompanyDetails.map { x =>
-            @x.companyRegistrationNumber.map { crn =>
-                @checkYourAnswers(
-                    question = Messages("tradingpremises.youragent.crn"),
-                    editLinkTag = "tradingpremisesyouragentcrn-edit",
-                    editUrl = controllers.tradingpremises.routes.AgentCompanyDetailsController.get(index, true).toString
-                ) {
-                    <p>@crn</p>
-                }
-            }
-        }
-
-
 
     }
 
