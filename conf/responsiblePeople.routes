@@ -91,6 +91,8 @@ POST        /experience-training/:index/                           controllers.r
 GET         /training/:index/                                      @controllers.responsiblepeople.TrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /training/:index/                                      @controllers.responsiblepeople.TrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
+GET         /fit-and-proper-notice/:index/                         @controllers.responsiblepeople.FitAndProperNoticeController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+
 GET         /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /fit-and-proper/:index/                                @controllers.responsiblepeople.FitAndProperController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
