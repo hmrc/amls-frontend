@@ -1,5 +1,5 @@
 /*
- * Copyright 2018 HM Revenue & Customs
+ * Copyright 2019 HM Revenue & Customs
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -158,7 +158,7 @@ object FormTypes {
   private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
   private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
-  val phoneNumberType = phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
+  val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
