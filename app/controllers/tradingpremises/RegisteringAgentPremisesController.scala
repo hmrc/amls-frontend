@@ -67,6 +67,7 @@ class RegisteringAgentPremisesController @Inject()(val dataCacheConnector: DataC
               resetAgentValues(tp.registeringAgentPremises(data), data)
             }
           } yield (data.agentPremises, edit) match {
+            case (true, true) => Redirect(routes.DetailedAnswersController.get(index))
             case (true, _) => Redirect(routes.BusinessStructureController.get(index,edit))
             case (false, true) => Redirect(routes.YourTradingPremisesController.getIndividual(index))
             case (false, false) => TPControllerHelper.redirectToNextPage(result, index, edit)
