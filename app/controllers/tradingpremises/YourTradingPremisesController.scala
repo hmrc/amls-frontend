@@ -22,12 +22,13 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessMatching
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview, SubmissionStatus}
 import models.tradingpremises.{RegisteringAgentPremises, TradingPremises}
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.tradingpremises.your_trading_premises
 
 import scala.concurrent.Future
@@ -99,11 +100,14 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
 
       (for {
         cache <- OptionT(dataCacheConnector.fetchAll)
+        bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
         tp <- OptionT.fromOption[Future](getData[TradingPremises](cache, index))
       } yield {
         edit match {
           case true if tp.isComplete & tp.hasAccepted =>
             Redirect(controllers.tradingpremises.routes.DetailedAnswersController.get(index))
+          case true if !tp.isComplete & ControllerHelper.isMSBSelected(Some(bm)) =>
+            Redirect(controllers.tradingpremises.routes.RegisteringAgentPremisesController.get(index))
           case true if !tp.isComplete =>
             Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
           case _ => Redirect(controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index))
