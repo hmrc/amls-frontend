@@ -63,7 +63,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
               }
             } yield edit match {
               case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.IsResidentialController.get(index, true))
+              case false => Redirect(routes.IsResidentialController.get(index, edit))
             }
         }
   }
