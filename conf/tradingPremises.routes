@@ -49,9 +49,6 @@ POST        /what-does-your-business-do/date-of-change/:index        controllers
 GET         /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
-POST        /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
-
 GET         /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
