@@ -18,11 +18,12 @@ package controllers.tradingpremises
 
 import java.util.UUID
 
-import models.tradingpremises.TradingPremises
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import play.api.test.Helpers.{OK, contentAsString, status}
 import connectors.DataCacheConnector
 import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.SubmissionDecisionApproved
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito.when
@@ -51,7 +52,7 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    val controller = new DetailedAnswersController(self.authConnector, mock[DataCacheConnector])
+    val controller = new DetailedAnswersController(self.authConnector, mockDataCacheConnector)
 
     when(statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
@@ -87,8 +88,27 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
     }
 
     "post is called" must {
-      "redirect to YourTradingPremisesController" in new Fixture {
+      "redirect to YourTradingPremisesController" when {
+        "all questions are complete and answers accepted" in new Fixture {
 
+          val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+          val ytp = Some(ytpModel)
+
+          val emptyCache = CacheMap("", Map.empty)
+
+          val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
+
+          when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
+
+          when(controller.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(emptyCache))
+
+          val result = controller.post(1)(newRequest)
+
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(controllers.tradingpremises.routes.YourTradingPremisesController.get().url))
+        }
       }
     }
 
