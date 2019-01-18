@@ -118,6 +118,13 @@ object TradingPremises {
     _.hasChanged
   }
 
+  def addressSpecified(yourTradingPremises: Option[YourTradingPremises]): Boolean = {
+    yourTradingPremises match {
+      case Some(_) => true
+      case _ => false
+    }
+  }
+
   def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
 
   def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =

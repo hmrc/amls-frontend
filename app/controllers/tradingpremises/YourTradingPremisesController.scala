@@ -66,7 +66,6 @@ class YourTradingPremisesController @Inject()(val dataCacheConnector: DataCacheC
         case (Some(data), status) => {
           val (completeTp, incompleteTp) = TradingPremises.filterWithIndex(data)
             .partition(_._1.isComplete)
-
           Ok(your_trading_premises(EmptyForm, edit, status, completeTp, incompleteTp))
         }
         case _ => Redirect(controllers.routes.RegistrationProgressController.get())
