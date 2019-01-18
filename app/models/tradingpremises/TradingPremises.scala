@@ -140,7 +140,7 @@ object TradingPremises {
       if (filter(tp).equals(Nil)) {
         Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get())
       } else {
-        tp match {
+        filter(tp) match {
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
           } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
