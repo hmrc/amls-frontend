@@ -57,7 +57,6 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
                     Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                   }
                   Redirect(routes.DetailedAnswersController.get(index))
-                  //Redirect(routes.YourTradingPremisesController.getIndividual(index))
                 } else {
                   (for {
                     tps <- tp.msbServices

@@ -177,7 +177,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
                   tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.YourTradingPremisesController.get())
+              } yield Redirect(routes.DetailedAnswersController.get(index))
           }
         }
   }
