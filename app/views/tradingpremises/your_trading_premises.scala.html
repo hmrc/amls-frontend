@@ -24,9 +24,10 @@
 @(f: forms.Form2[_], add: Boolean, status: SubmissionStatus, completeTp: Seq[(TradingPremises, Int)], incompleteTp: Seq[(TradingPremises, Int)])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @tpDetail(tp: TradingPremises) = {
-    @tp.yourTradingPremises.map { ytp =>
-        @ytp.tradingPremisesAddress.toLines.mkString(", ").toString
-    }
+    @{tp.yourTradingPremises match {
+        case Some(ytp) => ytp.tradingPremisesAddress.toLines.mkString(", ").toString
+        case None => Messages("tradingpremises.noaddress")
+    }}
 }
 
 @header = {

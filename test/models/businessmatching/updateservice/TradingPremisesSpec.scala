@@ -16,7 +16,8 @@
 
 package models.businessmatching.updateservice
 
-import jto.validation.{Invalid, Valid, Path, ValidationError}
+import jto.validation.{Invalid, Path, Valid, ValidationError}
+import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.scalatest.MustMatchers
 import org.scalatestplus.play.PlaySpec
 
@@ -69,6 +70,15 @@ class TradingPremisesSpec extends PlaySpec with MustMatchers {
           result mustBe Map("tradingPremises[]" -> Seq("2"))
         }
       }
+    }
+
+    "Given a model without a specified address" must {
+      "return false" in {
+
+        val tp = Some(TradingPremises())
+
+        TradingPremises.addressSpecified(tp.yourTradingPremises) mustBe false
+        }
     }
   }
 }
