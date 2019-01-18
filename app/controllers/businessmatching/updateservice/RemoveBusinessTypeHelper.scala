@@ -46,12 +46,25 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                    ) {
   def removeSectionData(model: RemoveBusinessTypeFlowModel)
                        (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+
+    //TODO - how can we execute these statements one at a time so as not to override the cache at each save?
     OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
-      case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
-      case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
-      case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
-      case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
-      case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+
+      //case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
+      case MoneyServiceBusiness => dataCacheConnector.removeByKey[MSBSection](MSBSection.key)
+
+      //case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
+      case HighValueDealing => dataCacheConnector.removeByKey[Hvd](Hvd.key)
+
+      //case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
+      case TrustAndCompanyServices => dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
+
+      //case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
+      case AccountancyServices => dataCacheConnector.removeByKey[Asp](Asp.key)
+
+      //case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+      case EstateAgentBusinessService => dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+
     }).toSeq))
   }
 

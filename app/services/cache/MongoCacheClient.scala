@@ -133,6 +133,25 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   }
 
   /**
+    * Removes the item with the specified key from the cache
+    */
+  def removeByKey[T](id: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
+    fetchAll(id) flatMap { maybeCache =>
+      val cache = maybeCache.getOrElse(Cache(id, Map.empty))
+
+      val updatedCache = cache.copy(
+        data = cache.data - (key),
+        lastUpdated = DateTime.now(DateTimeZone.UTC)
+      )
+
+      val document = Json.toJson(updatedCache)
+      val modifier = BSONDocument("$set" -> document)
+
+      collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
+    }
+  }
+
+  /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
     */
   def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
@@ -142,7 +161,13 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     } else {
       Json.toJson(data)
     }
-    toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
+
+    if(data != None) {
+      toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
+    }
+    else {
+      targetCache
+    }
   }
 
   /**

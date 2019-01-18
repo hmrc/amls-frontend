@@ -178,7 +178,11 @@ trait LandingService {
   }
 
   private def eabSection(viewResponse: ViewResponse) = {
-    Some(viewResponse.eabSection.copy(hasAccepted = true))
+    if(viewResponse.eabSection.services.nonEmpty) {
+      Some(viewResponse.eabSection.copy(hasAccepted = true))
+    } else {
+      None
+    }
   }
 
   private def aboutSection(viewResponse: ViewResponse) = {
@@ -190,19 +194,35 @@ trait LandingService {
   }
 
   private def tcspSection(viewResponse: ViewResponse) = {
-    Some(viewResponse.tcspSection.copy(hasAccepted = true))
+    if(viewResponse.tcspSection.tcspTypes.nonEmpty) {
+      Some(viewResponse.tcspSection.copy(hasAccepted = true))
+    } else {
+      None
+    }
   }
 
   private def aspSection(viewResponse: ViewResponse) = {
-    Some(viewResponse.aspSection.copy(hasAccepted = true))
+    if(viewResponse.aspSection.services.nonEmpty) {
+      Some(viewResponse.aspSection.copy(hasAccepted = true))
+    } else {
+      None
+    }
   }
 
   private def msbSection(viewResponse: ViewResponse) = {
-    Some(viewResponse.msbSection.copy(hasAccepted = true))
+    if(viewResponse.msbSection.throughput.nonEmpty) {
+      Some(viewResponse.msbSection.copy(hasAccepted = true))
+    } else {
+      None
+    }
   }
 
   private def hvdSection(viewResponse: ViewResponse) = {
-    Some(viewResponse.hvdSection.copy(hasAccepted = true))
+    if(viewResponse.hvdSection.products.nonEmpty) {
+      Some(viewResponse.hvdSection.copy(hasAccepted = true))
+    } else {
+      None
+    }
   }
 
   private def supervisionSection(viewResponse: ViewResponse) = {

@@ -56,6 +56,11 @@ trait DataCacheConnector {
   def remove(implicit hc: HeaderCarrier, ac: AuthContext): Future[Boolean] =
     cacheConnector.remove
 
+  def removeByKey[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, format: Format[T]): Future[CacheMap] = {
+    println("ACHI - Remove: " + cacheId)
+    cacheConnector.removeByKey(cacheId)
+  }
+
   def update[T](cacheId: String)(f: Option[T] => T)(implicit ac: AuthContext, hc: HeaderCarrier, fmt: Format[T]): Future[Option[T]] =
     cacheConnector.update(cacheId)(f)
 
