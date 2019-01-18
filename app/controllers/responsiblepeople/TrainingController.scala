@@ -79,7 +79,7 @@ class TrainingController @Inject()(
           case (true, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
           case (false, Some(BusinessMatching(_, Some(BusinessActivities(acts, _, _, _)),_,_,_,_, _, _, _)))
             if  appConfig.phase2ChangesToggle || acts.exists(act => act == MoneyServiceBusiness || act == TrustAndCompanyServices)
-          => Redirect(routes.FitAndProperController.get(index, false, flow))
+          => Redirect(routes.FitAndProperNoticeController.get(index, false, flow))
           case (false, _) => Redirect(routes.DetailedAnswersController.get(index, flow))
         }
       }
