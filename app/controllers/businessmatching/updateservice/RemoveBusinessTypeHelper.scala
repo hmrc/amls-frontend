@@ -45,7 +45,7 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
   def removeSectionData(model: RemoveBusinessTypeFlowModel)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
 
     //TODO - how can we execute these statements one at a time so as not to override the cache at each save?
     OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
