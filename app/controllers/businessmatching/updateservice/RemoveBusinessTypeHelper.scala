@@ -44,28 +44,50 @@ import scala.concurrent.{ExecutionContext, Future}
 class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
                                          implicit val dataCacheConnector: DataCacheConnector
                                    ) {
+
   def removeSectionData(model: RemoveBusinessTypeFlowModel)
-                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext) = {
+                       (implicit ac: AuthContext, hc: HeaderCarrier, ec: ExecutionContext): OptionT[Future, Seq[CacheMap]] = {
 
-    //TODO - how can we execute these statements one at a time so as not to override the cache at each save?
-    OptionT.liftF(Future.sequence((model.activitiesToRemove.getOrElse(Seq.empty) collect {
+    def removeActivities(activities: List[BMBusinessActivity]): Future[Seq[CacheMap]] = {
+      activities match {
+        case Nil =>
+          Future.successful(Seq.empty)
+        case first :: rest =>
+          for {
+            f <- removeActivity(first).map(Seq(_))
+            r <- removeActivities(rest)
+          } yield f ++ r
+      }
+    }
 
-      //case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
-      case MoneyServiceBusiness => dataCacheConnector.removeByKey[MSBSection](MSBSection.key)
+    def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
+      activity match {
+        //case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
+        case MoneyServiceBusiness =>
+          dataCacheConnector.removeByKey[MSBSection](MSBSection.key)
 
-      //case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
-      case HighValueDealing => dataCacheConnector.removeByKey[Hvd](Hvd.key)
+        //case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
+        case HighValueDealing =>
+          dataCacheConnector.removeByKey[Hvd](Hvd.key)
 
-      //case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
-      case TrustAndCompanyServices => dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
+        //case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
+        case TrustAndCompanyServices =>
+          dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
 
-      //case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
-      case AccountancyServices => dataCacheConnector.removeByKey[Asp](Asp.key)
+        //case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
+        case AccountancyServices =>
+          dataCacheConnector.removeByKey[Asp](Asp.key)
 
-      //case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
-      case EstateAgentBusinessService => dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+        //case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
+        case EstateAgentBusinessService =>
+          dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+      }
+    }
 
-    }).toSeq))
+    OptionT.liftF(model.activitiesToRemove.fold(Future.successful(Seq.empty[CacheMap])) {
+      activities =>
+        removeActivities(activities.toList)
+    })
   }
 
   def removeBusinessMatchingBusinessTypes(model: RemoveBusinessTypeFlowModel)

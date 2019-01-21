@@ -698,69 +698,69 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
   "Removing the section data" should {
     "clear the data from the cache" when {
       "removing MSB" in new Fixture {
-        mockCacheSave[MoneyServiceBusinessSection]
+        mockCacheRemoveByKey[MoneyServiceBusinessSection]
 
         val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(MoneyServiceBusiness)))).value)
 
-        verify(mockCacheConnector).save[MoneyServiceBusinessSection](
-          eqTo(MoneyServiceBusinessSection.key),
-          eqTo(MoneyServiceBusinessSection()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[MoneyServiceBusinessSection](
+          eqTo(MoneyServiceBusinessSection.key)
+        )(any(), any(), any())
       }
 
       "removing HVD" in new Fixture {
-        mockCacheSave[Hvd]
+        mockCacheRemoveByKey[Hvd]
 
         val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(HighValueDealing)))).value)
 
-        verify(mockCacheConnector).save[Hvd](
-          eqTo(Hvd.key),
-          eqTo(Hvd()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[Hvd](
+          eqTo(Hvd.key)
+        )(any(), any(), any())
       }
 
       "removing TCSP" in new Fixture {
-        mockCacheSave[Tcsp]
+        mockCacheRemoveByKey[Tcsp]
 
         val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(TrustAndCompanyServices)))).value)
 
-        verify(mockCacheConnector).save[Tcsp](
-          eqTo(Tcsp.key),
-          eqTo(Tcsp()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[Tcsp](
+          eqTo(Tcsp.key)
+        )(any(), any(), any())
       }
 
       "removing ASP" in new Fixture {
-        mockCacheSave[Asp]
+        mockCacheRemoveByKey[Asp]
 
         val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(AccountancyServices)))).value)
 
-        verify(mockCacheConnector).save[Asp](
-          eqTo(Asp.key),
-          eqTo(Asp()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[Asp](
+          eqTo(Asp.key)
+        )(any(), any(), any())
       }
 
       "removing EAB" in new Fixture {
-        mockCacheSave[EstateAgentBusiness]
+        mockCacheRemoveByKey[EstateAgentBusiness]
 
         val result = await(helper.removeSectionData(RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService)))).value)
 
-        verify(mockCacheConnector).save[EstateAgentBusiness](
-          eqTo(EstateAgentBusiness.key),
-          eqTo(EstateAgentBusiness()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[EstateAgentBusiness](
+          eqTo(EstateAgentBusiness.key)
+        )(any(), any(), any())
       }
 
       "removing multiple services" in new Fixture {
-        mockCacheSave[EstateAgentBusiness]
-        mockCacheSave[Tcsp]
+        mockCacheRemoveByKey[EstateAgentBusiness]
+        mockCacheRemoveByKey[Tcsp]
 
         val result = await(helper.removeSectionData(
           RemoveBusinessTypeFlowModel(Some(Set(EstateAgentBusinessService, TrustAndCompanyServices)))).value)
 
-        verify(mockCacheConnector).save[EstateAgentBusiness](
-          eqTo(EstateAgentBusiness.key),
-          eqTo(EstateAgentBusiness()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[EstateAgentBusiness](
+          eqTo(EstateAgentBusiness.key)
+        )(any(), any(), any())
 
-        verify(mockCacheConnector).save[Tcsp](
-          eqTo(Tcsp.key),
-          eqTo(Tcsp()))(any(), any(), any())
+        verify(mockCacheConnector).removeByKey[Tcsp](
+          eqTo(Tcsp.key)
+        )(any(), any(), any())
 
         verify(mockCacheConnector, never).save[MoneyServiceBusinessSection](eqTo(MoneyServiceBusinessSection.key), any())(any(), any(), any())
         verify(mockCacheConnector, never).save[Asp](eqTo(Asp.key), any())(any(), any(), any())

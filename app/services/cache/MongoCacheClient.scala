@@ -156,6 +156,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
 
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
+    * Id the data item passed in is null the entry will not be saved to the cache.
     */
   def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
