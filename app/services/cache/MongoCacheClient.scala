@@ -45,11 +45,19 @@ import uk.gov.hmrc.crypto.ApplicationCrypto
 case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime = DateTime.now(DateTimeZone.UTC)) {
 
   /**
-    * Upsert a value into the cache given its key
+    * Upsert a value into the cache given its key.
+    * If the data to be inserted is null then remove the entry by key
     */
   def upsert[T](key: String, data: JsValue)(implicit ev: Writes[T]) = {
+    val updated = if(data != None) {
+      this.data + (key -> data)
+    }
+    else {
+      this.data - (key)
+    }
+
     this.copy(
-      data = this.data + (key -> data),
+      data = updated,
       lastUpdated = DateTime.now(DateTimeZone.UTC)
     )
   }
@@ -156,7 +164,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
 
   /**
     * Inserts data into the existing cache object in memory given the specified key. If the data does not exist, it will be created.
-    * Id the data item passed in is null the entry will not be saved to the cache.
     */
   def upsert[T](targetCache: CacheMap, id: String, data: T, key: String)(implicit writes: Writes[T]) : CacheMap = {
     val jsonData = if (appConfig.mongoEncryptionEnabled) {
@@ -166,12 +173,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
       Json.toJson(data)
     }
 
-    if(data != None) {
-      toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
-    }
-    else {
-      targetCache
-    }
+    toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
   }
 
   /**
