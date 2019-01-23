@@ -25,6 +25,7 @@ import models.businessmatching._
 import models.status.SubmissionStatus
 import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
+import play.api.Logger
 import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
@@ -71,15 +72,19 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             // If there is only one activity in the data from the pre-reg,
             // then save that and redirect immediately without showing the
             // 'what does your business do' page.
-            updateDataStrict[TradingPremises](index) { tp =>
+              updateDataStrict[TradingPremises](index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-            }
-            Future.successful {
-              activities.contains(MoneyServiceBusiness) match {
-                case true => Redirect(routes.MSBServicesController.get(index))
-                case false => Redirect(routes.PremisesRegisteredController.get(index))
+              }.map {
+                _ =>
+                  activities.contains(MoneyServiceBusiness) match {
+                    case true => Redirect(routes.MSBServicesController.get(index))
+                    case false => Redirect(routes.PremisesRegisteredController.get(index))
+                  }
+            }.recover {
+                case _ =>
+                Logger.error(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
+                NotFound(notFoundView)
               }
-            }
           } else {
             val ba = BusinessActivities(activities)
             Future.successful {
