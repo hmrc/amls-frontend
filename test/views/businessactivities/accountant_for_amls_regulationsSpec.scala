@@ -16,13 +16,12 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.businessactivities.{AccountantForAMLSRegulations}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.businessactivities.AccountantForAMLSRegulations
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -66,6 +65,12 @@ class accountant_for_amls_regulationsSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("accountantForAMLSRegulations")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.accountant_for_amls_regulations(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

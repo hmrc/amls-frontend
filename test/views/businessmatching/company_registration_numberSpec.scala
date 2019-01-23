@@ -16,10 +16,10 @@
 
 package views.businessmatching
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.CompanyRegistrationNumber
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -82,5 +82,18 @@ class company_registration_numberSpec extends AmlsSpec with MustMatchers  {
 
       doc.body().text() must not include Messages("link.return.registration.progress")
     }
+
+    "have a back link in pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.company_registration_number(EmptyForm, edit = false, isPreSubmission = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
+    "have a back link in non pre-submission mode" in new ViewFixture {
+      def view = views.html.businessmatching.company_registration_number(EmptyForm, edit = false, isPreSubmission = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
   }
 }

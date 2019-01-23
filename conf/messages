@@ -143,7 +143,7 @@ error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter a valid account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number
-error.max.length.bankdetails.accountnumber = Enter a valid account number=
+error.max.length.bankdetails.accountnumber = Enter a valid account number
 error.required.bankdetails.iban.account = Enter either an IBAN number or an account number
 
 error.invalid.bankdetails.iban = Enter a valid IBAN number
@@ -230,9 +230,9 @@ error.required.rp.email = Enter a valid email address
 error.invalid.rp.email = Enter a valid email address
 error.max.length.rp.email = You can’t enter more than 100 characters
 error.required.rp.experiencetraining = Select yes if this person has experience in these activities
-error.required.rp.experiencetraining.information = Enter a brief description of this person's experience
+error.required.rp.experiencetraining.information = Enter a brief description of this person’s experience
 error.required.rp.training = Select yes if this person has had training in anti-money laundering or counter-terrorism funding
-error.required.rp.training.information = Enter a brief description of this person's training
+error.required.rp.training.information = Enter a brief description of this person’s training
 error.required.rp.fit_and_proper = Select yes if this person has already passed the Fit and Proper test
 error.required.rp.approval_check = Select yes if this person has already been charged for the approval check
 error.invalid.length.rp.training.information = You can’t enter more than 255 characters
@@ -483,7 +483,7 @@ services.list.lbl.04 = Cheque cashing (scrap metal dealers)
 hint.8.digits = It’s either 8 numbers, or a mix of 15 letters and numbers.
 hint.9.digits = It’s 9 numbers, like 123456789
 hint.10.digits = For example: 1234567890
-hint.255.chars = Enter 255 characters or less.
+hint.255.chars = Enter 255 characters or less
 
 lbl.hint.crn = It’s 8 characters and can be just numbers, or a mix of numbers and capital letters. If yours is 7 characters, enter a 0 (zero) at the beginning.
 
@@ -507,9 +507,9 @@ unauthorised.role.content = Your account doesn’t have enough access rights to 
 start.title = Manage your anti-money laundering supervision
 start.line1 = Use this service to register with HM Revenue and Customs (HMRC) for supervision under the Money Laundering regulations.
 start.line2 = If you’re already registered you can update your information, de-register or renew your registration.
-start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration.
+start.line3 = You need to be signed into your Government Gateway account to access the service. If you don't have an account you can <a href="https://www.tax.service.gov.uk/government-gateway-registration-frontend?accountType=organisation&continue=%2Fanti-money-laundering&origin=amls-frontend">sign up for Government Gateway</a> as part of your registration. Keep your Government Gateway ID number in a safe place as you will need it each time you use the service.
 
-start.button.text = Start now
+start.button.text = Sign in
 start.before.heading = Before you register
 start.before.line1 = You’ll need to pay <a href="https://www.gov.uk/guidance/money-laundering-regulations-registration-fees">a fee</a> when you apply, renew, or make changes to your registration. You can pay by Bacs or by debit or credit card when you complete your submission. We will not be able to process your submission until you have paid the registration fees.
 start.utr.heading = Unique Taxpayer Reference (UTR) number
@@ -1301,8 +1301,8 @@ bankdetails.accounttype.nonuk.lbl.02 = A non UK business bank account belonging 
 bankdetails.accounttype.nonuk.lbl.03 = A non UK business bank account belonging to another business
 bankdetails.accounttype.nonuk.lbl.04 = The business doesn’t use a bank account
 bankdetails.bankaccount.title = What kind of bank account is this?
-bankdetails.bankaccount.accountname.title = Give this bank account a name
-bankdetails.bankaccount.accountname = Give this bank account a name
+bankdetails.bankaccount.accountname.title = Give this bank account an informal name to help you identify it
+bankdetails.bankaccount.accountname = Give this bank account an informal name to help you identify it
 bankdetails.bankaccount.accounttype.title = Is this a UK bank account?
 bankdetails.bankaccount.accounttype = Is this a UK bank account?
 bankdetails.bankaccount.accounttype.uk.lbl = UK Bank Account
@@ -1508,16 +1508,16 @@ responsiblepeople.personName.middlename = Middle name, if applicable
 responsiblepeople.personName.lastname = Last name
 responsiblepeople.personName.isknownbyothernames = Has this person ever legally changed their name?
 responsiblepeople.personName.hasOtherNames = Is this person known by any other names?
-responsiblepeople.personName.otherfirstnames = Previous first names
-responsiblepeople.personName.othermiddlenames = Previous middle names
-responsiblepeople.personName.otherlastnames = Previous last names
+responsiblepeople.personName.otherfirstnames = Previous first name
+responsiblepeople.personName.othermiddlenames = Previous middle name
+responsiblepeople.personName.otherlastnames = Previous last name
 responsiblepeople.personName.previous.date.lbl = When did their name legally change?
 responsiblepeople.personName.alternativeName = Alternative name
 responsiblepeople.legalName.title = Has this person ever legally changed their name?
 responsiblepeople.legalName.heading = Has {0} ever legally changed their name?
 responsiblepeople.legalnamechangedate.title = When did this person's name change?
 responsiblepeople.legalnamechangedate.heading = When did {0}'s name change?
-responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll.
+responsiblepeople.legalnamechangedate.hint = For example, if they got married, divorced, or changed their name by deed poll. If they have changed their name more than once, give the most recent change.
 responsiblepeople.knownby.title = Is this person known by any other names?
 responsiblepeople.knownby.heading = Is {0} known by any other names?
 responsiblepeople.registeredforselfassessment.heading = Is {0} registered for Self Assessment?
@@ -1652,22 +1652,22 @@ responsiblepeople.check_your_answers.visuallyhidden.from.your = from your respon
 responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘About the Business’ section and let you know what they need.
 
-responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
-responsiblepeople.fit_and_proper.phase_2_heading = Has {0} passed the fit and proper test?
-responsiblepeople.fit_and_proper.phase_2_title = Has this person passed the fit and proper test?
-responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
-responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
-responsiblepeople.fit_and_proper.text.details.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
-responsiblepeople.fit_and_proper.phase_2_details = The HMRC fit and proper test is part of the Money Laundering Regulations. It is not the same as the test done by the Financial Conduct Authority.
-responsiblepeople.fit_and_proper.phase_2_details2 = The test checks the details you provided about {0} are correct and they are a suitable responsible person. If they have passed the test, they do not need to do it again.
-responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
-responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
-responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
+responsiblepeople.fit_and_proper.notice.title = HMRC’s fit and proper test and HMRC’s approval check
+responsiblepeople.fit_and_proper.notice.text1 = HMRC checks that the responsible people running your business meet the requirements of the Money Laundering Regulations. This is part of the registration process.
+responsiblepeople.fit_and_proper.notice.heading1 = HMRC’s fit and proper test
+responsiblepeople.fit_and_proper.notice.text2 = The fit and proper test is for money service businesses and trusts or company service providers. It is different to the test done by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.notice.heading2 = HMRC’s approval check
+responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, estate agent businesses and high value dealers.
 
-responsiblepeople.approval_check.heading = Has {0} been charged for the approval check?
+responsiblepeople.fit_and_proper.heading = Has {0} passed HMRC’s fit and proper test?
+responsiblepeople.fit_and_proper.title = Has this person passed the fit and proper test?
+responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trusts or company service providers. It is different to the test done by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test, either in their current role or in a previous role, they do not need to pass it again.
+
+responsiblepeople.approval_check.heading = Has HMRC charged your business or another business to do an approval check about {0}?
 responsiblepeople.approval_check.title = Has this person been charged for the approval check?
-responsiblepeople.approval_check.text.details = The HMRC approval check does similar checks but is different to the fit and proper check.
-responsiblepeople.approval_check.text.details2 = If {0} has already been charged for the approval check, they will not be charged again.
+responsiblepeople.approval_check.text.details = This is separate from HMRC’s fit and proper test. HMRC carries out the approval check as part of the registration process for accountancy service providers, estate agency businesses and high value dealers.
+responsiblepeople.approval_check.text.details2 = If a responsible person has already passed the check, either in their current role or in a previous role, they do not need to pass it again.
 
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
@@ -1998,7 +1998,7 @@ notifications.subject.MindedToReject = Refusal of Application being Considered
 notifications.subject.MindedToRevoke = Revocation of Registration being Considered
 notifications.subject.NoLongerMindedToReject = No longer considering refusal
 notifications.subject.NoLongerMindedToRevoke = No longer considering revocation
-notifications.subject.Others = Generic communication
+notifications.subject.Others = Message about your supervision
 
 notifications.subject.RegistrationVariationApproval = Registration Variation Approval
 notifications.subject.ApplicationAutorejectionForFailureToPay = Your application has failed
@@ -2130,3 +2130,6 @@ login-event.date-of-birth-message = their date of birth
 login-event.fit-and-proper-message = if they have passed the fit and proper test
 login-event.approval-check-charge-message = if they have been charged for the approval check
 login-event.event-messages-header = For each responsible person, you must tell us:
+
+############################### SiteBack ###############################
+site.back = Back

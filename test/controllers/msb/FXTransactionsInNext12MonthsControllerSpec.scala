@@ -130,7 +130,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
 
         }
 
-        "Successfully save data in save4later and navigate to Summary page" in new Fixture {
+        "Successfully save data in mongoCache and navigate to Summary page" in new Fixture {
             val newRequest = request.withFormUrlEncodedBody(
                 "fxTransaction" -> "12345678963"
             )
@@ -146,7 +146,7 @@ class FXTransactionsInNext12MonthsControllerSpec extends AmlsSpec with MockitoSu
             redirectLocation(result) must be(Some(controllers.msb.routes.SummaryController.get().url))
         }
 
-        "Successfully save data in save4later and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
+        "Successfully save data in mongoCache and navigate to Summary page in edit mode if the next page's data is in store" in new Fixture {
 
             val incomingModel = MoneyServiceBusiness(
                 whichCurrencies = Some(fullModel)

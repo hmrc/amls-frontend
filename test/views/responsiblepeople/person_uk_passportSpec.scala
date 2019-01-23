@@ -37,6 +37,8 @@ class person_uk_passportSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.person_uk_passport(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.uk.passport.title"))
       heading.html must be(Messages("responsiblepeople.uk.passport.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

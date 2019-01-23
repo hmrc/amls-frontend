@@ -17,12 +17,11 @@
 package views.responsiblepeople
 
 import forms.{Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK, ResponsiblePersonAddress}
+import models.responsiblepeople.{PersonAddressUK, ResponsiblePersonAddress}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
-import models.Country
 import models.autocomplete.NameValuePair
 import play.api.i18n.Messages
 import views.Fixture
@@ -39,6 +38,13 @@ class additional_extra_addressSpec extends AmlsSpec with MustMatchers {
   }
 
   "additional_extra_address view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))
+      def view = views.html.responsiblepeople.additional_extra_address(form2, true, 1, None, "firstName lastName", countries)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ResponsiblePersonAddress] = Form2(ResponsiblePersonAddress(PersonAddressUK("","",None,None,""), None))

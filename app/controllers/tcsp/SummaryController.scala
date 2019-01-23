@@ -21,7 +21,6 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import javax.inject.Inject
-import models.businessmatching.TrustAndCompanyServices
 import models.tcsp.Tcsp
 import services.StatusService
 import services.businessmatching.ServiceFlow
@@ -53,12 +52,7 @@ class SummaryController @Inject()
         (for {
           model <- OptionT(fetchModel)
           _ <- OptionT.liftF(dataCache.save[Tcsp](Tcsp.key, model.copy(hasAccepted = true)))
-          preSubmission <- OptionT.liftF(statusService.isPreSubmission)
-          inNewFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(TrustAndCompanyServices))
-        } yield (preSubmission, inNewFlow) match {
-          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-        }) getOrElse InternalServerError("Cannot update Tcsp")
+        } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Cannot update Tcsp")
   }
 
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) = dataCache.fetch[Tcsp](Tcsp.key)

@@ -22,21 +22,21 @@
     <summary class="summary">@Messages("confirmation.itemisedfeelink")</summary>
     <div class="details__inner">
         <ul class="list">
-            <table>
-                <caption>@summary</caption>
+            <span id="tblDesc">@summary</span>
+            <table aria-describedby="tblDesc">
                 <thead>
                     <tr>
-                        <th>@Messages("confirmation.item")</th>
-                        <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-                        <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-                        <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+                        <th scope="col">@Messages("confirmation.item")</th>
+                        <th scope="col" width="15%" class="numeric">@Messages("confirmation.quantity")</th>
+                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
                     </tr>
                 </thead>
                 <tbody>
                 @breakdown.map {
                     case BreakdownRow(label, quantity, perItem, total) => {
                         <tr>
-                            <td>@Messages(label)</td>
+                            <td scope="row">@Messages(label)</td>
                             <td class="numeric">@quantity</td>
                             <td class="numeric">@perItem</td>
                             <td class="numeric">@total</td>

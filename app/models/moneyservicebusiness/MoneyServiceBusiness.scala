@@ -84,7 +84,7 @@ case class MoneyServiceBusiness(
 
   private def mtComplete(mtFlag: Boolean): Boolean =
     if (mtFlag) {
-        this.businessUseAnIPSP.isDefined &&
+      this.businessUseAnIPSP.isDefined &&
         this.fundsTransfer.isDefined &&
         this.transactionsInNext12Months.isDefined &&
         (
@@ -112,10 +112,8 @@ case class MoneyServiceBusiness(
       true
     }
 
-  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = if(ApplicationConfig.hasAcceptedToggle) {
+  def isComplete(mtFlag: Boolean, ceFlag: Boolean, fxFlag: Boolean): Boolean = {
     allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag) && this.hasAccepted
-  } else {
-    allComplete && mtComplete(mtFlag) && ceComplete(ceFlag) && fxComplete(fxFlag)
   }
 }
 

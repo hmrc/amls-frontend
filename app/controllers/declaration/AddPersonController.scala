@@ -55,7 +55,7 @@ trait AddPersonController extends BaseController {
               case _ if isResponsiblePerson(data) => {
                 Redirect(routes.RegisterResponsiblePersonController.get())
               }
-              case SubmissionReadyForReview if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
+              case SubmissionReadyForReview => Redirect(routes.DeclarationController.getWithAmendment())
               case _ => Redirect(routes.DeclarationController.get())
             }
           }

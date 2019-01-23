@@ -62,7 +62,7 @@ class SubmitRegistrationConfirmationViewSpec extends AmlsSpec with PaymentGenera
     }
 
     "continue button has the right text" in new ViewFixture {
-      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.payfee")
+      doc.select(s".button[href=$continueHref]").text mustBe Messages("button.continuetopayment")
     }
 
   }

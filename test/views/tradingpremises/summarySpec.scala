@@ -20,7 +20,6 @@ import forms.EmptyForm
 import models.status.{SubmissionDecisionApproved, SubmissionReadyForReview}
 import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
 import org.joda.time.LocalDate
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.FakeRequest
 import utils.{AmlsSpec, StatusConstants}
 import views.Fixture
@@ -38,31 +37,7 @@ sealed trait ViewTestHelper extends AmlsSpec {
   }
 }
 
-class summarySpec extends ViewTestHelper {
-
-  override lazy val app = new GuiceApplicationBuilder()
-      .configure(Map("microservice.services.feature-toggle.release7" -> false))
-      .build()
-
-  "The summary page" must {
-
-    "redirect to the 'remove trading premises' page when 'delete' is clicked" in new ViewFixture {
-
-      def view = views.html.tradingpremises.summary(EmptyForm, tradingPremises, add = true, SubmissionDecisionApproved)
-
-      doc.getElementsByClass("check-your-answers__listing").select("a:nth-child(2)").attr("href") must be(
-        controllers.tradingpremises.routes.RemoveTradingPremisesController.get(1, complete = true).url
-      )
-    }
-  }
-
-}
-
-class summarySpecRelease7 extends ViewTestHelper {
-
-  override lazy val app = new GuiceApplicationBuilder()
-    .configure(Map("microservice.services.feature-toggle.release7" -> true))
-    .build()
+class SummarySpec extends ViewTestHelper {
 
   "The summary page" must {
 

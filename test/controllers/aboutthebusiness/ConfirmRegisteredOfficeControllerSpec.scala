@@ -71,7 +71,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
       }
 
-      "load Registered office or main place of business when Business Address from save4later returns None" in new Fixture {
+      "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
 
         val registeredAddress = ConfirmRegisteredOffice(isRegOfficeOrMainPlaceOfBusiness = true)
 

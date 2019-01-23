@@ -16,20 +16,17 @@
 
 package controllers.estateagentbusiness
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
+import javax.inject.Inject
 import models.estateagentbusiness.EstateAgentBusiness
-import models.businessmatching.{EstateAgentBusinessService}
+import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.estateagentbusiness._
-import services.StatusService
 
 class SummaryController @Inject()
 (
@@ -54,12 +51,7 @@ class SummaryController @Inject()
       (for {
         eab <- OptionT(dataCache.fetch[EstateAgentBusiness](EstateAgentBusiness.key))
         _ <- OptionT.liftF(dataCache.save[EstateAgentBusiness](EstateAgentBusiness.key, eab.copy(hasAccepted = true)))
-        preSubmission <- OptionT.liftF(statusService.isPreSubmission)
-        inServiceFlow <- OptionT.liftF(serviceFlow.inNewServiceFlow(EstateAgentBusinessService))
-      } yield (preSubmission, inServiceFlow) match {
-        case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
-        case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-      }) getOrElse InternalServerError("Could not update EstateAgentBusiness")
+      } yield Redirect(controllers.routes.RegistrationProgressController.get())) getOrElse InternalServerError("Could not update EstateAgentBusiness")
 
   }
 }

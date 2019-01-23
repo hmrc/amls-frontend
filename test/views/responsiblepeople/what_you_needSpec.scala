@@ -29,6 +29,12 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
   }
 
   "What you need View" must {
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.responsiblepeople.what_you_need(1)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "Have the correct title" in new ViewFixture {
       def view = views.html.responsiblepeople.what_you_need(1)
 

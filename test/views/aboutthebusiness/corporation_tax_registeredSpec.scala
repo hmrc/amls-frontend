@@ -16,10 +16,10 @@
 
 package views.aboutthebusiness
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{CorporationTaxRegistered, CorporationTaxRegisteredYes}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -72,6 +72,14 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("corporationTaxReference-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

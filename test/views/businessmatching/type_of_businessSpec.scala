@@ -16,10 +16,10 @@
 
 package views.businessmatching
 
-import forms.{InvalidForm, ValidForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching.TypeOfBusiness
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -68,6 +68,12 @@ class type_of_businessSpec extends AmlsSpec with MustMatchers  {
         .parent()
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessmatching.type_of_business(EmptyForm, edit = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

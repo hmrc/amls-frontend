@@ -8,6 +8,10 @@ import uk.gov.hmrc.sbtdistributables.SbtDistributablesPlugin._
 
 trait MicroService {
 
+  import com.typesafe.sbt.digest.Import.digest
+  import com.typesafe.sbt.web.Import.pipelineStages
+  import com.typesafe.sbt.web.Import.Assets
+
   import uk.gov.hmrc._
   import DefaultBuildSettings.{scalaSettings, defaultSettings, addTestReportOption}
   import TestPhases._
@@ -20,7 +24,7 @@ trait MicroService {
   val appName: String
 
   lazy val appDependencies : Seq[ModuleID] = ???
-  lazy val plugins : Seq[Plugins] = Seq.empty
+  lazy val plugins : Seq[Plugins] = Seq(play.sbt.PlayScala)
   lazy val playSettings : Seq[Setting[_]] = Seq.empty
 
   lazy val scoverageSettings = {
@@ -51,7 +55,8 @@ trait MicroService {
       libraryDependencies ++= appDependencies,
       retrieveManaged := true,
       evictionWarningOptions in update := EvictionWarningOptions.default.withWarnScalaVersionEviction(false),
-      routesGenerator := StaticRoutesGenerator
+      routesGenerator := StaticRoutesGenerator,
+      pipelineStages in Assets := Seq(digest)
     )
     .configs(IntegrationTest)
     .settings(inConfig(IntegrationTest)(Defaults.itSettings): _*)

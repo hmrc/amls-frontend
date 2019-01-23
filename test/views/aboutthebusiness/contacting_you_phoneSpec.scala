@@ -16,7 +16,7 @@
 
 package views.aboutthebusiness
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness.ContactingYouPhone
 import org.scalatest.MustMatchers
@@ -64,6 +64,14 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
 
       errorSummary.html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.contacting_you_phone(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

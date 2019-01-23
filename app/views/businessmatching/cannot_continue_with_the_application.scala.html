@@ -20,6 +20,7 @@
 @()(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("businessmatching.cannotcontinuewiththeapplication.title", "summary.businessmatching")
 }
 

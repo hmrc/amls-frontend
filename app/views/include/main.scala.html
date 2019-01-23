@@ -34,18 +34,18 @@
 )(mainContent: Html = HtmlFormat.empty)(implicit request: Request[_],m:Messages)
 
 @styles = {
-    <link href="@routes.AssetsController.at("jquery-ui.css")" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("amls.css")?v=1277522676380" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("print.css")?v=1277522676378" rel="stylesheet"/>
-    <link href="@routes.AssetsController.at("autocomplete/location-autocomplete.min.css?v=1277522676378")" rel="stylesheet" />
+    <link href="@routes.Assets.versioned("jquery-ui.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("amls.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("print.css")" rel="stylesheet"/>
+    <link href="@routes.Assets.versioned("autocomplete/location-autocomplete.min.css")" rel="stylesheet" />
     @linkElement
 }
 
 @scripts = {
-    <script src="@routes.AssetsController.at("jquery-ui.min.js")"></script>
-    <script src="@routes.AssetsController.at("autocomplete/location-autocomplete.min.js?v=2233256299")"></script>
-    <script src="@routes.AssetsController.at("amls.js")?v=1277522676378"></script>
-    <script src="@routes.AssetsController.at("timeout-dialog.js?v=123456799")"></script>
+    <script src="@routes.Assets.versioned("jquery-ui.min.js")"></script>
+    <script src="@routes.Assets.versioned("autocomplete/location-autocomplete.min.js")"></script>
+    <script src="@routes.Assets.versioned("amls.js")"></script>
+    <script src="@routes.Assets.versioned("timeout-dialog.js")"></script>
     @scriptElem
     <script>
     @if(userLoggedIn) {
@@ -109,10 +109,12 @@
 
 @content = {
     <main id="wrapper" role="main">
-        <div id="content">
+        <div class="centered-content">
             <div class="service-info">
                 @betaBanner
             </div>
+        </div>
+        <div id="content">
             <div class="grid-layout grid-layout--stacked">
                 <div class="grid-layout__column grid-layout__column--2-3">
                     @heading

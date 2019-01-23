@@ -16,13 +16,12 @@
 
 package views.aboutthebusiness
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.aboutthebusiness.{PreviouslyRegisteredYes, PreviouslyRegistered}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.aboutthebusiness.{PreviouslyRegistered, PreviouslyRegisteredYes}
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -72,6 +71,14 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("prevMLRRegNo-panel")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.previously_registered(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

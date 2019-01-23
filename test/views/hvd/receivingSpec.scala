@@ -49,6 +49,16 @@ class receivingSpec extends AmlsSpec with MustMatchers  {
   }
 
   "receiving view" must {
+
+    "have the back link button" in new ViewFixture {
+
+      val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))
+
+      def view = views.html.hvd.receiving(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ReceiveCashPayments] = Form2(ReceiveCashPayments(Some(PaymentMethods(true, true, None))))

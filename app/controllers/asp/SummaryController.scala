@@ -21,7 +21,6 @@ import controllers.BaseController
 import forms._
 import javax.inject.Inject
 import models.asp.Asp
-import models.businessmatching.AccountancyServices
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -48,11 +47,6 @@ class SummaryController @Inject()(val dataCache: DataCacheConnector,
         for {
           asp <- dataCache.fetch[Asp](Asp.key)
           _ <- dataCache.save[Asp](Asp.key, asp.copy(hasAccepted = true))
-          preSubmission <- statusService.isPreSubmission
-          inNewServiceFlow <- serviceFlow.inNewServiceFlow(AccountancyServices)
-        } yield (preSubmission, inNewServiceFlow) match {
-          case (false, true) => Redirect(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get())
-          case _ => Redirect(controllers.routes.RegistrationProgressController.get())
-        }
+        } yield Redirect(controllers.routes.RegistrationProgressController.get())
   }
 }

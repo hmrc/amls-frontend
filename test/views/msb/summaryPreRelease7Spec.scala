@@ -33,8 +33,6 @@ class summaryPreRelease7Spec extends  AmlsSpec with MustMatchers {
     implicit val requestWithToken = addToken(request)
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
-
   "MSB Summary page" should {
 
     "indicate whether foreign currencies are used" in new ViewFixture {

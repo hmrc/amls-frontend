@@ -175,8 +175,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
         controller.dataCache.save[Hvd](eqTo(Hvd.key), any())(any(), any(), any())
       } thenReturn Future.successful(cache)
 
-      setupInServiceFlow(false, Some(HighValueDealing))
-
       val result = controller.post()(request)
 
       status(result) mustBe SEE_OTHER
@@ -185,31 +183,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures
       val captor = ArgumentCaptor.forClass(classOf[Hvd])
       verify(controller.dataCache).save[Hvd](eqTo(Hvd.key), captor.capture())(any(), any(), any())
       captor.getValue.hasAccepted mustBe true
-    }
-
-    "redirect to NewServiceInformationController" when {
-      "status is not pre-submission and activity has just been added" in new Fixture {
-        val cache = mock[CacheMap]
-
-        when {
-          controller.dataCache.fetch[Hvd](any())(any(), any(), any())
-        } thenReturn Future.successful(Some(completeModel))
-
-        when {
-          controller.dataCache.save[Hvd](any(), any())(any(), any(), any())
-        } thenReturn Future.successful(cache)
-
-        setupInServiceFlow(true, Some(HighValueDealing))
-
-        when {
-          controller.statusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        val result = controller.post()(request)
-
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
-
-      }
     }
   }
 }

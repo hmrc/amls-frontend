@@ -21,6 +21,7 @@
 @(f: Form2[_], edit: Boolean, showReturnLink: Boolean = true, isPreSubmission:Boolean = true, fxEnabledToggle: Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("msb.services.title", if(isPreSubmission) "summary.businessmatching" else "summary.updateinformation")
 }

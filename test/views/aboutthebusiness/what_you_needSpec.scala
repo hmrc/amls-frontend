@@ -16,8 +16,9 @@
 
 package views.aboutthebusiness
 
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import forms.{EmptyForm, Form2}
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -48,6 +49,14 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("aboutthebusiness.whatyouneed.line_1"))
       html must include(Messages("aboutthebusiness.whatyouneed.line_2"))
       html must include(Messages("aboutthebusiness.whatyouneed.line_3"))
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.what_you_need()
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

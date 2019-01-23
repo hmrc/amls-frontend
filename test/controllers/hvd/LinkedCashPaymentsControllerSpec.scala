@@ -53,7 +53,7 @@ class LinkedCashPaymentsControllerSpec extends AmlsSpec {
       htmlValue.title mustBe title
     }
 
-    "successfully load UI from save4later" in new Fixture {
+    "successfully load UI from mongoCache" in new Fixture {
 
       when(controller.dataCacheConnector.fetch[Hvd](any())(any(), any(), any()))
         .thenReturn(Future.successful(Some(Hvd(linkedCashPayment = Some(LinkedCashPayments(true))))))

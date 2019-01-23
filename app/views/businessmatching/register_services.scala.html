@@ -23,10 +23,12 @@
 
 @header = { @isPreSubmission match {
     case true => {
+        @components.back_link()
         @errorSummary(f)
         @heading("businessmatching.registerservices.title", "summary.businessmatching")
     }
     case _ => {
+        @components.back_link()
         @errorSummary(f)
         @heading("businessmatching.registerservices.other.title", "summary.businessmatching")
     }

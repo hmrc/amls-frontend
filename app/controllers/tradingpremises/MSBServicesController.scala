@@ -16,22 +16,17 @@
 
 package controllers.tradingpremises
 
-import cats.data.OptionT
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
-import models.businessmatching.{BusinessActivity, BusinessMatching, BusinessMatchingMsbService => BMMsbServices}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises}
-import play.api.mvc.Result
+import models.businessmatching.BusinessMatching
+import models.status.SubmissionStatus
+import models.tradingpremises.TradingPremisesMsbServices._
+import models.tradingpremises.{TradingPremises, TradingPremisesMsbServices}
 import services.StatusService
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
-import models.tradingpremises.TradingPremisesMsbServices._
 
 import scala.concurrent.Future
 
@@ -122,7 +117,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
   }
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean = false, status: SubmissionStatus) =
-    ApplicationConfig.release7 && (!tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force)
+    !tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force
 }
 
 object MSBServicesController extends MSBServicesController {

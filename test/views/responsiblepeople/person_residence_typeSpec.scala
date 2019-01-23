@@ -37,6 +37,8 @@ class person_residence_typeSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.person_residence_type(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.person.a.resident.title"))
       heading.html must be(Messages("responsiblepeople.person.a.resident.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

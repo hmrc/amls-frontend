@@ -37,6 +37,8 @@ class position_within_businessSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.position_within_business(form2, true, 1, BusinessType.SoleProprietor, name, true, None)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(Messages("responsiblepeople.position_within_business.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +

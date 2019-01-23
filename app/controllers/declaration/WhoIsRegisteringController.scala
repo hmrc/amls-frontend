@@ -88,7 +88,7 @@ trait WhoIsRegisteringController extends BaseController {
   private def whoIsRegisteringView(status: Status, form: Form2[WhoIsRegistering], rp: Seq[ResponsiblePerson])
                                   (implicit auth: AuthContext, request: Request[AnyContent]): Future[Result] =
     statusService.getStatus flatMap {
-      case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) if AmendmentsToggle.feature =>
+      case SubmissionReadyForReview | SubmissionDecisionApproved | ReadyForRenewal(_) =>
         renewalService.getRenewal map {
           case Some(_) => status(who_is_registering_this_renewal(form, rp))
           case _ => status(who_is_registering_this_update(form, rp))
@@ -99,13 +99,13 @@ trait WhoIsRegisteringController extends BaseController {
 
   private def redirectToDeclarationPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview | SubmissionDecisionApproved if AmendmentsToggle.feature => Redirect(routes.DeclarationController.getWithAmendment())
+      case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.DeclarationController.getWithAmendment())
       case _ => Redirect(routes.DeclarationController.get())
     }
 
   private def redirectToAddPersonPage(implicit hc: HeaderCarrier, auth: AuthContext): Future[Result] =
     statusService.getStatus map {
-      case SubmissionReadyForReview | SubmissionDecisionApproved if AmendmentsToggle.feature => Redirect(routes.AddPersonController.getWithAmendment())
+      case SubmissionReadyForReview | SubmissionDecisionApproved => Redirect(routes.AddPersonController.getWithAmendment())
       case _ => Redirect(routes.AddPersonController.get())
     }
 

@@ -33,6 +33,15 @@ class penalised_under_estate_agents_actSpec extends AmlsSpec with MustMatchers  
   }
 
   "penalised_under_estate_agents_act view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[PenalisedUnderEstateAgentsAct] = Form2(PenalisedUnderEstateAgentsActNo)
+
+      def view = views.html.estateagentbusiness.penalised_under_estate_agents_act(form2, edit = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[PenalisedUnderEstateAgentsAct] = Form2(PenalisedUnderEstateAgentsActNo)

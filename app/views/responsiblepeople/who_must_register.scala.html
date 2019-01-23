@@ -19,6 +19,7 @@
 @(index: Int, flow: Option[String] = None)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("responsiblepeople.whomustregister.ymr", "summary.responsiblepeople")
 }
 

@@ -37,6 +37,8 @@ class legal_name_change_dateSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.legal_name_change_date(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.legalnamechangedate.title"))
       heading.html must be(Messages("responsiblepeople.legalnamechangedate.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

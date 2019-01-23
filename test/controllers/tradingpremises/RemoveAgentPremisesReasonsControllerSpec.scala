@@ -96,7 +96,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
       }
 
-      "save the reason data to Save4Later" in new Fixture {
+      "save the reason data to mongoCache" in new Fixture {
 
         val formRequest = request.withFormUrlEncodedBody(
           "removalReason" -> Form.OTHER,

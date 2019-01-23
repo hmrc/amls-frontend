@@ -17,12 +17,11 @@
 package config
 
 import javax.inject.{Inject, Singleton}
-
 import com.typesafe.config.Config
-import play.api.Play
+import play.api.Mode.Mode
+import play.api.{Configuration, Environment, Play}
 import play.api.mvc.Call
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.http.cache.client.{SessionCache, ShortLivedCache, ShortLivedHttpCaching}
+import uk.gov.hmrc.http.cache.client.SessionCache
 import uk.gov.hmrc.play.audit.http.HttpAuditing
 import uk.gov.hmrc.play.audit.http.config.AuditingConfig
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -46,7 +45,16 @@ trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost wi
 
 }
 
-object WSHttp extends WSHttp
+object WSHttp extends WSHttp {
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+
+  override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
+
+  override protected def mode: Mode = Play.current.mode
+
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
+}
 
 
 object AMLSControllerConfig extends ControllerConfig {
@@ -59,12 +67,18 @@ object BusinessCustomerSessionCache extends SessionCache with AppName with Servi
 
   override lazy val baseUri = baseUrl("cachable.session-cache")
   override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
 
 @Singleton
-class FrontendAuthConnector @Inject()(config: uk.gov.hmrc.play.config.inject.ServicesConfig) extends AuthConnector {
-  lazy val serviceUrl = config.baseUrl("auth")
+class FrontendAuthConnector @Inject()(environment: Environment, val runModeConfiguration: Configuration) extends AuthConnector with ServicesConfig {
+  lazy val serviceUrl = baseUrl("auth")
   override def http = WSHttp
+
+  override protected def mode: Mode = environment.mode
 }
 
 object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
@@ -75,10 +89,16 @@ object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
   override def baseUri = baseUrl("cachable.session-cache")
 
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
 
 object AMLSAuditConnector extends AuditConnector with RunMode {
   override lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"auditing")
+  override protected def mode: Mode = Play.current.mode
+  override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
 
 object AMLSAuthConnector extends AuthConnector {
@@ -96,6 +116,8 @@ object AMLSAuditFilter extends FrontendAuditFilter with AppName with Microservic
 
   override def controllerNeedsAuditing(controllerName: String): Boolean =
     AMLSControllerConfig.paramsForController(controllerName).needsAuditing
+
+  override protected def appNameConfiguration: Configuration = Play.current.configuration
 }
 
 object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport{
@@ -103,22 +125,8 @@ object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSu
     AMLSControllerConfig.paramsForController(controllerName).needsLogging
 }
 
-
 object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever {
   override lazy val httpGet: HttpGet = WSHttp
-}
-
-object AmlsShortLivedHttpCaching extends ShortLivedHttpCaching with AppName with ServicesConfig {
-  override lazy val http = WSHttp
-  override lazy val defaultSource = appName
-  override lazy val baseUri = baseUrl("cachable.short-lived-cache")
-  override lazy val domain = getConfString("cachable.short-lived-cache.domain",
-    throw new Exception(s"Could not find config 'cachable.short-lived-cache.domain'"))
-}
-
-object AmlsShortLivedCache extends ShortLivedCache {
-  override implicit lazy val crypto = ApplicationCrypto.JsonCrypto
-  override lazy val shortLiveCache = AmlsShortLivedHttpCaching
 }
 
 object WhitelistFilter extends AkamaiWhitelistFilter with MicroserviceFilterSupport{

@@ -16,19 +16,16 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness.EstateAgentBusiness
-import models.tcsp.Tcsp
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.test.Helpers._
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -43,10 +40,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
     when {
       controller.statusService.isPreSubmission(any(), any(), any())
-    } thenReturn Future.successful(false)
-
-    when {
-      controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
     } thenReturn Future.successful(false)
   }
 
@@ -90,33 +83,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))
       }
 
-    }
-
-    "redirect to NewServiceInformationController" when {
-      "status is not pre-submission and activity has just been added" in new Fixture {
-        val cache = mock[CacheMap]
-
-        when {
-          controller.dataCache.fetch[EstateAgentBusiness](any())(any(),any(),any())
-        } thenReturn Future.successful(Some(model))
-
-        when {
-          controller.dataCache.save[EstateAgentBusiness](any(), any())(any(),any(),any())
-        } thenReturn Future.successful(cache)
-
-        when {
-          controller.serviceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
-
-        when {
-          controller.statusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        val result = controller.post()(request)
-
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
-
-      }
     }
   }
 }

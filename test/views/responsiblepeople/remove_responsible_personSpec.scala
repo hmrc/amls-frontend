@@ -33,6 +33,13 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
   "remove_responsible_person view" must {
 
+    "have a back link" in new ViewFixture {
+      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
+
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))

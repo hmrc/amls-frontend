@@ -16,9 +16,9 @@
 
 package views.businessactivities
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.businessactivities.{RiskAssessmentPolicyNo, RiskAssessmentPolicy}
-import org.scalatest.{MustMatchers}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.businessactivities.{RiskAssessmentPolicy, RiskAssessmentPolicyNo}
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
@@ -72,6 +72,12 @@ class risk_assessment_policySpec extends AmlsSpec with MustMatchers {
       doc.getElementById("riskassessments")
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.businessactivities.risk_assessment_policy(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

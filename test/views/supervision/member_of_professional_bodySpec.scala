@@ -14,24 +14,27 @@
  * limitations under the License.
  */
 
-package views.msb
+package views.supervision
 
-import forms.{Form2, ValidForm}
-import models.moneyservicebusiness.WhichCurrencies
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
-import play.api.i18n.Messages
-import play.api.test.FakeApplication
+import forms.EmptyForm
+import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import views.Fixture
 
 
-class which_currenciesPreRelease7Spec extends AmlsSpec with MustMatchers  {
+class member_of_professional_bodySpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
+  "what_you_need view" must {
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.supervision.member_of_professional_body(EmptyForm, edit = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+  }
 }

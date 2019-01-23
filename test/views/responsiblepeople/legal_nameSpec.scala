@@ -37,6 +37,8 @@ class legal_nameSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.legal_name(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.legalName.title"))
       heading.html must be(Messages("responsiblepeople.legalName.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

@@ -59,10 +59,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     )
 
     when {
-      mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-    } thenReturn Future.successful(false)
-
-    when {
       mockStatusService.isPreSubmission(any(), any(), any())
     } thenReturn Future.successful(true)
 
@@ -178,7 +174,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   "Post" must {
-
     "redirect to RegistrationProgressController" when {
       "model has been saved with hasAccepted set to true" in new Fixture {
         mockIsNewActivity(false)
@@ -192,26 +187,5 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
         verify(controller.dataCache).save[MoneyServiceBusiness](eqTo(MoneyServiceBusiness.key), eqTo(completeModel.copy(hasAccepted = true)))(any(),any(),any())
       }
     }
-
-    "redirect to NewServiceInformationController" when {
-      "status is not pre-submission and activity has just been added" in new Fixture {
-        mockCacheFetch[MoneyServiceBusiness](Some(completeModel))
-        mockCacheSave[MoneyServiceBusiness]
-
-        when {
-          mockServiceFlow.inNewServiceFlow(any())(any(), any(), any())
-        } thenReturn Future.successful(true)
-
-        when {
-          controller.statusService.isPreSubmission(any(), any(), any())
-        } thenReturn Future.successful(false)
-
-        val result = controller.post()(request)
-
-        redirectLocation(result) mustBe Some(controllers.businessmatching.updateservice.add.routes.NeedMoreInformationController.get().url)
-
-      }
-    }
-
   }
 }

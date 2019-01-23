@@ -37,6 +37,8 @@ class known_bySpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.known_by(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must startWith(Messages("responsiblepeople.knownby.title"))
       heading.html must be(Messages("responsiblepeople.knownby.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

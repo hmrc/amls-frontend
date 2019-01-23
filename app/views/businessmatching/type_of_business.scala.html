@@ -21,6 +21,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("businessmatching.typeofbusiness.title", "summary.businessmatching")
 }

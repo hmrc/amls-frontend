@@ -47,14 +47,14 @@
         @detailsSummary(
             summary = Messages("confirmation.breakdown.details")
         ) {
-            <table>
-                <caption>@Messages("confirmation.breakdown")</caption>
+            <span id="tblDesc">@Messages("confirmation.breakdown")</span>
+            <table aria-describedby="tblDesc">
                 <thead>
                     <tr>
-                        <th>@Messages("confirmation.item")</th>
-                        <th width="15%" class="numeric">@Messages("confirmation.quantity")</th>
-                        <th width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
-                        <th width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
+                        <th scope="col">@Messages("confirmation.item")</th>
+                        <th scope="col" width="15%" class="numeric">@Messages("confirmation.quantity")</th>
+                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.feeperitem")</th>
+                        <th scope="col" width="20%" class="numeric">@Messages("confirmation.totalfee")</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,7 +62,7 @@
                 @rows.map {
                     case BreakdownRow(label, quantity, perItem, totalFees) => {
                         <tr>
-                            <td>@Messages(label)</td>
+                            <td scope="row">@Messages(label)</td>
                             <td class="numeric">@quantity</td>
                             <td class="numeric">@perItem</td>
                             <td class="numeric">@totalFees</td>
@@ -81,6 +81,6 @@
         }
     }
 
-    <p><a id="payfee" class="button" href="@paymentsUrl">@Messages("button.payfee")</a></p>
+    <p><a id="payfee" class="button" href="@paymentsUrl">@Messages("button.continuetopayment")</a></p>
 
 }

@@ -26,8 +26,6 @@ import play.api.test.FakeApplication
 
 class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with CharacterSets {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.release7" -> false))
-
   "When the user inputs the data that is posted in the form, the role within business" must {
 
     "successfully pass validation for Beneficial Shareholder" in {

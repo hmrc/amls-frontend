@@ -173,7 +173,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
             redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId).url))
           }
 
-          "redirect to FitAndProperController when businessActivities includes TrustAndCompanyServices and phase 2 changes toggle is false" in new Fixture {
+          "redirect to FitAndProperNoticeController when businessActivities includes TrustAndCompanyServices and phase 2 changes toggle is false" in new Fixture {
             when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -198,9 +198,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+            redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
           }
-          "redirect to FitAndProperController when businessActivities includes MoneyServiceBusiness and phase 2 changes toggle is false" in new Fixture {
+          "redirect to FitAndProperNoticeController when businessActivities includes MoneyServiceBusiness and phase 2 changes toggle is false" in new Fixture {
             when(mockAppConfig.phase2ChangesToggle).thenReturn(false)
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -227,9 +227,9 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+            redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
           }
-          "redirect to FitAndProperController when businessActivities includes HighValueDealing and phase 2 changes toggle is true" in new Fixture {
+          "redirect to FitAndProperNoticeController when businessActivities includes HighValueDealing and phase 2 changes toggle is true" in new Fixture {
             when(mockAppConfig.phase2ChangesToggle).thenReturn(true)
             val newRequest = request.withFormUrlEncodedBody(
               "training" -> "true",
@@ -254,7 +254,7 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
 
             val result = controller.post(recordId, false)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.FitAndProperController.get(recordId).url))
+            redirectLocation(result) must be(Some(routes.FitAndProperNoticeController.get(recordId).url))
           }
         }
         "edit is true" must {

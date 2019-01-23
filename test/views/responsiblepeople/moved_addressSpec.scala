@@ -39,6 +39,8 @@ class moved_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.moved_address(form2, address, 1, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(Messages("responsiblepeople.movedaddress.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +

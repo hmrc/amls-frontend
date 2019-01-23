@@ -22,6 +22,7 @@
 @(f: Form2[_], index: Int, personName: String, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.new.home.heading", personName), "summary.responsiblepeople")
 }

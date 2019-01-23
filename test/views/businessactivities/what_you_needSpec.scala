@@ -16,6 +16,7 @@
 
 package views.businessactivities
 
+import forms.{EmptyForm, Form2}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -47,6 +48,14 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("businessactivities.whatyouneed.line_1"))
       html must include(Messages("businessactivities.whatyouneed.line_2"))
       html must include(Messages("businessactivities.whatyouneed.line_3"))
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.businessactivities.what_you_need("/next-page")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

@@ -16,13 +16,12 @@
 
 package views.aboutthebusiness
 
-import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{ContactingYou, ContactingYouEmail}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.aboutthebusiness.ContactingYouEmail
 import org.scalatest.MustMatchers
-import utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -65,7 +64,14 @@ class contacting_youSpec extends AmlsSpec with MustMatchers  {
       }
 
       errorSummary.html() must include("not a message Key")
+    }
 
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.contacting_you(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

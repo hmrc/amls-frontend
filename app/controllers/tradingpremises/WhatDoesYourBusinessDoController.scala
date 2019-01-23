@@ -16,24 +16,25 @@
 
 package controllers.tradingpremises
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
 import models.DateOfChange
 import models.businessmatching._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
-import models.tradingpremises.{TradingPremisesMsbServices, TradingPremises, WhatDoesYourBusinessDo}
+import models.status.SubmissionStatus
+import models.tradingpremises.{TradingPremises, WhatDoesYourBusinessDo}
 import org.joda.time.LocalDate
+import play.api.Logger
 import play.api.mvc.Result
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
 
@@ -71,15 +72,19 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
             // If there is only one activity in the data from the pre-reg,
             // then save that and redirect immediately without showing the
             // 'what does your business do' page.
-            updateDataStrict[TradingPremises](index) { tp =>
+              updateDataStrict[TradingPremises](index) { tp =>
                 Some(tp.whatDoesYourBusinessDoAtThisAddress(WhatDoesYourBusinessDo(activities)))
-            }
-            Future.successful {
-              activities.contains(MoneyServiceBusiness) match {
-                case true => Redirect(routes.MSBServicesController.get(index))
-                case false => Redirect(routes.PremisesRegisteredController.get(index))
+              }.map {
+                _ =>
+                  activities.contains(MoneyServiceBusiness) match {
+                    case true => Redirect(routes.MSBServicesController.get(index))
+                    case false => Redirect(routes.PremisesRegisteredController.get(index))
+                  }
+            }.recover {
+                case _ =>
+                Logger.error(s"[WhatDoesYourBusinessDoController][get] WhatDoesYourBusinessDo($activities) can not be persisted for index = $index")
+                NotFound(notFoundView)
               }
-            }
           } else {
             val ba = BusinessActivities(activities)
             Future.successful {
@@ -185,7 +190,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
     tradingPremises.whatDoesYourBusinessDoAtThisAddress.fold(false) { _.activities != model.activities }
 
   def redirectToDateOfChange(tradingPremises: Option[TradingPremises], model: WhatDoesYourBusinessDo, status: SubmissionStatus) =
-    ApplicationConfig.release7 && tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
+    tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
 }

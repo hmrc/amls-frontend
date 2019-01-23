@@ -19,6 +19,7 @@
 @(nextPageUrl: String)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("title.wyn", "summary.businessactivities")
 }
 

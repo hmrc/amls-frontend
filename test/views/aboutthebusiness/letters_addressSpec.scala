@@ -16,7 +16,7 @@
 
 package views.aboutthebusiness
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.aboutthebusiness.{ConfirmRegisteredOffice, RegisteredOfficeUK}
 import org.scalatest.MustMatchers
@@ -66,6 +66,17 @@ class letters_addressSpec extends AmlsSpec with MustMatchers {
 
       errorSummary.html() must include("not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = {
+        val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
+        views.html.aboutthebusiness.letters_address(form2, address, true)
+      }
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

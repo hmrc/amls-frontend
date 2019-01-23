@@ -29,7 +29,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 
 class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
+  override lazy val app = FakeApplication()
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
 

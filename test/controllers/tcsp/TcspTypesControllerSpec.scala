@@ -104,7 +104,7 @@ class TcspTypesControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
 
-      "successfully navigate to next page while storing data in in save4later in edit mode" in  new Fixture {
+      "successfully navigate to next page while storing data in in mongoCache in edit mode" in  new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
           "serviceProviders[]" -> "01"

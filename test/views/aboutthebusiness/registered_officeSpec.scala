@@ -16,10 +16,10 @@
 
 package views.aboutthebusiness
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.aboutthebusiness.{RegisteredOfficeUK, RegisteredOffice}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import models.aboutthebusiness.{RegisteredOffice, RegisteredOfficeUK}
+import org.scalatest.MustMatchers
+import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
 import play.api.i18n.Messages
@@ -77,6 +77,14 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("country-fieldset")
         .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+      val form2: Form2[_] = EmptyForm
+
+      def view = views.html.aboutthebusiness.registered_office(form2, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

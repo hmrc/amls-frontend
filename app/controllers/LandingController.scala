@@ -18,7 +18,7 @@ package controllers
 
 import audit.ServiceEntrantEvent
 import cats.data.Validated.{Invalid, Valid}
-import config.{AMLSAuthConnector, AmlsShortLivedCache, ApplicationConfig}
+import config.{AMLSAuthConnector, ApplicationConfig}
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models._
@@ -40,14 +40,13 @@ import play.api.Logger
 import play.api.mvc.{Action, Call, Request, Result}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{CacheMap, ShortLivedCache}
+import uk.gov.hmrc.http.cache.client.{CacheMap}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
-import scala.util.{Failure, Success, Try}
 
 @Singleton
 class LandingController @Inject()(val landingService: LandingService,
@@ -59,7 +58,6 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val statusService: StatusService
                                  ) extends BaseController {
 
-  val shortLivedCache: ShortLivedCache = AmlsShortLivedCache
 
   private def isAuthorised(implicit headerCarrier: HeaderCarrier) =
     headerCarrier.authorization.isDefined
@@ -81,14 +79,8 @@ class LandingController @Inject()(val landingService: LandingService,
     implicit authContext =>
       implicit request =>
         authService.validateCredentialRole flatMap {
-          case true =>
-            if (AmendmentsToggle.feature) {
-              getWithAmendments
-            } else {
-              getWithoutAmendments
-            }
-          case _ =>
-            Future.successful(Redirect(authService.signoutUrl))
+          case true => getWithAmendments
+          case _ => Future.successful(Redirect(authService.signoutUrl))
         }
   }
 

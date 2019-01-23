@@ -20,7 +20,6 @@ import forms.{EmptyForm, InvalidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
 import models.businesscustomer.Address
-import models.businessmatching.BusinessType
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -40,6 +39,8 @@ class confirm_addressSpec extends AmlsSpec with MustMatchers {
       val form2 = EmptyForm
 
       def view = views.html.responsiblepeople.confirm_address(form2, address, 1, name)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
       doc.title must be(Messages("responsiblepeople.confirmaddress.title") +
         " - " + Messages("summary.responsiblepeople") +

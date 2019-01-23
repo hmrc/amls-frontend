@@ -33,6 +33,15 @@ class penalised_by_professionalSpec extends AmlsSpec with MustMatchers  {
   }
 
   "penalised_by_professional view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[ProfessionalBody] = Form2(ProfessionalBodyNo)
+
+      def view = views.html.estateagentbusiness.penalised_by_professional(form2, edit = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ProfessionalBody] = Form2(ProfessionalBodyNo)

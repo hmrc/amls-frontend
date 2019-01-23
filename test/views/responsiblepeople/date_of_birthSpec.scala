@@ -16,8 +16,7 @@
 
 package views.responsiblepeople
 
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.responsiblepeople.{ExperienceTraining, ExperienceTrainingYes}
+import forms.{EmptyForm, InvalidForm}
 import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
@@ -32,6 +31,12 @@ class date_of_birthSpec extends AmlsSpec with MustMatchers  {
   }
 
   "date_of_birth view" must {
+
+    "have a back link" in new ViewFixture {
+      val form2 = EmptyForm
+      def view = views.html.responsiblepeople.date_of_birth(form2, false, 1, None, "Gary")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
     "have correct title" in new ViewFixture {
 

@@ -21,25 +21,18 @@
 @(f: Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String, showFees: Boolean, phase2Toggle: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder((if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_heading" else "responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.fit_and_proper.heading", personName), "summary.responsiblepeople")
 }
 
 @main(
-    title = Messages(if(phase2Toggle) "responsiblepeople.fit_and_proper.phase_2_title" else "responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("responsiblepeople.fit_and_proper.title", personName) + " - " + Messages("summary.responsiblepeople"),
     heading = header
 ) {
 
-    @if(phase2Toggle) {
-        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details")</p>
-        <p>@Messages("responsiblepeople.fit_and_proper.phase_2_details2", personName)</p>
-    } else {
-        @if(showFees) {
-            <p>@Messages("responsiblepeople.fit_and_proper.text.details")</p>
-        } else {
-            <p>@Messages("responsiblepeople.fit_and_proper.text.details.no.fees")</p>
-        }
-    }
+    <p>@Messages("responsiblepeople.fit_and_proper.details")</p>
+    <p>@Messages("responsiblepeople.fit_and_proper.details2", personName)</p>
 
     @form(f, controllers.responsiblepeople.routes.FitAndProperController.post(index, edit, flow)) {
 
@@ -69,20 +62,6 @@
             }
         }
         </div>
-
-        @if(!phase2Toggle) {
-            @detailsSummary(
-                summary = Messages("responsiblepeople.fit_and_proper.text.info")
-            ) {
-                @panel(
-                    jsHidden = false,
-                    wide = false
-                ) {
-                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line1")</p>
-                    <p>@Messages("responsiblepeople.fit_and_proper.text.info.line2")</p>
-                }
-            }
-        }
 
         @submit(edit)
 

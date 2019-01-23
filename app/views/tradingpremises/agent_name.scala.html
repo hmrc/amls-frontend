@@ -38,15 +38,13 @@
             labelHidden = false
         )
 
-        @if(config.ApplicationConfig.release7) {
-            @date(
-                f = f,
-                p = "agentDateOfBirth",
-                labelText = "tradingpremises.agentname.name.dateOfBirth.lbl",
-                hintText = "tradingpremises.agentname.name.dateOfBirth.hint",
-                example = false
-            )
-        }
+        @date(
+            f = f,
+            p = "agentDateOfBirth",
+            labelText = "tradingpremises.agentname.name.dateOfBirth.lbl",
+            hintText = "tradingpremises.agentname.name.dateOfBirth.hint",
+            example = false
+        )
 
         @submit(edit)
     }

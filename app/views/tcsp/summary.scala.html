@@ -123,16 +123,7 @@
         }
 
     }
-
-    @if(ApplicationConfig.hasAcceptedToggle) {
-        @form(EmptyForm, controllers.tcsp.routes.SummaryController.post()) {
-            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
-        }
-    } else {
-        @anchor(
-            attrHref = controllers.routes.RegistrationProgressController.get().toString,
-            attrRole = true,
-            linkText = Messages("button.checkyouranswers.acceptandcomplete")
-        )
+    @form(EmptyForm, controllers.tcsp.routes.SummaryController.post()) {
+        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), false)
     }
 }

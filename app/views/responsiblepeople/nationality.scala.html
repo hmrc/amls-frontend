@@ -24,6 +24,7 @@
     s"""${f("other").id}-fieldset"""
 }
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @headingWithPlaceholder(("responsiblepeople.nationality.heading", personName), "summary.responsiblepeople")
 }

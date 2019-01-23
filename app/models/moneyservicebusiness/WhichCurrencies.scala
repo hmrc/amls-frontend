@@ -17,14 +17,13 @@
 package models.moneyservicebusiness
 
 import cats.data.Validated.{Invalid, Valid}
-import config.ApplicationConfig
 import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
 import models._
-import play.api.libs.json._
 import models.renewal.{WhichCurrencies => RWhichCurrencies}
+import play.api.libs.json._
 import utils.MappingUtils.Implicits._
 import utils.{GenericValidators, TraversableValidators}
 
@@ -83,14 +82,11 @@ object WhichCurrencies {
 
     val currencies = (__ \ "currencies").read(currencyListType).withMessage("error.invalid.msb.wc.currencies")
 
-    val usesForeignCurrencies = ApplicationConfig.release7 match {
-      case true =>
+    val usesForeignCurrencies =
         (__ \ "usesForeignCurrencies").read[String] withMessage "error.required.msb.wc.foreignCurrencies" map {
           case "Yes" => Option(true)
           case _ => Option(false)
         }
-      case _ => Rule[UrlFormEncoded, Option[Boolean]](_ => Valid(None))
-    }
 
     val bankMoneySource: Rule[UrlFormEncoded, Option[BankMoneySource]] =
       (__ \ "bankMoneySource").read[Option[String]] flatMap {
@@ -113,19 +109,9 @@ object WhichCurrencies {
       case _ => None
     }
 
-    ApplicationConfig.release7 match {
-      case true => (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateWhichCurrencies)).apply {
+    (currencies ~ ((usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateWhichCurrencies)).apply {
         (a, b) => WhichCurrencies(a.toSeq, b._1, b._2, b._3, b._4)
       }
-
-      case _ => (currencies ~ ((bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled andThen validateMoneySources))
-        .apply { (a: Traversable[String], b: MoneySourceValidation) =>
-          (a, b) match {
-            case (c, (bms, wms, cms)) => WhichCurrencies(c.toSeq, None, bms, wms, cms)
-          }
-        }
-    }
-
   }
 
   implicit val formW: Write[WhichCurrencies, UrlFormEncoded] = To[UrlFormEncoded] { __ =>
@@ -137,11 +123,8 @@ object WhichCurrencies {
     }
 
     val defaultFlagValue: (WhichCurrencies) => Option[String] = {
-      case x if ApplicationConfig.release7 && (x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined) =>
-        Some("Yes")
-      case _ if ApplicationConfig.release7 =>
-        Some("No")
-      case _ => None
+      case x if (x.customerMoneySource.contains(true) || x.bankMoneySource.isDefined || x.wholesalerMoneySource.isDefined) => Some("Yes")
+      case _ => Some("No")
     }
 
     (
@@ -227,9 +210,9 @@ object WhichCurrencies {
         (__ \ "customerMoneySource").readNullable(cmsReader)
       )((currencies, usesForeignCurrencies, bms, wms, cms) => {
 
-      val flag = (ApplicationConfig.release7, usesForeignCurrencies) match {
-        case (true, None) => Some(bms.isDefined || wms.isDefined || cms.contains(true))
-        case (_, x) => x
+      val flag = usesForeignCurrencies match {
+        case None => Some(bms.isDefined || wms.isDefined || cms.contains(true))
+        case x => x
       }
 
       WhichCurrencies(currencies, flag, bms, wms, cms)

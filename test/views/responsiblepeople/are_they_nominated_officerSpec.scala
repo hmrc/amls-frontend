@@ -37,6 +37,8 @@ class are_they_nominated_officerSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.are_they_nominated_officer(form2, true, 1, None, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(Messages("responsiblepeople.aretheynominatedofficer.title") +
         " - " + Messages("summary.responsiblepeople") +
         " - " + Messages("title.amls") +

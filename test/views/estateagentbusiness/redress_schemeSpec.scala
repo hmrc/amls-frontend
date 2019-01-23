@@ -34,6 +34,15 @@ class redress_schemeSpec extends AmlsSpec with MustMatchers  {
   }
 
   "redress_scheme view" must {
+
+    "have the back link button" in new TestFixture {
+      val form2: ValidForm[RedressScheme] = Form2(testScheme)
+
+      def view = views.html.estateagentbusiness.redress_scheme(form2, edit = true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new TestFixture {
 
       val form2: ValidForm[RedressScheme] = Form2(testScheme)

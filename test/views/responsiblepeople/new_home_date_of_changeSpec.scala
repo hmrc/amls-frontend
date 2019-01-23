@@ -43,6 +43,8 @@ class new_home_date_of_changeSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.responsiblepeople.new_home_date_of_change(form2, 1, name)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       doc.title must be(pageTitle)
       heading.html must be(Messages("responsiblepeople.new.home.date.of.change.heading", name))
       subHeading.html must include(Messages("summary.responsiblepeople"))

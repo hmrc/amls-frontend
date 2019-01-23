@@ -83,7 +83,7 @@ trait TcspValues {
 
 class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> false))
+  override lazy val app = FakeApplication()
 
   "Tcsp" must {
 
@@ -317,25 +317,5 @@ class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPer
         }
       }
     }
-  }
-}
-
-
-class TcspWithHasAcceptedSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
-
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.services.feature-toggle.has-accepted" -> true))
-
-  "Tcsp" must {
-
-    "isComplete" must {
-      "return true if the model is accepted" in {
-        completeModel.isComplete must be(true)
-      }
-
-      "return false if the model is not accepted" in {
-        completeModel.copy(hasAccepted = false).isComplete must be(false)
-      }
-    }
-
   }
 }
