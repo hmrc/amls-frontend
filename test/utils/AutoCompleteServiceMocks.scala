@@ -16,4 +16,20 @@
 
 package utils
 
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks with AutoCompleteServiceMocks
+import models.autocomplete.NameValuePair
+import org.mockito.Mockito.when
+import org.scalatest.mock.MockitoSugar
+import services.AutoCompleteService
+
+trait AutoCompleteServiceMocks extends MockitoSugar {
+
+  implicit val mockAutoComplete:AutoCompleteService = mock[AutoCompleteService]
+
+  when {
+    mockAutoComplete.getCountries
+  } thenReturn Some(Seq(
+    NameValuePair("United Kingdom", "GB"),
+    NameValuePair("Albania", "AL")
+  ))
+
+}
