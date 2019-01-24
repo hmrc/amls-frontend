@@ -314,7 +314,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
   "for will you do this business type at trading premises" must {
     "have a question title" in new MSBViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.tradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase))
+      doc.body().text must include(Messages("businessmatching.updateservice.tradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
     }
 
     "show edit link" in new MSBViewFixture {
@@ -333,7 +333,7 @@ class update_services_summarySpec  extends AmlsSpec with MustMatchers with Updat
 
   "if doing business type at trading premises, for which premises will you do this business type from" must {
     "have a question title" in new MSBAllViewFixture {
-      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05").toLowerCase))
+      doc.body().text must include(Messages("businessmatching.updateservice.whichtradingpremises.summary", Messages("businessmatching.registerservices.servicename.lbl.05.phrased")))
     }
 
     "show edit link" in new MSBAllViewFixture {

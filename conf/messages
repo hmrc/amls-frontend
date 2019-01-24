@@ -143,7 +143,7 @@ error.bankdetails.ukbankaccount = Select yes if this is a UK bank account
 error.invalid.bankdetails.sortcode = Enter a valid sort code
 error.bankdetails.accountnumber = Enter a valid account number
 error.invalid.bankdetails.accountnumber = Enter a valid account number
-error.max.length.bankdetails.accountnumber = Enter a valid account number=
+error.max.length.bankdetails.accountnumber = Enter a valid account number
 error.required.bankdetails.iban.account = Enter either an IBAN number or an account number
 
 error.invalid.bankdetails.iban = Enter a valid IBAN number
@@ -1652,22 +1652,22 @@ responsiblepeople.check_your_answers.visuallyhidden.from.your = from your respon
 responsiblepeople.check_your_answers.hasNonUKresident.1 = Because at least one of the people you’ve registered lives outside of the UK, HMRC will likely need more information about them.
 responsiblepeople.check_your_answers.hasNonUKresident.2 = They’ll contact you on the email address you give in the ‘About the Business’ section and let you know what they need.
 
-responsiblepeople.fit_and_proper.heading = Has {0} already passed the HMRC Money Laundering Regulations Fit and Proper test?
-responsiblepeople.fit_and_proper.phase_2_heading = Has {0} passed the fit and proper test?
-responsiblepeople.fit_and_proper.phase_2_title = Has this person passed the fit and proper test?
-responsiblepeople.fit_and_proper.title = Has this person already passed the HMRC Money Laundering Regulations Fit and Proper test?
-responsiblepeople.fit_and_proper.text.details = You’ll need to pay £100 for each responsible person that hasn’t passed the test.
-responsiblepeople.fit_and_proper.text.details.no.fees = You’ll need to pay a fee for each responsible person that hasn’t passed the test.
-responsiblepeople.fit_and_proper.phase_2_details = The HMRC fit and proper test is part of the Money Laundering Regulations. It is not the same as the test done by the Financial Conduct Authority.
-responsiblepeople.fit_and_proper.phase_2_details2 = The test checks the details you provided about {0} are correct and they are a suitable responsible person. If they have passed the test, they do not need to do it again.
-responsiblepeople.fit_and_proper.text.info = The Fit and Proper test
-responsiblepeople.fit_and_proper.text.info.line1 = The responsible people in your business need to pass a Fit and Proper test. If anyone has already passed the test before, they don’t need to do it again.
-responsiblepeople.fit_and_proper.text.info.line2 = HMRC will perform the tests by checking their records against the information you’ve given. You don't need to take any further action.
+responsiblepeople.fit_and_proper.notice.title = HMRC’s fit and proper test and HMRC’s approval check
+responsiblepeople.fit_and_proper.notice.text1 = HMRC checks that the responsible people running your business meet the requirements of the Money Laundering Regulations. This is part of the registration process.
+responsiblepeople.fit_and_proper.notice.heading1 = HMRC’s fit and proper test
+responsiblepeople.fit_and_proper.notice.text2 = The fit and proper test is for money service businesses and trusts or company service providers. It is different to the test done by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.notice.heading2 = HMRC’s approval check
+responsiblepeople.fit_and_proper.notice.text3 = The approval check is for accountancy service providers, estate agent businesses and high value dealers.
 
-responsiblepeople.approval_check.heading = Has {0} been charged for the approval check?
+responsiblepeople.fit_and_proper.heading = Has {0} passed HMRC’s fit and proper test?
+responsiblepeople.fit_and_proper.title = Has this person passed the fit and proper test?
+responsiblepeople.fit_and_proper.details = HMRC carries out the fit and proper test as part of the registration process for money service businesses and trusts or company service providers. It is different to the test done by the Financial Conduct Authority.
+responsiblepeople.fit_and_proper.details2 = If a responsible person has already passed the test, either in their current role or in a previous role, they do not need to pass it again.
+
+responsiblepeople.approval_check.heading = Has HMRC charged your business or another business to do an approval check about {0}?
 responsiblepeople.approval_check.title = Has this person been charged for the approval check?
-responsiblepeople.approval_check.text.details = The HMRC approval check does similar checks but is different to the fit and proper check.
-responsiblepeople.approval_check.text.details2 = If {0} has already been charged for the approval check, they will not be charged again.
+responsiblepeople.approval_check.text.details = This is separate from HMRC’s fit and proper test. HMRC carries out the approval check as part of the registration process for accountancy service providers, estate agency businesses and high value dealers.
+responsiblepeople.approval_check.text.details2 = If a responsible person has already passed the check, either in their current role or in a previous role, they do not need to pass it again.
 
 responsiblepeople.detailed_answers.title = Detailed answers
 responsiblepeople.detailed_answers.previous_names = Previous names
