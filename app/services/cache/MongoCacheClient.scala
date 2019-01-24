@@ -48,8 +48,8 @@ case class Cache(id: String, data: Map[String, JsValue], lastUpdated: DateTime =
     * Upsert a value into the cache given its key.
     * If the data to be inserted is null then remove the entry by key
     */
-  def upsert[T](key: String, data: JsValue)(implicit ev: Writes[T]) = {
-    val updated = if(data != None) {
+  def upsert[T](key: String, data: JsValue, hasValue: Boolean)(implicit ev: Writes[T]) = {
+    val updated = if(hasValue) {
       this.data + (key -> data)
     }
     else {
@@ -173,7 +173,7 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
       Json.toJson(data)
     }
 
-    toCacheMap(Cache(targetCache).upsert[T](key, jsonData))
+    toCacheMap(Cache(targetCache).upsert[T](key, jsonData, data != None))
   }
 
   /**
