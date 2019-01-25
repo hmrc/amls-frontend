@@ -19,16 +19,16 @@ package views.msb
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, MostTransactions}
+import models.moneyservicebusiness.MostTransactions
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import utils.AmlsSpec
+import utils.{AmlsSpec, AutoCompleteServiceMocks}
 import views.Fixture
 
 
 class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
-  trait ViewFixture extends Fixture {
+  trait ViewFixture extends Fixture with AutoCompleteServiceMocks {
     implicit val requestWithToken = addToken(request)
   }
 
@@ -37,7 +37,7 @@ class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.msb.most_transactions(form2, true)
+      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
 
       doc.title must be(Messages("msb.most.transactions.title") +
         " - " + Messages("summary.msb") +
@@ -49,7 +49,7 @@ class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.msb.most_transactions(form2, true)
+      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("msb.most.transactions.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -63,7 +63,7 @@ class most_transactionsSpec extends AmlsSpec with MustMatchers {
           (Path \ "mostTransactionsCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.msb.most_transactions(form2, true)
+      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
 

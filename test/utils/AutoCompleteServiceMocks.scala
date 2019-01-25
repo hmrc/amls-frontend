@@ -29,7 +29,11 @@ trait AutoCompleteServiceMocks extends MockitoSugar {
     mockAutoComplete.getCountries
   } thenReturn Some(Seq(
     NameValuePair("United Kingdom", "GB"),
-    NameValuePair("Albania", "AL")
+    NameValuePair("Afghanistan", "AF"),
+    NameValuePair("Åland Islands", "AX"),
+    NameValuePair("Albania", "AL"),
+    NameValuePair("Algeria", "DZ"),
+    NameValuePair("American Samoa", "AS")
   ))
 
 }

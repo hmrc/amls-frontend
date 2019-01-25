@@ -16,8 +16,9 @@
 
 @import include._
 @import forms2._
+@import models.autocomplete._
 
-@(f: forms.Form2[_], edit: Boolean)(implicit lang:Lang,  m: Messages, request: Request[_])
+@(f: forms.Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
     @errorSummary(f)
@@ -43,17 +44,20 @@
             @errorGroup(
                 field = f("mostTransactionsCountries")
             ) {
-                @country(
+                @country_autocomplete(
                     field = f("mostTransactionsCountries[0]"),
-                    labelText = "lbl.country.line1"
+                    labelText = "lbl.country.line1",
+                    data = countryData.getOrElse(Seq.empty)
                 )
-                @country(
+                @country_autocomplete(
                     field = f("mostTransactionsCountries[1]"),
-                    labelText = "lbl.country.line2"
+                    labelText = "lbl.country.line2",
+                    data = countryData.getOrElse(Seq.empty)
                 )
-                @country(
+                @country_autocomplete(
                     field = f("mostTransactionsCountries[2]"),
-                    labelText = "lbl.country.line3"
+                    labelText = "lbl.country.line3",
+                    data = countryData.getOrElse(Seq.empty)
                 )
             }
         }
