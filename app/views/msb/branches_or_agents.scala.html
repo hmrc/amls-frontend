@@ -80,7 +80,7 @@
                         ) { field =>
 
                         @country_autocomplete(
-                            field = f("country"),
+                            field = field,
                             classes = field match {
                                 case f: ValidField => Seq("")
                                 case f: InvalidField => Seq("js-hidden")
@@ -88,10 +88,6 @@
                             data = countryData.getOrElse(Seq.empty)
                         )
 
-                        @country(field, classes = field match {
-                            case f: ValidField => Seq("")
-                            case f: InvalidField => Seq("js-hidden")
-                            })
                         }
                     }
                 }
