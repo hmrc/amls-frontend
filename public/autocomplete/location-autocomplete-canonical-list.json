@@ -60,10 +60,6 @@
     "territory:AW"
   ],
   [
-    "Ascension",
-    "territory:SH-AC"
-  ],
-  [
     "Australia",
     "country:AU"
   ],
@@ -78,10 +74,6 @@
   [
     "Bahrain",
     "country:BH"
-  ],
-  [
-    "Baker Island",
-    "territory:UM-81"
   ],
   [
     "Bangladesh",
@@ -121,7 +113,7 @@
   ],
   [
     "Bonaire",
-    "territory:BQ-BO"
+    "territory:BQ"
   ],
   [
     "Bosnia and Herzegovina",
@@ -138,10 +130,6 @@
   [
     "Brazil",
     "country:BR"
-  ],
-  [
-    "British Antarctic Territory",
-    "territory:BAT"
   ],
   [
     "British Indian Ocean Territory",
@@ -194,10 +182,6 @@
   [
     "Central African Republic",
     "country:CF"
-  ],
-  [
-    "Ceuta",
-    "territory:ES-CE"
   ],
   [
     "Chad",
@@ -264,16 +248,8 @@
     "country:CZ"
   ],
   [
-    "Czechoslovakia",
-    "country:CS"
-  ],
-  [
     "Denmark",
     "country:DK"
-  ],
-  [
-    "Dhekelia",
-    "territory:XXD"
   ],
   [
     "Djibouti",
@@ -286,10 +262,6 @@
   [
     "Dominican Republic",
     "country:DO"
-  ],
-  [
-    "Dubai",
-    "territory:AE-DU"
   ],
   [
     "East Germany",
@@ -358,10 +330,6 @@
   [
     "French Southern Territories",
     "territory:TF"
-  ],
-  [
-    "Fujairah",
-    "territory:AE-FU"
   ],
   [
     "Gabon",
@@ -440,10 +408,6 @@
     "territory:HK"
   ],
   [
-    "Howland Island",
-    "territory:UM-84"
-  ],
-  [
     "Hungary",
     "country:HU"
   ],
@@ -496,16 +460,8 @@
     "country:JP"
   ],
   [
-    "Jarvis Island",
-    "territory:UM-86"
-  ],
-  [
     "Jersey",
     "territory:JE"
-  ],
-  [
-    "Johnston Atoll",
-    "territory:UM-67"
   ],
   [
     "Jordan",
@@ -520,16 +476,8 @@
     "country:KE"
   ],
   [
-    "Kingman Reef",
-    "territory:UM-89"
-  ],
-  [
     "Kiribati",
     "country:KI"
-  ],
-  [
-    "Kosovo",
-    "country:XK"
   ],
   [
     "Kuwait",
@@ -628,20 +576,12 @@
     "territory:YT"
   ],
   [
-    "Melilla",
-    "territory:ES-ML"
-  ],
-  [
     "Mexico",
     "country:MX"
   ],
   [
     "Micronesia",
     "country:FM"
-  ],
-  [
-    "Midway Islands",
-    "territory:UM-71"
   ],
   [
     "Moldova",
@@ -678,10 +618,6 @@
   [
     "Nauru",
     "country:NR"
-  ],
-  [
-    "Navassa Island",
-    "territory:UM-76"
   ],
   [
     "Nepal",
@@ -748,10 +684,6 @@
     "country:PW"
   ],
   [
-    "Palmyra Atoll",
-    "territory:UM-95"
-  ],
-  [
     "Panama",
     "country:PA"
   ],
@@ -792,10 +724,6 @@
     "country:QA"
   ],
   [
-    "Ras al-Khaimah",
-    "territory:AE-RK"
-  ],
-  [
     "Romania",
     "country:RO"
   ],
@@ -810,14 +738,6 @@
   [
     "Réunion",
     "territory:RE"
-  ],
-  [
-    "Saba",
-    "territory:BQ-SA"
-  ],
-  [
-    "Saint Barthélemy",
-    "territory:BL"
   ],
   [
     "Saint Helena",
@@ -858,10 +778,6 @@
   [
     "Seychelles",
     "country:SC"
-  ],
-  [
-    "Sharjah",
-    "territory:AE-SH"
   ],
   [
     "Sierra Leone",
@@ -1000,10 +916,6 @@
     "country:TT"
   ],
   [
-    "Tristan da Cunha",
-    "territory:SH-TA"
-  ],
-  [
     "Tunisia",
     "country:TN"
   ],
@@ -1024,20 +936,12 @@
     "country:TV"
   ],
   [
-    "USSR",
-    "country:SU"
-  ],
-  [
     "Uganda",
     "country:UG"
   ],
   [
     "Ukraine",
     "country:UA"
-  ],
-  [
-    "Umm al-Quwain",
-    "territory:AE-UQ"
   ],
   [
     "United Arab Emirates",
@@ -1080,10 +984,6 @@
     "country:VN"
   ],
   [
-    "Wake Island",
-    "territory:UM-79"
-  ],
-  [
     "Wallis and Futuna",
     "territory:WF"
   ],
@@ -1096,10 +996,6 @@
     "country:YE"
   ],
   [
-    "Yugoslavia",
-    "country:YU"
-  ],
-  [
     "Zambia",
     "country:ZM"
   ],
@@ -1110,5 +1006,29 @@
   [
     "Åland Islands",
     "territory:AX"
+  ],
+  [
+    "Côte d'Ivoire",
+    "country:CI"
+  ],
+  [
+    "Korea, Democratic People's Republic of",
+    "country:KP"
+  ],
+  [
+    "Korea, Republic of",
+    "country:KR"
+  ],
+  [
+    "Palestine, State of",
+    "country:PS"
+  ],
+  [
+    "Virgin Islands, British",
+    "country:VG"
+  ],
+  [
+    "Myanmar",
+    "country:MM"
   ]
 ]
