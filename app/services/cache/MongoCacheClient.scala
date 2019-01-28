@@ -145,7 +145,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
     */
   def removeByKey[T](id: String, key: String)(implicit writes: Writes[T]): Future[Cache] = {
 
-    println("removeByKey - fetch all")
     fetchAll(id) flatMap { maybeCache =>
       val cache = maybeCache.getOrElse(Cache(id, Map.empty))
 
@@ -157,7 +156,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
       val document = Json.toJson(updatedCache)
       val modifier = BSONDocument("$set" -> document)
 
-      println("removeByKey - fetch update")
       collection.update(bsonIdQuery(id), modifier, upsert = true) map { _ => updatedCache }
     }
   }

@@ -88,20 +88,16 @@ class BusinessMatchingService @Inject()(
     }
 
   def clearSection(activity: BusinessActivity)(implicit ac: AuthContext, hc: HeaderCarrier) = activity match {
-    //case AccountancyServices => dataCacheConnector.save[Asp](Asp.key, None)
-    case AccountancyServices => dataCacheConnector.removeByKey[Asp](Asp.key)
-
-    //case EstateAgentBusinessService => dataCacheConnector.save[EstateAgentBusiness](EstateAgentBusiness.key, None)
-    case EstateAgentBusinessService => dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
-
-    //case HighValueDealing => dataCacheConnector.save[Hvd](Hvd.key, None)
-    case HighValueDealing => dataCacheConnector.removeByKey[Hvd](Hvd.key)
-
-    //case MoneyServiceBusiness => dataCacheConnector.save[Msb](Msb.key, None)
-    case MoneyServiceBusiness => dataCacheConnector.removeByKey[Msb](Msb.key)
-
-    //case TrustAndCompanyServices => dataCacheConnector.save[Tcsp](Tcsp.key, None)
-    case TrustAndCompanyServices => dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
+    case AccountancyServices =>
+      dataCacheConnector.removeByKey[Asp](Asp.key)
+    case EstateAgentBusinessService =>
+      dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
+    case HighValueDealing =>
+      dataCacheConnector.removeByKey[Hvd](Hvd.key)
+    case MoneyServiceBusiness =>
+      dataCacheConnector.removeByKey[Msb](Msb.key)
+    case TrustAndCompanyServices =>
+      dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
   }
 
 }

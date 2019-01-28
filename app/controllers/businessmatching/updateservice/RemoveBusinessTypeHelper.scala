@@ -62,23 +62,14 @@ class RemoveBusinessTypeHelper @Inject()(val authConnector: AuthConnector,
 
     def removeActivity(activity: BMBusinessActivity): Future[CacheMap] = {
       activity match {
-        //case MoneyServiceBusiness => dataCacheConnector.save(MSBSection.key, MSBSection())
         case MoneyServiceBusiness =>
           dataCacheConnector.removeByKey[MSBSection](MSBSection.key)
-
-        //case HighValueDealing => dataCacheConnector.save(Hvd.key, Hvd())
         case HighValueDealing =>
           dataCacheConnector.removeByKey[Hvd](Hvd.key)
-
-        //case TrustAndCompanyServices => dataCacheConnector.save(Tcsp.key, Tcsp())
         case TrustAndCompanyServices =>
           dataCacheConnector.removeByKey[Tcsp](Tcsp.key)
-
-        //case AccountancyServices => dataCacheConnector.save(Asp.key, Asp())
         case AccountancyServices =>
           dataCacheConnector.removeByKey[Asp](Asp.key)
-
-        //case EstateAgentBusinessService => dataCacheConnector.save(EstateAgentBusiness.key, EstateAgentBusiness())
         case EstateAgentBusinessService =>
           dataCacheConnector.removeByKey[EstateAgentBusiness](EstateAgentBusiness.key)
       }
