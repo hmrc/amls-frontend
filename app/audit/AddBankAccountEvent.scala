@@ -19,12 +19,12 @@ package audit
 import cats.implicits._
 import models.bankdetails._
 import play.api.libs.json.{JsString, Writes}
-import uk.gov.hmrc.play.audit.AuditExtensions._
 import Utils._
+import utils.AuditHelper
 import play.api.mvc.Request
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.AuditExtensions._
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.AuditHelper
 
 object AddBankAccountEvent {
 

@@ -23,7 +23,7 @@ import models._
 import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.concurrent.ScalaFutures
+import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Org
@@ -34,7 +34,7 @@ import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with AmlsReferenceNumberGenerator {
+class FeeConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with IntegrationPatience with AmlsReferenceNumberGenerator {
 
   val connector = new FeeConnector(
     http = mock[HttpGet],

@@ -38,7 +38,8 @@ abstract class ApplicationGlobal extends DefaultFrontendGlobal {
 
   override lazy val frontendAuditFilter: FrontendAuditFilter = AMLSAuditFilter
 
-  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] = None
+  override def microserviceMetricsConfig(implicit app: Application): Option[Configuration] =
+    app.configuration.getConfig("microservice.metrics")
 }
 
 object ApplicationGlobal extends ApplicationGlobal {

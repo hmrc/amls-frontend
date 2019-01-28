@@ -158,7 +158,7 @@ object FormTypes {
   private val yearPatternPost1900 = regexWithMsg(yearRegexPost1900, "error.invalid.year.post1900")
   private val yearPattern = regexWithMsg(yearRegexFourDigits, "error.invalid.year")
 
-  val phoneNumberType = phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
+  val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
