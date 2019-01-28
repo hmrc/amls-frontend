@@ -476,11 +476,10 @@ class CurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
   it must {
     "use the correct services" in new Fixture {
-      AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
-      AdditionalAddressController.authConnector must be(AMLSAuthConnector)
+      CurrentAddressController.dataCacheConnector must be(DataCacheConnector)
+      CurrentAddressController.authConnector must be(AMLSAuthConnector)
     }
   }
-
 }
 
 

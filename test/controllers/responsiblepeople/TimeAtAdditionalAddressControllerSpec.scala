@@ -317,15 +317,12 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
     }
-
-
   }
 
   it must {
     "use the correct services" in new Fixture {
-      AdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
-      AdditionalAddressController.authConnector must be(AMLSAuthConnector)
+      TimeAtAdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
+      TimeAtAdditionalAddressController.authConnector must be(AMLSAuthConnector)
     }
   }
-
 }
