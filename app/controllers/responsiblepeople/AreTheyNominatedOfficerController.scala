@@ -16,15 +16,13 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
-import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import jto.validation.{From, Rule, Write}
-import jto.validation.forms._
 import play.api.mvc.{AnyContent, Request, Result}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.are_they_nominated_officer
 
@@ -44,9 +42,11 @@ object BooleanFormReadWrite {
   }
 }
 
-trait AreTheyNominatedOfficerController extends RepeatingSection with BaseController {
+class AreTheyNominatedOfficerController @Inject () (
+                                                     override val dataCacheConnector: DataCacheConnector,
+                                                     override val authConnector: AuthConnector
+                                                   ) extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
   val FIELDNAME = "isNominatedOfficer"
   implicit val boolWrite = BooleanFormReadWrite.formWrites(FIELDNAME)
   implicit val boolRead = BooleanFormReadWrite.formRule(FIELDNAME)
@@ -100,10 +100,4 @@ trait AreTheyNominatedOfficerController extends RepeatingSection with BaseContro
       case _ => NotFound(notFoundView)
     }
   }
-}
-
-object AreTheyNominatedOfficerController extends AreTheyNominatedOfficerController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

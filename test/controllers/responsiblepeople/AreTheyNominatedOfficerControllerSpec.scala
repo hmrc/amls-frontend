@@ -30,6 +30,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -42,10 +43,10 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AreTheyNominatedOfficerController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new AreTheyNominatedOfficerController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+      )
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)
@@ -194,6 +195,12 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 
         }
       }
+    }
+    "app must start" in {
+
+      val app = new GuiceApplicationBuilder().build()
+
+      app.injector.instanceOf[AreTheyNominatedOfficerController]
     }
   }
 }
