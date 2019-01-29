@@ -196,11 +196,5 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
         }
       }
     }
-    "app must start" in {
-
-      val app = new GuiceApplicationBuilder().build()
-
-      app.injector.instanceOf[AreTheyNominatedOfficerController]
-    }
   }
 }
