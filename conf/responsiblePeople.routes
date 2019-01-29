@@ -73,14 +73,11 @@ POST        /nominatedofficer/:index/                               controllers.
 GET         /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /additional-extra-address/:index/                      controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /additional-extra-address/:index/                      controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /additional-extra-address/:index/                      @controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /additional-extra-address/:index/                      @controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /time-at-additional-extra-address/:index/              controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-additional-extra-address/:index/              controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
-GET         /additional-extra-address/:index/                      controllers.responsiblepeople.AdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /additional-extra-address/:index/                      controllers.responsiblepeople.AdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /vat/:index/                                           controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /vat/:index/                                           controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
