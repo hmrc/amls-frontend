@@ -16,19 +16,22 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ContactDetails, ResponsiblePerson}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.contact_details
 
 import scala.concurrent.Future
 
-trait ContactDetailsController extends RepeatingSection with BaseController {
+class ContactDetailsController @Inject () (
+                                      override val dataCacheConnector: DataCacheConnector,
+                                      override val authConnector: AuthConnector
+                                          ) extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext => implicit request =>
@@ -65,12 +68,5 @@ trait ContactDetailsController extends RepeatingSection with BaseController {
           }
         }
       }
-
     }
-}
-
-object ContactDetailsController extends ContactDetailsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }
