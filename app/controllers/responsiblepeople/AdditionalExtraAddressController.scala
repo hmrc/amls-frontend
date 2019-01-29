@@ -42,7 +42,7 @@ class AdditionalExtraAddressController @Inject() (
                                                    override val dataCacheConnector: DataCacheConnector,
                                                    override val authConnector: AuthConnector,
                                                    auditConnector: AuditConnector,
-                                                   val autoCompleteService: AutoCompleteService
+                                                   autoCompleteService: AutoCompleteService
                                                  ) extends RepeatingSection with BaseController {
 
 
