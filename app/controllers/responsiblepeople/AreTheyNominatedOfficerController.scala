@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.responsiblepeople._
-import play.api.mvc.{AnyContent, Request, Result}
+import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.are_they_nominated_officer

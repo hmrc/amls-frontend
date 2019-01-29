@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.Country
 import models.autocomplete.NameValuePair
@@ -31,7 +30,6 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier

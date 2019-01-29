@@ -20,7 +20,7 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data._
 import cats.implicits._
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -37,7 +37,6 @@ import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-@Singleton
 class AdditionalExtraAddressController @Inject() (
                                                    override val dataCacheConnector: DataCacheConnector,
                                                    override val authConnector: AuthConnector,

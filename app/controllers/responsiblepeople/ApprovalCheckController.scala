@@ -20,14 +20,13 @@ import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
-import javax.inject.{Inject, Singleton}
-import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson }
+import javax.inject.Inject
+import models.responsiblepeople.ResponsiblePerson
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-@Singleton
 class ApprovalCheckController @Inject()(
                                          val dataCacheConnector: DataCacheConnector,
                                          val authConnector: AuthConnector,

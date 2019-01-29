@@ -17,12 +17,11 @@
 package controllers.responsiblepeople
 
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
+import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -31,7 +30,6 @@ import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.current_address
 import audit.AddressConversions._
 import com.google.inject.Inject
-import play.api.Play
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future

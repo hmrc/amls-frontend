@@ -17,9 +17,6 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -30,10 +27,8 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
