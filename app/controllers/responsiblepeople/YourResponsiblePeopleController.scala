@@ -16,16 +16,18 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.responsiblepeople.ResponsiblePerson
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.responsiblepeople.your_responsible_people
 
-trait YourResponsiblePeopleController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class YourResponsiblePeopleController @Inject () (
+                                                 override val dataCacheConnector: DataCacheConnector,
+                                                 override val authConnector: AuthConnector
+                                                 ) extends RepeatingSection with BaseController {
 
   def get() =
       Authorised.async {
@@ -40,10 +42,4 @@ trait YourResponsiblePeopleController extends RepeatingSection with BaseControll
             case _ => Redirect(controllers.routes.RegistrationProgressController.get())
           }
       }
-}
-
-object YourResponsiblePeopleController extends YourResponsiblePeopleController {
-  // $COVERAGE-OFF$
-  override def dataCacheConnector = DataCacheConnector
-  override def authConnector = AMLSAuthConnector
 }

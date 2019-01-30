@@ -1,6 +1,6 @@
 GET         /add                                                   @controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
 
-GET         /who-must-register/:index/                             controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, flow: Option[String] ?= None)
+GET         /who-must-register/:index/                             @controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, flow: Option[String] ?= None)
 GET         /what-you-need/:index/                                 @controllers.responsiblepeople.WhatYouNeedController.get(index:Int, flow: Option[String] ?= None)
 
 GET         /your-name/:index/                                     @controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -104,4 +104,4 @@ POST        /remove/:index/                                        @controllers.
 GET         /country-of-birth/:index/                              @controllers.responsiblepeople.CountryOfBirthController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /country-of-birth/:index/                              @controllers.responsiblepeople.CountryOfBirthController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /your-responsible-people                               controllers.responsiblepeople.YourResponsiblePeopleController.get()
+GET         /your-responsible-people                               @controllers.responsiblepeople.YourResponsiblePeopleController.get()

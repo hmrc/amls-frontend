@@ -16,21 +16,20 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import controllers.BaseController
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait WhoMustRegisterController extends BaseController {
+class WhoMustRegisterController @Inject () (
+                                           override val authConnector: AuthConnector
+                                           )extends BaseController {
 
   def get(index : Int, flow: Option[String] = None) =
       Authorised.async {
         implicit authContext => implicit request =>
           Future.successful(Ok(who_must_register(index, flow)))
       }
-}
-
-object WhoMustRegisterController extends WhoMustRegisterController {
-  override val authConnector = AMLSAuthConnector
 }
