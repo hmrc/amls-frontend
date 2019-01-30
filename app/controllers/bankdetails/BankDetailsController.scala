@@ -19,11 +19,9 @@ package controllers.bankdetails
 import controllers.BaseController
 import models.bankdetails.BankDetails
 import models.status.{NotCompleted, SubmissionReady, SubmissionStatus}
-import services.StatusService
 import utils.RepeatingSection
 
 trait BankDetailsController extends BaseController with RepeatingSection {
-  val statusService: StatusService
 
   implicit class BankDetailsSyntax(model: BankDetails) {
     def canEdit(status: SubmissionStatus): Boolean = status match {
