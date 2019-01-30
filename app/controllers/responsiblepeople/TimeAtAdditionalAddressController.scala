@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -24,14 +24,16 @@ import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
 import play.api.mvc.{AnyContent, Request}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.time_at_additional_address
 
 import scala.concurrent.Future
 
-trait TimeAtAdditionalAddressController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class TimeAtAdditionalAddressController @Inject () (
+                                                   override val dataCacheConnector: DataCacheConnector,
+                                                   override val authConnector: AuthConnector
+                                                   ) extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
@@ -94,10 +96,4 @@ trait TimeAtAdditionalAddressController extends RepeatingSection with BaseContro
         })
     }
   }
-}
-
-object TimeAtAdditionalAddressController extends TimeAtAdditionalAddressController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }
