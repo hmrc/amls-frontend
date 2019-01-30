@@ -1,7 +1,7 @@
 GET         /add                                                   @controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
 
 GET         /who-must-register/:index/                             controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, flow: Option[String] ?= None)
-GET         /what-you-need/:index/                                 controllers.responsiblepeople.WhatYouNeedController.get(index:Int, flow: Option[String] ?= None)
+GET         /what-you-need/:index/                                 @controllers.responsiblepeople.WhatYouNeedController.get(index:Int, flow: Option[String] ?= None)
 
 GET         /your-name/:index/                                     @controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /your-name/:index/                                     @controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
@@ -55,7 +55,7 @@ GET         /additional-address/:index/                            controllers.r
 POST        /additional-address/:index/                            controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /address-new/:index/                                   @controllers.responsiblepeople.NewHomeAddressController.get(index:Int)
-POST        /address-new/:index/                                    @controllers.responsiblepeople.NewHomeAddressController.post(index:Int)
+POST        /address-new/:index/                                   @controllers.responsiblepeople.NewHomeAddressController.post(index:Int)
 
 GET         /date-change-moved/:index/                             @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.get(index:Int)
 POST        /date-change-moved/:index/                             @controllers.responsiblepeople.NewHomeAddressDateOfChangeController.post(index:Int)
