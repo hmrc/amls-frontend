@@ -29,6 +29,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -44,10 +45,10 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val personNameController = new PersonNameController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val personNameController = new PersonNameController (
+      dataCacheConnector = mockDataCacheConnector ,
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -183,17 +184,6 @@ class PersonNameControllerSpec extends AmlsSpec with MockitoSugar {
           status(result) must be(NOT_FOUND)
         }
       }
-
-    }
-
-  }
-
-
-  it must {
-    "use the correct services" in new Fixture {
-      PersonNameController.dataCacheConnector must be(DataCacheConnector)
-      PersonNameController.authConnector must be(AMLSAuthConnector)
     }
   }
-
 }

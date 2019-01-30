@@ -3,8 +3,8 @@ GET         /add                                                   controllers.r
 GET         /who-must-register/:index/                             controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, flow: Option[String] ?= None)
 GET         /what-you-need/:index/                                 controllers.responsiblepeople.WhatYouNeedController.get(index:Int, flow: Option[String] ?= None)
 
-GET         /your-name/:index/                                     controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /your-name/:index/                                     controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /your-name/:index/                                     @controllers.responsiblepeople.PersonNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /your-name/:index/                                     @controllers.responsiblepeople.PersonNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /legal-name/:index/                                    @controllers.responsiblepeople.LegalNameController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /legal-name/:index/                                    @controllers.responsiblepeople.LegalNameController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
