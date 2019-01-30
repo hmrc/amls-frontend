@@ -1,4 +1,4 @@
-GET         /add                                                   controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
+GET         /add                                                   @controllers.responsiblepeople.ResponsiblePeopleAddController.get(displayGuidance:Boolean ?= true, flow: Option[String] ?= None)
 
 GET         /who-must-register/:index/                             controllers.responsiblepeople.WhoMustRegisterController.get(index:Int, flow: Option[String] ?= None)
 GET         /what-you-need/:index/                                 controllers.responsiblepeople.WhatYouNeedController.get(index:Int, flow: Option[String] ?= None)
