@@ -136,7 +136,7 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
                   )))
               }
             } map { _ =>
-              Redirect(routes.YourTradingPremisesController.get())
+              Redirect(routes.DetailedAnswersController.get(1))
             }
         }
       }
