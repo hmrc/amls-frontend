@@ -15,8 +15,8 @@ POST        /legal-name-change-date/:index/                        @controllers.
 GET         /known-by/:index/                                      @controllers.responsiblepeople.KnownByController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /known-by/:index/                                      @controllers.responsiblepeople.KnownByController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /self-assessment/:index/                               controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /self-assessment/:index/                               controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /self-assessment/:index/                               @controllers.responsiblepeople.RegisteredForSelfAssessmentController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /self-assessment/:index/                               @controllers.responsiblepeople.RegisteredForSelfAssessmentController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /address/:index/                                       @controllers.responsiblepeople.ConfirmAddressController.get(index: Int)
 POST        /address/:index/                                       @controllers.responsiblepeople.ConfirmAddressController.post(index: Int)
