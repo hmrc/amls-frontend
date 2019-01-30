@@ -21,7 +21,6 @@ import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
@@ -29,7 +28,6 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import services.AutoCompleteService
