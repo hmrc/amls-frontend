@@ -229,12 +229,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
       }
-      "App must start" in {
-
-        val app = new GuiceApplicationBuilder().build()
-
-        app.injector.instanceOf[DetailedAnswersController]
-      }
     }
   }
 }
