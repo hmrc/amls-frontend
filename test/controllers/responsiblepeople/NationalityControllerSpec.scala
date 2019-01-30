@@ -29,6 +29,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import services.AutoCompleteService
@@ -42,11 +43,13 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new NationalityController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val autoCompleteService = mock[AutoCompleteService]
-    }
+    val autoCompleteService = mock[AutoCompleteService]
+
+    val controller = new NationalityController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      autoCompleteService = autoCompleteService
+    )
 
     when {
       controller.autoCompleteService.getCountries

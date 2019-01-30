@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -24,15 +24,16 @@ import models.responsiblepeople.{Nationality, ResponsiblePerson}
 import services.AutoCompleteService
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.nationality
-import play.api.Play
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait NationalityController extends RepeatingSection with BaseController {
+class NationalityController @Inject () (
+                                       override val dataCacheConnector: DataCacheConnector,
+                                       override val authConnector: AuthConnector,
+                                       val autoCompleteService: AutoCompleteService
+                                       ) extends RepeatingSection with BaseController {
 
-  def dataCacheConnector: DataCacheConnector
-
-  val autoCompleteService: AutoCompleteService
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
         implicit authContext => implicit request =>
@@ -74,11 +75,3 @@ trait NationalityController extends RepeatingSection with BaseController {
           }
     }
 }
-
-object NationalityController extends NationalityController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
-  override def dataCacheConnector = DataCacheConnector
-}
-
