@@ -16,24 +16,25 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.{ResponsiblePerson, ResponsiblePersonEndDate}
 import models.status._
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.responsiblepeople.remove_responsible_person
 
 import scala.concurrent.Future
 
-//noinspection ScalaStyle
-trait RemoveResponsiblePersonController extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
-
-  private[controllers] def statusService: StatusService
+class RemoveResponsiblePersonController @Inject () (
+                                                   override val dataCacheConnector: DataCacheConnector,
+                                                   override val authConnector: AuthConnector,
+                                                   val statusService: StatusService
+                                                   ) extends RepeatingSection with BaseController {
 
   private def showRemovalDateField(status: SubmissionStatus, lineIdExists: Boolean): Boolean = {
     status match {
@@ -99,11 +100,4 @@ trait RemoveResponsiblePersonController extends RepeatingSection with BaseContro
             }
         }
   }
-}
-
-object RemoveResponsiblePersonController extends RemoveResponsiblePersonController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override private[controllers] val statusService: StatusService = StatusService
 }
