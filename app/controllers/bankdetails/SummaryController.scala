@@ -27,8 +27,7 @@ import scala.concurrent.Future
 @Singleton
 class SummaryController @Inject()(
                                    val dataCacheConnector: DataCacheConnector,
-                                   val authConnector: AuthConnector,
-                                   val statusService: StatusService
+                                   val authConnector: AuthConnector
                                  ) extends BankDetailsController {
 
   def get(index: Int) = Authorised.async {
