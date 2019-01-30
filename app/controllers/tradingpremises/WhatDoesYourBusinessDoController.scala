@@ -78,7 +78,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 _ =>
                   activities.contains(MoneyServiceBusiness) match {
                     case true => Redirect(routes.MSBServicesController.get(index))
-                    case false => Redirect(routes.PremisesRegisteredController.get(index))
+                    case false => Redirect(routes.DetailedAnswersController.get(index))
                   }
             }.recover {
                 case _ =>
@@ -111,10 +111,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
       } else {
         data.activities.contains(MoneyServiceBusiness) match {
           case true => Redirect(routes.MSBServicesController.get(index, edit, modelHasChanged(tradingPremises, data)))
-          case _ => edit match {
-            case true => Redirect(routes.SummaryController.getIndividual(index))
-            case false => Redirect(routes.PremisesRegisteredController.get(index))
-          }
+          case _ => Redirect(routes.DetailedAnswersController.get(index))
         }
       }
   }
@@ -181,7 +178,7 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
                 _ <- updateDataStrict[TradingPremises](index) { tradingPremises =>
                   tradingPremises.whatDoesYourBusinessDoAtThisAddress(tradingPremises.whatDoesYourBusinessDoAtThisAddress.get.copy(dateOfChange = Some(dateOfChange)))
                 }
-              } yield Redirect(routes.SummaryController.get())
+              } yield Redirect(routes.DetailedAnswersController.get(index))
           }
         }
   }

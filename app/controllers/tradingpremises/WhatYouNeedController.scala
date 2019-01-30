@@ -17,16 +17,17 @@
 package controllers.tradingpremises
 
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.businessmatching.{BusinessMatching, MoneyServiceBusiness}
+import javax.inject.{Inject, Singleton}
+import models.businessmatching.BusinessMatching
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.tradingpremises._
 
-trait WhatYouNeedController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class WhatYouNeedController @Inject()(val dataCacheConnector: DataCacheConnector,
+                                      val authConnector: AuthConnector) extends BaseController {
 
   def get(index: Int) = Authorised.async {
     implicit authContext => implicit request =>
@@ -36,10 +37,4 @@ trait WhatYouNeedController extends BaseController {
       }
   }
 
-}
-
-object WhatYouNeedController extends WhatYouNeedController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

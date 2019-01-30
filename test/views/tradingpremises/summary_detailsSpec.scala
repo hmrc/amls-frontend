@@ -79,12 +79,12 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
   "The summary details page" must {
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Address Answer: 1 2 asdfasdf")),
-      ("tradingpremises.summary.tradingstartdate", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
-      ("tradingpremises.summary.residential", checkElementTextIncludes(_, "lbl.yes")),
-      ("tradingpremises.summary.services", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money service business activities")),
+      ("tradingpremises.summary.address", checkElementTextIncludes(_, "Trading address (registered business address) Answer: 1 2 asdfasdf")),
+      ("tradingpremises.startDate.title", checkElementTextIncludes(_, DateHelper.formatDate(new LocalDate(1990, 2, 24)))),
+      ("tradingpremises.isResidential.title", checkElementTextIncludes(_, "lbl.yes")),
+      ("tradingpremises.whatdoesyourbusinessdo.title", checkElementTextOnlyIncludes(_, "Bill payment services", "Estate agency services", "Money service business activities")),
       ("tradingpremises.msb.services.title", checkElementTextIncludes(_, "Transmitting money","Currency exchange")),
-      ("tradingpremises.summary.who-uses", checkElementTextIncludes(_, "tradingpremises.summary.agents")),
+      ("tradingpremises.agent.premises.title", checkElementTextIncludes(_, "lbl.yes")),
       ("tradingpremises.businessStructure.title", checkElementTextIncludes(_, "businessType.lbl.01")),
       ("tradingpremises.agentname.title", checkElementTextIncludes(_, "test")),
       ("tradingpremises.agentpartnership.title", checkElementTextIncludes(_, "test")),
@@ -121,7 +121,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
 
       def view = views.html.tradingpremises.summary_details(tradingPremises, isMsb, 1, false)
 
-      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.whatdoesyourbusinessdo.title"))
       val servicesSection = hTwo.get.parent.toString
 
       servicesSection must include("Edit")
@@ -135,7 +135,7 @@ class summary_detailsSpec extends TestHelper with HtmlAssertions with TableDrive
 
       def view = views.html.tradingpremises.summary_details(tradingPremises.copy(whatDoesYourBusinessDoAtThisAddress = Some(testData)), isMsb, 1, true)
 
-      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.summary.services"))
+      val hTwo = doc.select("section.check-your-answers h2").toList.find(e => e.text() == Messages("tradingpremises.whatdoesyourbusinessdo.title"))
       val servicesSection = hTwo.get.parent.toString
 
       servicesSection mustNot include("Edit")

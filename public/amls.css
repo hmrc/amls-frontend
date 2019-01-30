@@ -836,12 +836,12 @@ fieldset .panel-indent {
   word-break: break-word;
 }
 
-ul#complete-rp-list {
+ul#complete-rp-list, ul#complete-tp-list {
   border-top: 1px solid #bfc1c3;
   margin-top: 20px;
 }
 
-ul#incomplete-rp-list {
+ul#incomplete-rp-list, ul#incomplete-tp-list {
   border-top: 1px solid #bfc1c3;
   margin-top: 20px;
   margin-bottom: 40px;

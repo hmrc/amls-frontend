@@ -178,26 +178,24 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         }
       }
 
-      "redirect to Premises registered page" when {
-        "activity is not MoneyServiceBusiness" when {
-          "only one activity is selected in Business Matching business activities page" in new Fixture {
-            val tradingPremises = TradingPremises()
+      "redirect to Check Your Answers Page page" when {
+        "only one activity is selected in Business Matching business activities page" in new Fixture {
+          val tradingPremises = TradingPremises()
 
-            val businessActivity = BusinessMatchingActivities(Set(AccountancyServices))
+          val businessActivity = BusinessMatchingActivities(Set(AccountancyServices))
 
-            when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(tradingPremises))))
+          when(mockDataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(tradingPremises))))
 
-            when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
-              .thenReturn(Some(Seq(tradingPremises)))
-            when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-              .thenReturn(Some(BusinessMatching(None, Some(businessActivity))))
+          when(mockCacheMap.getEntry[Seq[TradingPremises]](any())(any()))
+            .thenReturn(Some(Seq(tradingPremises)))
+          when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
+            .thenReturn(Some(BusinessMatching(None, Some(businessActivity))))
 
-            val result = whatDoesYourBusinessDoController.get(recordId1)(request)
+          val result = whatDoesYourBusinessDoController.get(recordId1, true)(request)
 
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(recordId1).url))
-          }
+          status(result) must be(SEE_OTHER)
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
         }
       }
 
@@ -244,7 +242,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
       }
 
       "respond with SEE_OTHER" when {
-        "given a Valid Request with SINGLE Activity and show the summary page" in new Fixture {
+        "given a Valid Request with SINGLE Activity and show the check your answers page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices))
           val tradingPremises = TradingPremises(None, None, None,None, None,None,Some(wdbd),None)
@@ -261,11 +259,11 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result = whatDoesYourBusinessDoController.post(recordId1, edit = true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
         }
 
 
-        "given a Valid Request with multiple ACTIVITIES and show the 'premises registered' page" in new Fixture {
+        "given a Valid Request with multiple ACTIVITIES and show the 'Check Your Answers' page" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
@@ -285,7 +283,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
           val result = whatDoesYourBusinessDoController.post(recordId1)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
         }
 
         "given a valid request and money services were specified" must {
@@ -367,7 +365,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           }
         }
 
-        "given a Valid Request in EDIT Mode and show the trading premises summary with record id" in new Fixture {
+        "given a Valid Request in EDIT Mode and show the trading premises check your answers with record id" in new Fixture {
 
           val wdbd = WhatDoesYourBusinessDo(Set(AccountancyServices, BillPaymentServices))
           val tradingPremises = TradingPremises(None, None, None, None,None,None,Some(wdbd),None)
@@ -388,7 +386,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
           val result = whatDoesYourBusinessDoController.post(recordId1, true)(newRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(recordId1).url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId1).url))
         }
       }
 
@@ -412,7 +410,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = whatDoesYourBusinessDoController.post(1)(newRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
         verify(mockDataCacheConnector).save[Seq[TradingPremises]](
           any(),
@@ -463,7 +461,7 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
         val result = whatDoesYourBusinessDoController.saveDateOfChange(1)(postRequest)
 
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
         val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
         verify(whatDoesYourBusinessDoController.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())

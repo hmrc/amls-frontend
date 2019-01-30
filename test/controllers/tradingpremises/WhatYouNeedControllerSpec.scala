@@ -16,17 +16,14 @@
 
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessmatching._
-import org.jsoup.Jsoup
-import org.scalatest.mock.MockitoSugar
-import org.mockito.Mockito._
 import org.mockito.Matchers._
-import  utils.AmlsSpec
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -37,10 +34,10 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new WhatYouNeedController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val controller = new WhatYouNeedController (
+      mockDataCacheConnector,
+      authConnector = self.authConnector
+    )
   }
 
   "WhatYouNeedController" must {
@@ -63,9 +60,9 @@ class WhatYouNeedControllerSpec extends AmlsSpec with MockitoSugar {
     }
   }
 
-  it must {
-    "use correct services" in new Fixture {
-      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
-    }
-  }
+//  it must {
+//    "use correct services" in new Fixture {
+//      WhatYouNeedController.authConnector must be(AMLSAuthConnector)
+//    }
+//  }
 }
