@@ -27,8 +27,8 @@ POST        /moved-address/:index/                                 @controllers.
 GET         /new-address/:index/                                   @controllers.responsiblepeople.CurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /new-address/:index/                                   @controllers.responsiblepeople.CurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /time-at-address/:index/                               controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /time-at-address/:index/                               controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /time-at-address/:index/                               @controllers.responsiblepeople.TimeAtCurrentAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /time-at-address/:index/                               @controllers.responsiblepeople.TimeAtCurrentAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /address/:index/date-change                            @controllers.responsiblepeople.CurrentAddressDateOfChangeController.get(index:Int, edit: Boolean ?= false)
 POST        /address/:index/date-change                            @controllers.responsiblepeople.CurrentAddressDateOfChangeController.post(index:Int, edit: Boolean ?= false)
