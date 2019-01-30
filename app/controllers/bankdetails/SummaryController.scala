@@ -19,7 +19,6 @@ package controllers.bankdetails
 import connectors.DataCacheConnector
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
