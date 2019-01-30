@@ -17,18 +17,22 @@
 package controllers.responsiblepeople
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
-import models.responsiblepeople.{ResponsiblePerson, SoleProprietorOfAnotherBusiness, VATRegistered}
+import models.responsiblepeople.{ResponsiblePerson, VATRegistered}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait VATRegisteredController extends RepeatingSection with BaseController {
+class VATRegisteredController @Inject () (
+                                         override val dataCacheConnector: DataCacheConnector,
+                                         override val authConnector: AuthConnector
+                                         ) extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext => implicit request =>
@@ -61,10 +65,4 @@ trait VATRegisteredController extends RepeatingSection with BaseController {
           }
         }
     }
-}
-
-object VATRegisteredController extends VATRegisteredController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

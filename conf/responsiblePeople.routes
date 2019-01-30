@@ -78,8 +78,8 @@ POST        /additional-extra-address/:index/                      @controllers.
 GET         /time-at-additional-extra-address/:index/              @controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /time-at-additional-extra-address/:index/              @controllers.responsiblepeople.TimeAtAdditionalExtraAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /vat/:index/                                           controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /vat/:index/                                           controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /vat/:index/                                           @controllers.responsiblepeople.VATRegisteredController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /vat/:index/                                           @controllers.responsiblepeople.VATRegisteredController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /experience-training/:index/                           @controllers.responsiblepeople.ExperienceTrainingController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /experience-training/:index/                           @controllers.responsiblepeople.ExperienceTrainingController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
