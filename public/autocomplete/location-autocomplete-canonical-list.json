@@ -136,7 +136,7 @@
     "territory:IO"
   ],
   [
-    "British Virgin Islands",
+    "Virgin Islands, British",
     "territory:VG"
   ],
   [
@@ -244,7 +244,7 @@
     "country:CY"
   ],
   [
-    "Czechia",
+    "Czech Republic",
     "country:CZ"
   ],
   [
@@ -448,7 +448,7 @@
     "country:IT"
   ],
   [
-    "Ivory Coast",
+    "Côte d'Ivoire",
     "country:CI"
   ],
   [
@@ -656,7 +656,7 @@
     "territory:NF"
   ],
   [
-    "North Korea",
+    "The Democratic People's Republic of Korea",
     "country:KP"
   ],
   [
@@ -668,7 +668,7 @@
     "country:NO"
   ],
   [
-    "Occupied Palestinian Territories",
+    "Palestine, State of",
     "territory:PS"
   ],
   [
@@ -820,7 +820,7 @@
     "territory:GS"
   ],
   [
-    "South Korea",
+    "Korea, Republic of",
     "country:KR"
   ],
   [
@@ -1008,27 +1008,31 @@
     "territory:AX"
   ],
   [
-    "Côte d'Ivoire",
-    "country:CI"
-  ],
-  [
-    "Korea, Democratic People's Republic of",
-    "country:KP"
-  ],
-  [
-    "Korea, Republic of",
-    "country:KR"
-  ],
-  [
-    "Palestine, State of",
-    "country:PS"
-  ],
-  [
     "Virgin Islands, British",
     "country:VG"
   ],
   [
     "Myanmar",
     "country:MM"
+  ],
+  [
+    "European Union",
+    "country:EU"
+  ],
+  [
+    "Netherlands Antilles",
+    "country:AN"
+  ],
+  [
+    "Neutral Zone",
+    "country:NT"
+  ],
+  [
+    "United Nations",
+    "country:UN"
+  ],
+  [
+    "United States Minor Outlying Islands",
+    "country:UM"
   ]
 ]
