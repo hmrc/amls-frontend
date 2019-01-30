@@ -18,7 +18,8 @@ package controllers.responsiblepeople
 
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuthConnector, AppConfig}
+import com.google.inject.Inject
+import config.AppConfig
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessmatching.BusinessMatching
@@ -26,20 +27,21 @@ import models.businessmatching.BusinessType.Partnership
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
 import models.status.{ReadyForRenewal, RenewalSubmitted, SubmissionDecisionApproved}
-import play.api.Play
 import play.api.mvc.{Action, AnyContent}
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, DeclarationHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait DetailedAnswersController extends BaseController with RepeatingSection {
-
-  protected def statusService: StatusService
-
-  protected def config: AppConfig
+class DetailedAnswersController @Inject () (
+                                             override val dataCacheConnector: DataCacheConnector,
+                                             override val authConnector: AuthConnector,
+                                             val statusService: StatusService,
+                                             val config: AppConfig
+                                           ) extends BaseController with RepeatingSection {
 
   private def showHideAddressMove(lineId: Option[Int])(implicit authContext: AuthContext, headerCarrier: HeaderCarrier): Future[Boolean] = {
     statusService.getStatus map {
@@ -117,12 +119,4 @@ trait DetailedAnswersController extends BaseController with RepeatingSection {
   private def fetchModel(implicit authContext: AuthContext, hc: HeaderCarrier) =
     dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
 
-}
-
-object DetailedAnswersController extends DetailedAnswersController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override protected def statusService: StatusService = StatusService
-  override protected  def config = Play.current.injector.instanceOf[AppConfig]
 }
