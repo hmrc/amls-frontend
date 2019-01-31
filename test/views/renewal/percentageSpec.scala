@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.PercentageOfCashPaymentOver15000
 import models.renewal.PercentageOfCashPaymentOver15000.{Second, Third}
@@ -65,6 +65,13 @@ class percentageSpec extends AmlsSpec with MustMatchers  {
 
       doc.getElementById("percentage")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.hvd.percentage(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }
