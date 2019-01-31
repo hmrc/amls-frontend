@@ -16,21 +16,18 @@
 
 package controllers.bankdetails
 
-import javax.inject.{Inject, Singleton}
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
 import forms.EmptyForm
+import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{RepeatingSection, StatusConstants}
+import utils.StatusConstants
 
 @Singleton
 class RemoveBankDetailsController @Inject()(
                                              val authConnector: AuthConnector = AMLSAuthConnector,
-                                             val dataCacheConnector: DataCacheConnector,
-                                             val statusService: StatusService
+                                             val dataCacheConnector: DataCacheConnector
                                            ) extends BankDetailsController {
 
   def get(index: Int) = Authorised.async {
