@@ -29,8 +29,8 @@ import views.html.responsiblepeople.position_within_business
 import scala.concurrent.Future
 
 class PositionWithinBusinessController @Inject () (
-                                                  override val dataCacheConnector: DataCacheConnector,
-                                                  override val authConnector: AuthConnector
+                                                  val dataCacheConnector: DataCacheConnector,
+                                                  val authConnector: AuthConnector
                                                   )extends RepeatingSection with BaseController {
 
 

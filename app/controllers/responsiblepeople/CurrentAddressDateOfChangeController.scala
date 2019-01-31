@@ -34,8 +34,8 @@ import utils.{DateOfChangeHelper, RepeatingSection}
 import scala.concurrent.Future
 
 class CurrentAddressDateOfChangeController @Inject () (
-                                                      override val dataCacheConnector: DataCacheConnector,
-                                                      override val authConnector: AuthConnector,
+                                                      val dataCacheConnector: DataCacheConnector,
+                                                      val authConnector: AuthConnector,
                                                       statusService: StatusService
                                                       ) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 

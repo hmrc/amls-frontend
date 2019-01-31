@@ -28,8 +28,8 @@ import views.html.responsiblepeople._
 import scala.concurrent.Future
 
 class RegisteredForSelfAssessmentController @Inject () (
-                                                       override val dataCacheConnector: DataCacheConnector,
-                                                       override val authConnector: AuthConnector
+                                                       val dataCacheConnector: DataCacheConnector,
+                                                       val authConnector: AuthConnector
                                                        ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =

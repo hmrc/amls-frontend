@@ -24,7 +24,7 @@ import views.html.responsiblepeople._
 import scala.concurrent.Future
 
 class WhatYouNeedController @Inject () (
-                                       override val authConnector:AuthConnector
+                                       val authConnector:AuthConnector
                                        ) extends BaseController {
 
   def get(index: Int, flow: Option[String] = None) =

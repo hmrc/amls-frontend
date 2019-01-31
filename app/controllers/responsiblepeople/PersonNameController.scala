@@ -28,8 +28,8 @@ import views.html.responsiblepeople.person_name
 import scala.concurrent.Future
 
 class PersonNameController @Inject () (
-                                        override val dataCacheConnector: DataCacheConnector,
-                                        override val authConnector: AuthConnector
+                                        val dataCacheConnector: DataCacheConnector,
+                                        val authConnector: AuthConnector
                                       ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {

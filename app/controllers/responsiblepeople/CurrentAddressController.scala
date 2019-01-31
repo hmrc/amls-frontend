@@ -35,11 +35,11 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.Future
 
 class CurrentAddressController @Inject () (
-                                            override val dataCacheConnector: DataCacheConnector,
+                                            val dataCacheConnector: DataCacheConnector,
                                             auditConnector: AuditConnector,
                                             autoCompleteService: AutoCompleteService,
                                             statusService: StatusService,
-                                            override val authConnector: AuthConnector
+                                            val authConnector: AuthConnector
                                           ) extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)

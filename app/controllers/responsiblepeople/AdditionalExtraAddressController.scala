@@ -38,8 +38,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class AdditionalExtraAddressController @Inject() (
-                                                   override val dataCacheConnector: DataCacheConnector,
-                                                   override val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector,
                                                    auditConnector: AuditConnector,
                                                    autoCompleteService: AutoCompleteService
                                                  ) extends RepeatingSection with BaseController {

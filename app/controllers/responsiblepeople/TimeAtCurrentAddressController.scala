@@ -33,8 +33,8 @@ import views.html.responsiblepeople.time_at_address
 import scala.concurrent.Future
 
 class TimeAtCurrentAddressController @Inject () (
-                                                override val dataCacheConnector: DataCacheConnector,
-                                                override val authConnector: AuthConnector,
+                                                val dataCacheConnector: DataCacheConnector,
+                                                val authConnector: AuthConnector,
                                                 val statusService: StatusService
                                                 )extends RepeatingSection with BaseController {
 

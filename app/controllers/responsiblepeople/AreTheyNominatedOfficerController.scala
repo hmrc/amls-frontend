@@ -43,8 +43,8 @@ object BooleanFormReadWrite {
 }
 
 class AreTheyNominatedOfficerController @Inject () (
-                                                     override val dataCacheConnector: DataCacheConnector,
-                                                     override val authConnector: AuthConnector
+                                                     val dataCacheConnector: DataCacheConnector,
+                                                     val authConnector: AuthConnector
                                                    ) extends RepeatingSection with BaseController {
 
   val FIELDNAME = "isNominatedOfficer"

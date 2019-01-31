@@ -25,8 +25,8 @@ import utils.RepeatingSection
 import views.html.responsiblepeople.your_responsible_people
 
 class YourResponsiblePeopleController @Inject () (
-                                                 override val dataCacheConnector: DataCacheConnector,
-                                                 override val authConnector: AuthConnector
+                                                 val dataCacheConnector: DataCacheConnector,
+                                                 val authConnector: AuthConnector
                                                  ) extends RepeatingSection with BaseController {
 
   def get() =

@@ -28,8 +28,8 @@ import views.html.responsiblepeople._
 import scala.concurrent.Future
 
 class VATRegisteredController @Inject () (
-                                         override val dataCacheConnector: DataCacheConnector,
-                                         override val authConnector: AuthConnector
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector
                                          ) extends RepeatingSection with BaseController {
 
 

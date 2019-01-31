@@ -31,8 +31,8 @@ import scala.concurrent.Future
 
 
 class RemoveResponsiblePersonController @Inject () (
-                                                   override val dataCacheConnector: DataCacheConnector,
-                                                   override val authConnector: AuthConnector,
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector,
                                                    val statusService: StatusService
                                                    ) extends RepeatingSection with BaseController {
 

@@ -25,8 +25,8 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 class ResponsiblePeopleAddController @Inject () (
-                                                override val dataCacheConnector: DataCacheConnector,
-                                                override val authConnector: AuthConnector
+                                                val dataCacheConnector: DataCacheConnector,
+                                                val authConnector: AuthConnector
                                                 ) extends BaseController with RepeatingSection {
 
   def get(displayGuidance: Boolean = true, flow: Option[String] = None) = Authorised.async {

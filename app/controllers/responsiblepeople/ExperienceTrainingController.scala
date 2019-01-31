@@ -32,8 +32,8 @@ import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class ExperienceTrainingController @Inject () (
-                                              override val dataCacheConnector: DataCacheConnector,
-                                              override val authConnector: AuthConnector
+                                              val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector
                                               ) extends RepeatingSection with BaseController {
 
 

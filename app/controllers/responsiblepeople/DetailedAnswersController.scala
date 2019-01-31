@@ -37,8 +37,8 @@ import utils.{ControllerHelper, DeclarationHelper, RepeatingSection}
 import scala.concurrent.Future
 
 class DetailedAnswersController @Inject () (
-                                             override val dataCacheConnector: DataCacheConnector,
-                                             override val authConnector: AuthConnector,
+                                             val dataCacheConnector: DataCacheConnector,
+                                             val authConnector: AuthConnector,
                                              val statusService: StatusService,
                                              val config: AppConfig
                                            ) extends BaseController with RepeatingSection {
