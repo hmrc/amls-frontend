@@ -35,6 +35,10 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       doc.title must startWith(Messages("title.wyn"))
     }
 
+    "Have a back link" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "Have the correct Headings" in new ViewFixture {
       heading.html must be(Messages("title.wyn"))
       subHeading.html must include(Messages("summary.bankdetails"))
