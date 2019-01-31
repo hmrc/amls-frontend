@@ -21,7 +21,6 @@ import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
-import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => meq, _}
@@ -42,11 +41,13 @@ class NationalityControllerSpec extends AmlsSpec with MockitoSugar with NinoUtil
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new NationalityController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val autoCompleteService = mock[AutoCompleteService]
-    }
+    val autoCompleteService = mock[AutoCompleteService]
+
+    val controller = new NationalityController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      autoCompleteService = autoCompleteService
+    )
 
     when {
       controller.autoCompleteService.getCountries

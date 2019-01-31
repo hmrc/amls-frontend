@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, InvolvedInOtherYes}
 import models.responsiblepeople.{ExperienceTrainingNo, ExperienceTrainingYes, PersonName, ResponsiblePerson}
@@ -30,6 +29,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -45,10 +45,13 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ExperienceTrainingController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val dataCacheConnector = mock[DataCacheConnector]
+
+
+    val controller = new ExperienceTrainingController (
+      dataCacheConnector = dataCacheConnector,
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -60,11 +63,6 @@ class ExperienceTrainingControllerSpec extends AmlsSpec with MockitoSugar with S
       Messages("title.amls") + " - " + Messages("title.gov")
 
     val personName = Some(PersonName("firstname", None, "lastname"))
-
-      "use correct services" in new Fixture {
-        ExperienceTrainingController.authConnector must be(AMLSAuthConnector)
-        ExperienceTrainingController.dataCacheConnector must be(DataCacheConnector)
-      }
 
     "get" must {
 

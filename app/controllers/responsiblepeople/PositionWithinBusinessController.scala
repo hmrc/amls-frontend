@@ -16,20 +16,24 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople._
-import utils.{ControllerHelper, RepeatingSection, StatusConstants}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.position_within_business
 
 import scala.concurrent.Future
 
-trait PositionWithinBusinessController extends RepeatingSection with BaseController {
+class PositionWithinBusinessController @Inject () (
+                                                  val dataCacheConnector: DataCacheConnector,
+                                                  val authConnector: AuthConnector
+                                                  )extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
       implicit authContext =>
@@ -118,11 +122,4 @@ trait PositionWithinBusinessController extends RepeatingSection with BaseControl
     case sq if index > 0 && index <= sq.length + 1 => sq.lift(index - 1)
     case _ => None
   }
-
-}
-
-object PositionWithinBusinessController extends PositionWithinBusinessController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }
