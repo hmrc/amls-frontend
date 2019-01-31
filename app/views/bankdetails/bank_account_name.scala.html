@@ -21,6 +21,7 @@
 @(f: forms.Form2[_], edit: Boolean, index:Option[Int])(implicit lang:Lang,  m: Messages, request: Request[_])
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("bankdetails.bankaccount.accountname.title", "summary.bankdetails")
 }
