@@ -16,7 +16,6 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import  utils.AmlsSpec
@@ -29,17 +28,11 @@ class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with Scal
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new WhoMustRegisterController {
-      override val authConnector = self.authConnector
-    }
+    val controller = new WhoMustRegisterController (
+      authConnector = self.authConnector
+    )
   }
   "WhoMustRegisterController" must {
-
-      "use correct services" in new Fixture {
-        WhoMustRegisterController.authConnector must be(AMLSAuthConnector)
-      }
-
-    "get" must {
 
       "load the page" in new Fixture {
         val result = controller.get(1)(request)
@@ -47,5 +40,4 @@ class WhoMustRegisterControllerSpec extends AmlsSpec with MockitoSugar with Scal
         contentAsString(result) must include(Messages("responsiblepeople.whomustregister.ymr"))
       }
     }
-  }
 }

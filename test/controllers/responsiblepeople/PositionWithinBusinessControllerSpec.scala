@@ -19,20 +19,17 @@ package controllers.responsiblepeople
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.Country
-import models.businessactivities.BusinessActivities
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalacheck.Gen
 import org.scalatest.mock.MockitoSugar
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -50,10 +47,10 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
     val mockAuthConnector = self.authConnector
 
-    val controller = new PositionWithinBusinessController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = mockAuthConnector
-    }
+    val controller = new PositionWithinBusinessController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = mockAuthConnector
+      )
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

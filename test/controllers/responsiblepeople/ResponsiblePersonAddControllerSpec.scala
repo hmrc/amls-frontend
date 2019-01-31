@@ -23,15 +23,14 @@ import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatest.prop.{PropertyChecks, TableDrivenPropertyChecks}
-import org.scalatest.{Pending, WordSpecLike}
-import org.scalatestplus.play.OneAppPerSuite
+import org.scalatest.prop.PropertyChecks
 import play.api.mvc.Call
 import utils.{AmlsSpec, AuthorisedFixture}
 import play.api.test.Helpers._
 import org.scalacheck.Gen
 import uk.gov.hmrc.http.cache.client.CacheMap
-import models.responsiblepeople.ResponsiblePerson.{flowChangeOfficer, flowFromDeclaration}
+import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
+import play.api.inject.guice.GuiceApplicationBuilder
 
 import scala.annotation.tailrec
 import scala.concurrent.Future
@@ -42,10 +41,10 @@ class ResponsiblePersonAddControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ResponsiblePeopleAddController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new ResponsiblePeopleAddController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
 
     @tailrec
     final def buildTestSequence(requiredCount: Int, acc: Seq[ResponsiblePerson] = Nil): Seq[ResponsiblePerson] = {
