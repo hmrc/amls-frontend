@@ -20,6 +20,7 @@
 @(f: forms.Form2[_], index: Int, showFees: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("tradingpremises.premises.registered.title", "summary.tradingpremises")
 }
