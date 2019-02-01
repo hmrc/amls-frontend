@@ -56,7 +56,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
                   updateDataStrict[TradingPremises](index) { utp =>
                     Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                   }
-                  Redirect(routes.PremisesRegisteredController.get(index))
+                  Redirect(routes.DetailedAnswersController.get(index))
                 } else {
                   (for {
                     tps <- tp.msbServices
@@ -82,10 +82,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       && edit && tradingPremises.lineId.isDefined) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
-      edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
-        case false => Redirect(routes.PremisesRegisteredController.get(index))
-      }
+      Redirect(routes.DetailedAnswersController.get(index))
     }
   }
 

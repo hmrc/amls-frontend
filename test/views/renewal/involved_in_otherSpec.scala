@@ -16,13 +16,12 @@
 
 package views.renewal
 
-import forms.{InvalidForm, ValidForm, Form2}
-import models.renewal.{InvolvedInOtherNo, InvolvedInOther}
-import org.scalatest.{MustMatchers}
-import  utils.AmlsSpec
-import jto.validation.Path
-import jto.validation.ValidationError
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import jto.validation.{Path, ValidationError}
+import models.renewal.{InvolvedInOther, InvolvedInOtherNo}
+import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import utils.AmlsSpec
 import views.Fixture
 
 
@@ -80,6 +79,13 @@ class involved_in_otherSpec extends AmlsSpec with MustMatchers {
       doc.getElementById("details").parent()
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.involved_in_other(EmptyForm, true, None)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

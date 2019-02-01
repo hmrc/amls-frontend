@@ -17,12 +17,11 @@
 package controllers.responsiblepeople
 
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople._
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionStatus}
+import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -30,16 +29,18 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DateOfChangeHelper, RepeatingSection}
 import views.html.responsiblepeople.current_address
 import audit.AddressConversions._
-import play.api.Play
+import com.google.inject.Inject
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait CurrentAddressController extends RepeatingSection with BaseController with DateOfChangeHelper {
-
-  def dataCacheConnector: DataCacheConnector
-  val auditConnector: AuditConnector
-  val autoCompleteService: AutoCompleteService
-  val statusService: StatusService
+class CurrentAddressController @Inject () (
+                                            val dataCacheConnector: DataCacheConnector,
+                                            auditConnector: AuditConnector,
+                                            autoCompleteService: AutoCompleteService,
+                                            statusService: StatusService,
+                                            val authConnector: AuthConnector
+                                          ) extends RepeatingSection with BaseController with DateOfChangeHelper {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
@@ -118,15 +119,4 @@ trait CurrentAddressController extends RepeatingSection with BaseController with
       }
     }
   }
-}
-
-object CurrentAddressController extends CurrentAddressController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  val statusService = StatusService
-
-  override def dataCacheConnector = DataCacheConnector
-  override lazy val auditConnector = AMLSAuditConnector
-  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
-
 }

@@ -38,7 +38,7 @@ class is_residentialSpec extends AmlsSpec with MustMatchers {
 
   "is_residentialSpec view" must {
 
-      "have correct title, heading and load UI with empty form" in new ViewFixture {
+      "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
@@ -52,6 +52,7 @@ class is_residentialSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.isResidential.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+        doc.getElementsByAttributeValue("class", "link-back") must not be empty
         doc.select("input[type=radio]").size() must be(2)
 
     }

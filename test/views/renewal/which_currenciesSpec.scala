@@ -16,12 +16,11 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.WhichCurrencies
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
-import play.api.test.FakeApplication
 import utils.AmlsSpec
 import views.Fixture
 import views.html.renewal.which_currencies
@@ -92,7 +91,13 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
       doc.getElementById("usesForeignCurrencies")
         .getElementsByClass("error-notification").first().html() must include("seventh not a message Key")
+    }
 
+    "have a back link" in new ViewFixture {
+
+      def view = which_currencies(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

@@ -37,7 +37,7 @@ class what_does_your_business_doSpec extends AmlsSpec with MustMatchers {
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
 
-    "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
@@ -53,6 +53,7 @@ class what_does_your_business_doSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.whatdoesyourbusinessdo.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.select("input[type=checkbox]").size must be(3)
 
     }

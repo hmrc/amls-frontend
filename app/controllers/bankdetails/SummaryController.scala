@@ -16,22 +16,17 @@
 
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import controllers.BaseController
 import javax.inject.{Inject, Singleton}
 import models.bankdetails.BankDetails
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
 
 import scala.concurrent.Future
 
 @Singleton
 class SummaryController @Inject()(
                                    val dataCacheConnector: DataCacheConnector,
-                                   val authConnector: AuthConnector,
-                                   val statusService: StatusService
+                                   val authConnector: AuthConnector
                                  ) extends BankDetailsController {
 
   def get(index: Int) = Authorised.async {

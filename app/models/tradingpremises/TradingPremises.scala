@@ -118,7 +118,17 @@ object TradingPremises {
     _.hasChanged
   }
 
+  def addressSpecified(yourTradingPremises: Option[YourTradingPremises]): Boolean = {
+    yourTradingPremises match {
+      case Some(_) => true
+      case _ => false
+    }
+  }
+
   def filter(tp: Seq[TradingPremises]) = tp.filterNot(_.status.contains(StatusConstants.Deleted)).filterNot(_ == TradingPremises())
+
+  def filterWithIndex(rp: Seq[TradingPremises]): Seq[(TradingPremises, Int)] =
+    rp.zipWithIndex.filterNot(_._1.status.contains(StatusConstants.Deleted)).filterNot(_._1 == TradingPremises())
 
   def section(implicit cache: CacheMap): Section = {
 
@@ -130,16 +140,16 @@ object TradingPremises {
       if (filter(tp).equals(Nil)) {
         Section(messageKey, NotStarted, anyChanged(tp), controllers.tradingpremises.routes.TradingPremisesAddController.get())
       } else {
-        tp match {
+        filter(tp) match {
           case premises if premises.nonEmpty && premises.forall {
             _.isComplete
-          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.SummaryController.answers())
+          } => Section(messageKey, Completed, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
           case _ =>
             val index = tp.indexWhere {
               case model if !model.isComplete => true
               case _ => false
             }
-            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.WhatYouNeedController.get(index + 1))
+            Section(messageKey, Started, anyChanged(tp), controllers.tradingpremises.routes.YourTradingPremisesController.get())
         }
       }
 

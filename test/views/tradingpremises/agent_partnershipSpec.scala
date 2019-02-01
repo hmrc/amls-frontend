@@ -31,7 +31,7 @@ class agent_partnershipSpec extends AmlsSpec with MustMatchers {
   }
 
   "agent_partnership view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title, components and back link" in new ViewFixture {
 
       val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
 
@@ -41,6 +41,7 @@ class agent_partnershipSpec extends AmlsSpec with MustMatchers {
       heading.html() must be(Messages("tradingpremises.agentpartnership.title"))
       subHeading.html() must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.getElementById(Messages("agentPartnership")).tagName() must be("input")
     }
 

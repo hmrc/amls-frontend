@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.{BusinessUseAnIPSP, BusinessUseAnIPSPNo, IdentifyLinkedTransactions}
+import models.moneyservicebusiness.IdentifyLinkedTransactions
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -32,6 +32,13 @@ class identify_linked_transactionsSpec extends AmlsSpec with MustMatchers {
   }
 
   "identify_linked_transactions view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[IdentifyLinkedTransactions] = Form2(IdentifyLinkedTransactions(true))
+      def view = views.html.msb.identify_linked_transactions(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[IdentifyLinkedTransactions] = Form2(IdentifyLinkedTransactions(true))

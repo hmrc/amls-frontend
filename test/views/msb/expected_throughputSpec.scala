@@ -32,6 +32,13 @@ class expected_throughputSpec extends AmlsSpec with MustMatchers {
   }
 
   "expected_throughput view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
+      def view = views.html.msb.expected_throughput(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
