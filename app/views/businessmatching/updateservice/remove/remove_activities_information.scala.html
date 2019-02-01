@@ -21,6 +21,7 @@
 @(placeholder: String)(implicit request: Request[_], m:Messages)
 
 @header = {
+    @components.back_link()
     @headingWithPlaceholder(
         ("updateservice.removeactivitiesinformation.header", placeholder),
         "summary.updateinformation"
@@ -32,10 +33,11 @@
     heading = header
 )  {
 
+    <p>xxxxxxxxxxx: @placeholder</p>
     @if(placeholder == "all services") {
         <p>@Messages("updateservice.removeactivitiesinformation.info.1.all")</p>
     } else {
-        <p>@Messages("updateservice.removeactivitiesinformation.info.1")</p>
+        <p>@Messages("updateservice.removeactivitiesinformation.info.3")</p>
     }
     <p>@Messages("updateservice.removeactivitiesinformation.info.2")</p>
 
