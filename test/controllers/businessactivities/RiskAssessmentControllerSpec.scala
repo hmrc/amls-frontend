@@ -19,12 +19,12 @@ package controllers.businessactivities
 import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities._
-import models.businessmatching.{BusinessActivities => BMBusinessActivities, MoneyServiceBusiness, AccountancyServices, BusinessMatching}
+import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServiceBusiness, BusinessActivities => BMBusinessActivities}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -34,6 +34,8 @@ import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+
+import scala.concurrent
 
 class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -98,8 +100,12 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(AccountancyServices, MoneyServiceBusiness))))))
-          when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-            .thenReturn(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -121,8 +127,12 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
-          when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-            .thenReturn(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))
@@ -130,22 +140,6 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
           val result = controller.post()(newRequest)
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.businessactivities.routes.AccountantForAMLSRegulationsController.get().url))
-        }
-
-        "redirect to the SummaryController when there is no cache data" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody(
-            "hasPolicy" -> "true",
-            "riskassessments[0]" -> "01",
-            "riskassessments[1]" -> "02"
-          )
-
-          when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
-            .thenReturn(Future.successful(None))
-
-          val result = controller.post()(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.businessactivities.routes.SummaryController.get().url))
         }
 
         "respond with BAD_REQUEST" when {
@@ -246,8 +240,12 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
           when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
             .thenReturn(Some(BusinessMatching(None, Some(BMBusinessActivities(Set(MoneyServiceBusiness))))))
-          when(mockCacheMap.getEntry[BusinessActivities](BusinessActivities.key))
-            .thenReturn(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo))))
+
+          when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(BusinessActivities(riskAssessmentPolicy = Some(RiskAssessmentPolicyNo)))))
+
+          when(controller.dataCacheConnector.save(any(), any())(any(), any(), any()))
+            .thenReturn(Future.successful(mockCacheMap))
 
           when(controller.dataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
             .thenReturn(Future.successful(Some(mockCacheMap)))

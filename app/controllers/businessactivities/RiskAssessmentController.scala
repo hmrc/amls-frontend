@@ -50,25 +50,27 @@ trait RiskAssessmentController extends BaseController {
         case f: InvalidForm =>
           Future.successful(BadRequest(risk_assessment_policy(f, edit)))
         case ValidForm(_, data) => {
-          dataCacheConnector.fetchAll map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                bmBusinessActivity <- ControllerHelper.getBusinessActivity(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                businessActivity <- cache.getEntry[BusinessActivities](BusinessActivities.key)
-              } yield {
-                dataCacheConnector.save[BusinessActivities](BusinessActivities.key,
-                  businessActivity.riskAssessmentPolicy(data))
-                redirectDependingOnEdit(edit, bmBusinessActivity)
-              }).getOrElse(Redirect(routes.SummaryController.get()))
+          dataCacheConnector.fetchAll flatMap { maybeCache =>
+            val businessMatching = for {
+              cacheMap <- maybeCache
+              bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+            } yield bm
+
+            for {
+              businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
+              _ <- dataCacheConnector.save[BusinessActivities](BusinessActivities.key, businessActivities.riskAssessmentPolicy(data))
+            } yield redirectDependingOnEdit(edit, ControllerHelper.isAccountancyServicesSelected(Some(businessMatching)))
+
           }
+        } recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
       }
   }
 
-  private def redirectDependingOnEdit(edit: Boolean, bmBusinessActivity: models.businessmatching.BusinessActivities) = edit match {
+  private def redirectDependingOnEdit(edit: Boolean, accountancyServices: Boolean) = edit match {
     case true => Redirect(routes.SummaryController.get())
-    case false => bmBusinessActivity.businessActivities.contains(AccountancyServices) match {
+    case false => accountancyServices match {
       case true => Redirect(routes.SummaryController.get())
       case false => Redirect(routes.AccountantForAMLSRegulationsController.get())
     }
