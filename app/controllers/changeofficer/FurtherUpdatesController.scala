@@ -16,18 +16,19 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
 import controllers.changeofficer.Helpers._
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.changeofficer._
 import models.responsiblepeople.{NominatedOfficer, Positions, ResponsiblePerson}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.RepeatingSection
+import utils.{RepeatingSection, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -57,6 +58,9 @@ class FurtherUpdatesController @Inject()(
               updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
             }))
           } yield {
+
+            deleteOldOfficer(oldOfficer._1, oldOfficer._2)
+
             Redirect(
               data match {
                 case FurtherUpdatesYes => controllers.routes.RegistrationProgressController.get()
@@ -97,4 +101,11 @@ class FurtherUpdatesController @Inject()(
     }
   }
 
+  private def deleteOldOfficer(rp: ResponsiblePerson, index: Int)(implicit ac: AuthContext, hc: HeaderCarrier) = {
+    for {
+      cache <- dataCacheConnector.fetch[ResponsiblePerson](ResponsiblePerson.key)
+      _ <- removeDataStrict[ResponsiblePerson](index)
+      if !rp.lineId.isDefined & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)
+    } yield cache
+  }
 }
