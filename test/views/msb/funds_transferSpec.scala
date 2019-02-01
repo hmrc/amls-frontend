@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.{FundsTransfer, TransactionsInNext12Months}
+import models.moneyservicebusiness.FundsTransfer
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -32,6 +32,13 @@ class funds_transferSpec extends AmlsSpec with MustMatchers {
   }
 
   "funds_transfer view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[FundsTransfer] = Form2(FundsTransfer(true))
+      def view = views.html.msb.funds_transfer(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[FundsTransfer] = Form2(FundsTransfer(true))
