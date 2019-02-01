@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.{ExpectedThroughput, FundsTransfer}
+import models.moneyservicebusiness.FundsTransfer
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
