@@ -35,6 +35,7 @@ class HasBankAccountViewSpec extends AmlsSpec {
 
       doc.select("h1").text mustBe Messages("bankdetails.hasbankaccount.title")
       validateTitle(s"${Messages("bankdetails.hasbankaccount.title")} - ${Messages("summary.bankdetails")}")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "displays validation messages in the correct place" in new ViewFixture {

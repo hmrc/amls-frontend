@@ -31,7 +31,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
   }
 
   "remove_trading_premises view" must {
-    "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
@@ -45,6 +45,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.remove.trading.premises.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.text", "trading name")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.btn")).last().html() must be(
         Messages("tradingpremises.remove.trading.premises.btn"))

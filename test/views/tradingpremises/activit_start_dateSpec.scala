@@ -45,6 +45,7 @@ class activit_start_dateSpec extends AmlsSpec with MustMatchers {
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.startDate.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
       doc.getElementsContainingOwnText(Messages("lbl.day")).hasText must be(true)
       doc.getElementsContainingOwnText(Messages("lbl.month")).hasText must be(true)

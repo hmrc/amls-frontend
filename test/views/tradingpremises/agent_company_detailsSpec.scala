@@ -52,6 +52,15 @@ class agent_company_detailsSpec extends AmlsSpec with MustMatchers {
       subHeading.html() must include(Messages("summary.tradingpremises"))
     }
 
+    "has a back link" in new ViewFixture {
+
+      val form2: ValidForm[AgentCompanyDetails] = Form2(AgentCompanyDetails("", None))
+
+      def view = views.html.tradingpremises.agent_company_details(form2, 0, false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
 
     "show errors in the correct locations" in new ViewFixture {
 
