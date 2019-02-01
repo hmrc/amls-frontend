@@ -21,6 +21,7 @@
 @(subtitle: String)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("declaration.register.responsible.person.title", subtitle)
 }
 
