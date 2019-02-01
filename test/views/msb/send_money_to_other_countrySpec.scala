@@ -18,8 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, SendMoneyToOtherCountry}
+import models.moneyservicebusiness.SendMoneyToOtherCountry
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -33,6 +32,13 @@ class send_money_to_other_countrySpec extends AmlsSpec with MustMatchers {
   }
 
   "branches_or_agents view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[SendMoneyToOtherCountry] = Form2(SendMoneyToOtherCountry(true))
+      def view = views.html.msb.send_money_to_other_country(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[SendMoneyToOtherCountry] = Form2(SendMoneyToOtherCountry(true))

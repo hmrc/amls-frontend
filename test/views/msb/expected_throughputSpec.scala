@@ -18,7 +18,7 @@ package views.msb
 
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.moneyservicebusiness.ExpectedThroughput
+import models.moneyservicebusiness.{CETransactionsInNext12Months, ExpectedThroughput}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -32,6 +32,13 @@ class expected_throughputSpec extends AmlsSpec with MustMatchers {
   }
 
   "expected_throughput view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
+      def view = views.html.msb.expected_throughput(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[ExpectedThroughput] = Form2(ExpectedThroughput.First)
