@@ -28,6 +28,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -41,10 +42,10 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredForSelfAssessmentController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new RegisteredForSelfAssessmentController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+      )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -151,13 +152,6 @@ class RegisteredForSelfAssessmentControllerSpec extends AmlsSpec with MockitoSug
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(recordId, Some(flowFromDeclaration)).url))
         }
       }
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      RegisteredForSelfAssessmentController.authConnector must be(AMLSAuthConnector)
-      RegisteredForSelfAssessmentController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

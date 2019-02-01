@@ -27,6 +27,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+
  class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
    trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)

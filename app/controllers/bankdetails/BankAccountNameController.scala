@@ -38,7 +38,7 @@ import scala.concurrent.Future
 class BankAccountNameController @Inject()(
                                            val authConnector: AuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService
+                                           val statusService: StatusService
                                          ) extends BankDetailsController {
 
   implicit def write: Write[String, UrlFormEncoded] = Write { data =>

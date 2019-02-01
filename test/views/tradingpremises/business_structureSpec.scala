@@ -45,6 +45,7 @@ class business_structureSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.businessStructure.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.select("input[type=radio]").size mustBe 5
     }
 

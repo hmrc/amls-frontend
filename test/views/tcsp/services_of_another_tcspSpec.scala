@@ -37,6 +37,8 @@ class services_of_another_tcspSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.tcsp.services_of_another_tcsp(form2, true)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       val title = Messages("tcsp.servicesOfAnotherTcsp.title") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
       doc.title must be(title)

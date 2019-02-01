@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessmatching.{AccountancyServices, BusinessActivities}
 import models.renewal.AMLSTurnover
@@ -75,6 +75,13 @@ class amls_turnoverSpec extends AmlsSpec with MustMatchers  {
 
       doc.getElementById("turnover")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.amls_turnover(EmptyForm, true, None)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

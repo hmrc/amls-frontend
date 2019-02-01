@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
 import models.renewal.SendTheLargestAmountsOfMoney
@@ -66,6 +66,13 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers  {
 
       doc.getElementById("countries")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.send_largest_amounts_of_money(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

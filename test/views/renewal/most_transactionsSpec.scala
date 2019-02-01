@@ -18,36 +18,36 @@ package views.renewal
 
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
-import models.renewal.PercentageOfCashPaymentOver15000
-import models.renewal.PercentageOfCashPaymentOver15000.{Second, Third}
+import models.Country
+import models.moneyservicebusiness.MostTransactions
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
-class percentageSpec extends AmlsSpec with MustMatchers  {
+class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "percentage view" must {
+  "most_transactions view" must {
     "have correct title" in new ViewFixture {
 
-      val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Second)
+      val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = views.html.renewal.most_transactions(form2, true)
 
-      doc.title must startWith(Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"))
+      doc.title must startWith(Messages("renewal.msb.most.transactions.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
-      val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Third)
+      val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = views.html.renewal.most_transactions(form2, true)
 
-      heading.html must be(Messages("renewal.hvd.percentage.title"))
+      heading.html must be(Messages("renewal.msb.most.transactions.title"))
       subHeading.html must include(Messages("summary.renewal"))
 
     }
@@ -56,20 +56,20 @@ class percentageSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "percentage") -> Seq(ValidationError("not a message Key"))
+          (Path \ "mostTransactionsCountries") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.renewal.percentage(form2, true)
+      def view = views.html.renewal.most_transactions(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("percentage")
+      doc.getElementById("mostTransactionsCountries")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.renewal.percentage(EmptyForm, true)
+      def view = views.html.renewal.most_transactions(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

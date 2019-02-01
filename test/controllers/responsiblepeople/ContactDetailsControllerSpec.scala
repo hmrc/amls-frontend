@@ -24,9 +24,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -36,10 +37,10 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
     self =>
     val request = addToken(authRequest)
 
-    val controller = new ContactDetailsController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new ContactDetailsController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -190,8 +191,13 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
         }
       }
-    }
+      "app must start" in {
 
+        val app = new GuiceApplicationBuilder().build()
+
+        app.injector.instanceOf[ContactDetailsController]
+      }
+    }
   }
 }
 
