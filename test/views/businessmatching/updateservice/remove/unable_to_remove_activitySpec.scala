@@ -16,33 +16,28 @@
 
 package views.businessmatching.updateservice.remove
 
-import models.businessmatching.AccountancyServices
-import org.scalatest.MustMatchers
+
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.remove.need_more_information
+import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
-
-class need_more_informationSpec extends AmlsSpec with MustMatchers {
+class unable_to_remove_activitySpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
-    def view = need_more_information(Set(AccountancyServices.getMessage()))
+
+    def view = unable_to_remove_activity("test")
   }
 
-  "The need_more_information view" must {
+  "The cannot_add_services view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.updateotherinformation.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.removeactivitiesinformation.title") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.updateotherinformation.heading"))
-    }
-
-    "have correct subHeading" in new ViewFixture {
-      subHeading.html must include(Messages("summary.updateservice"))
+      heading.html must be(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", "test", Messages("summary.updateinformation")))
     }
 
     "have the back link button" in new ViewFixture {
@@ -50,12 +45,8 @@ class need_more_informationSpec extends AmlsSpec with MustMatchers {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.hint"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.updateotherinformation.text"))
-    }
-
-    "have the correct button" in new ViewFixture {
-      doc.getElementById("removeserviceinfo-submit").text() mustBe Messages("Continue")
+      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.1"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.2"))
     }
   }
 
