@@ -42,6 +42,7 @@ class who_is_registering_this_renewalSpec extends AmlsSpec with MustMatchers  {
       doc.title mustBe s"${Messages("declaration.renewal.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.renewal.who.is.registering.heading"))
       subHeading.html must include(Messages("summary.submit.renewal"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
       doc.getElementsContainingOwnText(Messages("declaration.renewal.who.is.registering.text")).hasText must be(true)
 

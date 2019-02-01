@@ -44,6 +44,7 @@ class who_is_registering_this_updateSpec extends AmlsSpec with MustMatchers with
       doc.title mustBe s"${Messages("declaration.who.is.registering.amendment.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.who.is.registering.amendment.title"))
       subHeading.html must include(Messages("submit.amendment.application"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
       people.zipWithIndex.foreach { case (p, i) =>
         val id = s"person-$i"
