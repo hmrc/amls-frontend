@@ -16,19 +16,21 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.responsiblepeople.{ResponsiblePerson, SaRegistered}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople._
 
 import scala.concurrent.Future
 
-trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class RegisteredForSelfAssessmentController @Inject () (
+                                                       val dataCacheConnector: DataCacheConnector,
+                                                       val authConnector: AuthConnector
+                                                       ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) =
     Authorised.async {
@@ -68,11 +70,3 @@ trait RegisteredForSelfAssessmentController extends RepeatingSection with BaseCo
         }
     }
 }
-
-object RegisteredForSelfAssessmentController extends RegisteredForSelfAssessmentController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-
-  override def dataCacheConnector = DataCacheConnector
-}
-

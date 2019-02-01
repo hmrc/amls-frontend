@@ -1,4 +1,4 @@
-GET         /what-you-need/:index                                    controllers.tradingpremises.WhatYouNeedController.get(index: Int)
+GET         /what-you-need/:index                                    @controllers.tradingpremises.WhatYouNeedController.get(index: Int)
 
 GET         /add                                                     @controllers.tradingpremises.TradingPremisesAddController.get(displayGuidance : Boolean ?= true)
 
@@ -40,11 +40,8 @@ POST        /msb-activities/:index                                   controllers
 GET         /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
 
-GET         /check-your-answers                                      controllers.tradingpremises.SummaryController.get(edit: Boolean ?= false)
-POST        /check-your-answers                                      controllers.tradingpremises.SummaryController.post()
-
-GET         /your-answers                                            controllers.tradingpremises.SummaryController.answers()
-GET         /trading-premise-details/:index                          controllers.tradingpremises.SummaryController.getIndividual(index: Int)
+GET         /your-answers                                            @controllers.tradingpremises.YourTradingPremisesController.answers()
+GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int, edit: Boolean ?= false)
 
 GET         /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
 POST        /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
@@ -52,11 +49,13 @@ POST        /what-does-your-business-do/date-of-change/:index        controllers
 GET         /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
-GET         /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.get(index:Int)
-POST        /premises-registered/:index                              @controllers.tradingpremises.PremisesRegisteredController.post(index:Int)
-
 GET         /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index                                           controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
 
 GET         /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index/reasons                                   controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)
+
+GET         /your-trading-premises                                   @controllers.tradingpremises.YourTradingPremisesController.get(edit: Boolean ?= false)
+
+GET         /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.get(index: Int)
+POST        /check-your-answers/:index                               @controllers.tradingpremises.DetailedAnswersController.post(index: Int)

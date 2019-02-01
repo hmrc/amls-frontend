@@ -16,19 +16,17 @@
 
 package controllers.bankdetails
 
-import javax.inject.{Inject, Singleton}
-
-import cats.implicits._
 import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
-import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.bankdetails.{Account, BankDetails}
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{ControllerHelper, RepeatingSection, StatusConstants}
+import utils.StatusConstants
 
 import scala.concurrent.Future
 
@@ -37,7 +35,7 @@ class BankAccountIsUKController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
                                            val authConnector: AuthConnector = AMLSAuthConnector,
                                            val auditConnector: AuditConnector = AMLSAuditConnector,
-                                           implicit val statusService: StatusService
+                                           val statusService: StatusService
                                          ) extends BankDetailsController {
 
   def get(index: Int, edit: Boolean = false) = Authorised.async{

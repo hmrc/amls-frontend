@@ -32,6 +32,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers.{status, _}
 import services.StatusService
 import uk.gov.hmrc.domain.Nino
@@ -46,11 +47,11 @@ class RemoveResponsiblePersonControllerSpec extends AmlsSpec
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RemoveResponsiblePersonController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val statusService: StatusService =  mock[StatusService]
-      override val authConnector = self.authConnector
-    }
+    val controller = new RemoveResponsiblePersonController (
+      dataCacheConnector = mock[DataCacheConnector],
+      statusService =  mock[StatusService],
+      authConnector = self.authConnector
+    )
   }
 
   "RemoveResponsiblePersonController" when {

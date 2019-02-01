@@ -54,14 +54,25 @@
             id=Some("tpwhatyouneed-button")
         )
     } else {
-        @anchor(
-            attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
-            attrRole = true,
-            linkText = Messages("button.continue"),
-            visuallyhidden = Messages("summary.tradingpremises"),
-            returnLink = true,
-            id=Some("tpwhatyouneed-button")
-        )
+        @if(index == 1) {
+            @anchor(
+                attrHref = controllers.tradingpremises.routes.ConfirmAddressController.get(index).toString,
+                attrRole = true,
+                linkText = Messages("button.continue"),
+                visuallyhidden = Messages("summary.tradingpremises"),
+                returnLink = true,
+                id = Some("tpwhatyouneed-button")
+            )
+        } else {
+            @anchor(
+                attrHref = controllers.tradingpremises.routes.WhereAreTradingPremisesController.get(index).toString,
+                attrRole = true,
+                linkText = Messages("button.continue"),
+                visuallyhidden = Messages("summary.tradingpremises"),
+                returnLink = true,
+                id = Some("tpwhatyouneed-button")
+            )
+        }
     }
 
 

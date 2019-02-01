@@ -241,7 +241,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
 
           hstatus(result) must be(SEE_OTHER)
           redirectLocation(result) must be(
-            Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
+            Some(controllers.tradingpremises.routes.DetailedAnswersController.get(1).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
           verify(controller.auditConnector).sendEvent(captor.capture())(any(), any())
@@ -408,7 +408,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
     }
   }
 
-  "go to the summary page" when {
+  "go to the check your answers page" when {
     "data has not changed" in new Fixture {
 
       val initRequest = request.withFormUrlEncodedBody(
@@ -463,7 +463,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.post(1, edit = true)(initRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.SummaryController.getIndividual(1).url))
+      redirectLocation(result) must be(Some(controllers.tradingpremises.routes.DetailedAnswersController.get(1).url))
     }
   }
 
@@ -500,7 +500,7 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
       val result = controller.saveDateOfChange(1)(postRequest)
 
       hstatus(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
       val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())

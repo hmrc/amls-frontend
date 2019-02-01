@@ -17,13 +17,12 @@
 package models.tradingpremises
 
 import cats.data.Validated.Invalid
+import jto.validation._
+import jto.validation.forms.UrlFormEncoded
 import models.DateOfChange
 import org.joda.time.LocalDate
 import org.scalatest.{MustMatchers, WordSpec}
-import jto.validation.forms.UrlFormEncoded
-import jto.validation._
 import play.api.libs.json._
-import views.html.include.forms2.date
 
 class YourTradingPremisesSpec extends WordSpec with MustMatchers {
 

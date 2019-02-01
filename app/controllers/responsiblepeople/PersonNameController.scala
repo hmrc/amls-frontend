@@ -16,21 +16,21 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import play.api.i18n.Messages
-import play.api.mvc.Request
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.responsiblepeople.person_name
 
 import scala.concurrent.Future
 
-trait PersonNameController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class PersonNameController @Inject () (
+                                        val dataCacheConnector: DataCacheConnector,
+                                        val authConnector: AuthConnector
+                                      ) extends RepeatingSection with BaseController {
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
     implicit authContext =>
@@ -66,11 +66,4 @@ trait PersonNameController extends RepeatingSection with BaseController {
         }
       }
   }
-
-}
-
-object PersonNameController extends PersonNameController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

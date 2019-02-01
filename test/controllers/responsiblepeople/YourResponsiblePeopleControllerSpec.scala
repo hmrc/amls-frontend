@@ -16,9 +16,8 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.responsiblepeople.{IsKnownByOtherNamesNo, PersonName, ResponsiblePerson}
+import models.responsiblepeople.{PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -35,18 +34,13 @@ class YourResponsiblePeopleControllerSpec extends AmlsSpec with MockitoSugar {
     trait Fixture extends AuthorisedFixture {
       self => val request = addToken(authRequest)
 
-      val controller = new YourResponsiblePeopleController {
-        override val dataCacheConnector = mock[DataCacheConnector]
-        override val authConnector = self.authConnector
-      }
+      val controller = new YourResponsiblePeopleController (
+        dataCacheConnector = mock[DataCacheConnector],
+        authConnector = self.authConnector
+        )
     }
 
     "Get" must {
-
-      "use correct services" in new Fixture {
-        YourResponsiblePeopleController.authConnector must be(AMLSAuthConnector)
-        YourResponsiblePeopleController.dataCacheConnector must be(DataCacheConnector)
-      }
 
       "load the your answers page when section data is available" in new Fixture {
         val model = ResponsiblePerson(None, None)

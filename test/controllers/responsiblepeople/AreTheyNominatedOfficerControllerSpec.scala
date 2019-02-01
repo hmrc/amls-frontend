@@ -17,9 +17,6 @@
 package controllers.responsiblepeople
 
 import connectors.DataCacheConnector
-import models.Country
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{BusinessMatching, BusinessType}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._
 import org.joda.time.LocalDate
@@ -32,7 +29,6 @@ import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -42,10 +38,10 @@ class AreTheyNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new AreTheyNominatedOfficerController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new AreTheyNominatedOfficerController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+      )
 
     object DefaultValues {
       val noNominatedOfficerPositions = Positions(Set(BeneficialOwner, InternalAccountant), startDate)

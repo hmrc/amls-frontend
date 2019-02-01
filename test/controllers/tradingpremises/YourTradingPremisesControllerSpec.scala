@@ -19,51 +19,50 @@ package controllers.tradingpremises
 import java.util.UUID
 
 import connectors.DataCacheConnector
-import models.businessmatching.{BusinessActivities => BusinessMatchingActivities, _}
-import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService}
+import models.businessmatching.{AccountancyServices, BillPaymentServices, BusinessMatching, EstateAgentBusinessService, BusinessActivities => BusinessMatchingActivities, _}
 import models.status.{SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
-import models.tradingpremises.{Address, RegisteringAgentPremises, TradingPremises, YourTradingPremises}
+import models.tradingpremises._
 import org.joda.time.LocalDate
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.StatusService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
-import org.mockito.Matchers.{eq => meq}
+import utils.{AmlsSpec, AuthorisedFixture, CacheMocks}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
+class YourTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar with CacheMocks with generators.tradingpremises.TradingPremisesGenerator {
 
   implicit val request = FakeRequest
   val userId = s"user-${UUID.randomUUID()}"
   val mockDataCacheConnector = mock[DataCacheConnector]
-  val mockCacheMap = mock[CacheMap]
+  val mockStatusService = mock[StatusService]
+  //val mockCacheMap = mock[CacheMap]
+  val mockYtp = mock[TradingPremises]
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val summaryController = new SummaryController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val ytpController = new YourTradingPremisesController(
+      mockDataCacheConnector,
+      mockStatusService,
+      self.authConnector
+    )
 
-    when(summaryController.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
+    when(ytpController.statusService.getStatus(any(), any(), any())) thenReturn Future.successful(SubmissionDecisionApproved)
 
     val model = TradingPremises()
 
     val models = Seq(TradingPremises())
   }
 
-  "SummaryController" must {
+  "YourTradingPremisesController" must {
 
     "load the summary page when the model is present" in new Fixture {
       val businessMatchingActivitiesAll = BusinessMatchingActivities(
@@ -76,7 +75,7 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-      val result = summaryController.get()(request)
+      val result = ytpController.get()(request)
       status(result) must be(OK)
     }
 
@@ -92,38 +91,33 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-      val result = summaryController.get()(request)
+      val result = ytpController.get()(request)
       redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get.url))
       status(result) must be(SEE_OTHER)
     }
 
-    "for an individual display the trading premises summary page for individual" in new Fixture {
+    "for a complete individual display the trading premises check your answers page" in new Fixture {
 
       when(mockDataCacheConnector.fetchAll(any[HeaderCarrier], any[AuthContext]))
         .thenReturn(Future.successful(Some(mockCacheMap)))
 
-      val businessMatchingActivitiesAll = BusinessMatchingActivities(
-        Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService, MoneyServiceBusiness))
-
-      val businessMatchingMsbServices = BusinessMatchingMsbServices(
-        Set(TransmittingMoney, CurrencyExchange))
-
-      when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
-        .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll), Some(businessMatchingMsbServices))))
+      val ytp = tradingPremisesGen.sample.get.copy(whatDoesYourBusinessDoAtThisAddress =
+        Some(WhatDoesYourBusinessDo(Set(AccountancyServices, HighValueDealing, TelephonePaymentService),None)))
 
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
-        (any())).thenReturn(Some(Seq(TradingPremises())))
+       (any())).thenReturn(Some(Seq(ytp)))
 
-      val result = summaryController.getIndividual(1)(request)
+      val result = ytpController.getIndividual(1, true)(request)
 
-      status(result) must be(OK)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
     }
 
 
     "for an individual redirect to the trading premises summary summary if data is not present" in new Fixture {
       when(mockCacheMap.getEntry[Seq[TradingPremises]](meq(TradingPremises.key))
         (any())).thenReturn(None)
-      val result = summaryController.getIndividual(1)(request)
+      val result = ytpController.getIndividual(1)(request)
       status(result) must be(NOT_FOUND)
     }
 
@@ -138,9 +132,9 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
       when(mockCacheMap.getEntry[BusinessMatching](BusinessMatching.key))
         .thenReturn(Some(BusinessMatching(None, Some(businessMatchingActivitiesAll))))
 
-      val result = summaryController.answers()(request)
+      val result = ytpController.answers()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("summary.youranswers.title"))
+      contentAsString(result) must include(Messages("tradingpremises.yourpremises.title"))
     }
 
   }
@@ -157,13 +151,13 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
 
         val newRequest = request.withFormUrlEncodedBody( "hasAccepted" -> "true")
 
-        when(summaryController.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+        when(ytpController.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
           .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises =  Some(ytpModel), hasAccepted = true)))))
 
-        when(summaryController.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
+        when(ytpController.dataCacheConnector.save[Seq[TradingPremises]](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
 
-        val result = summaryController.post()(newRequest)
+        val result = ytpController.post()(newRequest)
 
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(controllers.routes.RegistrationProgressController.get().url))

@@ -27,6 +27,7 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -39,12 +40,12 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new DetailedAnswersController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-      override val config = mock[AppConfig]
-    }
+    val controller = new DetailedAnswersController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      config = mock[AppConfig]
+      )
 
     val businessMatching = BusinessMatching()
 
@@ -228,13 +229,6 @@ class DetailedAnswersControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
       }
-    }
-  }
-
-  it must {
-    "use the correct services" in new Fixture {
-      DetailedAnswersController.authConnector must be(AMLSAuthConnector)
-      DetailedAnswersController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }
