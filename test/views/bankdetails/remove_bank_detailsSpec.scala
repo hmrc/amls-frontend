@@ -48,5 +48,11 @@ class remove_bank_DetailsSpec extends AmlsSpec with MustMatchers  {
       subHeading.html must include(Messages("summary.bankdetails"))
 
     }
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.bankdetails.remove_bank_details(EmptyForm, 0, "AccountName")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

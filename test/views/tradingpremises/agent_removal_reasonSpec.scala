@@ -56,6 +56,15 @@ class remove_agent_premises_reasonsSpec extends AmlsSpec {
 
     }
 
+    "have a back link" in new ViewFixture {
+
+      val form2: ValidForm[AgentRemovalReason] = Form2(AgentRemovalReason(Schema.MAJOR_COMPLIANCE_ISSUES))
+
+      def view = views.html.tradingpremises.remove_agent_premises_reasons(form2, 1, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "show errors in the correct locations" when {
 
       "nothing is selected" in new ViewFixture {

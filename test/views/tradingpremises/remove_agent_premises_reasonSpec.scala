@@ -45,6 +45,7 @@ class remove_agent_premises_reasonSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.remove_reasons.agent.premises.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.select("input[type=radio]").size() must be(6)
     }
 
