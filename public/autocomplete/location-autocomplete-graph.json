@@ -348,7 +348,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bolivia"
+      "en-GB": "Bolivia, Plurinational State of"
     }
   },
   "country:BR": {
@@ -652,7 +652,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Cape Verde"
+      "en-GB": "Cabo Verde"
     }
   },
   "country:CY": {
@@ -924,7 +924,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Micronesia"
+      "en-GB": "Micronesia, Federated States of"
     }
   },
   "country:FR": {
@@ -1292,7 +1292,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Iran"
+      "en-GB": "Iran, Islamic Republic ofIran"
     }
   },
   "country:IS": {
@@ -1548,7 +1548,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Laos"
+      "en-GB": "Lao People's Democratic Republic"
     }
   },
   "country:LB": {
@@ -1756,7 +1756,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Moldova"
+      "en-GB": "Moldova, Republic of"
     }
   },
   "country:ME": {
@@ -1820,7 +1820,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Macedonia"
+      "en-GB": "Macedonia, the Former Yugoslav Republic of"
     }
   },
   "country:ML": {
@@ -2363,7 +2363,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Russia"
+      "en-GB": "Russian Federation"
     }
   },
   "country:RW": {
@@ -2747,7 +2747,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "East Timor"
+      "en-GB": "Timor-Leste"
     }
   },
   "country:TM": {
@@ -2859,7 +2859,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Tanzania"
+      "en-GB": "Tanzania, United Republic of"
     }
   },
   "country:UA": {
@@ -2955,7 +2955,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Vatican City"
+      "en-GB": "Holy See"
     }
   },
   "country:VC": {
@@ -2971,7 +2971,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "St Vincent"
+      "en-GB": "Saint Vincent and the Grenadines"
     }
   },
   "country:VE": {
@@ -2987,7 +2987,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Venezuela"
+      "en-GB": "Venezuela, Bolivarian Republic of"
     }
   },
   "country:VN": {
@@ -3003,7 +3003,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Vietnam"
+      "en-GB": "Viet Nam"
     }
   },
   "country:VU": {
@@ -5275,10 +5275,10 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bolivia"
+      "en-GB": "Bolivia, Plurinational State of"
     }
   },
-  "nym:Bonaire": {
+  "nym:Bonaire, Sint Eustatius and Saba": {
     "edges": {
       "from": [
         "territory:BQ"
@@ -5292,7 +5292,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bonaire"
+      "en-GB": "Bonaire, Sint Eustatius and Saba"
     }
   },
   "nym:Bosna i Hercegovina": {
@@ -6621,7 +6621,7 @@
       "en-GB": "Curaçao"
     }
   },
-  "nym:Czech Republic": {
+  "nym:Czechia": {
     "edges": {
       "from": [
         "country:CZ"
@@ -6635,7 +6635,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Czech Republic"
+      "en-GB": "Czechia"
     }
   },
   "nym:Czechoslav": {
@@ -7811,7 +7811,7 @@
       "en-GB": "FRG"
     }
   },
-  "nym:Falkland Islands": {
+  "nym:Falkland Islands (Malvinas)": {
     "edges": {
       "from": [
         "territory:FK"
@@ -7825,7 +7825,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Falkland Islands"
+      "en-GB": "Falkland Islands (Malvinas)"
     }
   },
   "nym:Faroe Islands": {
@@ -13979,7 +13979,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Pitcairn, Henderson, Ducie and Oeno Islands"
+      "en-GB": "Pitcairn"
     }
   },
   "nym:Plurinational State of Bolivia": {
@@ -17923,7 +17923,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Syria"
+      "en-GB": "Syrian Arab Republic"
     }
   },
   "nym:Syrian Arab Republic": {
@@ -18297,7 +18297,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Taiwan"
+      "en-GB": "Taiwan, Province of China"
     }
   },
   "nym:Tajik": {
@@ -18606,7 +18606,7 @@
       "en-GB": "The Commonwealth of The Bahamas"
     }
   },
-  "nym:The Czech Republic": {
+  "nym:The Czechia": {
     "edges": {
       "from": [
         "country:CZ"
@@ -18620,7 +18620,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "The Czech Republic"
+      "en-GB": "The Czechia"
     }
   },
   "nym:The Democratic People's Republic of Korea": {
@@ -22584,7 +22584,7 @@
       "en-GB": "VU"
     }
   },
-  "nym:Vatican City State": {
+  "nym:Holy See": {
     "edges": {
       "from": [
         "country:VA"
@@ -22598,7 +22598,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Vatican City State"
+      "en-GB": "Holy See"
     }
   },
   "nym:Veitnam": {
@@ -22632,7 +22632,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Venezuela"
+      "en-GB": "Venezuela, Bolivarian Republic of"
     }
   },
   "nym:Venezula": {
@@ -26941,7 +26941,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Bonaire"
+      "en-GB": "Bonaire, Sint Eustatius and Saba"
     }
   },
   "territory:BQ-SE": {
@@ -27085,7 +27085,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Falkland Islands"
+      "en-GB": "Falkland Islands (Malvinas)"
     }
   },
   "territory:FO": {
@@ -27485,7 +27485,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Pitcairn, Henderson, Ducie and Oeno Islands"
+      "en-GB": "Pitcairn"
     }
   },
   "territory:PR": {
@@ -27645,7 +27645,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Taiwan"
+      "en-GB": "Taiwan, Province of China"
     }
   },
   "territory:UM-67": {

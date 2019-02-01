@@ -108,11 +108,11 @@
     "country:BT"
   ],
   [
-    "Bolivia",
+    "Bolivia, Plurinational State of",
     "country:BO"
   ],
   [
-    "Bonaire",
+    "Bonaire, Sint Eustatius and Saba",
     "territory:BQ"
   ],
   [
@@ -140,7 +140,7 @@
     "territory:VG"
   ],
   [
-    "Brunei",
+    "Brunei Darussalam",
     "country:BN"
   ],
   [
@@ -172,7 +172,7 @@
     "country:CA"
   ],
   [
-    "Cape Verde",
+    "Cabo Verde",
     "country:CV"
   ],
   [
@@ -216,7 +216,7 @@
     "country:CG"
   ],
   [
-    "Congo (Democratic Republic)",
+    "Congo, the Democratic Republic of the",
     "country:CD"
   ],
   [
@@ -244,7 +244,7 @@
     "country:CY"
   ],
   [
-    "Czech Republic",
+    "Czechia",
     "country:CZ"
   ],
   [
@@ -268,7 +268,7 @@
     "country:DD"
   ],
   [
-    "East Timor",
+    "Timor-Leste",
     "country:TL"
   ],
   [
@@ -300,7 +300,7 @@
     "country:ET"
   ],
   [
-    "Falkland Islands",
+    "Falkland Islands (Malvinas)",
     "territory:FK"
   ],
   [
@@ -424,7 +424,7 @@
     "country:ID"
   ],
   [
-    "Iran",
+    "Iran, Islamic Republic of",
     "country:IR"
   ],
   [
@@ -488,7 +488,7 @@
     "country:KG"
   ],
   [
-    "Laos",
+    "Lao People's Democratic Republic",
     "country:LA"
   ],
   [
@@ -528,7 +528,7 @@
     "territory:MO"
   ],
   [
-    "Macedonia",
+    "Macedonia, the Former Yugoslav Republic of",
     "country:MK"
   ],
   [
@@ -580,11 +580,11 @@
     "country:MX"
   ],
   [
-    "Micronesia",
+    "Micronesia, Federated States of",
     "country:FM"
   ],
   [
-    "Moldova",
+    "Moldova, Republic of",
     "country:MD"
   ],
   [
@@ -704,7 +704,7 @@
     "country:PH"
   ],
   [
-    "Pitcairn, Henderson, Ducie and Oeno Islands",
+    "Pitcairn",
     "territory:PN"
   ],
   [
@@ -728,7 +728,7 @@
     "country:RO"
   ],
   [
-    "Russia",
+    "Russian Federation",
     "country:RU"
   ],
   [
@@ -844,7 +844,7 @@
     "country:LC"
   ],
   [
-    "St Vincent",
+    "Saint Vincent and the Grenadines",
     "country:VC"
   ],
   [
@@ -872,11 +872,11 @@
     "country:CH"
   ],
   [
-    "Syria",
+    "Syrian Arab Republic",
     "country:SY"
   ],
   [
-    "Taiwan",
+    "Taiwan, Province of China",
     "territory:TW"
   ],
   [
@@ -884,7 +884,7 @@
     "country:TJ"
   ],
   [
-    "Tanzania",
+    "Tanzania, United Republic of",
     "country:TZ"
   ],
   [
@@ -896,7 +896,7 @@
     "country:BS"
   ],
   [
-    "The Gambia",
+    "Gambia",
     "country:GM"
   ],
   [
@@ -972,15 +972,15 @@
     "country:VU"
   ],
   [
-    "Vatican City",
+    "Holy See",
     "country:VA"
   ],
   [
-    "Venezuela",
+    "Venezuela, Bolivarian Republic of",
     "country:VE"
   ],
   [
-    "Vietnam",
+    "Viet Nam",
     "country:VN"
   ],
   [
