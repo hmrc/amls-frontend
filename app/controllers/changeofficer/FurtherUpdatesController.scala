@@ -105,7 +105,7 @@ class FurtherUpdatesController @Inject()(
     for {
       cache <- dataCacheConnector.fetch[ResponsiblePerson](ResponsiblePerson.key)
       _ <- removeDataStrict[ResponsiblePerson](index)
-      if !rp.lineId.isDefined & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)
+      if rp.lineId.isEmpty & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)
     } yield cache
   }
 }
