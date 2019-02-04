@@ -36,7 +36,7 @@ class most_transactionsSpec extends AmlsSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
-      def view = views.html.msb.most_transactions(form2, true)
+      def view = views.html.msb.most_transactions(form2, true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 

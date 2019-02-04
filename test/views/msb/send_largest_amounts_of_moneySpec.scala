@@ -36,7 +36,7 @@ class send_largest_amounts_of_moneySpec extends AmlsSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[SendTheLargestAmountsOfMoney] = Form2(SendTheLargestAmountsOfMoney(Country("United Kingdom", "GB")))
-      def view = views.html.msb.send_largest_amounts_of_money(form2, true)
+      def view = views.html.msb.send_largest_amounts_of_money(form2, true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 

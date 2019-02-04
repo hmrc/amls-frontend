@@ -36,7 +36,7 @@ class branches_or_agentsSpec extends AmlsSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val form2: ValidForm[BranchesOrAgents] = Form2(BranchesOrAgents(Some(Seq.empty[Country])))
-      def view = views.html.msb.branches_or_agents(form2, edit = true)
+      def view = views.html.msb.branches_or_agents(form2, edit = true, mockAutoComplete.getCountries)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
