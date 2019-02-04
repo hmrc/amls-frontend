@@ -31,8 +31,8 @@ POST        /agent-name/date-of-change/:index                        @controller
 GET         /partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.get(index: Int, edit: Boolean ?= false)
 POST        /partners/:index                                         @controllers.tradingpremises.AgentPartnershipController.post(index: Int, edit: Boolean ?= false)
 
-GET         /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
-POST        /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
+GET         /what-does-your-business-do/:index                       @controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
+POST        /what-does-your-business-do/:index                       @controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
 GET         /msb-activities/:index                                   @controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 POST        /msb-activities/:index                                   @controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
@@ -43,8 +43,8 @@ POST        /agent/:index                                            @controller
 GET         /your-answers                                            @controllers.tradingpremises.YourTradingPremisesController.answers()
 GET         /trading-premise-details/:index                          @controllers.tradingpremises.YourTradingPremisesController.getIndividual(index: Int, edit: Boolean ?= false)
 
-GET         /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
-POST        /what-does-your-business-do/date-of-change/:index        controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
+GET         /what-does-your-business-do/date-of-change/:index        @controllers.tradingpremises.WhatDoesYourBusinessDoController.dateOfChange(index: Int)
+POST        /what-does-your-business-do/date-of-change/:index        @controllers.tradingpremises.WhatDoesYourBusinessDoController.saveDateOfChange(index: Int)
 
 GET         /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.get(index: Int, edit: Boolean ?= false)
 POST        /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
