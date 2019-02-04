@@ -30,7 +30,7 @@ class unable_to_remove_activitySpec extends AmlsSpec {
     def view = unable_to_remove_activity("test")
   }
 
-  "The cannot_add_services view" must {
+  "The unable_to_remove_activity view" must {
 
     "have the correct title" in new ViewFixture {
       doc.title must startWith(Messages("businessmatching.updateservice.removeactivitiesinformation.title") + " - " + Messages("summary.updateservice"))
