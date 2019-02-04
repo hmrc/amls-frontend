@@ -37,7 +37,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.rejection_reasons(notificationParams)
+      def view = views.html.notifications.v2m0.rejection_reasons(notificationParams)
 
       doc.title must be("Your application has been refused" +
         " - " + "Your registration" +
@@ -47,7 +47,7 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.rejection_reasons(notificationParams)
+      def view = views.html.notifications.v2m0.rejection_reasons(notificationParams)
 
       heading.html must be("Your application has been refused")
       subHeading.html must include("Your registration")
@@ -56,9 +56,16 @@ class rejection_reasonsSpec extends AmlsSpec with MustMatchers {
 
     "have correct content, businessName, endDate and reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.rejection_reasons(notificationParams)
+      def view = views.html.notifications.v2m0.rejection_reasons(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference") and include("endDate"))
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.notifications.v2m0.rejection_reasons(notificationParams)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 
