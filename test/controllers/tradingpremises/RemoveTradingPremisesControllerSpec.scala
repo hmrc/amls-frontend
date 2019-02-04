@@ -40,11 +40,11 @@ class RemoveTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RemoveTradingPremisesController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val statusService: StatusService = mock[StatusService]
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new RemoveTradingPremisesController (
+      dataCacheConnector = mock[DataCacheConnector],
+      statusService = mock[StatusService],
+      authConnector = self.authConnector
+    )
   }
 
   "RemoveTradingPremisesController" must {

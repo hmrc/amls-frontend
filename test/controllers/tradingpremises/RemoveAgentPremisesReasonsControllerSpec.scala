@@ -24,7 +24,6 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.libs.json.JsValue
 import play.api.test.Helpers._
-import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
 
@@ -41,8 +40,7 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
     val controller = new RemoveAgentPremisesReasonsController (
       dataCacheConnector = mock[DataCacheConnector],
-      authConnector = self.authConnector,
-      statusService = mock[StatusService]
+      authConnector = self.authConnector
     )
 
     val tradingPremises = TradingPremises()
