@@ -32,7 +32,7 @@ class who_is_registering_this_registrationSpec extends AmlsSpec with MustMatcher
     implicit val requestWithToken = addToken(request)
   }
 
-  "who_is_registering_this_renewal view" must {
+  "who_is_registering_this_registration view" must {
     "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
 
