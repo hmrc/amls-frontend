@@ -36,19 +36,19 @@ class business_turnoverSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[ExpectedBusinessTurnover] = Form2(ExpectedBusinessTurnover.Third)
 
-      def view = views.html.businessactivities.expected_business_turnover(form2, true)
+      def view = views.html.renewal.business_turnover(form2, true)
 
-      doc.title must startWith(Messages("businessactivities.business-turnover.title") + " - " + Messages("summary.businessactivities"))
+      doc.title must startWith(Messages("renewal.business-turnover.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[ExpectedBusinessTurnover] = Form2(ExpectedBusinessTurnover.Second)
 
-      def view = views.html.businessactivities.expected_business_turnover(form2, true)
+      def view = views.html.renewal.business_turnover(form2, true)
 
-      heading.html must be(Messages("businessactivities.business-turnover.title"))
-      subHeading.html must include(Messages("summary.businessactivities"))
+      heading.html must be(Messages("renewal.business-turnover.title"))
+      subHeading.html must include(Messages("summary.renewal"))
 
     }
 
@@ -56,20 +56,20 @@ class business_turnoverSpec extends AmlsSpec with MustMatchers  {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "expectedBusinessTurnover") -> Seq(ValidationError("not a message Key"))
+          (Path \ "businessTurnover") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.expected_business_turnover(form2, true)
+      def view = views.html.renewal.business_turnover(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
-      doc.getElementById("expectedBusinessTurnover")
+      doc.getElementById("businessTurnover")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.businessactivities.expected_business_turnover(EmptyForm, true)
+      def view = views.html.renewal.business_turnover(EmptyForm, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
