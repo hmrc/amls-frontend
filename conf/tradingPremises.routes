@@ -5,8 +5,8 @@ GET         /add                                                     @controller
 GET         /premises/:index                                         @controllers.tradingpremises.ConfirmAddressController.get(index: Int)
 POST        /premises/:index                                         @controllers.tradingpremises.ConfirmAddressController.post(index: Int)
 
-GET         /premises-details/:index                                 controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
-POST        /premises-details/:index                                 controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
+GET         /premises-details/:index                                 @controllers.tradingpremises.WhereAreTradingPremisesController.get(index: Int, edit: Boolean ?= false)
+POST        /premises-details/:index                                 @controllers.tradingpremises.WhereAreTradingPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.get(index: Int, edit: Boolean ?= false)
 POST        /trading-start-date/:index                               @controllers.tradingpremises.ActivityStartDateController.post(index: Int, edit: Boolean ?= false)
@@ -14,8 +14,8 @@ POST        /trading-start-date/:index                               @controller
 GET         /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.get(index: Int, edit: Boolean ?= false)
 POST        /is-residential/:index                                   @controllers.tradingpremises.IsResidentialController.post(index: Int, edit: Boolean ?= false)
 
-GET         /premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
-POST        /premises/date-of-change/:index                          controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
+GET         /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.dateOfChange(index: Int)
+POST        /premises/date-of-change/:index                          @controllers.tradingpremises.WhereAreTradingPremisesController.saveDateOfChange(index: Int)
 
 GET         /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.get(index: Int, edit: Boolean ?= false)
 POST        /crn-name/:index                                         @controllers.tradingpremises.AgentCompanyNameController.post(index: Int, edit: Boolean ?= false)
