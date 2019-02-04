@@ -22,6 +22,7 @@
 @(f: Form2[_], index: Int, edit: Boolean, changed: Boolean, model: BusinessMatching)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("tradingpremises.msb.services.title", "summary.tradingpremises")
 }

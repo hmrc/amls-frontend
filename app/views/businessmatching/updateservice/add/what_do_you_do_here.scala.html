@@ -21,6 +21,7 @@
 @(f: Form2[_], edit: Boolean, msbServiceValues: Set[String] = Set())(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("businessmatching.updateservice.whatdoyoudohere.heading", "summary.updateservice")
 }

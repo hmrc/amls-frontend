@@ -48,5 +48,11 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       html must include(Messages("renewal.whatyouneed.line_1"))
       html must include(Messages("renewal.whatyouneed.line_2"))
     }
+
+    "have a back link" in new ViewFixture {
+      def view = views.html.renewal.what_you_need()
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

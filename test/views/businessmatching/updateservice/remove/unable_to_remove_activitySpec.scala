@@ -14,34 +14,30 @@
  * limitations under the License.
  */
 
-package views.businessmatching.updateservice.add
+package views.businessmatching.updateservice.remove
 
-import forms.EmptyForm
+
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
-import views.html.businessmatching.updateservice.add._
+import views.html.businessmatching.updateservice.remove.unable_to_remove_activity
 
-class cannot_add_servicesSpec extends AmlsSpec {
+class unable_to_remove_activitySpec extends AmlsSpec {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
 
-    def view = cannot_add_services(EmptyForm)
+    def view = unable_to_remove_activity("test")
   }
 
-  "The cannot_add_services view" must {
+  "The unable_to_remove_activity view" must {
 
     "have the correct title" in new ViewFixture {
-      doc.title must startWith(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.title") + " - " + Messages("summary.updateservice"))
+      doc.title must startWith(Messages("businessmatching.updateservice.removeactivitiesinformation.title") + " - " + Messages("summary.updateservice"))
     }
 
     "have correct heading" in new ViewFixture {
-      heading.html must be(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading"))
-    }
-
-    "have correct subHeading" in new ViewFixture {
-      subHeading.html must include(Messages("summary.updateservice"))
+      heading.html must be(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", "test", Messages("summary.updateinformation")))
     }
 
     "have the back link button" in new ViewFixture {
@@ -49,8 +45,8 @@ class cannot_add_servicesSpec extends AmlsSpec {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1"))
-      doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.3"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.2"))
     }
   }
 

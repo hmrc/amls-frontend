@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.businessactivities.ExpectedBusinessTurnover
 import org.scalatest.MustMatchers
@@ -65,6 +65,13 @@ class business_turnoverSpec extends AmlsSpec with MustMatchers  {
 
       doc.getElementById("expectedBusinessTurnover")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.businessactivities.expected_business_turnover(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

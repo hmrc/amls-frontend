@@ -33,6 +33,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.tcsp.what_you_need()
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       val title = Messages("title.wyn") + " - " +
         Messages("summary.tcsp") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")

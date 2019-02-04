@@ -29,7 +29,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
   }
 
   "what_you_need view" must {
-    "have correct title" in new ViewFixture {
+    "have correct title, heading and back link" in new ViewFixture {
 
       def view = views.html.tradingpremises.what_you_need(1, false)
 
@@ -40,6 +40,8 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
       doc.title must be(title)
       heading.html must be(Messages("title.wyn"))
       subHeading.html must include(Messages("summary.tradingpremises"))
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
     }
 

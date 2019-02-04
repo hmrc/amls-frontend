@@ -48,6 +48,7 @@ class confirm_addressSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.confirmaddress.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.getElementsMatchingOwnText("#11").text mustBe "#11 some building Some street city United Kingdome"
       doc.select("input[type=radio]").size mustBe 2
     }

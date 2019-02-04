@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.{PaymentMethods, ReceiveCashPayments}
 import org.scalatest.MustMatchers
@@ -80,6 +80,13 @@ class receivingSpec extends AmlsSpec with MustMatchers  {
       doc.getElementById("receivePayments").html() must include("not a message Key")
       doc.getElementById("paymentMethods").html() must include("second not a message Key")
       doc.getElementById("paymentMethods-details-fieldset").html() must include("third not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.receiving(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

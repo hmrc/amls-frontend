@@ -24,26 +24,26 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class provided_servicesSpec extends AmlsSpec with MustMatchers {
+class another_tcsp_supervisionSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "provided_services view" must {
+  "another tcsp supervision view" must {
     "have correct title, heading amd subheading" in new ViewFixture {
 
       val form2 = EmptyForm
 
-      def view = views.html.tcsp.provided_services(form2, true)
+      def view = views.html.tcsp.another_tcsp_supervision(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
-      val title = Messages("tcsp.provided_services.title") + " - " + Messages("summary.tcsp") + " - " +
+      val title = Messages("tcsp.anothertcspsupervision.title") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
 
       doc.title must be(title)
-      heading.html must be(Messages("tcsp.provided_services.title"))
+      heading.html must be(Messages("tcsp.anothertcspsupervision.header"))
       subHeading.html must include(Messages("summary.tcsp"))
     }
 
@@ -51,19 +51,19 @@ class provided_servicesSpec extends AmlsSpec with MustMatchers {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "services") -> Seq(ValidationError("not a message Key")),
-          (Path \ "details") -> Seq(ValidationError("second not a message Key"))
+          (Path \ "servicesOfAnotherTCSP") -> Seq(ValidationError("not a message Key")),
+          (Path \ "mlrRefNumber") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.tcsp.provided_services(form2, true)
+      def view = views.html.tcsp.another_tcsp_supervision(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
 
-      doc.getElementById("services")
+      doc.getElementById("servicesOfAnotherTCSP")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
 
-      doc.getElementById("details").parent()
+      doc.getElementById("mlrRefNumber").parent()
         .getElementsByClass("error-notification").first().html() must include("second not a message Key")
 
     }

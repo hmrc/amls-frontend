@@ -16,22 +16,18 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.Country
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 
-import scala.collection.JavaConversions._
 import utils.AmlsSpec
-import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -47,10 +43,10 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
     self =>
     val request = addToken(authRequest)
 
-    val timeAtAdditionalExtraAddressController = new TimeAtAdditionalExtraAddressController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val timeAtAdditionalExtraAddressController = new TimeAtAdditionalExtraAddressController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector
+      )
   }
 
   val mockCacheMap = mock[CacheMap]
@@ -206,14 +202,10 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
         }
       }
     }
-
   }
+  "App must start" in {
+    val app = GuiceApplicationBuilder().build()
 
-  it must {
-    "use the correct services" in new Fixture {
-      TimeAtAdditionalExtraAddressController.dataCacheConnector must be(DataCacheConnector)
-      TimeAtAdditionalExtraAddressController.authConnector must be(AMLSAuthConnector)
-    }
+    app.injector.instanceOf[TimeAtAdditionalExtraAddressController]
   }
-
 }

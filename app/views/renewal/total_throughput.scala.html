@@ -22,6 +22,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_], messages: Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("renewal.msb.throughput.header", "summary.renewal")
 }
