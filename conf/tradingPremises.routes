@@ -34,8 +34,8 @@ POST        /partners/:index                                         @controller
 GET         /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.get(index: Int, edit: Boolean ?= false)
 POST        /what-does-your-business-do/:index                       controllers.tradingpremises.WhatDoesYourBusinessDoController.post(index: Int, edit: Boolean ?= false)
 
-GET         /msb-activities/:index                                   controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
-POST        /msb-activities/:index                                   controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
+GET         /msb-activities/:index                                   @controllers.tradingpremises.MSBServicesController.get(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
+POST        /msb-activities/:index                                   @controllers.tradingpremises.MSBServicesController.post(index: Int, edit: Boolean ?= false, changed: Boolean ?= false)
 
 GET         /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.get(index: Int, edit: Boolean ?= false)
 POST        /agent/:index                                            @controllers.tradingpremises.BusinessStructureController.post(index: Int, edit: Boolean ?= false)
