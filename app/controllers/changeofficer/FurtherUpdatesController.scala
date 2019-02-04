@@ -58,7 +58,6 @@ class FurtherUpdatesController @Inject()(
               updateNominatedOfficers(oldOfficer, changeOfficer.roleInBusiness, responsiblePeople, index)
             }))
           } yield {
-
             deleteOldOfficer(oldOfficer._1, oldOfficer._2)
 
             Redirect(
@@ -103,9 +102,11 @@ class FurtherUpdatesController @Inject()(
 
   private def deleteOldOfficer(rp: ResponsiblePerson, index: Int)(implicit ac: AuthContext, hc: HeaderCarrier) = {
     for {
-      cache <- dataCacheConnector.fetch[ResponsiblePerson](ResponsiblePerson.key)
-      _ <- removeDataStrict[ResponsiblePerson](index)
-      if rp.lineId.isEmpty & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)
-    } yield cache
+      maybeUpdatedCache <- if (rp.lineId.isEmpty & rp.endDate.isDefined & rp.status.contains(StatusConstants.Deleted)) {
+        removeDataStrict[ResponsiblePerson](index)
+      } else {
+        Future.successful(None)
+      }
+    } yield maybeUpdatedCache
   }
 }

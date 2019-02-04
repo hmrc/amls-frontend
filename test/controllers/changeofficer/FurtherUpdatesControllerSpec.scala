@@ -19,6 +19,7 @@ package controllers.changeofficer
 import connectors.DataCacheConnector
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, Director => Director$}
 import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.PrivateMethodTester
@@ -27,11 +28,14 @@ import play.api.i18n.Messages
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
-import scala.concurrent.Future
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with PrivateMethodTester {
 
@@ -90,6 +94,38 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
     } thenReturn Future.successful(cacheMap)
 
     lazy val controller = injector.instanceOf[FurtherUpdatesController]
+  }
+
+  trait TestFixture2 extends TestFixture {
+    self =>
+
+    override val oldOfficer = ResponsiblePerson(
+      personName = Some(PersonName("Old", None, "Officer")),
+      positions = Some(Positions(Set(
+        NominatedOfficer
+      ), None)), endDate = Some(ResponsiblePersonEndDate(new LocalDate())), status = Some("Deleted"))
+
+    when {
+      cacheMap.getEntry[Seq[ResponsiblePerson]](meq(ResponsiblePerson.key))(any())
+    } thenReturn Some(Seq(
+      newOfficer.copy(
+        positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+        hasChanged = true,
+        hasAccepted = true
+      )
+    ))
+
+    when {
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(Seq(
+      newOfficer.copy(
+        positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+        hasChanged = true,
+        hasAccepted = true
+      )
+    )))
+
+    override lazy val controller = injector.instanceOf[FurtherUpdatesController]
   }
 
   "The FurtherUpdatesController" when {
@@ -182,6 +218,37 @@ class FurtherUpdatesControllerSpec extends AmlsSpec with MockitoSugar with Priva
       }
     }
 
+    "deleteOldOfficer is called" must {
+      "return cache map without deleted rp (if rp was not submitted)" in new TestFixture2 {
+        val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
+
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+
+        Await.result(result, 1 second) mustEqual cacheMap
+
+        cacheMap.getEntry[ResponsiblePerson](ResponsiblePerson.key) must equal(Some(Seq(
+          newOfficer.copy(
+            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+            hasChanged = true,
+            hasAccepted = true
+          )
+        )))
+      }
+
+      "return none if rp was submitted" in new TestFixture2 {
+        override val oldOfficer = ResponsiblePerson(
+          personName = Some(PersonName("Old", None, "Officer")),
+          positions = Some(Positions(Set(
+            NominatedOfficer
+          ), None)), lineId = Some(11111))
+
+        val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
+
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+
+        Await.result(result, 1 second) mustBe None
+      }
+    }
   }
 
   it must {
