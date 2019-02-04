@@ -26,8 +26,7 @@ import play.api.libs.json.JsValue
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -40,13 +39,11 @@ class RemoveAgentPremisesReasonsControllerSpec extends AmlsSpec with MockitoSuga
 
     implicit val request = addToken(authRequest)
 
-    val controller = new RemoveAgentPremisesReasonsController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-
-      override protected def authConnector: AuthConnector = self.authConnector
-
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new RemoveAgentPremisesReasonsController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
 
     val tradingPremises = TradingPremises()
     val cache = CacheMap("", Map.empty[String, JsValue])
