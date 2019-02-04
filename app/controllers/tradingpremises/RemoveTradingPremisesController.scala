@@ -16,23 +16,24 @@
 
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
 
 import scala.concurrent.Future
 
-trait RemoveTradingPremisesController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-
-  private[controllers] def statusService: StatusService
+class RemoveTradingPremisesController @Inject () (
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector,
+                                                   val statusService: StatusService
+                                                 ) extends RepeatingSection with BaseController {
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -94,11 +95,4 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
           }
       }
   }
-}
-
-object RemoveTradingPremisesController extends RemoveTradingPremisesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override private[controllers] val statusService: StatusService = StatusService
 }

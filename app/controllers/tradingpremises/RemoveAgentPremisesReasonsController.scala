@@ -21,7 +21,6 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.tradingpremises.{AgentRemovalReason, TradingPremises}
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 import views.html.tradingpremises.remove_agent_premises_reasons
@@ -30,8 +29,7 @@ import scala.concurrent.Future
 
 class RemoveAgentPremisesReasonsController @Inject () (
                                                       val dataCacheConnector: DataCacheConnector,
-                                                      val authConnector: AuthConnector,
-                                                      statusService: StatusService
+                                                      val authConnector: AuthConnector
                                                       )extends RepeatingSection with BaseController {
 
 
