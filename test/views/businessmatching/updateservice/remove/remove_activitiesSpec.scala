@@ -50,6 +50,10 @@ class remove_activitiesSpec extends AmlsSpec with MustMatchers {
       subHeading.html must include(Messages("summary.updateservice"))
     }
 
+    "have the back link button" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "show the correct content" in new ViewFixture {
 
       val submittedActivities = Seq(MoneyServiceBusiness)

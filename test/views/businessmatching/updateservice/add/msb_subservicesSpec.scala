@@ -43,6 +43,7 @@ class msb_subservicesSpec extends AmlsSpec {
       doc.title must startWith(Messages("businessmatching.updateservice.msb.services.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.msb.services.title"))
       subHeading.html must include(Messages("summary.updateservice"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
     }
 

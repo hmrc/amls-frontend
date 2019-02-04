@@ -21,6 +21,7 @@
 @(activities: Set[String])(implicit request: Request[_], messages: Messages)
 
 @header = {
+    @components.back_link()
     @heading("businessmatching.updateservice.newserviceinformation.heading", "summary.updateservice")
 }
 

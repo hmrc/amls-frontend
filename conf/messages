@@ -1194,7 +1194,7 @@ businessmatching.updateservice.changeservices.choice.remove = Remove business ty
 
 businessmatching.updateservice.removeactivitiesinformation.title = Unable to remove services
 businessmatching.updateservice.removeactivitiesinformation.heading = Unable to remove {0}
-businessmatching.updateservice.removeactivitiesinformation.info.1 = You need to add a new service before you can remove the one you are currently registered for.
+businessmatching.updateservice.removeactivitiesinformation.info.3 = You need to add a new service before you can remove the one you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.1.all = You need to add a new service before you remove the services you are currently registered for.
 businessmatching.updateservice.removeactivitiesinformation.info.2 = If you want to de-register your business for anti-money laundering supervision, you can do this from your registration status page.
 
