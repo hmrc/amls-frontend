@@ -51,6 +51,10 @@ class change_servicesSpec extends AmlsSpec with MustMatchers {
     "have correct subHeading" in new ViewFixture {
       subHeading.html must include(Messages("summary.updateservice"))
     }
+    
+    "have a back link" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
 
     "show the correct content" in new ViewFixture {
       doc.body().text() must include(Messages("businessmatching.updateservice.changeservices.choice.add"))

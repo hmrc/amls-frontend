@@ -45,7 +45,7 @@ class unable_to_remove_activitySpec extends AmlsSpec {
     }
 
     "show the correct content" in new ViewFixture {
-      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.1"))
+      doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.3"))
       doc.body().text() must include(Messages("businessmatching.updateservice.removeactivitiesinformation.info.2"))
     }
   }
