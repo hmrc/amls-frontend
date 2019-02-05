@@ -90,6 +90,14 @@ object ControllerHelper {
     }
   }
 
+  def isAccountancyServicesSelected(bm: Option[BusinessMatching]): Boolean = {
+    bm match {
+      case Some(matching) => matching.activities.foldLeft(false) { (x, y) =>
+        y.businessActivities.contains(AccountancyServices)
+      }
+    }
+  }
+
   //For repeating section
 
 

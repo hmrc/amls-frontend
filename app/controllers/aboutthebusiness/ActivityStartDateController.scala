@@ -49,26 +49,37 @@ trait ActivityStartDateController extends BaseController {
       Form2[ActivityStartDate](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(activity_start_date(f, edit)))
-        case ValidForm(_, data) =>
-          dataCache.fetchAll map {
-            optionalCache =>
-              (for {
-                cache <- optionalCache
-                businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
-                aboutTheBusiness <- cache.getEntry[AboutTheBusiness](AboutTheBusiness.key)
-              } yield {
-                dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.activityStartDate(data))
-                getRouting(businessType, edit)
-              }).getOrElse(Redirect(routes.ConfirmRegisteredOfficeController.get(edit)))
+        case ValidForm(_, data) => {
+            dataCache.fetchAll flatMap  { maybeCache =>
+              val businessMatching = for {
+                cacheMap <- maybeCache
+                bm <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
+              } yield bm
 
+              val businessType = for {
+                bt <- ControllerHelper.getBusinessType(businessMatching)
+              } yield bt
+
+              val aboutTheBusiness = for {
+                cacheMap <- maybeCache
+                atb <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+              } yield atb
+
+              for {
+                _ <- dataCache.save[AboutTheBusiness](AboutTheBusiness.key, aboutTheBusiness.activityStartDate(data))
+              } yield  getRouting(businessType, edit)
+
+            }
+          } recoverWith {
+            case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
           }
       }
   }
 
-  private def getRouting(businessType: BusinessType, edit: Boolean): Result = {
+  private def getRouting(businessType: Option[BusinessType], edit: Boolean): Result = {
     (businessType, edit) match {
       case (_, true) => Redirect(routes.SummaryController.get())
-      case (UnincorporatedBody | LPrLLP | LimitedCompany | Partnership, _) =>
+      case (Some(UnincorporatedBody) | Some(LPrLLP) | Some(LimitedCompany) | Some(Partnership), _) =>
         Redirect(routes.VATRegisteredController.get(edit))
       case (_, false) =>
         Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
