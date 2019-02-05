@@ -43,6 +43,13 @@ class declaration_Spec extends AmlsSpec with MustMatchers  {
       subHeading.html must include(Messages("string2"))
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct content" in new ViewFixture {
       def view = views.html.declaration.declare("string1", "string2", "Name", isAmendment = false)
 

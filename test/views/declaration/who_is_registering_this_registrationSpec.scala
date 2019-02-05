@@ -17,43 +17,35 @@
 package views.declaration
 
 import forms.{Form2, InvalidForm, ValidForm}
-import generators.ResponsiblePersonGenerator
 import jto.validation.{Path, ValidationError}
 import models.declaration.WhoIsRegistering
-import models.responsiblepeople.{PersonName, ResponsiblePerson}
-import org.scalacheck.Gen
+import models.responsiblepeople.ResponsiblePerson
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
 
-class who_is_registering_this_updateSpec extends AmlsSpec with MustMatchers with ResponsiblePersonGenerator {
+class who_is_registering_this_registrationSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "who_is_registering_this_update view" must {
-    "have correct title, heading and required fields" in new ViewFixture {
+  "who_is_registering_this_registration view" must {
+    "have correct title" in new ViewFixture {
       val form2: ValidForm[WhoIsRegistering] = Form2(WhoIsRegistering("PersonName"))
-      val people = Gen.listOfN(2, responsiblePersonGen).sample.get
 
-      def view = views.html.declaration.who_is_registering_this_update(form2, people)
 
-      doc.title mustBe s"${Messages("declaration.who.is.registering.amendment.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
-      heading.html must be(Messages("declaration.who.is.registering.amendment.title"))
-      subHeading.html must include(Messages("submit.amendment.application"))
+      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
+
+      doc.title mustBe s"${Messages("declaration.who.is.registering.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
+      heading.html must be(Messages("declaration.who.is.registering.title", "submit.registration"))
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
-      people.zipWithIndex.foreach { case (p, i) =>
-        val id = s"person-$i"
-        doc.getElementById(id).`val`() must be(i.toString)
-        doc.getElementById(id).parent.text must include(p.personName.get.fullName)
-      }
-
-      doc.select("input[type=radio]").size mustBe people.size + 1
       doc.getElementsContainingOwnText(Messages("declaration.who.is.registering.text")).hasText must be(true)
+
+      doc.select("input[type=radio]").size mustBe 1
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -63,7 +55,7 @@ class who_is_registering_this_updateSpec extends AmlsSpec with MustMatchers with
           (Path \ "person") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.declaration.who_is_registering_this_update(form2, Seq(ResponsiblePerson()))
+      def view = views.html.declaration.who_is_registering_this_registration(form2, Seq(ResponsiblePerson()))
 
       errorSummary.html() must include("not a message Key")
 
