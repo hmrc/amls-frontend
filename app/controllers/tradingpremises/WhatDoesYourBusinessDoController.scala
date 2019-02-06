@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
@@ -31,15 +31,19 @@ import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
+class WhatDoesYourBusinessDoController @Inject () (
+                                                    val dataCacheConnector: DataCacheConnector,
+                                                    val authConnector: AuthConnector,
+                                                    val statusService: StatusService
+                                                  ) extends RepeatingSection with BaseController with FormHelpers with DateOfChangeHelper {
 
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+
 
   private def data(index: Int, edit: Boolean)(implicit ac: AuthContext, hc: HeaderCarrier)
   : Future[Either[Result, (CacheMap, Set[BusinessActivity])]] = {
@@ -190,11 +194,4 @@ trait WhatDoesYourBusinessDoController extends RepeatingSection with BaseControl
     tradingPremises.lineId.isDefined && isEligibleForDateOfChange(status) && modelHasChanged(tradingPremises, model)
 
   // scalastyle:on cyclomatic.complexity
-}
-
-object WhatDoesYourBusinessDoController extends WhatDoesYourBusinessDoController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
 }

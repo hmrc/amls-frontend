@@ -50,12 +50,12 @@ class WhereAreTradingPremisesControllerSpec extends AmlsSpec with MockitoSugar w
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new WhereAreTradingPremisesController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-      override val auditConnector = mock[AuditConnector]
-    }
+    val controller = new WhereAreTradingPremisesController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      auditConnector = mock[AuditConnector]
+      )
 
     when(controller.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionDecisionRejected))
 

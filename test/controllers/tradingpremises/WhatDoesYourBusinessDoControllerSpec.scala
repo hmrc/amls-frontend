@@ -56,11 +56,11 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val whatDoesYourBusinessDoController = new WhatDoesYourBusinessDoController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
 
     val businessMatchingActivitiesAll = BusinessMatchingActivities(
       Set(AccountancyServices, BillPaymentServices, EstateAgentBusinessService))
@@ -474,12 +474,5 @@ class WhatDoesYourBusinessDoControllerSpec extends AmlsSpec with MockitoSugar wi
 
     }
 
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      WhatDoesYourBusinessDoController.authConnector must be(AMLSAuthConnector)
-      WhatDoesYourBusinessDoController.dataCacheConnector must be(DataCacheConnector)
-    }
   }
 }

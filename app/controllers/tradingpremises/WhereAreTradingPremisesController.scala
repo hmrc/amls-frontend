@@ -20,7 +20,7 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data._
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, FormHelpers, InvalidForm, ValidForm}
@@ -32,16 +32,20 @@ import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{DateOfChangeHelper, RepeatingSection}
 import views.html.tradingpremises._
 
 import scala.concurrent.Future
 
-trait WhereAreTradingPremisesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
+class WhereAreTradingPremisesController @Inject () (
+                                                     val dataCacheConnector: DataCacheConnector,
+                                                     val statusService: StatusService,
+                                                     val auditConnector: AuditConnector,
+                                                     val authConnector: AuthConnector
+                                                   )extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
-  val auditConnector: AuditConnector
+
 
   def get(index: Int, edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -149,12 +153,4 @@ trait WhereAreTradingPremisesController extends RepeatingSection with BaseContro
         ytp <- tp.yourTradingPremises
       } yield (ytp.tradingName != premises.tradingName || ytp.tradingPremisesAddress != premises.tradingPremisesAddress) && tp.lineId.isDefined
     ).getOrElse(false)
-}
-
-object WhereAreTradingPremisesController extends WhereAreTradingPremisesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
-  override lazy val auditConnector = AMLSAuditConnector
 }
