@@ -36,9 +36,10 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
+import play.api.Play
 import play.api.mvc.Request
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier}
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
@@ -289,6 +290,6 @@ object LandingService extends LandingService {
   override private[services] lazy val keyStore = KeystoreConnector
   override private[services] lazy val desConnector = AmlsConnector
   override private[services] lazy val statusService = StatusService
-  override private[services] lazy val businessMatchingConnector = BusinessMatchingConnector
+  override private[services] lazy val businessMatchingConnector = Play.current.injector.instanceOf[BusinessMatchingConnector]
   // $COVERAGE-ON$
 }
