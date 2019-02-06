@@ -35,10 +35,10 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new LettersAddressController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new LettersAddressController (
+      dataCache = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
 
     val emptyCache = CacheMap("", Map.empty)
 
