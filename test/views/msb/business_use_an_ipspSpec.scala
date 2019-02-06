@@ -32,6 +32,13 @@ class business_use_an_ipspSpec extends AmlsSpec with MustMatchers {
   }
 
   "business_use_an_ipsp view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[BusinessUseAnIPSP] = Form2(BusinessUseAnIPSPNo)
+      def view = views.html.msb.business_use_an_ipsp(form2, edit = true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[BusinessUseAnIPSP] = Form2(BusinessUseAnIPSPNo)

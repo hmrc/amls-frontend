@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -29,10 +29,14 @@ import views.html.responsiblepeople.experience_training
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait ExperienceTrainingController extends RepeatingSection with BaseController {
+class ExperienceTrainingController @Inject () (
+                                              val dataCacheConnector: DataCacheConnector,
+                                              val authConnector: AuthConnector
+                                              ) extends RepeatingSection with BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+
 
   private def businessActivitiesData(implicit ac: AuthContext, hc: HeaderCarrier): Future[BusinessActivities] = {
     dataCacheConnector.fetchAll map {
@@ -91,11 +95,4 @@ trait ExperienceTrainingController extends RepeatingSection with BaseController 
         }
       }
     }
-
-}
-
-object ExperienceTrainingController extends ExperienceTrainingController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

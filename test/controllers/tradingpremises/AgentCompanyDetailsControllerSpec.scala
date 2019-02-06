@@ -22,21 +22,19 @@ import models.businessmatching.{BillPaymentServices, EstateAgentBusinessService,
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import utils.AmlsSpec
-import play.api.i18n.Messages
-import play.api.test.Helpers._
-import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.mockito.Matchers.{eq => meq, _}
 import org.scalatestplus.play.OneAppPerSuite
+import play.api.i18n.Messages
+import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite with MockitoSugar with ScalaFutures with TradingPremisesGenerator{
 
@@ -145,7 +143,7 @@ class AgentCompanyDetailsControllerSpec extends AmlsSpec with OneAppPerSuite wit
 
           val result = controller.post(1, true)(newRequest)
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.SummaryController.getIndividual(1).url))
+          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.getIndividual(1).url))
 
         }
       }

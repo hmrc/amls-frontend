@@ -22,6 +22,7 @@
 @(f: forms.Form2[_], edit: Boolean, responsiblePeople: Seq[(ResponsiblePerson, Int)])(implicit request: Request[_], m:Messages)
 
     @header = {
+        @components.back_link()
         @errorSummary(f)
         @heading("businessmatching.updateservice.whichfitandproper.heading", "summary.updateservice")
     }

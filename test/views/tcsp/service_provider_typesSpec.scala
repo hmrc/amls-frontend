@@ -37,6 +37,8 @@ class service_provider_typesSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.tcsp.service_provider_types(form2, true)
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+
       val title = Messages("tcsp.kind.of.service.provider.title") + " - " + Messages("summary.tcsp") + " - " +
                   Messages("title.amls") + " - " + Messages("title.gov")
       doc.title must be(title)
@@ -71,5 +73,7 @@ class service_provider_typesSpec extends AmlsSpec with MustMatchers {
 
 
     }
+
+
   }
 }

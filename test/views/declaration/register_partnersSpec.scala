@@ -40,6 +40,7 @@ class register_partnersSpec extends AmlsSpec with MustMatchers {
       doc.title mustBe s"${Messages("declaration.register.partners.title")} - ${Messages("title.amls")} - ${Messages("title.gov")}"
       heading.html must be(Messages("declaration.register.partners.title"))
       subHeading.html must include("subheading")
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "show errors in the correct locations" in new ViewFixture {

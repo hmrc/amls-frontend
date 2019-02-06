@@ -37,11 +37,13 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new CurrentAddressDateOfChangeController() {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val statusService = mock[StatusService]
+
+    val controller = new CurrentAddressDateOfChangeController(
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = statusService
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -273,5 +275,4 @@ class CurrentAddressDateOfChangeControllerSpec extends AmlsSpec with MockitoSuga
       }
     }
   }
-
 }

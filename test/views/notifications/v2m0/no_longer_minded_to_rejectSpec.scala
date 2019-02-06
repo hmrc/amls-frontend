@@ -36,7 +36,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
 
       doc.title must be("No longer considering refusal" +
         " - " + "Your registration" +
@@ -46,7 +46,7 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
 
       heading.html must be("No longer considering refusal")
       subHeading.html must include("Your registration")
@@ -55,9 +55,16 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.no_longer_minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
 
       doc.html must include("reference")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.notifications.v2m0.no_longer_minded_to_reject(notificationParams)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
   }

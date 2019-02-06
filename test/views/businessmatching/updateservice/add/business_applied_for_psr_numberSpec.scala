@@ -43,6 +43,7 @@ class business_applied_for_psr_numberSpec extends AmlsSpec {
       doc.title must startWith(Messages("businessmatching.updateservice.psr.number.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.psr.number.title"))
       subHeading.html must include(Messages("summary.updateservice"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
     }
 

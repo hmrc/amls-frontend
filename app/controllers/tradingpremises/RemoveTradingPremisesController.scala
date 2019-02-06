@@ -16,23 +16,24 @@
 
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.status._
 import models.tradingpremises.{ActivityEndDate, TradingPremises}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{RepeatingSection, StatusConstants}
 import views.html.tradingpremises.remove_trading_premises
 
 import scala.concurrent.Future
 
-trait RemoveTradingPremisesController extends RepeatingSection with BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-
-  private[controllers] def statusService: StatusService
+class RemoveTradingPremisesController @Inject () (
+                                                   val dataCacheConnector: DataCacheConnector,
+                                                   val authConnector: AuthConnector,
+                                                   val statusService: StatusService
+                                                 ) extends RepeatingSection with BaseController {
 
   def get(index: Int, complete: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -55,15 +56,20 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
   def remove(index: Int, complete: Boolean = false, tradingName: String) = Authorised.async {
     implicit authContext => implicit request =>
 
+      def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
+        Redirect(routes.YourTradingPremisesController.get())
+      }
+
       statusService.getStatus flatMap {
         case NotCompleted | SubmissionReady => removeDataStrict[TradingPremises](index) map { _ =>
-          Redirect(routes.SummaryController.get(complete))
+          Redirect(routes.YourTradingPremisesController.get(complete))
         }
         case SubmissionReadyForReview => for {
           _ <- updateDataStrict[TradingPremises](index) { tp =>
             tp.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
+
           }
-        } yield Redirect(routes.SummaryController.get(complete))
+        } yield Redirect(routes.YourTradingPremisesController.get(complete))
         case _ =>
           getData[TradingPremises](index) flatMap { premises =>
             premises.lineId match {
@@ -80,25 +86,13 @@ trait RemoveTradingPremisesController extends RepeatingSection with BaseControll
                       _ <- updateDataStrict[TradingPremises](index) { tp =>
                         tp.copy(status = Some(StatusConstants.Deleted), endDate = Some(data), hasChanged = true)
                       }
-                    } yield Redirect(routes.SummaryController.get(complete))
+                    } yield Redirect(routes.YourTradingPremisesController.get(complete))
                   }
                 }
 
-              case _ =>
-                updateDataStrict[TradingPremises](index) {
-                  _.copy(status = Some(StatusConstants.Deleted), hasChanged = true)
-                } map { _ =>
-                  Redirect(routes.SummaryController.get(complete))
-                }
+              case _ => removeWithoutDate
             }
           }
       }
   }
-}
-
-object RemoveTradingPremisesController extends RemoveTradingPremisesController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override private[controllers] val statusService: StatusService = StatusService
 }

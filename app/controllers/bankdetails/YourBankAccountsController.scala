@@ -22,13 +22,11 @@ import forms.EmptyForm
 import javax.inject.Inject
 import models.bankdetails.BankDetails
 import models.bankdetails.BankDetails.Filters._
-import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class YourBankAccountsController @Inject()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector = AMLSAuthConnector,
-                                            val statusService: StatusService
+                                            val authConnector: AuthConnector = AMLSAuthConnector
                                           ) extends BankDetailsController {
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext =>

@@ -25,10 +25,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.i18n.Messages
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -38,10 +38,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
     self =>
     val request = addToken(authRequest)
 
-    val controller = new VATRegisteredController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new VATRegisteredController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+      )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -55,7 +55,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         "with pre populated data" in new Fixture {
 
           when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName,vatRegistered = Some(VATRegisteredYes("123456789")))))))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName, vatRegistered = Some(VATRegisteredYes("123456789")))))))
 
           val result = controller.get(1)(request)
           status(result) must be(OK)
@@ -139,16 +139,16 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
       "given invalid data" must {
         "respond with BAD_REQUEST" in new Fixture {
 
-            val newRequest = request.withFormUrlEncodedBody(
-              "registeredForVATYes" -> "1234567890",
-              "personName" -> "Person Name"
-            )
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
+          val newRequest = request.withFormUrlEncodedBody(
+            "registeredForVATYes" -> "1234567890",
+            "personName" -> "Person Name"
+          )
+          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
+            .thenReturn(Future.successful(Some(Seq(ResponsiblePerson(personName = personName)))))
 
-            val result = controller.post(1)(newRequest)
-            status(result) must be(BAD_REQUEST)
-         }
+          val result = controller.post(1)(newRequest)
+          status(result) must be(BAD_REQUEST)
+        }
       }
 
       "Responsible Person cannot be found with given index" must {
@@ -168,7 +168,11 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           status(result) must be(NOT_FOUND)
         }
       }
+    }
+    "App" in {
+      val app = GuiceApplicationBuilder().build()
 
+      app.injector.instanceOf[VATRegisteredController]
     }
   }
 }

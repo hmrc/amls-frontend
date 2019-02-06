@@ -41,6 +41,13 @@ class register_responsible_personSpec extends AmlsSpec with MustMatchers {
       subHeading.html must include (Messages("subheading"))
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.declaration.register_responsible_person("subheading")
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "contain the expected content elements" in new ViewFixture{
       def view = views.html.declaration.register_responsible_person("subheading")
 

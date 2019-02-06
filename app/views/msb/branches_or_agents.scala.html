@@ -21,6 +21,7 @@
 @(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("msb.branchesoragents.title", "summary.msb")
 }

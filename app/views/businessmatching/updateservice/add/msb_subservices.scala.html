@@ -21,6 +21,7 @@
 @(f: Form2[_], edit: Boolean, isFxEnabled:Boolean = false)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("businessmatching.updateservice.msb.services.heading", "summary.updateservice")
 }

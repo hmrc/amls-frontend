@@ -25,6 +25,7 @@
 @(f: Form2[_])(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.heading", "summary.updateservice")
 }
 

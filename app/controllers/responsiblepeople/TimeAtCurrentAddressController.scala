@@ -16,69 +16,72 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople.{ResponsiblePerson, _}
-import models.status.{SubmissionDecisionApproved, SubmissionStatus}
+import models.status.SubmissionStatus
 import play.api.mvc.{AnyContent, Request}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.time_at_address
 
 import scala.concurrent.Future
 
-trait TimeAtCurrentAddressController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
-
-  val statusService: StatusService
+class TimeAtCurrentAddressController @Inject () (
+                                                val dataCacheConnector: DataCacheConnector,
+                                                val authConnector: AuthConnector,
+                                                val statusService: StatusService
+                                                )extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonCurrentAddress(PersonAddressUK("", "", None, None, ""), None)
 
   def get(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-      getData[ResponsiblePerson](index) map {
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_,Some(timeAtAddress),_)),_,_)),_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, flow, personName.titleName))
-        case Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_)) =>
-          Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
-        case _ => NotFound(notFoundView)
-      }
+    implicit authContext =>
+      implicit request =>
+        getData[ResponsiblePerson](index) map {
+          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(_, Some(timeAtAddress), _)), _, _)), _, _, _, _, _, _, _, _, _, _, _, _)) =>
+            Ok(time_at_address(Form2[TimeAtAddress](timeAtAddress), edit, index, flow, personName.titleName))
+          case Some(ResponsiblePerson(Some(personName), _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _, _)) =>
+            Ok(time_at_address(Form2(DefaultAddressHistory), edit, index, flow, personName.titleName))
+          case _ => NotFound(notFoundView)
+        }
   }
 
   def post(index: Int, edit: Boolean = false, flow: Option[String] = None) = Authorised.async {
-    implicit authContext => implicit request =>
-      (Form2[TimeAtAddress](request.body) match {
-        case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
+    implicit authContext =>
+      implicit request =>
+        (Form2[TimeAtAddress](request.body) match {
+          case f: InvalidForm => getData[ResponsiblePerson](index) map { rp =>
             BadRequest(time_at_address(f, edit, index, flow, ControllerHelper.rpTitleName(rp)))
           }
-        case ValidForm(_, data) => {
-          getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
-            (for {
-              rp <- responsiblePerson
-              addressHistory <- rp.addressHistory
-              currentAddress <- addressHistory.currentAddress
-            } yield {
-              val currentAddressWithTime = currentAddress.copy(
-                timeAtAddress = Some(data)
-              )
-              doUpdate(index, currentAddressWithTime).flatMap { _  =>
-                for {
-                  status <- statusService.getStatus
-                } yield {
-                  redirectTo(index,data,rp,status, edit, flow)
+          case ValidForm(_, data) => {
+            getData[ResponsiblePerson](index) flatMap { responsiblePerson =>
+              (for {
+                rp <- responsiblePerson
+                addressHistory <- rp.addressHistory
+                currentAddress <- addressHistory.currentAddress
+              } yield {
+                val currentAddressWithTime = currentAddress.copy(
+                  timeAtAddress = Some(data)
+                )
+                doUpdate(index, currentAddressWithTime).flatMap { _ =>
+                  for {
+                    status <- statusService.getStatus
+                  } yield {
+                    redirectTo(index, data, rp, status, edit, flow)
+                  }
                 }
-              }
-            }) getOrElse Future.successful(NotFound(notFoundView))
+              }) getOrElse Future.successful(NotFound(notFoundView))
+            }
           }
+        }).recoverWith {
+          case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
         }
-      }).recoverWith {
-        case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
-      }
   }
 
   private def doUpdate(index: Int, rp: ResponsiblePersonCurrentAddress)
@@ -98,20 +101,11 @@ trait TimeAtCurrentAddressController extends RepeatingSection with BaseControlle
                          rp: ResponsiblePerson,
                          status: SubmissionStatus,
                          edit: Boolean,
-                         flow: Option[String])(implicit request:Request[AnyContent]) = {
+                         flow: Option[String])(implicit request: Request[AnyContent]) = {
     timeAtAddress match {
       case ThreeYearsPlus | OneToThreeYears if !edit => Redirect(routes.PositionWithinBusinessController.get(index, edit, flow))
       case ThreeYearsPlus | OneToThreeYears if edit => Redirect(routes.DetailedAnswersController.get(index, flow))
       case _ => Redirect(routes.AdditionalAddressController.get(index, edit, flow))
     }
   }
-
-}
-
-object TimeAtCurrentAddressController extends TimeAtCurrentAddressController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  val statusService = StatusService
-
-  override def dataCacheConnector = DataCacheConnector
 }
