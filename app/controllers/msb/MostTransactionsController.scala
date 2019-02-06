@@ -22,15 +22,14 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbService, CurrencyExchange, ForeignExchange}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions}
 import play.api.mvc.Result
-import services.StatusService
 import services.businessmatching.ServiceFlow
+import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 
 import scala.concurrent.Future
 
@@ -38,7 +37,8 @@ import scala.concurrent.Future
 class MostTransactionsController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
-                                           implicit val serviceFlow: ServiceFlow
+                                           implicit val serviceFlow: ServiceFlow,
+                                           val autoCompleteService: AutoCompleteService
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -50,7 +50,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
               msb <- response
               transactions <- msb.mostTransactions
             } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(views.html.msb.most_transactions(form, edit))
+            Ok(views.html.msb.most_transactions(form, edit, autoCompleteService.getCountries))
         }
   }
 
@@ -59,7 +59,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector = AM
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.msb.most_transactions(f, edit)))
+            Future.successful(BadRequest(views.html.msb.most_transactions(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cacheConnector.fetchAll flatMap { maybeCache =>
               val result = for {
