@@ -33,5 +33,5 @@ POST        /letters-address                                       @controllers.
 
 GET         /what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
 
-GET         /check-your-answers                                    controllers.aboutthebusiness.SummaryController.get()
-POST        /check-your-answers                                    controllers.aboutthebusiness.SummaryController.post()
+GET         /check-your-answers                                    @controllers.aboutthebusiness.SummaryController.get()
+POST        /check-your-answers                                    @controllers.aboutthebusiness.SummaryController.post()
