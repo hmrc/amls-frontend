@@ -1,8 +1,8 @@
 GET         /contacting-you                                        @controllers.aboutthebusiness.ContactingYouController.get(edit: Boolean ?= false)
 POST        /contacting-you                                        @controllers.aboutthebusiness.ContactingYouController.post(edit: Boolean ?= false)
 
-GET         /contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
-POST        /contacting-you-phone                                  controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
+GET         /contacting-you-phone                                  @controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
+POST        /contacting-you-phone                                  @controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
 
 GET         /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
 POST        /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
