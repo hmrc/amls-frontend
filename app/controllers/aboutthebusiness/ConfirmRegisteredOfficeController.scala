@@ -17,7 +17,6 @@
 package controllers.aboutthebusiness
 
 import cats.data.OptionT
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -25,14 +24,17 @@ import models.aboutthebusiness.{AboutTheBusiness, ConfirmRegisteredOffice, Regis
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
 import views.html.aboutthebusiness._
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import cats.implicits._
+import com.google.inject.Inject
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait ConfirmRegisteredOfficeController extends BaseController {
+class ConfirmRegisteredOfficeController @Inject () (
+                                                   val dataCache: DataCacheConnector,
+                                                   val authConnector: AuthConnector
+                                                   ) extends BaseController {
 
-  def dataCache: DataCacheConnector
 
   def updateBMAddress(bm: BusinessMatching): Option[RegisteredOffice] = {
     bm.reviewDetails.fold[Option[RegisteredOffice]](None)(dtls => Some(RegisteredOfficeUK(
@@ -111,10 +113,4 @@ trait ConfirmRegisteredOfficeController extends BaseController {
             }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))
         }
   }
-}
-
-object ConfirmRegisteredOfficeController extends ConfirmRegisteredOfficeController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

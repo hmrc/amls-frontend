@@ -13,8 +13,8 @@ POST        /vat                                                   controllers.a
 GET         /corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
 POST        /corporation-tax                                       controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
 
-GET         /confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /confirming-address                                    controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /confirming-address                                    @controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /confirming-address                                    @controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
