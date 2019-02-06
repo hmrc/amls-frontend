@@ -45,12 +45,12 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new CorrespondenceAddressController {
-      override val dataConnector: DataCacheConnector = mock[DataCacheConnector]
 
-      override protected def authConnector: AuthConnector = self.authConnector
-      override val auditConnector = mock[AuditConnector]
-    }
+    val controller = new CorrespondenceAddressController (
+      dataConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      auditConnector = mock[AuditConnector]
+    )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
