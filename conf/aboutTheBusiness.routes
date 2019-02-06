@@ -16,8 +16,8 @@ POST        /corporation-tax                                       @controllers.
 GET         /confirming-address                                    @controllers.aboutthebusiness.ConfirmRegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /confirming-address                                    @controllers.aboutthebusiness.ConfirmRegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
-POST        /new-registered-office                                 controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
+GET         /new-registered-office                                 @controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
+POST        /new-registered-office                                 @controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 
 GET         /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
 POST        /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
