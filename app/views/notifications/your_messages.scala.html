@@ -20,6 +20,7 @@
 @(businessName: String, currentApplicationNotifications: Seq[NotificationRow], previousApplicationNotifications: Seq[NotificationRow] = Seq())(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("notifications.header", "summary.status")
 }
 
@@ -55,8 +56,6 @@
     title = Messages("notifications.header"),
     heading = header
 ) {
-
-    <a id="back-button" href="@controllers.routes.StatusController.get().url" id="back-link" class="back-link">@Messages("button.back")</a>
 
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
