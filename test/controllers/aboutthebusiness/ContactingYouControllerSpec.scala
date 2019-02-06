@@ -44,10 +44,10 @@ class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ContactingYouController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new ContactingYouController (
+      dataCache = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
