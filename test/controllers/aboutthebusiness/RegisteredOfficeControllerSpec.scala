@@ -34,14 +34,14 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import utils.{AmlsSpec, AuthorisedFixture}
+import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
     val controller = new RegisteredOfficeController () {
@@ -49,6 +49,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
       override val authConnector = self.authConnector
       override val statusService = mock[StatusService]
       override val auditConnector = mock[AuditConnector]
+      override val autoCompleteService = mockAutoComplete
     }
 
     when {

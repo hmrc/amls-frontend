@@ -16,31 +16,32 @@
 
 package controllers.aboutthebusiness
 
+import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data.OptionT
+import cats.implicits._
 import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
-import play.api.mvc.{Request, Result}
-import services.StatusService
+import play.api.Play
+import play.api.mvc.Request
+import services.{AutoCompleteService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
-import audit.AddressConversions._
-import cats.data.OptionT
-import cats.implicits._
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
-import scala.concurrent.{Future, Promise}
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.Future
 
 trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
 
   val dataCacheConnector: DataCacheConnector
   val statusService: StatusService
   val auditConnector: AuditConnector
+  val autoCompleteService: AutoCompleteService
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
 
@@ -53,7 +54,7 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
               aboutTheBusiness <- response
               registeredOffice <- aboutTheBusiness.registeredOffice
             } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
-            Ok(registered_office(form, edit))
+            Ok(registered_office(form, edit, autoCompleteService.getCountries))
 
         }
   }
@@ -62,7 +63,7 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
     implicit authContext => implicit request =>
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(registered_office(f, edit)))
+            Future.successful(BadRequest(registered_office(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
 
             val doUpdate = for {
@@ -101,4 +102,5 @@ object RegisteredOfficeController extends RegisteredOfficeController {
   override val authConnector = AMLSAuthConnector
   override val statusService = StatusService
   override lazy val auditConnector = AMLSAuditConnector
+  override val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
 }
