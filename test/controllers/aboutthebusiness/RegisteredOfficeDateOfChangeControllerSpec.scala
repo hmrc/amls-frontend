@@ -36,11 +36,11 @@ class RegisteredOfficeDateOfChangeControllerSpec extends AmlsSpec with  MockitoS
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredOfficeDateOfChangeController () {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val controller = new RegisteredOfficeDateOfChangeController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)

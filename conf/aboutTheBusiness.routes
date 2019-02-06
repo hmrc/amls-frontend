@@ -19,8 +19,8 @@ POST        /confirming-address                                    @controllers.
 GET         /new-registered-office                                 @controllers.aboutthebusiness.RegisteredOfficeController.get(edit: Boolean ?= false)
 POST        /new-registered-office                                 @controllers.aboutthebusiness.RegisteredOfficeController.post(edit: Boolean ?= false)
 
-GET         /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
-POST        /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
+GET         /new-registered-office/date-change                     @controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
+POST        /new-registered-office/date-change                     @controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
 
 GET         /address-for-letters                                   @controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
 POST        /address-for-letters                                   @controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
