@@ -22,8 +22,8 @@ POST        /new-registered-office                                 controllers.a
 GET         /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.get()
 POST        /new-registered-office/date-change                     controllers.aboutthebusiness.RegisteredOfficeDateOfChangeController.post()
 
-GET         /address-for-letters                                   controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
-POST        /address-for-letters                                   controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
+GET         /address-for-letters                                   @controllers.aboutthebusiness.CorrespondenceAddressController.get(edit: Boolean ?= false)
+POST        /address-for-letters                                   @controllers.aboutthebusiness.CorrespondenceAddressController.post(edit: Boolean ?= false)
 
 GET         /activities                                            @controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
 POST        /activities                                            @controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)

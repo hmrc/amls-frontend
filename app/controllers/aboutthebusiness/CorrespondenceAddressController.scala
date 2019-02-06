@@ -17,27 +17,29 @@
 package controllers.aboutthebusiness
 
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, RegisteredOffice, UKCorrespondenceAddress}
+import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 import audit.AddressConversions._
 import cats.data.OptionT
 import cats.implicits._
+import com.google.inject.Inject
 import play.api.mvc.Request
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
-trait CorrespondenceAddressController extends BaseController {
+class CorrespondenceAddressController @Inject () (
+                                                 val dataConnector: DataCacheConnector,
+                                                 val authConnector: AuthConnector,
+                                                 val auditConnector: AuditConnector
+                                                 ) extends BaseController {
 
-  protected def dataConnector: DataCacheConnector
-  protected[controllers] val auditConnector: AuditConnector
 
   private val initialiseWithUK = UKCorrespondenceAddress("","", "", "", None, None, "")
 
@@ -81,11 +83,4 @@ trait CorrespondenceAddressController extends BaseController {
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
-}
-
-object CorrespondenceAddressController extends CorrespondenceAddressController {
-  // $COVERAGE-OFF$
-  override protected val dataConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override protected[controllers] lazy val auditConnector = AMLSAuditConnector
 }
