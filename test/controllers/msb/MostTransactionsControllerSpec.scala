@@ -41,7 +41,8 @@ class MostTransactionsControllerSpec extends AmlsSpec with MockitoSugar {
       self.authConnector,
       mockCacheConnector,
       mockStatusService,
-      mockServiceFlow
+      mockServiceFlow,
+      mockAutoComplete
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)

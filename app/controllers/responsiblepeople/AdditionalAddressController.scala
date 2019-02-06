@@ -20,31 +20,31 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, ThreeYearsPlus}
 import models.responsiblepeople._
-import play.api.Play
 import play.api.mvc.{AnyContent, Request}
 import services.AutoCompleteService
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.{Failure, Success}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{ControllerHelper, RepeatingSection}
 import views.html.responsiblepeople.additional_address
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait AdditionalAddressController extends RepeatingSection with BaseController {
-
-  def dataCacheConnector: DataCacheConnector
-
-  val auditConnector: AuditConnector
-
-  val autoCompleteService: AutoCompleteService
+@Singleton
+class AdditionalAddressController @Inject() (
+                                              override val dataCacheConnector: DataCacheConnector,
+                                              override val authConnector: AuthConnector,
+                                              auditConnector: AuditConnector,
+                                              val autoCompleteService: AutoCompleteService
+                                            ) extends RepeatingSection with BaseController {
 
   final val DefaultAddressHistory = ResponsiblePersonAddress(PersonAddressUK("", "", None, None, ""), None)
 
@@ -126,12 +126,4 @@ trait AdditionalAddressController extends RepeatingSection with BaseController {
       auditConnector.sendEvent(AddressCreatedEvent(newAddress))
     }
   }
-}
-
-object AdditionalAddressController extends AdditionalAddressController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override lazy val auditConnector = AMLSAuditConnector
-  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
 }

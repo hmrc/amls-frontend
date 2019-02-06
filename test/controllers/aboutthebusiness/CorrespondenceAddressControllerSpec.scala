@@ -19,6 +19,7 @@ package controllers.aboutthebusiness
 import connectors.DataCacheConnector
 import models.Country
 import models.aboutthebusiness.{AboutTheBusiness, NonUKCorrespondenceAddress, UKCorrespondenceAddress}
+import models.autocomplete.NameValuePair
 import org.jsoup.Jsoup
 import org.jsoup.nodes.{Document, Element}
 import org.jsoup.select.Elements
@@ -27,18 +28,17 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
-
-import scala.collection.JavaConversions._
+import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.collection.JavaConversions._
 import scala.concurrent.Future
 
 class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
@@ -47,10 +47,18 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
     self => val request = addToken(authRequest)
     val controller = new CorrespondenceAddressController {
       override val dataConnector: DataCacheConnector = mock[DataCacheConnector]
-
+      override val autoCompleteService = mock[AutoCompleteService]
       override protected def authConnector: AuthConnector = self.authConnector
       override val auditConnector = mock[AuditConnector]
+
     }
+
+    when {
+      controller.autoCompleteService.getCountries
+    } thenReturn Some(Seq(
+      NameValuePair("United Kingdom", "UK"),
+      NameValuePair("Albania", "AL")
+    ))
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -73,6 +81,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
         status(result) must be(OK)
 
         val page = Jsoup.parse(contentAsString(result))
+
         page.getElementById("yourName").`val` must be("Name Test")
         page.getElementById("businessName").`val` must be("Test")
         page.getElementById("isUK-true").hasAttr("checked") must be(false)
@@ -83,7 +92,6 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
         page.getElementById("addressLineNonUK4").`val` must be("")
         page.getElementById("postCode").`val` must be("")
         page.select("#country option[selected]").attr("value") must be("AL")
-
       }
 
       "no data exists in the keystore" in new Fixture {

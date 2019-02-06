@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import connectors.DataCacheConnector
 import models.Country
-import models.businessactivities.{NonUkAccountantsAddress, UkAccountantsAddress, WhoIsYourAccountant, BusinessActivities}
+import models.businessactivities.{BusinessActivities, NonUkAccountantsAddress, WhoIsYourAccountant}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
@@ -26,8 +26,9 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
+import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.concurrent.Future
 
@@ -36,13 +37,14 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
   with ScalaFutures
   with PrivateMethodTester {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks{
     self =>
     val request = addToken(authRequest)
 
     val controller = new WhoIsYourAccountantController {
       override val dataCacheConnector = mock[DataCacheConnector]
       override val authConnector = self.authConnector
+      override val autoCompleteService: AutoCompleteService = mockAutoComplete
     }
   }
 
