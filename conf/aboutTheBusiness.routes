@@ -4,8 +4,8 @@ POST        /contacting-you                                        @controllers.
 GET         /contacting-you-phone                                  @controllers.aboutthebusiness.ContactingYouPhoneController.get(edit: Boolean ?= false)
 POST        /contacting-you-phone                                  @controllers.aboutthebusiness.ContactingYouPhoneController.post(edit: Boolean ?= false)
 
-GET         /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
-POST        /previously-registered                                 controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
+GET         /previously-registered                                 @controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
+POST        /previously-registered                                 @controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
 GET         /vat                                                   controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
 POST        /vat                                                   controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
@@ -28,8 +28,8 @@ POST        /address-for-letters                                   @controllers.
 GET         /activities                                            @controllers.aboutthebusiness.ActivityStartDateController.get(edit: Boolean ?= false)
 POST        /activities                                            @controllers.aboutthebusiness.ActivityStartDateController.post(edit: Boolean ?= false)
 
-GET         /letters-address                                       controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
-POST        /letters-address                                       controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
+GET         /letters-address                                       @controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
+POST        /letters-address                                       @controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
 
 GET         /what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
 
