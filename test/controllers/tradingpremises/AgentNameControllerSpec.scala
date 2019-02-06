@@ -259,7 +259,7 @@ class AgentNameControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutur
           val result = controller.saveDateOfChange(1)(postRequest)
 
           status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(routes.YourTradingPremisesController.get().url))
+          redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
           val captor = ArgumentCaptor.forClass(classOf[Seq[TradingPremises]])
           verify(controller.dataCacheConnector).save[Seq[TradingPremises]](meq(TradingPremises.key), captor.capture())(any(), any(), any())
