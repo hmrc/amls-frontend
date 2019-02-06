@@ -53,6 +53,15 @@ class add_personSpec extends AmlsSpec with MustMatchers  {
       subHeading.html must include(Messages("string2"))
     }
 
+    "have a back link" in new ViewFixture {
+
+      val form2: ValidForm[AddPerson] = Form2(AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))))
+
+      def view = views.html.declaration.add_person("string1", "string2", Some(BusinessType.LPrLLP), form2)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "pre-populate the fields correctly" in new ViewFixture {
 
       val role = RoleWithinBusinessRelease7(Set(

@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.PercentageOfCashPaymentOver15000
 import models.renewal.PercentageOfCashPaymentOver15000.{Second, Third}
@@ -36,19 +36,19 @@ class percentageSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Second)
 
-      def view = views.html.hvd.percentage(form2, true)
+      def view = views.html.renewal.percentage(form2, true)
 
-      doc.title must startWith(Messages("hvd.percentage.title") + " - " + Messages("summary.hvd"))
+      doc.title must startWith(Messages("renewal.hvd.percentage.title") + " - " + Messages("summary.renewal"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[PercentageOfCashPaymentOver15000] = Form2(Third)
 
-      def view = views.html.hvd.percentage(form2, true)
+      def view = views.html.renewal.percentage(form2, true)
 
-      heading.html must be(Messages("hvd.percentage.title"))
-      subHeading.html must include(Messages("summary.hvd"))
+      heading.html must be(Messages("renewal.hvd.percentage.title"))
+      subHeading.html must include(Messages("summary.renewal"))
 
     }
 
@@ -59,12 +59,19 @@ class percentageSpec extends AmlsSpec with MustMatchers  {
           (Path \ "percentage") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.hvd.percentage(form2, true)
+      def view = views.html.renewal.percentage(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
       doc.getElementById("percentage")
         .getElementsByClass("error-notification").first().html() must include("not a message Key")
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.percentage(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

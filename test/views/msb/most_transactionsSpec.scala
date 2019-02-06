@@ -19,7 +19,7 @@ package views.msb
 import forms.{Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.Country
-import models.moneyservicebusiness.{BranchesOrAgents, MostTransactions}
+import models.moneyservicebusiness.MostTransactions
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
 import utils.AmlsSpec
@@ -33,6 +33,13 @@ class most_transactionsSpec extends AmlsSpec with MustMatchers {
   }
 
   "most_transactions view" must {
+
+    "have the back link button" in new ViewFixture {
+      val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))
+      def view = views.html.msb.most_transactions(form2, true)
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "have correct title" in new ViewFixture {
 
       val form2: ValidForm[MostTransactions] = Form2(MostTransactions(Seq.empty[Country]))

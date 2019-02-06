@@ -16,7 +16,7 @@
 
 package views.renewal
 
-import forms.{Form2, InvalidForm, ValidForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import jto.validation.{Path, ValidationError}
 import models.renewal.SendMoneyToOtherCountry
 import org.scalatest.MustMatchers
@@ -79,5 +79,11 @@ class send_money_to_other_countrySpec extends AmlsSpec with MustMatchers {
       doc.getElementsByClass("return-link").first().html() must include(controllers.renewal.routes.RenewalProgressController.get.url)
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.renewal.send_money_to_other_country(EmptyForm, true)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

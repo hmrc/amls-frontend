@@ -62,7 +62,7 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
                 tp.copy(yourTradingPremises = ytp)
               }
             } yield edit match {
-              case true => Redirect(routes.SummaryController.getIndividual(index))
+              case true => Redirect(routes.DetailedAnswersController.get(index))
               case false => Redirect(routes.IsResidentialController.get(index, edit))
             }
         }

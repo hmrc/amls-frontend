@@ -51,6 +51,15 @@ class bank_account_typeSpec extends AmlsSpec with MustMatchers  {
 
       heading.html() must be(Messages("bankdetails.accounttype.title"))
     }
+
+    "have a back link" in new ViewFixture {
+
+      val form2: ValidForm[Account] = Form2(NonUKAccountNumber(""))
+
+      override def view: HtmlFormat.Appendable = views.html.bankdetails.bank_account_types(form2, false, 0)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 
   "show errors in correct places when validation fails" in new ViewFixture {

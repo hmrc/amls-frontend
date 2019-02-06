@@ -41,12 +41,11 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val timeAtAddressController = new TimeAtCurrentAddressController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-
-    }
+    val timeAtAddressController = new TimeAtCurrentAddressController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+      )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -533,13 +532,6 @@ class TimeAtCurrentAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
       }
 
-    }
-  }
-
-  it must {
-    "use the correct services" in new Fixture {
-      TimeAtCurrentAddressController.dataCacheConnector must be(DataCacheConnector)
-      TimeAtCurrentAddressController.authConnector must be(AMLSAuthConnector)
     }
   }
 }

@@ -17,22 +17,22 @@
 package controllers.tradingpremises
 
 import connectors.DataCacheConnector
-import models.{TradingPremisesSection}
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, TransmittingMoney, CurrencyExchange}
-import models.tradingpremises.{TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney, TradingPremises,
-CurrencyExchange => TPCurrencyExchange, ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremisesMsbService}
+import models.TradingPremisesSection
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, TransmittingMoney}
+import models.tradingpremises.{ChequeCashingNotScrapMetal, ChequeCashingScrapMetal, TradingPremises, TradingPremisesMsbService, CurrencyExchange => TPCurrencyExchange, TradingPremisesMsbServices => TPMsbServices, TransmittingMoney => TPTransmittingMoney}
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
 import org.jsoup.Jsoup
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
@@ -44,15 +44,11 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     val cache: DataCacheConnector = mock[DataCacheConnector]
 
-    val controller = new MSBServicesController {
-      override val dataCacheConnector: DataCacheConnector = self.cache
-
-      override protected def authConnector: AuthConnector = self.authConnector
-
-      override val statusService = mock[StatusService]
-
-
-    }
+    val controller = new MSBServicesController (
+      dataCacheConnector = cache,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
     val mockCacheMap = mock[CacheMap]
     val emptyCache = CacheMap("", Map.empty)
     val model = TradingPremises()
@@ -162,7 +158,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     }
 
-    "redirect to PremisesRegisteredController" when {
+    "redirect to DetailedAnswersController" when {
 
       "on valid submission" in new Fixture {
 
@@ -181,7 +177,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = false)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.PremisesRegisteredController.get(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
     }
@@ -218,7 +214,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
       "adding 'CurrencyExchange' as a service during edit" in new Fixture {
@@ -250,7 +246,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
 
     }
@@ -282,7 +278,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
             val result = controller.post(1, edit = true)(newRequest)
 
             status(result) mustBe SEE_OTHER
-            redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+            redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
         }
       }
 
@@ -354,7 +350,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
 
     }
 
-    "redirect to the SummaryController" when {
+    "redirect to the CheckYourAnswersController" when {
       "editing, and the services have changed for a record that hasn't been submitted yet" in new Fixture {
 
         val tpNone = TradingPremises(
@@ -380,7 +376,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
         val result = controller.post(1, edit = true)(newRequest)
 
         status(result) mustBe SEE_OTHER
-        redirectLocation(result) mustBe Some(routes.SummaryController.getIndividual(1).url)
+        redirectLocation(result) mustBe Some(routes.DetailedAnswersController.get(1).url)
       }
     }
 
@@ -401,7 +397,7 @@ class MSBServicesControllerSpec extends AmlsSpec with ScalaFutures with MockitoS
       val result = controller.post(1)(newRequest)
 
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.PremisesRegisteredController.get(1).url))
+      redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(1).url))
 
       verify(controller.dataCacheConnector).save[Seq[TradingPremises]](
         any(),

@@ -46,6 +46,10 @@ class fit_and_properSpec extends AmlsSpec with MustMatchers {
       subHeading.html must include(Messages("summary.updateservice"))
     }
 
+    "have the back link button" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "not show the return link" in new ViewFixture {
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

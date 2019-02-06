@@ -94,5 +94,10 @@ class total_throughputSpec extends AmlsSpec with MustMatchers {
       Option(validationMsg) mustBe defined
       validationMsg.text must include(requiredMsg)
     }
+
+    "have a back link" in new ViewFixture {
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
   }
 }

@@ -52,6 +52,10 @@ class which_trading_premisesSpec extends AmlsSpec with TradingPremisesGenerator 
       subHeading.html must include(Messages("summary.updateservice"))
     }
 
+    "have the back link button" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "not show the return link" in new ViewFixture {
       doc.body().text() must not include Messages("link.return.registration.progress")
     }

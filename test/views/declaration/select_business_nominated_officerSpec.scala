@@ -45,6 +45,7 @@ class select_business_nominated_officerSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("declaration.who.is.business.nominated.officer"))
       subHeading.html must include("subheading")
       doc.text() must include(Messages("declaration.who.is.business.nominated.officer.text"))
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
     "have a list of responsible people" in new ViewFixture {

@@ -34,7 +34,7 @@ class msb_servicesSpec extends AmlsSpec with MustMatchers {
   }
 
   "msb_services view" must {
-    "have correct title, heading and load UI with empty form" in new ViewFixture {
+    "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
@@ -50,6 +50,7 @@ class msb_servicesSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.msb.services.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       doc.select("input[type=checkbox]").size mustBe 1
     }
 

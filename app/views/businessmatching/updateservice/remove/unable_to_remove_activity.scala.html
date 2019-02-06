@@ -20,6 +20,7 @@
 @(activity: String)(implicit request: Request[_],messages:Messages)
 
 @header = {
+  @components.back_link()
   @heading(Messages("businessmatching.updateservice.removeactivitiesinformation.heading", activity), "summary.updateservice")
 }
 
@@ -28,7 +29,7 @@
   heading = header
 )  {
 
-  <p>@Messages("businessmatching.updateservice.removeactivitiesinformation.info.1")</p>
+  <p>@Messages("businessmatching.updateservice.removeactivitiesinformation.info.3")</p>
   <p>@Messages("businessmatching.updateservice.removeactivitiesinformation.info.2")</p>
 
   @anchor(

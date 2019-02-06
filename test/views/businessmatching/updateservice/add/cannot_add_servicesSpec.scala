@@ -44,6 +44,10 @@ class cannot_add_servicesSpec extends AmlsSpec {
       subHeading.html must include(Messages("summary.updateservice"))
     }
 
+    "have the back link button" in new ViewFixture {
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "show the correct content" in new ViewFixture {
       doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.1"))
       doc.body().text() must include(Messages("businessmatching.updateservice.nopsr.cannotcontinuewiththeapplication.requiredinfo.2"))

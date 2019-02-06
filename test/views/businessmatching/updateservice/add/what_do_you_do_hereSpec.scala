@@ -59,7 +59,7 @@ class what_do_you_do_hereSpec extends AmlsSpec {
 
       doc.title must startWith(Messages("businessmatching.updateservice.whatdoyoudohere.title") + " - " + Messages("summary.updateservice"))
       heading.html must be(Messages("businessmatching.updateservice.whatdoyoudohere.heading"))
-
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
       subHeading.html must include(Messages("summary.updateservice"))
 
     }

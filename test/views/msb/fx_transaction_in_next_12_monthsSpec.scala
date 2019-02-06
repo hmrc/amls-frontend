@@ -32,6 +32,13 @@ class fx_transaction_in_next_12_monthsSpec extends AmlsSpec with MustMatchers {
     }
 
     "fx_transaction_in_next_12_months view" must {
+
+        "have the back link button" in new ViewFixture {
+            val form2: ValidForm[FXTransactionsInNext12Months] = Form2(FXTransactionsInNext12Months("1"))
+            def view = views.html.msb.fx_transaction_in_next_12_months(form2, true)
+             doc.getElementsByAttributeValue("class", "link-back") must not be empty
+        }
+
         "have correct title" in new ViewFixture {
 
             val form2: ValidForm[FXTransactionsInNext12Months] = Form2(FXTransactionsInNext12Months("1"))

@@ -60,6 +60,13 @@ class no_longer_minded_to_rejectSpec extends AmlsSpec with MustMatchers {
       doc.html must include("reference")
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.no_longer_minded_to_reject(notificationParams)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
   }
 
 }

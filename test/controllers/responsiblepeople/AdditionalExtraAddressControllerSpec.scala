@@ -16,24 +16,20 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
+
 import connectors.DataCacheConnector
-import models.Country
 import models.autocomplete.NameValuePair
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-import org.jsoup.select.Elements
+
 import org.mockito.ArgumentCaptor
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 
-import scala.collection.JavaConversions._
 import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -53,19 +49,23 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
     self =>
     val request = addToken(authRequest)
 
-    val additionalExtraAddressController = new AdditionalExtraAddressController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val auditConnector = mock[AuditConnector]
-      override val authConnector = self.authConnector
-      override val autoCompleteService = mock[AutoCompleteService]
-    }
+
+    val auditConnector = mock[AuditConnector]
+    val autoCompleteService = mock[AutoCompleteService]
+
+    val additionalExtraAddressController = new AdditionalExtraAddressController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector,
+      auditConnector = auditConnector,
+      autoCompleteService = autoCompleteService
+    )
 
     when {
-      additionalExtraAddressController.auditConnector.sendEvent(any())(any(), any())
+      auditConnector.sendEvent(any())(any(), any())
     } thenReturn Future.successful(Success)
 
     when {
-      additionalExtraAddressController.autoCompleteService.getCountries
+      autoCompleteService.getCountries
     } thenReturn Some(Seq(
       NameValuePair("Country 1", "country:1"),
       NameValuePair("Country 2", "country:2")
@@ -181,7 +181,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.TimeAtAdditionalExtraAddressController.get(RecordId).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-          verify(additionalExtraAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+          verify(auditConnector).sendEvent(captor.capture())(any(), any())
 
           captor.getValue match {
             case d: DataEvent =>
@@ -239,7 +239,7 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
 
           val captor = ArgumentCaptor.forClass(classOf[DataEvent])
-          verify(additionalExtraAddressController.auditConnector).sendEvent(captor.capture())(any(), any())
+          verify(auditConnector).sendEvent(captor.capture())(any(), any())
 
           captor.getValue match {
             case d: DataEvent =>
@@ -297,14 +297,6 @@ class AdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSugar {
         val result = additionalExtraAddressController.post(0)(requestWithParams)
         status(result) must be(NOT_FOUND)
       }
-    }
-
-  }
-
-  it must {
-    "use the correct services" in new Fixture {
-      AdditionalExtraAddressController.dataCacheConnector must be(DataCacheConnector)
-      AdditionalExtraAddressController.authConnector must be(AMLSAuthConnector)
     }
   }
 }

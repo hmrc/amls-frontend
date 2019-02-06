@@ -36,7 +36,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct title" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
 
       doc.title must be("Refusal being considered" +
         " - " + "Your registration" +
@@ -46,7 +46,7 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct headings" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
 
       heading.html must be("Refusal being considered")
       subHeading.html must include("Your registration")
@@ -55,9 +55,16 @@ class minded_to_rejectSpec extends AmlsSpec with MustMatchers {
 
     "have correct content, businessName and reference displayed" in new ViewFixture {
 
-      def view = views.html.notifications.v1m0.minded_to_reject(notificationParams)
+      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
 
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("reference"))
+    }
+
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.notifications.v2m0.minded_to_reject(notificationParams)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
   }
 }

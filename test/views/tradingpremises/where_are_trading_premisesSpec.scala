@@ -32,7 +32,7 @@ class where_are_trading_premisesSpec extends AmlsSpec with MustMatchers {
 
   "where_are_trading_premises view" must {
 
-      "have correct title, heading and load UI with empty form" in new ViewFixture {
+      "have correct title, heading, back link and load UI with empty form" in new ViewFixture {
 
       val form2 = EmptyForm
 
@@ -46,6 +46,7 @@ class where_are_trading_premisesSpec extends AmlsSpec with MustMatchers {
       heading.html must be(Messages("tradingpremises.yourtradingpremises.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
+        doc.getElementsByAttributeValue("class", "link-back") must not be empty
         doc.getElementById("addressLine1").tagName() must be("input")
         doc.getElementById("addressLine2").tagName() must be("input")
         doc.getElementById("addressLine3").tagName() must be("input")

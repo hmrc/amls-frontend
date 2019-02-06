@@ -16,23 +16,16 @@
 
 package controllers.responsiblepeople
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.Country
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.TimeAtAddress.{SixToElevenMonths, ZeroToFiveMonths}
+import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
-import models.status.SubmissionReadyForReview
 import org.jsoup.Jsoup
-import org.jsoup.nodes.{Document, Element}
-
-import scala.collection.JavaConversions._
-import org.jsoup.select.Elements
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
-import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AuthorisedFixture
@@ -47,10 +40,10 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val timeAtAdditionalAddressController = new TimeAtAdditionalAddressController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val timeAtAdditionalAddressController = new TimeAtAdditionalAddressController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -316,13 +309,6 @@ class TimeAtAdditionalAddressControllerSpec extends AmlsSpec with MockitoSugar {
           }
         }
       }
-    }
-  }
-
-  it must {
-    "use the correct services" in new Fixture {
-      TimeAtAdditionalAddressController.dataCacheConnector must be(DataCacheConnector)
-      TimeAtAdditionalAddressController.authConnector must be(AMLSAuthConnector)
     }
   }
 }

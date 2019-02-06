@@ -16,7 +16,7 @@
 
 package controllers.tradingpremises
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, _}
@@ -30,10 +30,11 @@ import utils.{DateOfChangeHelper, RepeatingSection}
 
 import scala.concurrent.Future
 
-trait MSBServicesController extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+class MSBServicesController @Inject () (
+                                       val dataCacheConnector: DataCacheConnector,
+                                       val authConnector: AuthConnector,
+                                       val statusService: StatusService
+                                       ) extends RepeatingSection with BaseController with DateOfChangeHelper with FormHelpers {
 
   def get(index: Int, edit: Boolean = false, changed: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -56,7 +57,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
                   updateDataStrict[TradingPremises](index) { utp =>
                     Some(utp.msbServices(Some(TradingPremisesMsbServices(msbServices))))
                   }
-                  Redirect(routes.PremisesRegisteredController.get(index))
+                  Redirect(routes.DetailedAnswersController.get(index))
                 } else {
                   (for {
                     tps <- tp.msbServices
@@ -82,10 +83,7 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
       && edit && tradingPremises.lineId.isDefined) {
       Redirect(routes.WhatDoesYourBusinessDoController.dateOfChange(index))
     } else {
-      edit match {
-        case true => Redirect(routes.SummaryController.getIndividual(index))
-        case false => Redirect(routes.PremisesRegisteredController.get(index))
-      }
+      Redirect(routes.DetailedAnswersController.get(index))
     }
   }
 
@@ -118,11 +116,4 @@ trait MSBServicesController extends RepeatingSection with BaseController with Da
 
   private def redirectToDateOfChange(tradingPremises: Option[TradingPremises], msbServices: TradingPremisesMsbServices, force: Boolean = false, status: SubmissionStatus) =
     !tradingPremises.get.msbServices.contains(msbServices) && isEligibleForDateOfChange(status) || force
-}
-
-object MSBServicesController extends MSBServicesController {
-  // $COVERAGE-OFF$
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override val statusService = StatusService
 }

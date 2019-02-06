@@ -60,6 +60,13 @@ class minded_to_revokeSpec extends AmlsSpec with MustMatchers {
       doc.html must (include("msgContent") and include("Fake Name Ltd.") and include("amlsRegNo"))
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.notifications.v1m0.minded_to_revoke(notificationParams)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
   }
 
 

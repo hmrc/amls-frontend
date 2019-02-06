@@ -29,13 +29,15 @@ class agent_nameSpec extends AmlsSpec with MustMatchers {
     implicit val requestWithToken = addToken(request)
   }
 
-  "have correct title and heading" in new ViewFixture {
+  "have correct title, heading and back link" in new ViewFixture {
 
     def view: _root_.play.twirl.api.HtmlFormat.Appendable =
       views.html.tradingpremises.agent_name(EmptyForm, 0, false)
 
     doc.title() must startWith(Messages("tradingpremises.agentname.title") + " - " + Messages("summary.tradingpremises"))
     heading.html() must be(Messages("tradingpremises.agentname.title"))
+
+    doc.getElementsByAttributeValue("class", "link-back") must not be empty
 
   }
 

@@ -97,6 +97,10 @@ class your_messagesSpec extends AmlsSpec with MustMatchers  {
             heading.html must be(Messages("notifications.header"))
         }
 
+        "have a back link" in new ViewFixture {
+            doc.getElementsByAttributeValue("class", "link-back") must not be empty
+        }
+
         "have a panel displaying the business name" in new ViewFixture {
             doc.getElementById("business-name").text mustEqual businessName
         }
