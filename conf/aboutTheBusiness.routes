@@ -7,8 +7,8 @@ POST        /contacting-you-phone                                  @controllers.
 GET         /previously-registered                                 @controllers.aboutthebusiness.PreviouslyRegisteredController.get(edit: Boolean ?= false)
 POST        /previously-registered                                 @controllers.aboutthebusiness.PreviouslyRegisteredController.post(edit: Boolean ?= false)
 
-GET         /vat                                                   controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
-POST        /vat                                                   controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
+GET         /vat                                                   @controllers.aboutthebusiness.VATRegisteredController.get(edit: Boolean ?= false)
+POST        /vat                                                   @controllers.aboutthebusiness.VATRegisteredController.post(edit: Boolean ?= false)
 
 GET         /corporation-tax                                       @controllers.aboutthebusiness.CorporationTaxRegisteredController.get(edit: Boolean ?= false)
 POST        /corporation-tax                                       @controllers.aboutthebusiness.CorporationTaxRegisteredController.post(edit: Boolean ?= false)
@@ -31,7 +31,7 @@ POST        /activities                                            @controllers.
 GET         /letters-address                                       @controllers.aboutthebusiness.LettersAddressController.get(edit: Boolean ?= false)
 POST        /letters-address                                       @controllers.aboutthebusiness.LettersAddressController.post(edit: Boolean ?= false)
 
-GET         /what-you-need                                         controllers.aboutthebusiness.WhatYouNeedController.get()
+GET         /what-you-need                                         @controllers.aboutthebusiness.WhatYouNeedController.get()
 
 GET         /check-your-answers                                    @controllers.aboutthebusiness.SummaryController.get()
 POST        /check-your-answers                                    @controllers.aboutthebusiness.SummaryController.post()

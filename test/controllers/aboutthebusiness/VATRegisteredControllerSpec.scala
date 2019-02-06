@@ -41,10 +41,10 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    val controller = new VATRegisteredController {
-      override val dataCacheConnector = mockCacheConnector
-      override val authConnector = self.authConnector
-    }
+    val controller = new VATRegisteredController (
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector
+    )
   }
 
   "BusinessRegisteredForVATController" when {
