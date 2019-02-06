@@ -16,36 +16,25 @@
 
 package services
 
-import connectors.{AmlsConnector, DataCacheConnector, PayApiConnector}
-import controllers.FeeGuidanceController
-import models.ReadStatusResponse
+import connectors.DataCacheConnector
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
-import models.registrationprogress.{Completed, NotStarted, Section}
 import models.responsiblepeople.{PersonName, _}
 import models.status._
-import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
+import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject._
-import play.api.{Application, Mode}
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.mvc.Call
-import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits._
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
+  trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> true)
@@ -53,6 +42,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
       .overrides(bind[StatusService].to(mockStatusService))
+      .overrides(bind[AutoCompleteService].to(mockAutoComplete))
 
     val builder = defaultBuilder
     lazy val app = builder.build()
