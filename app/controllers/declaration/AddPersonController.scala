@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -27,14 +27,17 @@ import models.status._
 import play.api.mvc.{AnyContent, Request, Result}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-trait AddPersonController extends BaseController {
+class AddPersonController @Inject () (
+                                       val dataCacheConnector: DataCacheConnector,
+                                       val statusService: StatusService,
+                                       val authConnector: AuthConnector
+                                     ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
 
   def get() = Authorised.async {
     implicit authContext => implicit request => {
@@ -92,11 +95,4 @@ trait AddPersonController extends BaseController {
         }
       }
     }
-}
-
-object AddPersonController extends AddPersonController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
 }
