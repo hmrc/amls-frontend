@@ -20,28 +20,29 @@ import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
 import cats.data.OptionT
 import cats.implicits._
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
-import play.api.Play
 import play.api.mvc.Request
 import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
-  val auditConnector: AuditConnector
-  val autoCompleteService: AutoCompleteService
+class RegisteredOfficeController @Inject () (
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val statusService: StatusService,
+                                            val auditConnector: AuditConnector,
+                                            val authConnector: AuthConnector,
+                                            val autoCompleteService: AutoCompleteService
+                                            ) extends BaseController with DateOfChangeHelper {
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
 
@@ -94,13 +95,4 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
-}
-
-object RegisteredOfficeController extends RegisteredOfficeController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
-  override lazy val auditConnector = AMLSAuditConnector
-  override val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
 }

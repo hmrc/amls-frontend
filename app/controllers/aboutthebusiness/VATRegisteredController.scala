@@ -17,21 +17,25 @@
 package controllers.aboutthebusiness
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness._
-import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership}
+import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait VATRegisteredController extends BaseController {
+class VATRegisteredController @Inject () (
+                                         val dataCacheConnector: DataCacheConnector,
+                                         val authConnector: AuthConnector
+                                         ) extends BaseController {
 
-  val dataCacheConnector: DataCacheConnector
+
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -75,10 +79,4 @@ trait VATRegisteredController extends BaseController {
     cache <- maybeCache
     businessType <- ControllerHelper.getBusinessType(cache.getEntry[BusinessMatching](BusinessMatching.key))
   } yield businessType
-}
-
-object VATRegisteredController extends VATRegisteredController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

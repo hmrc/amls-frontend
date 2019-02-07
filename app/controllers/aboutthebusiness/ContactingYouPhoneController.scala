@@ -16,20 +16,20 @@
 
 package controllers.aboutthebusiness
 
-import java.lang.ProcessBuilder.Redirect
-
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness._
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait ContactingYouPhoneController extends BaseController {
-
-  val dataCache: DataCacheConnector
+class ContactingYouPhoneController @Inject () (
+                                              val dataCache: DataCacheConnector,
+                                              val authConnector: AuthConnector
+                                              ) extends BaseController {
 
   def updateData(contactingYou: Option[ContactingYou], data: ContactingYouPhone): ContactingYou = {
     contactingYou.fold[ContactingYou](ContactingYou())(x => x.copy(phoneNumber = Some(data.phoneNumber)))
@@ -66,10 +66,4 @@ trait ContactingYouPhoneController extends BaseController {
           }
       }
   }
-}
-
-object ContactingYouPhoneController extends ContactingYouPhoneController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCache = DataCacheConnector
 }

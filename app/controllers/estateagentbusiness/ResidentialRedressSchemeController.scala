@@ -16,18 +16,19 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{ValidForm, InvalidForm, Form2, EmptyForm}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.estateagentbusiness._
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.estateagentbusiness._
 
 import scala.concurrent.Future
 
-trait ResidentialRedressSchemeController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class ResidentialRedressSchemeController  @Inject()(
+                                                    val dataCacheConnector: DataCacheConnector,
+                                                    val authConnector: AuthConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -57,11 +58,4 @@ trait ResidentialRedressSchemeController extends BaseController {
           }
       }
   }
-
-}
-
-object ResidentialRedressSchemeController extends ResidentialRedressSchemeController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

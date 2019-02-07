@@ -20,6 +20,7 @@
 @(f: forms.Form2[_])(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @errorSummary(f)
     @heading("payments.typeofbank.header", "submit.registration")
 }

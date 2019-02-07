@@ -16,7 +16,6 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionDecisionRejected}
@@ -44,13 +43,13 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
   trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new RegisteredOfficeController () {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-      override val auditConnector = mock[AuditConnector]
-      override val autoCompleteService = mockAutoComplete
-    }
+    val controller = new RegisteredOfficeController(
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService],
+      auditConnector = mock[AuditConnector],
+      autoCompleteService = mockAutoComplete
+      )
 
     when {
       controller.auditConnector.sendEvent(any())(any(), any())
@@ -60,11 +59,6 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
   val emptyCache = CacheMap("", Map.empty)
 
   "RegisteredOfficeController" must {
-
-    "use correct services" in new Fixture {
-      RegisteredOfficeController.authConnector must be(AMLSAuthConnector)
-      RegisteredOfficeController.dataCacheConnector must be(DataCacheConnector)
-    }
 
     val ukAddress = RegisteredOfficeUK("305", "address line", Some("address line2"), Some("address line3"), "AA1 1AA")
 

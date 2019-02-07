@@ -16,22 +16,20 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import controllers.BaseController
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait WhatYouNeedController extends BaseController {
+class WhatYouNeedController @Inject () (
+                                       val authConnector: AuthConnector
+                                       ) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
       Future.successful(Ok(what_you_need()))
   }
 
-}
-
-object WhatYouNeedController extends WhatYouNeedController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
 }
