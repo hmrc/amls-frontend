@@ -33,8 +33,8 @@ POST        /risk-assessment                                      controllers.bu
 GET         /employees                                            controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /employees                                            controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
 
-GET         /employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
-POST        /employees-amls                                         controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
+GET         /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
+POST        /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
 GET         /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
 POST        /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
