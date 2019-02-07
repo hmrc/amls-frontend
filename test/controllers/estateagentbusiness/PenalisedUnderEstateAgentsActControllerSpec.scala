@@ -37,10 +37,10 @@ class PenalisedUnderEstateAgentsActControllerSpec extends AmlsSpec with MockitoS
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new PenalisedUnderEstateAgentsActController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new PenalisedUnderEstateAgentsActController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
