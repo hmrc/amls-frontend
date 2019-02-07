@@ -16,29 +16,32 @@
 
 package controllers.aboutthebusiness
 
+import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data.OptionT
+import cats.implicits._
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
+import play.api.mvc.Request
+import services.AutoCompleteService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
-import audit.AddressConversions._
-import cats.data.OptionT
-import cats.implicits._
-import com.google.inject.Inject
-import play.api.mvc.Request
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class CorrespondenceAddressController @Inject () (
                                                  val dataConnector: DataCacheConnector,
                                                  val authConnector: AuthConnector,
-                                                 val auditConnector: AuditConnector
+                                                 val auditConnector: AuditConnector,
+                                                 val autoCompleteService: AutoCompleteService
                                                  ) extends BaseController {
+
 
 
   private val initialiseWithUK = UKCorrespondenceAddress("","", "", "", None, None, "")
@@ -51,7 +54,7 @@ class CorrespondenceAddressController @Inject () (
             aboutTheBusiness <- response
             correspondenceAddress <- aboutTheBusiness.correspondenceAddress
           } yield Form2[CorrespondenceAddress](correspondenceAddress)).getOrElse(Form2[CorrespondenceAddress](initialiseWithUK))
-          Ok(correspondence_address(form, edit))
+          Ok(correspondence_address(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -59,7 +62,7 @@ class CorrespondenceAddressController @Inject () (
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddress](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(correspondence_address(f, edit)))
+          Future.successful(BadRequest(correspondence_address(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
             aboutTheBusiness <- OptionT(dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))

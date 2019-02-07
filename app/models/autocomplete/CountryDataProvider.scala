@@ -16,7 +16,7 @@
 
 package models.autocomplete
 
-import javax.inject.Inject
+import javax.inject.{Singleton, Inject}
 
 import com.google.inject.ImplementedBy
 import play.api.Environment
@@ -29,6 +29,7 @@ trait CountryDataProvider {
   def fetch: Option[Seq[NameValuePair]]
 }
 
+@Singleton
 class GovUkCountryDataProvider @Inject()(env: Environment) extends CountryDataProvider {
   lazy val countryCodes = models.countries.map(_.code.toUpperCase()).toSet
 

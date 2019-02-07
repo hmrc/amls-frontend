@@ -17,14 +17,13 @@
 package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessmatching._
 import models.renewal.{MostTransactions, Renewal}
 import play.api.mvc.Result
-import services.RenewalService
+import services.{AutoCompleteService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -32,7 +31,8 @@ import scala.concurrent.Future
 @Singleton
 class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                                            val cache: DataCacheConnector,
-                                           val renewalService: RenewalService) extends BaseController {
+                                           val renewalService: RenewalService,
+                                           val autoCompleteService: AutoCompleteService) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext =>
@@ -43,7 +43,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
               msb <- response
               transactions <- msb.mostTransactions
             } yield Form2[MostTransactions](transactions)).getOrElse(EmptyForm)
-            Ok(views.html.renewal.most_transactions(form, edit))
+            Ok(views.html.renewal.most_transactions(form, edit, autoCompleteService.getCountries))
         }
   }
 
@@ -53,7 +53,7 @@ class MostTransactionsController @Inject()(val authConnector: AuthConnector,
       implicit request =>
         Form2[MostTransactions](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit)))
+            Future.successful(BadRequest(views.html.renewal.most_transactions(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
             cache.fetchAll flatMap {
               optMap =>
