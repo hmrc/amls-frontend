@@ -24,8 +24,8 @@ POST        /record-transactions                                  @controllers.b
 GET         /crime-agency                                         controllers.businessactivities.NCARegisteredController.get(edit: Boolean ?= false)
 POST        /crime-agency                                         controllers.businessactivities.NCARegisteredController.post(edit: Boolean ?= false)
 
-GET         /accountant                                           controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
-POST        /accountant                                           controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
+GET         /accountant                                           @controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
+POST        /accountant                                           @controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
 
 GET         /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
 POST        /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)

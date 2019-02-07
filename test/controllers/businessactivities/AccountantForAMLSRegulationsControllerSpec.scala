@@ -20,13 +20,14 @@ import connectors.DataCacheConnector
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import org.jsoup.Jsoup
 import org.mockito.ArgumentCaptor
-import org.mockito.Matchers.{eq => eqTo, any}
+import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
@@ -34,12 +35,16 @@ import scala.concurrent.Future
 
 class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSugar {
 
+
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new AccountantForAMLSRegulationsController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+
+   val mockedDataCacheConnector = mock[DataCacheConnector]
+
+   val controller = new AccountantForAMLSRegulationsController(
+     dataCacheConnector = mockedDataCacheConnector,
+     authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)

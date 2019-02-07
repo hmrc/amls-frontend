@@ -16,19 +16,20 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import com.google.inject.{Inject, Singleton}
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait AccountantForAMLSRegulationsController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+@Singleton
+class AccountantForAMLSRegulationsController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                        override val authConnector: AuthConnector
+                                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -66,10 +67,4 @@ trait AccountantForAMLSRegulationsController extends BaseController {
       case d@Some(AccountantForAMLSRegulations(false)) => ba.accountantForAMLSRegulations(d).whoIsYourAccountant(None).taxMatters(None)
     }
   }
-}
-
-object AccountantForAMLSRegulationsController extends AccountantForAMLSRegulationsController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
 }
