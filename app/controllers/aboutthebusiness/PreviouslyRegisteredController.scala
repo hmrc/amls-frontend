@@ -17,21 +17,23 @@
 package controllers.aboutthebusiness
 
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness._
-import models.businessmatching.{BusinessType, BusinessMatching}
+import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType._
 import play.api.mvc.Result
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.aboutthebusiness._
 
 import scala.concurrent.Future
 
-trait PreviouslyRegisteredController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class PreviouslyRegisteredController @Inject () (
+                                                  val dataCacheConnector: DataCacheConnector,
+                                                  val authConnector: AuthConnector
+                                                ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -86,10 +88,4 @@ trait PreviouslyRegisteredController extends BaseController {
         Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
     }
   }
-}
-
-object PreviouslyRegisteredController extends PreviouslyRegisteredController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
 }

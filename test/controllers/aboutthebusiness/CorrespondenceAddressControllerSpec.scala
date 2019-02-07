@@ -35,7 +35,6 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.model.DataEvent
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.collection.JavaConversions._
@@ -45,13 +44,13 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new CorrespondenceAddressController {
-      override val dataConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val autoCompleteService = mock[AutoCompleteService]
-      override protected def authConnector: AuthConnector = self.authConnector
-      override val auditConnector = mock[AuditConnector]
 
-    }
+    val controller = new CorrespondenceAddressController (
+      dataConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      auditConnector = mock[AuditConnector],
+      autoCompleteService = mock[AutoCompleteService]
+    )
 
     when {
       controller.autoCompleteService.getCountries

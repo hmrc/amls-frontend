@@ -17,13 +17,11 @@
 package controllers.aboutthebusiness
 
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import config.{AMLSAuditConnector, AMLSAuthConnector}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
-import models.status.{ReadyForRenewal, SubmissionDecisionApproved}
-import play.api.mvc.{Request, Result}
+import play.api.mvc.Request
 import services.StatusService
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import utils.DateOfChangeHelper
@@ -31,16 +29,18 @@ import views.html.aboutthebusiness._
 import audit.AddressConversions._
 import cats.data.OptionT
 import cats.implicits._
+import com.google.inject.Inject
 import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
-
-import scala.concurrent.{Future, Promise}
+import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait RegisteredOfficeController extends BaseController with DateOfChangeHelper {
-
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
-  val auditConnector: AuditConnector
+class RegisteredOfficeController @Inject () (
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val statusService: StatusService,
+                                            val auditConnector: AuditConnector,
+                                            val authConnector: AuthConnector
+                                            ) extends BaseController with DateOfChangeHelper {
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
 
@@ -93,12 +93,4 @@ trait RegisteredOfficeController extends BaseController with DateOfChangeHelper 
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
-}
-
-object RegisteredOfficeController extends RegisteredOfficeController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
-  override lazy val auditConnector = AMLSAuditConnector
 }

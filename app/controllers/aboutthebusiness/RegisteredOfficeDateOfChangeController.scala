@@ -16,7 +16,7 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -24,14 +24,18 @@ import models.DateOfChange
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOfficeNonUK, RegisteredOfficeUK}
 import org.joda.time.LocalDate
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 
 import scala.concurrent.Future
 
-trait RegisteredOfficeDateOfChangeController extends BaseController with DateOfChangeHelper {
+class RegisteredOfficeDateOfChangeController @Inject () (
+                                                          val dataCacheConnector: DataCacheConnector,
+                                                          val statusService: StatusService,
+                                                          val authConnector: AuthConnector
+                                                        ) extends BaseController with DateOfChangeHelper {
 
-  val dataCacheConnector: DataCacheConnector
-  val statusService: StatusService
+
 
   def get = {
     Authorised {
@@ -69,12 +73,4 @@ trait RegisteredOfficeDateOfChangeController extends BaseController with DateOfC
           }
         }
   }
-
-}
-
-object RegisteredOfficeDateOfChangeController extends RegisteredOfficeDateOfChangeController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }

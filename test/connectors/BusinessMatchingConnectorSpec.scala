@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.WSHttp
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
@@ -63,15 +64,13 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
   trait Fixture extends AuthorisedFixture { self =>
 
-    object TestBusinessMatchingConnector extends BusinessMatchingConnector {
-      override val http = mock[CoreGet]
-      lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
-      val sessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
-      override val crypto = sessionCookieCryptoFilter.encrypt _
+    val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
 
-      override protected def mode: Mode = Play.current.mode
-      override protected def runModeConfiguration: Configuration = Play.current.configuration
-    }
+
+    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
+      http = mock[WSHttp],
+      applicationCrypto = applicationCrypto
+    )
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 
