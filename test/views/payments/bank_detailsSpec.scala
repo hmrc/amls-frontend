@@ -39,6 +39,13 @@ class bank_detailsSpec extends AmlsSpec with PaymentGenerator{
       doc.getElementsContainingOwnText(Messages("payments.bankdetails.hint")) must not be empty
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.payments.bank_details(true, 0, paymentReferenceNumber)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "display non uk details" when {
 
       "non UK" in new Fixture {

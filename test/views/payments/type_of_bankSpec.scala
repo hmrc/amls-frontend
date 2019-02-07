@@ -41,6 +41,13 @@ class type_of_bankSpec extends PlaySpec with AmlsSpec{
 
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.payments.type_of_bank(EmptyForm)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty, Seq(
