@@ -16,21 +16,23 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities._
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait ExpectedBusinessTurnoverController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
+@Singleton
+class ExpectedBusinessTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                    implicit val statusService: StatusService,
+                                                    override val authConnector: AuthConnector
+                                                   ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -65,11 +67,4 @@ trait ExpectedBusinessTurnoverController extends BaseController {
       }
     }
   }
-}
-
-object ExpectedBusinessTurnoverController extends ExpectedBusinessTurnoverController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override val statusService: StatusService = StatusService
 }

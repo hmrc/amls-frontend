@@ -39,11 +39,11 @@ class ExpectedBusinessTurnoverControllerSpec extends AmlsSpec with MockitoSugar 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ExpectedBusinessTurnoverController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override implicit val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new ExpectedBusinessTurnoverController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
