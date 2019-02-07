@@ -120,14 +120,6 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
 
       }
-
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

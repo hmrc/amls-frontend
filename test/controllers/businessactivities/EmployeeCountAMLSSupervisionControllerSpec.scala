@@ -117,14 +117,6 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
 
       }
-
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

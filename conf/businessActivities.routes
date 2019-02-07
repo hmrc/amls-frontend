@@ -1,7 +1,7 @@
 GET         /what-you-need                                        @controllers.businessactivities.WhatYouNeedController.get()
 
-GET         /franchise                                            controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
-POST        /franchise                                            controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
+GET         /franchise                                            @controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
+POST        /franchise                                            @controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
 GET         /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
