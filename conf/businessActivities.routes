@@ -9,8 +9,8 @@ POST        /confirm-activities                                   controllers.bu
 GET         /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
 POST        /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
-GET         /turnover                                             controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
-POST        /turnover                                             controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
+GET         /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
+POST        /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
 
 GET         /business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.get(edit: Boolean ?= false)
 POST        /business-turnover                                    controllers.businessactivities.ExpectedBusinessTurnoverController.post(edit: Boolean ?= false)
