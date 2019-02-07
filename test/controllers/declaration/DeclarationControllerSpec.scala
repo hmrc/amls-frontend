@@ -43,11 +43,11 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     self =>
     val request = addToken(authRequest)
 
-    val declarationController = new DeclarationController {
-      override val authConnector = self.authConnector
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val statusService = mock[StatusService]
-    }
+    val declarationController = new DeclarationController (
+      authConnector = self.authConnector,
+      dataCacheConnector = mock[DataCacheConnector],
+      statusService = mock[StatusService]
+    )
 
     val mockCacheMap = mock[CacheMap]
     val response = SubscriptionResponse(
@@ -73,12 +73,6 @@ class DeclarationControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
   }
 
   "Declaration get" must {
-
-    "use the correct services" in new Fixture {
-      DeclarationController.authConnector must be(AMLSAuthConnector)
-      DeclarationController.dataCacheConnector must be(DataCacheConnector)
-      DeclarationController.statusService must be(StatusService)
-    }
 
     "redirect to the declaration-persons page if name and/or business matching not found" in new Fixture {
 

@@ -79,15 +79,15 @@ GET         /submit-application/bank-details-non-uk/                            
 
 GET         /submit-application/confirm-bacs/                                         @controllers.ConfirmationController.bacsConfirmation()
 
-GET         /declaration/add-person                                                   controllers.declaration.AddPersonController.get()
-POST        /declaration/add-person                                                   controllers.declaration.AddPersonController.post()
+GET         /declaration/add-person                                                   @controllers.declaration.AddPersonController.get()
+POST        /declaration/add-person                                                   @controllers.declaration.AddPersonController.post()
 
 GET         /declaration/register-responsible-person                                  @controllers.declaration.RegisterResponsiblePersonController.get()
 
-GET         /declaration/declaration                                                  controllers.declaration.DeclarationController.get()
-GET         /update-information/declaration                                           controllers.declaration.DeclarationController.getWithAmendment()
+GET         /declaration/declaration                                                  @controllers.declaration.DeclarationController.get()
+GET         /update-information/declaration                                           @controllers.declaration.DeclarationController.getWithAmendment()
 
-GET         /update-information/add-person                                            controllers.declaration.AddPersonController.getWithAmendment()
+GET         /update-information/add-person                                            @controllers.declaration.AddPersonController.getWithAmendment()
 
 GET         /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeBusinessTypesController.get()
 POST        /update-information/change-services                                       @controllers.businessmatching.updateservice.ChangeBusinessTypesController.post()

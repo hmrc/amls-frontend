@@ -16,23 +16,24 @@
 
 package controllers.declaration
 
-import config.{AMLSAuthConnector, ApplicationConfig}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.declaration.AddPerson
 import models.status.{ReadyForRenewal, SubmissionReadyForReview}
-import play.api.i18n.Messages
-import play.api.mvc.{Action, AnyContent, Result}
+import play.api.mvc.Result
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-trait DeclarationController extends BaseController {
-
-  def dataCacheConnector: DataCacheConnector
-  def statusService: StatusService
+class DeclarationController @Inject () (
+                                       val dataCacheConnector: DataCacheConnector,
+                                       val statusService: StatusService,
+                                       val authConnector: AuthConnector
+                                       ) extends BaseController {
 
   lazy val defaultView = declarationView("declaration.declaration.title", "submit.registration", isAmendment = false)
 
@@ -75,11 +76,4 @@ trait DeclarationController extends BaseController {
       case _ => Redirect(routes.AddPersonController.get())
     }
 
-}
-
-object DeclarationController extends DeclarationController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }
