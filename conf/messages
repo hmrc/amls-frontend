@@ -2016,6 +2016,8 @@ notifications.subject.DeRegistrationEffectiveDateChange = Your de-registration d
 
 notifications.subject.NoSubject = <no subject>
 
+notifications.content.NoContent = <![CDATA[<P>No content</P>]]>
+
 notifications.previousReg = Messages from your previous registrations
 
 notifications.header = Your messages
