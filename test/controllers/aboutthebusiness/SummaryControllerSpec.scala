@@ -40,11 +40,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val controller = new SummaryController (
+      dataCache = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
 
     val testBusinessName = "Ubunchews Accountancy Services"
 
@@ -63,11 +63,6 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   "Get" must {
-
-    "use correct services" in new Fixture {
-      SummaryController.authConnector must be(AMLSAuthConnector)
-      SummaryController.dataCache must be(DataCacheConnector)
-    }
 
     "load the summary page when section data is available" in new Fixture {
 

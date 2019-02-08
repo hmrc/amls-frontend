@@ -305,7 +305,9 @@ $(function () {
          { name: 'Cote d\'Ivoire', code: 'country:CI' },
          { name: 'South Korea', code: 'country:KR' },
          { name: 'North Korea', code: 'country:KP' },
-         { name: 'Czechia', code: 'country:CZ' }
+         { name: 'Czechia', code: 'country:CZ' },
+         { name: 'Czech Republic', code: 'country:CZ'},
+         { name: 'East Timor', code: 'country:TL'}
       ],
        defaultValue: '',
       selectElement: this,

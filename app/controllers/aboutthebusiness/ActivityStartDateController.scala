@@ -16,7 +16,7 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -24,13 +24,16 @@ import models.aboutthebusiness._
 import models.businessmatching.{BusinessMatching, BusinessType}
 import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership, UnincorporatedBody}
 import play.api.mvc.Result
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.aboutthebusiness.activity_start_date
 
 import scala.concurrent.Future
 
-trait ActivityStartDateController extends BaseController {
-  def dataCache: DataCacheConnector
+class ActivityStartDateController @Inject () (
+                                             val dataCache: DataCacheConnector,
+                                             val authConnector: AuthConnector
+                                             ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -85,10 +88,4 @@ trait ActivityStartDateController extends BaseController {
         Redirect(routes.ConfirmRegisteredOfficeController.get(edit))
     }
   }
-}
-
-object ActivityStartDateController extends ActivityStartDateController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

@@ -16,16 +16,14 @@
 
 package controllers.renewal
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, Renewal}
-import services.RenewalService
+import services.{AutoCompleteService, RenewalService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.renewal._
 
 import scala.concurrent.Future
@@ -33,7 +31,8 @@ import scala.concurrent.Future
 @Singleton
 class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheConnector,
                                              val authConnector: AuthConnector,
-                                             val renewalService: RenewalService
+                                             val renewalService: RenewalService,
+                                             val autoCompleteService: AutoCompleteService
                                             ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -45,7 +44,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
               renewal <- response
               customers <- renewal.customersOutsideUK
             } yield Form2[CustomersOutsideUK](customers)).getOrElse(EmptyForm)
-            Ok(customers_outside_uk(form, edit))
+            Ok(customers_outside_uk(form, edit, autoCompleteService.getCountries))
         }
   }
 
@@ -54,7 +53,7 @@ class CustomersOutsideUKController @Inject()(val dataCacheConnector: DataCacheCo
       implicit request =>
         Form2[CustomersOutsideUK](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(customers_outside_uk(f, edit)))
+            Future.successful(BadRequest(customers_outside_uk(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) => {
             dataCacheConnector.fetchAll flatMap { optionalCache =>
               (for {

@@ -17,6 +17,7 @@
 package connectors
 
 import config.WSHttp
+import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Logger, Play}
 import play.api.libs.json.Json
@@ -28,7 +29,7 @@ import uk.gov.hmrc.play.partials.HeaderCarrierForPartialsConverter
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CoreGet, HttpGet, NotFoundException}
+import uk.gov.hmrc.http.NotFoundException
 
 case class BusinessMatchingAddress(line_1: String,
                                    line_2: String,
@@ -66,8 +67,13 @@ object BusinessMatchingReviewDetails {
   implicit val formats = Json.format[BusinessMatchingReviewDetails]
 }
 
-trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPartialsConverter {
-  val http: CoreGet
+class BusinessMatchingConnector @Inject()(val http: WSHttp,
+                                          val applicationCrypto: ApplicationCrypto
+                                          ) extends ServicesConfig with HeaderCarrierForPartialsConverter {
+
+  val sessionCookieCryptoFilter: SessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
+  override val crypto: String => String = sessionCookieCryptoFilter.encrypt _
+
   val businessMatchingUrl = s"${baseUrl("business-customer")}/business-customer"
   val serviceName = "amls"
 
@@ -88,13 +94,6 @@ trait BusinessMatchingConnector extends ServicesConfig with HeaderCarrierForPart
         Future.failed(ex)
     }
   }
-}
-
-object BusinessMatchingConnector extends BusinessMatchingConnector {
-  override val http = WSHttp
-  lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
-  val sessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
-  override val crypto = sessionCookieCryptoFilter.encrypt _
 
   override protected def mode: Mode = Play.current.mode
   override protected def runModeConfiguration: Configuration = Play.current.configuration

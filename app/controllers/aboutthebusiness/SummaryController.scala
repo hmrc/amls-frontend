@@ -16,20 +16,22 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.AboutTheBusiness
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
 
 
-trait SummaryController extends BaseController {
-
-  protected def dataCache: DataCacheConnector
-  val statusService: StatusService
+class SummaryController @Inject () (
+                                   val dataCache: DataCacheConnector,
+                                   val statusService: StatusService,
+                                   val authConnector: AuthConnector
+                                   ) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -59,11 +61,4 @@ trait SummaryController extends BaseController {
         Redirect(controllers.routes.RegistrationProgressController.get())
       }
   }
-}
-
-object SummaryController extends SummaryController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
-  override val statusService = StatusService
 }

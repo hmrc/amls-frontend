@@ -22,6 +22,7 @@
 @(isUK: Boolean, fee: Currency, paymentReference: String)(implicit request: Request[_],m:Messages)
 
 @header = {
+    @components.back_link()
     @heading("payments.bankdetails.header", "submit.registration")
 }
 
