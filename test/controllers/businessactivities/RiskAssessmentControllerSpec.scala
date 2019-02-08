@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities._
 import models.businessmatching.{AccountancyServices, BusinessMatching, MoneyServiceBusiness, BusinessActivities => BMBusinessActivities}
@@ -29,24 +28,20 @@ import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent
 
 class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new RiskAssessmentController {
-
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override protected def authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new RiskAssessmentController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -255,13 +250,6 @@ class RiskAssessmentControllerSpec extends AmlsSpec with MockitoSugar {
           redirectLocation(result) must be(Some(routes.SummaryController.get().url))
         }
       }
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      RiskAssessmentController.authConnector must be(AMLSAuthConnector)
-      RiskAssessmentController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

@@ -27,8 +27,8 @@ POST        /crime-agency                                         @controllers.b
 GET         /accountant                                           @controllers.businessactivities.AccountantForAMLSRegulationsController.get(edit: Boolean ?= false)
 POST        /accountant                                           @controllers.businessactivities.AccountantForAMLSRegulationsController.post(edit: Boolean ?= false)
 
-GET         /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
-POST        /risk-assessment                                      controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
+GET         /risk-assessment                                      @controllers.businessactivities.RiskAssessmentController.get(edit: Boolean ?= false)
+POST        /risk-assessment                                      @controllers.businessactivities.RiskAssessmentController.post(edit: Boolean ?= false)
 
 GET         /employees                                            @controllers.businessactivities.HowManyEmployeesController.get(edit: Boolean ?= false)
 POST        /employees                                            @controllers.businessactivities.HowManyEmployeesController.post(edit: Boolean ?= false)
