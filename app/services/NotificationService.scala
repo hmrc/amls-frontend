@@ -60,7 +60,10 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id))
-        messageText <- OptionT.fromOption[Future](details.messageText)
+        messageText <- OptionT.fromOption[Future](details.messageText match {
+          case t@Some(_) => t
+          case _ => Some("notifications.content.NoContent")
+        })
       } yield details.copy(messageText = Some(CustomAttributeProvider.commonMark(NotificationDetails.processGenericMessage(messageText))))).value
     }
   }
