@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.{Inject, Singleton}
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -30,10 +30,11 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait InvolvedInOtherController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService: StatusService
+@Singleton
+class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                            implicit val statusService: StatusService,
+                                            override val authConnector: AuthConnector
+                                          )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -114,13 +115,4 @@ trait InvolvedInOtherController extends BaseController {
     }
 
   }
-
-
-}
-
-object InvolvedInOtherController extends InvolvedInOtherController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override implicit val statusService: StatusService = StatusService
 }

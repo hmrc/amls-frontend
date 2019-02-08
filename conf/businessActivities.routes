@@ -3,8 +3,8 @@ GET         /what-you-need                                        @controllers.b
 GET         /franchise                                            @controllers.businessactivities.BusinessFranchiseController.get(edit: Boolean ?= false)
 POST        /franchise                                            @controllers.businessactivities.BusinessFranchiseController.post(edit: Boolean ?= false)
 
-GET         /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
-POST        /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
+GET         /confirm-activities                                   @controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
+POST        /confirm-activities                                   @controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
 GET         /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
 POST        /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)

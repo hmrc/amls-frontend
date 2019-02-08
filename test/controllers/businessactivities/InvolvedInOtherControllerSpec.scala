@@ -42,11 +42,11 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-     val controller = new InvolvedInOtherController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-       override implicit val statusService: StatusService = mock[StatusService]
-     }
+     val controller = new InvolvedInOtherController (
+       dataCacheConnector = mock[DataCacheConnector],
+       authConnector = self.authConnector,
+       statusService = mock[StatusService]
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
