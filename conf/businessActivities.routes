@@ -42,5 +42,5 @@ POST        /accountant-details                                   controllers.bu
 GET         /tax-matters                                          controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
 POST        /tax-matters                                          controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)
 
-GET         /check-your-answers                                   controllers.businessactivities.SummaryController.get()
-POST        /check-your-answers                                   controllers.businessactivities.SummaryController.post()
+GET         /check-your-answers                                   @controllers.businessactivities.SummaryController.get()
+POST        /check-your-answers                                   @controllers.businessactivities.SummaryController.post()

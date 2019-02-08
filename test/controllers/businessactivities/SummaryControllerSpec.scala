@@ -38,11 +38,11 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new SummaryController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService: StatusService = mock[StatusService]
-    }
+    val controller = new SummaryController (
+      dataCache = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
 
     val mockCacheMap = mock[CacheMap]
 
