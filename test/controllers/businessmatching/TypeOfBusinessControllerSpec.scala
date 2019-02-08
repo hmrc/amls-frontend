@@ -17,19 +17,16 @@
 package controllers.businessmatching
 
 import connectors.DataCacheConnector
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.{TypeOfBusiness, BusinessMatching}
+import models.businessmatching.{BusinessMatching, TypeOfBusiness}
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -38,10 +35,10 @@ class TypeOfBusinessControllerSpec extends AmlsSpec with MockitoSugar with Scala
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new TypeOfBusinessController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new TypeOfBusinessController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   "TypeOfBusinessController" must {

@@ -16,19 +16,19 @@
 
 package controllers.businessmatching
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessmatching.{TypeOfBusiness, BusinessMatching}
+import javax.inject.Inject
+import models.businessmatching.{BusinessMatching, TypeOfBusiness}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessmatching.type_of_business
 
 import scala.concurrent.Future
 
-trait TypeOfBusinessController extends BaseController {
-
-  private[controllers] def dataCacheConnector: DataCacheConnector
+class TypeOfBusinessController @Inject()(
+                                val dataCacheConnector: DataCacheConnector,
+                                val authConnector: AuthConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -60,10 +60,4 @@ trait TypeOfBusinessController extends BaseController {
       }
     }
   }
-}
-
-object TypeOfBusinessController extends TypeOfBusinessController {
-  // $COVERAGE-OFF$
-  override private[controllers] def dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
 }
