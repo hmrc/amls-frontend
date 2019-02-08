@@ -6,8 +6,8 @@ POST        /franchise                                            @controllers.b
 GET         /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.get(edit: Boolean ?= false)
 POST        /confirm-activities                                   controllers.businessactivities.InvolvedInOtherController.post(edit: Boolean ?= false)
 
-GET         /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
-POST        /procedures                                           controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
+GET         /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.get(edit: Boolean ?= false)
+POST        /procedures                                           @controllers.businessactivities.IdentifySuspiciousActivityController.post(edit: Boolean ?= false)
 
 GET         /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.get(edit: Boolean ?= false)
 POST        /turnover                                             @controllers.businessactivities.ExpectedAMLSTurnoverController.post(edit: Boolean ?= false)
