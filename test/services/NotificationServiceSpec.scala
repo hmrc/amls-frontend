@@ -18,11 +18,12 @@ package services
 
 import connectors.AmlsNotificationConnector
 import models.notifications.ContactType._
-import models.notifications.{IDType, NotificationRow}
+import models.notifications.{ContactType, IDType, NotificationDetails, NotificationRow}
 import org.joda.time.{DateTime, DateTimeZone}
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
+import org.scalatest.prop.GeneratorDrivenPropertyChecks
 import play.api.i18n.MessagesApi
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
@@ -33,7 +34,7 @@ import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
-class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
+class NotificationServiceSpec extends AmlsSpec with MockitoSugar with GeneratorDrivenPropertyChecks{
 
   implicit val hc = HeaderCarrier()
 
@@ -55,10 +56,10 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
       contactNumber = None,
       variation = false,
       receivedAt = new DateTime(2017, 12, 1, 1, 3, DateTimeZone.UTC),
-      false,
-      "XJML00000200000",
-      "1",
-      IDType("132456")
+      isRead = false,
+      amlsRegistrationNumber = "XJML00000200000",
+      templatePackageVersion = "1",
+      _id = IDType("132456")
     )
 
     val dateTime = new DateTime(1479730062573L, DateTimeZone.UTC)
@@ -89,9 +90,29 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
   val messageWithDateAndRefNumber = "parameter1-31/07/2018|parameter2-ABC1234"
   val messageWithDate = "parameter1-31/07/2018"
 
+  val contactTypes = List[(ContactType, Option[String])](
+    (ApplicationApproval, Some(messageWithDateAndRefNumber)),
+    (RenewalApproval, Some(messageWithDate)),
+    (RejectionReasons, Some(messageWithDateAndRefNumber)),
+    (RevocationReasons, Some(messageWithDateAndRefNumber)),
+    (AutoExpiryOfRegistration,Some(messageWithDate)),
+    (ReminderToPayForApplication,Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForRenewal,Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForVariation,Some(messageWithAmountRefNumberAndStatus)),
+    (ReminderToPayForManualCharges,Some(messageWithAmountRefNumberAndStatus)),
+    (RenewalReminder,Some(messageWithDate)),
+    (MindedToRevoke, Some(messageWithDateAndRefNumber)),
+    (MindedToReject, Some(messageWithDateAndRefNumber)),
+    (NoLongerMindedToReject, Some(messageWithDateAndRefNumber)),
+    (NoLongerMindedToRevoke, Some(messageWithDateAndRefNumber)),
+    (RegistrationVariationApproval, Some(messageWithDateAndRefNumber)),
+    (ApplicationAutorejectionForFailureToPay, Some(messageWithDateAndRefNumber)),
+    (DeRegistrationEffectiveDateChange, Some(messageWithDate)),
+    (Others,Some(messageWithDateAndRefNumber)),
+    (NoSubject, Some(messageWithDate)),
+    (NoSubject, None))
 
   "The Notification Service" must {
-
     "get all notifications in order" in new Fixture {
 
       when(amlsNotificationConnector.fetchAllBySafeId(any())(any(), any(), any()))
@@ -101,6 +122,21 @@ class NotificationServiceSpec extends AmlsSpec with MockitoSugar {
       result.head.receivedAt mustBe new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)
     }
 
-  }
+    "return content of the notification for every type of notification" in new Fixture {
 
+      for(cType <- contactTypes) {
+        when(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(any(), any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(NotificationDetails(
+            messageText = cType._2,
+            contactType = Some(ApplicationApproval),
+            status = None,
+            variation = false,
+            receivedAt = new DateTime(2017, 12, 3, 1, 3, DateTimeZone.UTC)))))
+
+        val result = await(service.getMessageDetails("", "", cType._1,"v1m0"))
+        result mustBe defined
+        result.value.messageText mustBe defined
+      }
+    }
+  }
 }
