@@ -36,8 +36,8 @@ POST        /employees                                            @controllers.b
 GET         /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.get(edit: Boolean ?= false)
 POST        /employees-amls                                       @controllers.businessactivities.EmployeeCountAMLSSupervisionController.post(edit: Boolean ?= false)
 
-GET         /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
-POST        /accountant-details                                   controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
+GET         /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.get(edit: Boolean ?= false)
+POST        /accountant-details                                   @controllers.businessactivities.WhoIsYourAccountantController.post(edit: Boolean ?= false)
 
 GET         /tax-matters                                          @controllers.businessactivities.TaxMattersController.get(edit: Boolean ?= false)
 POST        /tax-matters                                          @controllers.businessactivities.TaxMattersController.post(edit: Boolean ?= false)

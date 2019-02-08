@@ -26,7 +26,6 @@ import org.scalatest.PrivateMethodTester
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
-import services.AutoCompleteService
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
@@ -41,11 +40,11 @@ class WhoIsYourAccountantControllerSpec extends AmlsSpec
     self =>
     val request = addToken(authRequest)
 
-    val controller = new WhoIsYourAccountantController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val autoCompleteService: AutoCompleteService = mockAutoComplete
-    }
+    val controller = new WhoIsYourAccountantController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      autoCompleteService = mockAutoComplete
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
