@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -26,7 +26,6 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-@Singleton
 class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
                                          override val authConnector: AuthConnector
                                         )extends BaseController {

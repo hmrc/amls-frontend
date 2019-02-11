@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
@@ -26,7 +26,6 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-@Singleton
 class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                                 val autoCompleteService: AutoCompleteService,
                                                 override val authConnector: AuthConnector

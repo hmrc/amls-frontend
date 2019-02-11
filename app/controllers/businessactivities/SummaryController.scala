@@ -18,7 +18,7 @@ package controllers.businessactivities
 
 import cats.data.OptionT
 import cats.implicits._
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
@@ -31,7 +31,6 @@ import views.html.businessactivities.summary
 
 import scala.concurrent.Future
 
-@Singleton
 class SummaryController @Inject() (val dataCache: DataCacheConnector,
                                    implicit val statusService: StatusService,
                                    override val authConnector: AuthConnector

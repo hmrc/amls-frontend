@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import com.google.inject.{Inject, Singleton}
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -30,7 +30,6 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-@Singleton
 class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheConnector,
                                             implicit val statusService: StatusService,
                                             override val authConnector: AuthConnector
