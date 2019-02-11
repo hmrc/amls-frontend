@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -26,9 +26,9 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait IdentifySuspiciousActivityController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class IdentifySuspiciousActivityController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                                       override val authConnector: AuthConnector
+                                                     ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -56,14 +56,7 @@ trait IdentifySuspiciousActivityController extends BaseController {
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case false => Redirect(routes.NCARegisteredController.get())
-
           }
       }
   }
-}
-
-object IdentifySuspiciousActivityController extends IdentifySuspiciousActivityController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

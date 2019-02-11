@@ -16,21 +16,20 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
-import play.api.Play
 import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait WhoIsYourAccountantController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  val autoCompleteService: AutoCompleteService
+class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                                val autoCompleteService: AutoCompleteService,
+                                                override val authConnector: AuthConnector
+                                              )extends BaseController {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
@@ -68,11 +67,4 @@ trait WhoIsYourAccountantController extends BaseController {
         }
       }
   }
-}
-
-object WhoIsYourAccountantController extends WhoIsYourAccountantController {
-  // $COVERAGE-OFF$
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override lazy val autoCompleteService = Play.current.injector.instanceOf(classOf[AutoCompleteService])
 }

@@ -17,13 +17,12 @@
 package controllers.businessactivities
 
 import controllers.BaseController
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import models.status._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
-@Singleton
 class WhatYouNeedController @Inject()(val authConnector: AuthConnector, statusService: StatusService) extends BaseController {
 
   def get = Authorised.async {

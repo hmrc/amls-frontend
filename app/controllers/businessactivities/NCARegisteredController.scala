@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -26,9 +26,9 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait NCARegisteredController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class NCARegisteredController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                         override val authConnector: AuthConnector
+                                        )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -60,10 +60,4 @@ trait NCARegisteredController extends BaseController {
       }
     }
   }
-}
-
-object NCARegisteredController extends NCARegisteredController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

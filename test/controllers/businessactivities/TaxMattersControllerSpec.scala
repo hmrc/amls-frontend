@@ -38,10 +38,10 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new TaxMattersController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new TaxMattersController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   "TaxMattersController" when {
@@ -127,12 +127,6 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
       }
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      TaxMattersController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }
