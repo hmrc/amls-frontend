@@ -39,10 +39,8 @@ class AccountantForAMLSRegulationsControllerSpec extends AmlsSpec with MockitoSu
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-   val mockedDataCacheConnector = mock[DataCacheConnector]
-
    val controller = new AccountantForAMLSRegulationsController(
-     dataCacheConnector = mockedDataCacheConnector,
+     dataCacheConnector = mock[DataCacheConnector],
      authConnector = self.authConnector
     )
   }
