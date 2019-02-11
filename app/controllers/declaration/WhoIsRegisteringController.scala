@@ -16,7 +16,7 @@
 
 package controllers.declaration
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.{AmlsConnector, DataCacheConnector}
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -24,7 +24,7 @@ import models.declaration._
 import models.declaration.release7.RoleWithinBusinessRelease7
 import models.responsiblepeople.{PositionWithinBusiness, ResponsiblePerson}
 import models.status._
-import play.api.Play
+
 import play.api.mvc.{Action, AnyContent, Request, Result}
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -34,13 +34,13 @@ import views.html.declaration.{who_is_registering_this_registration, who_is_regi
 
 import scala.concurrent.Future
 
-trait WhoIsRegisteringController extends BaseController {
-
-  private[controllers] def amlsConnector: AmlsConnector
-  private[controllers] def renewalService: RenewalService
-
-  def dataCacheConnector: DataCacheConnector
-  def statusService: StatusService
+class WhoIsRegisteringController @Inject () (
+                                            val authConnector: AuthConnector,
+                                            val dataCacheConnector: DataCacheConnector,
+                                            val statusService: StatusService,
+                                            val renewalService: RenewalService,
+                                            val amlsConnector: AmlsConnector
+                                            ) extends BaseController {
 
   def get = Authorised.async {
     implicit authContext => implicit request =>
@@ -142,13 +142,4 @@ trait WhoIsRegisteringController extends BaseController {
       }
     )
   }
-}
-
-object WhoIsRegisteringController extends WhoIsRegisteringController {
-  // $COVERAGE-OFF$
-  override private[controllers] val amlsConnector: AmlsConnector = AmlsConnector
-  override private[controllers] val renewalService = Play.current.injector.instanceOf[RenewalService]
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override val statusService: StatusService = StatusService
 }

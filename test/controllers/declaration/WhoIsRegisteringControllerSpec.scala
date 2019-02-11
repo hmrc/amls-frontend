@@ -46,13 +46,13 @@ class WhoIsRegisteringControllerSpec extends AmlsSpec with MockitoSugar with Res
   trait Fixture extends AuthorisedFixture {
     self =>
     val request = addToken(authRequest)
-    val controller = new WhoIsRegisteringController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val amlsConnector = mock[AmlsConnector]
-      override val statusService: StatusService = mock[StatusService]
-      override private[controllers] val renewalService = mock[RenewalService]
-    }
+    val controller = new WhoIsRegisteringController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      amlsConnector = mock[AmlsConnector],
+      statusService = mock[StatusService],
+      renewalService = mock[RenewalService]
+    )
 
     val pendingReadStatusResponse = ReadStatusResponse(LocalDateTime.now(), "Pending", None, None, None,
       None, false)

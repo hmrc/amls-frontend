@@ -53,11 +53,11 @@ POST        /your-registration/de-register-application-reason                   
 GET         /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.get()
 POST        /satisfaction-survey                                                      @controllers.SatisfactionSurveyController.post()
 
-GET         /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
-POST        /submit-application/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.post()
+GET         /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get()
+POST        /submit-application/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.post()
 
-GET         /update-information/who-is-registering                                    controllers.declaration.WhoIsRegisteringController.get()
-GET         /update-information/who-is-registering-renewal                            controllers.declaration.WhoIsRegisteringController.get()
+GET         /update-information/who-is-registering                                    @controllers.declaration.WhoIsRegisteringController.get()
+GET         /update-information/who-is-registering-renewal                            @controllers.declaration.WhoIsRegisteringController.get()
 
 GET         /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.get()
 POST        /declaration/partner                                                      @controllers.declaration.RegisterPartnersController.post()
