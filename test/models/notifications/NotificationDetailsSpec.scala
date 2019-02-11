@@ -89,13 +89,9 @@ class NotificationDetailsSpec extends PlaySpec with MustMatchers {
 
     }
 
-    "return a runtime Exception when the contact type cannot be figured out" in {
+    "return return the no subject when the contact type cannot be figured out" in {
       val details = NotificationDetails(None, None, None, false, dateTime)
-      val thrown = intercept[Exception] {
-        details.subject
-      }
-
-      assert(thrown.getMessage === "No matching ContactType found")
+      details.subject mustBe "notifications.subject.NoSubject"
     }
 
   }

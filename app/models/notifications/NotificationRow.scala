@@ -17,11 +17,11 @@
 package models.notifications
 
 import models.notifications.ContactType._
-import models.notifications.StatusType.DeRegistered
+import models.notifications.RejectedReason._
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter}
 import org.joda.time.{DateTime, DateTimeZone}
 import play.api.libs.json.{JsValue, Writes, _}
-import RejectedReason._
+import utils.ContactTypeHelper
 
 case class NotificationRow(
                             status: Option[Status],
@@ -40,24 +40,6 @@ case class NotificationRow(
     receivedAt.toString(fmt)
   }
 
-  def getContactType: ContactType = {
-
-    val statusReason = for {
-      st <- status
-      reason <- st.statusReason
-    } yield reason
-
-    contactType.getOrElse(
-      (status, statusReason, variation) match {
-        case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
-        case (_, Some(_), _) => ApplicationAutorejectionForFailureToPay
-        case (_, _, true) => RegistrationVariationApproval
-        case _ => NoSubject
-      }
-    )
-
-  }
-
   def subject: String = contactType match {
     case Some(RejectionReasons) => {
       (for {
@@ -69,14 +51,15 @@ case class NotificationRow(
       } yield sr) getOrElse "notifications.fail.title"
     }
     case _ => {
-      getContactType match {
+      val cType = ContactTypeHelper.getContactType(status, contactType, variation)
+      cType match {
         case ApplicationAutorejectionForFailureToPay => "notifications.fail.title"
-        case _ => s"notifications.subject.$getContactType"
+        case _ => s"notifications.subject.$cType"
       }
     }
   }
 
-  def notificationType: String = getContactType match {
+  def notificationType: String = ContactTypeHelper.getContactType(status, contactType, variation) match {
     case ApplicationApproval |
          RegistrationVariationApproval |
          RenewalApproval |
