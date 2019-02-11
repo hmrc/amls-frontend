@@ -16,30 +16,32 @@
 
 package controllers.aboutthebusiness
 
+import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
+import cats.data.OptionT
+import cats.implicits._
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
 import models.aboutthebusiness.{AboutTheBusiness, RegisteredOffice, RegisteredOfficeUK}
 import play.api.mvc.Request
-import services.StatusService
+import services.{AutoCompleteService, StatusService}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
 import views.html.aboutthebusiness._
-import audit.AddressConversions._
-import cats.data.OptionT
-import cats.implicits._
-import com.google.inject.Inject
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
+
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class RegisteredOfficeController @Inject () (
                                             val dataCacheConnector: DataCacheConnector,
                                             val statusService: StatusService,
                                             val auditConnector: AuditConnector,
-                                            val authConnector: AuthConnector
+                                            val authConnector: AuthConnector,
+                                            val autoCompleteService: AutoCompleteService
                                             ) extends BaseController with DateOfChangeHelper {
 
   private val preSelectUK = RegisteredOfficeUK("", "", None, None, "")
@@ -53,7 +55,7 @@ class RegisteredOfficeController @Inject () (
               aboutTheBusiness <- response
               registeredOffice <- aboutTheBusiness.registeredOffice
             } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
-            Ok(registered_office(form, edit))
+            Ok(registered_office(form, edit, autoCompleteService.getCountries))
 
         }
   }
@@ -62,7 +64,7 @@ class RegisteredOfficeController @Inject () (
     implicit authContext => implicit request =>
         Form2[RegisteredOffice](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(registered_office(f, edit)))
+            Future.successful(BadRequest(registered_office(f, edit, autoCompleteService.getCountries)))
           case ValidForm(_, data) =>
 
             val doUpdate = for {
