@@ -434,7 +434,7 @@ package object models {
     Country("United Arab Emirates", "AE"),
     Country("United Kingdom", "GB"),
     Country("United Nations", "UN"),
-    Country("United States", "US"),
+    Country("United States of America", "US"),
     Country("United States Minor Outlying Islands", "UM"),
     Country("Uruguay", "UY"),
     Country("Uzbekistan", "UZ"),

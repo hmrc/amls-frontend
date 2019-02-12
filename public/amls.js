@@ -318,7 +318,15 @@ $(function () {
          { name: 'Curacao', code: 'territory:CW'},
          { name: 'Timor Leste', code: 'country:TL'},
          { name: 'Burma', code: 'country:MM'},
-         { name: 'Reunion', code: "territory:RE"}
+         { name: 'Reunion', code: "territory:RE"},
+         { name: 'St Helena, Ascension and Tristan da Cunha', code: "territory:SH"},
+         { name: 'Ascension', code: "territory:SH"},
+         { name: 'St Kitts and Nevis', code: "country:KN"},
+         { name: 'St Lucia', code: "country:LC"},
+         { name: 'St Martin (French part)', code: "territory:MF"},
+         { name: 'St Pierre and Miquelon', code: "territory:PM"},
+         { name: 'St Vincent and the Grenadines', code: "country:VC"},
+         { name: 'Vatican City', code: "country:VA"}
       ],
        defaultValue: '',
       selectElement: this,

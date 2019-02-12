@@ -1468,7 +1468,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "St Kitts and Nevis"
+      "en-GB": "Saint Kitts and Nevis"
     }
   },
   "country:KP": {
@@ -1580,7 +1580,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "St Lucia"
+      "en-GB": "Saint Lucia"
     }
   },
   "country:LI": {
@@ -2907,7 +2907,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "United States"
+      "en-GB": "United States of America"
     }
   },
   "country:UY": {
@@ -16498,10 +16498,10 @@
       "en-GB": "SH-AC"
     }
   },
-  "nym:SH-HL": {
+  "nym:SH": {
     "edges": {
       "from": [
-        "territory:SH-HL"
+        "territory:SH"
       ]
     },
     "meta": {
@@ -16512,7 +16512,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "SH-HL"
+      "en-GB": "SH"
     }
   },
   "nym:SH-TA": {
@@ -16790,7 +16790,7 @@
   "nym:Saint Helena": {
     "edges": {
       "from": [
-        "territory:SH-HL"
+        "territory:SH"
       ]
     },
     "meta": {
@@ -27553,7 +27553,7 @@
       "en-GB": "Réunion"
     }
   },
-  "territory:SH-HL": {
+  "territory:SH": {
     "edges": {
       "from": [
       ]
@@ -27566,7 +27566,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Helena"
+      "en-GB": "Saint Helena, Ascension and Tristan da Cunha"
     }
   },
   "territory:SJ": {
@@ -27742,7 +27742,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "United States Virgin Islands"
+      "en-GB": "Virgin Islands, U.S."
     }
   },
   "territory:WF": {
