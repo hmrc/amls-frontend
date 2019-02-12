@@ -305,9 +305,14 @@ $(function () {
          { name: 'Cote d\'Ivoire', code: 'country:CI' },
          { name: 'South Korea', code: 'country:KR' },
          { name: 'North Korea', code: 'country:KP' },
-         { name: 'Czechia', code: 'country:CZ' },
          { name: 'Czech Republic', code: 'country:CZ'},
-         { name: 'East Timor', code: 'country:TL'}
+         { name: 'East Timor', code: 'country:TL'},
+         { name: 'Cape Verde', code: 'country:CV'},
+         { name: 'Laos', code: 'country:LA'},
+         { name: 'St Vincent', code: 'country:VC'},
+         { name: 'Vietnam', code: 'country:VN'},
+         { name: 'Congo (Democratic Republic)', code: 'country:CD'},
+         { name: 'The Gambia', code: 'country:GM'}
       ],
        defaultValue: '',
       selectElement: this,

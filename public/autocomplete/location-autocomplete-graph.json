@@ -332,7 +332,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Brunei"
+      "en-GB": "Brunei Darussalam"
     }
   },
   "country:BO": {
@@ -476,7 +476,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Congo (Democratic Republic)"
+      "en-GB": "Congo, the Democratic Republic of the"
     }
   },
   "country:CF": {
@@ -1036,7 +1036,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "The Gambia"
+      "en-GB": "Gambia"
     }
   },
   "country:GN": {
@@ -1292,7 +1292,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Iran, Islamic Republic ofIran"
+      "en-GB": "Iran, Islamic Republic of"
     }
   },
   "country:IS": {
@@ -2651,7 +2651,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Syria"
+      "en-GB": "Syrian Arab Republic"
     }
   },
   "country:SZ": {
@@ -5499,7 +5499,7 @@
       "en-GB": "Brtain"
     }
   },
-  "nym:Brunei Darussalam": {
+  "nym:Brunei": {
     "edges": {
       "from": [
         "country:BN"
@@ -6075,6 +6075,23 @@
     "names": {
       "cy": false,
       "en-GB": "Cabo"
+    }
+  },
+  "nym:Cape Verde": {
+    "edges": {
+      "from": [
+        "country:CV"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Cape Verde"
     }
   },
   "nym:Cabo Verde": {
