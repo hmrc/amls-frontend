@@ -317,7 +317,8 @@ $(function () {
          { name: 'Aland Islands', code: 'territory:AX'},
          { name: 'Curacao', code: 'territory:CW'},
          { name: 'Timor Leste', code: 'country:TL'},
-         { name: 'Burma', code: 'country:MM'}
+         { name: 'Burma', code: 'country:MM'},
+         { name: 'Reunion', code: "territory:RE"}
       ],
        defaultValue: '',
       selectElement: this,
