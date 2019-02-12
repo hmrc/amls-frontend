@@ -312,7 +312,8 @@ $(function () {
          { name: 'St Vincent', code: 'country:VC'},
          { name: 'Vietnam', code: 'country:VN'},
          { name: 'Congo (Democratic Republic)', code: 'country:CD'},
-         { name: 'The Gambia', code: 'country:GM'}
+         { name: 'The Gambia', code: 'country:GM'},
+         { name: 'Aland Islands', code: 'territory:AX'}
       ],
        defaultValue: '',
       selectElement: this,
