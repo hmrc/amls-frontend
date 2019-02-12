@@ -302,7 +302,8 @@ $(function () {
       ],
       additionalSynonyms: [
          { name: 'The Ivory Coast', code: 'country:CI' },
-         { name: 'Cote d\'Ivoire', code: 'country:CI' },
+         { name: 'Cote d Ivoire', code: 'country:CI' },
+         { name: 'Cote dIvoire', code: 'country:CI' },
          { name: 'South Korea', code: 'country:KR' },
          { name: 'North Korea', code: 'country:KP' },
          { name: 'Czech Republic', code: 'country:CZ'},
@@ -313,7 +314,9 @@ $(function () {
          { name: 'Vietnam', code: 'country:VN'},
          { name: 'Congo (Democratic Republic)', code: 'country:CD'},
          { name: 'The Gambia', code: 'country:GM'},
-         { name: 'Aland Islands', code: 'territory:AX'}
+         { name: 'Aland Islands', code: 'territory:AX'},
+         { name: 'Curacao', code: 'territory:CW'},
+         { name: 'Timor Leste', code: 'country:TL'}
       ],
        defaultValue: '',
       selectElement: this,
