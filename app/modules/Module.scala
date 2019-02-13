@@ -49,7 +49,6 @@ class Module extends AbstractModule {
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[CorePost]).toInstance(WSHttp)
     bind(classOf[CoreGet]).toInstance(WSHttp)
-    bind(classOf[LandingService]).toInstance(LandingService)
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
