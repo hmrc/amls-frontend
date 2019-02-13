@@ -16,20 +16,18 @@
 
 package modules
 
-import com.google.inject.{AbstractModule, Provider, Provides, TypeLiteral}
+import com.google.inject.{AbstractModule, Provides, TypeLiteral}
 import com.typesafe.config.Config
-import config.{AMLSAuditConnector, AppConfig, WSHttp}
+import config.{AMLSAuditConnector, WSHttp}
 import connectors._
-import javax.inject.Inject
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
-import play.api.{Application, Configuration}
+import play.api.Configuration
 import services._
 import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.ServicesConfig
 
 class Module extends AbstractModule {
 
@@ -44,8 +42,6 @@ class Module extends AbstractModule {
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
-    bind(classOf[StatusService]).toInstance(StatusService)
-    bind(classOf[AmlsConnector]).toInstance(AmlsConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
     bind(classOf[CorePost]).toInstance(WSHttp)

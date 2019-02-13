@@ -16,6 +16,7 @@
 
 package config
 
+import config.ApplicationConfig.amlsUrl
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment, Play}
@@ -97,6 +98,8 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
   override protected def mode: Mode = environment.mode
 
   def amlsUrl = baseUrl("amls")
+
+  def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
   def showFeesToggle = getConfBool("feature-toggle.show-fees", defBool = false)
 

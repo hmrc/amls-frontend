@@ -16,34 +16,30 @@
 
 package connectors
 
-import config.{ApplicationConfig, WSHttp}
+import config.{AppConfig, WSHttp}
+import javax.inject.Inject
 import models.deregister.{DeRegisterSubscriptionRequest, DeRegisterSubscriptionResponse}
 import models.payments._
 import models.registrationdetails.RegistrationDetails
 import models.withdrawal.{WithdrawSubscriptionRequest, WithdrawSubscriptionResponse}
 import models.{AmendVariationRenewalResponse, _}
 import play.api.Logger
-import play.api.libs.json.{JsObject, Json, Reads, Writes}
+import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http._
-import play.api.http.Status.UNPROCESSABLE_ENTITY
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http._
 
-trait AmlsConnector {
+class AmlsConnector @Inject()(private[connectors] val httpPost: WSHttp,
+                              private[connectors] val httpGet: WSHttp,
+                              private[connectors] val httpPut: WSHttp,
+                              private[this] val appConfig: AppConfig) {
 
-  private[connectors] def httpPost: HttpPost
+  private[connectors] val url: String = appConfig.subscriptionUrl
 
-  private[connectors] def httpGet: HttpGet
+  private[connectors] val registrationUrl: String = s"${appConfig.amlsUrl}/amls/registration"
 
-  private[connectors] def httpPut: HttpPut
-
-  private[connectors] def url: String
-
-  private[connectors] def registrationUrl: String
-
-  private[connectors] def paymentUrl: String
+  private[connectors] val paymentUrl: String= s"${appConfig.amlsUrl}/amls/payment"
 
   def subscribe
   (subscriptionRequest: SubscriptionRequest, safeId: String)
@@ -272,14 +268,4 @@ trait AmlsConnector {
 
     httpPost.POST[CreateBacsPaymentRequest, Payment](postUrl, request)
   }
-
-}
-
-object AmlsConnector extends AmlsConnector {
-  override private[connectors] val httpPost = WSHttp
-  override private[connectors] val httpGet = WSHttp
-  override private[connectors] val httpPut = WSHttp
-  override private[connectors] def url = ApplicationConfig.subscriptionUrl
-  override private[connectors] def registrationUrl = s"${ApplicationConfig.amlsUrl}/amls/registration"
-  override private[connectors] def paymentUrl = s"${ApplicationConfig.amlsUrl}/amls/payment"
 }

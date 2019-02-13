@@ -17,6 +17,7 @@
 package services
 
 import connectors.AmlsConnector
+import javax.inject.Inject
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
@@ -27,13 +28,9 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait StatusService {
-
-  private[services] def amlsConnector: AmlsConnector
-
-  private[services] def progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
-
-  private[services] def enrolmentsService: AuthEnrolmentsService
+class StatusService @Inject()(private[services] val amlsConnector: AmlsConnector,
+                              private[services] val progressService: ProgressService,
+                              private[services] val enrolmentsService: AuthEnrolmentsService) {
 
   private val renewalPeriod = 30
 
@@ -175,9 +172,4 @@ trait StatusService {
   def isPreSubmission(implicit hc: HeaderCarrier, auth: AuthContext, ec: ExecutionContext): Future[Boolean] = getStatus map { s => isPreSubmission(s) }
 
   def isPreSubmission(status: SubmissionStatus) = Set(NotCompleted, SubmissionReady).contains(status)
-}
-
-object StatusService extends StatusService {
-  override private[services] val amlsConnector: AmlsConnector = AmlsConnector
-  override private[services] lazy val enrolmentsService = Play.current.injector.instanceOf[AuthEnrolmentsService]
 }

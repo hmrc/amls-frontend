@@ -288,8 +288,8 @@ object LandingService extends LandingService {
   // $COVERAGE-OFF$
   override private[services] lazy val cacheConnector = DataCacheConnector
   override private[services] lazy val keyStore = KeystoreConnector
-  override private[services] lazy val desConnector = AmlsConnector
-  override private[services] lazy val statusService = StatusService
+  override private[services] lazy val desConnector = Play.current.injector.instanceOf[AmlsConnector]
+  override private[services] lazy val statusService = Play.current.injector.instanceOf[StatusService]
   override private[services] lazy val businessMatchingConnector = Play.current.injector.instanceOf[BusinessMatchingConnector]
   // $COVERAGE-ON$
 }
