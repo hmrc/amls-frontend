@@ -332,7 +332,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Brunei"
+      "en-GB": "Brunei Darussalam"
     }
   },
   "country:BO": {
@@ -380,7 +380,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "The Bahamas"
+      "en-GB": "Bahamas"
     }
   },
   "country:BT": {
@@ -476,7 +476,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Congo (Democratic Republic)"
+      "en-GB": "Congo, the Democratic Republic of the"
     }
   },
   "country:CF": {
@@ -1036,7 +1036,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "The Gambia"
+      "en-GB": "Gambia"
     }
   },
   "country:GN": {
@@ -1292,7 +1292,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Iran, Islamic Republic ofIran"
+      "en-GB": "Iran, Islamic Republic of"
     }
   },
   "country:IS": {
@@ -1468,7 +1468,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "St Kitts and Nevis"
+      "en-GB": "Saint Kitts and Nevis"
     }
   },
   "country:KP": {
@@ -1580,7 +1580,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "St Lucia"
+      "en-GB": "Saint Lucia"
     }
   },
   "country:LI": {
@@ -2651,7 +2651,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Syria"
+      "en-GB": "Syrian Arab Republic"
     }
   },
   "country:SZ": {
@@ -2907,7 +2907,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "United States"
+      "en-GB": "United States of America"
     }
   },
   "country:UY": {
@@ -5499,7 +5499,7 @@
       "en-GB": "Brtain"
     }
   },
-  "nym:Brunei Darussalam": {
+  "nym:Brunei": {
     "edges": {
       "from": [
         "country:BN"
@@ -6075,6 +6075,23 @@
     "names": {
       "cy": false,
       "en-GB": "Cabo"
+    }
+  },
+  "nym:Cape Verde": {
+    "edges": {
+      "from": [
+        "country:CV"
+      ]
+    },
+    "meta": {
+      "canonical": false,
+      "canonical-mask": 0,
+      "display-name": false,
+      "stable-name": false
+    },
+    "names": {
+      "cy": false,
+      "en-GB": "Cape Verde"
     }
   },
   "nym:Cabo Verde": {
@@ -16481,10 +16498,10 @@
       "en-GB": "SH-AC"
     }
   },
-  "nym:SH-HL": {
+  "nym:SH": {
     "edges": {
       "from": [
-        "territory:SH-HL"
+        "territory:SH"
       ]
     },
     "meta": {
@@ -16495,7 +16512,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "SH-HL"
+      "en-GB": "SH"
     }
   },
   "nym:SH-TA": {
@@ -16773,7 +16790,7 @@
   "nym:Saint Helena": {
     "edges": {
       "from": [
-        "territory:SH-HL"
+        "territory:SH"
       ]
     },
     "meta": {
@@ -27536,7 +27553,7 @@
       "en-GB": "Réunion"
     }
   },
-  "territory:SH-HL": {
+  "territory:SH": {
     "edges": {
       "from": [
       ]
@@ -27549,7 +27566,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "Saint Helena"
+      "en-GB": "Saint Helena, Ascension and Tristan da Cunha"
     }
   },
   "territory:SJ": {
@@ -27725,7 +27742,7 @@
     },
     "names": {
       "cy": false,
-      "en-GB": "United States Virgin Islands"
+      "en-GB": "Virgin Islands, U.S."
     }
   },
   "territory:WF": {

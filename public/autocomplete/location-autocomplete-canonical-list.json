@@ -656,7 +656,7 @@
     "territory:NF"
   ],
   [
-    "The Democratic People's Republic of Korea",
+    "Korea, Democratic People's Republic of",
     "country:KP"
   ],
   [
@@ -740,8 +740,8 @@
     "territory:RE"
   ],
   [
-    "Saint Helena",
-    "territory:SH-HL"
+    "Saint Helena, Ascension and Tristan da Cunha",
+    "territory:SH"
   ],
   [
     "Saint Pierre and Miquelon",
@@ -836,11 +836,11 @@
     "country:LK"
   ],
   [
-    "St Kitts and Nevis",
+    "Saint Kitts and Nevis",
     "country:KN"
   ],
   [
-    "St Lucia",
+    "Saint Lucia",
     "country:LC"
   ],
   [
@@ -892,7 +892,7 @@
     "country:TH"
   ],
   [
-    "The Bahamas",
+    "Bahamas",
     "country:BS"
   ],
   [
@@ -952,11 +952,11 @@
     "country:GB"
   ],
   [
-    "United States",
+    "United States of America",
     "country:US"
   ],
   [
-    "United States Virgin Islands",
+    "Virgin Islands, U.S.",
     "territory:VI"
   ],
   [
