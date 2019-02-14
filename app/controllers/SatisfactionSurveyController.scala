@@ -16,13 +16,13 @@
 
 package controllers
 
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import audit.SurveyEvent
+import config.AMLSAuthConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.{Inject, Singleton}
 import models.SatisfactionSurvey
 import play.api.Logger
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import audit.SurveyEvent
-import javax.inject.{Inject, Singleton}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
@@ -51,9 +51,3 @@ class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
     }
   }
 }
-
-//object SatisfactionSurveyController extends SatisfactionSurveyController {
-//  // $COVERAGE-OFF$
-//  override val authConnector = AMLSAuthConnector
-//  override val auditConnector = AMLSAuditConnector
-//}
