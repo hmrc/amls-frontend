@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ContactDetails, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
@@ -24,6 +24,7 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -193,7 +194,9 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       }
       "app must start" in {
 
-        val app = new GuiceApplicationBuilder().build()
+        val app = new GuiceApplicationBuilder()
+          .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
+          .build()
 
         app.injector.instanceOf[ContactDetailsController]
       }

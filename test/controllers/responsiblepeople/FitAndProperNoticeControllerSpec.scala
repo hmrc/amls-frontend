@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures
@@ -37,6 +37,7 @@ class FitAndProperNoticeControllerSpec extends AmlsSpec with MockitoSugar with S
     val request = addToken(authRequest)
     lazy val mockAppConfig = mock[AppConfig]
     lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))

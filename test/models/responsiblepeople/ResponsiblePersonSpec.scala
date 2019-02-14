@@ -16,6 +16,7 @@
 
 package models.responsiblepeople
 
+import connectors.KeystoreConnector
 import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started}
@@ -26,6 +27,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
@@ -35,6 +37,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
 
   override lazy val app: Application = new GuiceApplicationBuilder()
+    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
     .build()
 
@@ -652,7 +655,7 @@ class ResponsiblePersonSpec extends PlaySpec with MockitoSugar with ResponsibleP
 
 class ResponsiblePersonSpecWithPhase2Changes extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
 
-  override lazy val app: Application = new GuiceApplicationBuilder()
+  override lazy val app: Application = new GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 

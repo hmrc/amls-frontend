@@ -36,6 +36,8 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services._
 import uk.gov.hmrc.http.HttpResponse
@@ -50,6 +52,8 @@ class ConfirmationControllerSpec extends AmlsSpec
   with AmlsReferenceNumberGenerator
   with PaymentGenerator
   with SubscriptionResponseGenerator {
+
+  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
 
   trait Fixture extends AuthorisedFixture {
     self =>

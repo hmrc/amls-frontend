@@ -16,10 +16,12 @@
 
 package utils
 
+import connectors.KeystoreConnector
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.i18n.MessagesApi
+import play.api.inject.bind
 import play.api.inject.guice.{GuiceApplicationBuilder, GuiceableModule}
 import play.api.test.FakeRequest
 import play.api.{Application, Mode}
@@ -30,7 +32,7 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 trait AmlsSpec extends PlaySpec with OneAppPerSuite with MockitoSugar with MustMatchers {
 
-  protected val bindModules: Seq[GuiceableModule] = Seq()
+  protected val bindModules: Seq[GuiceableModule] = Seq(bind[KeystoreConnector].to(mock[KeystoreConnector]))
 
   implicit override lazy val app: Application = new GuiceApplicationBuilder()
     .disable[com.kenshoo.play.metrics.PlayModule]

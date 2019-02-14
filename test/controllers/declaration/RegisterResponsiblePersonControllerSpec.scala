@@ -16,21 +16,19 @@
 
 package controllers.declaration
 
-import connectors.DataCacheConnector
-import models.status.{SubmissionReady, SubmissionReadyForReview, SubmissionDecisionApproved, ReadyForRenewal}
+import connectors.{DataCacheConnector, KeystoreConnector}
+import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
+import org.mockito.Matchers._
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeApplication
+import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
-import play.api.inject.bind
-import org.mockito.Mockito._
-import org.mockito.Matchers._
-import play.api.test.Helpers._
-
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -43,6 +41,7 @@ class RegisterResponsiblePersonControllerSpec extends AmlsSpec with MockitoSugar
     val statusService = mock[StatusService]
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))

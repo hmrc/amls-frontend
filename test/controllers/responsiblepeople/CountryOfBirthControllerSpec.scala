@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople._
 import models.Country
 import models.autocomplete.{CountryDataProvider, NameValuePair}
@@ -31,7 +31,7 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Nino
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -45,6 +45,7 @@ class CountryOfBirthControllerSpec extends AmlsSpec with MockitoSugar with NinoU
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))

@@ -19,12 +19,11 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision.Supervision
 import org.jsoup.Jsoup
@@ -79,6 +78,7 @@ class RegisterServicesControllerSpec extends AmlsSpec
     val businessMatching1 = BusinessMatching(None, Some(businessActivities1))
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .overrides(bind[StatusService].to(statusService))

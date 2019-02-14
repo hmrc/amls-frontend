@@ -16,7 +16,7 @@
 
 package typeclasses.confirmation
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.businessmatching.{BusinessActivity, EstateAgentBusinessService, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
@@ -31,6 +31,7 @@ import services.ConfirmationService
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.StatusConstants
+import play.api.inject.bind
 
 class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
   with MockitoSugar
@@ -42,6 +43,7 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
   with AmlsReferenceNumberGenerator {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
+    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 

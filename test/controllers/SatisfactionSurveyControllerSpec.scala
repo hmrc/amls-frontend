@@ -16,23 +16,26 @@
 
 package controllers
 
+import connectors.KeystoreConnector
 import models.businessactivities._
 import org.jsoup.Jsoup
 import org.mockito.Matchers
+import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.audit.http.connector.{AuditResult, AuditConnector}
-import utils.AuthorisedFixture
-import org.mockito.Matchers._
-import org.mockito.Mockito._
+import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
 class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
+
+  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)

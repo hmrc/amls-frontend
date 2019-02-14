@@ -18,11 +18,9 @@ package models.asp
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
 trait AspValues {
 
@@ -69,10 +67,7 @@ trait AspValues {
 
 }
 
-class AspSpec extends PlaySpec with MockitoSugar with AspValues with OneAppPerSuite{
-
-  override lazy val app = FakeApplication()
-
+class AspSpec extends AmlsSpec with AspValues {
 
   "None" when {
     val initial: Option[Asp] = None

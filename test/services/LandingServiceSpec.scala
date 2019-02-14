@@ -38,6 +38,8 @@ import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, Vie
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -49,6 +51,8 @@ import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
+
+  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
 
   object TestLandingService extends LandingService {
     override private[services] val cacheConnector = mock[DataCacheConnector]

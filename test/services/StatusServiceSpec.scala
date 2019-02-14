@@ -24,23 +24,18 @@ import org.joda.time.{DateTimeUtils, LocalDate, LocalDateTime}
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Call
-import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class StatusServiceSpec extends AmlsSpec with ScalaFutures {
 
   val testStatusService = new StatusService(amlsConnector = mock[AmlsConnector],
                                            progressService = mock[ProgressService],
                                            enrolmentsService = mock[AuthEnrolmentsService])
 
-  implicit val hc = mock[HeaderCarrier]
-  implicit val ac = mock[AuthContext]
   implicit val ec = mock[ExecutionContext]
 
   val readStatusResponse: ReadStatusResponse = ReadStatusResponse(new LocalDateTime(), "Pending", None, None, None,

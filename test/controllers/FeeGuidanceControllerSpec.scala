@@ -17,7 +17,7 @@
 package controllers
 
 import config.ApplicationConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
@@ -48,6 +48,7 @@ class FeeGuidanceControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> false)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]

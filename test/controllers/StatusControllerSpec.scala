@@ -17,7 +17,7 @@
 package controllers
 
 import cats.implicits._
-import connectors.{AmlsConnector, AuthenticatorConnector, DataCacheConnector, FeeConnector}
+import connectors._
 import generators.PaymentGenerator
 import models.ResponseType.SubscriptionResponseType
 import models.businesscustomer.{Address, ReviewDetails}
@@ -36,6 +36,7 @@ import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.OneAppPerSuite
 import play.api.http.Status.OK
 import play.api.i18n.Messages
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services._
@@ -50,7 +51,7 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
   val cacheMap = mock[CacheMap]
 
-  override lazy val app = GuiceApplicationBuilder().build()
+  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
 
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)

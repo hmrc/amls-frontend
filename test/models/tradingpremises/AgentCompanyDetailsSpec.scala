@@ -16,13 +16,11 @@
 
 package models.tradingpremises
 
-import play.api.libs.json.Json
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import play.api.libs.json.JsSuccess
+import jto.validation.{Invalid, Path, Valid, ValidationError}
+import play.api.libs.json.{JsSuccess, Json}
+import utils.AmlsSpec
 
-class AgentCompanyDetailsSpec extends PlaySpec with OneAppPerSuite{
+class AgentCompanyDetailsSpec extends AmlsSpec {
 
   "AgentCompanyDetails" must {
 

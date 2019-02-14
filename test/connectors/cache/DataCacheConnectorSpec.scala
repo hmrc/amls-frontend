@@ -19,21 +19,17 @@ package connectors.cache
 import org.mockito.Mockito._
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
 import org.scalatest.prop.PropertyChecks
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsBoolean, JsString, JsValue, Json}
 import services.cache.{Cache, MongoCacheClient, MongoCacheClientFactory}
-import uk.gov.hmrc.http.{HeaderCarrier}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser}
+import uk.gov.hmrc.play.frontend.auth.LoggedInUser
+import utils.AmlsSpec
 
 import scala.concurrent.Future
 
 class DataCacheConnectorSpec
-  extends PlaySpec
-    with OneAppPerSuite
+  extends AmlsSpec
     with Conversions
-    with MockitoSugar
     with ScalaFutures
     with PropertyChecks
     with IntegrationPatience {
@@ -44,8 +40,7 @@ class DataCacheConnectorSpec
   }
 
   trait Fixture {
-    implicit val headerCarrier = HeaderCarrier()
-    implicit val authContext = mock[AuthContext]
+
     implicit val user = mock[LoggedInUser]
     val key = "key"
     val cacheId = arbitrary[String].sample.get

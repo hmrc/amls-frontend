@@ -17,16 +17,13 @@
 package models.supervision
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import models.tcsp.Tcsp
 import org.joda.time.LocalDate
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
-class SupervisionSpec extends PlaySpec with MockitoSugar with SupervisionValues with OneAppPerSuite {
+class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
   "Supervision" must {
 

@@ -17,7 +17,7 @@
 package controllers.renewal
 
 import cats.data.OptionT
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._
@@ -36,11 +36,11 @@ import services.{ProgressService, RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 import cats.implicits._
 import services.businessmatching.BusinessMatchingService
-import scala.concurrent.ExecutionContext.Implicits.global
 
+import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import uk.gov.hmrc.http.HeaderCarrier
 
@@ -60,6 +60,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val businessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[ProgressService].to(progressService))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))

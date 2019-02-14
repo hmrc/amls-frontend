@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.TimeAtAddress.ZeroToFiveMonths
 import models.responsiblepeople._
@@ -25,7 +25,7 @@ import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-
+import play.api.inject.bind
 import utils.AmlsSpec
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
@@ -204,7 +204,9 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
     }
   }
   "App must start" in {
-    val app = GuiceApplicationBuilder().build()
+    val app = GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
+      .build()
 
     app.injector.instanceOf[TimeAtAdditionalExtraAddressController]
   }

@@ -31,7 +31,7 @@ package services
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models._
 import models.businesscustomer.ReviewDetails
@@ -54,6 +54,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import utils.StatusConstants
+import play.api.inject.bind
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -68,6 +69,7 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
   with AmlsReferenceNumberGenerator {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
+    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 

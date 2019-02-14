@@ -16,7 +16,7 @@
 
 package controllers.responsiblepeople
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
@@ -43,6 +43,7 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -245,7 +246,7 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    lazy val defaultBuilder = new GuiceApplicationBuilder()
+    lazy val defaultBuilder = new GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]

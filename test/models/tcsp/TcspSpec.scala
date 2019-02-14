@@ -18,11 +18,9 @@ package models.tcsp
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
 trait TcspValues {
 
@@ -81,9 +79,7 @@ trait TcspValues {
   )
 }
 
-class TcspSpec extends PlaySpec with MockitoSugar with TcspValues with OneAppPerSuite {
-
-  override lazy val app = FakeApplication()
+class TcspSpec extends AmlsSpec with TcspValues {
 
   "Tcsp" must {
 

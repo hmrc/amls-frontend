@@ -15,18 +15,18 @@
  */
 
  package controllers.responsiblepeople
- import connectors.DataCacheConnector
-import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
-import org.jsoup.Jsoup
-import org.jsoup.nodes.Document
-import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.Helpers._
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
+ import connectors.{DataCacheConnector, KeystoreConnector}
+ import models.responsiblepeople.ResponsiblePerson._
+ import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
+ import org.jsoup.Jsoup
+ import org.jsoup.nodes.Document
+ import org.scalatest.concurrent.ScalaFutures
+ import org.scalatest.mock.MockitoSugar
+ import play.api.inject.bind
+ import play.api.inject.guice.GuiceApplicationBuilder
+ import play.api.test.Helpers._
+ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
  class ApprovalCheckControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
    trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
@@ -35,6 +35,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
+       .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
      val builder = defaultBuilder
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[ApprovalCheckController]

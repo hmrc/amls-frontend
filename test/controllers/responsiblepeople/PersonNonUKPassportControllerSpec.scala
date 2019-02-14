@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import config.{AppConfig, ApplicationConfig}
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
@@ -45,6 +45,7 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))

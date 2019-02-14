@@ -16,24 +16,21 @@
 
 package controllers.declaration
 
-import connectors.DataCacheConnector
-import models.businesscustomer.{Address, ReviewDetails}
-import models.businessmatching.BusinessMatching
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople._
 import models.status._
 import org.joda.time.LocalDate
-import org.scalatest.mock.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeApplication
-import services.{ProgressService, StatusService}
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
-import play.api.inject.bind
-import play.api.test.Helpers._
-import org.mockito.Mockito._
 import org.mockito.Matchers.{eq => meq, _}
+import org.mockito.Mockito._
+import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import services.{ProgressService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
 
@@ -48,6 +45,7 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
     val progressService = mock[ProgressService]
 
     lazy val app = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))

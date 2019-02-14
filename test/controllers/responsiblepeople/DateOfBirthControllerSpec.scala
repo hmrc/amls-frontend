@@ -17,9 +17,9 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.responsiblepeople.ResponsiblePerson._
-import models.responsiblepeople.{UKPassportYes, _}
+import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.mockito.Matchers._
@@ -48,6 +48,7 @@ class DateOfBirthControllerSpec extends AmlsSpec with MockitoSugar {
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[AppConfig].to(mockAppConfig))
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .build()
 
     val controller = app.injector.instanceOf[DateOfBirthController]

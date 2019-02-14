@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{PersonName, _}
@@ -37,6 +37,7 @@ class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures w
   trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
+      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))

@@ -17,18 +17,14 @@
 package models.estateagentbusiness
 
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
-import org.mockito.Mockito._
-import org.mockito.Matchers.{eq => eqTo, _}
-import play.api.test.FakeApplication
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import utils.AmlsSpec
 
-class EstateAgentBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
-
-  override lazy val app = FakeApplication()
+class EstateAgentBusinessSpec extends AmlsSpec {
 
   val services = Services(Set(Residential, Commercial, Auction))
   val professionalBody = ProfessionalBodyYes("details")
