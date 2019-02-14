@@ -30,10 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (
                                 val amlsConnector: AmlsConnector,
-                                val progressService: ProgressService,
                                 val enrolmentsService: AuthEnrolmentsService
                               ){
-
+  private[services] def progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   private val renewalPeriod = 30
 
   val Pending = "Pending"

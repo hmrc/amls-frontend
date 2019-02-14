@@ -37,9 +37,10 @@ class StatusServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures wit
 
    val service = new StatusService(
     amlsConnector = mock[AmlsConnector],
-    progressService = mock[ProgressService],
     enrolmentsService = mock[AuthEnrolmentsService]
-  )
+  ){
+     override val progressService = mock[ProgressService]
+   }
 
   implicit val hc = mock[HeaderCarrier]
   implicit val ac = mock[AuthContext]
