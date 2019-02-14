@@ -59,12 +59,17 @@
             @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.13", "13")
             @checkbox(f("businessType[]"), "supervision.memberofprofessionalbody.lbl.14", "14", target = s"#$target1")
         }
+        @panel(
+            field = Some(f(s"$target1")),
+            panel = false,
+            jsHidden = true
+        ) {
             @input(
-                panel = true,
                 field = f("specifyOtherBusiness"),
-                labelText = "lbl.pleasespecify"
+                labelText = "lbl.pleasespecify",
+                panel = true
             )
-
+        }
         @submit(edit)
     }
 }
