@@ -19,3 +19,4 @@
 - [ ] Unit test approach and implementation has been reviewed with QA (testers).
 - [ ] Requires acceptance test run.
 - [ ] Appropriate labels added.
+- [ ] RELEASE NOTES ADDED.
