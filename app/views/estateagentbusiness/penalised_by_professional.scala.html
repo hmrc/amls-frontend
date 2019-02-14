@@ -82,15 +82,21 @@ heading = header
         classes = Seq("professionalBody-fieldset"),
         f = f(target)
     ) {
-        @textarea(
-            field = f("professionalBody"),
-            labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
-            hintText = "hint.255.chars",
-            bold = false,
-            largeWidth = true,
-            cols = "30",
-            rows = "8"
-        )
+        @panel(
+            jsHidden = false,
+            wide = true,
+            gutter = true
+        ) {
+            @textarea(
+                field = f("professionalBody"),
+                labelText = "estateagentbusiness.penalisedbyprofessional.lbl.detailslbl",
+                hintText = "hint.255.chars",
+                bold = false,
+                largeWidth = true,
+                cols = "30",
+                rows = "8"
+            )
+        }
     }
 
 @submit(edit)
