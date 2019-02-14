@@ -75,15 +75,21 @@
             classes = Seq("professionalBodyAct-fieldset"),
             f = f("penalisedUnderEstateAgentsActDetails-fieldset")
         ) {
-            @textarea(
-                f("penalisedUnderEstateAgentsActDetails"),
-                labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
-                hintText = "hint.255.chars",
-                bold = false,
-                largeWidth = true,
-                cols = "30",
-                rows = "8"
-            )
+            @panel(
+                jsHidden = false,
+                wide = false,
+                gutter = true
+            ) {
+                @textarea(
+                    f("penalisedUnderEstateAgentsActDetails"),
+                    labelText = "estateagentbusiness.penalisedunderestateagentsact.lbl.detailslbl",
+                    hintText = "hint.255.chars",
+                    bold = false,
+                    largeWidth = true,
+                    cols = "30",
+                    rows = "8"
+                )
+            }
         }
 
         @submit(edit)
