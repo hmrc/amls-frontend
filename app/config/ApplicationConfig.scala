@@ -16,7 +16,6 @@
 
 package config
 
-import config.ApplicationConfig.{amlsUrl, baseUrl, notificationsUrl}
 import javax.inject.Inject
 import play.api.Mode.Mode
 import play.api.{Configuration, Environment, Play}
@@ -122,6 +121,10 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
   def notificationsUrl = baseUrl("amls-notification")
 
   def allNotificationsUrl = s"$notificationsUrl/amls-notification"
+
+  def ggUrl = baseUrl("government-gateway")
+
+  def enrolUrl = s"$ggUrl/enrol"
 
   val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
   val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
