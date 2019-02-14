@@ -145,6 +145,7 @@ object FormTypes {
   private val phoneNumberPattern = regexWithMsg(phoneNumberRegex, "err.invalid.phone.number")
 
   private val emailRequired = required("error.required.rp.email")
+  private val confirmEmailRequired = required("error.invalid.rp.email")
   private val emailLength = maxWithMsg(maxEmailLength, "error.max.length.rp.email")
   private val emailPattern = regexWithMsg(emailRegex, "error.invalid.rp.email")
 
@@ -160,6 +161,7 @@ object FormTypes {
 
   val phoneNumberType = notEmptyStrip andThen phoneNumberRequired andThen phoneNumberLength andThen phoneNumberPattern
   val emailType = emailRequired andThen emailLength andThen emailPattern
+  val confirmEmailType = confirmEmailRequired andThen emailLength andThen emailPattern
   val dayType = dayRequired andThen dayPattern
   val monthType = monthRequired andThen monthPattern
   private val yearTypePost1900: Rule[String, String] = yearRequired andThen yearPatternPost1900
@@ -212,7 +214,7 @@ object FormTypes {
   val confirmEmailMatchRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
     ((__ \ "email").read(emailType) ~
-      (__ \ "confirmEmail").read(emailType)).tupled.andThen(confirmEmailMatchRuleMapping)
+      (__ \ "confirmEmail").read(confirmEmailType)).tupled.andThen(confirmEmailMatchRuleMapping)
   }
 
   val premisesEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {

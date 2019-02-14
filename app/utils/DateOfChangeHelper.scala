@@ -47,7 +47,7 @@ trait DateOfChangeHelper {
     def startDate = tradingPremises.yourTradingPremises.fold[Option[LocalDate]](None)(ytp => ytp.startDate)
 
     def startDateValidationMessage =
-      Messages("error.expected.tp.dateofchange.after.startdate", startDate.fold("")(_.toString("dd-MM-yyyy")))
+      Messages("error.expected.tp.dat. eofchange.after.startdate", startDate.fold("")(_.toString("dd-MM-yyyy")))
   }
 
 }
