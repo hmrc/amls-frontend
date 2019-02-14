@@ -23,22 +23,22 @@ import org.scalatest.BeforeAndAfter
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures with BeforeAndAfter {
 
   val emptyCache = CacheMap("", Map.empty)
 
-  object KeystoreConnector extends KeystoreConnector {
-    override private[connectors] val amlsDataCache: SessionCache = mock[SessionCache]
-  }
+  val amlsDataCache = mock[SessionCache]
+
+  val connector = new KeystoreConnector(amlsDataCache)
 
   before {
-    reset(KeystoreConnector.amlsDataCache)
+    reset(connector.amlsDataCache)
   }
 
   implicit val hc = mock[HeaderCarrier]
@@ -48,10 +48,10 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "return a successful future when the value is found" in {
 
       when {
-        KeystoreConnector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any(), any())
+        connector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any(), any())
       } thenReturn Future.successful(Some(ConfirmationStatus(Some(true))))
 
-      whenReady(KeystoreConnector.confirmationStatus) { result =>
+      whenReady(connector.confirmationStatus) { result =>
         result mustBe ConfirmationStatus(Some(true))
       }
 
@@ -59,10 +59,10 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
     "return an empty successful future when the value is not found" in {
       when {
-        KeystoreConnector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any(), any())
+        connector.amlsDataCache.fetchAndGetEntry[ConfirmationStatus](eqTo(ConfirmationStatus.key))(any(), any(), any())
       } thenReturn Future.successful(None)
 
-      whenReady(KeystoreConnector.confirmationStatus) { result =>
+      whenReady(connector.confirmationStatus) { result =>
         result mustBe ConfirmationStatus(None)
       }
 
@@ -71,11 +71,11 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "save the confirmation status into the keystore" in {
 
       when {
-        KeystoreConnector.amlsDataCache.cache(any(), any())(any(), any(), any())
+        connector.amlsDataCache.cache(any(), any())(any(), any(), any())
       } thenReturn Future.successful(emptyCache)
 
-      whenReady(KeystoreConnector.setConfirmationStatus) { _ =>
-        verify(KeystoreConnector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(Some(true))))(any(), any(), any())
+      whenReady(connector.setConfirmationStatus) { _ =>
+        verify(connector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(Some(true))))(any(), any(), any())
       }
 
     }
@@ -83,11 +83,11 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
     "remove the confirmation status from the keystore" in {
 
       when {
-        KeystoreConnector.amlsDataCache.cache(any(), any())(any(), any(), any())
+        connector.amlsDataCache.cache(any(), any())(any(), any(), any())
       } thenReturn Future.successful(emptyCache)
 
-      whenReady(KeystoreConnector.resetConfirmation) { _ =>
-        verify(KeystoreConnector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(None)))(any(), any(), any())
+      whenReady(connector.resetConfirmation) { _ =>
+        verify(connector.amlsDataCache).cache(eqTo(ConfirmationStatus.key), eqTo(ConfirmationStatus(None)))(any(), any(), any())
       }
 
     }

@@ -16,17 +16,15 @@
 
 package connectors
 
-import config.{AmlsSessionCache, BusinessCustomerSessionCache}
-import models.businesscustomer.ReviewDetails
+import config.AmlsSessionCache
+import javax.inject.Inject
 import models.status.ConfirmationStatus
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.SessionCache
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait KeystoreConnector {
-
-  private[connectors] def amlsDataCache: SessionCache
+class KeystoreConnector @Inject()(val amlsDataCache: SessionCache = AmlsSessionCache) {
 
   def confirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     amlsDataCache.fetchAndGetEntry[ConfirmationStatus](ConfirmationStatus.key) flatMap {
@@ -40,9 +38,4 @@ trait KeystoreConnector {
   def resetConfirmation(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     amlsDataCache.cache(ConfirmationStatus.key, ConfirmationStatus(None)) flatMap { _ => Future.successful() }
 
-}
-
-object KeystoreConnector extends KeystoreConnector {
-  // $COVERAGE-OFF$
-  override private[connectors] def amlsDataCache: SessionCache = AmlsSessionCache
 }
