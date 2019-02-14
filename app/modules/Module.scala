@@ -41,7 +41,6 @@ class Module extends AbstractModule {
     bind(classOf[KeystoreConnector]).toInstance(KeystoreConnector)
     bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
-    bind(classOf[AmlsNotificationConnector]).toInstance(AmlsNotificationConnector)
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[GovernmentGatewayService]).toInstance(GovernmentGatewayService)
     bind(classOf[CorePost]).toInstance(WSHttp)

@@ -16,21 +16,21 @@
 
 package connectors
 
-import config.{ApplicationConfig, WSHttp}
-import models.notifications.{NotificationDetails, NotificationResponse, NotificationRow}
+import config.{AppConfig, WSHttp}
+import javax.inject.Inject
+import models.notifications.{NotificationDetails, NotificationRow}
 import play.api.Logger
-import play.api.libs.json.{Json, Writes}
+import play.api.libs.json.Writes
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.http._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{CoreGet, CorePost, _}
 
-trait AmlsNotificationConnector {
+class AmlsNotificationConnector @Inject()(private[connectors] val http: WSHttp,
+                                          private[this] val appConfig: AppConfig) {
 
-  private[connectors] val http : CoreGet with CorePost
-  private[connectors] def baseUrl : String
+  private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 
   def fetchAllByAmlsRegNo(amlsRegistrationNumber: String)(implicit
                                                           headerCarrier: HeaderCarrier,
@@ -80,10 +80,4 @@ trait AmlsNotificationConnector {
         case _:NotFoundException => None
       }
   }
-}
-
-object AmlsNotificationConnector extends AmlsNotificationConnector {
-  // $COVERAGE-OFF$
-  override private[connectors] lazy val http = WSHttp
-  override private[connectors] def baseUrl = ApplicationConfig.allNotificationsUrl
 }
