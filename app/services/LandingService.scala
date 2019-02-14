@@ -286,7 +286,7 @@ trait LandingService {
 
 object LandingService extends LandingService {
   // $COVERAGE-OFF$
-  override private[services] lazy val cacheConnector = DataCacheConnector
+  override private[services] lazy val cacheConnector = Play.current.injector.instanceOf[DataCacheConnector]
   override private[services] lazy val keyStore = Play.current.injector.instanceOf[KeystoreConnector]
   override private[services] lazy val desConnector = Play.current.injector.instanceOf[AmlsConnector]
   override private[services] lazy val statusService = Play.current.injector.instanceOf[StatusService]

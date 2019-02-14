@@ -19,7 +19,6 @@ package modules
 import com.google.inject.{AbstractModule, Provides, TypeLiteral}
 import com.typesafe.config.Config
 import config.{AMLSAuditConnector, WSHttp}
-import connectors._
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
 import play.api.Configuration
@@ -38,7 +37,6 @@ class Module extends AbstractModule {
     bind(classOf[HttpPost]).toInstance(WSHttp)
     bind(classOf[HttpDelete]).toInstance(WSHttp)
     bind(classOf[WSHttp]).toInstance(WSHttp)
-    bind(classOf[DataCacheConnector]).toInstance(DataCacheConnector)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
     bind(classOf[CorePost]).toInstance(WSHttp)
