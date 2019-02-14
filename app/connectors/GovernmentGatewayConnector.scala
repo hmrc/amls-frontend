@@ -29,9 +29,9 @@ import utils.AuditHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GovernmentGatewayConnector @Inject()(protected[connectors] val http: WSHttp,
-                                           private[this] val appConfig: AppConfig,
-                                           private[connectors] val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
+class GovernmentGatewayConnector @Inject()(val http: WSHttp,
+                                           val appConfig: AppConfig,
+                                           val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
                                           ) {
 
   protected def enrolUrl = appConfig.enrolUrl

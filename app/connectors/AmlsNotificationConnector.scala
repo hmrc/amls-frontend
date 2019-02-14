@@ -27,8 +27,8 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsNotificationConnector @Inject()(private[connectors] val http: WSHttp,
-                                          private[this] val appConfig: AppConfig) {
+class AmlsNotificationConnector @Inject()(val http: WSHttp,
+                                          val appConfig: AppConfig) {
 
   private[connectors] def baseUrl : String = appConfig.allNotificationsUrl
 

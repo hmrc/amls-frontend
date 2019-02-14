@@ -30,10 +30,10 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class AmlsConnector @Inject()(private[connectors] val httpPost: WSHttp,
-                              private[connectors] val httpGet: WSHttp,
-                              private[connectors] val httpPut: WSHttp,
-                              private[this] val appConfig: AppConfig) {
+class AmlsConnector @Inject()(val httpPost: WSHttp,
+                              val httpGet: WSHttp,
+                              val httpPut: WSHttp,
+                              val appConfig: AppConfig) {
 
   private[connectors] val url: String = appConfig.subscriptionUrl
 
