@@ -44,61 +44,7 @@ import utils.{ControllerHelper, DeclarationHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
-  def sections
-  (implicit hc: HeaderCarrier,
-            ac: AuthContext,
-            ec: ExecutionContext): Future[Seq[Section]] =
 
-    cacheConnector.fetchAll map {
-      optionCache =>
-        optionCache map {
-          cache =>
-            sections(cache)
-        } getOrElse Seq.empty
-    }
-
-  def sections(cache : CacheMap) : Seq[Section] = {
-      mandatorySections(cache) ++
-      dependentSections(cache)
-  }
-
-  def sectionsFromBusinessActivities(activities: Set[BusinessActivity],
-                                     msbServices: Option[BusinessMatchingMsbServices]
-                                    )(implicit cache: CacheMap): Set[Section] =
-    activities.foldLeft[Set[Section]](Set.empty) {
-      (m, n) => n match {
-        case AccountancyServices =>
-          m + Asp.section + Supervision.section
-        case EstateAgentBusinessService =>
-          m + EstateAgentBusiness.section
-        case HighValueDealing =>
-          m + Hvd.section
-        case MoneyServiceBusiness if msbServices.isDefined =>
-          m + Msb.section
-        case TrustAndCompanyServices =>
-          m + Tcsp.section + Supervision.section
-        case _ => m
-      }
-    }
-
-  private def dependentSections(implicit cache: CacheMap): Set[Section] =
-    (for {
-      bm <- cache.getEntry[BusinessMatching](BusinessMatching.key)
-      ba <- bm.activities
-    } yield sectionsFromBusinessActivities(ba.businessActivities, bm.msbServices)) getOrElse Set.empty
-
-  private def mandatorySections(implicit cache: CacheMap): Seq[Section] =
-    Seq(
-      BusinessMatching.section,
-      AboutTheBusiness.section,
-      BusinessActivities.section,
-      BankDetails.section,
-      TradingPremises.section,
-      ResponsiblePerson.section
-    )
-
-}
 
 class ProgressService @Inject()(
                                  val cacheConnector: DataCacheConnector,

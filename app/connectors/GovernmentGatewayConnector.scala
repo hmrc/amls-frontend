@@ -67,7 +67,7 @@ trait GovernmentGatewayConnector {
 
 object GovernmentGatewayConnector extends GovernmentGatewayConnector {
   override val http: CorePost = WSHttp
-  override val enrolUrl: String = ApplicationConfig.enrolUrl
+  override lazy val enrolUrl: String = ApplicationConfig.enrolUrl
   override private[connectors] val audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
   private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
   private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"
