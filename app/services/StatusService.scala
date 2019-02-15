@@ -30,9 +30,9 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class StatusService @Inject() (
                                 val amlsConnector: AmlsConnector,
-                                val enrolmentsService: AuthEnrolmentsService
+                                val enrolmentsService: AuthEnrolmentsService,
+                                val sectionsProvider: SectionsProvider
                               ){
-  private[services] def progressService: ProgressService = Play.current.injector.instanceOf[ProgressService]
   private val renewalPeriod = 30
 
   val Pending = "Pending"
@@ -137,7 +137,7 @@ class StatusService @Inject() (
         _.status == Completed
       }
 
-    progressService.sections map {
+    sectionsProvider.sections map {
       sections =>
         if (isComplete(sections)) {
           Logger.debug("StatusService:notYetSubmitted: SubmissionReady")

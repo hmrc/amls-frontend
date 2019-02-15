@@ -28,9 +28,9 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{ProgressService, RenewalService}
+import services.{ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -47,16 +47,18 @@ class SummaryControllerSpec extends AmlsSpec with MockitoSugar {
     lazy val mockDataCacheConnector = mock[DataCacheConnector]
     lazy val mockRenewalService = mock[RenewalService]
     lazy val mockProgressService = mock[ProgressService]
+    lazy val mockSectionsProvider = mock[SectionsProvider]
 
     val controller = new SummaryController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
       renewalService = mockRenewalService,
-      progressService = mockProgressService
+      progressService = mockProgressService,
+      sectionsProvider = mockSectionsProvider
     )
 
     when {
-      mockProgressService.sections(any())
+      mockSectionsProvider.sections(any())
     } thenReturn Seq.empty[Section]
 
     when {
