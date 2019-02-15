@@ -30,10 +30,9 @@ import utils.AuditHelper
 import scala.concurrent.{ExecutionContext, Future}
 
 class GovernmentGatewayConnector @Inject()(val http: WSHttp,
-                                           val appConfig: AppConfig,
-                                           val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
-                                          ) {
+                                           val appConfig: AppConfig) {
 
+  val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
   protected def enrolUrl = appConfig.enrolUrl
   private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
   private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"

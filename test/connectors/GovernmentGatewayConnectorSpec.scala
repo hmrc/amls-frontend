@@ -45,7 +45,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
   trait Fixture extends DependencyMocks {
     val audit = mock[Audit]
 
-    val connector = new GovernmentGatewayConnector(mock[WSHttp], mock[AppConfig], audit)
+    val connector = new GovernmentGatewayConnector(mock[WSHttp], mock[AppConfig])
 
     val fn: DataEvent => Unit = d => {}
 

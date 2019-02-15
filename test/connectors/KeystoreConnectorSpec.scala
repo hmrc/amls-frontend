@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.AmlsSessionCache
 import models.status.ConfirmationStatus
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
@@ -24,7 +25,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.{CacheMap, SessionCache}
+import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -33,7 +34,7 @@ class KeystoreConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures
 
   val emptyCache = CacheMap("", Map.empty)
 
-  val amlsDataCache = mock[SessionCache]
+  val amlsDataCache = mock[AmlsSessionCache]
 
   val connector = new KeystoreConnector(amlsDataCache)
 

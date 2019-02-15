@@ -17,14 +17,14 @@
 package connectors
 
 import config.AmlsSessionCache
-import javax.inject.Inject
+import javax.inject.{Inject, Singleton}
 import models.status.ConfirmationStatus
 import uk.gov.hmrc.http.HeaderCarrier
-import uk.gov.hmrc.http.cache.client.SessionCache
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class KeystoreConnector @Inject()(val amlsDataCache: SessionCache = AmlsSessionCache) {
+@Singleton
+class KeystoreConnector @Inject()(val amlsDataCache: AmlsSessionCache) {
 
   def confirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
     amlsDataCache.fetchAndGetEntry[ConfirmationStatus](ConfirmationStatus.key) flatMap {
