@@ -44,14 +44,14 @@
         ) {
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                labelText = "lbl.yes",
                 value = "true",
                 target = s"#${f("postCode").id}-fieldset",
                 inline = true
             )
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                labelText = "lbl.no",
                 value = "false",
                 target = s"#${f("country").id}-fieldset",
                 inline = true
