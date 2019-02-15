@@ -32,7 +32,7 @@ import play.api.i18n.Messages
 import play.api.mvc.Call
 import play.api.test.Helpers._
 import services.businessmatching.BusinessMatchingService
-import services.{AuthEnrolmentsService, ProgressService}
+import services.{AuthEnrolmentsService, ProgressService, SectionsProvider}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
@@ -56,6 +56,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
       dataCache = mockCacheConnector,
       enrolmentsService = mock[AuthEnrolmentsService],
       statusService = mockStatusService,
+      sectionsProvider = mock[SectionsProvider],
       businessMatchingService = mockBusinessMatchingService,
       serviceFlow = mockServiceFlow
     )
@@ -68,7 +69,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
     when(mockBusinessMatchingService.getAdditionalBusinessActivities(any(), any(), any())) thenReturn OptionT.none[Future, Set[BusinessActivity]]
 
     when {
-      controller.progressService.sectionsFromBusinessActivities(any(), any())(any())
+      controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
     } thenReturn Set.empty[Section]
 
     when {
@@ -87,7 +88,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
           mockApplicationStatus(SubmissionReadyForReview)
 
-          when(controller.progressService.sections(mockCacheMap))
+          when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
           val responseF = controller.get()(request)
@@ -118,7 +119,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.progressService.sections(mockCacheMap))
+            when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq(
                 Section("TESTSECTION1", Completed, false, mock[Call]),
                 Section("TESTSECTION2", Completed, true, mock[Call])
@@ -145,7 +146,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
             mockApplicationStatus(ReadyForRenewal(None))
 
-            when(controller.progressService.sections(mockCacheMap))
+            when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq.empty[Section])
 
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
@@ -172,7 +173,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
@@ -195,7 +196,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
               mockApplicationStatus(SubmissionReadyForReview)
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
@@ -221,7 +222,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, false, mock[Call])
@@ -244,7 +245,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", Completed, false, mock[Call]),
                   Section("TESTSECTION2", Completed, false, mock[Call])
@@ -274,7 +275,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", NotStarted, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
@@ -297,7 +298,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
                 .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-              when(controller.progressService.sections(mockCacheMap))
+              when(controller.sectionsProvider.sections(mockCacheMap))
                 .thenReturn(Seq(
                   Section("TESTSECTION1", NotStarted, false, mock[Call]),
                   Section("TESTSECTION2", Completed, true, mock[Call])
@@ -322,7 +323,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
               .thenReturn(Future.successful(Some(amlsRegistrationNumber)))
 
-            when(controller.progressService.sections(mockCacheMap))
+            when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(Seq(
                 Section("TESTSECTION1", NotStarted, false, mock[Call]),
                 Section("TESTSECTION2", Completed, false, mock[Call])
@@ -351,7 +352,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
               Section("TESTSECTION2", Completed, false, mock[Call])
             )
 
-            when(controller.progressService.sections(mockCacheMap))
+            when(controller.sectionsProvider.sections(mockCacheMap))
               .thenReturn(sections)
 
             val responseF = controller.get()(request)
@@ -382,7 +383,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
             Section("TESTSECTION2", Completed, false, mock[Call])
           )
 
-          when(controller.progressService.sections(mockCacheMap))
+          when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(sections)
 
           val responseF = controller.get()(request)
@@ -400,7 +401,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
 
       "the user is not enrolled into the AMLS Account" must {
         "show the registration progress page" in new Fixture {
-          when(controller.progressService.sections(mockCacheMap))
+          when(controller.sectionsProvider.sections(mockCacheMap))
             .thenReturn(Seq.empty[Section])
 
           when(controller.enrolmentsService.amlsRegistrationNumber(any[AuthContext], any[HeaderCarrier], any[ExecutionContext]))
@@ -422,7 +423,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           mockCacheFetch(Some(mockBusinessMatching))
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
-          when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
+          when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
           status(result) must be(SEE_OTHER)
@@ -441,7 +442,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           } thenReturn Future.successful(Some(amlsRegistrationNumber))
 
           val completeSection = Section(BusinessMatching.messageKey, Started, true, controllers.routes.LandingController.get())
-          when(controller.progressService.sections(mockCacheMap)) thenReturn Seq(completeSection)
+          when(controller.sectionsProvider.sections(mockCacheMap)) thenReturn Seq(completeSection)
 
           val result = controller.get()(request)
           status(result) mustBe OK
@@ -469,7 +470,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           val sections = Seq(models.moneyservicebusiness.MoneyServiceBusiness.section)
 
           when {
-            controller.progressService.sections(any())
+            controller.sectionsProvider.sections(any())
           } thenReturn sections
 
           val newSections = Set(
@@ -478,7 +479,7 @@ class RegistrationProgressControllerSpec extends AmlsSpec
           )
 
           when {
-            controller.progressService.sectionsFromBusinessActivities(any(), any())(any())
+            controller.sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
           } thenReturn newSections
 
           mockApplicationStatus(SubmissionDecisionApproved)

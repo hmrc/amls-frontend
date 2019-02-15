@@ -44,13 +44,28 @@ import utils.{ControllerHelper, DeclarationHelper}
 import scala.concurrent.{ExecutionContext, Future}
 import uk.gov.hmrc.http.HeaderCarrier
 
-class ProgressService @Inject()(
-                                 val cacheConnector: DataCacheConnector,
-                                 val statusService: StatusService,
-                                 config: AppConfig
-                               ){
+class SectionsProvider @Inject()(protected val cacheConnector: DataCacheConnector) {
+  def sections
+  (implicit hc: HeaderCarrier,
+            ac: AuthContext,
+            ec: ExecutionContext): Future[Seq[Section]] =
 
-  def sectionsFromBusinessActivities(activities: Set[BusinessActivity], msbServices: Option[BusinessMatchingMsbServices])(implicit cache: CacheMap) =
+    cacheConnector.fetchAll map {
+      optionCache =>
+        optionCache map {
+          cache =>
+            sections(cache)
+        } getOrElse Seq.empty
+    }
+
+  def sections(cache : CacheMap) : Seq[Section] = {
+      mandatorySections(cache) ++
+      dependentSections(cache)
+  }
+
+  def sectionsFromBusinessActivities(activities: Set[BusinessActivity],
+                                     msbServices: Option[BusinessMatchingMsbServices]
+                                    )(implicit cache: CacheMap): Set[Section] =
     activities.foldLeft[Set[Section]](Set.empty) {
       (m, n) => n match {
         case AccountancyServices =>
@@ -83,25 +98,16 @@ class ProgressService @Inject()(
       ResponsiblePerson.section
     )
 
+}
 
-  def sections
-  (implicit
-   hc: HeaderCarrier,
-   ac: AuthContext,
-   ec: ExecutionContext
-  ): Future[Seq[Section]] =
-    cacheConnector.fetchAll map {
-      optionCache =>
-        optionCache map {
-          cache =>
-            sections(cache)
-        } getOrElse Seq.empty
-    }
+class ProgressService @Inject()(
+                                 val cacheConnector: DataCacheConnector,
+                                 val statusService: StatusService,
+                                 config: AppConfig
+                               ){
 
-  def sections(cache : CacheMap) : Seq[Section] = {
-      mandatorySections(cache) ++
-      dependentSections(cache)
-  }
+
+
 
   def getSubmitRedirect (implicit auth: AuthContext,  ec: ExecutionContext, hc: HeaderCarrier) : Future[Option[Call]] = {
 

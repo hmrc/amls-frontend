@@ -32,7 +32,7 @@ import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.mvc.Call
 import play.api.test.Helpers._
-import services.{ProgressService, RenewalService, StatusService}
+import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -57,6 +57,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     val progressService = mock[ProgressService]
     val renewalService = mock[RenewalService]
     val statusService = mock[StatusService]
+    val sectionsProvider = mock[SectionsProvider]
     val businessMatchingService = mock[BusinessMatchingService]
 
     lazy val app = new GuiceApplicationBuilder()
@@ -67,6 +68,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       .bindings(bind[RenewalService].to(renewalService))
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[StatusService].to(statusService))
+      .overrides(bind[SectionsProvider].to(sectionsProvider))
       .overrides(bind[BusinessMatchingService].to(businessMatchingService))
       .build()
 
@@ -83,7 +85,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
     } thenReturn Future.successful(Some(cacheMap))
 
     when {
-      progressService.sections(eqTo(cacheMap))
+      sectionsProvider.sections(eqTo(cacheMap))
     } thenReturn Seq(defaultSection)
 
     when {
@@ -106,7 +108,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
       .thenReturn(OptionT.none[Future, Set[BusinessActivity]])
 
     when {
-      progressService.sectionsFromBusinessActivities(any(), any())(any())
+      sectionsProvider.sectionsFromBusinessActivities(any(), any())(any())
     } thenReturn Set(defaultSection)
 
   }
@@ -169,7 +171,7 @@ class RenewalProgressControllerSpec extends AmlsSpec with BusinessMatchingGenera
         Section("businessmatching", Completed, true,  controllers.businessmatching.routes.SummaryController.get())
       )
 
-      when(controller.progressService.sections(cacheMap))
+      when(controller.sectionsProvider.sections(cacheMap))
         .thenReturn(sections)
 
       when(controller.renewals.canSubmit(any(),any()))

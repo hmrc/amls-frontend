@@ -16,8 +16,8 @@
 
 package services
 
+import com.google.inject.Inject
 import connectors.AmlsConnector
-import javax.inject.Inject
 import models.ReadStatusResponse
 import models.registrationprogress.{Completed, Section}
 import models.status._
@@ -28,10 +28,11 @@ import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class StatusService @Inject()(private[services] val amlsConnector: AmlsConnector,
-                              private[services] val progressService: ProgressService,
-                              private[services] val enrolmentsService: AuthEnrolmentsService) {
-
+class StatusService @Inject() (
+                                val amlsConnector: AmlsConnector,
+                                val enrolmentsService: AuthEnrolmentsService,
+                                val sectionsProvider: SectionsProvider
+                              ){
   private val renewalPeriod = 30
 
   val Pending = "Pending"
@@ -136,7 +137,7 @@ class StatusService @Inject()(private[services] val amlsConnector: AmlsConnector
         _.status == Completed
       }
 
-    progressService.sections map {
+    sectionsProvider.sections map {
       sections =>
         if (isComplete(sections)) {
           Logger.debug("StatusService:notYetSubmitted: SubmissionReady")

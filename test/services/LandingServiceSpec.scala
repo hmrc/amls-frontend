@@ -38,8 +38,6 @@ import models.{AmendVariationRenewalResponse, Country, SubscriptionResponse, Vie
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.inject.bind
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Writes
 import play.api.test.{DefaultAwaitTimeout, FakeRequest, FutureAwaits}
 import uk.gov.hmrc.http.HeaderCarrier
@@ -52,15 +50,13 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits with DefaultAwaitTimeout {
 
-  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
-
-  object TestLandingService extends LandingService {
-    override private[services] val cacheConnector = mock[DataCacheConnector]
-    override private[services] val keyStore = mock[KeystoreConnector]
-    override private[services] val desConnector = mock[AmlsConnector]
-    override private[services] val statusService = mock[StatusService]
-    override private[services] val businessMatchingConnector = mock[BusinessMatchingConnector]
-  }
+  val service = new LandingService (
+    cacheConnector = mock[DataCacheConnector],
+    keyStore = mock[KeystoreConnector],
+    desConnector = mock[AmlsConnector],
+    statusService = mock[StatusService],
+    businessMatchingConnector = mock[BusinessMatchingConnector]
+  )
 
   "setAltCorrespondenceAddress" must {
 
@@ -72,7 +68,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       implicit val r = FakeRequest()
 
-      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+      when(service.cacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
       def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
@@ -81,10 +77,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         } thenReturn Future.successful(result)
       }
 
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(service.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(true)))
 
 
-      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
 
     }
 
@@ -93,7 +89,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val aboutTheBusiness = AboutTheBusiness(None, None, None, None, None,None, None, None)
 
-      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+      when(service.cacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
       def setUpMockView[T](mock: DataCacheConnector, result: CacheMap, key: String, section: T) = {
@@ -102,10 +98,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         } thenReturn Future.successful(result)
       }
 
-      setUpMockView(TestLandingService.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(false)))
+      setUpMockView(service.cacheConnector, cacheMap, AboutTheBusiness.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(false)))
 
 
-      await(TestLandingService.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
 
     }
   }
@@ -141,7 +137,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
       val cache = mock[CacheMap]
 
-      when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+      when(service.cacheConnector.save[AboutTheBusiness](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(cache))
 
       when {
@@ -149,22 +145,22 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       } thenReturn None
 
       when {
-        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
-      setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(service.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-      await(TestLandingService.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
+      await(service.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
 
-      verify(TestLandingService.desConnector).view(any())(any(), any(), any(), any())
+      verify(service.desConnector).view(any())(any(), any(), any(), any())
     }
 
     "only call API 5 data" when {
       "the cache doesn't contain a ViewResponse entry" in {
         val cache = mock[CacheMap]
 
-        reset(TestLandingService.cacheConnector)
-        reset(TestLandingService.desConnector)
+        reset(service.cacheConnector)
+        reset(service.desConnector)
 
         val model = AboutTheBusiness()
 
@@ -172,14 +168,14 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
           cache.getEntry[AboutTheBusiness](eqTo(AboutTheBusiness.key))(any())
         } thenReturn Some(model)
 
-        when(TestLandingService.cacheConnector.save[AboutTheBusiness](any(), any())
+        when(service.cacheConnector.save[AboutTheBusiness](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
-        setUpMockView(TestLandingService.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+        setUpMockView(service.cacheConnector, cache, AboutTheBusiness.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
-        await(TestLandingService.setAltCorrespondenceAddress("regNo", Some(cache)))
+        await(service.setAltCorrespondenceAddress("regNo", Some(cache)))
 
-        verify(TestLandingService.desConnector, never()).view(any())(any(), any(), any(), any())
+        verify(service.desConnector, never()).view(any())(any(), any(), any(), any())
       }
     }
 
@@ -206,72 +202,72 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     )
 
     "update all saved sections" in {
-      reset(TestLandingService.cacheConnector)
+      reset(service.cacheConnector)
 
-      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
+      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(SubmissionReadyForReview))
 
       when {
-        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
       val user = mock[LoggedInUser]
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
       when {
-        TestLandingService.cacheConnector.fetchAllWithDefault
+        service.cacheConnector.fetchAllWithDefault
       } thenReturn Future.successful(cacheMap)
 
       val subscriptionResponse = mock[SubscriptionResponse]
       val amendVariationResponse = mock[AmendVariationRenewalResponse]
 
       when {
-        TestLandingService.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
       } thenReturn Future.successful(Some(subscriptionResponse))
 
       when {
-        TestLandingService.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
       } thenReturn Future.successful(Some(amendVariationResponse))
 
       when {
-        TestLandingService.cacheConnector.saveAll(any())(any(),any())
+        service.cacheConnector.saveAll(any())(any(),any())
       } thenReturn Future.successful(cacheMap)
 
-      await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo")) mustEqual cacheMap
 
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
         eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
         eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BankDetails.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AddPerson.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
         eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
         eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Tcsp.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Tcsp.key),
         eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Asp.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Asp.key),
         eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
         eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Hvd.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
         eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Supervision.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
         eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
         eqTo(Some(subscriptionResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
         eqTo(Some(amendVariationResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
         eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
     }
   }
@@ -336,69 +332,69 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
     )
 
     "update all saved sections" in {
-      reset(TestLandingService.cacheConnector)
+      reset(service.cacheConnector)
 
-      when(TestLandingService.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
+      when(service.statusService.getStatus(any(), any(), any())).thenReturn(Future.successful(RenewalSubmitted(None)))
 
       when {
-        TestLandingService.cacheConnector.fetchAllWithDefault
+        service.cacheConnector.fetchAllWithDefault
       } thenReturn Future.successful(cacheMap)
 
       when {
-        TestLandingService.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
+        service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
       when {
-        TestLandingService.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[SubscriptionResponse](eqTo(SubscriptionResponse.key))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       when {
-        TestLandingService.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
+        service.cacheConnector.fetch[AmendVariationRenewalResponse](eqTo(AmendVariationRenewalResponse.key))(any(), any(), any())
       } thenReturn Future.successful(None)
 
       val user = mock[LoggedInUser]
 
       when(authContext.user).thenReturn(user)
       when(user.oid).thenReturn("")
-      when(TestLandingService.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
+      when(service.cacheConnector.remove(any(), any())).thenReturn(Future.successful(true))
 
       when {
-        TestLandingService.cacheConnector.saveAll(any())(any(), any())
+        service.cacheConnector.saveAll(any())(any(), any())
       } thenReturn Future.successful(cacheMap)
 
-      await(TestLandingService.refreshCache("regNo")) mustEqual cacheMap
+      await(service.refreshCache("regNo")) mustEqual cacheMap
 
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(ViewResponse.key),
         eqTo(Some(viewResponse)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BusinessMatching.key),
         eqTo(viewResponse.businessMatchingSection.copy(hasAccepted = true, preAppComplete = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(EstateAgentBusiness.key),
         eqTo(Some(viewResponse.eabSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AboutTheBusiness.key),
         eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BankDetails.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AddPerson.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
         eqTo(viewResponse.aboutYouSection))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(BusinessActivities.key),
         eqTo(viewResponse.businessActivitiesSection.copy(hasAccepted = true)))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Tcsp.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Tcsp.key),
         eqTo(Some(viewResponse.tcspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Asp.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Asp.key),
         eqTo(Some(viewResponse.aspSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(MoneyServiceBusiness.key),
         eqTo(Some(viewResponse.msbSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Hvd.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Hvd.key),
         eqTo(Some(viewResponse.hvdSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(Supervision.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(Supervision.key),
         eqTo(Some(viewResponse.supervisionSection.copy(hasAccepted = true))))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(SubscriptionResponse.key),
         eqTo(None))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(AmendVariationRenewalResponse.key),
         eqTo(None))(any(), any(), any())
-      verify(TestLandingService.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
+      verify(service.cacheConnector).upsert(any(), eqTo(ResponsiblePerson.key),
         eqTo(Some(viewResponse.responsiblePeopleSection.fold(Seq.empty[ResponsiblePerson])(_.map(rp => rp.copy(hasAccepted = true))))))(any(), any(), any())
     }
   }
@@ -417,12 +413,12 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       implicit val r = FakeRequest()
 
       when {
-        TestLandingService.businessMatchingConnector.getReviewDetails(any())
+        service.businessMatchingConnector.getReviewDetails(any())
       } thenReturn Future.successful(Some(model))
 
-      await(TestLandingService.reviewDetails)
+      await(service.reviewDetails)
 
-      verify(TestLandingService.businessMatchingConnector).getReviewDetails(any())
+      verify(service.businessMatchingConnector).getReviewDetails(any())
     }
   }
 
@@ -445,20 +441,20 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "save BusinessMatching succeed" in {
       when {
-        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.successful(cacheMap)
 
-      whenReady (TestLandingService.updateReviewDetails(reviewDetails)) {
+      whenReady (service.updateReviewDetails(reviewDetails)) {
         _ mustEqual cacheMap
       }
     }
 
     "pass back a failed future when updating BusinessMatching fails" in {
       when {
-        TestLandingService.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
+        service.cacheConnector.save[BusinessMatching](eqTo(BusinessMatching.key), any())(any(), any(), any())
       } thenReturn Future.failed(new Exception(""))
 
-      whenReady (TestLandingService.updateReviewDetails(reviewDetails).failed) {
+      whenReady (service.updateReviewDetails(reviewDetails).failed) {
         _ mustBe an[Exception]
       }
     }

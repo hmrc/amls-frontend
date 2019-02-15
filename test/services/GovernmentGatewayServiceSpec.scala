@@ -17,20 +17,22 @@
 package services
 
 import connectors.GovernmentGatewayConnector
-import org.mockito.Matchers._
-import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import play.api.http.Status._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
-import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
+import scala.concurrent.ExecutionContext.Implicits.global
+import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
-  val ggService = new GovernmentGatewayService(mock[GovernmentGatewayConnector])
+  val service: GovernmentGatewayService = new GovernmentGatewayService(
+    ggConnector = mock[GovernmentGatewayConnector]
+  )
 
   "GovernmentGatewayService" must {
 
@@ -41,10 +43,10 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
       val response = HttpResponse(OK)
 
       when {
-        ggService.ggConnector.enrol(any())(any(), any(), any())
+        service.ggConnector.enrol(any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (ggService.enrol("mlrRefNo", "safeId", "postcode")) {
+      whenReady (service.enrol("mlrRefNo", "safeId", "postcode")) {
         result =>
           result must equal (response)
       }

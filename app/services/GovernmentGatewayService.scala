@@ -16,14 +16,16 @@
 
 package services
 
+import com.google.inject.Inject
 import connectors.GovernmentGatewayConnector
-import javax.inject.Inject
 import models.governmentgateway.EnrolmentRequest
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
 
-class GovernmentGatewayService @Inject()(private[services] val ggConnector: GovernmentGatewayConnector) {
+class GovernmentGatewayService @Inject() (
+                                         val ggConnector: GovernmentGatewayConnector
+                                         ){
 
   def enrol
   (mlrRefNo: String, safeId: String, postCode: String)

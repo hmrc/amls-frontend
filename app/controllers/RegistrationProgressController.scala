@@ -17,7 +17,6 @@
 package controllers
 
 import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import config.AMLSAuthConnector
@@ -28,7 +27,7 @@ import models.renewal.Renewal
 import models.status._
 import play.api.mvc.{AnyContent, Request}
 import services.businessmatching.{BusinessMatchingService, ServiceFlow}
-import services.{AuthEnrolmentsService, ProgressService, StatusService}
+import services.{AuthEnrolmentsService, ProgressService, SectionsProvider, StatusService}
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
@@ -46,6 +45,7 @@ class RegistrationProgressController @Inject()(
                                                 protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                 protected[controllers] val statusService: StatusService,
                                                 protected[controllers] val progressService: ProgressService,
+                                                protected[controllers] val sectionsProvider: SectionsProvider,
                                                 protected[controllers] val businessMatchingService: BusinessMatchingService,
                                                 protected[controllers] val serviceFlow: ServiceFlow
                                               ) extends BaseController {
@@ -64,8 +64,8 @@ class RegistrationProgressController @Inject()(
               newActivities <- getNewActivities orElse OptionT.some(Set.empty[BusinessActivity])
             } yield {
               businessMatching.reviewDetails map { reviewDetails =>
-                val newSections = progressService.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
-                val sections = progressService.sections(cacheMap)
+                val newSections = sectionsProvider.sectionsFromBusinessActivities(newActivities, businessMatching.msbServices)(cacheMap).toSeq
+                val sections = sectionsProvider.sections(cacheMap)
                 val sectionsToDisplay = sections.filter(s => s.name != BusinessMatching.messageKey) diff newSections
                 val canEditPreapplication = Set(NotCompleted, SubmissionReady).contains(status)
                 val activities = businessMatching.activities.fold(Seq.empty[String])(_.businessActivities.map(_.getMessage()).toSeq)

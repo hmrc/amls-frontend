@@ -17,7 +17,6 @@
 package controllers.renewal
 
 import javax.inject.{Inject, Singleton}
-
 import cats.implicits._
 import cats.data.OptionT
 import connectors.DataCacheConnector
@@ -25,7 +24,7 @@ import controllers.BaseController
 import forms.EmptyForm
 import models.businessmatching.BusinessMatching
 import models.renewal.Renewal
-import services.{ProgressService, RenewalService}
+import services.{ProgressService, RenewalService, SectionsProvider}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.renewal.summary
 
@@ -38,7 +37,8 @@ class SummaryController @Inject()
   val dataCacheConnector: DataCacheConnector,
   val authConnector: AuthConnector,
   val renewalService: RenewalService,
-  val progressService: ProgressService
+  val progressService: ProgressService,
+  val sectionsProvider: SectionsProvider
 ) extends BaseController {
 
   def get = Authorised.async {
@@ -52,7 +52,7 @@ class SummaryController @Inject()
               renewal <- OptionT.fromOption[Future](cache.getEntry[Renewal](Renewal.key))
               renewalSection <- OptionT.liftF(renewalService.getSection)
             } yield {
-              val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
+              val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewalService.canSubmit(renewalSection, variationSections)
               Ok(summary(EmptyForm, renewal, businessMatching.activities, businessMatching.msbServices, canSubmit))
             }) getOrElse Redirect(controllers.routes.RegistrationProgressController.get())
