@@ -16,33 +16,20 @@
 
 package services
 
-import javax.inject.Inject
-
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import connectors.DataCacheConnector
-import models.aboutthebusiness.AboutTheBusiness
-import models.asp.Asp
-import models.bankdetails.BankDetails
-import models.businessactivities.BusinessActivities
+import javax.inject.Inject
 import models.businessmatching.BusinessType.Partnership
 import models.businessmatching.{BusinessActivities => _, _}
-import models.estateagentbusiness.EstateAgentBusiness
-import models.hvd.Hvd
-import models.moneyservicebusiness.{MoneyServiceBusiness => Msb}
-import models.registrationprogress.Section
 import models.responsiblepeople.ResponsiblePerson
-import models.supervision.Supervision
-import models.tcsp.Tcsp
-import models.tradingpremises.TradingPremises
 import play.api.mvc.Call
-import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import utils.{ControllerHelper, DeclarationHelper}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 
