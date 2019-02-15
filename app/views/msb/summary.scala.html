@@ -131,9 +131,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
                     editLinkTag = "msbsendmoneytoothercountries-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
-                        controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
                 ) {
                     <p>@otherCountries.money match {
                         case true => {@Messages("lbl.yes")}
