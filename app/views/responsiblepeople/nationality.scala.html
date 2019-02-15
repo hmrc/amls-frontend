@@ -66,11 +66,17 @@
             jsHidden = true,
             id = target
         ) {
-            @country_autocomplete(
-                field = f("otherCountry"),
-                labelText = "responsiblepeople.nationality.selection.other.name",
-                data = countryData.getOrElse(Seq.empty)
-            )
+            @panel(
+                jsHidden = false,
+                wide = false,
+                gutter = true
+            ) {
+                @country_autocomplete(
+                    field = f("otherCountry"),
+                    labelText = "responsiblepeople.nationality.selection.other.name",
+                    data = countryData.getOrElse(Seq.empty)
+                )
+            }
         }
 
         @submit(edit)
