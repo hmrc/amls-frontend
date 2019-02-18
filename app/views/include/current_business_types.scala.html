@@ -18,11 +18,6 @@
 
 @(existingActivities: Set[String])(implicit m: Messages)
 
-@panel(
-    jsHidden = false,
-    wide = true,
-    gutter = true
-) {
     @if(existingActivities.size == 1) {
         <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint")</p>
         <p>@existingActivities.head</p>
@@ -30,4 +25,3 @@
         <p>@Messages("businessmatching.updateservice.selectactivities.currentactivities.hint.plural")</p>
         <p>@bulletedList(existingActivities)</p>
     }
-}
