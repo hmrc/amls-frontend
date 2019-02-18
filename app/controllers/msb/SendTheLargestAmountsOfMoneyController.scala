@@ -60,11 +60,8 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
             _ <- cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.sendTheLargestAmountsOfMoney(Some(data))
             )
-          } yield edit match {
-            case true if msb.mostTransactions.isDefined =>
-              Redirect(routes.SummaryController.get())
-            case _ =>
-              Redirect(routes.MostTransactionsController.get(edit))
+          } yield {
+           Redirect(routes.MostTransactionsController.get(edit))
           }
       }
   }

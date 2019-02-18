@@ -131,9 +131,7 @@
                 @checkYourAnswers(
                     question = Messages("msb.send.money.title"),
                     editLinkTag = "msbsendmoneytoothercountries-edit",
-                    editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
-                        controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
-                    } else ""
+                    editUrl = controllers.msb.routes.SendMoneyToOtherCountryController.get(true).toString
                 ) {
                     <p>@otherCountries.money match {
                         case true => {@Messages("lbl.yes")}
@@ -146,9 +144,7 @@
                         @checkYourAnswers(
                             question = Messages("msb.send.the.largest.amounts.of.money.title"),
                             editLinkTag = "msbsendlargestamounts-edit",
-                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
-                                controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
-                            } else ""
+                            editUrl = controllers.msb.routes.SendTheLargestAmountsOfMoneyController.get(true).toString
                         ) {
                             <ul class="list list--comma">
                                 @lom.countryList.map { country =>
@@ -162,9 +158,7 @@
                         @checkYourAnswers(
                             question = Messages("msb.most.transactions.title"),
                             editLinkTag = "msbmosttransactions-edit",
-                            editUrl = if(isEditable || register.addedSubSectors.fold(false)(_.contains(TransmittingMoney))) {
-                                controllers.msb.routes.MostTransactionsController.get(true).toString
-                            } else ""
+                            editUrl = controllers.msb.routes.MostTransactionsController.get(true).toString
                         ) {
                             <ul class="list list--comma">
                                 @mt.countries.map { country =>
