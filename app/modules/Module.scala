@@ -39,6 +39,7 @@ class Module extends AbstractModule {
     bind(classOf[WSHttp]).toInstance(WSHttp)
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
+    bind(classOf[GovernmentGatewayConnector]).toInstance(GovernmentGatewayConnector)
     bind(classOf[CorePost]).toInstance(WSHttp)
     bind(classOf[CoreGet]).toInstance(WSHttp)
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
