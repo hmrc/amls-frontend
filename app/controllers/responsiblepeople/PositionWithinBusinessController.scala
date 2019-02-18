@@ -84,14 +84,10 @@ class PositionWithinBusinessController @Inject () (
               }
               rpSeqOption <- dataCacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key)
             } yield {
-              if (hasNominatedOfficer(rpSeqOption)) {
                 edit match {
                   case true => Redirect(routes.DetailedAnswersController.get(index, flow))
                   case _ => Redirect(routes.SoleProprietorOfAnotherBusinessController.get(index, edit, flow))
                 }
-              } else {
-                Redirect(routes.AreTheyNominatedOfficerController.get(index, edit))
-              }
             }
           } recoverWith {
             case _: IndexOutOfBoundsException => Future.successful(NotFound(notFoundView))
