@@ -16,7 +16,6 @@
 
 package models.aboutthebusiness
 
-import models.bankdetails.BankDetails
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
@@ -150,6 +149,17 @@ class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSui
 
     "isComplete must return false" in {
       partialModel.isComplete must be(false)
+    }
+  }
+
+  "isComplete return false" when {
+    "altCorrespondenceAddress is true but correspondenceAddress is not set" in {
+      val modelWithMissingCorrespondecneAddress = completeModel.copy(
+        altCorrespondenceAddress = Some(true),
+        correspondenceAddress = None
+      )
+
+      modelWithMissingCorrespondecneAddress.isComplete must be(false)
     }
   }
 
