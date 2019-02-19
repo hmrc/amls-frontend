@@ -81,7 +81,6 @@ class FrontendAuthConnector @Inject()(environment: Environment, val runModeConfi
   override protected def mode: Mode = environment.mode
 }
 
-@Singleton
 class AmlsSessionCache @Inject()(environment: Environment, override val runModeConfiguration: Configuration, override val appNameConfiguration: Configuration)
   extends SessionCache with AppName with ServicesConfig {
 
