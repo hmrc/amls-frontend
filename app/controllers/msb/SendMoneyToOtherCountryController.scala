@@ -64,7 +64,7 @@ class SendMoneyToOtherCountryController @Inject()(val dataCacheConnector: DataCa
                 services <- bm.msbServices
                 register <- cache.getEntry[ServiceChangeRegister](ServiceChangeRegister.key) orElse Some(ServiceChangeRegister())
               } yield {
-                data.money && edit match {
+                data.money match {
                   case true => dataCacheConnector.save(MoneyServiceBusiness.key, msb.sendMoneyToOtherCountry(data)) map {
                     _ => routing(data.money, services.msbServices,register, msb, edit)
                   }
