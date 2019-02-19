@@ -35,8 +35,6 @@ import scala.concurrent.Future
 
 class SatisfactionSurveyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
-
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 

@@ -38,7 +38,6 @@ import scala.concurrent.Future
 class AuthServiceSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with UserDetailsGenerator with OneAppPerSuite {
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.amls-frontend.public.host" -> "localhost:9222")
     .configure("microservice.services.logout.url" -> "http://logout")
     .build()

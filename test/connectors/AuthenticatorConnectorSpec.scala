@@ -37,7 +37,6 @@ class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
     val featureToggleSetting: Boolean
 
     lazy val app = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .configure("microservice.services.feature-toggle.refresh-profile" -> featureToggleSetting)
       .overrides(bind[HttpPost].to(http))

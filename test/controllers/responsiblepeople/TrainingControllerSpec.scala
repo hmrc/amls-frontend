@@ -48,7 +48,6 @@ class TrainingControllerSpec extends AmlsSpec with MockitoSugar with ScalaFuture
     lazy val mockAppConfig = mock[AppConfig]
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))

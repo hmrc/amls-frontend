@@ -51,8 +51,6 @@ class StatusControllerSpec extends AmlsSpec with MockitoSugar with OneAppPerSuit
 
   val cacheMap = mock[CacheMap]
 
-  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
-
   trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 

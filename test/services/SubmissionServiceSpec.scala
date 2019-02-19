@@ -59,7 +59,6 @@ class SubmissionServiceSpec extends AmlsSpec
   with TradingPremisesGenerator {
 
   override lazy val app = GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.amounts.registration" -> 100)
     .build()
 

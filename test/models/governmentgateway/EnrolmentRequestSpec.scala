@@ -16,17 +16,14 @@
 
 package models.governmentgateway
 
-import connectors.KeystoreConnector
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.inject.bind
 
 class EnrolmentRequestSpec extends PlaySpec with OneAppPerSuite with MockitoSugar {
 
   override implicit lazy val app = new GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.gg-knownfacts-postcode" -> true)
     .build()
 

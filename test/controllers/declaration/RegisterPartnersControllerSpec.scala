@@ -45,7 +45,6 @@ class RegisterPartnersControllerSpec extends AmlsSpec with MockitoSugar {
     val progressService = mock[ProgressService]
 
     lazy val app = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(authConnector))
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))

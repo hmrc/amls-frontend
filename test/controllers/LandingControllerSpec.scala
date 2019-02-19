@@ -64,8 +64,6 @@ import scala.concurrent.{ExecutionContext, Future}
 
 class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerator {
 
-  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
-
   trait Fixture extends AuthorisedFixture {
     self =>
 
@@ -309,8 +307,6 @@ class LandingControllerWithoutAmendmentsSpec extends AmlsSpec with StatusGenerat
 }
 
 class LandingControllerWithAmendmentsSpec extends AmlsSpec with MockitoSugar with MustMatchers with StatusGenerator {
-
-  override lazy val app = GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector])).build()
 
   val businessCustomerUrl = "TestUrl"
 

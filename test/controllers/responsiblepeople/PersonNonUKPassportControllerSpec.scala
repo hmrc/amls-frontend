@@ -16,8 +16,8 @@
 
 package controllers.responsiblepeople
 
-import config.{AppConfig, ApplicationConfig}
-import connectors.{DataCacheConnector, KeystoreConnector}
+import config.AppConfig
+import connectors.DataCacheConnector
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{DateOfBirth, NonUKPassportYes, PersonName, ResponsiblePerson}
 import org.joda.time.LocalDate
@@ -27,15 +27,14 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
 
@@ -45,7 +44,6 @@ class PersonNonUKPassportControllerSpec extends AmlsSpec with MockitoSugar {
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))

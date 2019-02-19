@@ -35,7 +35,6 @@
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
       .overrides(bind[DataCacheConnector].to(mockCacheConnector))
-       .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
      val builder = defaultBuilder
     lazy val app = builder.build()
     lazy val controller = app.injector.instanceOf[ApprovalCheckController]

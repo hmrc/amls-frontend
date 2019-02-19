@@ -42,7 +42,6 @@ import scala.concurrent.ExecutionContext.Implicits.global
 class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
     .build()
 
@@ -782,7 +781,6 @@ class RemoveBusinessTypeHelperSpec extends AmlsSpec with FutureAssertions with M
 class RemoveBusinessTypeHelperSpecForPhase2 extends AmlsSpec with FutureAssertions with MockitoSugar with ScalaFutures {
 
   override implicit lazy val app: Application = new GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 

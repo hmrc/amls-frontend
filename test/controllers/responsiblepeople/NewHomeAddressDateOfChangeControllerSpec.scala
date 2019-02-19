@@ -16,16 +16,16 @@
 
 package controllers.responsiblepeople
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
-import org.mockito.Mockito.{when, _}
+import org.mockito.Mockito.when
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import play.api.test.Helpers._
 import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
@@ -38,7 +38,6 @@ class NewHomeAddressDateOfChangeControllerSpec extends AmlsSpec {
     val dataCacheConnector = mock[DataCacheConnector]
 
     lazy val app = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[DataCacheConnector].to(dataCacheConnector))
       .overrides(bind[AuthConnector].to(self.authConnector))

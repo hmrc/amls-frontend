@@ -22,7 +22,7 @@ import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{ApprovalFlags, PersonName, ResponsiblePerson}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.any
+import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
@@ -31,11 +31,8 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
-import org.mockito.Matchers.{eq => meq, _}
-import uk.gov.hmrc.http.cache.client.CacheMap
 
 import scala.concurrent.Future
-import scala.runtime.Nothing$
 
 class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
@@ -43,7 +40,6 @@ class FitAndProperControllerSpec extends AmlsSpec with MockitoSugar with ScalaFu
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
@@ -246,7 +242,7 @@ class FitAndProperControllerSpecPhase2 extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture with DependencyMocks { self =>
     val request = addToken(authRequest)
 
-    lazy val defaultBuilder = new GuiceApplicationBuilder().overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
+    lazy val defaultBuilder = new GuiceApplicationBuilder()
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]

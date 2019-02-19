@@ -16,16 +16,13 @@
 
 package utils
 
-import connectors.KeystoreConnector
 import models.responsiblepeople._
 import play.api.Application
-import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 
 class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues{
 
   override lazy val app: Application = new GuiceApplicationBuilder()
-    .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
     .build()
 

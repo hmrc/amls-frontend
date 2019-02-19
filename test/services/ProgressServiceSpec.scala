@@ -16,15 +16,13 @@
 
 package services
 
-import connectors.{DataCacheConnector, KeystoreConnector}
+import connectors.DataCacheConnector
 import models.businesscustomer.{Address, ReviewDetails}
 import models.businessmatching.BusinessMatching
 import models.responsiblepeople.{PersonName, _}
 import models.status._
 import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -32,12 +30,11 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyM
 
 import scala.concurrent.ExecutionContext.Implicits._
 
-class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
       .configure("microservice.services.feature-toggle.show-fees" -> true)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))

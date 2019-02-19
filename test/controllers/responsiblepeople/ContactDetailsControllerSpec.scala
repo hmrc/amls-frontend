@@ -195,7 +195,6 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
       "app must start" in {
 
         val app = new GuiceApplicationBuilder()
-          .overrides(bind[KeystoreConnector].to(mock[KeystoreConnector]))
           .build()
 
         app.injector.instanceOf[ContactDetailsController]
