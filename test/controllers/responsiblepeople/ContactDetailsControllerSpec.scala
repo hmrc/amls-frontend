@@ -192,13 +192,6 @@ class ContactDetailsControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
         }
       }
-      "app must start" in {
-
-        val app = new GuiceApplicationBuilder()
-          .build()
-
-        app.injector.instanceOf[ContactDetailsController]
-      }
     }
   }
 }

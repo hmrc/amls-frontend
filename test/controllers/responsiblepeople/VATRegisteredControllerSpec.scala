@@ -25,7 +25,6 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
@@ -168,12 +167,6 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
           status(result) must be(NOT_FOUND)
         }
       }
-    }
-    "App" in {
-      val app = GuiceApplicationBuilder()
-        .build()
-
-      app.injector.instanceOf[VATRegisteredController]
     }
   }
 }

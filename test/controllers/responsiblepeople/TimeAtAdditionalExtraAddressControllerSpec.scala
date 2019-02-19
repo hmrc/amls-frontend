@@ -201,9 +201,4 @@ class TimeAtAdditionalExtraAddressControllerSpec extends AmlsSpec with MockitoSu
       }
     }
   }
-  "App must start" in {
-    val app = GuiceApplicationBuilder().build()
-
-    app.injector.instanceOf[TimeAtAdditionalExtraAddressController]
-  }
 }
