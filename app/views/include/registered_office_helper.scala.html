@@ -19,12 +19,7 @@
 
 @(model: RegisteredOffice)(implicit m:Messages)
 
-  @panel(
-    jsHidden = false,
-    wide = true,
-    gutter = true
-  ) {
       <p>@model.toLines.map { line =>
           @line<br />
       }</p>
-  }
+

@@ -59,7 +59,7 @@ class ContactingYouEmailSpec extends PlaySpec with MockitoSugar {
         ContactingYouEmail.formRule.validate(data) must
           be(Invalid(Seq(
             (Path \ "email") -> Seq(ValidationError("error.required.rp.email")),
-            (Path \ "confirmEmail") -> Seq(ValidationError("error.required.rp.email"))
+            (Path \ "confirmEmail") -> Seq(ValidationError("error.invalid.rp.email"))
           )))
       }
     }
