@@ -18,11 +18,10 @@ package models.moneyservicebusiness
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.CharacterSets
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
+import utils.AmlsSpec
 
-class WhichCurrenciesSpec extends WordSpec with MustMatchers with OneAppPerSuite with CharacterSets {
+class WhichCurrenciesSpec extends AmlsSpec with CharacterSets {
 
   "Which Currencies" when {
     "data is complete" should {

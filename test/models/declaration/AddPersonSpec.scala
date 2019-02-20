@@ -18,11 +18,10 @@ package models.declaration
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.declaration.release7.RoleWithinBusinessRelease7
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsSuccess, Json}
+import utils.AmlsSpec
 
-class AddPersonRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSuite{
+class AddPersonRelease7Spec extends AmlsSpec {
 
   "Form Rules and Writes" must {
 

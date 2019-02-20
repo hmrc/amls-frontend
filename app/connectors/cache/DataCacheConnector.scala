@@ -17,17 +17,15 @@
 package connectors
 
 import connectors.cache.MongoCacheConnector
-import play.api.Play
+import javax.inject.Inject
 import play.api.libs.json.Format
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.http.{HeaderCarrier}
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.Future
 
-trait DataCacheConnector {
-
-  def cacheConnector: MongoCacheConnector
+class DataCacheConnector @Inject()(val cacheConnector: MongoCacheConnector){
 
   def fetch[T](cacheId: String)(implicit authContext: AuthContext, hc: HeaderCarrier, formats: Format[T]): Future[Option[T]] =
     cacheConnector.fetch(cacheId)
@@ -61,8 +59,4 @@ trait DataCacheConnector {
 
   def saveAll(cacheMap: Future[CacheMap])(implicit hc: HeaderCarrier, ac: AuthContext): Future[CacheMap] =
     cacheConnector.saveAll(cacheMap)
-}
-
-object DataCacheConnector extends DataCacheConnector {
-  def cacheConnector: MongoCacheConnector = Play.current.injector.instanceOf[MongoCacheConnector]
 }

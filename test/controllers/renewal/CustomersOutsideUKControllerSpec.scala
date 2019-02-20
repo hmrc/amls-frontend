@@ -16,12 +16,12 @@
 
 package controllers.renewal
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.Country
 import models.businessmatching._
 import models.renewal.{CustomersOutsideUK, MostTransactions, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import play.api.i18n.Messages
 import play.api.inject._
@@ -30,13 +30,13 @@ import play.api.mvc.{AnyContentAsFormUrlEncoded, Result}
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import services.RenewalService
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class CustomersOutsideUKControllerSpec extends AmlsSpec {
 

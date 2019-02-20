@@ -16,6 +16,7 @@
 
 package models.responsiblepeople
 
+import connectors.KeystoreConnector
 import controllers.responsiblepeople.NinoUtil
 import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started}
@@ -26,6 +27,7 @@ import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap

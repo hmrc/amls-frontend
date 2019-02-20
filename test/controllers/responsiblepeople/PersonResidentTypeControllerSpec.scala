@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.Country
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople._

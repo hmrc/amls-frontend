@@ -21,14 +21,11 @@ import models.registrationprogress.{Completed, NotStarted, Started}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{eq => meq, _}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatest.{MustMatchers, WordSpec}
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.libs.json.Json
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.StatusConstants
+import utils.{AmlsSpec, StatusConstants}
 
-class TradingPremisesSpec extends WordSpec with MustMatchers with MockitoSugar with OneAppPerSuite {
+class TradingPremisesSpec extends AmlsSpec {
 
   val ytp = YourTradingPremises(
     "foo",

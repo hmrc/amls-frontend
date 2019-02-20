@@ -17,14 +17,12 @@
 package audit
 
 import models.bankdetails._
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.test.FakeRequest
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import uk.gov.hmrc.http.HeaderCarrier
+import utils.AmlsSpec
 
-class AddBankAccountEventSpec extends PlaySpec with OneAppPerSuite {
+class AddBankAccountEventSpec extends AmlsSpec {
 
-  implicit val headerCarrier = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/test-path")
 
   "The bank account audit event" must {

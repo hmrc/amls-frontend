@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import config.{AMLSAuthConnector, AppConfig}
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import models.businessmatching._
 import models.responsiblepeople.ResponsiblePerson._
 import models.responsiblepeople.{PersonName, ResponsiblePerson, TrainingNo, TrainingYes}

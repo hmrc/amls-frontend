@@ -16,6 +16,7 @@
 
 package connectors
 
+import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator, GovernmentGatewayGenerator}
 import models.governmentgateway.EnrolmentRequest
@@ -24,9 +25,9 @@ import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.time.{Millis, Seconds, Span}
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{CorePost, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.model.{Audit, DataEvent}
-import utils.{DependencyMocks, AmlsSpec}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
@@ -42,14 +43,13 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
     PatienceConfig(timeout = Span(15, Seconds), interval = Span(500, Millis))
 
   trait Fixture extends DependencyMocks {
-    val connector = new GovernmentGatewayConnector {
-      override protected[connectors] val http = mock[CorePost]
-      override protected val enrolUrl = "/testurl"
-      override private[connectors] val audit = mock[Audit]
-    }
+    val audit = mock[Audit]
+
+    val connector = new GovernmentGatewayConnector(mock[WSHttp], mock[AppConfig])
 
     val fn: DataEvent => Unit = d => {}
-    when(connector.audit.sendDataEvent) thenReturn fn
+
+    when(audit.sendDataEvent) thenReturn fn
 
     def mockHttpCall(response: Future[HttpResponse]) = when {
       connector.http.POST[EnrolmentRequest, HttpResponse](any(), any(), any())(any(), any(), any(), any())
@@ -67,7 +67,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
       }
 
       "throw DuplicateEnrolmentException when a duplicate enrolment message was received" in new Fixture {
-        mockHttpCall(Future.failed(new Exception(GovernmentGatewayConnector.duplicateEnrolmentMessage)))
+        mockHttpCall(Future.failed(new Exception(connector.duplicateEnrolmentMessage)))
 
         intercept[DuplicateEnrolmentException] {
           await(connector.enrol(enrolmentRequestGen.sample.get))
@@ -75,7 +75,7 @@ class GovernmentGatewayConnectorSpec extends AmlsSpec
       }
 
       "throw InvalidEnrolmentCredentialsException when an invalid credentials message was received" in new Fixture {
-        mockHttpCall(Future.failed(new Exception(GovernmentGatewayConnector.invalidCredentialsMessage)))
+        mockHttpCall(Future.failed(new Exception(connector.invalidCredentialsMessage)))
 
         intercept[InvalidEnrolmentCredentialsException] {
           await(connector.enrol(enrolmentRequestGen.sample.get))

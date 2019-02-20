@@ -16,20 +16,15 @@
 
 package models.aboutthebusiness
 
-import models.bankdetails.BankDetails
 import models.registrationprogress.{Completed, NotStarted, Section, Started}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsNull, Json}
-import play.api.test.FakeApplication
 import uk.gov.hmrc.http.cache.client.CacheMap
+import utils.AmlsSpec
 
-class AboutTheBusinessSpec extends PlaySpec with MockitoSugar  with OneAppPerSuite {
-
-  override lazy val app = FakeApplication()
+class AboutTheBusinessSpec extends AmlsSpec {
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
 

@@ -17,7 +17,7 @@
 package controllers.renewal
 
 import cats.data.OptionT
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.businessmatching.BusinessMatchingGenerator
 import models.ReadStatusResponse
 import models.businessmatching._

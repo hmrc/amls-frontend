@@ -17,7 +17,7 @@
 package services
 
 import config.AppConfig
-import connectors.AmlsConnector
+import connectors.{AmlsConnector, KeystoreConnector}
 import exceptions.{DuplicateSubscriptionException, NoEnrolmentException}
 import generators.ResponsiblePersonGenerator
 import generators.tradingpremises.TradingPremisesGenerator
@@ -39,20 +39,18 @@ import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalacheck.Gen
 import org.scalatest.concurrent.{IntegrationPatience, ScalaFutures}
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.Json
-import play.api.test.FakeApplication
 import play.api.test.Helpers._
 import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.frontend.auth.Principal
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
-import utils.{DependencyMocks, AmlsSpec}
-import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
+import utils.{AmlsSpec, DependencyMocks}
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, Upstream4xxResponse}
 
 class SubmissionServiceSpec extends AmlsSpec
   with ScalaFutures
@@ -60,7 +58,9 @@ class SubmissionServiceSpec extends AmlsSpec
   with ResponsiblePersonGenerator
   with TradingPremisesGenerator {
 
-  override lazy val app = FakeApplication(additionalConfiguration = Map("microservice.amounts.registration" -> 100))
+  override lazy val app = GuiceApplicationBuilder()
+    .configure("microservice.amounts.registration" -> 100)
+    .build()
 
   trait Fixture extends DependencyMocks {
 

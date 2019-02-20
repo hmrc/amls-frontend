@@ -17,7 +17,7 @@
 package controllers.responsiblepeople
 
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.scalatest.concurrent.ScalaFutures

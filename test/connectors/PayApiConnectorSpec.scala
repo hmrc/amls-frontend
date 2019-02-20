@@ -21,27 +21,21 @@ import models.ReturnLocation
 import models.payments.{CreatePaymentRequest, CreatePaymentResponse, PayApiLinks}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.{Configuration, Play}
-import play.api.Mode.Mode
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.http.HttpResponse
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.config.ServicesConfig
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class PayApiConnectorSpec extends PlaySpec with MustMatchers with ScalaFutures with MockitoSugar with IntegrationPatience with OneAppPerSuite {
+class PayApiConnectorSpec extends AmlsSpec with ScalaFutures with IntegrationPatience {
 
-  implicit val headerCarrier = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/anti-money-laundering/confirmation")
 
   trait TestFixture {

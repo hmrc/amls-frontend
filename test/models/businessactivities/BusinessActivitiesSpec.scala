@@ -17,15 +17,11 @@
 package models.businessactivities
 
 import models.Country
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.libs.json.{JsNull, Json}
-import play.api.test.FakeApplication
 import models.businessmatching.{BusinessActivities => ba, _}
+import play.api.libs.json.Json
+import utils.AmlsSpec
 
-class BusinessActivitiesSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
-
-  override lazy val app = FakeApplication()
+class BusinessActivitiesSpec extends AmlsSpec {
 
   val DefaultFranchiseName = "DEFAULT FRANCHISE NAME"
   val DefaultSoftwareName = "DEFAULT SOFTWARE"
