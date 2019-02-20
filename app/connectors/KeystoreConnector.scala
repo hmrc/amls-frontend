@@ -17,13 +17,12 @@
 package connectors
 
 import config.AmlsSessionCache
-import javax.inject.{Inject, Singleton}
+import javax.inject.Inject
 import models.status.ConfirmationStatus
 import uk.gov.hmrc.http.HeaderCarrier
 
 import scala.concurrent.{ExecutionContext, Future}
 
-@Singleton
 class KeystoreConnector @Inject()(val amlsDataCache: AmlsSessionCache) {
 
   def confirmationStatus(implicit hc: HeaderCarrier, ec: ExecutionContext) =
