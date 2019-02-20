@@ -18,8 +18,8 @@ package services
 
 import cats.data.OptionT
 import cats.implicits._
+import com.google.inject.Inject
 import connectors.{AmlsConnector, BusinessMatchingConnector, DataCacheConnector, KeystoreConnector}
-import models.{AmendVariationRenewalResponse, SubscriptionResponse, ViewResponse}
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -36,21 +36,21 @@ import models.status.RenewalSubmitted
 import models.supervision.Supervision
 import models.tcsp.Tcsp
 import models.tradingpremises.TradingPremises
-import play.api.Play
+import models.{AmendVariationRenewalResponse, SubscriptionResponse, ViewResponse}
 import play.api.mvc.Request
-import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.{ExecutionContext, Future}
 
-trait LandingService {
-
-  private[services] val cacheConnector: DataCacheConnector
-  private[services] val keyStore: KeystoreConnector
-  private[services] val desConnector: AmlsConnector
-  private[services] val statusService: StatusService
-  private[services] val businessMatchingConnector: BusinessMatchingConnector
+class LandingService @Inject() (
+                               val cacheConnector: DataCacheConnector,
+                               val keyStore: KeystoreConnector,
+                               val desConnector: AmlsConnector,
+                               val statusService: StatusService,
+                               val businessMatchingConnector: BusinessMatchingConnector
+                               ){
 
   def cacheMap(implicit hc: HeaderCarrier, ec: ExecutionContext, ac: AuthContext): Future[Option[CacheMap]] = cacheConnector.fetchAll
 
@@ -282,14 +282,4 @@ trait LandingService {
     case (None, None) => model.copy(altCorrespondenceAddress = Some(false), hasAccepted = true)
     case _ => model
   }
-}
-
-object LandingService extends LandingService {
-  // $COVERAGE-OFF$
-  override private[services] lazy val cacheConnector = DataCacheConnector
-  override private[services] lazy val keyStore = KeystoreConnector
-  override private[services] lazy val desConnector = AmlsConnector
-  override private[services] lazy val statusService = StatusService
-  override private[services] lazy val businessMatchingConnector = Play.current.injector.instanceOf[BusinessMatchingConnector]
-  // $COVERAGE-ON$
 }

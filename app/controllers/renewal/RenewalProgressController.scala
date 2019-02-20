@@ -26,7 +26,7 @@ import models.registrationprogress.Completed
 import models.status.{ReadyForRenewal, RenewalSubmitted}
 import play.api.i18n.MessagesApi
 import services.businessmatching.BusinessMatchingService
-import services.{ProgressService, RenewalService, StatusService}
+import services.{ProgressService, RenewalService, SectionsProvider, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.renewal.renewal_progress
@@ -40,6 +40,7 @@ class RenewalProgressController @Inject()
   val authConnector: AuthConnector,
   val dataCacheConnector: DataCacheConnector,
   val progressService: ProgressService,
+  val sectionsProvider: SectionsProvider,
   val messages: MessagesApi,
   val renewals: RenewalService,
   val businessMatchingService: BusinessMatchingService,
@@ -59,7 +60,7 @@ class RenewalProgressController @Inject()
               businessMatching <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
             } yield {
 
-              val variationSections = progressService.sections(cache).filter(_.name != BusinessMatching.messageKey)
+              val variationSections = sectionsProvider.sections(cache).filter(_.name != BusinessMatching.messageKey)
               val canSubmit = renewals.canSubmit(renewalSection, variationSections)
               val msbOrTcspExists = ControllerHelper.isMSBSelected(Some(businessMatching)) ||
                 ControllerHelper.isTCSPSelected(Some(businessMatching))
