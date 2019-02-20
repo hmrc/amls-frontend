@@ -148,6 +148,17 @@ class AboutTheBusinessSpec extends AmlsSpec {
     }
   }
 
+  "isComplete return false" when {
+    "altCorrespondenceAddress is true but correspondenceAddress is not set" in {
+      val modelWithMissingCorrespondecneAddress = completeModel.copy(
+        altCorrespondenceAddress = Some(true),
+        correspondenceAddress = None
+      )
+
+      modelWithMissingCorrespondecneAddress.isComplete must be(false)
+    }
+  }
+
   "'None'" when {
 
     val initial: Option[AboutTheBusiness] = None

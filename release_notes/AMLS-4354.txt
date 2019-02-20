@@ -1,0 +1,1 @@
+ + [AMLS-4354](https://jira.tools.tax.service.gov.uk/browse/AMLS-4354) - "bug fix - About the Business shows complete when postal address is changed from yes to no"
