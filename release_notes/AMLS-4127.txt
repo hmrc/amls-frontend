@@ -1,0 +1,1 @@
+ + [AMLS-4127](https://jira.tools.tax.service.gov.uk/browse/AMLS-4127) - 'Fixed incorrect visually hidden label on "You need to register as a responsible person" continue button'
