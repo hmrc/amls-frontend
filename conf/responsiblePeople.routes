@@ -66,9 +66,6 @@ POST        /time-at-additional-address/:index/                    @controllers.
 GET         /position/:index/                                      @controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /position/:index/                                      @controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
-GET         /nominatedofficer/:index/                              @controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /nominatedofficer/:index/                              @controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
 GET         /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
