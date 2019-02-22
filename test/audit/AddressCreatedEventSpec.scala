@@ -16,21 +16,18 @@
 
 package audit
 
-import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
-import org.scalatest.MustMatchers
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import cats.implicits._
-import uk.gov.hmrc.play.audit.AuditExtensions._
 import audit.AddressConversions._
+import cats.implicits._
 import models.Country
 import models.aboutthebusiness.{NonUKCorrespondenceAddress, RegisteredOfficeNonUK, RegisteredOfficeUK, UKCorrespondenceAddress}
+import models.responsiblepeople.{PersonAddressNonUK, PersonAddressUK}
 import models.tradingpremises.{Address => TradingPremisesAddress}
 import play.api.test.FakeRequest
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.AuditExtensions._
+import utils.AmlsSpec
 
-class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
+class AddressCreatedEventSpec extends AmlsSpec {
 
-  implicit val hc = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/test-path")
 
   "The AddressCreatedAuditEvent" must {
@@ -39,7 +36,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
 
         val address = PersonAddressUK("Line 1", "Line 2", "Line 3".some, None, "postcode")
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "addressLine3" -> "Line 3",
@@ -54,7 +51,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given an address of a responsible person outside the UK" in {
         val address = PersonAddressNonUK("Line 1", "Line 2", "Line 3".some, None, Country("Norway", "NW"))
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Line 1",
           "addressLine2" -> "Line 2",
           "addressLine3" -> "Line 3",
@@ -67,7 +64,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given the address of a trading premises" in {
         val address = TradingPremisesAddress("TP Line 1", "TP Line 2", "TP Line 3".some, None, "a post code")
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "TP Line 1",
           "addressLine2" -> "TP Line 2",
           "addressLine3" -> "TP Line 3",
@@ -81,7 +78,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given the address of a registered office in the UK" in {
         val address = RegisteredOfficeUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, "a post code")
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
@@ -95,7 +92,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given the address of a registered office outside the UK" in {
         val address = RegisteredOfficeNonUK("RO Line 1", "RO Line 2", "RO Line 3".some, None, Country("Scotland", "SCO"))
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "RO Line 1",
           "addressLine2" -> "RO Line 2",
           "addressLine3" -> "RO Line 3",
@@ -108,7 +105,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given a correspondence address in the UK" in {
         val address = UKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, "NE1 1ET")
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
           "addressLine2" -> "CA Line 2",
           "addressLine3" -> "CA Line 3",
@@ -122,7 +119,7 @@ class AddressCreatedEventSpec extends PlaySpec with MustMatchers with OneAppPerS
       "given a correspondence address outside the UK" in {
         val address = NonUKCorrespondenceAddress("not used", "not used", "CA Line 1", "CA Line 2", "CA Line 3".some, None, Country("Finland", "FIN"))
         val event = AddressCreatedEvent(address)
-        val expected = hc.toAuditDetails() ++ Map(
+        val expected = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "CA Line 1",
           "addressLine2" -> "CA Line 2",
           "addressLine3" -> "CA Line 3",

@@ -17,12 +17,12 @@
 package models.payments
 
 import models.ReturnLocation
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
+import utils.AmlsSpec
 
-class PaymentRedirectRequestSpec extends PlaySpec with OneAppPerSuite {
+class PaymentRedirectRequestSpec extends AmlsSpec {
 
   "The PaymentRedirectRequest type" must {
 

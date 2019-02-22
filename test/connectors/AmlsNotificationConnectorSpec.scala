@@ -16,22 +16,21 @@
 
 package connectors
 
+import config.{AppConfig, WSHttp}
 import models.notifications._
-import org.joda.time.{DateTime, DateTimeZone, LocalDateTime}
+import org.joda.time.{DateTime, DateTimeZone}
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Org
+import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.frontend.auth.connectors.domain._
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, LoggedInUser, Principal}
-import uk.gov.hmrc.play.http._
-import org.joda.time.{DateTimeZone, LocalDateTime}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CorePost, _}
 
 class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
@@ -56,11 +55,7 @@ class AmlsNotificationConnectorSpec extends PlaySpec with MockitoSugar with Scal
     None, None)
 
   private trait Fixture {
-
-    val connector = new AmlsNotificationConnector {
-      override private[connectors] val http = mock[CoreGet with CorePost]
-      override private[connectors] def baseUrl: String = "amls-notification"
-    }
+    val connector = new AmlsNotificationConnector (mock[WSHttp], mock[AppConfig])
   }
 
   "AmlsNotificationConnector" must {

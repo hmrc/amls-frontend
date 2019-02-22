@@ -16,15 +16,13 @@
 
 package models.tradingpremises
 
+import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.DateOfChange
 import org.joda.time.LocalDate
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
-import play.api.libs.json.{JsPath, JsSuccess}
-import play.api.test.FakeApplication
+import play.api.libs.json.JsSuccess
+import utils.AmlsSpec
 
-class AgentNaRoleWithinBusinessRelease7SpemeSpec extends PlaySpec with OneAppPerSuite {
+class AgentNaRoleWithinBusinessRelease7SpemeSpec extends AmlsSpec {
 
   "AgentName" must {
 

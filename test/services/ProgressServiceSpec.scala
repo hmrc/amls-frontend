@@ -23,8 +23,6 @@ import models.responsiblepeople.{PersonName, _}
 import models.status._
 import org.joda.time.LocalDate
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.OneAppPerSuite
 import play.api.inject._
 import play.api.inject.guice.GuiceApplicationBuilder
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
@@ -32,7 +30,7 @@ import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks, DependencyM
 
 import scala.concurrent.ExecutionContext.Implicits._
 
-class ProgressServiceSpec extends AmlsSpec with MockitoSugar with ScalaFutures with OneAppPerSuite {
+class ProgressServiceSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture with DependencyMocks with AutoCompleteServiceMocks { self =>
 

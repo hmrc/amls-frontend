@@ -16,18 +16,15 @@
 
 package audit
 
-import org.scalatest.MustMatchers
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import cats.implicits._
 import audit.AddressConversions._
+import cats.implicits._
 import play.api.test.FakeRequest
-import uk.gov.hmrc.play.audit.model.DataEvent
 import uk.gov.hmrc.play.audit.AuditExtensions._
-import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.model.DataEvent
+import utils.AmlsSpec
 
-class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
+class AddressModifiedEventSpec extends AmlsSpec {
 
-  implicit val hc = HeaderCarrier()
   implicit val request = FakeRequest("GET", "/test-path")
 
   "The AddressModifiedAuditEvent" must {
@@ -36,7 +33,7 @@ class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPer
         val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2", "Line 3".some, "Spain", "AA1 1AA".some)
         val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2", "Old line 3".some, "France", "NE1 1ET".some)
 
-        val expectedResult = hc.toAuditDetails() ++ Map(
+        val expectedResult = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Addr Line 1",
           "addressLine2" -> "Addr Line 2",
           "addressLine3" -> "Line 3",
@@ -59,7 +56,7 @@ class AddressModifiedEventSpec extends PlaySpec with MustMatchers with OneAppPer
         val currentAddress = AuditAddress("Addr Line 1", "Addr Line 2", None, "Spain", None)
         val oldAddress = AuditAddress("Old addr Line 1", "Old addr Line 2", None, "France", None)
 
-        val expectedResult = hc.toAuditDetails() ++ Map(
+        val expectedResult = headerCarrier.toAuditDetails() ++ Map(
           "addressLine1" -> "Addr Line 1",
           "addressLine2" -> "Addr Line 2",
           "country" -> "Spain",

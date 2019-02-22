@@ -16,13 +16,12 @@
 
 package models.payments
 
-import org.scalatest.MustMatchers
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
+import models.ReturnLocation
 import play.api.libs.json.Json
 import play.api.test.FakeRequest
-import models.ReturnLocation
+import utils.AmlsSpec
 
-class CreatePaymentRequestSpec extends PlaySpec with MustMatchers with OneAppPerSuite {
+class CreatePaymentRequestSpec extends AmlsSpec {
 
   implicit val request = FakeRequest("GET", "http://localhost:9222")
 

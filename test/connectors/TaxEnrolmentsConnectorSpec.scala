@@ -16,43 +16,30 @@
 
 package connectors
 
-import java.util.UUID
-
 import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import generators.auth.UserDetailsGenerator
 import generators.{AmlsReferenceNumberGenerator, BaseGenerator}
-import models.auth.UserDetails
 import models.enrolment.{AmlsEnrolmentKey, ErrorResponse, TaxEnrolment}
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{verify, when}
-import org.scalatest.MustMatchers
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import uk.gov.hmrc.http.{HeaderCarrier, HttpException, HttpResponse, Upstream4xxResponse}
+import uk.gov.hmrc.http.{HttpResponse, Upstream4xxResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.play.frontend.auth.connectors.domain.Accounts
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 
-class TaxEnrolmentsConnectorSpec extends PlaySpec
-  with MustMatchers
+class TaxEnrolmentsConnectorSpec extends AmlsSpec
   with ScalaFutures
-  with MockitoSugar
   with AmlsReferenceNumberGenerator
   with UserDetailsGenerator
-  with BaseGenerator
-  with OneAppPerSuite {
+  with BaseGenerator {
 
   trait Fixture {
-
-    implicit val headerCarrier = HeaderCarrier()
-    implicit val authContext = mock[AuthContext]
 
     val http = mock[WSHttp]
     val appConfig = mock[AppConfig]

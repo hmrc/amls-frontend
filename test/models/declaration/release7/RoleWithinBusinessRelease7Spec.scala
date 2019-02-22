@@ -17,14 +17,11 @@
 package models.declaration.release7
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
-import models.declaration.RoleWithinBusiness
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import play.api.test.FakeApplication
+import utils.AmlsSpec
 
 
-class RoleWithinBusinessRelease7Spec extends PlaySpec with MockitoSugar with OneAppPerSuite{
+class RoleWithinBusinessRelease7Spec extends AmlsSpec {
 
   "RoleWithinBusiness" must {
 

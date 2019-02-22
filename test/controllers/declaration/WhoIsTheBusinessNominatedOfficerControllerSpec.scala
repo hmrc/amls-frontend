@@ -16,13 +16,12 @@
 
 package controllers.declaration
 
-import connectors.{AmlsConnector, DataCacheConnector}
+import connectors.{AmlsConnector, DataCacheConnector, KeystoreConnector}
 import models.declaration.BusinessNominatedOfficer
 import models.responsiblepeople.ResponsiblePerson.flowFromDeclaration
 import models.responsiblepeople._
 import models.status.{ReadyForRenewal, SubmissionDecisionApproved, SubmissionReady, SubmissionReadyForReview}
 import org.joda.time.LocalDate
-import org.mockito.Matchers.{eq => meq}
 import org.scalatest.mock.MockitoSugar
 import play.api.i18n.Messages
 import play.api.inject.bind
@@ -30,7 +29,7 @@ import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.test.Helpers._
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, DependencyMocks, AmlsSpec, StatusConstants}
+import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, StatusConstants}
 
 class WhoIsTheBusinessNominatedOfficerControllerSpec extends AmlsSpec with MockitoSugar {
 

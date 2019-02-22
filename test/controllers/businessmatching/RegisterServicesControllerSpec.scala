@@ -19,12 +19,11 @@ package controllers.businessmatching
 import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import forms.{EmptyForm, Form2}
 import generators.ResponsiblePersonGenerator
 import models.businessactivities.{AccountantForAMLSRegulations, BusinessActivities, TaxMatters, WhoIsYourAccountant}
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
-import models.moneyservicebusiness.{MoneyServiceBusiness => MSBModel}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.supervision.Supervision
 import org.jsoup.Jsoup

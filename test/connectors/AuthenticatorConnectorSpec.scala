@@ -19,23 +19,20 @@ package connectors
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.PlaySpec
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
-import uk.gov.hmrc.http.{HeaderCarrier, HttpPost, HttpResponse}
+import uk.gov.hmrc.http.{HttpPost, HttpResponse}
+import utils.AmlsSpec
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.duration._
 import scala.concurrent.{Await, Future}
 
-class AuthenticatorConnectorSpec extends PlaySpec with ScalaFutures with MockitoSugar {
+class AuthenticatorConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait TestFixture {
 
     val http = mock[HttpPost]
-
-    implicit val hc = HeaderCarrier()
 
     val featureToggleSetting: Boolean
 

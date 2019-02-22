@@ -16,7 +16,7 @@
 
 package services
 
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models.ResponseType.{AmendOrVariationResponseType, SubscriptionResponseType}
 import models._
@@ -42,6 +42,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import utils.StatusConstants
+import play.api.inject.bind
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future

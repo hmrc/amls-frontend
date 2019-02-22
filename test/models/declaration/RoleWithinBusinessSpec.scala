@@ -18,13 +18,11 @@ package models.declaration
 
 import jto.validation.{Invalid, Path, Valid, ValidationError}
 import models.CharacterSets
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
-import play.api.test.FakeApplication
+import utils.AmlsSpec
 
 
-class RoleWithinBusinessSpec extends PlaySpec with MockitoSugar with OneAppPerSuite with CharacterSets {
+class RoleWithinBusinessSpec extends AmlsSpec with CharacterSets {
 
   "When the user inputs the data that is posted in the form, the role within business" must {
 
