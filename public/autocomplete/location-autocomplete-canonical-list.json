@@ -60,10 +60,6 @@
     "territory:AW"
   ],
   [
-    "Ascension",
-    "territory:SH-AC"
-  ],
-  [
     "Australia",
     "country:AU"
   ],
@@ -78,10 +74,6 @@
   [
     "Bahrain",
     "country:BH"
-  ],
-  [
-    "Baker Island",
-    "territory:UM-81"
   ],
   [
     "Bangladesh",
@@ -116,12 +108,12 @@
     "country:BT"
   ],
   [
-    "Bolivia",
+    "Bolivia, Plurinational State of",
     "country:BO"
   ],
   [
-    "Bonaire",
-    "territory:BQ-BO"
+    "Bonaire, Sint Eustatius and Saba",
+    "territory:BQ"
   ],
   [
     "Bosnia and Herzegovina",
@@ -140,19 +132,15 @@
     "country:BR"
   ],
   [
-    "British Antarctic Territory",
-    "territory:BAT"
-  ],
-  [
     "British Indian Ocean Territory",
     "territory:IO"
   ],
   [
-    "British Virgin Islands",
+    "Virgin Islands, British",
     "territory:VG"
   ],
   [
-    "Brunei",
+    "Brunei Darussalam",
     "country:BN"
   ],
   [
@@ -184,7 +172,7 @@
     "country:CA"
   ],
   [
-    "Cape Verde",
+    "Cabo Verde",
     "country:CV"
   ],
   [
@@ -194,10 +182,6 @@
   [
     "Central African Republic",
     "country:CF"
-  ],
-  [
-    "Ceuta",
-    "territory:ES-CE"
   ],
   [
     "Chad",
@@ -232,7 +216,7 @@
     "country:CG"
   ],
   [
-    "Congo (Democratic Republic)",
+    "Congo, the Democratic Republic of the",
     "country:CD"
   ],
   [
@@ -264,16 +248,8 @@
     "country:CZ"
   ],
   [
-    "Czechoslovakia",
-    "country:CS"
-  ],
-  [
     "Denmark",
     "country:DK"
-  ],
-  [
-    "Dhekelia",
-    "territory:XXD"
   ],
   [
     "Djibouti",
@@ -288,15 +264,11 @@
     "country:DO"
   ],
   [
-    "Dubai",
-    "territory:AE-DU"
-  ],
-  [
     "East Germany",
     "country:DD"
   ],
   [
-    "East Timor",
+    "Timor-Leste",
     "country:TL"
   ],
   [
@@ -328,7 +300,7 @@
     "country:ET"
   ],
   [
-    "Falkland Islands",
+    "Falkland Islands (Malvinas)",
     "territory:FK"
   ],
   [
@@ -358,10 +330,6 @@
   [
     "French Southern Territories",
     "territory:TF"
-  ],
-  [
-    "Fujairah",
-    "territory:AE-FU"
   ],
   [
     "Gabon",
@@ -440,10 +408,6 @@
     "territory:HK"
   ],
   [
-    "Howland Island",
-    "territory:UM-84"
-  ],
-  [
     "Hungary",
     "country:HU"
   ],
@@ -460,7 +424,7 @@
     "country:ID"
   ],
   [
-    "Iran",
+    "Iran, Islamic Republic of",
     "country:IR"
   ],
   [
@@ -484,7 +448,7 @@
     "country:IT"
   ],
   [
-    "Ivory Coast",
+    "Côte d'Ivoire",
     "country:CI"
   ],
   [
@@ -496,16 +460,8 @@
     "country:JP"
   ],
   [
-    "Jarvis Island",
-    "territory:UM-86"
-  ],
-  [
     "Jersey",
     "territory:JE"
-  ],
-  [
-    "Johnston Atoll",
-    "territory:UM-67"
   ],
   [
     "Jordan",
@@ -520,16 +476,8 @@
     "country:KE"
   ],
   [
-    "Kingman Reef",
-    "territory:UM-89"
-  ],
-  [
     "Kiribati",
     "country:KI"
-  ],
-  [
-    "Kosovo",
-    "country:XK"
   ],
   [
     "Kuwait",
@@ -540,7 +488,7 @@
     "country:KG"
   ],
   [
-    "Laos",
+    "Lao People's Democratic Republic",
     "country:LA"
   ],
   [
@@ -580,7 +528,7 @@
     "territory:MO"
   ],
   [
-    "Macedonia",
+    "Macedonia, the Former Yugoslav Republic of",
     "country:MK"
   ],
   [
@@ -628,23 +576,15 @@
     "territory:YT"
   ],
   [
-    "Melilla",
-    "territory:ES-ML"
-  ],
-  [
     "Mexico",
     "country:MX"
   ],
   [
-    "Micronesia",
+    "Micronesia, Federated States of",
     "country:FM"
   ],
   [
-    "Midway Islands",
-    "territory:UM-71"
-  ],
-  [
-    "Moldova",
+    "Moldova, Republic of",
     "country:MD"
   ],
   [
@@ -678,10 +618,6 @@
   [
     "Nauru",
     "country:NR"
-  ],
-  [
-    "Navassa Island",
-    "territory:UM-76"
   ],
   [
     "Nepal",
@@ -720,7 +656,7 @@
     "territory:NF"
   ],
   [
-    "North Korea",
+    "Korea, Democratic People's Republic of",
     "country:KP"
   ],
   [
@@ -732,7 +668,7 @@
     "country:NO"
   ],
   [
-    "Occupied Palestinian Territories",
+    "Palestine, State of",
     "territory:PS"
   ],
   [
@@ -746,10 +682,6 @@
   [
     "Palau",
     "country:PW"
-  ],
-  [
-    "Palmyra Atoll",
-    "territory:UM-95"
   ],
   [
     "Panama",
@@ -772,7 +704,7 @@
     "country:PH"
   ],
   [
-    "Pitcairn, Henderson, Ducie and Oeno Islands",
+    "Pitcairn",
     "territory:PN"
   ],
   [
@@ -792,15 +724,11 @@
     "country:QA"
   ],
   [
-    "Ras al-Khaimah",
-    "territory:AE-RK"
-  ],
-  [
     "Romania",
     "country:RO"
   ],
   [
-    "Russia",
+    "Russian Federation",
     "country:RU"
   ],
   [
@@ -812,16 +740,8 @@
     "territory:RE"
   ],
   [
-    "Saba",
-    "territory:BQ-SA"
-  ],
-  [
-    "Saint Barthélemy",
-    "territory:BL"
-  ],
-  [
-    "Saint Helena",
-    "territory:SH-HL"
+    "Saint Helena, Ascension and Tristan da Cunha",
+    "territory:SH"
   ],
   [
     "Saint Pierre and Miquelon",
@@ -858,10 +778,6 @@
   [
     "Seychelles",
     "country:SC"
-  ],
-  [
-    "Sharjah",
-    "territory:AE-SH"
   ],
   [
     "Sierra Leone",
@@ -904,7 +820,7 @@
     "territory:GS"
   ],
   [
-    "South Korea",
+    "Korea, Republic of",
     "country:KR"
   ],
   [
@@ -920,15 +836,15 @@
     "country:LK"
   ],
   [
-    "St Kitts and Nevis",
+    "Saint Kitts and Nevis",
     "country:KN"
   ],
   [
-    "St Lucia",
+    "Saint Lucia",
     "country:LC"
   ],
   [
-    "St Vincent",
+    "Saint Vincent and the Grenadines",
     "country:VC"
   ],
   [
@@ -956,11 +872,11 @@
     "country:CH"
   ],
   [
-    "Syria",
+    "Syrian Arab Republic",
     "country:SY"
   ],
   [
-    "Taiwan",
+    "Taiwan, Province of China",
     "territory:TW"
   ],
   [
@@ -968,7 +884,7 @@
     "country:TJ"
   ],
   [
-    "Tanzania",
+    "Tanzania, United Republic of",
     "country:TZ"
   ],
   [
@@ -976,11 +892,11 @@
     "country:TH"
   ],
   [
-    "The Bahamas",
+    "Bahamas",
     "country:BS"
   ],
   [
-    "The Gambia",
+    "Gambia",
     "country:GM"
   ],
   [
@@ -998,10 +914,6 @@
   [
     "Trinidad and Tobago",
     "country:TT"
-  ],
-  [
-    "Tristan da Cunha",
-    "territory:SH-TA"
   ],
   [
     "Tunisia",
@@ -1024,20 +936,12 @@
     "country:TV"
   ],
   [
-    "USSR",
-    "country:SU"
-  ],
-  [
     "Uganda",
     "country:UG"
   ],
   [
     "Ukraine",
     "country:UA"
-  ],
-  [
-    "Umm al-Quwain",
-    "territory:AE-UQ"
   ],
   [
     "United Arab Emirates",
@@ -1048,11 +952,11 @@
     "country:GB"
   ],
   [
-    "United States",
+    "United States of America",
     "country:US"
   ],
   [
-    "United States Virgin Islands",
+    "Virgin Islands, U.S.",
     "territory:VI"
   ],
   [
@@ -1068,20 +972,16 @@
     "country:VU"
   ],
   [
-    "Vatican City",
+    "Holy See",
     "country:VA"
   ],
   [
-    "Venezuela",
+    "Venezuela, Bolivarian Republic of",
     "country:VE"
   ],
   [
-    "Vietnam",
+    "Viet Nam",
     "country:VN"
-  ],
-  [
-    "Wake Island",
-    "territory:UM-79"
   ],
   [
     "Wallis and Futuna",
@@ -1096,10 +996,6 @@
     "country:YE"
   ],
   [
-    "Yugoslavia",
-    "country:YU"
-  ],
-  [
     "Zambia",
     "country:ZM"
   ],
@@ -1110,5 +1006,33 @@
   [
     "Åland Islands",
     "territory:AX"
+  ],
+  [
+    "Virgin Islands, British",
+    "country:VG"
+  ],
+  [
+    "Myanmar",
+    "country:MM"
+  ],
+  [
+    "European Union",
+    "country:EU"
+  ],
+  [
+    "Netherlands Antilles",
+    "country:AN"
+  ],
+  [
+    "Neutral Zone",
+    "country:NT"
+  ],
+  [
+    "United Nations",
+    "country:UN"
+  ],
+  [
+    "United States Minor Outlying Islands",
+    "country:UM"
   ]
 ]

@@ -16,18 +16,20 @@
 
 package controllers.aboutthebusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.aboutthebusiness.{AboutTheBusiness, LettersAddress, RegisteredOffice}
 import views.html.aboutthebusiness._
 import play.api.mvc.Result
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import com.google.inject.Inject
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 
-trait LettersAddressController extends BaseController {
-
-  def dataCache: DataCacheConnector
+class LettersAddressController @Inject () (
+                                          val dataCache: DataCacheConnector,
+                                          val authConnector: AuthConnector
+                                          )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -87,10 +89,4 @@ trait LettersAddressController extends BaseController {
       case false => Redirect(routes.CorrespondenceAddressController.get(edit))
     }
   }
-}
-
-object LettersAddressController extends LettersAddressController {
-  // $COVERAGE-OFF$
-  override val dataCache = DataCacheConnector
-  override val authConnector = AMLSAuthConnector
 }

@@ -37,10 +37,10 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new BusinessFranchiseController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new BusinessFranchiseController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -130,12 +130,4 @@ class BusinessFranchiseControllerSpec extends AmlsSpec with MockitoSugar with Sc
       }
     }
   }
-
-  it must {
-    "use the correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
-    }
-  }
-
 }

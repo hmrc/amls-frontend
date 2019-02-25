@@ -51,8 +51,8 @@ POST        /nationality/:index/                                   @controllers.
 GET         /check-your-answers/:index/                            @controllers.responsiblepeople.DetailedAnswersController.get(index: Int, flow: Option[String] ?= None)
 POST        /check-your-answers/:index/                            @controllers.responsiblepeople.DetailedAnswersController.post(index: Int, flow: Option[String] ?= None)
 
-GET         /additional-address/:index/                            controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /additional-address/:index/                            controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+GET         /additional-address/:index/                            @controllers.responsiblepeople.AdditionalAddressController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
+POST        /additional-address/:index/                            @controllers.responsiblepeople.AdditionalAddressController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /address-new/:index/                                   @controllers.responsiblepeople.NewHomeAddressController.get(index:Int)
 POST        /address-new/:index/                                   @controllers.responsiblepeople.NewHomeAddressController.post(index:Int)
@@ -65,9 +65,6 @@ POST        /time-at-additional-address/:index/                    @controllers.
 
 GET         /position/:index/                                      @controllers.responsiblepeople.PositionWithinBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /position/:index/                                      @controllers.responsiblepeople.PositionWithinBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-
-GET         /nominatedofficer/:index/                              @controllers.responsiblepeople.AreTheyNominatedOfficerController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
-POST        /nominatedofficer/:index/                              @controllers.responsiblepeople.AreTheyNominatedOfficerController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 
 GET         /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.get(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)
 POST        /sole-proprietor/:index/                               @controllers.responsiblepeople.SoleProprietorOfAnotherBusinessController.post(index:Int, edit: Boolean ?= false, flow: Option[String] ?= None)

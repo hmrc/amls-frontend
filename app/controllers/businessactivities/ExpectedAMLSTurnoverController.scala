@@ -16,24 +16,23 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.ExpectedAMLSTurnover
-import models.businessactivities.{BusinessActivities, _}
+import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
+import models.businessmatching._
 import services.StatusService
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
 import views.html.businessactivities._
-import models.businessmatching._
-import services.businessmatching.ServiceFlow
 
 import scala.concurrent.Future
 
-trait ExpectedAMLSTurnoverController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
-  implicit val statusService:StatusService
+class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                override val authConnector: AuthConnector,
+                                                implicit val statusService: StatusService
+                                               )extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -78,11 +77,4 @@ trait ExpectedAMLSTurnoverController extends BaseController {
       }
     }
   }
-}
-
-object ExpectedAMLSTurnoverController extends ExpectedAMLSTurnoverController {
-  // $COVERAGE-OFF$
-  override val authConnector = AMLSAuthConnector
-  override val dataCacheConnector = DataCacheConnector
-  override implicit val statusService: StatusService = StatusService
 }

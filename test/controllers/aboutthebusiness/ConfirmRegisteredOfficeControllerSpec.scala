@@ -40,10 +40,10 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ConfirmRegisteredOfficeController {
-      override val dataCache = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new ConfirmRegisteredOfficeController (
+      dataCache = mock[DataCacheConnector],
+      authConnector = self.authConnector
+      )
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")

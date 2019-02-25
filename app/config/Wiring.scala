@@ -81,7 +81,9 @@ class FrontendAuthConnector @Inject()(environment: Environment, val runModeConfi
   override protected def mode: Mode = environment.mode
 }
 
-object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
+class AmlsSessionCache @Inject()(environment: Environment, override val runModeConfiguration: Configuration, override val appNameConfiguration: Configuration)
+  extends SessionCache with AppName with ServicesConfig {
+
   override def http = WSHttp
 
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
@@ -90,9 +92,7 @@ object AmlsSessionCache extends SessionCache with AppName with ServicesConfig {
 
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 
-  override protected def appNameConfiguration: Configuration = Play.current.configuration
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = environment.mode
 }
 
 object AMLSAuditConnector extends AuditConnector with RunMode {

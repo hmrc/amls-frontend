@@ -16,9 +16,4 @@
 
 package utils
 
-import uk.gov.hmrc.play.frontend.auth.AuthContext
-import uk.gov.hmrc.http.HeaderCarrier
-
-import scala.concurrent.ExecutionContext
-
-trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks
+trait DependencyMocks extends CacheMocks with StatusMocks with ServiceFlowMocks with RouterMocks with AutoCompleteServiceMocks

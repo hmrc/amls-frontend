@@ -292,12 +292,47 @@ $(function () {
 
   $('[data-gov-autocomplete]').each(function() {
     openregisterLocationPicker({
-        defaultValue: '',
+      additionalEntries: [
+         { name: 'European Union', code: 'country:EU' },
+         { name: 'Netherlands Antilles', code: 'country:AN' },
+         { name: 'Neutral Zone', code: 'country:NT' },
+         { name: 'United Nations', code: 'country:UN' },
+         { name: 'United States Minor Outlying Islands', code: 'country:UM' },
+         { name: 'Saint Helena, Ascension and Tristan da Cunha', code: 'SH' }
+      ],
+      additionalSynonyms: [
+         { name: 'The Ivory Coast', code: 'country:CI' },
+         { name: 'Cote d Ivoire', code: 'country:CI' },
+         { name: 'Cote dIvoire', code: 'country:CI' },
+         { name: 'South Korea', code: 'country:KR' },
+         { name: 'North Korea', code: 'country:KP' },
+         { name: 'Czech Republic', code: 'country:CZ'},
+         { name: 'East Timor', code: 'country:TL'},
+         { name: 'Cape Verde', code: 'country:CV'},
+         { name: 'Laos', code: 'country:LA'},
+         { name: 'St Vincent', code: 'country:VC'},
+         { name: 'Vietnam', code: 'country:VN'},
+         { name: 'Congo (Democratic Republic)', code: 'country:CD'},
+         { name: 'The Gambia', code: 'country:GM'},
+         { name: 'Aland Islands', code: 'territory:AX'},
+         { name: 'Curacao', code: 'territory:CW'},
+         { name: 'Timor Leste', code: 'country:TL'},
+         { name: 'Burma', code: 'country:MM'},
+         { name: 'Reunion', code: "territory:RE"},
+         { name: 'St Helena, Ascension and Tristan da Cunha', code: "territory:SH"},
+         { name: 'Ascension Island', code: "territory:SH"},
+         { name: 'St Kitts and Nevis', code: "country:KN"},
+         { name: 'St Lucia', code: "country:LC"},
+         { name: 'St Martin (French part)', code: "territory:MF"},
+         { name: 'St Pierre and Miquelon', code: "territory:PM"},
+         { name: 'St Vincent and the Grenadines', code: "country:VC"},
+         { name: 'Vatican City', code: "country:VA"},
+         { name: 'USA', code: "country:US"}
+      ],
+       defaultValue: '',
       selectElement: this,
       url: '/anti-money-laundering/assets/countries'
     })
-
-
 
     var selectFieldName = $(this).attr('id');
     var nonSelectFieldName = selectFieldName.replace('-select','');

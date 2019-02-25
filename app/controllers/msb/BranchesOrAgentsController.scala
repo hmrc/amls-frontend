@@ -21,12 +21,14 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.moneyservicebusiness.{BranchesOrAgents, MoneyServiceBusiness}
+import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
 class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector
+                                            val authConnector: AuthConnector,
+                                            val autoCompleteService: AutoCompleteService
                                            ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -39,7 +41,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
             branches <- msb.branchesOrAgents
           } yield Form2[BranchesOrAgents](branches)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.branches_or_agents(form, edit))
+          Ok(views.html.msb.branches_or_agents(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -47,7 +49,7 @@ class BranchesOrAgentsController @Inject() (val dataCacheConnector: DataCacheCon
     implicit authContext => implicit request =>
       Form2[BranchesOrAgents](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit)))
+          Future.successful(BadRequest(views.html.msb.branches_or_agents(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <- dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key)

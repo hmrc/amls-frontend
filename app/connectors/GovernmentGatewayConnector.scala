@@ -17,22 +17,25 @@
 package connectors
 
 import audit.EnrolEvent
-import config.{AMLSAuditConnector, ApplicationConfig, WSHttp}
+import config.{AMLSAuditConnector, AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
-import models.governmentgateway.{EnrolmentRequest}
+import javax.inject.Inject
+import models.governmentgateway.EnrolmentRequest
 import play.api.Logger.{debug, warn}
 import play.api.libs.json.{Json, Writes}
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.model.Audit
-
-import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{CorePost, HeaderCarrier, HttpResponse}
 import utils.AuditHelper
 
-trait GovernmentGatewayConnector {
+import scala.concurrent.{ExecutionContext, Future}
 
-  protected[connectors] def http: CorePost
-  protected def enrolUrl: String
-  private[connectors] def audit: Audit
+class GovernmentGatewayConnector @Inject()(val http: WSHttp,
+                                           val appConfig: AppConfig) {
+
+  val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
+  protected def enrolUrl = appConfig.enrolUrl
+  private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
+  private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"
 
   private def msg(msg: String) = s"[GovernmentGatewayConnector][enrol] - $msg"
 
@@ -52,10 +55,10 @@ trait GovernmentGatewayConnector {
         debug(msg(s"Successful Response: ${response.json}"))
         response
     } recoverWith {
-      case e: Throwable if e.getMessage.contains(GovernmentGatewayConnector.duplicateEnrolmentMessage) =>
+      case e: Throwable if e.getMessage.contains(duplicateEnrolmentMessage) =>
         warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(DuplicateEnrolmentException(e.getMessage, e))
-      case e: Throwable if e.getMessage.contains(GovernmentGatewayConnector.invalidCredentialsMessage) =>
+      case e: Throwable if e.getMessage.contains(invalidCredentialsMessage) =>
         warn(msg(s"'${e.getMessage}' error encountered"))
         Future.failed(InvalidEnrolmentCredentialsException(e.getMessage, e))
       case e =>
@@ -63,12 +66,4 @@ trait GovernmentGatewayConnector {
         Future.failed(e)
     }
   }
-}
-
-object GovernmentGatewayConnector extends GovernmentGatewayConnector {
-  override val http: CorePost = WSHttp
-  override val enrolUrl: String = ApplicationConfig.enrolUrl
-  override private[connectors] val audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
-  private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
-  private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"
 }

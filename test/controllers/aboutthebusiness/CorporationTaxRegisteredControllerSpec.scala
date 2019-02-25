@@ -52,11 +52,11 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
     mockCacheGetEntry[BusinessMatching](Some(businessMatching), BusinessMatching.key)
     mockCacheSave[AboutTheBusiness]
 
-    val controller = new CorporationTaxRegisteredController {
-      override val dataCacheConnector = mockCacheConnector
-      override val authConnector = self.authConnector
-      override val businessMatchingConnector = mock[BusinessMatchingConnector]
-    }
+    val controller = new CorporationTaxRegisteredController (
+      dataCacheConnector = mockCacheConnector,
+      authConnector = self.authConnector,
+      businessMatchingConnector = mock[BusinessMatchingConnector]
+    )
   }
 
   "CorporationTaxRegisteredController" when {

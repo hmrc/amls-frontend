@@ -16,16 +16,16 @@
 
 package services
 
+import com.google.inject.Inject
 import connectors.GovernmentGatewayConnector
-import models.governmentgateway.{EnrolmentRequest, EnrolmentResponse}
-import play.api.http.Status.OK
+import models.governmentgateway.EnrolmentRequest
+import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 
 import scala.concurrent.{ExecutionContext, Future}
-import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
-trait GovernmentGatewayService {
-
-  private[services] def ggConnector: GovernmentGatewayConnector
+class GovernmentGatewayService @Inject() (
+                                         val ggConnector: GovernmentGatewayConnector
+                                         ){
 
   def enrol
   (mlrRefNo: String, safeId: String, postCode: String)
@@ -38,9 +38,4 @@ trait GovernmentGatewayService {
       safeId = safeId,
       postCode = postCode
     ))
-}
-
-object GovernmentGatewayService extends GovernmentGatewayService {
-  // $COVERAGE-OFF$
-  override lazy val ggConnector = GovernmentGatewayConnector
 }

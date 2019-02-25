@@ -18,11 +18,10 @@ package models.notifications
 
 import cats.implicits._
 import models.confirmation.Currency
-import models.notifications.ContactType.{ApplicationAutorejectionForFailureToPay, DeRegistrationEffectiveDateChange, RegistrationVariationApproval}
-import models.notifications.StatusType.DeRegistered
 import org.joda.time.format.{DateTimeFormat, DateTimeFormatter, ISODateTimeFormat}
 import org.joda.time.{DateTime, DateTimeZone, LocalDate}
 import play.api.libs.json._
+import utils.ContactTypeHelper
 
 case class NotificationDetails(contactType: Option[ContactType],
                                status: Option[Status],
@@ -30,28 +29,13 @@ case class NotificationDetails(contactType: Option[ContactType],
                                variation: Boolean,
                                receivedAt: DateTime) {
 
-  def subject = s"notifications.subject.$getContactType"
+  val cType = ContactTypeHelper.getContactType(status, contactType, variation)
+
+  def subject = s"notifications.subject.$cType"
 
   def dateReceived = {
     val fmt: DateTimeFormatter = DateTimeFormat.forPattern("d MMMM Y")
     receivedAt.toString(fmt)
-  }
-
-  private def getContactType: ContactType = {
-
-    val statusReason = for {
-      st <- status
-      reason <- st.statusReason
-    } yield reason
-
-    contactType.getOrElse(
-      (status, statusReason, variation) match {
-        case (Some(Status(Some(DeRegistered), _)), _, _) => DeRegistrationEffectiveDateChange
-        case (_, Some(_), _) => ApplicationAutorejectionForFailureToPay
-        case (_, _, true) => RegistrationVariationApproval
-        case _ => throw new RuntimeException("No matching ContactType found")
-      }
-    )
   }
 
 }

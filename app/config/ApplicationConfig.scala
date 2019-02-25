@@ -74,6 +74,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
   lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
+  // The following values are used by the Fee Guidance Controller currently toggled off with feature-toggle.show-fees
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFeeRate = getConfigInt("amounts.people")
@@ -98,6 +99,8 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
 
   def amlsUrl = baseUrl("amls")
 
+  def subscriptionUrl = s"$amlsUrl/amls/subscription"
+
   def showFeesToggle = getConfBool("feature-toggle.show-fees", defBool = false)
 
   def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
@@ -115,6 +118,14 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
   def enrolmentStubsUrl = baseUrl("enrolment-stubs")
 
   def feePaymentUrl = s"$amlsUrl/amls/payment"
+
+  def notificationsUrl = baseUrl("amls-notification")
+
+  def allNotificationsUrl = s"$notificationsUrl/amls-notification"
+
+  def ggUrl = baseUrl("government-gateway")
+
+  def enrolUrl = s"$ggUrl/enrol"
 
   val mongoEncryptionEnabled = baseConfig.getBoolean("appCache.mongo.encryptionEnabled") getOrElse true
   val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false

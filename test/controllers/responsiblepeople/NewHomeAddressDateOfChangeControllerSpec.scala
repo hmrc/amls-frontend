@@ -20,13 +20,13 @@ import connectors.DataCacheConnector
 import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.mockito.Matchers._
-import org.mockito.Mockito.{when, _}
+import org.mockito.Mockito.when
 import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import play.api.test.Helpers._
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 

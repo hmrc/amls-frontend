@@ -16,28 +16,33 @@
 
 package controllers.aboutthebusiness
 
+import audit.AddressConversions._
 import audit.{AddressCreatedEvent, AddressModifiedEvent}
-import config.{AMLSAuditConnector, AMLSAuthConnector}
+import cats.data.OptionT
+import cats.implicits._
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
-import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, RegisteredOffice, UKCorrespondenceAddress}
+import models.aboutthebusiness.{AboutTheBusiness, CorrespondenceAddress, UKCorrespondenceAddress}
+import play.api.mvc.Request
+import services.AutoCompleteService
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.aboutthebusiness._
-import audit.AddressConversions._
-import cats.data.OptionT
-import cats.implicits._
-import play.api.mvc.Request
-import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
-trait CorrespondenceAddressController extends BaseController {
+class CorrespondenceAddressController @Inject () (
+                                                 val dataConnector: DataCacheConnector,
+                                                 val authConnector: AuthConnector,
+                                                 val auditConnector: AuditConnector,
+                                                 val autoCompleteService: AutoCompleteService
+                                                 ) extends BaseController {
 
-  protected def dataConnector: DataCacheConnector
-  protected[controllers] val auditConnector: AuditConnector
+
 
   private val initialiseWithUK = UKCorrespondenceAddress("","", "", "", None, None, "")
 
@@ -49,7 +54,7 @@ trait CorrespondenceAddressController extends BaseController {
             aboutTheBusiness <- response
             correspondenceAddress <- aboutTheBusiness.correspondenceAddress
           } yield Form2[CorrespondenceAddress](correspondenceAddress)).getOrElse(Form2[CorrespondenceAddress](initialiseWithUK))
-          Ok(correspondence_address(form, edit))
+          Ok(correspondence_address(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -57,7 +62,7 @@ trait CorrespondenceAddressController extends BaseController {
     implicit authContext => implicit request => {
       Form2[CorrespondenceAddress](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(correspondence_address(f, edit)))
+          Future.successful(BadRequest(correspondence_address(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
             aboutTheBusiness <- OptionT(dataConnector.fetch[AboutTheBusiness](AboutTheBusiness.key))
@@ -81,11 +86,4 @@ trait CorrespondenceAddressController extends BaseController {
       auditConnector.sendEvent(AddressCreatedEvent(currentAddress))
     }
   }
-}
-
-object CorrespondenceAddressController extends CorrespondenceAddressController {
-  // $COVERAGE-OFF$
-  override protected val dataConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
-  override protected[controllers] lazy val auditConnector = AMLSAuditConnector
 }

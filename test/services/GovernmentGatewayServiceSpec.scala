@@ -30,9 +30,9 @@ import uk.gov.hmrc.http.{ HeaderCarrier, HttpResponse }
 
 class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with ScalaFutures {
 
-  object GovernmentGatewayService extends GovernmentGatewayService {
-    override private[services] val ggConnector = mock[GovernmentGatewayConnector]
-  }
+  val service: GovernmentGatewayService = new GovernmentGatewayService(
+    ggConnector = mock[GovernmentGatewayConnector]
+  )
 
   "GovernmentGatewayService" must {
 
@@ -43,10 +43,10 @@ class GovernmentGatewayServiceSpec extends PlaySpec with MockitoSugar with Scala
       val response = HttpResponse(OK)
 
       when {
-        GovernmentGatewayService.ggConnector.enrol(any())(any(), any(), any())
+        service.ggConnector.enrol(any())(any(), any(), any())
       } thenReturn Future.successful(response)
 
-      whenReady (GovernmentGatewayService.enrol("mlrRefNo", "safeId", "postcode")) {
+      whenReady (service.enrol("mlrRefNo", "safeId", "postcode")) {
         result =>
           result must equal (response)
       }

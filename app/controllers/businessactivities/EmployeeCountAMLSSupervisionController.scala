@@ -16,19 +16,19 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
-import models.businessactivities.{BusinessActivities, EmployeeCount, EmployeeCountAMLSSupervision, HowManyEmployees}
+import models.businessactivities.{BusinessActivities, EmployeeCountAMLSSupervision, HowManyEmployees}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait EmployeeCountAMLSSupervisionController extends BaseController {
-
-  def dataCacheConnector: DataCacheConnector
+class EmployeeCountAMLSSupervisionController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                                        override val authConnector: AuthConnector
+                                                       ) extends BaseController {
 
   def updateData(howManyEmployees: Option[HowManyEmployees], data: EmployeeCountAMLSSupervision): HowManyEmployees = {
     howManyEmployees.fold[HowManyEmployees](HowManyEmployees(employeeCountAMLSSupervision = Some(data.employeeCountAMLSSupervision)))(x =>
@@ -66,10 +66,4 @@ trait EmployeeCountAMLSSupervisionController extends BaseController {
       }
     }
   }
-}
-
-object EmployeeCountAMLSSupervisionController extends EmployeeCountAMLSSupervisionController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override val authConnector: AuthConnector = AMLSAuthConnector
 }

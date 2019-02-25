@@ -16,18 +16,16 @@
 
 package services
 
-import javax.inject.{Inject, Singleton}
-
 import cats.data.OptionT
 import cats.implicits._
 import connectors.AmlsNotificationConnector
+import javax.inject.{Inject, Singleton}
 import models.notifications.{ContactType, NotificationDetails, NotificationRow}
-import play.api.i18n.MessagesApi
+import play.api.i18n._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 @Singleton
 class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificationConnector, val messagesApi: MessagesApi) {
@@ -60,7 +58,10 @@ class NotificationService @Inject()(val amlsNotificationConnector: AmlsNotificat
 
       case _ => (for {
         details <- OptionT(amlsNotificationConnector.getMessageDetailsByAmlsRegNo(amlsRegNo, id))
-        messageText <- OptionT.fromOption[Future](details.messageText)
+        messageText <- OptionT.fromOption[Future](details.messageText match {
+          case t@Some(_) => t
+          case _ => Some("<![CDATA[<P>No content</P>]]>")
+        })
       } yield details.copy(messageText = Some(CustomAttributeProvider.commonMark(NotificationDetails.processGenericMessage(messageText))))).value
     }
   }

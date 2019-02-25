@@ -17,14 +17,12 @@
 package utils
 
 import controllers.BaseController
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.mvc.Action
 import play.api.test.FakeRequest
 import play.api.test.Helpers._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
-class FeatureToggleSpec extends PlaySpec with MockitoSugar with OneAppPerSuite {
+class FeatureToggleSpec extends AmlsSpec {
 
 
 

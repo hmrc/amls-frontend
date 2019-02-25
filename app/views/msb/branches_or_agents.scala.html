@@ -17,8 +17,9 @@
 @import forms.{Form2, ValidField, InvalidField}
 @import include._
 @import forms2._
+@import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages)
 
 @header = {
     @components.back_link()
@@ -78,10 +79,16 @@
                         @defining(
                             f(s"countries[$i]")
                         ) { field =>
-                        @country(field, classes = field match {
-                            case f: ValidField => Seq("")
-                            case f: InvalidField => Seq("js-hidden")
-                            })
+
+                        @country_autocomplete(
+                            field = field,
+                            classes = field match {
+                                case f: ValidField => Seq("")
+                                case f: InvalidField => Seq("js-hidden")
+                            },
+                            data = countryData.getOrElse(Seq.empty)
+                        )
+
                         }
                     }
                 }

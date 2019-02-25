@@ -42,6 +42,13 @@ class ways_to_paySpec extends AmlsSpec {
       doc.html must include(Messages("payments.waystopay.info2"))
     }
 
+    "have a back link" in new ViewFixture {
+
+      def view = views.html.payments.ways_to_pay(EmptyForm)
+
+      doc.getElementsByAttributeValue("class", "link-back") must not be empty
+    }
+
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty, Seq(

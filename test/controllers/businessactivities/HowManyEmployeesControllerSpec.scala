@@ -38,10 +38,10 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new HowManyEmployeesController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new HowManyEmployeesController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -120,14 +120,6 @@ class HowManyEmployeesControllerSpec extends AmlsSpec with MockitoSugar with Sca
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
 
       }
-
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

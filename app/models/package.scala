@@ -14,7 +14,6 @@
  * limitations under the License.
  */
 
-import org.joda.time.LocalDate
 import jto.validation.Rule
 
 package object models {
@@ -236,7 +235,7 @@ package object models {
     Country("Cambodia", "KH"),
     Country("Cameroon", "CM"),
     Country("Canada", "CA"),
-    Country("Cape Verde", "CV"),
+    Country("Cabo Verde", "CV"),
     Country("Cayman Islands", "KY"),
     Country("Central African Republic", "CF"),
     Country("Chad", "TD"),
@@ -255,7 +254,7 @@ package object models {
     Country("Cuba", "CU"),
     Country("Curaçao", "CW"),
     Country("Cyprus", "CY"),
-    Country("Czech Republic", "CZ"),
+    Country("Czechia", "CZ"),
     Country("Denmark", "DK"),
     Country("Djibouti", "DJ"),
     Country("Dominica", "DM"),
@@ -295,7 +294,7 @@ package object models {
     Country("Guyana", "GY"),
     Country("Haiti", "HT"),
     Country("Heard Island and McDonald Islands", "HM"),
-    Country("Holy See (Vatican City State)", "VA"),
+    Country("Holy See", "VA"),
     Country("Honduras", "HN"),
     Country("Hong Kong", "HK"),
     Country("Hungary", "HU"),
@@ -396,7 +395,6 @@ package object models {
     Country("Saudi Arabia", "SA"),
     Country("Senegal", "SN"),
     Country("Serbia", "RS"),
-    Country("Serbia and Montenegro", "RS"),
     Country("Seychelles", "SC"),
     Country("Sierra Leone", "SL"),
     Country("Singapore", "SG"),
@@ -436,7 +434,7 @@ package object models {
     Country("United Arab Emirates", "AE"),
     Country("United Kingdom", "GB"),
     Country("United Nations", "UN"),
-    Country("United States", "US"),
+    Country("United States of America", "US"),
     Country("United States Minor Outlying Islands", "UM"),
     Country("Uruguay", "UY"),
     Country("Uzbekistan", "UZ"),

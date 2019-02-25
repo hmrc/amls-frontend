@@ -16,26 +16,26 @@
 
 package controllers.businessmatching.updateservice
 
-import config.ApplicationConfig
+import connectors.KeystoreConnector
 import models.asp.Asp
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.businessmatching.{BusinessActivities => BMBusinessActivities, _}
 import models.estateagentbusiness.EstateAgentBusiness
-import models.moneyservicebusiness.{ExpectedThroughput, MoneyServiceBusiness => MoneyServiceBusinessSection}
 import models.flowmanagement.RemoveBusinessTypeFlowModel
 import models.hvd.Hvd
+import models.moneyservicebusiness.{MoneyServiceBusiness => MoneyServiceBusinessSection}
 import models.responsiblepeople.{ApprovalFlags, ResponsiblePerson}
 import models.tcsp.Tcsp
 import models.tradingpremises.{CurrencyExchange, TradingPremises, TradingPremisesMsbServices, WhatDoesYourBusinessDo}
+import org.mockito.Matchers.{any, eq => eqTo}
+import org.mockito.Mockito.{never, verify}
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import utils._
-import play.api.test.Helpers._
-import org.mockito.Mockito.{never, verify}
-import org.mockito.Matchers.{any, eq => eqTo}
-import org.scalatestplus.play.{OneAppPerTest, PlaySpec}
-import play.api.{Application, Mode}
+import play.api.Application
+import play.api.inject.bind
 import play.api.inject.guice.GuiceApplicationBuilder
+import play.api.test.Helpers._
+import utils._
 
 import scala.concurrent.ExecutionContext.Implicits.global
 

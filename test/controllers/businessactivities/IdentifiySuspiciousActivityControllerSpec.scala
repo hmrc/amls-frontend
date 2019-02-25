@@ -16,22 +16,19 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
-import models.businessactivities.{BusinessActivities, BusinessFranchiseYes, IdentifySuspiciousActivity}
+import models.businessactivities.{BusinessActivities, IdentifySuspiciousActivity}
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
-import org.scalatest.Ignore
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import play.api.test.Helpers._
-import  utils.AmlsSpec
 import play.api.i18n.Messages
-import play.api.libs.json.{JsObject, Json}
+import play.api.libs.json.Json
+import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -40,10 +37,10 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new IdentifySuspiciousActivityController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new IdentifySuspiciousActivityController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   "IdentifySuspiciousActivityController" when {
@@ -127,12 +124,6 @@ class IdentifiySuspiciousActivityControllerSpec extends AmlsSpec with MockitoSug
         status(result) must be(SEE_OTHER)
         redirectLocation(result) must be(Some(routes.SummaryController.get().url))
       }
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      IdentifySuspiciousActivityController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

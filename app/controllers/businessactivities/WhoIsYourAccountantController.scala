@@ -16,18 +16,20 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
+import services.AutoCompleteService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait WhoIsYourAccountantController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class WhoIsYourAccountantController @Inject() ( val dataCacheConnector: DataCacheConnector,
+                                                val autoCompleteService: AutoCompleteService,
+                                                override val authConnector: AuthConnector
+                                              )extends BaseController {
 
   //Joe - cannot seem to provide a default for UK/Non UK without providing defaults for other co-products
   private val defaultValues = WhoIsYourAccountant("", None, UkAccountantsAddress("","", None, None, ""))
@@ -42,7 +44,7 @@ trait WhoIsYourAccountantController extends BaseController {
           } yield {
             Form2[WhoIsYourAccountant](whoIsYourAccountant)
           }).getOrElse(Form2(defaultValues))
-          Ok(views.html.businessactivities.who_is_your_accountant(form, edit))
+          Ok(views.html.businessactivities.who_is_your_accountant(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -50,7 +52,7 @@ trait WhoIsYourAccountantController extends BaseController {
     implicit authContext => implicit request =>
       Form2[WhoIsYourAccountant](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit)))
+          Future.successful(BadRequest(views.html.businessactivities.who_is_your_accountant(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) => {
           for {
             businessActivity <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)
@@ -65,10 +67,4 @@ trait WhoIsYourAccountantController extends BaseController {
         }
       }
   }
-}
-
-object WhoIsYourAccountantController extends WhoIsYourAccountantController {
-  // $COVERAGE-OFF$
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
 }

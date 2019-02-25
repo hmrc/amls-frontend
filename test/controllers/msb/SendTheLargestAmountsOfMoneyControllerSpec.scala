@@ -18,7 +18,7 @@ package controllers.msb
 
 import models.Country
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, MostTransactions, SendTheLargestAmountsOfMoney}
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
@@ -31,14 +31,15 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks{
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new SendTheLargestAmountsOfMoneyController(
       self.authConnector,
       mockCacheConnector,
       mockStatusService,
-      mockServiceFlow
+      mockServiceFlow,
+      mockAutoComplete
     )
 
     mockCacheFetch[ServiceChangeRegister](None, None)
@@ -136,7 +137,7 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      redirectLocation(result) must be(Some(routes.MostTransactionsController.get(true).url))
     }
 
     "on post with valid data in edit mode when the next page's data isn't in the store" in new Fixture {

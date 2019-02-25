@@ -21,13 +21,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{CurrencyExchange, ForeignExchange, TransmittingMoney, MoneyServiceBusiness => MsbActivity}
 import models.moneyservicebusiness.{MoneyServiceBusiness, SendTheLargestAmountsOfMoney}
-import services.StatusService
 import services.businessmatching.ServiceFlow
+import services.{AutoCompleteService, StatusService}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.ControllerHelper
 import views.html.msb.send_largest_amounts_of_money
 
 import scala.concurrent.Future
@@ -35,7 +32,8 @@ import scala.concurrent.Future
 class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
                                                        implicit val cacheConnector: DataCacheConnector,
                                                        implicit val statusService: StatusService,
-                                                       implicit val serviceFlow: ServiceFlow
+                                                       implicit val serviceFlow: ServiceFlow,
+                                                       val autoCompleteService: AutoCompleteService
                                                       ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -46,7 +44,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
             msb <- response
             amount <- msb.sendTheLargestAmountsOfMoney
           } yield Form2[SendTheLargestAmountsOfMoney](amount)).getOrElse(EmptyForm)
-          Ok(send_largest_amounts_of_money(form, edit))
+          Ok(send_largest_amounts_of_money(form, edit, autoCompleteService.getCountries))
       }
   }
 
@@ -54,7 +52,7 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
     implicit authContext => implicit request =>
       Form2[SendTheLargestAmountsOfMoney](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(send_largest_amounts_of_money(f, edit)))
+          Future.successful(BadRequest(send_largest_amounts_of_money(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           for {
             msb <-
@@ -62,11 +60,8 @@ class SendTheLargestAmountsOfMoneyController @Inject()(val authConnector: AuthCo
             _ <- cacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key,
               msb.sendTheLargestAmountsOfMoney(Some(data))
             )
-          } yield edit match {
-            case true if msb.mostTransactions.isDefined =>
-              Redirect(routes.SummaryController.get())
-            case _ =>
-              Redirect(routes.MostTransactionsController.get(edit))
+          } yield {
+           Redirect(routes.MostTransactionsController.get(edit))
           }
       }
   }

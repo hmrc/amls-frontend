@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include._
 @import include.forms2._
+@import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -43,14 +44,14 @@
         ) {
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                labelText = "lbl.yes",
                 value = "true",
                 target = s"#${f("postCode").id}-fieldset",
                 inline = true
             )
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                labelText = "lbl.no",
                 value = "false",
                 target = s"#${f("country").id}-fieldset",
                 inline = true
@@ -59,6 +60,7 @@
 
         @fieldset(
             f = f("postCode-fieldset"),
+            legendHidden = true,
             legend = "aboutthebusiness.correspondenceaddress.address",
             jsHidden = false,
             panel = false,
@@ -67,22 +69,22 @@
             @input(
                 field = f("addressLine1"),
                 labelText = "lbl.address.line1",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLine2"),
                 labelText = "lbl.address.line2",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLine3"),
                 labelText = "lbl.address.line3",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLine4"),
                 labelText = "lbl.address.line4",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("postCode"),
@@ -93,6 +95,7 @@
 
         @fieldset(
             f = f("country-fieldset"),
+            legendHidden = true,
             legend = "aboutthebusiness.correspondenceaddress.address",
             jsHidden = true,
             panel = false,
@@ -101,26 +104,27 @@
             @input(
                 field = f("addressLineNonUK1"),
                 labelText = "lbl.address.line1",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLineNonUK2"),
                 labelText = "lbl.address.line2",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLineNonUK3"),
                 labelText = "lbl.address.line3",
-                labelHidden = true
+                labelHidden = false
             )
             @input(
                 field = f("addressLineNonUK4"),
                 labelText = "lbl.address.line4",
-                labelHidden = true
+                labelHidden = false
             )
-            @country(
+            @country_autocomplete(
                 field = f("country"),
-                labelText = "aboutthebusiness.correspondenceaddress.country"
+                labelText = "aboutthebusiness.correspondenceaddress.country",
+                data = countryData.getOrElse(Seq.empty)
             )
         }
 

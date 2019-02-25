@@ -19,8 +19,8 @@ package controllers
 import java.net.URLEncoder
 
 import config.ApplicationConfig
-import connectors.DataCacheConnector
-import generators.{StatusGenerator}
+import connectors.{DataCacheConnector, KeystoreConnector}
+import generators.StatusGenerator
 import models.aboutthebusiness.AboutTheBusiness
 import models.asp.Asp
 import models.bankdetails.BankDetails
@@ -46,12 +46,14 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 import org.scalatest.MustMatchers
 import org.scalatest.mock.MockitoSugar
+import play.api.inject.bind
+import play.api.inject.guice.GuiceApplicationBuilder
 import play.api.libs.json.JsResultException
 import play.api.mvc.{Request, Result}
+import play.api.test.FakeRequest
 import play.api.test.Helpers._
-import play.api.test.{FakeApplication, FakeRequest}
 import services.{AuthEnrolmentsService, AuthService, LandingService, StatusService}
-import uk.gov.hmrc.http.cache.client.{CacheMap}
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.ExtendedDataEvent

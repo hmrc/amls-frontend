@@ -1,11 +1,11 @@
-GET         /business-type                                          controllers.businessmatching.BusinessTypeController.get()
-POST        /business-type                                          controllers.businessmatching.BusinessTypeController.post()
+GET         /business-type                                          @controllers.businessmatching.BusinessTypeController.get()
+POST        /business-type                                          @controllers.businessmatching.BusinessTypeController.post()
 
 GET         /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.get()
 POST        /postcode                                               @controllers.businessmatching.ConfirmPostCodeController.post()
 
-GET         /type-of-business                                       controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
-POST        /type-of-business                                       controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
+GET         /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.get(edit: Boolean ?= false)
+POST        /type-of-business                                       @controllers.businessmatching.TypeOfBusinessController.post(edit: Boolean ?= false)
 
 GET         /activities                                             @controllers.businessmatching.RegisterServicesController.get(edit: Boolean ?= false)
 POST        /activities                                             @controllers.businessmatching.RegisterServicesController.post(edit: Boolean ?= false)

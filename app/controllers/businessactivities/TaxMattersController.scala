@@ -16,7 +16,7 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
+import com.google.inject.Inject
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
@@ -26,9 +26,9 @@ import views.html.businessactivities._
 
 import scala.concurrent.Future
 
-trait TaxMattersController extends BaseController {
-
-  val dataCacheConnector: DataCacheConnector
+class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
+                                      override val authConnector: AuthConnector
+                                     ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
@@ -57,10 +57,4 @@ trait TaxMattersController extends BaseController {
           } yield Redirect(routes.SummaryController.get())
       }
   }
-}
-
-object TaxMattersController extends TaxMattersController {
-  // $COVERAGE-OFF$
-  override val dataCacheConnector: DataCacheConnector = DataCacheConnector
-  override protected val authConnector: AuthConnector = AMLSAuthConnector
 }

@@ -30,10 +30,10 @@ import scala.concurrent.Future
 
 class BranchesOrAgentsControllerSpec extends AmlsSpec with MockitoSugar {
 
-  trait Fixture extends AuthorisedFixture with DependencyMocks{
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
     self => val request = addToken(authRequest)
 
-    val controller = new BranchesOrAgentsController(mockCacheConnector, authConnector = self.authConnector)
+    val controller = new BranchesOrAgentsController(mockCacheConnector, authConnector = self.authConnector, mockAutoComplete)
   }
 
   "BranchesOrAgentsController" must {

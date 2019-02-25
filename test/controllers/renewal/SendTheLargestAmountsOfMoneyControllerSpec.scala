@@ -21,7 +21,7 @@ import connectors.DataCacheConnector
 import models.Country
 import models.renewal.{CustomersOutsideUK, Renewal, SendTheLargestAmountsOfMoney}
 import org.jsoup.Jsoup
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration}
 import org.scalatest.mock.MockitoSugar
@@ -30,13 +30,13 @@ import play.api.mvc.Result
 import play.api.test.Helpers._
 import services.{RenewalService, StatusService}
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture, AutoCompleteServiceMocks}
 
 import scala.concurrent.Future
 
 class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSugar with PatienceConfiguration with IntegrationPatience {
 
-  trait Fixture extends AuthorisedFixture {
+  trait Fixture extends AuthorisedFixture with AutoCompleteServiceMocks {
     self =>
     val request = addToken(authRequest)
 
@@ -51,7 +51,8 @@ class SendTheLargestAmountsOfMoneyControllerSpec extends AmlsSpec with MockitoSu
     val controller = new SendTheLargestAmountsOfMoneyController(
       dataCacheConnector = mockDataCacheConnector,
       authConnector = self.authConnector,
-      renewalService = mockRenewalService
+      renewalService = mockRenewalService,
+      autoCompleteService = mockAutoComplete
     )
   }
 

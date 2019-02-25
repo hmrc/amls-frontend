@@ -16,7 +16,6 @@
 
 package controllers.estateagentbusiness
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.estateagentbusiness._
 import org.jsoup.Jsoup
@@ -24,11 +23,10 @@ import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -38,20 +36,15 @@ class PenalisedByProfessionalControllerSpec extends AmlsSpec with MockitoSugar w
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new PenalisedByProfessionalController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new PenalisedByProfessionalController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
 
   "PenalisedByProfessionalController" must {
-
-    "use correct services" in new Fixture {
-      PenalisedByProfessionalController.authConnector must be(AMLSAuthConnector)
-      PenalisedByProfessionalController.dataCacheConnector must be(DataCacheConnector)
-    }
 
     "on get display the Penalised By Professional Body page" in new Fixture {
       when(controller.dataCacheConnector.fetch[EstateAgentBusiness](any())

@@ -16,7 +16,6 @@
 
 package controllers.businessactivities
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import models.businessactivities.{BusinessActivities, HowManyEmployees}
 import org.jsoup.Jsoup
@@ -26,8 +25,7 @@ import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
 
@@ -35,10 +33,10 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
-    val controller = new EmployeeCountAMLSSupervisionController {
-      override val dataCacheConnector: DataCacheConnector = mock[DataCacheConnector]
-      override val authConnector: AuthConnector = self.authConnector
-    }
+    val controller = new EmployeeCountAMLSSupervisionController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)
@@ -117,14 +115,6 @@ class EmployeeCountAMLSSupervisionControllerSpec extends AmlsSpec with MockitoSu
         redirectLocation(resultTrue) must be(Some(routes.SummaryController.get().url))
 
       }
-
-    }
-  }
-
-  it must {
-    "use correct services" in new Fixture {
-      BusinessFranchiseController.authConnector must be(AMLSAuthConnector)
-      BusinessFranchiseController.dataCacheConnector must be(DataCacheConnector)
     }
   }
 }

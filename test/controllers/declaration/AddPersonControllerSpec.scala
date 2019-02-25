@@ -44,11 +44,11 @@ class AddPersonControllerSpec extends AmlsSpec with MockitoSugar {
 
     val request = addToken(authRequest)
 
-    val addPersonController = new AddPersonController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val addPersonController = new AddPersonController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
 
     val emptyCache = CacheMap("", Map.empty)
 
@@ -296,11 +296,11 @@ class AddPersonControllerWithoutAmendmentSpec extends AmlsSpec with MockitoSugar
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val addPersonController = new AddPersonController {
-      override val dataCacheConnector = mockDataCacheConnector
-      override val authConnector = self.authConnector
-      override val statusService = mock[StatusService]
-    }
+    val addPersonController = new AddPersonController (
+      dataCacheConnector = mockDataCacheConnector,
+      authConnector = self.authConnector,
+      statusService = mock[StatusService]
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)

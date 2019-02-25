@@ -39,7 +39,8 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    implicit val dataCacheConnector: DataCacheConnector,
                                    val mongoCacheConnector: MongoCacheConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
-                                   val stubsService: UpdateMongoCacheService) extends BaseController {
+                                   val stubsService: UpdateMongoCacheService,
+                                   val amlsConnector: AmlsConnector) extends BaseController {
 
 
   def dropMongoCache = Authorised.async {
@@ -88,7 +89,7 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
 
   def getPayment(ref: String) = Authorised.async {
     implicit authContext => implicit request =>
-      AmlsConnector.getPaymentByPaymentReference(ref) map {
+      amlsConnector.getPaymentByPaymentReference(ref) map {
         case Some(p) => Ok(Json.toJson(p))
         case _ => Ok(s"The payment for $ref was not found")
       }
@@ -96,7 +97,7 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
 
   def companyName = Authorised.async {
     implicit authContext => implicit request =>
-      AmlsConnector.registrationDetails("XJ0000100093742") map { details =>
+      amlsConnector.registrationDetails("XJ0000100093742") map { details =>
         Ok(details.companyName)
       } recover {
         case _ => Ok("Failed to fetch registration details")

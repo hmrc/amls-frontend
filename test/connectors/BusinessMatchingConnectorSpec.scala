@@ -16,24 +16,20 @@
 
 package connectors
 
+import config.WSHttp
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
-import play.api.Mode.Mode
+import play.api.Play
 import play.api.libs.json.Json
 import play.api.test.Helpers._
-import utils.AuthorisedFixture
+import uk.gov.hmrc.crypto.ApplicationCrypto
+import uk.gov.hmrc.http.NotFoundException
+import utils.{AmlsSpec, AuthorisedFixture}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.{CoreGet, HeaderCarrier, NotFoundException}
-import play.api.{Configuration, Play}
-import uk.gov.hmrc.crypto.ApplicationCrypto
-import uk.gov.hmrc.play.frontend.filters.SessionCookieCryptoFilter
 
-class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneAppPerSuite {
-
-  implicit val headerCarrier = HeaderCarrier()
+class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   val validReviewDetailsJson =
     """
@@ -63,15 +59,13 @@ class BusinessMatchingConnectorSpec extends PlaySpec with ScalaFutures with OneA
 
   trait Fixture extends AuthorisedFixture { self =>
 
-    object TestBusinessMatchingConnector extends BusinessMatchingConnector {
-      override val http = mock[CoreGet]
-      lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
-      val sessionCookieCryptoFilter = new SessionCookieCryptoFilter(applicationCrypto)
-      override val crypto = sessionCookieCryptoFilter.encrypt _
+    val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
 
-      override protected def mode: Mode = Play.current.mode
-      override protected def runModeConfiguration: Configuration = Play.current.configuration
-    }
+
+    object TestBusinessMatchingConnector extends BusinessMatchingConnector (
+      http = mock[WSHttp],
+      applicationCrypto = applicationCrypto
+    )
 
     val address = BusinessMatchingAddress("1 Test Street", "Test Town", None, None, None, "UK")
 

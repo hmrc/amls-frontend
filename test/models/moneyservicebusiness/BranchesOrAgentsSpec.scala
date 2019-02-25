@@ -111,7 +111,7 @@ class BranchesOrAgentsSpec extends PlaySpec with MustMatchers{
 
       rule.validate(form) mustBe Valid(BranchesOrAgents(Some(Seq(
         Country("United Kingdom", "GB"),
-        Country("United States", "US")
+        Country("United States of America", "US")
       ))))
     }
 

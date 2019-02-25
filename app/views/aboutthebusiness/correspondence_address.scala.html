@@ -17,8 +17,9 @@
 @import forms.Form2
 @import include._
 @import forms2._
+@import models.autocomplete._
 
-@(f: Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: Form2[_], edit: Boolean, countryData: Option[Seq[NameValuePair]])(implicit request: Request[_],m:Messages, lang: Lang)
 
 @target = @{
     s"""${f("postCode").id}-fieldset"""
@@ -39,13 +40,8 @@
     heading = header
 ) {
 
-    @panel(
-        wide = true,
-        gutter = true,
-        jsHidden = false
-    ) {
-        <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
-    }
+    <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+
 
     @form(f, controllers.aboutthebusiness.routes.CorrespondenceAddressController.post(edit)) {
 
@@ -92,7 +88,7 @@
         @fieldset(
             f = f(s"$target"),
             legend = "aboutthebusiness.correspondenceaddress.address",
-            legendHidden = true,
+            legendHidden = false,
             panel = false
         ) {
             @input(
@@ -101,18 +97,15 @@
             )
             @input(
                 field = f("addressLine2"),
-                labelText = "lbl.address.line2",
-                labelHidden = true
+                labelText = "lbl.address.line2"
             )
             @input(
                 field = f("addressLine3"),
-                labelText = "lbl.address.line3",
-                labelHidden = true
+                labelText = "lbl.address.line3"
             )
             @input(
                 field = f("addressLine4"),
-                labelText = "lbl.address.line4",
-                labelHidden = true
+                labelText = "lbl.address.line4"
             )
             @input(
                 field = f("postCode"),
@@ -134,22 +127,20 @@
             )
             @input(
                 field = f("addressLineNonUK2"),
-                labelText = "lbl.address.line2",
-                labelHidden = true
+                labelText = "lbl.address.line2"
             )
             @input(
                 field = f("addressLineNonUK3"),
-                labelText = "lbl.address.line3",
-                labelHidden = true
+                labelText = "lbl.address.line3"
             )
             @input(
                 field = f("addressLineNonUK4"),
-                labelText = "lbl.address.line4",
-                labelHidden = true
+                labelText = "lbl.address.line4"
             )
-            @country(
+            @country_autocomplete(
                 field = f("country"),
-                labelText = "aboutthebusiness.correspondenceaddress.country"
+                labelText = "aboutthebusiness.correspondenceaddress.country",
+                data = countryData.getOrElse(Seq.empty)
             )
         }
 

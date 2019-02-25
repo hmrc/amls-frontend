@@ -26,18 +26,17 @@ import models.responsiblepeople._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
-import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.mock.MockitoSugar
-import utils.{AmlsSpec, StatusConstants}
 import play.api.i18n.Messages
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import utils.AuthorisedFixture
+import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar with ResponsiblePersonGenerator {
 
@@ -275,8 +274,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
       }
 
       "when edit is false" must {
-        "redirect to the sole proprietor another business Controller" when {
-          "Nominated Officer is selected" in new Fixture {
+        "redirect to the sole proprietor another business Controller" in new Fixture {
 
             val newRequest = request.withFormUrlEncodedBody(
               "positions" -> "04",
@@ -296,7 +294,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
           }
 
-          "another position is selected in addition to the nomindated Officer" in new Fixture {
+          "another position is selected in addition to the nominated Officer" in new Fixture {
 
             val positions = Positions(Set(Director, NominatedOfficer), startDate)
             val responsiblePeople = ResponsiblePerson(positions = Some(positions))
@@ -311,63 +309,20 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
 
             when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
               (any(), any(), any())).thenReturn(Future.successful(Some(Seq(responsiblePeople))))
+
             val mockCacheMap = mock[CacheMap]
             when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
 
             val result = controller.post(RecordId)(newRequest)
             status(result) must be(SEE_OTHER)
             redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.SoleProprietorOfAnotherBusinessController.get(RecordId).url))
-
           }
-
-        }
-
-        "redirect to the AreTheyNominatedOfficerController" when {
-
-          "Nominated Officer is NOT selected" in new Fixture {
-
-            val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-              "startDate.day" -> "24",
-              "startDate.month" -> "2",
-              "startDate.year" -> "1990")
-
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-              (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-            val mockCacheMap = mock[CacheMap]
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(RecordId)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-          }
-
-          "Nominated Officer is NOT selected and status is Deleted" in new Fixture {
-
-            val mockCacheMap = mock[CacheMap]
-
-            val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-              "startDate.day" -> "24",
-              "startDate.month" -> "2",
-              "startDate.year" -> "1990"
-            )
-
-            when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any()))
-              .thenReturn(Future.successful(Some(Seq(hasNominatedOfficerButDeleted))))
-
-            when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any()))
-              .thenReturn(Future.successful(mockCacheMap))
-
-            val result = controller.post(RecordId)(newRequest)
-            status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId).url))
-          }
-
-        }
       }
 
-      "when edit is true" must {
-        "redirect to the VAT Registered Controller when Nominated Officer is selected" in new Fixture {
 
+
+      "when edit is true" must {
+        "redirect to the VAT Registered Controller on submission" in new Fixture {
           val newRequest = request.withFormUrlEncodedBody(
             "positions" -> "04",
             "startDate.day" -> "24",
@@ -383,25 +338,7 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
           status(result) must be(SEE_OTHER)
           redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.DetailedAnswersController.get(RecordId, Some(flowFromDeclaration)).url))
         }
-
-        "redirect to the AreTheyNominatedOfficerController when Nominated Officer is NOT selected" in new Fixture {
-
-          val newRequest = request.withFormUrlEncodedBody("positions" -> "06",
-            "startDate.day" -> "24",
-            "startDate.month" -> "2",
-            "startDate.year" -> "1990")
-
-          when(controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())
-            (any(), any(), any())).thenReturn(Future.successful(Some(Seq(ResponsiblePerson()))))
-          val mockCacheMap = mock[CacheMap]
-          when(controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())).thenReturn(Future.successful(mockCacheMap))
-
-          val result = controller.post(RecordId, true)(newRequest)
-          status(result) must be(SEE_OTHER)
-          redirectLocation(result) must be(Some(controllers.responsiblepeople.routes.AreTheyNominatedOfficerController.get(RecordId, true).url))
-        }
       }
-
     }
   }
 
@@ -428,8 +365,6 @@ class PositionWithinBusinessControllerSpec extends AmlsSpec with MockitoSugar wi
         ))) must be(false)
       }
     }
-
-
   }
 
   "displayNominatedOfficer" must {

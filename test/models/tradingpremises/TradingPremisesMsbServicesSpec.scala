@@ -16,12 +16,12 @@
 
 package models.tradingpremises
 
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import play.api.libs.json._
+import utils.AmlsSpec
 
-class TradingPremisesMsbServicesSpec extends PlaySpec with OneAppPerSuite {
+class TradingPremisesMsbServicesSpec extends AmlsSpec {
 
   "MsbServices" must {
 

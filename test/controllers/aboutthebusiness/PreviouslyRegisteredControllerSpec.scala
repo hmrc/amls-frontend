@@ -42,10 +42,10 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new PreviouslyRegisteredController {
-      override val dataCacheConnector = mock[DataCacheConnector]
-      override val authConnector = self.authConnector
-    }
+    val controller = new PreviouslyRegisteredController (
+      dataCacheConnector = mock[DataCacheConnector],
+      authConnector = self.authConnector
+    )
   }
 
   val emptyCache = CacheMap("", Map.empty)

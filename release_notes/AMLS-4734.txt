@@ -1,0 +1,1 @@
+ + [AMLS-4734](https://jira.tools.tax.service.gov.uk/browse/AMLS-4734) - 'Change nominated officer hidden legend'

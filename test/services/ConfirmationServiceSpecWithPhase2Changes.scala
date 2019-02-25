@@ -31,7 +31,7 @@ package services
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import connectors.DataCacheConnector
+import connectors.{DataCacheConnector, KeystoreConnector}
 import generators.{AmlsReferenceNumberGenerator, ResponsiblePersonGenerator}
 import models._
 import models.businesscustomer.ReviewDetails
@@ -54,6 +54,7 @@ import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.domain.{Accounts, OrgAccount}
 import uk.gov.hmrc.play.frontend.auth.{AuthContext, Principal}
 import utils.StatusConstants
+import play.api.inject.bind
 
 import scala.concurrent.ExecutionContext.Implicits._
 import scala.concurrent.Future
@@ -96,11 +97,11 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       Some(SubscriptionFees(
         registrationFee = 0,
         fpFee = None,
-        fpFeeRate = None,
+        fpFeeRate = Some(100),
         approvalCheckFee = None,
-        approvalCheckFeeRate = None,
+        approvalCheckFeeRate = Some(40),
         premiseFee = 0,
-        premiseFeeRate = None,
+        premiseFeeRate = Some(115),
         totalFees = 0,
         paymentReference = paymentRefNo
       )))
@@ -110,11 +111,11 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       etmpFormBundleNumber = "",
       registrationFee = 100,
       fpFee = None,
-      fpFeeRate = None,
+      fpFeeRate = Some(100),
       approvalCheckFee = None,
-      approvalCheckFeeRate = None,
+      approvalCheckFeeRate = Some(40),
       premiseFee = 0,
-      premiseFeeRate = None,
+      premiseFeeRate = Some(115),
       totalFees = 100,
       paymentReference = Some(paymentRefNo),
       difference = Some(0)
@@ -125,11 +126,11 @@ class ConfirmationServiceSpecWithPhase2Changes extends PlaySpec
       etmpFormBundleNumber = "",
       registrationFee = 100,
       fpFee = None,
-      fpFeeRate = None,
+      fpFeeRate = Some(100),
       approvalCheckFee = None,
-      approvalCheckFeeRate = None,
+      approvalCheckFeeRate = Some(40),
       premiseFee = 0,
-      premiseFeeRate = None,
+      premiseFeeRate = Some(115),
       totalFees = 100,
       paymentReference = Some(""),
       difference = Some(0)

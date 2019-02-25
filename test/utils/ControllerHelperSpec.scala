@@ -17,12 +17,10 @@
 package utils
 
 import models.responsiblepeople._
-import org.scalatest.mock.MockitoSugar
-import org.scalatestplus.play.{OneAppPerSuite, PlaySpec}
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class ControllerHelperSpec  extends PlaySpec with MockitoSugar with ResponsiblePeopleValues with OneAppPerSuite {
+class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues{
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
