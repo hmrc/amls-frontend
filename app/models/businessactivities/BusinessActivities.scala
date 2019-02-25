@@ -118,7 +118,7 @@ case class BusinessActivities(
         }
 
       case ba@BusinessActivities(
-      Some(InvolvedInOtherYes(details)), Some(_), Some(_), Some(_), Some(_), _,
+      Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _,
       Some(_), Some(_), Some(_), Some(_), Some(_), _, _, _, _, true) if !containsASP =>
         (ba.accountantForAMLSRegulations, ba.whoIsYourAccountant, ba.taxMatters) match {
           case (Some(AccountantForAMLSRegulations(true)), Some(_), Some(_)) => true
@@ -131,7 +131,7 @@ case class BusinessActivities(
       Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
 
       case BusinessActivities(
-      Some(InvolvedInOtherYes(details)), Some(_), Some(_), Some(_), Some(_), _,
+      Some(InvolvedInOtherYes(_)), Some(_), Some(_), Some(_), Some(_), _,
       Some(_), _, Some(_), Some(_), Some(_), _, _, _, _, true) if containsASP => true
 
       case _ => false
