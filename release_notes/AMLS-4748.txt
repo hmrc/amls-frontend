@@ -1,0 +1,1 @@
+ + [AMLS-4748](https://jira.tools.tax.service.gov.uk/browse/AMLS-4748) - 'Business activities - does your business do anything else mini loop back button issue results in schema fail'
