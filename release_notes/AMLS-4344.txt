@@ -1,0 +1,1 @@
+ + [AMLS-4344](https://jira.tools.tax.service.gov.uk/browse/AMLS-4344) - 'Default application config fees to zero when not found in DES response object'

@@ -60,11 +60,11 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       Some(SubscriptionFees(
         registrationFee = 0,
         fpFee = Some(100.00),
-        fpFeeRate = None,
-        approvalCheckFee = Some(200.00),
-        approvalCheckFeeRate = Some(100.00),
+        fpFeeRate = Some(100),
+        approvalCheckFee = Some(40),
+        approvalCheckFeeRate = Some(40),
         premiseFee = 0,
-        premiseFeeRate = None,
+        premiseFeeRate = Some(115),
         totalFees = 0,
         paymentReference = "XA000000000000"
       )))
@@ -74,11 +74,11 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
       etmpFormBundleNumber = "",
       registrationFee = 100,
       fpFee = None,
-      fpFeeRate = None,
+      fpFeeRate = Some(100),
       approvalCheckFee = None,
-      approvalCheckFeeRate = None,
+      approvalCheckFeeRate = Some(40),
       premiseFee = 0,
-      premiseFeeRate = None,
+      premiseFeeRate = Some(115),
       totalFees = 100,
       paymentReference = Some("XA000000000000"),
       difference = Some(0)
@@ -110,8 +110,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             BreakdownRow(
               label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 1,
-              perItm = Currency(100.00),
-              total = Currency(200.00)
+              perItm = Currency(40.00),
+              total = Currency(40.00)
             )
           )
           result must be(expectedResult)
@@ -146,8 +146,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             BreakdownRow(
               label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 1,
-              perItm = Currency(100.00),
-              total = Currency(200.00)
+              perItm = Currency(40.00),
+              total = Currency(40.00)
             )
           )
           result must be(expectedResult)
@@ -188,8 +188,8 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             BreakdownRow(
               label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 2,
-              perItm = Currency(100.00),
-              total = Currency(200.00)
+              perItm = Currency(40.00),
+              total = Currency(40.00)
             )
           )
           result must be(expectedResult)
@@ -613,11 +613,11 @@ class ResponsiblePeopleRowsPhase2Spec extends PlaySpec
             BreakdownRow(
               label = "confirmation.responsiblepeople.approvalcheck.notpassed",
               quantity = 1,
-              perItm = Currency(100.00),
-              total = Currency(200.00)
+              perItm = Currency(40.00),
+              total = Currency(40.00)
             ))
 
-              result must be(expectedResult)
+          result must be(expectedResult)
         }
       }
     }

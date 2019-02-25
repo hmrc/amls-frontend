@@ -59,28 +59,28 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     email <- emailGen
     address <- personAddressGen
   } yield ResponsiblePerson(
-    Some(personName),
-    Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
-    None,
-    Some(KnownBy(Some(false), None)),
-    Some(PersonResidenceType(NonUKResidence, None, None)),
-    None,
-    None,
-    None,
-    Some(ContactDetails(phoneNumber, email)),
-    Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
-    Some(positions),
-    Some(SaRegisteredNo),
-    None,
-    Some(ExperienceTrainingNo),
-    Some(TrainingNo),
+    personName = Some(personName),
+    legalName = Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
+    legalNameChangeDate = None,
+    knownBy = Some(KnownBy(Some(false), None)),
+    personResidenceType = Some(PersonResidenceType(NonUKResidence, None, None)),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(ContactDetails(phoneNumber, email)),
+    addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
+    positions = Some(positions),
+    saRegistered = Some(SaRegisteredNo),
+    vatRegistered = None,
+    experienceTraining = Some(ExperienceTrainingNo),
+    training = Some(TrainingNo),
     approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
     hasChanged = false,
     hasAccepted = true,
-    None,
-    None,
-    None,
-    Some(SoleProprietorOfAnotherBusiness(false))
+    lineId = None,
+    status = None,
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))
   )
 
   def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePerson] = for {
