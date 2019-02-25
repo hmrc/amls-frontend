@@ -1,0 +1,1 @@
+ + [AMLS-3717](https://jira.tools.tax.service.gov.uk/browse/AMLS-3717) - 'NewOfficerController now only displays complete employees for selection as Nominated Officer'

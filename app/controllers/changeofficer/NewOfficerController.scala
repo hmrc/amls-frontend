@@ -16,22 +16,21 @@
 
 package controllers.changeofficer
 
-import javax.inject.Inject
-
 import cats.data.OptionT
+import cats.implicits._
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import forms.{Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness}
 import models.responsiblepeople.ResponsiblePerson
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.StatusConstants
 
 import scala.concurrent.Future
-import cats.implicits._
-import utils.StatusConstants
-import uk.gov.hmrc.http.HeaderCarrier
 
 class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConnector: DataCacheConnector) extends BaseController {
 
@@ -80,6 +79,6 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))
       selectedOfficer <- OptionT.fromOption[Future](changeOfficer.newOfficer) orElse OptionT.some(NewOfficer(""))
-    } yield (selectedOfficer, people.filter(p => p.personName.isDefined & !p.status.contains(StatusConstants.Deleted)))
+    } yield (selectedOfficer, people.filter(p => p.personName.isDefined & p.isComplete & !p.status.contains(StatusConstants.Deleted)))
   }
 }

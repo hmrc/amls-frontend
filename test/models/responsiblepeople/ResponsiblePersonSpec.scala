@@ -16,11 +16,7 @@
 
 package models.responsiblepeople
 
-import connectors.KeystoreConnector
-import controllers.responsiblepeople.NinoUtil
-import models.Country
 import models.registrationprogress.{Completed, NotStarted, Started}
-import models.responsiblepeople.TimeAtAddress.{OneToThreeYears, SixToElevenMonths, ZeroToFiveMonths}
 import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito._
