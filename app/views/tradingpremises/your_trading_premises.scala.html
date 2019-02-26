@@ -87,7 +87,15 @@
         </ul>
     }
 
-    @form(f, controllers.routes.RegistrationProgressController.get()) {
-        @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+    @if(incompleteTp.nonEmpty || (completeTp.isEmpty & incompleteTp.isEmpty)) {
+        @form(f, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("button.returntoapplicationprogress")), returnLink = false)
+        }
+    } else {
+        @form(f, controllers.routes.RegistrationProgressController.get()) {
+            @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
+            }
+        }
     }
-}
+
+
