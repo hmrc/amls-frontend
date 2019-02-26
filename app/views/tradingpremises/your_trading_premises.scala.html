@@ -87,7 +87,7 @@
         </ul>
     }
 
-    @if(incompleteTp.nonEmpty) {
+    @if(incompleteTp.nonEmpty || (completeTp.isEmpty & incompleteTp.isEmpty)) {
         @form(f, controllers.routes.RegistrationProgressController.get()) {
             @submit(false, Some(Messages("button.returntoapplicationprogress")), returnLink = false)
         }
