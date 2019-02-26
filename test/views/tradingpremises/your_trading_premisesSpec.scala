@@ -22,6 +22,7 @@ import models.status.NotCompleted
 import models.tradingpremises.{Address, TradingPremises, YourTradingPremises}
 import org.scalatest.MustMatchers
 import play.api.i18n.Messages
+import play.twirl.api.HtmlFormat
 import utils.AmlsSpec
 import views.Fixture
 
@@ -114,6 +115,26 @@ class your_trading_premisesSpec extends AmlsSpec with MustMatchers with TradingP
       doc.getElementById("detail-edit-3").attr("href") must be(controllers.tradingpremises.routes.YourTradingPremisesController.getIndividual(4, true).url)
       doc.getElementById("detail-remove-3").attr("href") must be(controllers.tradingpremises.routes.RemoveTradingPremisesController.get(4).url)
 
+    }
+
+    "show the correct continuation button when there are both types of lists" in new ViewFixture {
+      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, incompleteTpSeq)
+      html must include(Messages("button.returntoapplicationprogress"))
+    }
+
+    "show the correct continuation button when there are only incomplete tps" in new ViewFixture {
+      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], incompleteTpSeq)
+      html must include(Messages("button.returntoapplicationprogress"))
+    }
+
+    "show the correct continuation button when there are only complete TP's" in new ViewFixture {
+      def  view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, completeTpSeq, Seq.empty[(TradingPremises, Int)])
+      html must include(Messages("button.checkyouranswers.acceptandcomplete"))
+    }
+
+    "show the correct continuation button when there are no TPs" in new ViewFixture {
+      def view = views.html.tradingpremises.your_trading_premises(EmptyForm, false, NotCompleted, Seq.empty[(TradingPremises, Int)], Seq.empty[(TradingPremises, Int)])
+      html must include (Messages("button.returntoapplicationprogress"))
     }
   }
 }
