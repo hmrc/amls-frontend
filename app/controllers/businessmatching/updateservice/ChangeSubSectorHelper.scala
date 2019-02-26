@@ -109,17 +109,22 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
 
     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) flatMap { maybeMsb =>
-      val sectorDiff = model.subSectors.getOrElse(Set.empty)
-      val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
-      val hasAccepted = msb.hasAccepted
-      val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
+      if(maybeMsb.isDefined) {
+        val sectorDiff = model.subSectors.getOrElse(Set.empty)
+        val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
+        val hasAccepted = msb.hasAccepted
+        val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
 
-      if (sectorDiff.isEmpty) {
-        Future.successful(msb)
-      } else {
-        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
-          updatedMsb.copy(hasAccepted = hasAccepted)
+        if (sectorDiff.isEmpty) {
+          Future.successful(msb)
+        } else {
+          dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
+            updatedMsb.copy(hasAccepted = hasAccepted)
+          }
         }
+      }
+      else {
+        Future.successful(None)
       }
     }
   }
