@@ -39,5 +39,14 @@ class headingSpec extends PlaySpec with AmlsSpec {
       html.select("h1").text() mustBe "some title"
       html.select("p").text() contains "some section"
     }
+
+    "render the heading with title only" in new Fixture {
+      val result = heading("some title").toString
+
+      val html = Jsoup.parse(result)
+
+      html.select("h1").text() mustBe "some title"
+      html.select("p" ).first() mustBe null
+    }
   }
 }
