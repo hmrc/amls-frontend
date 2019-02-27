@@ -18,6 +18,7 @@ package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
+import models.businessmatching
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
@@ -109,22 +110,22 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
     }
 
     dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) flatMap { maybeMsb =>
-      if(maybeMsb.isDefined) {
-        val sectorDiff = model.subSectors.getOrElse(Set.empty)
-        val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
-        val hasAccepted = msb.hasAccepted
-        val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
+      val sectorDiff = model.subSectors.getOrElse(Set.empty)
+      val msb = maybeMsb.getOrElse(MoneyServiceBusiness())
+      val hasAccepted = msb.hasAccepted
+      val updatedMsb = updateMT(updateCE(msb, sectorDiff), sectorDiff)
 
-        if (sectorDiff.isEmpty) {
-          Future.successful(msb)
+      if (sectorDiff.isEmpty) {
+        Future.successful(msb)
+      } else {
+        // If the msb section is an empty section return none to avoid empty cache entry for MSB
+        if (msb == MoneyServiceBusiness()) {
+          Future.successful(None)
         } else {
           dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
             updatedMsb.copy(hasAccepted = hasAccepted)
           }
         }
-      }
-      else {
-        Future.successful(None)
       }
     }
   }
