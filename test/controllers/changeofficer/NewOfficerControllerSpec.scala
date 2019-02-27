@@ -21,25 +21,27 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
-import models.responsiblepeople._
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
+import models.responsiblepeople._
+import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalacheck.Gen
+import org.scalatest.PrivateMethodTester
+import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
-import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
-import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
+import scala.concurrent.duration._
+import scala.concurrent.{Await, Future}
 
 
 class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
@@ -70,6 +72,101 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       cache.fetch[ChangeOfficer](eqTo(ChangeOfficer.key))(any(), any(), any())
     } thenReturn Future.successful(Some(changeOfficer))
   }
+
+  trait TestFixtureForChangeNominatedOfficer extends AuthorisedFixture {
+    self =>
+    val request = addToken(self.authRequest)
+
+    val dataCacheConnector = mock[DataCacheConnector]
+    val cacheMap = mock[CacheMap]
+
+    val changeOfficer = ChangeOfficer(
+      RoleInBusiness(Set.empty),
+      Some(NewOfficer("NewOfficer"))
+    )
+
+    val newOfficer = ResponsiblePerson(
+      personName = Some(PersonName("New", None, "Officer")),
+      positions = Some(Positions(Set(
+        DesignatedMember
+      ), None)))
+
+    val oldOfficer = ResponsiblePerson(
+      personName = Some(PersonName("Old", None, "Officer")),
+      positions = Some(Positions(Set(
+        NominatedOfficer
+      ), None)))
+
+    val responsiblePeople = Seq(
+      newOfficer,
+      oldOfficer
+    )
+
+    lazy val responsiblePeopleGen = Gen.listOf(responsiblePersonGen).sample.get
+    lazy val emptyPerson = ResponsiblePerson()
+    lazy val responsiblePeopleWithEmptyPerson = responsiblePeopleGen :+ emptyPerson
+
+    val injector = new GuiceInjectorBuilder()
+      .overrides(bind[AuthConnector].to(self.authConnector))
+      .overrides(bind[DataCacheConnector].to(dataCacheConnector))
+      .build()
+
+    when {
+      controller.dataCacheConnector.fetchAll(any(), any())
+    } thenReturn Future.successful(Some(cacheMap))
+
+    when {
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(responsiblePeople))
+
+    when {
+      cacheMap.getEntry[ChangeOfficer](eqTo(ChangeOfficer.key))(any())
+    } thenReturn Some(changeOfficer)
+
+    when {
+      cacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+    } thenReturn Some(responsiblePeople)
+
+    when {
+      controller.dataCacheConnector.save[Seq[ResponsiblePerson]](any(), any())(any(), any(), any())
+    } thenReturn Future.successful(cacheMap)
+
+    lazy val controller = injector.instanceOf[NewOfficerController]
+  }
+
+  trait TestFixtureForDeleteOldOfficer extends TestFixtureForChangeNominatedOfficer {
+    self =>
+
+    override val oldOfficer = ResponsiblePerson(
+      personName = Some(PersonName("Old", None, "Officer")),
+      positions = Some(Positions(Set(
+        NominatedOfficer
+      ), None)), endDate = Some(ResponsiblePersonEndDate(new LocalDate())), status = Some("Deleted"))
+
+    when {
+      cacheMap.getEntry[Seq[ResponsiblePerson]](eqTo(ResponsiblePerson.key))(any())
+    } thenReturn Some(Seq(
+      newOfficer.copy(
+        positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+        hasChanged = true,
+        hasAccepted = true
+      )
+    ))
+
+    when {
+      controller.dataCacheConnector.fetch[Seq[ResponsiblePerson]](any())(any(), any(), any())
+    } thenReturn Future.successful(Some(Seq(
+      newOfficer.copy(
+        positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+        hasChanged = true,
+        hasAccepted = true
+      )
+    )))
+
+    override lazy val controller = injector.instanceOf[NewOfficerController]
+  }
+
+
 
   "The NewOfficerController" when {
     "get is called" must {
@@ -114,42 +211,44 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
     }
 
     "post is called" must {
-      "respond with SEE_OTHER and redirect to the FurtherUpdatesController" in new TestFixture {
+      "respond with SEE_OTHER and redirect to the RegistrationProgress controller" in new TestFixtureForChangeNominatedOfficer {
 
         when {
-          cache.fetch[ChangeOfficer](any())(any(),any(), any())
+          dataCacheConnector.fetch[ChangeOfficer](any())(any(), any(), any())
         } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
 
         when {
-          cache.save[ChangeOfficer](any(),any())(any(),any(),any())
+          dataCacheConnector.save[ChangeOfficer](any(), any())(any(), any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
         val result = controller.post()(request.withFormUrlEncodedBody("person" -> "testName"))
-        status(result) mustBe(SEE_OTHER)
 
-        redirectLocation(result) mustBe Some(controllers.changeofficer.routes.FurtherUpdatesController.get().url)
 
-        verify(cache).save(
+        status(result) mustBe (SEE_OTHER)
+
+        redirectLocation(result) mustBe Some(controllers.routes.RegistrationProgressController.get().url)
+
+        verify(dataCacheConnector).save(
           eqTo(ChangeOfficer.key),
           eqTo(ChangeOfficer(
             RoleInBusiness(Set(models.changeofficer.SoleProprietor)),
             Some(NewOfficer("testName"))
-          )))(any(),any(),any())
+          )))(any(), any(), any())
 
       }
 
       "respond with SEE_OTHER and redirect to the ResponsiblePeopleAddController" in new TestFixture {
 
         when {
-          cache.fetch[ChangeOfficer](any())(any(),any(), any())
+          cache.fetch[ChangeOfficer](any())(any(), any(), any())
         } thenReturn Future.successful(Some(ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), None)))
 
         when {
-          cache.save[ChangeOfficer](any(),any())(any(),any(),any())
+          cache.save[ChangeOfficer](any(), any())(any(), any(), any())
         } thenReturn Future.successful(mock[CacheMap])
 
         val result = controller.post()(request.withFormUrlEncodedBody("person" -> "someoneElse"))
-        status(result) mustBe(SEE_OTHER)
+        status(result) mustBe (SEE_OTHER)
 
         redirectLocation(result) mustBe Some(controllers.responsiblepeople.routes.ResponsiblePeopleAddController.get(false, Some(flowChangeOfficer)).url)
 
@@ -200,8 +299,91 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         ))
 
       }
+    }
 
+    "addNominatedOfficer is called" must {
+      "add NominatedOfficer to the positions of the given responsible person" in new TestFixtureForChangeNominatedOfficer {
+
+        val addNominatedOfficer = PrivateMethod[ResponsiblePerson]('addNominatedOfficer)
+
+        val result = controller invokePrivate addNominatedOfficer(newOfficer)
+
+        result must equal(newOfficer.copy(
+          positions = Some(Positions(Set(DesignatedMember, NominatedOfficer), newOfficer.positions.get.startDate)),
+          hasChanged = true
+        ))
+
+      }
+    }
+
+    "removeNominatedOfficers is called" must {
+      "remove NominatedOfficer from the positions of the given responsible person" in new TestFixtureForChangeNominatedOfficer {
+
+        val removeNominatedOfficers = PrivateMethod[Seq[ResponsiblePerson]]('removeNominatedOfficers)
+
+        val result = controller invokePrivate removeNominatedOfficers(responsiblePeople)
+
+        result must equal(Seq(
+          newOfficer,
+          oldOfficer.copy(
+            positions = Some(Positions(Set.empty[PositionWithinBusiness], oldOfficer.positions.get.startDate)),
+            hasChanged = true
+          )))
+      }
+    }
+
+    "updateNominatedOfficers is called" must {
+      "return a collection of responsible people with updated nominated officers" in new TestFixtureForChangeNominatedOfficer {
+
+        val updateNominatedOfficers = PrivateMethod[Seq[ResponsiblePerson]]('updateNominatedOfficers)
+
+        val result = controller invokePrivate updateNominatedOfficers((oldOfficer, 1), RoleInBusiness(Set()), responsiblePeople, 0)
+
+        result must equal(Seq(
+          newOfficer.copy(
+            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+            hasChanged = true,
+            hasAccepted = true
+          ),
+          oldOfficer.copy(
+            positions = Some(Positions(oldOfficer.positions.get.positions - NominatedOfficer, oldOfficer.positions.get.startDate)),
+            hasChanged = true,
+            hasAccepted = true
+          )
+        ))
+      }
+    }
+
+    "deleteOldOfficer is called" must {
+      "return cache map without deleted rp (if rp was not submitted)" in new TestFixtureForDeleteOldOfficer {
+        val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
+
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+
+        Await.result(result, 1 second) mustEqual cacheMap
+
+        cacheMap.getEntry[ResponsiblePerson](ResponsiblePerson.key) must equal(Some(Seq(
+          newOfficer.copy(
+            positions = Some(Positions(newOfficer.positions.get.positions + NominatedOfficer, newOfficer.positions.get.startDate)),
+            hasChanged = true,
+            hasAccepted = true
+          )
+        )))
+      }
+
+      "return none if rp was submitted" in new TestFixtureForDeleteOldOfficer {
+        override val oldOfficer = ResponsiblePerson(
+          personName = Some(PersonName("Old", None, "Officer")),
+          positions = Some(Positions(Set(
+            NominatedOfficer
+          ), None)), lineId = Some(11111))
+
+        val deleteOldOfficer = PrivateMethod[Future[Product]]('deleteOldOfficer)
+
+        val result = controller invokePrivate deleteOldOfficer(oldOfficer, 1, mock[AuthContext], HeaderCarrier())
+
+        Await.result(result, 1 second) mustBe None
+      }
     }
   }
-
 }

@@ -22,8 +22,7 @@ object Flow {
     controllers.changeofficer.routes.StillEmployedController.get().url,
     controllers.changeofficer.routes.RoleInBusinessController.get().url,
     controllers.changeofficer.routes.RemoveResponsiblePersonController.get().url,
-    controllers.changeofficer.routes.NewOfficerController.get().url,
-    controllers.changeofficer.routes.FurtherUpdatesController.get().url
+    controllers.changeofficer.routes.NewOfficerController.get().url
   )
 
 }
