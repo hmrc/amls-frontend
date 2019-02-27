@@ -1,10 +1,10 @@
 GET         /what-you-need                                              @controllers.estateagentbusiness.WhatYouNeedController.get()
 
-GET         /penalised-body                                             @controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
-POST        /penalised-body                                             @controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
+GET         /penalty-by-professional-body                               @controllers.estateagentbusiness.PenalisedByProfessionalController.get(edit: Boolean ?= false)
+POST        /penalty-by-professional-body                               @controllers.estateagentbusiness.PenalisedByProfessionalController.post(edit: Boolean ?= false)
 
-GET         /penalised-act                                              @controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
-POST        /penalised-act                                              @controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
+GET         /penalty-under-estate-agent-act                             @controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.get(edit: Boolean ?= false)
+POST        /penalty-under-estate-agent-act                             @controllers.estateagentbusiness.PenalisedUnderEstateAgentsActController.post(edit: Boolean ?= false)
 
 GET         /services                                                   @controllers.estateagentbusiness.BusinessServicesController.get(edit: Boolean ?= false)
 POST        /services                                                   @controllers.estateagentbusiness.BusinessServicesController.post(edit: Boolean ?= false)
