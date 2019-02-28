@@ -21,34 +21,29 @@ import org.jsoup.nodes.Document
 import org.jsoup.select.Elements
 import org.scalatestplus.play.PlaySpec
 import utils.AmlsSpec
-import views.html.include.heading
+import views.html.include.headingWithPlaceholder
 
-class headingSpec extends PlaySpec with AmlsSpec {
-
-  trait Fixture {
-  }
+class headingWithPlaceholderSpec extends PlaySpec with AmlsSpec {
 
   "The Html output" must {
-    "render the heading with title and section" in new Fixture {
-      val result: String = heading("some title", "some section").toString
+    "render the heading with title and placeholder provided" in {
+      val result: String = headingWithPlaceholder(("responsiblepeople.remove.responsible.person.title", "rpName")).toString
       val html: Document = Jsoup.parse(result)
 
-      val h1: String = html.select("h1").text()
-      val p: String = html.select("p").text()
+      val header: String = html.select( "h1").text()
+      val section: Elements = html.select("p")
 
-      h1 mustBe "some title"
-      p must include ("some section")
+      header must include ("rpName")
+      section.isEmpty mustBe true
     }
 
-    "render the heading with title only" in new Fixture {
-      val result: String = heading("some title").toString
+    "render the section" in {
+      val result: String = headingWithPlaceholder(("dontCare", "dontCare"), "mySection").toString
       val html: Document = Jsoup.parse(result)
 
-      val h1: String = html.select("h1").text()
-      val p: Elements = html.select("p" )
+      val section: String = html.select( "p").text()
 
-      h1 mustBe "some title"
-      p.isEmpty mustBe true
+      section must include ("mySection")
     }
   }
 }

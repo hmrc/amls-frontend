@@ -56,7 +56,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
 
-      heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title"))
+      heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title", "Gary"))
     }
 
     "show date form if boolean is set to true" in new ViewFixture {

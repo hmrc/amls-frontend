@@ -18,12 +18,13 @@
 @import include.{main, heading}
 @import include.forms2._
 
+@import views.html.include.headingWithPlaceholder
 @(f: forms.Form2[_],index: Int, personName: String, showDateField:Boolean, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+    @headingWithPlaceholder(("responsiblepeople.remove.responsible.person.title", personName), "summary.responsiblepeople")
 }
 
 @main(
