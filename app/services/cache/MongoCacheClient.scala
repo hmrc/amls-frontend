@@ -20,7 +20,7 @@ import config.AppConfig
 import connectors.cache.Conversions
 import javax.inject.Inject
 import org.joda.time.{DateTime, DateTimeZone}
-import play.api.{Configuration, Logger, Play}
+import play.api.Logger
 import play.api.libs.concurrent.Execution.Implicits.defaultContext
 import play.api.libs.json._
 import play.modules.reactivemongo.MongoDbConnection
@@ -29,15 +29,14 @@ import reactivemongo.api.commands.WriteResult
 import reactivemongo.api.indexes.{Index, IndexType}
 import reactivemongo.bson.{BSONDocument, BSONObjectID}
 import reactivemongo.play.json.ImplicitBSONHandlers._
-import uk.gov.hmrc.crypto._
 import uk.gov.hmrc.crypto.json.{JsonDecryptor, JsonEncryptor}
+import uk.gov.hmrc.crypto.{ApplicationCrypto, _}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.mongo.ReactiveRepository
 import uk.gov.hmrc.mongo.json.ReactiveMongoFormats
 
 import scala.concurrent.Future
 import scala.util.{Failure, Success, Try}
-import uk.gov.hmrc.crypto.ApplicationCrypto
 
 // $COVERAGE-OFF$
 // Coverage has been turned off for these types, as the only things we can really do with them
@@ -79,17 +78,16 @@ class CryptoCache(cache: Cache, crypto: CompositeSymmetricCrypto) extends Cache(
 /**
   * An injectible factory for creating new MongoCacheClients
   */
-class MongoCacheClientFactory @Inject()(config: AppConfig) {
+class MongoCacheClientFactory @Inject()(config: AppConfig, applicationCrypto: ApplicationCrypto) {
   class DbConnection extends MongoDbConnection
-
-  def createClient: MongoCacheClient = new MongoCacheClient(config, new DbConnection().db)
+  def createClient: MongoCacheClient = new MongoCacheClient(config, new DbConnection().db, applicationCrypto)
 }
 
 /**
   * Implements a client which utilises the GOV UK cache repository to store cached data in Mongo.
   * @param appConfig The application configuration
   */
-class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
+class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB, applicationCrypto: ApplicationCrypto)
   extends ReactiveRepository[Cache, BSONObjectID]("app-cache", db, Cache.format)
     with Conversions
     with CacheOps {
@@ -98,7 +96,6 @@ class MongoCacheClient(appConfig: AppConfig, db: () => DefaultDB)
   private def debug(msg: String) = Logger.debug(s"$logPrefix $msg")
   private def error(msg: String, e: Throwable) = Logger.error(s"$logPrefix $msg", e)
   private def error(msg: String) = Logger.error(s"$logPrefix $msg")
-  private val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
 
   implicit val compositeSymmetricCrypto: CompositeSymmetricCrypto = applicationCrypto.JsonCrypto
 
