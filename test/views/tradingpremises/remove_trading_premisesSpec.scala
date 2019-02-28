@@ -42,7 +42,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
       def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", false )
 
       doc.title must be(pageTitle)
-      heading.html must be(Messages("tradingpremises.remove.trading.premises.title"))
+      heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

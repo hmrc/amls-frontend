@@ -23,7 +23,7 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
+    @heading("tradingpremises.remove.trading.premises.enddate.lbl", "summary.tradingpremises")
 }
 
 @main(
@@ -32,7 +32,7 @@
 ) {
 
     @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName)) {
-        <div class="panel-indent panel-border-wide">
+        <div class="panel-border-wide">
             <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
         </div>
 
@@ -40,7 +40,7 @@
             @date(
                 f = f,
                 p = "endDate",
-                labelText = "tradingpremises.remove.trading.premises.enddate.lbl",
+                labelText = "",
                 hintText = "",
                 true
             )
