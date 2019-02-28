@@ -1,1 +1,0 @@
- + [AMLS-4381](https://jira.tools.tax.service.gov.uk/browse/AMLS-4381) - 'Removed forced choice of nominated officer after creation of responsible person'
