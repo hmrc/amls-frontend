@@ -16,10 +16,10 @@
 
 package config
 
-import play.api.mvc.{EssentialAction, Filters, Request, WithFilters}
-import play.api.{Application, Configuration, Play}
 import play.api.Play.current
 import play.api.i18n.Messages.Implicits._
+import play.api.mvc.{EssentialAction, Filters, Request}
+import play.api.{Application, Configuration}
 import play.twirl.api.Html
 import uk.gov.hmrc.crypto.ApplicationCrypto
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
@@ -43,10 +43,9 @@ abstract class ApplicationGlobal extends DefaultFrontendGlobal {
 }
 
 object ApplicationGlobal extends ApplicationGlobal {
-  override lazy val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
   override def onStart(app: Application) {
     super.onStart(app)
-    applicationCrypto.verifyConfiguration()
+    app.injector.instanceOf(classOf[ApplicationCrypto]).verifyConfiguration()
   }
 }
 
