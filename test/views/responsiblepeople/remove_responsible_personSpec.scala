@@ -68,26 +68,6 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
       heading.html() must be(Messages("responsiblepeople.remove.named.responsible.person", "Gary"))
     }
 
-    "show date form if boolean is set to true" in new ViewFixture {
-
-      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
-
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true)
-
-      form.html() must include (Messages("responsiblepeople.remove.responsible.person.enddate.lbl"))
-
-    }
-
-    "hide date form if boolean is set to false" in new ViewFixture {
-
-      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
-
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
-
-      form.html() must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
-
-    }
-
     "show errors in correct places when validation fails" in new ViewFixture {
 
       val messageKey1 = "definitely not a message key"
