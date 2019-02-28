@@ -155,6 +155,8 @@ $(function () {
     $('*[data-add-one]').addOne({});
   })();
 
+
+
   (function () {
     var checkedInputs = 'input[type="checkbox"], input[type="radio"]';
 
