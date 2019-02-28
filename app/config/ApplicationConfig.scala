@@ -74,6 +74,7 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val mongoCacheUpdateUrl = baseUrl("amls-stub") + getConfigString("amls-stub.get-file-url")
   lazy val testOnlyStubsUrl = baseUrl("test-only") + getConfigString("test-only.get-base-url")
 
+  // The following values are used by the Fee Guidance Controller currently toggled off with feature-toggle.show-fees
   lazy val regFee = getConfigInt("amounts.registration")
   lazy val premisesFee = getConfigInt("amounts.premises")
   lazy val peopleFeeRate = getConfigInt("amounts.people")

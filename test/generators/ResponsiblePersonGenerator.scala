@@ -16,12 +16,11 @@
 
 package generators
 
-import config.ApplicationConfig
-import models.responsiblepeople._
-import org.scalacheck.Gen
 import models.FormTypes
 import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
+import models.responsiblepeople._
 import org.joda.time.LocalDate
+import org.scalacheck.Gen
 
 // scalastyle:off magic.number
 trait ResponsiblePersonGenerator extends BaseGenerator {
@@ -59,6 +58,37 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     email <- emailGen
     address <- personAddressGen
   } yield ResponsiblePerson(
+    personName = Some(personName),
+    legalName = Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
+    legalNameChangeDate = None,
+    knownBy = Some(KnownBy(Some(false), None)),
+    personResidenceType = Some(PersonResidenceType(NonUKResidence, None, None)),
+    ukPassport = None,
+    nonUKPassport = None,
+    dateOfBirth = None,
+    contactDetails = Some(ContactDetails(phoneNumber, email)),
+    addressHistory = Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
+    positions = Some(positions),
+    saRegistered = Some(SaRegisteredNo),
+    vatRegistered = None,
+    experienceTraining = Some(ExperienceTrainingNo),
+    training = Some(TrainingNo),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
+    hasChanged = false,
+    hasAccepted = true,
+    lineId = None,
+    status = None,
+    endDate = None,
+    soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))
+  )
+
+  val completeResponsiblePersonGen: Gen[ResponsiblePerson] = for {
+    personName <- personNameGen
+    positions <- positionsGen
+    phoneNumber <- numSequence(10)
+    email <- emailGen
+    address <- personAddressGen
+  } yield new ResponsiblePerson(
     Some(personName),
     Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
     None,
@@ -81,7 +111,9 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     None,
     None,
     Some(SoleProprietorOfAnotherBusiness(false))
-  )
+  ) {
+    override def isComplete: Boolean = true
+  }
 
   def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePerson] = for {
     person <- responsiblePersonGen

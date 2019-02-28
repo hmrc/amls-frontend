@@ -16,19 +16,19 @@
 
 package typeclasses.confirmation
 
-import config.ApplicationConfig
 import models.confirmation.RowEntity
 import models.{AmendVariationRenewalResponse, SubmissionResponse}
+import utils.FeeRateHelper
 
 trait FeeCalculations {
 
   def submissionRow(response: SubmissionResponse) = RowEntity("confirmation.submission", response.getRegistrationFee)
 
   def premisesRow(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises",
-    response.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
+    FeeRateHelper.fetch(response.getPremiseFeeRate))
 
   def premisesVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.tradingpremises",
-    variationResponse.getPremiseFeeRate.getOrElse(ApplicationConfig.premisesFee))
+    FeeRateHelper.fetch(variationResponse.getPremiseFeeRate))
 
   def premisesHalfYear(response: SubmissionResponse) = RowEntity("confirmation.tradingpremises.half",
     premisesRow(response).feePer / 2)
@@ -39,13 +39,13 @@ trait FeeCalculations {
   val PremisesZero = RowEntity("confirmation.tradingpremises.zero", 0)
 
   def peopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople",
-    response.getFpFeeRate.getOrElse(ApplicationConfig.peopleFeeRate))
+    FeeRateHelper.fetch(response.getFpFeeRate))
 
   def approvalCheckPeopleRow(response: SubmissionResponse) = RowEntity("confirmation.responsiblepeople.approvalcheck.notpassed",
-    response.getApprovalCheckFeeRate.getOrElse(ApplicationConfig.approvalCheckPeopleFeeRate))
+    FeeRateHelper.fetch(response.getApprovalCheckFeeRate))
 
   def peopleVariationRow(variationResponse: AmendVariationRenewalResponse) = RowEntity("confirmation.responsiblepeople",
-    variationResponse.getFpFeeRate.getOrElse(ApplicationConfig.peopleFeeRate))
+    FeeRateHelper.fetch(variationResponse.getFpFeeRate))
 
 
   def renewalTotalPremisesFee(renewal: AmendVariationRenewalResponse): BigDecimal =

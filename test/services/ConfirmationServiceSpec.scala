@@ -85,11 +85,11 @@ class ConfirmationServiceSpec extends PlaySpec
       Some(SubscriptionFees(
         registrationFee = 0,
         fpFee = None,
-        fpFeeRate = None,
+        fpFeeRate = Some(100),
         approvalCheckFee = None,
-        approvalCheckFeeRate = None,
+        approvalCheckFeeRate = Some(40),
         premiseFee = 0,
-        premiseFeeRate = None,
+        premiseFeeRate = Some(115),
         totalFees = 0,
         paymentReference = paymentRefNo
       )))
@@ -98,12 +98,12 @@ class ConfirmationServiceSpec extends PlaySpec
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fpFee = None,
+      fpFee = Some(100),
       fpFeeRate = None,
       approvalCheckFee = None,
-      approvalCheckFeeRate = None,
+      approvalCheckFeeRate = Some(40),
       premiseFee = 0,
-      premiseFeeRate = None,
+      premiseFeeRate = Some(115),
       totalFees = 100,
       paymentReference = Some(paymentRefNo),
       difference = Some(0)
@@ -113,28 +113,28 @@ class ConfirmationServiceSpec extends PlaySpec
       processingDate = "",
       etmpFormBundleNumber = "",
       registrationFee = 100,
-      fpFee = None,
-      fpFeeRate = None,
+      fpFee = Some(100),
+      fpFeeRate = Some(100),
       approvalCheckFee = None,
-      approvalCheckFeeRate = None,
+      approvalCheckFeeRate = Some(40),
       premiseFee = 0,
-      premiseFeeRate = None,
+      premiseFeeRate = Some(115),
       totalFees = 100,
       paymentReference = Some(""),
       difference = Some(0)
     )
 
     def feeResponse(responseType: ResponseType) = FeeResponse(
-      responseType,
-      amlsRegistrationNumber,
-      100,
-      None,
-      None,
-      0,
-      100,
-      Some(paymentRefNo),
-      None,
-      DateTime.now
+      responseType = responseType,
+      amlsReferenceNumber = amlsRegistrationNumber,
+      registrationFee = 100,
+      fpFee = None,
+      approvalCheckFee = None,
+      premiseFee = 0,
+      totalFees = 100,
+      paymentReference = Some(paymentRefNo),
+      difference = None,
+      createdAt = DateTime.now
     )
 
     val reviewDetails = mock[ReviewDetails]
@@ -202,18 +202,18 @@ class ConfirmationServiceSpec extends PlaySpec
         }
       }
 
-      "submit amendment returning submission data with dynamic fee rate" in new Fixture {
+      "submit amendment returning submission data with fee rates" in new Fixture {
 
         val amendmentResponseWithRate = AmendVariationRenewalResponse(
           processingDate = "",
           etmpFormBundleNumber = "",
           registrationFee = 100,
-          fpFee = Some(500),
-          fpFeeRate = Some(250),
+          fpFee = Some(100),
+          fpFeeRate = Some(100),
           approvalCheckFee = None,
-          approvalCheckFeeRate = None,
-          premiseFee = 150,
-          premiseFeeRate = Some(150),
+          approvalCheckFeeRate = Some(40),
+          premiseFee = 115,
+          premiseFeeRate = Some(115),
           totalFees = 100,
           paymentReference = Some(paymentRefNo),
           difference = Some(0)
@@ -230,9 +230,9 @@ class ConfirmationServiceSpec extends PlaySpec
         val rows = Seq(
           BreakdownRow("confirmation.submission", 1, 100, 100)
         ) ++ Seq(
-          BreakdownRow("confirmation.responsiblepeople", 1, 250, 500)
+          BreakdownRow("confirmation.responsiblepeople", 1, 100, 100)
         ) ++ Seq(
-          BreakdownRow("confirmation.tradingpremises", 1, 150, 150)
+          BreakdownRow("confirmation.tradingpremises", 1, 115, 115)
         )
 
         val response = Some(rows)
@@ -1281,9 +1281,7 @@ class ConfirmationServiceSpec extends PlaySpec
 
         }
       }
-
     }
-
   }
 }
 
