@@ -24,7 +24,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @headingWithPlaceholder(("responsiblepeople.remove.responsible.person.title", personName), "summary.responsiblepeople")
+    @if(showDateField) {
+        @headingWithPlaceholder(("responsiblepeople.remove.named.responsible.person", personName), "summary.responsiblepeople")
+    } else {
+        @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+    }
 }
 
 @main(

@@ -50,13 +50,22 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
     }
 
-    "have correct heading" in new ViewFixture {
+    "show none named person heading" in new ViewFixture {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", showDateField = false)
 
-      heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title", "Gary"))
+      heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title"))
+    }
+
+    "show named person heading" in new ViewFixture {
+
+      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
+
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", showDateField = true)
+
+      heading.html() must be(Messages("responsiblepeople.remove.named.responsible.person", "Gary"))
     }
 
     "show date form if boolean is set to true" in new ViewFixture {

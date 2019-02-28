@@ -51,7 +51,12 @@ class RemoveResponsiblePersonController @Inject () (
       } yield rp match {
         case (Some(ResponsiblePerson(Some(personName),_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_,_))) =>
           Ok(views.html.responsiblepeople.remove_responsible_person(
-            EmptyForm, index, personName.fullName, showRemovalDateField(status, rp.get.lineId.isDefined), flow))
+            f = EmptyForm,
+            index = index,
+            personName = personName.fullName,
+            showDateField = showRemovalDateField(status, rp.get.lineId.isDefined),
+            flow = flow
+          ))
         case _ => NotFound(notFoundView)
       }
   }

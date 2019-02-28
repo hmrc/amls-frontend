@@ -27,7 +27,7 @@ class headingWithPlaceholderSpec extends PlaySpec with AmlsSpec {
 
   "The Html output" must {
     "render the heading with title and placeholder provided" in {
-      val result: String = headingWithPlaceholder(("responsiblepeople.remove.responsible.person.title", "rpName")).toString
+      val result: String = headingWithPlaceholder(("responsiblepeople.remove.named.responsible.person", "rpName")).toString
       val html: Document = Jsoup.parse(result)
 
       val header: String = html.select( "h1").text()
