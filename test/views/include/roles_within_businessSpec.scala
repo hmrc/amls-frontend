@@ -83,7 +83,7 @@ class roles_within_businessSpec extends AmlsSpec with MustMatchers {
     BusinessType.Partnership -> List(4, 5, 8),
     BusinessType.LimitedCompany -> List(1, 2, 4, 8),
     BusinessType.UnincorporatedBody -> List(4, 8),
-    BusinessType.LPrLLP -> List(4, 5, 7, 8)
+    BusinessType.LPrLLP -> List(4, 7, 8)
   )
 
   "have the correct fields" when {
