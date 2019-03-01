@@ -22,17 +22,17 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class another_bodySpec extends AmlsSpec with MustMatchers  {
+class supervision_endSpec extends AmlsSpec with MustMatchers  {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
   }
 
-  "another_body view" must {
+  "supervision_end view" must {
 
     "have a back link" in new ViewFixture {
 
-      def view = views.html.supervision.another_body(EmptyForm, edit = false)
+      def view = views.html.supervision.supervision_end(EmptyForm, edit = false)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

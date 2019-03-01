@@ -38,44 +38,13 @@
 
     @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
 
-        @fieldset(
-            legend = "supervision.another_body.title",
-            f = f("anotherBody"),
-            legendHidden = true,
-            panel = false,
-            classes = Seq("inline")
-        ) {
-            @radio(
-                f = f("anotherBody"),
-                labelText = "lbl.yes",
-                value = "true",
-                target = s"#$target",
-                inline = true
+            @date(
+                f = f,
+                p = "endDate",
+                labelText = "supervision.another_body.endDate.lbl",
+                hintText = "supervision.another_body.endDate.hint",
+                example = false
             )
-            @radio(
-                f = f("anotherBody"),
-                labelText = "lbl.no",
-                value = "false",
-                inline = true
-            )
-        }
-
-        @panel(
-            field = Some(f(s"$target"))
-        ) {
-
-            @errorGroup(
-                field = f("supervisor-panel"),
-                classes = Seq("form-field")
-            ) {
-                @input(
-                    field = f("supervisorName"),
-                    labelText = "supervision.another_body.lbl.supervisor",
-                    bold = false,
-                    panel = false
-                )
-            }
-        }
 
         @submit(edit)
     }
