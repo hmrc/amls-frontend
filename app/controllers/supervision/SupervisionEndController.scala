@@ -18,11 +18,11 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.{EmptyForm, Form2}
+import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision.{AnotherBody, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.supervision.supervision_end
+import views.html.supervision.{another_body, supervision_end}
 
 import scala.concurrent.Future
 
@@ -45,10 +45,24 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
 
   def post(edit : Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
+      Form2[AnotherBody](request.body) match {
+        case f: InvalidForm =>
+          Future.successful(BadRequest(another_body(f, edit)))
+        case ValidForm(_, data) =>
+            for {
+              supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
+              _ <- dataCacheConnector.save[Supervision](Supervision.key,
+                supervision.anotherBody(data)
+              )
+            } yield
 
-      edit match {
-        case true => Future.successful(Redirect(routes.SummaryController.get()))
-        case false => Future.successful(Redirect(routes.SupervisionEndReasonsController.get()))
-      }
+              edit match {
+                case true => Redirect(routes.SummaryController.get())
+                case false => Redirect(routes.SupervisionEndReasonsController.get())
+              }
+
+
+        }
+
   }
 }
