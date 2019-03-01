@@ -86,6 +86,12 @@ class BusinessActivitiesSpec extends AmlsSpec {
     hasAccepted = true
   )
 
+  val completeModelOtherYesNoExpectedTurnover = completeModel.copy(
+    expectedBusinessTurnover = None,
+    hasChanged = false,
+    hasAccepted = true
+  )
+
   val completeModelWithoutCustUK = BusinessActivities(
     involvedInOther = Some(DefaultInvolvedInOther),
     expectedBusinessTurnover = Some(DefaultBusinessTurnover),
@@ -252,6 +258,10 @@ class BusinessActivitiesSpec extends AmlsSpec {
       )
 
       model.isComplete(Some(ba(Set(HighValueDealing)))) must be(true)
+    }
+
+    "return false if other business activities true but no expectedBusinessTurnover present" in {
+      completeModelOtherYesNoExpectedTurnover.isComplete(None) must be(false)
     }
   }
 

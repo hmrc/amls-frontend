@@ -21,25 +21,25 @@ import cats.implicits._
 import connectors.DataCacheConnector
 import generators.ResponsiblePersonGenerator
 import models.changeofficer.{ChangeOfficer, NewOfficer, RoleInBusiness, SoleProprietor}
-import models.responsiblepeople._
 import models.responsiblepeople.ResponsiblePerson.flowChangeOfficer
+import models.responsiblepeople._
 import org.jsoup.Jsoup
+import org.mockito.Matchers.{eq => eqTo, _}
+import org.mockito.Mockito._
 import org.scalacheck.Gen
+import org.scalatest.PrivateMethodTester
+import org.scalatest.concurrent.ScalaFutures
 import play.api.inject.bind
 import play.api.inject.guice.GuiceInjectorBuilder
 import play.api.test.Helpers._
+import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.http.cache.client.CacheMap
-import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.{AuthorisedFixture, AmlsSpec, StatusConstants}
-import org.mockito.Matchers.{eq => eqTo, _}
-import org.mockito.Mockito._
-import org.scalatest.PrivateMethodTester
-import org.scalatest.concurrent.ScalaFutures
 import uk.gov.hmrc.play.frontend.auth.AuthContext
+import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.{AmlsSpec, AuthorisedFixture, StatusConstants}
 
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
-import uk.gov.hmrc.http.HeaderCarrier
 
 
 class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator with PrivateMethodTester with ScalaFutures {
@@ -55,11 +55,9 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
       .build()
 
     lazy val controller = injector.instanceOf[NewOfficerController]
-
-    lazy val responsiblePeople = Gen.listOf(responsiblePersonGen).sample.get
-    lazy val emptyPerson = ResponsiblePerson()
+    lazy val responsiblePeople = Gen.listOf(completeResponsiblePersonGen).sample.get
+    lazy val emptyPerson = new ResponsiblePerson()
     lazy val responsiblePeopleWithEmptyPerson = responsiblePeople :+ emptyPerson
-
     lazy val changeOfficer = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)))
 
     when {
@@ -73,7 +71,8 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
   "The NewOfficerController" when {
     "get is called" must {
-      "get the view and show all the responsible people, except people with no name" in new TestFixture {
+
+      "get the view and show all the complete responsible people, except people with no name" in new TestFixture {
         val result = controller.get()(request)
 
         status(result) mustBe OK
@@ -87,10 +86,21 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
         }
       }
 
+      "get the view and show all the responsible people, except incomplete people" in new TestFixture {
+        val result = controller.get()(request)
+
+        status(result) mustBe OK
+
+        verify(cache).fetch(eqTo(ResponsiblePerson.key))(any(), any(), any())
+
+        val html = Jsoup.parse(contentAsString(result))
+        html.select(s"input[type=radio][value=IncompletePerson]").size() mustBe 0
+      }
+
       "prepopulate the view with the selected person" in new TestFixture {
 
         override lazy val responsiblePeople = Gen.listOfN(3, responsiblePersonGen).sample.get :+
-          ResponsiblePerson(Some(PersonName("Test", None, "Person")))
+          new ResponsiblePerson(Some(PersonName("Test", None, "Person"))) { override def isComplete: Boolean = true }
 
         val model = ChangeOfficer(RoleInBusiness(Set(SoleProprietor)), Some(NewOfficer("TestPerson")))
 
@@ -172,14 +182,15 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
 
     "getPeopleAndSelectedOfficer" must {
 
-      "return all responsible people with name defined and without deleted status" in new TestFixture {
+      "return all complete responsible people with name defined and without deleted status" in new TestFixture {
 
         override lazy val responsiblePeople = List(
-          responsiblePersonGen.sample.get,
-          responsiblePersonGen.sample.get.copy(personName = None),
-          responsiblePersonGen.sample.get,
-          responsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
-          responsiblePersonGen.sample.get
+          completeResponsiblePersonGen.sample.get,
+          completeResponsiblePersonGen.sample.get.copy(personName = None),
+          completeResponsiblePersonGen.sample.get,
+          completeResponsiblePersonGen.sample.get.copy(status = Some(StatusConstants.Deleted)),
+          completeResponsiblePersonGen.sample.get,
+          new ResponsiblePerson(Some(PersonName("Incomplete", None, "Person"))){override def isComplete: Boolean = false}
         )
 
         when {
@@ -198,9 +209,7 @@ class NewOfficerControllerSpec extends AmlsSpec with ResponsiblePersonGenerator 
             responsiblePeople(4)
           )
         ))
-
       }
-
     }
   }
 

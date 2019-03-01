@@ -16,12 +16,11 @@
 
 package generators
 
-import config.ApplicationConfig
-import models.responsiblepeople._
-import org.scalacheck.Gen
 import models.FormTypes
 import models.responsiblepeople.TimeAtAddress.ThreeYearsPlus
+import models.responsiblepeople._
 import org.joda.time.LocalDate
+import org.scalacheck.Gen
 
 // scalastyle:off magic.number
 trait ResponsiblePersonGenerator extends BaseGenerator {
@@ -82,6 +81,39 @@ trait ResponsiblePersonGenerator extends BaseGenerator {
     endDate = None,
     soleProprietorOfAnotherBusiness = Some(SoleProprietorOfAnotherBusiness(false))
   )
+
+  val completeResponsiblePersonGen: Gen[ResponsiblePerson] = for {
+    personName <- personNameGen
+    positions <- positionsGen
+    phoneNumber <- numSequence(10)
+    email <- emailGen
+    address <- personAddressGen
+  } yield new ResponsiblePerson(
+    Some(personName),
+    Some(PreviousName(hasPreviousName = Some(false), None, None, None)),
+    None,
+    Some(KnownBy(Some(false), None)),
+    Some(PersonResidenceType(NonUKResidence, None, None)),
+    None,
+    None,
+    None,
+    Some(ContactDetails(phoneNumber, email)),
+    Some(ResponsiblePersonAddressHistory(Some(ResponsiblePersonCurrentAddress(address, Some(ThreeYearsPlus), None)))),
+    Some(positions),
+    Some(SaRegisteredNo),
+    None,
+    Some(ExperienceTrainingNo),
+    Some(TrainingNo),
+    approvalFlags = ApprovalFlags(hasAlreadyPassedFitAndProper = None),
+    hasChanged = false,
+    hasAccepted = true,
+    None,
+    None,
+    None,
+    Some(SoleProprietorOfAnotherBusiness(false))
+  ) {
+    override def isComplete: Boolean = true
+  }
 
   def responsiblePersonWithPositionsGen(positions: Option[Set[PositionWithinBusiness]]): Gen[ResponsiblePerson] = for {
     person <- responsiblePersonGen
