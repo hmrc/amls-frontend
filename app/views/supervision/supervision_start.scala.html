@@ -34,12 +34,11 @@
     heading = header
 )  {
 
-    @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
+    @form(f, controllers.supervision.routes.SupervisionStartController.post(edit)) {
 
         @date(
                 f = f,
                 p = "startDate",
-                labelText = "supervision.another_body.startDate.lbl",
                 hintText = "supervision.another_body.startDate.hint",
                 example = false
             )

@@ -34,13 +34,11 @@
     heading = header
 )  {
 
-    <p>@Messages("supervision.supervision_end_reasons.description")</p>
-
-    @form(f, controllers.supervision.routes.AnotherBodyController.post(edit)) {
+    @form(f, controllers.supervision.routes.SupervisionEndReasonsController.post(edit)) {
 
             @textarea(
                 field = f("endingReason"),
-                labelText = "supervision.supervision_end_reasons.lbl",
+                labelText = "supervision.supervision_end_reasons.description",
                 bold = false,
                 largeWidth = true,
                 cols = "30",
