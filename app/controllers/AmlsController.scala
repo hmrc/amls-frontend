@@ -16,14 +16,14 @@
 
 package controllers
 
-import config.AMLSAuthConnector
+import javax.inject.Inject
 import play.api.mvc._
 import uk.gov.hmrc.play.frontend.auth.Actions
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 import scala.concurrent.Future
 
-trait AmlsController extends Actions with BaseController{
+class AmlsController @Inject()(amlsAuthConnector: AuthConnector) extends Actions with BaseController{
 
   val unauthorised = Action {
     implicit request =>
@@ -40,8 +40,8 @@ trait AmlsController extends Actions with BaseController{
       implicit request =>
         Future.successful(Ok("OK"))
   }
+
+  override protected def authConnector: AuthConnector = amlsAuthConnector
 }
 
-object AmlsController extends AmlsController {
-  override protected def authConnector: AuthConnector = AMLSAuthConnector
-}
+

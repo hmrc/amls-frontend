@@ -46,7 +46,7 @@ class StatusController @Inject()(val landingService: LandingService,
                                   val amlsConnector: AmlsConnector,
                                   val dataCache: DataCacheConnector,
                                   val authenticator: AuthenticatorConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                  val authConnector: AuthConnector,
                                  val feeResponseService: FeeResponseService
                                  ) extends BaseController {
 

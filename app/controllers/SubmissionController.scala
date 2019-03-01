@@ -16,7 +16,6 @@
 
 package controllers
 
-import config.AMLSAuthConnector
 import connectors.AuthenticatorConnector
 import exceptions.{DuplicateEnrolmentException, DuplicateSubscriptionException, InvalidEnrolmentCredentialsException}
 import javax.inject.{Inject, Singleton}
@@ -37,7 +36,7 @@ class SubmissionController @Inject()(
                                      val statusService: StatusService,
                                      val renewalService: RenewalService,
                                      val authenticator: AuthenticatorConnector,
-                                     val authConnector: AuthConnector = AMLSAuthConnector
+                                     val authConnector: AuthConnector
                                     ) extends BaseController {
 
   private def handleRenewalAmendment()(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {

@@ -16,7 +16,6 @@
 
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import forms.EmptyForm
 import javax.inject.{Inject, Singleton}
@@ -26,7 +25,7 @@ import utils.StatusConstants
 
 @Singleton
 class RemoveBankDetailsController @Inject()(
-                                             val authConnector: AuthConnector = AMLSAuthConnector,
+                                             val authConnector: AuthConnector,
                                              val dataCacheConnector: DataCacheConnector
                                            ) extends BankDetailsController {
 

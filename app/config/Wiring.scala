@@ -19,7 +19,7 @@ package config
 import javax.inject.{Inject, Singleton}
 import com.typesafe.config.Config
 import play.api.Mode.Mode
-import play.api.{Configuration, Environment, Play}
+import play.api.{Application, Configuration, Environment, Play}
 import play.api.mvc.Call
 import uk.gov.hmrc.http.cache.client.SessionCache
 import uk.gov.hmrc.play.audit.http.HttpAuditing
@@ -37,96 +37,106 @@ import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFi
 
 trait Hooks extends HttpHooks with HttpAuditing {
   override val hooks = Seq.empty
-  override lazy val auditConnector: AuditConnector = AMLSAuditConnector
 }
 
-trait WSHttp extends HttpGet with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
+class WSHttp @Inject()( application: Application,
+                        amlsAuditConnector: AMLSAuditConnector) extends HttpGet
+  with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
   with Hooks with HttpPatch with WSPatch with AppName with RunMode {
 
+    override lazy val auditConnector: AuditConnector = amlsAuditConnector
+    override protected def appNameConfiguration: Configuration = application.configuration
+    override protected def configuration: Option[Config] = Some(application.configuration.underlying)
+    override protected def mode: Mode = application.mode
+    override protected def runModeConfiguration: Configuration = application.configuration
 }
 
-object WSHttp extends WSHttp {
+// TODO: Maintaining a WSHttp object for static references in twirl templates. Remove when upgrading to 2.6
+object StaticWSHttp extends HttpGet
+  with WSGet with HttpPut with WSPut with HttpPost with WSPost with HttpDelete  with WSDelete
+  with Hooks with HttpPatch with WSPatch with AppName with RunMode {
 
+  lazy val wsHttp: WSHttp = new WSHttp(Play.current, new AMLSAuditConnector(Play.current))
+  override lazy val auditConnector: AuditConnector = wsHttp.auditConnector
   override protected def appNameConfiguration: Configuration = Play.current.configuration
-
   override protected def configuration: Option[Config] = Some(Play.current.configuration.underlying)
-
   override protected def mode: Mode = Play.current.mode
-
   override protected def runModeConfiguration: Configuration = Play.current.configuration
 }
 
-
-object AMLSControllerConfig extends ControllerConfig {
-  override def controllerConfigs: Config = Play.current.configuration.underlying.getConfig("controllers")
+class AMLSControllerConfig @Inject()(application: Application) extends ControllerConfig {
+  override def controllerConfigs: Config = application.configuration.underlying.getConfig("controllers")
 }
 
-object BusinessCustomerSessionCache extends SessionCache with AppName with ServicesConfig{
-  override lazy val http = WSHttp
+class BusinessCustomerSessionCache @Inject()(application: Application, wsHttp: WSHttp) extends SessionCache with AppName with ServicesConfig{
+  override lazy val http = wsHttp
   override lazy val defaultSource: String = getConfString("cachable.session-cache.review-details.cache","business-customer-frontend")
 
   override lazy val baseUri = baseUrl("cachable.session-cache")
   override lazy val domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
 
-  override protected def appNameConfiguration: Configuration = Play.current.configuration
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
+  override protected def appNameConfiguration: Configuration = application.configuration
+  override protected def mode: Mode = application.mode
+  override protected def runModeConfiguration: Configuration = application.configuration
 }
 
 @Singleton
-class FrontendAuthConnector @Inject()(environment: Environment, val runModeConfiguration: Configuration) extends AuthConnector with ServicesConfig {
+class FrontendAuthConnector @Inject()( environment: Environment,
+                                       val runModeConfiguration: Configuration,
+                                       wsHttp: WSHttp) extends AuthConnector with ServicesConfig {
   lazy val serviceUrl = baseUrl("auth")
-  override def http = WSHttp
-
+  override def http = wsHttp
   override protected def mode: Mode = environment.mode
 }
 
-class AmlsSessionCache @Inject()(environment: Environment, override val runModeConfiguration: Configuration, override val appNameConfiguration: Configuration)
+class AmlsSessionCache @Inject()( environment: Environment,
+                                  override val runModeConfiguration: Configuration,
+                                  override val appNameConfiguration: Configuration, wsHttp: WSHttp)
   extends SessionCache with AppName with ServicesConfig {
 
-  override def http = WSHttp
-
+  override def http = wsHttp
   override def defaultSource = getConfString("amls-frontend.cache", "amls-frontend")
-
   override def baseUri = baseUrl("cachable.session-cache")
-
   override def domain = getConfString("cachable.session-cache.domain", throw new Exception(s"Could not find config 'cachable.session-cache.domain'"))
-
   override protected def mode: Mode = environment.mode
 }
 
-object AMLSAuditConnector extends AuditConnector with RunMode {
+class AMLSAuditConnector @Inject()( application: Application ) extends AuditConnector with RunMode {
   override lazy val auditingConfig: AuditingConfig = LoadAuditingConfig(s"auditing")
-  override protected def mode: Mode = Play.current.mode
-  override protected def runModeConfiguration: Configuration = Play.current.configuration
+  override protected def mode: Mode = application.mode
+  override protected def runModeConfiguration: Configuration = application.configuration
 }
 
-object AMLSAuthConnector extends AuthConnector {
+class AMLSAuthConnector @Inject()(wsHttp: WSHttp) extends AuthConnector {
   override val serviceUrl: String = ApplicationConfig.authHost
-  override lazy val http: HttpGet = WSHttp
+  override lazy val http: HttpGet = wsHttp
 }
 
-object AMLSAuditFilter extends FrontendAuditFilter with AppName with MicroserviceFilterSupport{
+class AMLSAuditFilter @Inject()(
+                     application: Application,
+                     amlsControllerConfig: AMLSControllerConfig,
+                     amlsAuditConnector: AMLSAuditConnector) extends FrontendAuditFilter with AppName with MicroserviceFilterSupport{
 
   override lazy val maskedFormFields: Seq[String] = Nil
 
   override lazy val applicationPort: Option[Int] = None
 
-  override lazy val auditConnector: AuditConnector = AMLSAuditConnector
+  override lazy val auditConnector: AuditConnector = amlsAuditConnector
 
   override def controllerNeedsAuditing(controllerName: String): Boolean =
-    AMLSControllerConfig.paramsForController(controllerName).needsAuditing
+    amlsControllerConfig.paramsForController(controllerName).needsAuditing
 
-  override protected def appNameConfiguration: Configuration = Play.current.configuration
+  override protected def appNameConfiguration: Configuration = application.configuration
 }
 
-object AMLSLoggingFilter extends FrontendLoggingFilter with MicroserviceFilterSupport{
+class AMLSLoggingFilter @Inject()( application: Application,
+                                   amlsControllerConfig: AMLSControllerConfig) extends FrontendLoggingFilter with MicroserviceFilterSupport{
   override def controllerNeedsLogging(controllerName: String): Boolean =
-    AMLSControllerConfig.paramsForController(controllerName).needsLogging
+    amlsControllerConfig.paramsForController(controllerName).needsLogging
 }
 
 object CachedStaticHtmlPartialProvider extends CachedStaticHtmlPartialRetriever {
-  override lazy val httpGet: HttpGet = WSHttp
+  override lazy val httpGet: HttpGet = StaticWSHttp
 }
 
 object WhitelistFilter extends AkamaiWhitelistFilter with MicroserviceFilterSupport{

@@ -40,7 +40,8 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
                                    val mongoCacheConnector: MongoCacheConnector,
                                    implicit val testOnlyStubConnector: TestOnlyStubConnector,
                                    val stubsService: UpdateMongoCacheService,
-                                   val amlsConnector: AmlsConnector) extends BaseController {
+                                   val amlsConnector: AmlsConnector,
+                                    val customerCache: BusinessCustomerSessionCache) extends BaseController {
 
 
   def dropMongoCache = Authorised.async {
@@ -52,7 +53,7 @@ class TestOnlyController @Inject()(val authConnector: AuthConnector,
   }
 
   def removeCacheData(implicit ac: AuthContext,  hc: HeaderCarrier) = for {
-    _ <- BusinessCustomerSessionCache.remove()
+    _ <- customerCache.remove()
     _ <- mongoCacheConnector.remove
     response <- testOnlyStubConnector.clearState()
   } yield response

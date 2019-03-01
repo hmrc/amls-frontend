@@ -16,12 +16,10 @@
 
 package controllers.supervision
 
-import javax.inject.Inject
-
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
+import javax.inject.Inject
 import models.supervision.{ProfessionalBodyMember, ProfessionalBodyMemberNo, ProfessionalBodyMemberYes, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.member_of_professional_body
@@ -30,7 +28,7 @@ import scala.concurrent.Future
 
 class ProfessionalBodyMemberController @Inject()(
                                                   val dataCacheConnector: DataCacheConnector,
-                                                  val authConnector: AuthConnector = AMLSAuthConnector
+                                                  val authConnector: AuthConnector
                                                 ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
