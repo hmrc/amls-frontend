@@ -18,8 +18,9 @@ package controllers.supervision
 
 import connectors.DataCacheConnector
 import controllers.BaseController
-import forms.EmptyForm
+import forms.{EmptyForm, Form2}
 import javax.inject.Inject
+import models.supervision.{AnotherBody, Supervision}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.another_body
 
@@ -31,14 +32,14 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-//      dataCacheConnector.fetch[Supervision](Supervision.key) map {
-//        response =>
-//          val form: Form2[AnotherBody] = (for {
-//            supervision <- response
-//            anotherBody <- supervision.anotherBody
-//          } yield Form2[AnotherBody](anotherBody)).getOrElse(EmptyForm)
-          Future.successful(Ok(another_body(EmptyForm, edit)))
-     // }
+      dataCacheConnector.fetch[Supervision](Supervision.key) map {
+        response =>
+          val form: Form2[AnotherBody] = (for {
+            supervision <- response
+            anotherBody <- supervision.anotherBody
+          } yield Form2[AnotherBody](anotherBody)).getOrElse(EmptyForm)
+          Ok(another_body(form, edit))
+      }
   }
 
   def post(edit : Boolean = false) = Authorised.async {
