@@ -33,9 +33,9 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
     val controller = new AnotherBodyController(mockCacheConnector, authConnector = self.authConnector)
   }
 
-  "PenalisedByProfessionalController" must {
+  "AnotherBodyControllerController" must {
 
-    "on get display the Penalised By Professional Body page" in new Fixture {
+    "on get display the Another Body page" in new Fixture {
 
       mockCacheFetch[Supervision](None)
 
