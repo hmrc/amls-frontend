@@ -74,7 +74,7 @@ class NewOfficerController @Inject()(val authConnector: AuthConnector, cacheConn
       }
   }
 
-  def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext): OptionT[Future, (NewOfficer, Seq[ResponsiblePerson])] = {
+  def getPeopleAndSelectedOfficer()(implicit headerCarrier: HeaderCarrier, authContext: AuthContext) = {
     for {
       people <- OptionT(cacheConnector.fetch[Seq[ResponsiblePerson]](ResponsiblePerson.key))
       changeOfficer <- OptionT(cacheConnector.fetch[ChangeOfficer](ChangeOfficer.key)) orElse OptionT.pure(ChangeOfficer(RoleInBusiness(Set.empty)))

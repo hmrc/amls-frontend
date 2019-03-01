@@ -54,7 +54,7 @@ sealed trait BranchesOrAgents0 {
           _ withMessage "error.required.hasCountries.msb.branchesOrAgents"
         }
 
-      val countrySeqR: Rule[Seq[String], Seq[Country]] = {
+      val countrySeqR = {
         (seqToOptionSeq[String] andThen flattenR[String] andThen cR)
           .andThen(minLengthR[Seq[Country]](minLength) withMessage "error.invalid.countries.msb.branchesOrAgents")
           .andThen(maxLengthR[Seq[Country]](maxLength))
