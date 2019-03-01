@@ -107,17 +107,6 @@ class ChangeSubSectorHelperSpec extends AmlsSpec {
   }
 
   "updating the sub sectors" must {
-
-    "return an empty entity where no msb exists in cache" in new Fixture {
-      val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("XXXX")))
-
-      mockCacheFetch[MSB](None, Some(MSB.key))
-
-      await {
-        helper.updateMsb(model)
-      } mustBe MSB()
-    }
-
     "wipe the currency exchange questions when it isn't set" in new Fixture {
 
       val model = ChangeSubSectorFlowModel(Some(Set(TransmittingMoney)), Some(BusinessAppliedForPSRNumberYes("XXXX")))

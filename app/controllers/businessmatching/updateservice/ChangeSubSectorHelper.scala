@@ -18,7 +18,6 @@ package controllers.businessmatching.updateservice
 
 import connectors.DataCacheConnector
 import javax.inject.Inject
-import models.businessmatching
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.flowmanagement.ChangeSubSectorFlowModel
@@ -118,13 +117,8 @@ class ChangeSubSectorHelper @Inject()(val authConnector: AuthConnector,
       if (sectorDiff.isEmpty) {
         Future.successful(msb)
       } else {
-        // If the msb section is an empty section return none to avoid empty cache entry for MSB
-        if (msb == MoneyServiceBusiness()) {
-          Future.successful(None)
-        } else {
-          dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
-            updatedMsb.copy(hasAccepted = hasAccepted)
-          }
+        dataCacheConnector.save[MoneyServiceBusiness](MoneyServiceBusiness.key, updatedMsb) map { _ =>
+          updatedMsb.copy(hasAccepted = hasAccepted)
         }
       }
     }
