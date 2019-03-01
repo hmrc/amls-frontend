@@ -1,1 +1,0 @@
- + [AMLS-4727](https://jira.tools.tax.service.gov.uk/browse/AMLS-4727) - 'Fixed fieldset legend on "Is this the right address to send you letters?"'
