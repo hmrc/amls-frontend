@@ -18,6 +18,7 @@ package views.supervision
 
 import forms.EmptyForm
 import org.scalatest.MustMatchers
+import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
@@ -29,6 +30,18 @@ class another_bodySpec extends AmlsSpec with MustMatchers  {
   }
 
   "another_body view" must {
+
+    "have correct title, headings and form fields" in new ViewFixture {
+      val form2 = EmptyForm
+
+      def view = views.html.supervision.another_body(EmptyForm, edit = false)
+
+      doc.title must startWith(Messages("supervision.another_body.title"))
+      heading.html must be(Messages("supervision.another_body.title"))
+      subHeading.html must include(Messages("summary.supervision"))
+
+      doc.getElementsByAttributeValue("name", "anotherBody") must not be empty
+    }
 
     "have a back link" in new ViewFixture {
 

@@ -18,6 +18,7 @@ package views.supervision
 
 import forms.EmptyForm
 import org.scalatest.MustMatchers
+import play.api.i18n.Messages
 import utils.AmlsSpec
 import views.Fixture
 
@@ -29,6 +30,16 @@ class supervision_endSpec extends AmlsSpec with MustMatchers  {
   }
 
   "supervision_end view" must {
+
+    "have correct title, headings and form fields" in new ViewFixture {
+      val form2 = EmptyForm
+
+      def view = views.html.supervision.supervision_end(EmptyForm, edit = false)
+
+      doc.title must startWith(Messages("supervision.supervision_end.title"))
+      heading.html must be(Messages("supervision.supervision_end.title"))
+      subHeading.html must include(Messages("summary.supervision"))
+    }
 
     "have a back link" in new ViewFixture {
 
