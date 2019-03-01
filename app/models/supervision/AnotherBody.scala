@@ -30,9 +30,9 @@ import models.ValidationRule
 sealed trait AnotherBody
 
 case class AnotherBodyYes(supervisorName: String,
-                          startDate: LocalDate,
-                          endDate: LocalDate,
-                          endingReason: String) extends AnotherBody
+                          startDate: Option[LocalDate],
+                          endDate: Option[LocalDate],
+                          endingReason: Option[String]) extends AnotherBody
 
 case object AnotherBodyNo extends AnotherBody
 
@@ -53,10 +53,11 @@ object AnotherBody {
     maxLength(reasonMaxLength).withMessage("error.invalid.maxlength.255") andThen
     basicPunctuationPattern()
 
-  type ValidationRuleType = (String, LocalDate, LocalDate, String)
+  type ValidationRuleType = (String, Option[LocalDate], Option[LocalDate], Option[String])
 
   val validationRule: ValidationRule[ValidationRuleType] = Rule[ValidationRuleType, ValidationRuleType] {
-    case x@(_, d1, d2, _) if !d1.isAfter(d2) => Valid(x)
+    case x@(_, d1, d2, _) if d1.isDefined && d2.isDefined && !d1.get.isAfter(d2.get) => Valid(x)
+    case x@(_, d1, d2, _) if d1.isEmpty & d2.isEmpty => Valid(x)
     case _ => Invalid(Seq(
       (Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
       (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))
@@ -70,9 +71,9 @@ object AnotherBody {
       case true =>
 
         val r = (__ \ "supervisorName").read(supervisorRule) ~
-          (__ \ "startDate").read(localDateFutureRule) ~
-          (__ \ "endDate").read(localDateFutureRule) ~
-          (__ \ "endingReason").read(reasonRule)
+          (__ \ "startDate").read(optionR(localDateFutureRule)) ~
+          (__ \ "endDate").read(optionR(localDateFutureRule)) ~
+          (__ \ "endingReason").read(optionR(reasonRule))
 
         r.tupled andThen validationRule andThen Rule.fromMapping[ValidationRuleType, AnotherBody]( x => {
           Valid(AnotherBodyYes(x._1, x._2, x._3, x._4))
@@ -88,13 +89,13 @@ object AnotherBody {
       Map(
         "anotherBody" -> Seq("true"),
         "supervisorName" -> Seq(a.supervisorName),
-        "endingReason" -> Seq(a.endingReason)
+        "endingReason" -> Seq(a.endingReason.getOrElse(""))
       ) ++ (
-        localDateWrite.writes(a.startDate) map {
+        localDateWrite.writes(a.startDate.getOrElse(LocalDate.now())) map {
           case (key, value) =>
             s"startDate.$key" -> value
         })  ++ (
-        localDateWrite.writes(a.endDate) map {
+        localDateWrite.writes(a.endDate.getOrElse(LocalDate.now())) map {
           case (key, value) =>
             s"endDate.$key" -> value
         })
@@ -111,9 +112,9 @@ object AnotherBody {
       case true =>
         (
           (__ \ "supervisorName").read[String] ~
-            (__ \ "startDate").read[LocalDate] ~
-            (__ \ "endDate").read[LocalDate] ~
-            (__ \ "endingReason").read[String]) (AnotherBodyYes.apply _) map identity[AnotherBody]
+            (__ \ "startDate").readNullable[LocalDate] ~
+            (__ \ "endDate").readNullable[LocalDate] ~
+            (__ \ "endingReason").readNullable[String]) (AnotherBodyYes.apply _) map identity[AnotherBody]
 
       case false => AnotherBodyNo
     }
