@@ -35,7 +35,14 @@
     heading = header
 )  {
 
-    <p>@Messages("businessactivities.confirm-activities.subtitle") @businessTypes</p>
+     <p>@Messages("businessactivities.confirm-activities.subtitle")</p>
+     <ul class="list list-bullet">
+       @businessTypes.map {activity =>
+         @activity.split('|').map {a =>
+           <li>@if(a.charAt(0) == 'a' || a.charAt(0) == 'e') { an @a } else { a @a }</li>
+         }
+       }
+     </ul>
 
     <p>@Messages("businessactivities.involved.other.hint")</p>
     <ul class="list list-bullet">

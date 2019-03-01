@@ -1119,6 +1119,7 @@ businessmatching.businessType.lbl.05 = Unincorporated association or trust
 businessmatching.registerservices.title = What do you need to register?
 businessmatching.registerservices.other.title = What other service do you need to register?
 businessmatching.registerservices.details = More information about these categories
+
 businessmatching.registerservices.existing = You’ve told us your business already does:
 businessmatching.registerservices.servicename.lbl.01 = Accountancy services
 businessmatching.registerservices.servicename.lbl.02 = Bill payment services
@@ -1127,6 +1128,15 @@ businessmatching.registerservices.servicename.lbl.04 = High value dealing
 businessmatching.registerservices.servicename.lbl.05 = Money service business activities
 businessmatching.registerservices.servicename.lbl.06 = Trust or company services
 businessmatching.registerservices.servicename.lbl.07 = Telephone, digital and IT payment services
+
+businessactivities.registerservices.servicename.lbl.01 = accountancy services provider
+businessactivities.registerservices.servicename.lbl.02 = bill payment service provider
+businessactivities.registerservices.servicename.lbl.03 = estate agency business
+businessactivities.registerservices.servicename.lbl.04 = high value dealer
+businessactivities.registerservices.servicename.lbl.05 = money service business
+businessactivities.registerservices.servicename.lbl.06 = trust or company service provider
+businessactivities.registerservices.servicename.lbl.07 = telecommunications, digital and IT payment service provider
+
 businessmatching.registerservices.servicename.lbl.01.phrased = accountancy services
 businessmatching.registerservices.servicename.lbl.02.phrased = bill payment services
 businessmatching.registerservices.servicename.lbl.03.phrased = estate agency services

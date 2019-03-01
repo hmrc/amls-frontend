@@ -80,13 +80,13 @@ class InvolvedInOtherControllerSpec extends AmlsSpec with MockitoSugar with Scal
 
         val html = contentAsString(result)
 
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.01"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.02"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.03"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.04"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.05"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.06"))
-        html must include(Messages("businessmatching.registerservices.servicename.lbl.07"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.01"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.02"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.03"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.04"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.05"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.06"))
+        html must include(Messages("businessactivities.registerservices.servicename.lbl.07"))
 
         val page = Jsoup.parse(html)
 
