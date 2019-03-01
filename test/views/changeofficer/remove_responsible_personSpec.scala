@@ -44,7 +44,7 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.changeofficer.remove_responsible_person(EmptyForm, "testName")
 
-      heading.html must be(Messages("changeofficer.removeresponsibleperson.heading", "testName"))
+      heading.html must be(Messages("changeofficer.removeresponsibleperson.lbl", "testName"))
       subHeading.html must include(Messages("summary.updateinformation"))
 
     }
