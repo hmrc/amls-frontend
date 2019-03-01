@@ -19,6 +19,7 @@
 @import models.supervision._
 @import utils._
 @import config.ApplicationConfig
+@import org.joda.time._
 
 @(f: forms.Form2[_], model: Supervision)(implicit request: Request[_],m:Messages, lang: Lang)
 
@@ -31,37 +32,59 @@
     heading = header
 ) {
 
-    @checkYourAnswers(
-        question = Messages("supervision.another_body.title"),
-        editLinkTag = "supervisionanotherbody-edit",
-        editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
-    ) {
-        @model.anotherBody.map {
-            case AnotherBodyNo => { <p>@Messages("lbl.no")</p> }
-            case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
-                <p>@Messages("lbl.yes")</p>
-                @checkYourAnswersExtra(
-                    question = Messages("supervision.another_body.lbl.supervisor")
-                ) {
-                    <p>@supervisorName</p>
-                }
-                @checkYourAnswersExtra(
-                    question = Messages("supervision.another_body.startDate.lbl")
-                ) {
-                    <p>@DateHelper.formatDate(startDate)</p>
-                }
-                @checkYourAnswersExtra(
-                    question = Messages("supervision.another_body.endDate.lbl")
-                ) {
-                    <p>@DateHelper.formatDate(endDate)</p>
-                }
-                @checkYourAnswersExtra(
-                    question = Messages("supervision.another_body.endingReason.lbl")
-                ) {
-                    <p>@endingReason</p>
-                }
+    @model.anotherBody.map {
+        case AnotherBodyNo => {
+            @checkYourAnswers(
+                question = Messages("supervision.another_body.title"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+            ) {
+                <p>@Messages("lbl.no")</p>
             }
         }
+
+        case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
+            @checkYourAnswers(
+                question = Messages("supervision.another_body.title"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+            ) {
+                <p>@Messages("lbl.yes")</p>
+            }
+
+            @checkYourAnswers(
+                question = Messages("supervision.another_body.lbl.supervisor"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
+            ) {
+                <p>@supervisorName</p>
+            }
+
+            @checkYourAnswers(
+                question = Messages("supervision.supervision_start.title"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.SupervisionStartController.get(true).toString
+            ) {
+                <p>@DateHelper.formatDate(startDate.getOrElse(LocalDate.now()))</p>
+            }
+
+            @checkYourAnswers(
+                question = Messages("supervision.supervision_end.title"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.SupervisionEndController.get(true).toString
+            ) {
+                <p>@DateHelper.formatDate(endDate.getOrElse(LocalDate.now()))</p>
+            }
+
+            @checkYourAnswers(
+                question = Messages("supervision.supervision_end_reasons.title"),
+                editLinkTag = "supervisionanotherbody-edit",
+                editUrl = controllers.supervision.routes.SupervisionEndReasonsController.get(true).toString
+            ) {
+                <p>@endingReason.getOrElse("")</p>
+            }
+        }
+
     }
 
     @checkYourAnswers(
