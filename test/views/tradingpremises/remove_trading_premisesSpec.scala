@@ -39,7 +39,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", false )
+      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", true )
 
       doc.title must be(pageTitle)
 
@@ -52,14 +52,14 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
         Messages("tradingpremises.remove.trading.premises.btn"))
     }
 
-    "shows trading premises address." in new ViewFixture {
+    "shows correct heading for input param showDateField equal false." in new ViewFixture {
 
       val form2 = EmptyForm
 
       def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", false )
 
-      heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
-      doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.text", "trading address")).hasText must be(true)
+      heading.html must be(Messages("tradingpremises.remove.trading.premises.title"))
+      subHeading.html must include(Messages("summary.tradingpremises"))
     }
 
     "check date field existence when input param showDateField is set to true" in new ViewFixture {

@@ -23,7 +23,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.remove.trading.premises.enddate.lbl", "summary.tradingpremises")
+    @if(showDateField) {
+        @heading("tradingpremises.remove.trading.premises.enddate.lbl", "summary.tradingpremises")
+    } else {
+        @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
+    }
 }
 
 @main(
