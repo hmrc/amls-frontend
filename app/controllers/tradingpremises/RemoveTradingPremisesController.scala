@@ -48,7 +48,6 @@ class RemoveTradingPremisesController @Inject () (
               f = EmptyForm,
               index = index,
               complete = complete,
-              tradingName = tp.yourTradingPremises.fold("")(_.tradingName),
               tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(",")),
               showDateField = tp.lineId.isDefined
             )
@@ -59,7 +58,6 @@ class RemoveTradingPremisesController @Inject () (
             f = EmptyForm,
             index = index,
             complete = complete,
-            tradingName = tp.yourTradingPremises.fold("")(_.tradingName),
             tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(",")),
             showDateField = false
           )
@@ -69,7 +67,7 @@ class RemoveTradingPremisesController @Inject () (
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, tradingName: String) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, tradingAddress: String) = Authorised.async {
     implicit authContext => implicit request =>
 
       def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
@@ -102,8 +100,7 @@ class RemoveTradingPremisesController @Inject () (
                           f = f,
                           index = index,
                           complete = complete,
-                          tradingName = tradingName,
-                          tradingAddress = "-- blah blah --",
+                          tradingAddress = tradingAddress,
                           showDateField = true
                         )
                       )
