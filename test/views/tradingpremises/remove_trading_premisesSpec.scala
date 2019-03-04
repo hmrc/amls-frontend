@@ -39,20 +39,33 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", false )
+      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", false )
 
+      println(doc.title)
+      println(s"-- \n${pageTitle}\n")
       doc.title must be(pageTitle)
+
       heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
       subHeading.html must include(Messages("summary.tradingpremises"))
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
-      doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.text", "trading name")).hasText must be(true)
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.text", "trading address")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.btn")).last().html() must be(
         Messages("tradingpremises.remove.trading.premises.btn"))
     }
 
+    "shows trading premises address." in new ViewFixture {
+
+      val form2 = EmptyForm
+
+      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", false )
+
+      heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
+      doc.getElementsMatchingOwnText(Messages("tradingpremises.remove.trading.premises.text", "trading address")).hasText must be(true)
+    }
+
     "check date field existence when input param showDateField is set to true" in new ViewFixture {
-      def view = views.html.tradingpremises.remove_trading_premises(EmptyForm, 1, false, "trading name", true)
+      def view = views.html.tradingpremises.remove_trading_premises(EmptyForm, 1, false, "trading name", "trading Address", true)
       doc.getElementsMatchingOwnText(Messages("lbl.day")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("lbl.month")).hasText must be(true)
       doc.getElementsMatchingOwnText(Messages("lbl.year")).hasText must be(true)
@@ -65,7 +78,7 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, true,"trading name", true)
+      def view = views.html.tradingpremises.remove_trading_premises(form2, 1, true,"trading name", "trading address",true)
 
       errorSummary.html() must include("not a message Key")
     }

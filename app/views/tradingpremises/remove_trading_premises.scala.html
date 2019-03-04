@@ -18,7 +18,7 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String, tradingAddress: String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
@@ -33,7 +33,7 @@
 
     @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName)) {
         <div class="panel-border-wide">
-            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
+            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
         </div>
 
         @if(showDateField) {
