@@ -41,8 +41,6 @@ class remove_trading_premisesSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.tradingpremises.remove_trading_premises(form2, 1, false, "trading name", "trading address", false )
 
-      println(doc.title)
-      println(s"-- \n${pageTitle}\n")
       doc.title must be(pageTitle)
 
       heading.html must be(Messages("tradingpremises.remove.trading.premises.enddate.lbl"))
