@@ -151,13 +151,13 @@ class ConfirmationController @Inject()(
           form <- OptionT.fromOption[Future](request.body.asFormUrlEncoded)
           paymentRef <- OptionT.fromOption[Future](form("paymentRef").headOption)
           oldPayment <- OptionT(amlsConnector.getPaymentByPaymentReference(paymentRef))
-          newPayment <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
+          nextUrl <- OptionT.liftF(paymentsService.paymentsUrlOrDefault(
             paymentRef,
             oldPayment.amountInPence.toDouble / 100,
             controllers.routes.ConfirmationController.paymentConfirmation(paymentRef).url,
             oldPayment.amlsRefNo,
             oldPayment.safeId))
-        } yield Redirect(newPayment.links.nextUrl)
+        } yield Redirect(nextUrl.value)
 
         result getOrElse InternalServerError("Unable to retry payment due to a failure")
   }

@@ -16,20 +16,18 @@
 
 package models.payments
 
-import config.ApplicationConfig
-import play.api.libs.json.Json
+import play.api.libs.json.{Format, Json}
+import play.api.libs.functional.syntax._
 
-case class PayApiLinks(nextUrl: String)
+case class NextUrl(value: String)
 
-object PayApiLinks {
-  implicit val format = Json.format[PayApiLinks]
+object NextUrl {
+  implicit val format: Format[NextUrl] = implicitly[Format[String]].inmap(NextUrl(_), _.value)
 }
 
-case class CreatePaymentResponse(links: PayApiLinks, paymentId: Option[String] = None)
+case class CreatePaymentResponse(nextUrl: NextUrl, paymentId: String)
 
 object CreatePaymentResponse {
-
-  def default = CreatePaymentResponse(PayApiLinks(ApplicationConfig.paymentsUrl), None)
 
   implicit val format = Json.format[CreatePaymentResponse]
 }

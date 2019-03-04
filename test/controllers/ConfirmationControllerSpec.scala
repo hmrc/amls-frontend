@@ -98,7 +98,7 @@ class ConfirmationControllerSpec extends AmlsSpec
 
     when {
       controller.paymentsConnector.createPayment(any())(any(), any())
-    } thenReturn Future.successful(Some(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber))))
+    } thenReturn Future.successful(Some(CreatePaymentResponse(NextUrl("/payments"), amlsRegistrationNumber)))
 
     when {
       controller.amlsConnector.refreshPaymentStatus(any())(any(), any(), any())
@@ -409,12 +409,12 @@ class ConfirmationControllerSpec extends AmlsSpec
 
       when {
         controller.paymentsService.paymentsUrlOrDefault(any(), any(), any(), any(), any())(any(), any(), any(), any())
-      } thenReturn Future.successful(paymentResponse)
+      } thenReturn Future.successful(paymentResponse.nextUrl)
 
       val result = controller.retryPayment()(request.withFormUrlEncodedBody(postData))
 
       status(result) mustBe SEE_OTHER
-      redirectLocation(result) mustBe Some(paymentResponse.links.nextUrl)
+      redirectLocation(result) mustBe Some(paymentResponse.nextUrl.value)
     }
 
     "fail if a payment cannot be retried" in new Fixture {

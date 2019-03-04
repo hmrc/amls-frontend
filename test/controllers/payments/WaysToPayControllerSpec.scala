@@ -19,7 +19,7 @@ package controllers.payments
 import generators.{AmlsReferenceNumberGenerator, PaymentGenerator}
 import models.ResponseType.SubscriptionResponseType
 import models.confirmation.Currency
-import models.payments.{CreateBacsPaymentRequest, CreatePaymentResponse, PayApiLinks, WaysToPay}
+import models.payments._
 import models.status.SubmissionReadyForReview
 import models.{FeeResponse, ReadStatusResponse, ReturnLocation}
 import org.joda.time.DateTime
@@ -133,7 +133,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
 
           when {
             controller.paymentsService.requestPaymentsUrl(any(), any(), any(), any())(any(), any(), any(), any())
-          } thenReturn Future.successful(CreatePaymentResponse(PayApiLinks("/payments"), Some(amlsRegistrationNumber)))
+          } thenReturn Future.successful(NextUrl("/payments-next-url"))
 
           val result = controller.post()(postRequest)
           val body = contentAsString(result)
@@ -145,7 +145,7 @@ class WaysToPayControllerSpec extends AmlsSpec with AmlsReferenceNumberGenerator
             eqTo(safeId)
           )(any(), any(), any(), any())
 
-          redirectLocation(result) mustBe Some("/payments")
+          redirectLocation(result) mustBe Some("/payments-next-url")
         }
 
         "return 500" when {

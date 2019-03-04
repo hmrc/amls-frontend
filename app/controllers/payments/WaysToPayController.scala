@@ -60,8 +60,8 @@ class WaysToPayController @Inject()(
                     controllers.routes.ConfirmationController.paymentConfirmation(paymentReference).url,
                     fees.amlsReferenceNumber,
                     safeId
-                  ) map { paymentsRedirect =>
-                    Redirect(paymentsRedirect.links.nextUrl)
+                  ) map{ nextUrl =>
+                    Redirect(nextUrl.value)
                   }
                 }("Cannot retrieve payment information")
               case Bacs =>
