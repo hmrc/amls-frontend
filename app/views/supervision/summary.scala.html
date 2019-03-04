@@ -43,7 +43,7 @@
             }
         }
 
-        case AnotherBodyYes(supervisorName, startDate, endDate, endingReason) => {
+        case AnotherBodyYes(supervisorName, startDate, endDate, endingReasons) => {
             @checkYourAnswers(
                 question = Messages("supervision.another_body.title"),
                 editLinkTag = "supervisionanotherbody-edit",
@@ -65,7 +65,7 @@
                 editLinkTag = "supervisionanotherbody-edit",
                 editUrl = controllers.supervision.routes.SupervisionStartController.get(true).toString
             ) {
-                <p>@DateHelper.formatDate(startDate.getOrElse(LocalDate.now()))</p>
+                    <p>@DateHelper.formatDate(startDate.get.startDate)</p>
             }
 
             @checkYourAnswers(
@@ -73,7 +73,7 @@
                 editLinkTag = "supervisionanotherbody-edit",
                 editUrl = controllers.supervision.routes.SupervisionEndController.get(true).toString
             ) {
-                <p>@DateHelper.formatDate(endDate.getOrElse(LocalDate.now()))</p>
+                <p>@DateHelper.formatDate(endDate.get.endDate)</p>
             }
 
             @checkYourAnswers(
@@ -81,7 +81,7 @@
                 editLinkTag = "supervisionanotherbody-edit",
                 editUrl = controllers.supervision.routes.SupervisionEndReasonsController.get(true).toString
             ) {
-                <p>@endingReason.getOrElse("")</p>
+                <p>@endingReasons.get.endingReason</p>
             }
         }
 
