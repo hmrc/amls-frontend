@@ -18,7 +18,6 @@ package controllers.businessmatching
 
 import cats.data.OptionT
 import cats.implicits._
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.EmptyForm
@@ -34,7 +33,7 @@ import scala.concurrent.Future
 @Singleton
 class SummaryController @Inject()(
                                    val dataCache: DataCacheConnector,
-                                   val authConnector: AuthConnector = AMLSAuthConnector,
+                                   val authConnector: AuthConnector,
                                    val statusService: StatusService,
                                    val businessMatchingService: BusinessMatchingService
                                  ) extends BaseController {

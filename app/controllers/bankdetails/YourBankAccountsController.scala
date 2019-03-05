@@ -16,7 +16,6 @@
 
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import forms.EmptyForm
 import javax.inject.Inject
@@ -26,7 +25,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
 class YourBankAccountsController @Inject()(
                                             val dataCacheConnector: DataCacheConnector,
-                                            val authConnector: AuthConnector = AMLSAuthConnector
+                                            val authConnector: AuthConnector
                                           ) extends BankDetailsController {
   def get(complete: Boolean = false) = Authorised.async {
     implicit authContext =>

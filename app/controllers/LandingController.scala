@@ -54,7 +54,7 @@ class LandingController @Inject()(val landingService: LandingService,
                                   val auditConnector: AuditConnector,
                                   val authService: AuthService,
                                   val cacheConnector: DataCacheConnector,
-                                  val authConnector: AuthConnector = AMLSAuthConnector,
+                                  val authConnector: AuthConnector,
                                   val statusService: StatusService
                                  ) extends BaseController {
 

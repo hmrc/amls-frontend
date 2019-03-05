@@ -29,7 +29,7 @@ import scala.concurrent.Future
 
 @Singleton
 class SatisfactionSurveyController @Inject()(val auditConnector: AuditConnector,
-                                             val authConnector: AuthConnector = AMLSAuthConnector) extends BaseController {
+                                             val authConnector: AuthConnector) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>

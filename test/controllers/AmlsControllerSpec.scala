@@ -32,9 +32,7 @@ class AmlsControllerSpec extends AmlsSpec {
       val request = addToken(unauthenticatedRequest)
       val mockAuthConnector = mock[AuthConnector]
 
-      val controller = new AmlsController {
-        override protected def authConnector: AuthConnector = mockAuthConnector
-      }
+      val controller = new AmlsController(mockAuthConnector)
     }
 
     "AmlsController" must {
