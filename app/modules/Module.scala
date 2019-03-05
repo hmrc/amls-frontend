@@ -36,7 +36,6 @@ class Module extends AbstractModule {
     bind(classOf[HttpGet]).to(classOf[WSHttp])
     bind(classOf[HttpPost]).to(classOf[WSHttp])
     bind(classOf[HttpDelete]).to(classOf[WSHttp])
-   /// bind(classOf[WSHttp]).to(classOf[WSHttp])
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
     bind(classOf[AuditConnector]).to(classOf[AMLSAuditConnector])
     bind(classOf[CorePost]).to(classOf[WSHttp])
