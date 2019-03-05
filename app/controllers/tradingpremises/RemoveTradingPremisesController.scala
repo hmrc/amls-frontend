@@ -48,7 +48,7 @@ class RemoveTradingPremisesController @Inject () (
               f = EmptyForm,
               index = index,
               complete = complete,
-              tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(",")),
+              tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(", ")),
               showDateField = tp.lineId.isDefined
             )
           )
