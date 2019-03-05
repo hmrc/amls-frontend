@@ -51,7 +51,7 @@ class activit_start_dateSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText(Messages("lbl.month")).hasText must be(true)
       doc.getElementsContainingOwnText(Messages("lbl.year")).hasText must be(true)
 
-      doc.getElementsContainingOwnText(Messages("tradingpremises.yourtradingpremises.startdate")).hasText must be(true)
+      doc.getElementsContainingOwnText(Messages("lbl.date.example")).hasText must be(true)
     }
 
     "show errors in the correct locations" in new ViewFixture {
