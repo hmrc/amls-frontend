@@ -229,11 +229,11 @@ trait SupervisionValues {
   object DefaultValues {
 
     private val supervisor = "Company A"
-    private val start = new LocalDate(1993, 8, 25)
+    private val start = Some(SupervisionStart(new LocalDate(1993, 8, 25)))
     //scalastyle:off magic.number
-    private val end = new LocalDate(1999, 8, 25)
+    private val end = Some(SupervisionEnd(new LocalDate(1999, 8, 25)))
     //scalastyle:off magic.number
-    private val reason = "Ending reason"
+    private val reason = Some(SupervisionEndReasons("Ending reason"))
 
     val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
     val DefaultProfessionalBody = ProfessionalBodyYes("details")
@@ -269,9 +269,9 @@ trait SupervisionValues {
     "anotherBody" -> Json.obj(
       "anotherBody" -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> "1993-08-25",
-      "endDate" -> "1999-08-25",
-      "endingReason" -> "Ending reason"
+      "startDate" -> Json.obj("startDate" -> "1993-08-25"),
+      "endDate" -> Json.obj("endDate" -> "1999-08-25"),
+      "endingReason" -> Json.obj("endingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
       "isAMember" -> true
@@ -292,9 +292,9 @@ trait SupervisionValues {
     "anotherBody" -> Json.obj(
       "anotherBody" -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> "1993-08-25",
-      "endDate" -> "1999-08-25",
-      "endingReason" -> "Ending reason"
+      "startDate" -> Json.obj("startDate" -> "1993-08-25"),
+      "endDate" -> Json.obj("endDate" -> "1999-08-25"),
+      "endingReason" -> Json.obj("endingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
       "isAMember" -> true,

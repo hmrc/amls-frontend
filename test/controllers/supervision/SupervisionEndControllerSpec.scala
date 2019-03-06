@@ -16,7 +16,7 @@
 
 package controllers.supervision
 
-import models.supervision.{AnotherBodyNo, AnotherBodyYes, ProfessionalBodyYes, Supervision}
+import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
@@ -52,11 +52,11 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
 
 
     "on get display the SupervisionEnd page with pre populated data" in new Fixture {
-      val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-      val end = new LocalDate(1998, 2, 24) //scalastyle:off magic.number
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
 
       mockCacheFetch[Supervision](Some(Supervision(
-        Some(AnotherBodyYes("Name", start, end, "Reason")),
+        Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))),
         None,
         None,
         Some(ProfessionalBodyYes("details"))

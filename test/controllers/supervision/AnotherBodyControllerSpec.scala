@@ -16,7 +16,7 @@
 
 package controllers.supervision
 
-import models.supervision.{AnotherBodyNo, AnotherBodyYes, ProfessionalBodyYes, Supervision}
+import models.supervision._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
 import org.scalatest.concurrent.ScalaFutures
@@ -27,7 +27,7 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks{
+  trait Fixture extends AuthorisedFixture  with DependencyMocks {
     self => val request = addToken(authRequest)
 
     val controller = new AnotherBodyController(mockCacheConnector, authConnector = self.authConnector)
@@ -46,15 +46,11 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
 
 
   "on get display the Another Body page with pre populated data" in new Fixture {
-    val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
-    val end = new LocalDate(1998, 2, 24)   //scalastyle:off magic.number
+    val start = Some(SupervisionStart(new LocalDate(1990, 2, 24)))//scalastyle:off magic.number
+    val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24)))   //scalastyle:off magic.number
 
     mockCacheFetch[Supervision](Some(Supervision(
-      Some(AnotherBodyYes("Name", start, end, "Reason")),
-      None,
-      None,
-      Some(ProfessionalBodyYes("details"))
-    )))
+      Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))), None, None, Some(ProfessionalBodyYes("details")))))
 
     val result = controller.get()(request)
     status(result) must be(OK)
