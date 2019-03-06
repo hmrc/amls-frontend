@@ -225,7 +225,7 @@
                     @model.taxMatters.map { x =>
                       @model.whoIsYourAccountant.map { accountant =>
                         @checkYourAnswers(
-                            question =  Messages("businessactivities.tax.matters.title", accountant.accountantsName),
+                            question =  Messages("businessactivities.tax.matters.summary.title", accountant.accountantsName),
                             editUrl = controllers.businessactivities.routes.TaxMattersController.get(true).toString
                         ) {
                             <p>@x.manageYourTaxAffairs match {

@@ -71,7 +71,7 @@ class summarySpec extends AmlsSpec
       ("businessactivities.accountantForAMLSRegulations.title",checkElementTextIncludes(_, "lbl.yes")),
       ("businessactivities.whoisyouraccountant.title",
         checkElementTextIncludes(_, "AccountantName","tradingName","line1","line2","line3","line4","AB12CD")),
-      ("businessactivities.tax.matters.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
+      ("businessactivities.tax.matters.summary.title",checkElementTextIncludes(_, "AccountantName", "lbl.yes"))
     )
 
     "include the provided data" in new ViewFixture {
