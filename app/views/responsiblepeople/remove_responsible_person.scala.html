@@ -18,12 +18,17 @@
 @import include.{main, heading}
 @import include.forms2._
 
+@import views.html.include.headingWithPlaceholder
 @(f: forms.Form2[_],index: Int, personName: String, showDateField:Boolean, flow: Option[String] = None)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+    @if(showDateField) {
+        @headingWithPlaceholder(("responsiblepeople.remove.named.responsible.person", personName), "summary.responsiblepeople")
+    } else {
+        @heading("responsiblepeople.remove.responsible.person.title", "summary.responsiblepeople")
+    }
 }
 
 @main(
@@ -33,19 +38,13 @@
 
     @form(f, controllers.responsiblepeople.routes.RemoveResponsiblePersonController.remove(index, flow)) {
 
-        @panel(
-            jsHidden = false,
-            wide = true,
-            gutter = true
-        ) {
             <p>@Messages("responsiblepeople.remove.responsible.person", personName)</p>
-        }
 
         @if(showDateField) {
             @date(
                 f = f,
                 p = "endDate",
-                labelText = "responsiblepeople.remove.responsible.person.enddate.lbl",
+                labelText = "",
                 hintText = "",
                 true
             )
