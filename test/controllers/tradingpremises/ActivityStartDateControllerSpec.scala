@@ -15,11 +15,11 @@
  */
 
 package controllers.tradingpremises
-
 import connectors.DataCacheConnector
 import models.tradingpremises._
 import org.joda.time.LocalDate
 import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers.{any, eq => meq}
 import org.mockito.Mockito.when
 import org.scalatest.concurrent.ScalaFutures
@@ -28,9 +28,12 @@ import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture}
 
+import scala.collection.JavaConverters._
 import scala.concurrent.Future
 
 class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with MockitoSugar {
+
+  val address = Address("1", "2", None, None, "AA1 1BB", None)
 
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
@@ -41,7 +44,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
   }
 
   "ActivityStartDateController" must {
-    val ytpModel = YourTradingPremises("foo", Address("1","2",None,None,"AA1 1BB",None), None, Some(new LocalDate(2010, 10, 10)), None)
+    val ytpModel = YourTradingPremises("foo", address, None, Some(new LocalDate(2010, 10, 10)), None)
     val ytp = Some(ytpModel)
 
     val emptyCache = CacheMap("", Map.empty)
@@ -71,7 +74,8 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
 
         val result = controller.get(1, false)(request)
         status(result) must be(OK)
-        val document = Jsoup.parse(contentAsString(result))
+        val document: Document = Jsoup.parse(contentAsString(result))
+        document.getElementsByTag("p").asScala.count(e => e.text.contains(address.postcode)) mustEqual 1
         document.select("input[name=startDate.day]").`val` must include("10")
         document.select("input[name=startDate.month]").`val` must include("10")
         document.select("input[name=startDate.year]").`val` must include("2010")
@@ -126,6 +130,9 @@ class ActivityStartDateControllerSpec extends AmlsSpec with ScalaFutures with Mo
           "startDate.month" -> "5",
           "startDate.year" -> "2014"
         )
+
+        when(controller.dataCacheConnector.fetch[Seq[TradingPremises]](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(Seq(TradingPremises(yourTradingPremises = ytp)))))
 
         val result = controller.post(1, false)(postRequest)
         status(result) must be(BAD_REQUEST)
