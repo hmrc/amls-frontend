@@ -334,8 +334,9 @@ $(function () {
       url: '/anti-money-laundering/assets/countries'
     })
 
-    var selectFieldName = $(this).attr('id');
+    var selectFieldName = $(this).attr('id').replace('[', '\\[').replace(']', '\\]');
     var nonSelectFieldName = selectFieldName.replace('-select','');
+
     $('#' + nonSelectFieldName).keydown(function(e) {
       if (e.keyCode === 13 && $(this).val() === '') {
           $('#' + selectFieldName).val('')
