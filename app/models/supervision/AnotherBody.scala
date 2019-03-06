@@ -88,7 +88,6 @@ object AnotherBody {
           (__ \ "endingReason").read[Option[SupervisionEndReasons]]).apply(AnotherBodyYes.apply _)
 
       case false => Rule.fromMapping { _ => Valid(AnotherBodyNo) }
-
     }
   }
 

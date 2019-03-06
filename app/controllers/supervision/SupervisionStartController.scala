@@ -33,10 +33,9 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
       dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(Supervision(anotherBody, _, _, _, _, _))  if getStartDate(anotherBody).isDefined =>
-          Ok(supervision_start(Form2[SupervisionStart](SupervisionStart(getStartDate(anotherBody).get)), edit))
+        case Some(Supervision(anotherBody, _, _, _, _, _))  if getStartDate(anotherBody).isDefined
+        => Ok(supervision_start(Form2[SupervisionStart](SupervisionStart(getStartDate(anotherBody).get)), edit))
         case _ => Ok(supervision_start(EmptyForm, edit))
       }
   }
@@ -72,12 +71,11 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
               result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
           }
       }
-
   }
 
   private def updateData(anotherBody: AnotherBody, data: SupervisionStart): AnotherBody = {
     val updatedAnotherBody = anotherBody match {
-      case a@AnotherBodyYes(supervisorName, startDate, endDate, _) => a.startDate(data)
+      case a@AnotherBodyYes(_, _, _, _) => a.startDate(data)
     }
     updatedAnotherBody
   }

@@ -32,10 +32,9 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
-
       dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndReasons(anotherBody).isDefined =>
-          Ok(supervision_end_reasons(Form2[SupervisionEndReasons](SupervisionEndReasons(getEndReasons(anotherBody).get)), edit))
+        case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndReasons(anotherBody).isDefined
+        => Ok(supervision_end_reasons(Form2[SupervisionEndReasons](SupervisionEndReasons(getEndReasons(anotherBody).get)), edit))
         case _ => Ok(supervision_end_reasons(EmptyForm, edit))
       }
   }

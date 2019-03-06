@@ -34,7 +34,8 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndDate(anotherBody).isDefined => Ok(supervision_end(Form2[SupervisionEnd](SupervisionEnd(getEndDate(anotherBody).get)), edit))
+        case Some(Supervision(anotherBody, _, _, _, _, _)) if getEndDate(anotherBody).isDefined
+        => Ok(supervision_end(Form2[SupervisionEnd](SupervisionEnd(getEndDate(anotherBody).get)), edit))
         case _ => Ok(supervision_end(EmptyForm, edit))
       }
   }
@@ -54,7 +55,8 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
 
       dataCacheConnector.fetch[Supervision](Supervision.key) flatMap { supervision =>
         val extraFields: Map[String, Seq[String]] = supervision.get.anotherBody match {
-          case Some(data) if data.isInstanceOf[AnotherBodyYes] => Map("supervisionStartDate" -> Seq(data.asInstanceOf[AnotherBodyYes].startDate.get.startDate.toString("yyyy-MM-dd")))
+          case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
+            Map("supervisionStartDate" -> Seq(data.asInstanceOf[AnotherBodyYes].startDate.get.startDate.toString("yyyy-MM-dd")))
           case None => Map()
         }
 
@@ -62,10 +64,6 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
           case f: InvalidForm =>
             Future.successful(BadRequest(supervision_end(f, edit)))
           case a@ValidForm(_, data) =>
-
-            println(a)
-            println(data)
-
             dataCacheConnector.fetchAll flatMap {
               optMap =>
                 val result = for {
@@ -84,23 +82,10 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
       }
   }
 
-//  private def getStartDate()(implicit authContext: AuthContext, hc: HeaderCarrier) = {
-//    for {
-//      supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-//      anotherBody: AnotherBody <- supervision.anotherBody
-//      supervisionStart <- anotherBody.asInstanceOf[AnotherBodyYes].startDate
-//      if !anotherBody.equals(AnotherBodyNo)
-//      date <- supervisionStart.startDate
-//    } yield date
-//  }
-
   private def updateData(anotherBody: AnotherBody, data: SupervisionEnd): AnotherBody = {
-    println("Supervision "+ anotherBody)
-    println("Form data "+ data)
     val updatedAnotherBody = anotherBody match {
-      case a@AnotherBodyYes(supervisorName, startDate, endDate, _) => a.endDate(data)
+      case a@AnotherBodyYes(_, _, _, _) => a.endDate(data)
     }
-    println("updatedAnotherBody: " + updatedAnotherBody)
     updatedAnotherBody
   }
 
