@@ -56,7 +56,7 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
       dataCacheConnector.fetch[Supervision](Supervision.key) flatMap { supervision =>
         val extraFields: Map[String, Seq[String]] = supervision.get.anotherBody match {
           case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
-            Map("supervisionStartDate" -> Seq(data.asInstanceOf[AnotherBodyYes].startDate.get.startDate.toString("yyyy-MM-dd")))
+            Map("extraStartDate" -> Seq(data.asInstanceOf[AnotherBodyYes].startDate.get.startDate.toString("yyyy-MM-dd")))
           case None => Map()
         }
 

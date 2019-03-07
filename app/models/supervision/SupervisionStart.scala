@@ -49,13 +49,13 @@ object SupervisionStart {
     import play.api.libs.json.Reads._
     import play.api.libs.json._
 
-    (__ \ "startDate").read[LocalDate].map(SupervisionStart.apply) map identity[SupervisionStart]
+    (__ \ "supervisionStartDate").read[LocalDate].map(SupervisionStart.apply)
   }
 
   implicit val jsonWrites = Writes[SupervisionStart] {
     case a : SupervisionStart =>
       Json.obj(
-       "startDate" -> a.startDate
+       "supervisionStartDate" -> a.startDate
     )
   }
 }

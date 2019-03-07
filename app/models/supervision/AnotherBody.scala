@@ -23,16 +23,16 @@ import jto.validation.forms._
 import models.FormTypes._
 import models.ValidationRule
 import org.joda.time.LocalDate
-import play.api.libs.json.{Json, Reads, Writes}
+import utils.MappingUtils.constant
 
 
 
 sealed trait AnotherBody
 
 case class AnotherBodyYes(supervisorName: String,
-                          startDate: Option[SupervisionStart],
-                          endDate: Option[SupervisionEnd],
-                          endingReason: Option[SupervisionEndReasons]) extends AnotherBody {
+                          startDate: Option[SupervisionStart] = None,
+                          endDate: Option[SupervisionEnd] = None,
+                          endingReason: Option[SupervisionEndReasons] = None) extends AnotherBody {
 
   def supervisorName(p: String): AnotherBodyYes =
     this.copy(supervisorName = p)
@@ -100,6 +100,23 @@ object AnotherBody {
     case AnotherBodyNo => Map("anotherBody" -> Seq("false"))
   }
 
+  import play.api.libs.json._
+
+  def oldStartDateReader: Reads[Option[SupervisionStart]] =
+    (__ \ "startDate").readNullable[LocalDate] map { sd =>
+     sd.fold[Option[SupervisionStart]](None) { e => Some(SupervisionStart(e))}
+    }
+
+  def oldEndDateReader: Reads[Option[SupervisionEnd]] =
+    (__ \ "endDate").readNullable[LocalDate] map { ed =>
+      ed.fold[Option[SupervisionEnd]](None) { e => Some(SupervisionEnd(e))}
+    }
+
+  def oldEndReasonsReader: Reads[Option[SupervisionEndReasons]] =
+    (__ \ "endingReason").readNullable[String] map { er =>
+      er.fold[Option[SupervisionEndReasons]](None) { e => Some(SupervisionEndReasons(e))}
+    }
+
   implicit val jsonReads: Reads[AnotherBody] = {
 
     import play.api.libs.functional.syntax._
@@ -110,9 +127,18 @@ object AnotherBody {
       case true =>
         (
           (__ \ "supervisorName").read[String] and
-            (__ \ "startDate").readNullable[SupervisionStart] and
-            (__ \ "endDate").read(Reads.optionNoError[SupervisionEnd]) and
-            (__ \ "endingReason").read(Reads.optionNoError[SupervisionEndReasons])
+            ((__ \ "startDate").read(Reads.optionNoError[SupervisionStart]) flatMap {
+              case None => oldStartDateReader
+              case x => constant(x)
+          }) and
+            ((__ \ "endDate").read(Reads.optionNoError[SupervisionEnd]) flatMap {
+              case None => oldEndDateReader
+              case x => constant(x)
+            }) and
+            ((__ \"endingReason").read(Reads.optionNoError[SupervisionEndReasons]) flatMap {
+              case None => oldEndReasonsReader
+              case x => constant(x)
+            })
           ) (AnotherBodyYes.apply _) map identity[AnotherBody]
 
       case false => AnotherBodyNo

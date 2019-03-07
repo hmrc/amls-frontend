@@ -63,9 +63,14 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
     (edit, anotherBodyComplete(cache)) match {
-      case (true, Some(true)) => Redirect(routes.SummaryController.get())
-      case (true, Some(false)) => Redirect(routes.SupervisionStartController.get())
-      case (false, Some(false)) => Redirect(routes.SupervisionStartController.get())
+
+      // edit, (isComplete, isAnotherBodyYes)
+      case (true, Some((false, true))) => Redirect(routes.SupervisionStartController.get())
+      case (false, Some((false, true))) => Redirect(routes.SupervisionStartController.get())
+      case (false, Some((true, true))) => Redirect(routes.SummaryController.get())
+
+      case (true, Some((true, false))) => Redirect(routes.SummaryController.get())
+      case (false, Some((true, false))) => Redirect(routes.ProfessionalBodyMemberController.get())
     }
   }
 
@@ -80,13 +85,13 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
     supervision.anotherBody(updatedAnotherBody)
   }
 
-  private def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[Boolean] = {
+  private def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[(Boolean, Boolean)] = {
     for {
       supervision <- cache.getEntry[Supervision](Supervision.key)
       anotherBody <- supervision.anotherBody
     } yield anotherBody match {
-      case AnotherBodyNo => true
-      case body => body.asInstanceOf[AnotherBodyYes].isComplete()
+      case AnotherBodyNo => (true, false)
+      case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
     }
   }
 }
