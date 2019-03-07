@@ -1597,7 +1597,7 @@ responsiblepeople.position_within_business.lbl.03 = Internal accountant
 responsiblepeople.position_within_business.lbl.04 = Nominated officer
 responsiblepeople.position_within_business.lbl.05 = Partner
 responsiblepeople.position_within_business.lbl.06 = Sole proprietor
-responsiblepeople.position_within_business.lbl.07 = Designated member
+responsiblepeople.position_within_business.lbl.07 = Designated member (Partner)
 responsiblepeople.position_within_business.lbl.08 = External accountant
 responsiblepeople.position_within_business.lbl.09 = Other
 responsiblepeople.position_within_business.other_position.lbl = Please specify
@@ -1718,7 +1718,8 @@ responsiblepeople.nationality.selection.other = National of a different country
 responsiblepeople.nationality.selection.other.name = Country name
 responsiblepeople.summary.responsible.people = People you have registered
 responsiblepeople.summary.no.responsible.people = You currently have no responsible people registered
-responsiblepeople.remove.responsible.person.title = Remove a responsible person
+responsiblepeople.remove.named.responsible.person = When did {0} stop being a responsible person for your business?
+responsiblepeople.remove.responsible.person.title = Remove a responsible person 
 responsiblepeople.remove.responsible.person = This will permanently remove {0} from your list of responsible people.
 responsiblepeople.remove.responsible.person.enddate.lbl = When did this person stop being a responsible person for your business?
 responsiblepeople.remove.responsible.person.btn = Remove responsible person
@@ -1973,9 +1974,9 @@ changeofficer.newnominatedofficer.validationerror = You must select a nominated 
 
 changeofficer.removeresponsibleperson.title = Remove a responsible person
 changeofficer.removeresponsibleperson.heading = Remove a responsible person
-changeofficer.removeresponsibleperson.info = Based on your answers, {0} doesn’t need to be registered as a responsible person any more.
-changeofficer.removeresponsibleperson.lbl = When did {0} stop being your nominated officer?
-
+changeofficer.removeresponsibleperson.info = This will permanently remove {0} from your list of responsible people.
+changeofficer.removeresponsibleperson.lbl = When did {0} stop being a responsible person for your business?
+changeofficer.remove.responsibleperson.btn = Remove responsible person
 
 changeofficer.changelink.heading = Nominated Officer:
 changeofficer.changelink.text = Change
