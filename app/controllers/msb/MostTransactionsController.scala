@@ -16,7 +16,6 @@
 
 package controllers.msb
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
@@ -34,7 +33,7 @@ import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import scala.concurrent.Future
 
 @Singleton
-class MostTransactionsController @Inject()(val authConnector: AuthConnector = AMLSAuthConnector,
+class MostTransactionsController @Inject()(val authConnector: AuthConnector,
                                            implicit val cacheConnector: DataCacheConnector,
                                            implicit val statusService: StatusService,
                                            implicit val serviceFlow: ServiceFlow,

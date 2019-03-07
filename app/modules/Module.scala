@@ -18,7 +18,7 @@ package modules
 
 import com.google.inject.{AbstractModule, Provides, TypeLiteral}
 import com.typesafe.config.Config
-import config.{AMLSAuditConnector, WSHttp}
+import config.{AMLSAuditConnector, AMLSAuditFilter, AMLSLoggingFilter, WSHttp}
 import models.businessmatching.updateservice.ChangeBusinessType
 import models.flowmanagement.{AddBusinessTypeFlowModel, ChangeSubSectorFlowModel, RemoveBusinessTypeFlowModel}
 import play.api.Configuration
@@ -26,20 +26,22 @@ import services.flowmanagement.Router
 import services.flowmanagement.flowrouters.businessmatching.{AddBusinessTypeRouter, ChangeBusinessTypeRouter, ChangeSubSectorRouter, RemoveBusinessTypeRouter}
 import uk.gov.hmrc.http._
 import uk.gov.hmrc.play.audit.http.connector.AuditConnector
+import uk.gov.hmrc.play.frontend.filters.{FrontendAuditFilter, FrontendLoggingFilter}
 
 class Module extends AbstractModule {
 
   type HmrcAuthConnector = uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 
   def configure() = {
-    bind(classOf[HttpGet]).toInstance(WSHttp)
-    bind(classOf[HttpPost]).toInstance(WSHttp)
-    bind(classOf[HttpDelete]).toInstance(WSHttp)
-    bind(classOf[WSHttp]).toInstance(WSHttp)
+    bind(classOf[HttpGet]).to(classOf[WSHttp])
+    bind(classOf[HttpPost]).to(classOf[WSHttp])
+    bind(classOf[HttpDelete]).to(classOf[WSHttp])
     bind(classOf[HmrcAuthConnector]).to(classOf[config.FrontendAuthConnector])
-    bind(classOf[AuditConnector]).toInstance(AMLSAuditConnector)
-    bind(classOf[CorePost]).toInstance(WSHttp)
-    bind(classOf[CoreGet]).toInstance(WSHttp)
+    bind(classOf[AuditConnector]).to(classOf[AMLSAuditConnector])
+    bind(classOf[CorePost]).to(classOf[WSHttp])
+    bind(classOf[CoreGet]).to(classOf[WSHttp])
+    bind(classOf[FrontendLoggingFilter]).to(classOf[AMLSLoggingFilter])
+    bind(classOf[FrontendAuditFilter]).to(classOf[AMLSAuditFilter])
     bind(new TypeLiteral[Router[AddBusinessTypeFlowModel]] {}).to(classOf[AddBusinessTypeRouter])
     bind(new TypeLiteral[Router[ChangeBusinessType]] {}).to(classOf[ChangeBusinessTypeRouter])
     bind(new TypeLiteral[Router[RemoveBusinessTypeFlowModel]] {}).to(classOf[RemoveBusinessTypeRouter])
