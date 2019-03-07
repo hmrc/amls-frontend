@@ -81,7 +81,7 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
       val input = SupervisionEndReasons(reason)
 
-      val expectedJson = Json.obj("endingReason" -> "Reason")
+      val expectedJson = Json.obj("supervisionEndingReason" -> "Reason")
 
       Json.toJson(input) must be(expectedJson)
     }
@@ -90,16 +90,16 @@ class SupervisionEndReasonsSpec extends PlaySpec with MockitoSugar {
 
       val input = Json.obj(
         "anotherBody" -> true,
-        "endingReason" -> "Reason")
+        "supervisionEndingReason" -> "Reason")
 
       val expected = SupervisionEndReasons(reason)
 
-      Json.fromJson[SupervisionEndReasons](input) must be (JsSuccess(expected, JsPath \ "endingReason"))
+      Json.fromJson[SupervisionEndReasons](input) must be (JsSuccess(expected, JsPath \ "supervisionEndingReason"))
     }
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionEndReasons](Json.obj()) must
-        be(JsError((JsPath \ "endingReason") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionEndingReason") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
   }
 }

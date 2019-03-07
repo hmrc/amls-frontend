@@ -25,17 +25,18 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class SupervisionEndSpec extends PlaySpec with MockitoSugar {
   trait Fixture {
 
-    val end = new LocalDate(1998, 2, 24)//scalastyle:off magic.number
+    val startDateField = Map("extraStartDate" -> Seq("2000-01-01"))
+    val end = new LocalDate(2005, 2, 24)//scalastyle:off magic.number
   }
 
   "Form Rules and Writes" must {
     "given 'yes' selected with valid end date " in new Fixture {
 
-      val urlFormEncoded = Map(
+      val urlFormEncoded = startDateField ++ Map(
         "anotherBody" -> Seq("true"),
         "endDate.day" -> Seq("24"),
         "endDate.month" -> Seq("2"),
-        "endDate.year" -> Seq("1998")
+        "endDate.year" -> Seq("2005")
       )
 
       val expected = Valid(SupervisionEnd(end))
@@ -47,21 +48,22 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
       "given a future date" in new Fixture {
 
         val data = SupervisionEnd.formWrites.writes(SupervisionEnd(LocalDate.now().plusMonths(1)))
-        SupervisionEnd.formRule.validate(data) must be(Invalid(Seq(Path \ "endDate" -> Seq(
+
+        SupervisionEnd.formRule.validate(data ++ startDateField) must be(Invalid(Seq(Path \ "endDate" -> Seq(
           ValidationError("error.future.date")))))
       }
 
-//      "supervision enddate is before supervision startdate" in new Fixture {
-//
-//        val urlFormEncoded = Map(
-//          "endDate.day" -> Seq("24"),
-//          "endDate.month" -> Seq("2"),
-//          "endDate.year" -> Seq("1998"))
-//
-//        val expected = Invalid(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))))
-//
-//        SupervisionEnd.formRule.validate(urlFormEncoded) must be(expected)
-//      }
+      "supervision enddate is before supervision startdate" in new Fixture {
+
+        val urlFormEncoded = startDateField ++ Map(
+          "endDate.day" -> Seq("24"),
+          "endDate.month" -> Seq("2"),
+          "endDate.year" -> Seq("1990"))
+
+        val expected = Invalid(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))))
+
+        SupervisionEnd.formRule.validate(urlFormEncoded) must be(expected)
+      }
     }
   }
 
@@ -72,7 +74,7 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
         "anotherBody" -> Seq("true"),
         "endDate.day" -> Seq("24"),
         "endDate.month" -> Seq("2"),
-        "endDate.year" -> Seq("1998")
+        "endDate.year" -> Seq("2005")
       )
 
       val input = SupervisionEnd(end)
@@ -84,7 +86,7 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
 
       val input = SupervisionEnd(end)
 
-      val expectedJson = Json.obj("endDate" -> "1998-02-24")
+      val expectedJson = Json.obj("supervisionEndDate" -> "2005-02-24")
 
       Json.toJson(input) must be(expectedJson)
     }
@@ -93,16 +95,16 @@ class SupervisionEndSpec extends PlaySpec with MockitoSugar {
 
       val input = Json.obj(
         "anotherBody" -> true,
-        "endDate" -> "1998-02-24")
+        "supervisionEndDate" -> "2005-02-24")
 
       val expected = SupervisionEnd(end)
 
-      Json.fromJson[SupervisionEnd](input) must be (JsSuccess(expected, JsPath \ "endDate"))
+      Json.fromJson[SupervisionEnd](input) must be (JsSuccess(expected, JsPath \ "supervisionEndDate"))
     }
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionEnd](Json.obj()) must
-        be(JsError((JsPath \ "endDate") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionEndDate") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
   }
 }

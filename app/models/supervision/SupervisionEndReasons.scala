@@ -55,13 +55,13 @@ object SupervisionEndReasons {
     import play.api.libs.json.Reads._
     import play.api.libs.json._
 
-    (__ \ "endingReason").read[String].map(SupervisionEndReasons.apply) map identity[SupervisionEndReasons]
+    (__ \ "supervisionEndingReason").read[String].map(SupervisionEndReasons.apply) map identity[SupervisionEndReasons]
   }
 
   implicit val jsonWrites = Writes[SupervisionEndReasons] {
     case a: SupervisionEndReasons =>
       Json.obj(
-        "endingReason" -> a.endingReason
+        "supervisionEndingReason" -> a.endingReason
       )
   }
 }

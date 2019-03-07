@@ -72,7 +72,7 @@ class SupervisionStartSpec extends PlaySpec with MockitoSugar {
 
       val input = SupervisionStart(start)
 
-      val expectedJson = Json.obj("startDate" -> "1990-02-24")
+      val expectedJson = Json.obj("supervisionStartDate" -> "1990-02-24")
 
       Json.toJson(input) must be(expectedJson)
     }
@@ -81,16 +81,16 @@ class SupervisionStartSpec extends PlaySpec with MockitoSugar {
 
       val input = Json.obj(
         "anotherBody" -> true,
-        "startDate" -> "1990-02-24")
+        "supervisionStartDate" -> "1990-02-24")
 
       val expected = SupervisionStart(start)
 
-      Json.fromJson[SupervisionStart](input) must be (JsSuccess(expected, JsPath \ "startDate"))
+      Json.fromJson[SupervisionStart](input) must be (JsSuccess(expected, JsPath \ "supervisionStartDate"))
     }
 
     "fail when data is missing" in {
       Json.fromJson[SupervisionStart](Json.obj()) must
-        be(JsError((JsPath \ "startDate") -> play.api.data.validation.ValidationError("error.path.missing")))
+        be(JsError((JsPath \ "supervisionStartDate") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
   }
 }

@@ -21,6 +21,9 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
 import models.supervision._
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.supervision_end_reasons
 
@@ -57,9 +60,9 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
         case ValidForm(_, data) =>
           for {
             supervision: Option[Supervision] <- dataCacheConnector.fetch[Supervision](Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key,
+            cache <- dataCacheConnector.save[Supervision](Supervision.key,
               updateData(supervision, data))
-          } yield redirect(edit)
+          } yield redirectTo(edit, cache)
         }
   }
 
@@ -70,10 +73,25 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
     supervision.anotherBody(updatedAnotherBody)
   }
 
-  private def redirect(edit: Boolean) = {
-    edit match {
-      case true => Redirect(routes.SummaryController.get())
-      case false => Redirect(routes.ProfessionalBodyMemberController.get())
+  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+    (edit, anotherBodyComplete(cache)) match {
+      case (true, Some((false, true))) => Redirect(routes.ProfessionalBodyMemberController.get())
+      case (false, Some((false, true))) => Redirect(routes.ProfessionalBodyMemberController.get())
+      case (false, Some((true, true))) if cache.getEntry[Supervision](Supervision.key).get.isComplete => Redirect(routes.SummaryController.get())
+      case (false, Some((true, true))) if !cache.getEntry[Supervision](Supervision.key).get.isComplete => Redirect(routes.ProfessionalBodyMemberController.get())
+
+      case (true, Some((true, false))) if cache.getEntry[Supervision](Supervision.key).get.isComplete => Redirect(routes.SummaryController.get())
+      case (false, Some((true, false))) => Redirect(routes.ProfessionalBodyMemberController.get())
+    }
+  }
+
+  private def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[(Boolean, Boolean)] = {
+    for {
+      supervision <- cache.getEntry[Supervision](Supervision.key)
+      anotherBody <- supervision.anotherBody
+    } yield anotherBody match {
+      case AnotherBodyNo => (true, false)
+      case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
     }
   }
 }

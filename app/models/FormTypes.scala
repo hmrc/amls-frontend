@@ -235,7 +235,7 @@ object FormTypes {
 
   val supervisionEndDateRule = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
-    ((__ \ "supervisionStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+    ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
       (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 

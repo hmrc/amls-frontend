@@ -269,9 +269,9 @@ trait SupervisionValues {
     "anotherBody" -> Json.obj(
       "anotherBody" -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> Json.obj("startDate" -> "1993-08-25"),
-      "endDate" -> Json.obj("endDate" -> "1999-08-25"),
-      "endingReason" -> Json.obj("endingReason" -> "Ending reason")
+      "startDate" -> Json.obj("supervisionStartDate" -> "1993-08-25"),
+      "endDate" -> Json.obj("supervisionEndDate" -> "1999-08-25"),
+      "endingReason" -> Json.obj("supervisionEndingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
       "isAMember" -> true
@@ -292,9 +292,9 @@ trait SupervisionValues {
     "anotherBody" -> Json.obj(
       "anotherBody" -> true,
       "supervisorName" -> "Company A",
-      "startDate" -> Json.obj("startDate" -> "1993-08-25"),
-      "endDate" -> Json.obj("endDate" -> "1999-08-25"),
-      "endingReason" -> Json.obj("endingReason" -> "Ending reason")
+      "startDate" -> Json.obj("supervisionStartDate" -> "1993-08-25"),
+      "endDate" -> Json.obj("supervisionEndDate" -> "1999-08-25"),
+      "endingReason" -> Json.obj("supervisionEndingReason" -> "Ending reason")
     ),
     "professionalBodyMember" -> Json.obj(
       "isAMember" -> true,
