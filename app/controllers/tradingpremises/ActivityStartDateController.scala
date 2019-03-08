@@ -22,8 +22,11 @@ import forms._
 import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
+import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
+
+import scala.concurrent.Future
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
@@ -56,12 +59,9 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
           case f: InvalidForm =>
             for {
               tp <- getData[TradingPremises](index)
-            } yield tp match {
-              case Some(section) =>
-                section.yourTradingPremises match {
-                  case Some(ytp) => BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit, ytp.tradingPremisesAddress))
-                  case _ => NotFound(notFoundView)
-                }
+            } yield tp.flatMap(_.yourTradingPremises) match {
+              case Some(ytp) =>
+                    BadRequest(views.html.tradingpremises.activity_start_date (f, index, edit, ytp.tradingPremisesAddress) )
               case _ => NotFound(notFoundView)
             }
           case ValidForm(_, data) =>
