@@ -67,36 +67,24 @@
             jsHidden = false,
             data = Seq("data-toggle-new")
         ) {
-
             @fieldset(
                 f = f("countries-fieldset"),
                 hint = "msb.branchesoragents.hint",
                 legend = "msb.branchesoragents.legend",
                 panel = false
             ) {
-                @addRemove("lbl.add.another.country") {
-                    @for(i <- 0 until 10) {
-                        @defining(
-                            f(s"countries[$i]")
-                        ) { field =>
-
-                        @country_autocomplete(
-                            field = field,
-                            classes = field match {
-                                case f: ValidField => Seq("")
-                                case f: InvalidField => Seq("js-hidden")
-                            },
-                            data = countryData.getOrElse(Seq.empty)
-                        )
-
-                        }
-                    }
+                @for(i <- 0 until 10) {
+                    @defining(
+                        f(s"countries[$i]")
+                    ) { field => @country_autocomplete(
+                        field = field,
+                        labelText = s"lbl.country.line${i + 1}",
+                        data = countryData.getOrElse(Seq.empty)
+                    ) }
                 }
             }
-
         }
 
         @submit(edit)
-
     }
 }
