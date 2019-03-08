@@ -16,12 +16,11 @@
 
 package models.supervision
 
-import cats.data.Validated.{Invalid, Valid}
+import cats.data.Validated.Valid
 import jto.validation._
 import jto.validation.forms.Rules._
 import jto.validation.forms._
 import models.FormTypes._
-import models.ValidationRule
 import org.joda.time.LocalDate
 import utils.MappingUtils.constant
 
@@ -66,21 +65,10 @@ object AnotherBody {
     maxLength(supervisorMaxLength).withMessage("error.invalid.supervision.supervisor") andThen
     basicPunctuationPattern()
 
-  type ValidationRuleType = (Option[String], Option[LocalDate], Option[LocalDate], Option[String])
-
-  val validationRule: ValidationRule[ValidationRuleType] = Rule[ValidationRuleType, ValidationRuleType] {
-    case x@(_, d1, d2, _) if d1.isDefined & d2.isDefined && !d1.get.isAfter(d2.get) => Valid(x)
-    case x@(_, d1, d2, _) => Valid(x)
-    case _ => Invalid(Seq(
-      (Path \ "startDate") -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate")),
-      (Path \ "endDate") -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))
-    ))
-  }
-
   implicit val formRule: Rule[UrlFormEncoded, AnotherBody] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    (__ \ "anotherBody").read[Boolean] flatMap {
+    (__ \ "anotherBody").read[Boolean].withMessage("error.required.supervision.anotherbody") flatMap {
       case true =>
         ((__ \ "supervisorName").read(supervisorRule) ~
           (__ \ "startDate").read[Option[SupervisionStart]] ~

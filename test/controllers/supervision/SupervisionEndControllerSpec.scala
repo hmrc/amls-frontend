@@ -91,5 +91,23 @@ class SupervisionEndControllerSpec extends AmlsSpec with MockitoSugar with Scala
       document.select("input[name=endDate.year]").`val` must be("")
     }
 
+    "on post with invalid data" in new Fixture {
+
+      mockCacheFetch[Supervision](Some(Supervision(
+        Some(AnotherBodyYes("Name", Some(SupervisionStart(new LocalDate(2005, 2, 24))))),
+        None,
+        None,
+        Some(ProfessionalBodyYes("details"))
+      )))
+
+      val newRequest = request.withFormUrlEncodedBody()
+
+      val result = controller.post()(newRequest)
+      status(result) must be(BAD_REQUEST)
+
+      val document = Jsoup.parse(contentAsString(result))
+      document.select("a[href=#endDate]").html() must be(Messages("error.expected.jodadate.format"))
+    }
+
   }
 }
