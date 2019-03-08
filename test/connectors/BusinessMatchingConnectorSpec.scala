@@ -20,7 +20,6 @@ import config.WSHttp
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
-import play.api.Play
 import play.api.libs.json.Json
 import play.api.test.Helpers._
 import uk.gov.hmrc.crypto.ApplicationCrypto
@@ -59,8 +58,7 @@ class BusinessMatchingConnectorSpec extends AmlsSpec with ScalaFutures {
 
   trait Fixture extends AuthorisedFixture { self =>
 
-    val applicationCrypto = Play.current.injector.instanceOf[ApplicationCrypto]
-
+    val applicationCrypto:ApplicationCrypto = app.injector.instanceOf(classOf[ApplicationCrypto])
 
     object TestBusinessMatchingConnector extends BusinessMatchingConnector (
       http = mock[WSHttp],

@@ -16,7 +16,6 @@
 
 package controllers.bankdetails
 
-import config.AMLSAuthConnector
 import connectors.DataCacheConnector
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.{Inject, Singleton}
@@ -29,7 +28,7 @@ import scala.concurrent.Future
 
 @Singleton
 class BankAccountTypeController @Inject()(
-                                           val authConnector: AuthConnector = AMLSAuthConnector,
+                                           val authConnector: AuthConnector,
                                            val dataCacheConnector: DataCacheConnector,
                                            val statusService: StatusService
                                          ) extends BankDetailsController {

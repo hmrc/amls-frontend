@@ -18,12 +18,16 @@
 @import include.{main, heading}
 @import include.forms2._
 
-@(f: forms.Form2[_],index: Int, complete: Boolean, tradingName:String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
+@(f: forms.Form2[_],index: Int, complete: Boolean, tradingAddress: String, showDateField:Boolean)(implicit request: Request[_],m:Messages, lang: Lang)
 
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
+    @if(showDateField) {
+        @heading("tradingpremises.remove.trading.premises.enddate.lbl", "summary.tradingpremises")
+    } else {
+        @heading("tradingpremises.remove.trading.premises.title", "summary.tradingpremises")
+    }
 }
 
 @main(
@@ -31,16 +35,16 @@
     heading = header
 ) {
 
-    @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingName)) {
-        <div class="panel-indent panel-border-wide">
-            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingName)</p>
+    @form(f, controllers.tradingpremises.routes.RemoveTradingPremisesController.remove(index, complete, tradingAddress)) {
+        <div class="panel-border-wide">
+            <p>@Messages("tradingpremises.remove.trading.premises.text", tradingAddress)</p>
         </div>
 
         @if(showDateField) {
             @date(
                 f = f,
                 p = "endDate",
-                labelText = "tradingpremises.remove.trading.premises.enddate.lbl",
+                labelText = "",
                 hintText = "",
                 true
             )

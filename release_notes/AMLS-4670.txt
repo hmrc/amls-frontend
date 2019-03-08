@@ -1,1 +1,0 @@
- + [AMLS-4670](https://jira.tools.tax.service.gov.uk/browse/AMLS-4670) - 'Trading premises content changes'

@@ -40,7 +40,7 @@ import scala.concurrent.Future
 
 @Singleton
 class RegistrationProgressController @Inject()(
-                                                protected[controllers] val authConnector: AuthConnector = AMLSAuthConnector,
+                                                protected[controllers] val authConnector: AuthConnector,
                                                 protected[controllers] val dataCache: DataCacheConnector,
                                                 protected[controllers] val enrolmentsService: AuthEnrolmentsService,
                                                 protected[controllers] val statusService: StatusService,

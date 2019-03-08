@@ -43,17 +43,31 @@ class RemoveTradingPremisesController @Inject () (
       } yield (tp, status) match {
 
         case (Some(_), SubmissionDecisionApproved | ReadyForRenewal(_) | RenewalSubmitted(_)) =>
-          Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-            tp.yourTradingPremises.fold("")(_.tradingName), showDateField = tp.lineId.isDefined))
+          Ok (
+            views.html.tradingpremises.remove_trading_premises (
+              f = EmptyForm,
+              index = index,
+              complete = complete,
+              tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(", ")),
+              showDateField = tp.lineId.isDefined
+            )
+          )
 
-        case (Some(_), _) => Ok(views.html.tradingpremises.remove_trading_premises(EmptyForm, index, complete,
-          tp.yourTradingPremises.fold("")(_.tradingName), showDateField = false))
+        case (Some(_), _) => Ok (
+          views.html.tradingpremises.remove_trading_premises (
+            f = EmptyForm,
+            index = index,
+            complete = complete,
+            tradingAddress = tp.yourTradingPremises.fold("")(_.tradingPremisesAddress.toLines.mkString(",")),
+            showDateField = false
+          )
+        )
 
         case _ => NotFound(notFoundView)
       }
   }
 
-  def remove(index: Int, complete: Boolean = false, tradingName: String) = Authorised.async {
+  def remove(index: Int, complete: Boolean = false, tradingAddress: String) = Authorised.async {
     implicit authContext => implicit request =>
 
       def removeWithoutDate = removeDataStrict[TradingPremises](index) map { _ =>
@@ -73,14 +87,24 @@ class RemoveTradingPremisesController @Inject () (
         case _ =>
           getData[TradingPremises](index) flatMap { premises =>
             premises.lineId match {
-              case Some(_) =>
+              case Some(tp) =>
                 val extraFields = Map(
                   "premisesStartDate" -> Seq(premises.get.yourTradingPremises.get.startDate.get.toString("yyyy-MM-dd"))
                 )
 
                 Form2[ActivityEndDate](request.body.asFormUrlEncoded.get ++ extraFields) match {
                   case f: InvalidForm =>
-                    Future.successful(BadRequest(remove_trading_premises(f, index, complete, tradingName, true)))
+                    Future.successful(
+                      BadRequest(
+                        remove_trading_premises(
+                          f = f,
+                          index = index,
+                          complete = complete,
+                          tradingAddress = tradingAddress,
+                          showDateField = true
+                        )
+                      )
+                    )
                   case ValidForm(_, data) => {
                     for {
                       _ <- updateDataStrict[TradingPremises](index) { tp =>

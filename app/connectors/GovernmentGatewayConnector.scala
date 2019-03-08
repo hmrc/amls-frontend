@@ -17,22 +17,24 @@
 package connectors
 
 import audit.EnrolEvent
-import config.{AMLSAuditConnector, AppConfig, WSHttp}
+import config.{AppConfig, WSHttp}
 import exceptions.{DuplicateEnrolmentException, InvalidEnrolmentCredentialsException}
 import javax.inject.Inject
 import models.governmentgateway.EnrolmentRequest
 import play.api.Logger.{debug, warn}
 import play.api.libs.json.{Json, Writes}
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse}
+import uk.gov.hmrc.play.audit.http.connector.AuditConnector
 import uk.gov.hmrc.play.audit.model.Audit
 import utils.AuditHelper
 
 import scala.concurrent.{ExecutionContext, Future}
 
 class GovernmentGatewayConnector @Inject()(val http: WSHttp,
-                                           val appConfig: AppConfig) {
+                                           val appConfig: AppConfig,
+                                           val auditConnector: AuditConnector) {
 
-  val audit: Audit = new Audit(AuditHelper.appName, AMLSAuditConnector)
+  val audit: Audit = new Audit(AuditHelper.appName, auditConnector)
   protected def enrolUrl = appConfig.enrolUrl
   private[connectors] val duplicateEnrolmentMessage = "The service HMRC-MLR-ORG requires unique identifiers"
   private[connectors] val invalidCredentialsMessage = "The credential has the wrong type of role"
