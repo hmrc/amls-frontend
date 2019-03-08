@@ -74,13 +74,15 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    val anotherBody = utils.ControllerHelper.anotherBodyComplete(cache)
+    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyComplete, isAnotherBodyYes}
+
+    val anotherBody = anotherBodyComplete(cache)
 
     if (isAnotherBodyYes(anotherBody)) {
       (edit, isAnotherBodyComplete(anotherBody)) match {
         case (true, false) => Redirect(routes.SupervisionStartController.get())
         case (false, false) => Redirect(routes.SupervisionStartController.get())
-        case (false, true) => Redirect(routes.SummaryController.get())
+        case (_, true) => Redirect(routes.SummaryController.get())
       }
     } else {
       (edit, isAnotherBodyComplete(anotherBody)) match {
@@ -90,17 +92,5 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
     }
   }
 
-  private def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
-    abCompleteAndYes match {
-      case Some(yes) if yes._2=> true
-      case _ => false
-    }
-  }
 
-  private def isAnotherBodyComplete(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
-    abCompleteAndYes match {
-      case Some(complete) if complete._1=> true
-      case _ => false
-    }
-  }
 }

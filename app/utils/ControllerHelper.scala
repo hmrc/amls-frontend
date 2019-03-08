@@ -169,4 +169,18 @@ object ControllerHelper {
       case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
     }
   }
+
+  def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+    abCompleteAndYes match {
+      case Some(yes) if yes._2=> true
+      case _ => false
+    }
+  }
+
+  def isAnotherBodyComplete(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+    abCompleteAndYes match {
+      case Some(complete) if complete._1=> true
+      case _ => false
+    }
+  }
 }

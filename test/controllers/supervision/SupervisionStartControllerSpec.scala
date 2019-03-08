@@ -90,6 +90,50 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
       document.select("input[name=startDate.year]").`val` must be("")
     }
 
+    "on post with valid data" in new Fixture {
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
+
+      mockCacheFetch[Supervision](None)
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start)))), Supervision.key)
+
+      val result = controller.post()(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SupervisionEndController.get().url))
+    }
+
+    "on post with valid data in edit mode" in new Fixture {
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "startDate.day" -> "24",
+        "startDate.month" -> "2",
+        "startDate.year" -> "1990")
+
+      mockCacheFetch[Supervision](None)
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+
+      val result = controller.post(true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
+
     "on post with invalid data" in new Fixture {
 
       mockCacheFetch[Supervision](Some(Supervision(

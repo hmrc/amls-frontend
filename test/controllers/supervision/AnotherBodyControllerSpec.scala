@@ -27,8 +27,9 @@ import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures {
 
-  trait Fixture extends AuthorisedFixture  with DependencyMocks {
-    self => val request = addToken(authRequest)
+  trait Fixture extends AuthorisedFixture with DependencyMocks {
+    self =>
+    val request = addToken(authRequest)
 
     val controller = new AnotherBodyController(mockCacheConnector, authConnector = self.authConnector)
   }
@@ -81,6 +82,58 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       document.select("input[name=supervisorName]").`val` must be("")
     }
 
+    "on post with valid data" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+
+      mockCacheFetch[Supervision](None)
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+
+      val result = controller.post()(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SupervisionStartController.get().url))
+    }
+
+    "on post with valid data for AnotherBodyYes" in new Fixture {
+
+      val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+
+      mockCacheFetch[Supervision](None)
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+
+      val result = controller.post(true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SupervisionStartController.get().url))
+    }
+
+    "on post with valid data for AnotherBodyYes" when {
+      "AnotherBody is complete but supervision is incomplete" in new Fixture {
+        val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+        val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+
+        val newRequest = request.withFormUrlEncodedBody("anotherBody" -> "true", "supervisorName" -> "Name")
+
+        mockCacheFetch[Supervision](None)
+
+        mockCacheSave[Supervision]
+
+        mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+
+        val result = controller.post(true)(newRequest)
+
+        status(result) must be(SEE_OTHER)
+        redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+      }
+    }
+
     "on post with invalid data" in new Fixture {
 
       val newRequest = request.withFormUrlEncodedBody()
@@ -92,37 +145,39 @@ class AnotherBodyControllerSpec extends AmlsSpec with MockitoSugar with ScalaFut
       document.select("a[href=#anotherBody]").html() must be(Messages("error.required.supervision.anotherbody"))
     }
 
-     "on post with valid data in edit mode" in new Fixture {
+    "on post with valid data in edit mode for AnotherBodyNo" in new Fixture {
 
-       val newRequest = request.withFormUrlEncodedBody(
-         "anotherBody" -> "false"
-       )
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "false"
+      )
 
-       mockCacheFetch[Supervision](None)
+      mockCacheFetch[Supervision](None)
 
-       mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))), Supervision.key)
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))), Supervision.key)
 
-       mockCacheSave[Supervision]
+      mockCacheSave[Supervision]
 
-       val result = controller.post(true)(newRequest)
-       status(result) must be(SEE_OTHER)
-       redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
-     }
-}
+      val result = controller.post(true)(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.supervision.routes.SummaryController.get().url))
+    }
 
-  object DefaultValues {
+    "on post with valid data for AnotherBodyNo" in new Fixture {
 
-    private val supervisor = "Company A"
-    private val start = Some(SupervisionStart(new LocalDate(1993, 8, 25)))
-    //scalastyle:off magic.number
-    private val end = Some(SupervisionEnd(new LocalDate(1999, 8, 25)))
-    //scalastyle:off magic.number
-    private val reason = Some(SupervisionEndReasons("Ending reason"))
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "false"
+      )
 
-    val DefaultAnotherBody = AnotherBodyYes(supervisor, start, end, reason)
-    val DefaultProfessionalBody = ProfessionalBodyYes("details")
-    val DefaultProfessionalBodyMember = ProfessionalBodyMemberYes
-    val DefaultBusinessTypes = ProfessionalBodies(Set(AccountingTechnicians, CharteredCertifiedAccountants, Other("test")))
+      mockCacheFetch[Supervision](None)
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyNo))), Supervision.key)
+
+      mockCacheSave[Supervision]
+
+      val result = controller.post()(newRequest)
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(controllers.supervision.routes.ProfessionalBodyMemberController.get().url))
+    }
   }
 }
 

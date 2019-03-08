@@ -83,6 +83,47 @@ class SupervisionEndReasonsControllerSpec extends AmlsSpec with MockitoSugar wit
       val document = Jsoup.parse(contentAsString(result))
       document.select("textarea[name=endingReason]").`val` must be("")
     }
+
+    "on post with valid data" in new Fixture {
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "endingReason" -> "Reason")
+
+      mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end)))), Supervision.key)
+
+      val result = controller.post()(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.ProfessionalBodyMemberController.get().url))
+    }
+
+    "on post with valid data in edit mode" in new Fixture {
+      val start = Some(SupervisionStart(new LocalDate(1990, 2, 24))) //scalastyle:off magic.number
+      val end = Some(SupervisionEnd(new LocalDate(1998, 2, 24))) //scalastyle:off magic.number
+
+      val newRequest = request.withFormUrlEncodedBody(
+        "anotherBody" -> "true",
+        "endingReason" -> "Reason")
+
+      mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
+
+      mockCacheSave[Supervision]
+
+      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+
+      val result = controller.post(true)(newRequest)
+
+      status(result) must be(SEE_OTHER)
+      redirectLocation(result) must be(Some(routes.SummaryController.get().url))
+    }
+
   }
 }
 
