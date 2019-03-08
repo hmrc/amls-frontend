@@ -63,7 +63,7 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
         Form2[SupervisionEnd](request.body.asFormUrlEncoded.get ++ extraFields) match {
           case f: InvalidForm =>
             Future.successful(BadRequest(supervision_end(f, edit)))
-          case a@ValidForm(_, data) =>
+          case ValidForm(_, data) =>
             dataCacheConnector.fetchAll flatMap {
               optMap =>
                 val result = for {

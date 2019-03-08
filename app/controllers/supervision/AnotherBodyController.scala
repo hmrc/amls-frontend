@@ -61,19 +61,6 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
       }
   }
 
-  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
-    (edit, anotherBodyComplete(cache)) match {
-
-      // edit, (isComplete, isAnotherBodyYes)
-      case (true, Some((false, true))) => Redirect(routes.SupervisionStartController.get())
-      case (false, Some((false, true))) => Redirect(routes.SupervisionStartController.get())
-      case (false, Some((true, true))) => Redirect(routes.SummaryController.get())
-
-      case (true, Some((true, false))) => Redirect(routes.SummaryController.get())
-      case (false, Some((true, false))) => Redirect(routes.ProfessionalBodyMemberController.get())
-    }
-  }
-
   private def updateData(supervision: Supervision, data: AnotherBody): Supervision = {
     def updatedAnotherBody = (supervision.anotherBody, data) match {
       case (_, d) if d.equals(AnotherBodyNo) => AnotherBodyNo
@@ -85,13 +72,35 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
     supervision.anotherBody(updatedAnotherBody)
   }
 
-  private def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[(Boolean, Boolean)] = {
-    for {
-      supervision <- cache.getEntry[Supervision](Supervision.key)
-      anotherBody <- supervision.anotherBody
-    } yield anotherBody match {
-      case AnotherBodyNo => (true, false)
-      case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
+  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+
+    val anotherBody = utils.ControllerHelper.anotherBodyComplete(cache)
+
+    if (isAnotherBodyYes(anotherBody)) {
+      (edit, isAnotherBodyComplete(anotherBody)) match {
+        case (true, false) => Redirect(routes.SupervisionStartController.get())
+        case (false, false) => Redirect(routes.SupervisionStartController.get())
+        case (false, true) => Redirect(routes.SummaryController.get())
+      }
+    } else {
+      (edit, isAnotherBodyComplete(anotherBody)) match {
+        case (true, true) => Redirect(routes.SummaryController.get())
+        case (false, true) => Redirect(routes.ProfessionalBodyMemberController.get())
+      }
+    }
+  }
+
+  private def isAnotherBodyYes(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+    abCompleteAndYes match {
+      case Some(yes) if yes._2=> true
+      case _ => false
+    }
+  }
+
+  private def isAnotherBodyComplete(abCompleteAndYes: Option[(Boolean, Boolean)]) = {
+    abCompleteAndYes match {
+      case Some(complete) if complete._1=> true
+      case _ => false
     }
   }
 }

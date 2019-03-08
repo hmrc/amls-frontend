@@ -24,6 +24,7 @@ import models.renewal.CustomersOutsideUK
 import models.responsiblepeople.ResponsiblePerson.filter
 import models.responsiblepeople.{NonUKResidence, ResponsiblePerson}
 import models.status._
+import models.supervision.{AnotherBodyNo, AnotherBodyYes, Supervision}
 import play.api.Play.current
 import play.api.i18n.Messages
 import play.api.i18n.Messages.Implicits._
@@ -31,6 +32,7 @@ import play.api.mvc.Request
 import services.StatusService
 import services.businessmatching.ServiceFlow
 import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 
 import scala.concurrent.ExecutionContext.Implicits.global
@@ -156,5 +158,15 @@ object ControllerHelper {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
+  }
+
+  def anotherBodyComplete(cache: CacheMap)(implicit authContext: AuthContext, hc: HeaderCarrier): Option[(Boolean, Boolean)] = {
+    for {
+      supervision <- cache.getEntry[Supervision](Supervision.key)
+      anotherBody <- supervision.anotherBody
+    } yield anotherBody match {
+      case AnotherBodyNo => (true, false)
+      case body => (body.asInstanceOf[AnotherBodyYes].isComplete(), true)
+    }
   }
 }
