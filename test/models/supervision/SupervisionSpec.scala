@@ -86,8 +86,12 @@ class SupervisionSpec extends AmlsSpec with SupervisionValues {
 
     "have an isComplete function that" must {
 
-      "show if the model is complete" in {
+      "show if the model is complete for AnotherBodyYes" in {
         completeModel.isComplete must be(true)
+      }
+
+      "show if the model is complete for AnotherBodyNo" in {
+        completeModel.copy(anotherBody = Some(AnotherBodyNo)).isComplete must be(true)
       }
 
       "show if the model is incomplete" when {

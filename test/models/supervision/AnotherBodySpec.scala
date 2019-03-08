@@ -152,4 +152,16 @@ class AnotherBodySpec extends PlaySpec with MockitoSugar {
         be(JsError((JsPath \ "anotherBody") -> play.api.data.validation.ValidationError("error.path.missing")))
     }
   }
+
+  "isComplete" must {
+    "return true for complete AnotherBodyYes" in new Fixture {
+      val completeAnotherBodyYes = AnotherBodyYes("Name", start, end, reason)
+      completeAnotherBodyYes.isComplete() mustBe true
+    }
+
+    "return false for incomplete AnotherBodyYes" in new Fixture {
+      val completeAnotherBodyYes = AnotherBodyYes("Name", start, end, reason)
+      completeAnotherBodyYes.copy(startDate = None).isComplete() mustBe false
+    }
+  }
 }

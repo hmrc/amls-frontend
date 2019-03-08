@@ -46,9 +46,8 @@ case class AnotherBodyYes(supervisorName: String,
     this.copy(endingReason = Some(p))
 
   def isComplete(): Boolean = this match {
-    case AnotherBodyYes(name, Some(_), Some(_), Some(_)) => true
+    case AnotherBodyYes(_, Some(_), Some(_), Some(_)) => true
     case _ => false
-
   }
 }
 

@@ -17,10 +17,12 @@
 package utils
 
 import models.responsiblepeople._
+import models.supervision._
+import org.joda.time.LocalDate
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
-class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues{
+class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with DependencyMocks {
 
   override lazy val app: Application = new GuiceApplicationBuilder()
     .configure("microservice.services.feature-toggle.phase-2-changes" -> true)
@@ -57,6 +59,68 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues{
         "any responsiblePerson is not complete" in {
           ControllerHelper.hasIncompleteResponsiblePerson(createRPsWithMissingDoB) mustEqual true
         }
+      }
+    }
+
+    "anotherBodyComplete" must {
+      "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyNo " in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+
+        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(true, false)
+      }
+
+      "return tuple of (is anotherBodyComplete, is anotherBodyYes) for AnotherBodyYes " in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+
+        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(false, true)
+      }
+
+      "return tuple of (is anotherBodyComplete, is anotherBodyYes) for complete AnotherBodyYes " in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
+          Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
+          Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+
+        ControllerHelper.anotherBodyComplete(mockCacheMap) mustBe Some(true, true)
+      }
+    }
+
+    "isAnotherBodyYes" must {
+      "return true if AnotherBody is instance of AnotherBodyYes" in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes(supervisorName = "Name")))), Supervision.key)
+
+        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+      }
+
+      "return false if AnotherBody is AnotherBodyNo" in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+
+        ControllerHelper.isAnotherBodyYes(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe false
+      }
+    }
+
+    "isAnotherBodyComplete" must {
+      "return true if AnotherBodyYes is complete" in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
+          Some(SupervisionEnd(new LocalDate(1998, 2, 24))),
+          Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+      }
+
+      "return false if AnotherBodyYes is incomplete" in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name",
+          Some(SupervisionStart(new LocalDate(1990, 2, 24))),
+          Some(SupervisionEnd(new LocalDate(1998, 2, 24))))))), Supervision.key)
+
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe false
+      }
+
+      "return true if AnotherBody is AnotherBodyNo" in {
+        mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
+
+        ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
       }
     }
   }
