@@ -29,15 +29,16 @@ import scala.concurrent.Future
 
 class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConnector,
                                            val authConnector: AuthConnector
-                                      ) extends BaseController {
+                                          ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(Supervision(anotherBody, _, _, _, _, _))  if getStartDate(anotherBody).isDefined
-        => Ok(supervision_start(Form2[SupervisionStart](SupervisionStart(getStartDate(anotherBody).get)), edit))
-        case _ => Ok(supervision_start(EmptyForm, edit))
-      }
+    implicit authContext =>
+      implicit request =>
+        dataCacheConnector.fetch[Supervision](Supervision.key) map {
+          case Some(Supervision(anotherBody, _, _, _, _, _)) if getStartDate(anotherBody).isDefined
+          => Ok(supervision_start(Form2[SupervisionStart](SupervisionStart(getStartDate(anotherBody).get)), edit))
+          case _ => Ok(supervision_start(EmptyForm, edit))
+        }
   }
 
   private def getStartDate(anotherBody: Option[AnotherBody]): Option[LocalDate] = {
@@ -50,27 +51,39 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
     }
   }
 
-  def post(edit : Boolean = false) = Authorised.async {
-    implicit authContext => implicit request =>
-      Form2[SupervisionStart](request.body) match {
-        case f: InvalidForm =>
-          Future.successful(BadRequest(supervision_start(f, edit)))
-        case ValidForm(_, data) =>
-          dataCacheConnector.fetchAll flatMap {
-            optMap =>
-              val result = for {
-                cache <- optMap
-                supervision <- cache.getEntry[Supervision](Supervision.key)
-                anotherBody <- supervision.anotherBody
-              } yield {
-                dataCacheConnector.save[Supervision](Supervision.key,
-                  supervision.copy(anotherBody=Some(updateData(anotherBody, data)) )) map {
-                  _ => redirect(edit)
-                }
-              }
-              result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+  def post(edit: Boolean = false) = Authorised.async {
+    implicit authContext =>
+      implicit request =>
+
+        dataCacheConnector.fetch[Supervision](Supervision.key) flatMap { supervision =>
+          val extraFields: Map[String, Seq[String]] = supervision.get.anotherBody match {
+            case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
+              Map("extraEndDate" -> Seq(data.asInstanceOf[AnotherBodyYes].endDate match {
+                case Some(date) => date.endDate.toString("yyyy-MM-dd")
+                case None => ""
+              }))
+            case None => Map()
           }
-      }
+
+          Form2[SupervisionStart](request.body.asFormUrlEncoded.get ++ extraFields) match {
+            case f: InvalidForm => Future.successful(BadRequest(supervision_start(f, edit)))
+            case ValidForm(_, data) =>
+              dataCacheConnector.fetchAll flatMap {
+                optMap =>
+                  val result = for {
+                    cache <- optMap
+                    supervision <- cache.getEntry[Supervision](Supervision.key)
+                    anotherBody <- supervision.anotherBody
+                  } yield {
+                    dataCacheConnector.save[Supervision](Supervision.key,
+                      supervision.copy(anotherBody = Some(updateData(anotherBody, data)))) map {
+                      _ => redirect(edit)
+                    }
+                  }
+                  result getOrElse Future.failed(new Exception("Unable to retrieve sufficient data"))
+              }
+          }
+        }
   }
 
   private def updateData(anotherBody: AnotherBody, data: SupervisionStart): AnotherBody = {

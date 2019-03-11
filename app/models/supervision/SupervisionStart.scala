@@ -18,7 +18,7 @@ package models.supervision
 
 import jto.validation.forms.UrlFormEncoded
 import jto.validation.{From, Rule, Write}
-import models.FormTypes.{localDateFutureRule, _}
+import models.FormTypes._
 import org.joda.time.LocalDate
 import play.api.libs.json.{Json, Reads, Writes}
 
@@ -28,7 +28,7 @@ object SupervisionStart {
   implicit val formRule: Rule[UrlFormEncoded, SupervisionStart] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    (__ \ "startDate").read(localDateFutureRule) map SupervisionStart.apply
+    __.read(supervisionStartDateRule) map SupervisionStart.apply
   }
 
   implicit val formWrites: Write[SupervisionStart, UrlFormEncoded] = Write {

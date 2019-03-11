@@ -21,9 +21,11 @@ import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.businessmatching.{BusinessActivities, BusinessActivity}
 import org.joda.time.LocalDate
+import org.joda.time.format.DateTimeFormat
+import uk.gov.hmrc.domain.Nino
 import utils.DateHelper.localDateOrdering
 import utils.TraversableValidators.minLengthR
-import uk.gov.hmrc.domain.Nino
+
 import scala.util.matching.Regex
 
 object FormTypes {
@@ -228,17 +230,6 @@ object FormTypes {
       (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(premisesEndDateRuleMapping).repath(_ => Path \ "endDate")
   }
 
-  val supervisionEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
-    case (d1, d2) if d2.isAfter(d1) => Valid(d2)
-    case (_, _) => Invalid(Seq(ValidationError("error.expected.supervision.enddate.after.startdate")))
-  }
-
-  val supervisionEndDateRule = From[UrlFormEncoded] { __ =>
-    import jto.validation.forms.Rules._
-    ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
-      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
-  }
-
   val peopleEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate, String), LocalDate] {
     case (d1, d2, un) if d2.isAfter(d1) => Valid(d2)
     case (startDate, _, userName) => Invalid(Seq(ValidationError("error.expected.rp.date.after.start", userName, startDate.toString("dd-MM-yyyy"))))
@@ -253,6 +244,34 @@ object FormTypes {
 
   def businessActivityRule(msg: String) = From[UrlFormEncoded] { __ =>
     (__ \ "businessActivities").read(minLengthR[Set[BusinessActivity]](1).withMessage(msg)) map (BusinessActivities(_))
+  }
+
+  /** Supervision section date rules **/
+  val supervisionEndDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
+    case (d1, d2) if d2.isAfter(d1) => Valid(d2)
+    case (_, _) => Invalid(Seq(ValidationError("error.expected.supervision.enddate.after.startdate")))
+  }
+
+  val supervisionStartDateRuleMapping = Rule.fromMapping[(LocalDate, LocalDate), LocalDate] {
+    case (d1, d2) if d2.isBefore(d1) => Valid(d2)
+    case (_, _) => Invalid(Seq(ValidationError("error.expected.supervision.startdate.before.enddate")))
+  }
+
+  val supervisionEndDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "extraStartDate").read(jodaLocalDateR("yyyy-MM-dd")) ~
+      (__ \ "endDate").read(localDateFutureRule)).tupled.andThen(supervisionEndDateRuleMapping).repath(_ => Path \ "endDate")
+  }
+
+  val extraEndDateRule = Rule.fromMapping[String, LocalDate] {
+    case str if str.nonEmpty => Valid(LocalDate.parse(str, DateTimeFormat.forPattern("yyyy-MM-dd")))
+    case _ => Valid(new LocalDate(2099, 12, 31))
+  }
+
+  val supervisionStartDateRule = From[UrlFormEncoded] { __ =>
+    import jto.validation.forms.Rules._
+    ((__ \ "extraEndDate").read(extraEndDateRule) ~
+      (__ \ "startDate").read(localDateFutureRule)).tupled.andThen(supervisionStartDateRuleMapping).repath(_ => Path \ "startDate")
   }
 
   /** Business Identifier Rules */
