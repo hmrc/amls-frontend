@@ -49,14 +49,6 @@
                 editLinkTag = "supervisionanotherbody-edit",
                 editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
             ) {
-                <p>@Messages("lbl.yes")</p>
-            }
-
-            @checkYourAnswers(
-                question = Messages("supervision.another_body.lbl.supervisor"),
-                editLinkTag = "supervisionanotherbody-edit",
-                editUrl = controllers.supervision.routes.AnotherBodyController.get(true).toString
-            ) {
                 <p>@supervisorName</p>
             }
 
