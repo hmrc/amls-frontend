@@ -92,7 +92,7 @@ class SupervisionEndController @Inject()(val dataCacheConnector: DataCacheConnec
   private def redirect(edit: Boolean) = {
     edit match {
       case true => Redirect(routes.SummaryController.get())
-      case false => Redirect(routes.SupervisionEndReasonsController.get())
+      case false => Redirect(routes.SupervisionEndReasonsController.get(false))
     }
   }
 }

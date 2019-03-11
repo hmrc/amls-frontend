@@ -69,28 +69,21 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
       case (None, d:AnotherBodyYes) => AnotherBodyYes(d.supervisorName, None, None, None)
 
     }
-    supervision.anotherBody(updatedAnotherBody)
+    supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
   }
 
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyComplete, isAnotherBodyYes}
+    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
 
     val anotherBody = anotherBodyComplete(cache)
 
-    if (isAnotherBodyYes(anotherBody)) {
-      (edit, isAnotherBodyComplete(anotherBody)) match {
-        case (true, false) => Redirect(routes.SupervisionStartController.get())
-        case (false, false) => Redirect(routes.SupervisionStartController.get())
-        case (_, true) => Redirect(routes.SummaryController.get())
-      }
-    } else {
-      (edit, isAnotherBodyComplete(anotherBody)) match {
-        case (true, true) => Redirect(routes.SummaryController.get())
-        case (false, true) => Redirect(routes.ProfessionalBodyMemberController.get())
-      }
+    def supervisionComplete = cache.getEntry[Supervision](Supervision.key).get.isComplete
+
+    supervisionComplete match {
+      case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
+      case false => Redirect(routes.ProfessionalBodyMemberController.get())
+      case true => Redirect(routes.SummaryController.get())
     }
   }
-
-
 }

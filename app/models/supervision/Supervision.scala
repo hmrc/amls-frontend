@@ -46,8 +46,15 @@ case class Supervision(
 
   def isComplete: Boolean = this match {
     case Supervision(Some(AnotherBodyNo), Some(ProfessionalBodyMemberYes), Some(_), Some(_), _, true) => true
-    case Supervision(Some(anotherBody), Some(ProfessionalBodyMemberYes), Some(_), Some(_), _, true) if anotherBody.asInstanceOf[AnotherBodyYes].isComplete() => true
-    case Supervision(Some(_), Some(ProfessionalBodyMemberNo), _, Some(_), _, true) => true
+
+    case Supervision(Some(anotherBody), Some(ProfessionalBodyMemberYes), Some(_), Some(_), _, true)
+      if anotherBody.asInstanceOf[AnotherBodyYes].isComplete() => true
+
+    case Supervision(Some(AnotherBodyNo), Some(ProfessionalBodyMemberNo), _, Some(_), _, true) => true
+
+    case Supervision(Some(anotherBody), Some(ProfessionalBodyMemberNo), _, Some(_), _, true)
+      if anotherBody.asInstanceOf[AnotherBodyYes].isComplete() => true
+
     case _ => false
   }
 
