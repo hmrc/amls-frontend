@@ -16,17 +16,20 @@
 
 package controllers.tradingpremises
 
-import javax.inject.{Inject, Singleton}
-
 import connectors.DataCacheConnector
 import controllers.BaseController
 import forms._
+import javax.inject.{Inject, Singleton}
 import models.tradingpremises._
 import play.api.i18n.MessagesApi
+import play.api.mvc.{Request, Result}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.RepeatingSection
 
 import scala.concurrent.Future
+
 
 @Singleton
 class ActivityStartDateController @Inject()(override val messagesApi: MessagesApi,
@@ -38,14 +41,17 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
       implicit request =>
 
         getData[TradingPremises](index) map {
-          case Some(tp) => {
-            val form = tp.yourTradingPremises match {
-              case Some(YourTradingPremises(_,_,_,Some(date),_)) => Form2[ActivityStartDate](ActivityStartDate(date))
-              case _ => EmptyForm
+          case Some(tpSection) =>
+            tpSection.yourTradingPremises match {
+              case Some(YourTradingPremises(_, tradingPremisesAddress, _, None, _)) =>
+                Ok(views.html.tradingpremises.activity_start_date(EmptyForm, index, edit, tradingPremisesAddress))
+              case Some(YourTradingPremises(_, tradingPremisesAddress, _, Some(startDate), _)) =>
+                Ok(views.html.tradingpremises.activity_start_date(Form2[ActivityStartDate](ActivityStartDate(startDate)), index, edit, tradingPremisesAddress))
+              case _ =>
+               NotFound(notFoundView)
             }
-            Ok(views.html.tradingpremises.activity_start_date(form, index, edit))
-          }
-          case None => NotFound(notFoundView)
+          case _ =>
+            NotFound(notFoundView)
         }
   }
 
@@ -54,17 +60,38 @@ class ActivityStartDateController @Inject()(override val messagesApi: MessagesAp
       implicit request =>
         Form2[ActivityStartDate](request.body) match {
           case f: InvalidForm =>
-            Future.successful(BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit)))
+            handleInvalidForm(index, edit, f)
           case ValidForm(_, data) =>
-            for {
-              _ <- updateDataStrict[TradingPremises](index) { tp =>
-                val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
-                tp.copy(yourTradingPremises = ytp)
-              }
-            } yield edit match {
-              case true => Redirect(routes.DetailedAnswersController.get(index))
-              case false => Redirect(routes.IsResidentialController.get(index, edit))
-            }
+            handleValidForm(index, edit, data)
+
         }
+  }
+
+  private def handleValidForm(index: Int, edit: Boolean, data: ActivityStartDate)
+                             (implicit user: AuthContext,
+                              hc: HeaderCarrier,
+                              request: Request[_]) = {
+    for {
+      _ <- updateDataStrict[TradingPremises](index) { tp =>
+        val ytp = tp.yourTradingPremises.fold[Option[YourTradingPremises]](None)(x => Some(x.copy(startDate = Some(data.startDate))))
+        tp.copy(yourTradingPremises = ytp)
+      }
+    } yield edit match {
+      case true => Redirect(routes.DetailedAnswersController.get(index))
+      case false => Redirect(routes.IsResidentialController.get(index, edit))
+    }
+  }
+
+  private def handleInvalidForm(index: Int, edit: Boolean, f: InvalidForm)
+                               (implicit user: AuthContext,
+                                hc: HeaderCarrier,
+                                request: Request[_]) = {
+    for {
+      tp <- getData[TradingPremises](index)
+    } yield tp.flatMap(_.yourTradingPremises) match {
+      case Some(ytp) =>
+        BadRequest(views.html.tradingpremises.activity_start_date(f, index, edit, ytp.tradingPremisesAddress))
+      case _ => NotFound(notFoundView)
+    }
   }
 }
