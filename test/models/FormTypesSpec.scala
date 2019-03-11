@@ -17,10 +17,9 @@
 package models
 
 import controllers.responsiblepeople.NinoUtil
-import org.scalatestplus.play.PlaySpec
 import jto.validation.forms.UrlFormEncoded
-import jto.validation.{Invalid, Path, Valid}
-import jto.validation.ValidationError
+import jto.validation.{Invalid, Path, Valid, ValidationError}
+import org.scalatestplus.play.PlaySpec
 import uk.gov.hmrc.domain.Nino
 
 class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
@@ -228,6 +227,94 @@ class FormTypesSpec extends PlaySpec with CharacterSets with NinoUtil {
 
       result mustBe Invalid(Seq((Path \ "endDate") -> Seq(ValidationError("error.expected.rp.date.after.start", "User 1", startDate.toString("dd-MM-yyyy")))))
 
+    }
+  }
+
+  "supervisionEndDateRule" must {
+
+    import org.joda.time.LocalDate
+
+    "fail validation when end date is before start date" in {
+
+      val startDate = new LocalDate(1999, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "extraStartDate" -> Seq(startDate.toString("yyyy-MM-dd")),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("1998")
+      )
+
+      val result = FormTypes.supervisionEndDateRule.validate(form)
+
+      result mustBe Invalid(Seq(Path \ "endDate" -> Seq(ValidationError("error.expected.supervision.enddate.after.startdate"))))
+    }
+
+    "pass validation when end date is after start date" in {
+
+      val startDate = new LocalDate(1999, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "extraStartDate" -> Seq(startDate.toString("yyyy-MM-dd")),
+        "endDate.day" -> Seq("1"),
+        "endDate.month" -> Seq("1"),
+        "endDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.supervisionEndDateRule.validate(form)
+
+      result must be (Valid(LocalDate.parse("2000-01-01")))
+    }
+  }
+
+  "supervisionStartDateRule" must {
+
+    import org.joda.time.LocalDate
+
+    "fail validation when start date is after end date" in {
+
+      val endDate = new LocalDate(1997, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "extraEndDate" -> Seq(endDate.toString("yyyy-MM-dd")),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("1998")
+      )
+
+      val result = FormTypes.supervisionStartDateRule.validate(form)
+
+      result mustBe Invalid(Seq(Path \ "startDate" -> Seq(ValidationError("error.expected.supervision.startdate.before.enddate"))))
+    }
+
+    "pass validation when start date is before end date" in {
+
+      val endDate = new LocalDate(2001, 1, 1)
+
+      val form: UrlFormEncoded = Map(
+        "extraEndDate" -> Seq(endDate.toString("yyyy-MM-dd")),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.supervisionStartDateRule.validate(form)
+
+      result must be (Valid(LocalDate.parse("2000-01-01")))
+    }
+
+    "pass validation when end date is not provided" in {
+
+      val form: UrlFormEncoded = Map(
+        "extraEndDate" -> Seq(""),
+        "startDate.day" -> Seq("1"),
+        "startDate.month" -> Seq("1"),
+        "startDate.year" -> Seq("2000")
+      )
+
+      val result = FormTypes.supervisionStartDateRule.validate(form)
+
+      result must be (Valid(LocalDate.parse("2000-01-01")))
     }
   }
 

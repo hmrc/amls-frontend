@@ -25,13 +25,14 @@ import play.api.libs.json.{JsError, JsPath, JsSuccess, Json}
 class SupervisionStartSpec extends PlaySpec with MockitoSugar {
   trait Fixture {
 
+    val endDateField = Map("extraEndDate" -> Seq("2000-01-01"))
     val start = new LocalDate(1990, 2, 24) //scalastyle:off magic.number
   }
 
   "Form Rules and Writes" must {
     "given 'yes' selected with valid start date " in new Fixture {
 
-      val urlFormEncoded = Map(
+      val urlFormEncoded = endDateField ++ Map(
         "anotherBody" -> Seq("true"),
         "startDate.day" -> Seq("24"),
         "startDate.month" -> Seq("2"),
@@ -47,7 +48,7 @@ class SupervisionStartSpec extends PlaySpec with MockitoSugar {
       "given a future date" in new Fixture {
 
         val data = SupervisionStart.formWrites.writes(SupervisionStart(LocalDate.now().plusDays(1)))
-        SupervisionStart.formRule.validate(data) must be(Invalid(Seq(Path \ "startDate" -> Seq(
+        SupervisionStart.formRule.validate(data ++ endDateField) must be(Invalid(Seq(Path \ "startDate" -> Seq(
           ValidationError("error.future.date")))))
       }
     }

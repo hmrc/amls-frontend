@@ -100,7 +100,7 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
         "startDate.month" -> "2",
         "startDate.year" -> "1990")
 
-      mockCacheFetch[Supervision](None)
+      mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name")))))
 
       mockCacheSave[Supervision]
 
@@ -122,11 +122,11 @@ class SupervisionStartControllerSpec extends AmlsSpec with MockitoSugar with Sca
         "startDate.month" -> "2",
         "startDate.year" -> "1990")
 
-      mockCacheFetch[Supervision](None)
+      mockCacheFetch[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))))
 
       mockCacheSave[Supervision]
 
-      mockCacheGetEntry[Supervision](Some(Supervision(anotherBody = Some(AnotherBodyYes("Name", start, end, Some(SupervisionEndReasons("Reason")))))), Supervision.key)
+      mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyYes("Name", start, end)))), Supervision.key)
 
       val result = controller.post(true)(newRequest)
 
