@@ -30,6 +30,7 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
+    val accountantName = "Accountant name"
   }
 
   "tax_matters view" must {
@@ -37,7 +38,7 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[TaxMatters] = Form2(TaxMatters(true))
 
-      def view = views.html.businessactivities.tax_matters(form2, true)
+      def view = views.html.businessactivities.tax_matters(form2, true, accountantName)
 
       doc.title must startWith(Messages("businessactivities.tax.matters.title"))
     }
@@ -46,9 +47,9 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[TaxMatters] = Form2(TaxMatters(true))
 
-      def view = views.html.businessactivities.tax_matters(form2, true)
+      def view = views.html.businessactivities.tax_matters(form2, true, accountantName)
 
-      heading.html must be(Messages("businessactivities.tax.matters.title"))
+      heading.html must be(Messages("businessactivities.tax.matters.heading", accountantName))
       subHeading.html must include(Messages("summary.businessactivities"))
 
     }
@@ -60,7 +61,7 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
           (Path \ "manageYourTaxAffairs") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.businessactivities.tax_matters(form2, true)
+      def view = views.html.businessactivities.tax_matters(form2, true, accountantName)
 
       errorSummary.html() must include("not a message Key")
 
@@ -70,7 +71,7 @@ class tax_mattersSpec extends AmlsSpec with MustMatchers {
     }
 
     "have a back link" in new ViewFixture {
-      def view = views.html.businessactivities.tax_matters(EmptyForm, true)
+      def view = views.html.businessactivities.tax_matters(EmptyForm, true, accountantName)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
