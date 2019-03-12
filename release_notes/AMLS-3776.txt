@@ -1,1 +1,0 @@
- + [AMLS-3776](https://jira.tools.tax.service.gov.uk/browse/AMLS-3776) - 'Add optimizely config to content security policy'
