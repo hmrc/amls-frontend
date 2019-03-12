@@ -16,6 +16,7 @@
 
 package utils
 
+import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoIsYourAccountant}
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
@@ -41,6 +42,14 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
       )
     )
   }
+
+  val accountantNameCompleteModel = Some(BusinessActivities(
+    whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
+      accountantsTradingName = None,
+      address = UkAccountantsAddress("", "", None, None, "")))))
+
+  val accountantNameInCompleteModel = Some(BusinessActivities(
+    whoIsYourAccountant = None))
 
   "ControllerHelper" must {
     "hasIncompleteResponsiblePerson" must {
@@ -121,6 +130,18 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
         mockCacheGetEntry[Supervision](Some(Supervision(Some(AnotherBodyNo))), Supervision.key)
 
         ControllerHelper.isAnotherBodyComplete(ControllerHelper.anotherBodyComplete(mockCacheMap)) mustBe true
+      }
+    }
+
+    "return accountant name" when {
+      "accountant name is called with complete model" in {
+        ControllerHelper.accountantName(accountantNameCompleteModel) mustEqual "Accountant name"
+      }
+    }
+
+    "return empty string" when {
+      "accountant name is called with incomplete model" in {
+        ControllerHelper.accountantName(accountantNameInCompleteModel) mustEqual ""
       }
     }
   }

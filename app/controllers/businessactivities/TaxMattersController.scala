@@ -22,9 +22,8 @@ import controllers.BaseController
 import forms._
 import models.businessactivities.{BusinessActivities, _}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
+import utils.ControllerHelper
 import views.html.businessactivities._
-
-import scala.concurrent.Future
 
 class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector,
                                       override val authConnector: AuthConnector
@@ -33,12 +32,11 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map {
-        response =>
-          val form: Form2[TaxMatters] = (for {
-            businessActivities <- response
-            taxMatters <- businessActivities.taxMatters
-          } yield Form2[TaxMatters](taxMatters)).getOrElse(EmptyForm)
-          Ok(tax_matters(form, edit))
+          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), Some(taxMatters),_,_,_))
+          => Ok(tax_matters(Form2[TaxMatters](taxMatters), edit, whoIsYourAccountant.accountantsName))
+          case Some(BusinessActivities(_,_,_,_,_,_,_,_,_,_,_,Some(whoIsYourAccountant), _,_,_,_))
+          => Ok(tax_matters(EmptyForm, edit, whoIsYourAccountant.accountantsName))
+          case _ => NotFound(notFoundView)
       }
   }
 
@@ -46,7 +44,9 @@ class TaxMattersController @Inject() (val dataCacheConnector: DataCacheConnector
     implicit authContext => implicit request =>
       Form2[TaxMatters](request.body) match {
         case f: InvalidForm =>
-          Future.successful(BadRequest(tax_matters(f, edit)))
+          dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key) map { ba =>
+          BadRequest(tax_matters(f, edit, ControllerHelper.accountantName(ba)))
+          }
         case ValidForm(_, data) =>
           for {
             businessActivities <- dataCacheConnector.fetch[BusinessActivities](BusinessActivities.key)

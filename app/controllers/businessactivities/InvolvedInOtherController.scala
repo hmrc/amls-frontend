@@ -97,19 +97,19 @@ class InvolvedInOtherController @Inject() ( val dataCacheConnector: DataCacheCon
     val typesString = activities.activities map { a =>
       a.businessActivities.map { line =>
         line match {
-          case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
-          case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
-          case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
-          case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
-          case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
-          case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
-          case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+          case AccountancyServices => Messages("businessactivities.registerservices.servicename.lbl.01")
+          case BillPaymentServices => Messages("businessactivities.registerservices.servicename.lbl.02")
+          case EstateAgentBusinessService => Messages("businessactivities.registerservices.servicename.lbl.03")
+          case HighValueDealing => Messages("businessactivities.registerservices.servicename.lbl.04")
+          case MoneyServiceBusiness => Messages("businessactivities.registerservices.servicename.lbl.05")
+          case TrustAndCompanyServices => Messages("businessactivities.registerservices.servicename.lbl.06")
+          case TelephonePaymentService => Messages("businessactivities.registerservices.servicename.lbl.07")
         }
       }
     }
 
     typesString match {
-      case Some(types) => Some(typesString.getOrElse(Set()).mkString(", ") + ".")
+      case Some(types) => Some(typesString.getOrElse(List()).toList.sorted.mkString("|"))
       case None => None
     }
 
