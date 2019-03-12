@@ -41,14 +41,14 @@
 
         @fieldset(
             legend = "legend.address",
-            legendHidden = false,
+            legendHidden = true,
             panel = false,
             f = f("address-fieldset")
         ) {
-            @input(field = f("addressLine1"), labelText = "lbl.address.line1", labelHidden = true)
-            @input(field = f("addressLine2"), labelText = "lbl.address.line2", labelHidden = true)
-            @input(field = f("addressLine3"), labelText = "lbl.address.line3", labelHidden = true)
-            @input(field = f("addressLine4"), labelText = "lbl.address.line4", labelHidden = true)
+            @input(field = f("addressLine1"), labelText = "lbl.address.line1", labelHidden = false)
+            @input(field = f("addressLine2"), labelText = "lbl.address.line2", labelHidden = false)
+            @input(field = f("addressLine3"), labelText = "lbl.address.line3", labelHidden = false)
+            @input(field = f("addressLine4"), labelText = "lbl.address.line4", labelHidden = false)
 
             @input(
                 field = f("postcode"),

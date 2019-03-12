@@ -50,33 +50,22 @@ class remove_responsible_personSpec extends AmlsSpec with MustMatchers  {
 
     }
 
-    "have correct heading" in new ViewFixture {
+    "show none named person heading" in new ViewFixture {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", showDateField = false)
 
       heading.html() must be(Messages("responsiblepeople.remove.responsible.person.title"))
     }
 
-    "show date form if boolean is set to true" in new ViewFixture {
+    "show named person heading" in new ViewFixture {
 
       val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
 
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", true)
+      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", showDateField = true)
 
-      form.html() must include (Messages("responsiblepeople.remove.responsible.person.enddate.lbl"))
-
-    }
-
-    "hide date form if boolean is set to false" in new ViewFixture {
-
-      val form2: ValidForm[ExperienceTraining] = Form2(ExperienceTrainingYes("info"))
-
-      def view = views.html.responsiblepeople.remove_responsible_person(form2, 1, "Gary", false)
-
-      form.html() must not include Messages("responsiblepeople.remove.responsible.person.enddate.lbl")
-
+      heading.html() must be(Messages("responsiblepeople.remove.named.responsible.person", "Gary"))
     }
 
     "show errors in correct places when validation fails" in new ViewFixture {

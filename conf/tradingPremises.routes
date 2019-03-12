@@ -50,7 +50,7 @@ GET         /who-uses/:index                                         @controller
 POST        /who-uses/:index                                         @controllers.tradingpremises.RegisteringAgentPremisesController.post(index: Int, edit: Boolean ?= false)
 
 GET         /remove/:index                                           @controllers.tradingpremises.RemoveTradingPremisesController.get(index: Int, complete: Boolean ?= false)
-POST        /remove/:index                                           @controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingName: String)
+POST        /remove/:index                                           @controllers.tradingpremises.RemoveTradingPremisesController.remove(index: Int, complete: Boolean ?= false, tradingAddress: String)
 
 GET         /remove/:index/reasons                                   @controllers.tradingpremises.RemoveAgentPremisesReasonsController.get(index: Int, complete: Boolean ?= false)
 POST        /remove/:index/reasons                                   @controllers.tradingpremises.RemoveAgentPremisesReasonsController.post(index: Int, complete: Boolean ?= false)

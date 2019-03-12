@@ -21,6 +21,7 @@ import org.scalatest.MustMatchers
 import utils.AmlsSpec
 import jto.validation.Path
 import jto.validation.ValidationError
+import models.tradingpremises.Address
 import play.api.i18n.Messages
 import views.Fixture
 
@@ -40,8 +41,14 @@ class activit_start_dateSpec extends AmlsSpec with MustMatchers {
         Messages("summary.tradingpremises") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov")
 
-      def view = views.html.tradingpremises.activity_start_date(form2, 1, false)
+      def view = {
+        val address = Address("line 1", "Line 2", None, None, "postcode")
+        views.html.tradingpremises.activity_start_date(form2, 1, false, address)
+      }
 
+      val expectedAddressInHtml = "<p> line 1<br> Line 2<br> postcode<br> </p>"
+
+      doc.html must include(expectedAddressInHtml)
       doc.title must be(pageTitle)
       heading.html must be(Messages("tradingpremises.startDate.title"))
       subHeading.html must include(Messages("summary.tradingpremises"))
@@ -51,7 +58,7 @@ class activit_start_dateSpec extends AmlsSpec with MustMatchers {
       doc.getElementsContainingOwnText(Messages("lbl.month")).hasText must be(true)
       doc.getElementsContainingOwnText(Messages("lbl.year")).hasText must be(true)
 
-      doc.getElementsContainingOwnText(Messages("tradingpremises.yourtradingpremises.startdate")).hasText must be(true)
+      doc.getElementsContainingOwnText(Messages("lbl.date.example")).hasText must be(true)
     }
 
     "show errors in the correct locations" in new ViewFixture {
@@ -61,7 +68,10 @@ class activit_start_dateSpec extends AmlsSpec with MustMatchers {
           (Path \ "some path") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.tradingpremises.activity_start_date(form2, 1, true)
+      def view = {
+        val address = Address("", "", None, None, "")
+        views.html.tradingpremises.activity_start_date(form2, 1, true, address)
+      }
 
       errorSummary.html() must include("not a message Key")
     }

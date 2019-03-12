@@ -33,8 +33,8 @@ import scala.concurrent.Future
 @Singleton
 class BankAccountIsUKController @Inject()(
                                            val dataCacheConnector: DataCacheConnector,
-                                           val authConnector: AuthConnector = AMLSAuthConnector,
-                                           val auditConnector: AuditConnector = AMLSAuditConnector,
+                                           val authConnector: AuthConnector,
+                                           val auditConnector: AuditConnector,
                                            val statusService: StatusService
                                          ) extends BankDetailsController {
 
