@@ -23,40 +23,37 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("msb.which_currencies.title", "summary.msb")
+    @heading("msb.deal_foreign_currencies.title", "summary.msb")
 }
 
 @main(
-    title = Messages("msb.which_currencies.title") + " - " + Messages("summary.msb"),
+    title = Messages("msb.deal_foreign_currencies.title") + " - " + Messages("summary.msb"),
     heading = header
 ) {
 
     @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
 
-        @hint(
-            hint = "msb.which_currencies.uptoThree.hint",
-            hint2 = "msb.which_currencies.uptoThree.hint2"
-        )
 
         @fieldset(
-            f = f("currencies-fieldset"),
-            legend = "msb.which_currencies.title",
-            legendHidden = true,
+            f = f("usesForeignCurrencies-fieldset"),
+            legend = Messages("msb.which_currencies.foreign_currencies_question"),
             panel = false,
-            classes = Seq("form-group")
+            classes = Seq("inline form-group")
         ) {
-            @errorGroup(f("currencies")) {
-                @currency(
-                    field = f("currencies[0]"),
-                    labelText = "lbl.currency.line1"
+
+            @errorGroup(f("usesForeignCurrencies")) {
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.yes",
+                    value = "Yes",
+                    inline = true
                 )
-                @currency(
-                    field = f("currencies[1]"),
-                    labelText = "lbl.currency.line2"
-                )
-                @currency(
-                    field = f("currencies[2]"),
-                    labelText = "lbl.currency.line3"
+
+                @radio(
+                    f = f("usesForeignCurrencies"),
+                    labelText = "lbl.no",
+                    value = "No",
+                    inline = true
                 )
             }
         }
