@@ -42,21 +42,15 @@
             legendHidden = true,
             panel = false
         ) {
-            @country_autocomplete(
-                field = f("country_1"),
-                labelText = "lbl.country.line1",
-                data = countryData.getOrElse(Seq.empty)
-            )
-            @country_autocomplete(
-                field = f("country_2"),
-                labelText = "lbl.country.line2",
-                data = countryData.getOrElse(Seq.empty)
-            )
-            @country_autocomplete(
-                field = f("country_3"),
-                labelText = "lbl.country.line3",
-                data = countryData.getOrElse(Seq.empty)
-            )
+            @for(i <- 1 until 4) {
+                @defining(
+                    f(s"country_$i")
+                ) { field => @country_autocomplete(
+                    field = field,
+                    labelText = s"lbl.country.line$i",
+                    data = countryData.getOrElse(Seq.empty)
+                ) }
+            }
         }
         @submit(edit)
     }

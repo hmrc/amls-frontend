@@ -464,6 +464,13 @@ lbl.address.postcode = Postcode
 lbl.country.line1 = Country 1
 lbl.country.line2 = Country 2 (if applicable)
 lbl.country.line3 = Country 3 (if applicable)
+lbl.country.line4 = Country 4 (if applicable)
+lbl.country.line5 = Country 5 (if applicable)
+lbl.country.line6 = Country 6 (if applicable)
+lbl.country.line7 = Country 7 (if applicable)
+lbl.country.line8 = Country 8 (if applicable)
+lbl.country.line9 = Country 9 (if applicable)
+lbl.country.line10 = Country 10 (if applicable)
 
 lbl.currency.line1 = Currency 1
 lbl.currency.line2 = Currency 2 (if applicable)
