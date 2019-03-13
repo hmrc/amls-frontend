@@ -31,7 +31,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
+    @form(f, controllers.msb.routes.DealForeignCurrenciesController.get()) {
 
         @hint(
             hint = "msb.which_currencies.uptoThree.hint",
@@ -60,5 +60,9 @@
                 )
             }
         }
+        <div class="clear">
+        @submit()
+        </div>
     }
+
 }

@@ -29,26 +29,26 @@ import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
-                                           implicit val dataCacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService,
-                                           implicit val serviceFlow: ServiceFlow
+class DealForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
+                                                implicit val dataCacheConnector: DataCacheConnector,
+                                                implicit val statusService: StatusService,
+                                                implicit val serviceFlow: ServiceFlow
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request => {
-      ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
-        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
-        response =>
-          val form = (for {
-            msb <- response
-            currencies <- msb.whichCurrencies
-          } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
+//      ControllerHelper.allowedToEdit(MsbActivity, Some(CurrencyExchange)) flatMap {
+//        case true => dataCacheConnector.fetch[MoneyServiceBusiness](MoneyServiceBusiness.key) map {
+//        response =>
+//          val form = (for {
+//            msb <- response
+//            currencies <- msb.whichCurrencies
+//          } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.which_currencies(form, edit))
-      }
-        case false => Future.successful(NotFound(notFoundView))
-      }
+          Future.successful(Ok(views.html.msb.deal_foreign_currencies(EmptyForm, edit)))
+//      }
+//        case false => Future.successful(NotFound(notFoundView))
+//      }
     }
   }
 }

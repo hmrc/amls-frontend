@@ -29,10 +29,10 @@ import utils.ControllerHelper
 
 import scala.concurrent.Future
 
-class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
-                                           implicit val dataCacheConnector: DataCacheConnector,
-                                           implicit val statusService: StatusService,
-                                           implicit val serviceFlow: ServiceFlow
+class SupplyForeignCurrenciesController @Inject()(val authConnector: AuthConnector,
+                                                  implicit val dataCacheConnector: DataCacheConnector,
+                                                  implicit val statusService: StatusService,
+                                                  implicit val serviceFlow: ServiceFlow
                                           ) extends BaseController {
 
   def get(edit: Boolean = false) = Authorised.async {
@@ -45,7 +45,7 @@ class WhichCurrenciesController @Inject() (val authConnector: AuthConnector,
             currencies <- msb.whichCurrencies
           } yield Form2[WhichCurrencies](currencies)).getOrElse(EmptyForm)
 
-          Ok(views.html.msb.which_currencies(form, edit))
+          Ok(views.html.msb.supply_foreign_currencies(form, edit))
       }
         case false => Future.successful(NotFound(notFoundView))
       }

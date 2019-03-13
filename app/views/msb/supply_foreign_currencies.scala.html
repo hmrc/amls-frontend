@@ -31,7 +31,7 @@
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
+    @form(f, controllers.msb.routes.FXTransactionsInNext12MonthsController.get()) {
 
 
         @panel(
@@ -40,10 +40,11 @@
         ) {
             @fieldset(
                 f = f("usesForeignCurrencies-fieldset"),
-                legend = "msb.which_currencies.who.will",
+                legend = "msb.supply_foreign_currencies.title",
                 hint = "lbl.select.all",
                 jsHidden = false,
-                panel = false
+                panel = false,
+                legendHidden = true
             ) {
                 @errorGroup(
                     field = f("WhoWillSupply")

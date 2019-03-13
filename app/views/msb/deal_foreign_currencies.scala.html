@@ -31,14 +31,14 @@
     heading = header
 ) {
 
-    @form(f, controllers.msb.routes.WhichCurrenciesController.post(edit)) {
-
+    @form(f, controllers.msb.routes.SupplyForeignCurrenciesController.get()) {
 
         @fieldset(
             f = f("usesForeignCurrencies-fieldset"),
-            legend = Messages("msb.which_currencies.foreign_currencies_question"),
+            legend = Messages("msb.deal_foreign_currencies.title"),
             panel = false,
-            classes = Seq("inline form-group")
+            classes = Seq("inline form-group"),
+            legendHidden = true
         ) {
 
             @errorGroup(f("usesForeignCurrencies")) {
@@ -56,6 +56,9 @@
                     inline = true
                 )
             }
+            <div class="clear">
+            @submit()
+            </div>
         }
     }
 }
