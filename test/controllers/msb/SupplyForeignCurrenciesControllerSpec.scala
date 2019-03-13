@@ -17,24 +17,22 @@
 package controllers.msb
 
 import models.businessmatching.updateservice.ServiceChangeRegister
-import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, CurrencyExchange, ForeignExchange, MoneyServiceBusiness => MoneyServiceBusinessActivity}
+import models.businessmatching.{BusinessMatching, BusinessMatchingMsbServices, MoneyServiceBusiness => MoneyServiceBusinessActivity}
 import models.moneyservicebusiness._
 import models.status.{NotCompleted, SubmissionDecisionApproved}
 import org.jsoup.Jsoup
-import org.mockito.ArgumentCaptor
 import org.mockito.Matchers.{eq => eqTo, _}
 import org.mockito.Mockito._
 import org.scalatest.MustMatchers
 import org.scalatest.concurrent.{IntegrationPatience, PatienceConfiguration, ScalaFutures}
 import org.scalatest.mock.MockitoSugar
-import play.api.http.Status.{BAD_REQUEST, SEE_OTHER}
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks}
 
 import scala.concurrent.Future
 
-class WhichCurrencyControllerSpec extends AmlsSpec
+class SupplyForeignCurrenciesControllerSpec extends AmlsSpec
                                     with MockitoSugar
                                     with MustMatchers
                                     with PatienceConfiguration
@@ -52,7 +50,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
     when(mockCacheConnector.save[MoneyServiceBusiness](any(), any())(any(),any(),any()))
       .thenReturn(Future.successful(CacheMap("TESTID", Map())))
 
-    val controller = new WhichCurrenciesController ( dataCacheConnector = mockCacheConnector,
+    val controller = new SupplyForeignCurrenciesController ( dataCacheConnector = mockCacheConnector,
       authConnector = self.authConnector,
       statusService = mockStatusService,
       serviceFlow = mockServiceFlow)
@@ -114,7 +112,7 @@ class WhichCurrencyControllerSpec extends AmlsSpec
 
         status(result) mustEqual OK
 
-        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
+//        document.select("select[name=currencies[0]] > option[value=USD]").hasAttr("selected") must be(true)
 //        document.select("input[name=usesForeignCurrencies][checked]").`val` mustEqual "Yes"
         document.select("input[name=bankMoneySource][checked]").`val` mustEqual ""
         document.select("input[name=wholesalerMoneySource][checked]").`val` mustEqual ""

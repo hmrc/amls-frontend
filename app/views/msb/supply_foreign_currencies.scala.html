@@ -34,10 +34,6 @@
     @form(f, controllers.msb.routes.FXTransactionsInNext12MonthsController.get()) {
 
 
-        @panel(
-            field = Some(f("usesForeignCurrency-fieldset")),
-            jsHidden = false
-        ) {
             @fieldset(
                 f = f("usesForeignCurrencies-fieldset"),
                 legend = "msb.supply_foreign_currencies.title",
@@ -81,7 +77,6 @@
                         value = "Yes"
                     )
                 }
-            }
         }
 
     <div class="clear">

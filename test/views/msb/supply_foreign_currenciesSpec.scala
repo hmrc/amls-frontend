@@ -35,7 +35,7 @@ class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-      def view = views.html.msb.supply_foreign_countries(formData, true)
+      def view = views.html.msb.supply_foreign_currencies(formData, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,7 +43,7 @@ class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
 
-      def view = views.html.msb.supply_foreign_countries(formData, true)
+      def view = views.html.msb.supply_foreign_currencies(formData, true)
 
       doc.title must startWith(Messages("msb.supply_foreign_currencies.title") + " - " + Messages("summary.msb"))
     }
@@ -52,7 +52,7 @@ class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
 
-      def view = views.html.msb.supply_foreign_countries(formData, true)
+      def view = views.html.msb.supply_foreign_currencies(formData, true)
 
       heading.html must be(Messages("msb.supply_foreign_currencies.title"))
       subHeading.html must include(Messages("summary.msb"))
@@ -63,7 +63,7 @@ class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
 
-      def view = views.html.msb.supply_foreign_countries(formData, true)
+      def view = views.html.msb.supply_foreign_currencies(formData, true)
 
       Option(doc.getElementById("bankMoneySource-Yes")).isDefined must be(true)
       Option(doc.getElementById("wholesalerMoneySource-Yes")).isDefined must be(true)
@@ -77,7 +77,7 @@ class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
           (Path \ "WhoWillSupply") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.msb.supply_foreign_countries(form2, true)
+      def view = views.html.msb.supply_foreign_currencies(form2, true)
       errorSummary.html() must include("third not a message Key")
 
       doc.getElementById("WhoWillSupply")
