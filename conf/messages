@@ -630,9 +630,9 @@ fee.reference.number.lbl = Your reference number
 fee.details.note = You must keep a record of the fee amount and reference number. You’ll need them to make the payment.
 
 ############################### Progress page ###############################
-progress.title = Application progress
-progress.lede = It can take between 30 and 45 minutes to complete all sections.
-progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application.
+progress.title = About your business
+progress.lede = You need to add information about your business to apply for supervision. 
+progress.saved.automatically = Your information is saved automatically. If you sign out, you’ll have 28 days to return and complete your application. 
 progress.link.edit = Edit
 progress.link.continue = Continue
 progress.continue = Section incomplete

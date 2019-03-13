@@ -44,7 +44,6 @@ class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressG
         Messages("title.yapp") + " - " +
         Messages("title.amls") + " - " + Messages("title.gov"))
       heading.html must be(Messages("progress.title"))
-      subHeading.html must include(Messages("summary.status"))
 
       doc.select("h2.heading-small").first().ownText() must be("progress.section1.name")
     }
