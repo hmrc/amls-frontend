@@ -56,13 +56,20 @@ class SupervisionStartController @Inject()(val dataCacheConnector: DataCacheConn
       implicit request =>
 
         dataCacheConnector.fetch[Supervision](Supervision.key) flatMap { supervision =>
-          val extraFields: Map[String, Seq[String]] = supervision.get.anotherBody match {
-            case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
-              Map("extraEndDate" -> Seq(data.asInstanceOf[AnotherBodyYes].endDate match {
-                case Some(date) => date.endDate.toString("yyyy-MM-dd")
-                case None => ""
-              }))
-            case None => Map()
+          def extraFields: Map[String, Seq[String]] = supervision match {
+            case Some(s) => getExtraFields(s)
+            case _ => Map()
+          }
+
+          def getExtraFields(s: Supervision): Map[String, Seq[String]] = {
+            s.anotherBody match {
+              case Some(data) if data.isInstanceOf[AnotherBodyYes] =>
+                Map("extraEndDate" -> Seq(data.asInstanceOf[AnotherBodyYes].endDate match {
+                  case Some(date) => date.endDate.toString("yyyy-MM-dd")
+                  case None => ""
+                }))
+              case None => Map()
+            }
           }
 
           Form2[SupervisionStart](request.body.asFormUrlEncoded.get ++ extraFields) match {

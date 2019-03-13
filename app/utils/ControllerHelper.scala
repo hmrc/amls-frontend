@@ -189,4 +189,9 @@ object ControllerHelper {
     case Some(activities) if activities.whoIsYourAccountant.isDefined => activities.whoIsYourAccountant.get.accountantsName
     case _ => ""
   }
+
+  def supervisionComplete(cache: CacheMap) = cache.getEntry[Supervision](Supervision.key) match {
+    case Some(supervision) => supervision.isComplete
+    case _ => false
+  }
 }

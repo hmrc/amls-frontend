@@ -74,13 +74,11 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
 
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
 
-    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes}
+    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes, supervisionComplete}
 
     val anotherBody = anotherBodyComplete(cache)
 
-    def supervisionComplete = cache.getEntry[Supervision](Supervision.key).get.isComplete
-
-    supervisionComplete match {
+    supervisionComplete(cache) match {
       case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
       case false => Redirect(routes.ProfessionalBodyMemberController.get())
       case true => Redirect(routes.SummaryController.get())

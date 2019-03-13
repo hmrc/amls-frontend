@@ -19,10 +19,6 @@
 
 @(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
 
-@target = @{
-    s"""${f("anotherBody").id}-panel"""
-}
-
 @header = {
     @components.back_link()
     @errorSummary(f)
@@ -39,8 +35,9 @@
             @date(
                 f = f,
                 p = "endDate",
-                hintText = "supervision.another_body.endDate.hint",
-                example = false
+                labelText = "supervision.supervision_end.title",
+                legendHidden = true,
+                example = true
             )
 
         @submit(edit)

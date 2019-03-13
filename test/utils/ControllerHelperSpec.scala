@@ -20,6 +20,7 @@ import models.businessactivities.{BusinessActivities, UkAccountantsAddress, WhoI
 import models.responsiblepeople._
 import models.supervision._
 import org.joda.time.LocalDate
+import org.mockito.Mockito.when
 import play.api.Application
 import play.api.inject.guice.GuiceApplicationBuilder
 
@@ -142,6 +143,30 @@ class ControllerHelperSpec extends AmlsSpec with ResponsiblePeopleValues with De
     "return empty string" when {
       "accountant name is called with incomplete model" in {
         ControllerHelper.accountantName(accountantNameInCompleteModel) mustEqual ""
+      }
+    }
+
+    "supervisionComplete" must {
+      "return false if supervision section is incomplete" in {
+        ControllerHelper.supervisionComplete(mockCacheMap) mustBe false
+      }
+
+      "return true if supervision section is complete" in {
+        val complete = mock[Supervision]
+
+        when(complete.isComplete) thenReturn true
+        when(mockCacheMap.getEntry[Supervision]("supervision")) thenReturn Some(complete)
+
+        ControllerHelper.supervisionComplete(mockCacheMap) mustBe true
+      }
+
+      "return false if supervision section is not available" in {
+        val complete = mock[Supervision]
+
+        when(complete.isComplete) thenReturn false
+        when(mockCacheMap.getEntry[Supervision]("supervision")) thenReturn None
+
+        ControllerHelper.supervisionComplete(mockCacheMap) mustBe false
       }
     }
   }

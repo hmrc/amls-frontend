@@ -77,10 +77,9 @@ class SupervisionEndReasonsController @Inject()(val dataCacheConnector: DataCach
   }
 
   private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+      import utils.ControllerHelper.supervisionComplete
 
-    def supervisionComplete = cache.getEntry[Supervision](Supervision.key).get.isComplete
-
-      supervisionComplete match {
+      supervisionComplete(cache) match {
         case false => Redirect(routes.ProfessionalBodyMemberController.get())
         case true => Redirect(routes.SummaryController.get())
       }
