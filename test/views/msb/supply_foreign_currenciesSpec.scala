@@ -25,7 +25,7 @@ import utils.AmlsSpec
 import views.Fixture
 
 
-class which_currenciesSpec extends AmlsSpec with MustMatchers {
+class supply_foreign_currenciesSpec extends AmlsSpec with MustMatchers {
 
   trait ViewFixture extends Fixture {
     implicit val requestWithToken = addToken(request)
@@ -35,7 +35,7 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
     "have the back link button" in new ViewFixture {
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = views.html.msb.supply_foreign_countries(formData, true)
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
 
@@ -43,35 +43,46 @@ class which_currenciesSpec extends AmlsSpec with MustMatchers {
 
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
 
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = views.html.msb.supply_foreign_countries(formData, true)
 
-      doc.title must startWith(Messages("msb.which_currencies.title") + " - " + Messages("summary.msb"))
+      doc.title must startWith(Messages("msb.supply_foreign_currencies.title") + " - " + Messages("summary.msb"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
 
-      def view = views.html.msb.which_currencies(formData, true)
+      def view = views.html.msb.supply_foreign_countries(formData, true)
 
-      heading.html must be(Messages("msb.which_currencies.title"))
+      heading.html must be(Messages("msb.supply_foreign_currencies.title"))
       subHeading.html must include(Messages("summary.msb"))
 
+    }
+
+    "ask the user who will supply the foreign currency" in new ViewFixture {
+
+      val formData: ValidForm[WhichCurrencies] = Form2(WhichCurrencies(Seq("GBP"), None, None, None, None))
+
+      def view = views.html.msb.supply_foreign_countries(formData, true)
+
+      Option(doc.getElementById("bankMoneySource-Yes")).isDefined must be(true)
+      Option(doc.getElementById("wholesalerMoneySource-Yes")).isDefined must be(true)
+      Option(doc.getElementById("customerMoneySource-Yes")).isDefined must be(true)
     }
 
     "show errors in the correct locations" in new ViewFixture {
 
       val form2: InvalidForm = InvalidForm(Map.empty,
         Seq(
-          (Path \ "currencies") -> Seq(ValidationError("not a message Key"))
+          (Path \ "WhoWillSupply") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.msb.which_currencies(form2, true)
+      def view = views.html.msb.supply_foreign_countries(form2, true)
+      errorSummary.html() must include("third not a message Key")
 
-      errorSummary.html() must include("not a message Key")
+      doc.getElementById("WhoWillSupply")
+        .getElementsByClass("error-notification").first().html() must include("third not a message Key")
 
-      doc.getElementById("currencies")
-        .getElementsByClass("error-notification").first().html() must include("not a message Key")
     }
   }
 }
