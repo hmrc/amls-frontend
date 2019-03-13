@@ -18,8 +18,7 @@ package config
 
 import javax.inject.Inject
 import play.api.Mode.Mode
-import play.api.{Configuration, Environment, Play}
-import play.api.Play.current
+import play.api.{Application, Configuration, Environment, Play}
 import uk.gov.hmrc.play.config.ServicesConfig
 
 trait ApplicationConfig {
@@ -56,7 +55,6 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   lazy val amlsUrl = baseUrl("amls")
   lazy val subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-
   lazy val notificationsUrl = baseUrl("amls-notification")
   lazy val allNotificationsUrl = s"$notificationsUrl/amls-notification"
   lazy val paymentsUrl = getConfigString("paymentsUrl")
@@ -66,7 +64,9 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
 
   def businessCustomerUrl = getConfigString("business-customer.url")
 
+  private implicit lazy val app:Application = Play.current
   lazy val whitelist = Play.configuration.getStringSeq("whitelist") getOrElse Seq.empty
+
   lazy val ggUrl = baseUrl("government-gateway")
 
   lazy val enrolUrl = s"$ggUrl/enrol"
@@ -93,7 +93,8 @@ object ApplicationConfig extends ApplicationConfig with ServicesConfig {
   }
 }
 
-class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration) extends ServicesConfig {
+class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Configuration, baseConfig: Configuration)
+  extends ApplicationConfig with ServicesConfig {
 
   override protected def mode: Mode = environment.mode
 
@@ -131,4 +132,13 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
   val mongoAppCacheEnabled = baseConfig.getBoolean("appCache.mongo.enabled") getOrElse false
   val cacheExpiryInSeconds = baseConfig.getInt("appCache.expiryInSeconds") getOrElse 60
 
+  override def refreshProfileToggle: Boolean = getConfBool("feature-toggle.refresh-profile", false)
+
+  override def frontendBaseUrl = {
+    val secure = getConfBool("amls-frontend.public.secure", defBool = false)
+    val scheme = if (secure) "https" else "http"
+    val host = getConfString("amls-frontend.public.host", "")
+
+    s"$scheme://$host"
+  }
 }

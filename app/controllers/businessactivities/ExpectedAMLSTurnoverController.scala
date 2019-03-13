@@ -22,6 +22,7 @@ import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessactivities.{BusinessActivities, ExpectedAMLSTurnover}
 import models.businessmatching._
+import play.api.i18n.Messages
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
@@ -46,8 +47,8 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
               (for {
                 businessActivities <- cache.getEntry[BusinessActivities](BusinessActivities.key)
                 expectedTurnover <- businessActivities.expectedAMLSTurnover
-              } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessMatching.activities)))
-                .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessMatching.activities)))
+              } yield Ok(expected_amls_turnover(Form2[ExpectedAMLSTurnover](expectedTurnover), edit, businessTypes(businessMatching))))
+                .getOrElse (Ok(expected_amls_turnover(EmptyForm, edit, businessTypes(businessMatching))))
             }) getOrElse Ok(expected_amls_turnover(EmptyForm, edit, None))
         }
         case false => Future.successful(NotFound(notFoundView))
@@ -61,7 +62,7 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
           for {
             businessMatching <- dataCacheConnector.fetch[BusinessMatching](BusinessMatching.key)
           } yield {
-            BadRequest(expected_amls_turnover(f, edit, businessMatching.activities))
+            BadRequest(expected_amls_turnover(f, edit, businessTypes(businessMatching)))
           }
 
         case ValidForm(_, data) =>
@@ -76,5 +77,27 @@ class ExpectedAMLSTurnoverController @Inject() (val dataCacheConnector: DataCach
           }
       }
     }
+  }
+
+  private def businessTypes(activities: BusinessMatching): Option[String] = {
+    val typesString = activities.activities map { a =>
+      a.businessActivities.map { line =>
+        line match {
+          case AccountancyServices => Messages("businessmatching.registerservices.servicename.lbl.01")
+          case BillPaymentServices => Messages("businessmatching.registerservices.servicename.lbl.02")
+          case EstateAgentBusinessService => Messages("businessmatching.registerservices.servicename.lbl.03")
+          case HighValueDealing => Messages("businessmatching.registerservices.servicename.lbl.04")
+          case MoneyServiceBusiness => Messages("businessmatching.registerservices.servicename.lbl.05")
+          case TrustAndCompanyServices => Messages("businessmatching.registerservices.servicename.lbl.06")
+          case TelephonePaymentService => Messages("businessmatching.registerservices.servicename.lbl.07")
+        }
+      }
+    }
+
+    typesString match {
+      case Some(types) => Some(typesString.getOrElse(List()).toList.sorted.mkString("|"))
+      case None => None
+    }
+
   }
 }

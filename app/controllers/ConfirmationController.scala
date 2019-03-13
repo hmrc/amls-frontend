@@ -44,7 +44,7 @@ import scala.concurrent.Future
 
 @Singleton
 class ConfirmationController @Inject()(
-                                        val authConnector: AuthConnector = AMLSAuthConnector,
+                                        val authConnector: AuthConnector,
                                         private[controllers] val keystoreConnector: KeystoreConnector,
                                         private[controllers] implicit val dataCacheConnector: DataCacheConnector,
                                         private[controllers] implicit val amlsConnector: AmlsConnector,

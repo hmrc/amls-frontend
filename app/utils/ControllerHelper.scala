@@ -18,6 +18,7 @@ package utils
 
 import cats.implicits._
 import connectors.DataCacheConnector
+import models.businessactivities.{BusinessActivities => BA}
 import models.businessmatching._
 import models.businessmatching.updateservice.ServiceChangeRegister
 import models.renewal.CustomersOutsideUK
@@ -156,5 +157,10 @@ object ControllerHelper {
     views.html.error(Messages("error.not-found.title"),
       Messages("error.not-found.heading"),
       Messages("error.not-found.message"))
+  }
+
+  def accountantName(ba: Option[BA]): String = ba match {
+    case Some(activities) if activities.whoIsYourAccountant.isDefined => activities.whoIsYourAccountant.get.accountantsName
+    case _ => ""
   }
 }

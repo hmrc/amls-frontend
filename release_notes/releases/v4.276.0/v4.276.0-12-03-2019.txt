@@ -1,0 +1,7 @@
+ + [AMLS-3150](https://jira.tools.tax.service.gov.uk/browse/AMLS-3150) - "Trading premises - When will the business start trading from these premises? - Address not played back"
+ + [AMLS-3776](https://jira.tools.tax.service.gov.uk/browse/AMLS-3776) - 'Add optimizely config to content security policy'
+ + [AMLS-4392](https://jira.tools.tax.service.gov.uk/browse/AMLS-4392) - 'Remove Partner from list of Position in Business Options for LLP as not valid in DES schema'
+ + [AMLS-4451](https://jira.tools.tax.service.gov.uk/browse/AMLS-4451) - "update the contents for 3 'Remove pages for responsible person' i.e. RP, TP, and Nominated Officer"
+ + [AMLS-4627](https://jira.tools.tax.service.gov.uk/browse/AMLS-4627) - "Trading Name is played back on 'Remove trading premises' page"
+ + [AMLS-4658](https://jira.tools.tax.service.gov.uk/browse/AMLS-4658) - 'Corrected content and contractions in Business Activities section'
+ + [AMLS-4740](https://jira.tools.tax.service.gov.uk/browse/AMLS-4740) - 'Replaced remaining  static methods with dependency injection, in readiness for upgrade to Play 2.6'
