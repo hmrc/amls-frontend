@@ -52,7 +52,7 @@ class correspondence_addressSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.correspondence_address(form2, true, countries)
 
-      doc.title must startWith(Messages("aboutthebusiness.correspondenceaddress.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -68,7 +68,7 @@ class correspondence_addressSpec extends AmlsSpec with MustMatchers  {
       ))
       def view = views.html.aboutthebusiness.correspondence_address(form2, true, countries)
 
-      heading.html must be(Messages("aboutthebusiness.correspondenceaddress.title"))
+      heading.html must be(Messages("businessdetails.correspondenceaddress.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

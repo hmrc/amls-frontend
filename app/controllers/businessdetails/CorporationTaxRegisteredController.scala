@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import cats.data.OptionT
 import cats.implicits._

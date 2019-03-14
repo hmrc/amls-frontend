@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
@@ -100,7 +100,7 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
 
         val result = controller.get(false)(request)
         status(result) must be(OK)
-        Jsoup.parse(contentAsString(result)).title must include(Messages("aboutthebusiness.correspondenceaddress.title"))
+        Jsoup.parse(contentAsString(result)).title must include(Messages("businessdetails.correspondenceaddress.title"))
         Jsoup.parse(contentAsString(result)).select("#isUK-true").attr("checked") mustBe "checked"
 
       }

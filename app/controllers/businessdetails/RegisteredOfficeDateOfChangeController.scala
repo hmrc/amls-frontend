@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import com.google.inject.Inject
 import connectors.DataCacheConnector
@@ -43,7 +43,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
         Ok(views.html.date_of_change(
           Form2[DateOfChange](DateOfChange(LocalDate.now)),
           "summary.aboutbusiness",
-          controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post()
+          controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
         ))
     }
   }
@@ -60,7 +60,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
             case form: InvalidForm =>
               Future.successful(BadRequest(views.html.date_of_change(
                 form, "summary.aboutbusiness",
-                controllers.aboutthebusiness.routes.RegisteredOfficeDateOfChangeController.post())
+                controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post())
               ))
             case ValidForm(_, dateOfChange) =>
               for {

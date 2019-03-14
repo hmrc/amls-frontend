@@ -38,7 +38,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.previously_registered(form2, true)
 
-      doc.title must startWith(Messages("aboutthebusiness.registeredformlr.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -47,7 +47,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.previously_registered(form2, true)
 
-      heading.html must be(Messages("aboutthebusiness.registeredformlr.title"))
+      heading.html must be(Messages("businessdetails.registeredformlr.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

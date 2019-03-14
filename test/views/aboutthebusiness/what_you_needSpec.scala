@@ -46,9 +46,9 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
     "contain the expected content elements" in new ViewFixture{
       def view = views.html.aboutthebusiness.what_you_need()
 
-      html must include(Messages("aboutthebusiness.whatyouneed.line_1"))
-      html must include(Messages("aboutthebusiness.whatyouneed.line_2"))
-      html must include(Messages("aboutthebusiness.whatyouneed.line_3"))
+      html must include(Messages("businessdetails.whatyouneed.line_1"))
+      html must include(Messages("businessdetails.whatyouneed.line_2"))
+      html must include(Messages("businessdetails.whatyouneed.line_3"))
     }
 
     "have a back link" in new ViewFixture {

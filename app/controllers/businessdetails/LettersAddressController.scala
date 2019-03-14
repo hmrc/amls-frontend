@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import controllers.BaseController

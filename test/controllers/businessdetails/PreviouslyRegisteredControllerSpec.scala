@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
@@ -57,7 +57,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
         (any(), any(), any())).thenReturn(Future.successful(None))
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include(Messages("aboutthebusiness.registeredformlr.title"))
+      contentAsString(result) must include(Messages("businessdetails.registeredformlr.title"))
     }
 
     "on get display the previously registered with HMRC with pre populated data" in new Fixture {
@@ -93,7 +93,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.VATRegisteredController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get().url))
     }
 
     "on post with valid data and load confirm address page when businessType is SoleProprietor" in new Fixture {
@@ -117,7 +117,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
     }
 
     "on post with valid data" in new Fixture {
@@ -141,7 +141,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post()(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
     }
 
     "on post with valid data in edit mode and load summary page" in new Fixture {
@@ -165,7 +165,7 @@ class PreviouslyRegisteredControllerSpec extends AmlsSpec with MockitoSugar with
 
       val result = controller.post(true)(newRequest)
       status(result) must be(SEE_OTHER)
-      redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.VATRegisteredController.get(true).url))
+      redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get(true).url))
     }
 
     "on post with invalid data" in new Fixture {

@@ -41,11 +41,11 @@ class letters_addressSpec extends AmlsSpec with MustMatchers {
         views.html.aboutthebusiness.letters_address(form2, address, true)
       }
 
-      doc.title must be(Messages("aboutthebusiness.lettersaddress.title") +
+      doc.title must be(Messages("businessdetails.lettersaddress.title") +
         " - " + Messages("summary.aboutbusiness") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("aboutthebusiness.lettersaddress.title"))
+      heading.html must be(Messages("businessdetails.lettersaddress.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
       doc.getElementsMatchingOwnText("line1").text mustBe "line1 line2 AB12CD"

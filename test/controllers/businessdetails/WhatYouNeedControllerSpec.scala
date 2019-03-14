@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar

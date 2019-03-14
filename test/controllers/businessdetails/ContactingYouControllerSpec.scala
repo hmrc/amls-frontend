@@ -14,25 +14,28 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import java.util.UUID
 
 import connectors.DataCacheConnector
 import models.aboutthebusiness.{AboutTheBusiness, ContactingYou}
+import org.jsoup.Jsoup
+import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.BeforeAndAfterEach
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.test.Helpers._
 import uk.gov.hmrc.http.cache.client.CacheMap
-import utils.{AuthorisedFixture, AmlsSpec}
+import utils.AuthorisedFixture
 
 import scala.concurrent.Future
 
-class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
+class ContactingYouControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutures with BeforeAndAfterEach {
 
   val userId = s"user-${UUID.randomUUID}"
   val contactingYou = Some(ContactingYou(Some("+44 (0)123 456-7890"), Some("test@test.com")))
@@ -41,7 +44,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
   trait Fixture extends AuthorisedFixture {
     self => val request = addToken(authRequest)
 
-    val controller = new ContactingYouPhoneController (
+    val controller = new ContactingYouController (
       dataCache = mock[DataCacheConnector],
       authConnector = self.authConnector
     )
@@ -49,7 +52,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
   val emptyCache = CacheMap("", Map.empty)
 
-  "ContactingYouPhoneController" must {
+  "BusinessHasEmailController" must {
 
     "Get" must {
 
@@ -60,7 +63,7 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.phone.title"))
+        contentAsString(result) must include(Messages("businessdetails.contactingyou.email.title"))
       }
 
       "load the page with the pre populated data" in new Fixture {
@@ -70,7 +73,15 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.contactingyou.phone.title"))
+        contentAsString(result) must include(Messages("businessdetails.contactingyou.email.title"))
+      }
+
+      "load the page with no data" in new Fixture {
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(None))
+        val result = controller.get()(request)
+        status(result) must be(OK)
+        contentAsString(result) must include(Messages("businessdetails.contactingyou.email.title"))
       }
 
     }
@@ -80,7 +91,8 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
       "on post of valid data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> "+44 (0)123 456-7890"
+          "confirmEmail" -> "test@test.com",
+          "email" -> "test@test.com"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -91,14 +103,14 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(routes.LettersAddressController.get().url))
+        redirectLocation(result) must be(Some(routes.ContactingYouPhoneController.get().url))
       }
 
 
       "on post of incomplete data" in new Fixture {
 
         val newRequest = request.withFormUrlEncodedBody(
-          "phoneNumber" -> ""
+          "email" -> "test@test.com"
         )
 
         when(controller.dataCache.fetch[AboutTheBusiness](any())
@@ -110,6 +122,28 @@ class ContactingYouPhoneControllerSpec extends AmlsSpec with MockitoSugar with S
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
       }
+
+      "on post of different email addresses" in new Fixture {
+
+        val newRequest = request.withFormUrlEncodedBody(
+          "confirmEmail" -> "test@test.com",
+          "email" -> "test1@test.com"
+        )
+
+        when(controller.dataCache.fetch[AboutTheBusiness](any())
+          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusinessWithData)))
+
+        when(controller.dataCache.save[AboutTheBusiness](any(), any())
+          (any(), any(), any())).thenReturn(Future.successful(emptyCache))
+
+        val result = controller.post()(newRequest)
+        status(result) must be(BAD_REQUEST)
+      }
+
+
+
+
+
 
     }
   }

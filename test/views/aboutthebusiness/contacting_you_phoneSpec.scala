@@ -40,11 +40,11 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
         views.html.aboutthebusiness.contacting_you_phone(form2, true)
       }
 
-      doc.title must be(Messages("aboutthebusiness.contactingyou.phone.title") +
+      doc.title must be(Messages("businessdetails.contactingyou.phone.title") +
         " - " + Messages("summary.aboutbusiness") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
-      heading.html must be(Messages("aboutthebusiness.contactingyou.phone.title"))
+      heading.html must be(Messages("businessdetails.contactingyou.phone.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
       doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty

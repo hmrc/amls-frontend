@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
@@ -68,7 +68,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.confirmingyouraddress.title"))
+        contentAsString(result) must include(Messages("businessdetails.confirmingyouraddress.title"))
       }
 
       "load Registered office or main place of business when Business Address from mongoCache returns None" in new Fixture {
@@ -80,7 +80,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
 
       }
 
@@ -94,7 +94,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
       }
     }
 
@@ -118,7 +118,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ContactingYouController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
         verify(
           controller.dataCache).save[AboutTheBusiness](any(),
           meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any()
@@ -143,7 +143,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.RegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
         verify(
           controller.dataCache).save[AboutTheBusiness](any(),
           meq(aboutTheBusiness.copy(registeredOffice = None)))(any(), any(), any()

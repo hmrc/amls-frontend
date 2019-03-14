@@ -39,7 +39,7 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
 
-      doc.title must startWith(Messages("aboutthebusiness.registeredoffice.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -48,7 +48,7 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
 
-      heading.html must be(Messages("aboutthebusiness.registeredoffice.title"))
+      heading.html must be(Messages("businessdetails.registeredoffice.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

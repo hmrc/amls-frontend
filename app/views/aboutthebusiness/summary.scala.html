@@ -35,7 +35,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredformlr.title"),
             editLinkTag = "aboutthebusinessregform-edit",
-            editUrl = controllers.aboutthebusiness.routes.PreviouslyRegisteredController.get(true).toString
+            editUrl = controllers.businessdetails.routes.PreviouslyRegisteredController.get(true).toString
         ) {
             <p>@model.previouslyRegistered.map {
                 case PreviouslyRegisteredNo => { @Messages("lbl.no") }
@@ -48,7 +48,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.activity.start.date.title"),
             editLinkTag = "aboutthebusinessactivitystartdate-edit",
-            editUrl = controllers.aboutthebusiness.routes.ActivityStartDateController.get(true).toString
+            editUrl = controllers.businessdetails.routes.ActivityStartDateController.get(true).toString
         ) {
             <p>@Messages("lbl.start.date") @DateHelper.formatDate(activityStartDate.startDate)</p>
         }
@@ -58,7 +58,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredforvat.title"),
             editLinkTag = "aboutthebusinessregisteredvat-edit",
-            editUrl = controllers.aboutthebusiness.routes.VATRegisteredController.get(true).toString
+            editUrl = controllers.businessdetails.routes.VATRegisteredController.get(true).toString
         ) {
             <p>@vatRegistered match {
                 case VATRegisteredNo => { @Messages("lbl.no") }
@@ -71,7 +71,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.registeredoffice.title"),
             editLinkTag = "aboutthebusinessregoffice-edit",
-            editUrl = controllers.aboutthebusiness.routes.RegisteredOfficeController.get(true).toString
+            editUrl = controllers.businessdetails.routes.RegisteredOfficeController.get(true).toString
         ) {
             <p>@a.toLines.map { line =>
                 @line<br />
@@ -85,7 +85,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.email.title"),
             editLinkTag = "aboutthebusinesscontactyou-edit",
-            editUrl = controllers.aboutthebusiness.routes.ContactingYouController.get(true).toString
+            editUrl = controllers.businessdetails.routes.ContactingYouController.get(true).toString
         ) {
             <ul class="list">
                 <li>@Messages("aboutthebusiness.contactingyou.email.lbl"): @c.email</li>
@@ -95,7 +95,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.contactingyou.phone.title"),
             editLinkTag = "aboutthebusinesscontactphone-edit",
-            editUrl = controllers.aboutthebusiness.routes.ContactingYouPhoneController.get(true).toString
+            editUrl = controllers.businessdetails.routes.ContactingYouPhoneController.get(true).toString
         ) {
             <ul class="list">
                 <li>@Messages("aboutthebusiness.contactingyou.phone.lbl"): @c.phoneNumber</li>
@@ -107,7 +107,7 @@
         @checkYourAnswers(
             question = Messages("aboutthebusiness.lettersaddress.title"),
             editLinkTag = "aboutthebusinesslettersaddress-edit",
-            editUrl = controllers.aboutthebusiness.routes.LettersAddressController.get(true).toString
+            editUrl = controllers.businessdetails.routes.LettersAddressController.get(true).toString
         ) {
             @model.registeredOffice.map { a =>
             <p>@a.toLines.map { line =>
@@ -127,14 +127,14 @@
             question = Messages("aboutthebusiness.correspondenceaddress.postal.address"),
             editLinkTag = "aboutthebusinesscorraddress-edit",
             classes = Seq("check-your-answers__last"),
-            editUrl = controllers.aboutthebusiness.routes.CorrespondenceAddressController.get(true).toString
+            editUrl = controllers.businessdetails.routes.CorrespondenceAddressController.get(true).toString
         ) {
             <p>@ca.toLines.map { line =>
                     @line<br />
                 }
             }</p>
     }
-        @form(f, controllers.aboutthebusiness.routes.SummaryController.post()) {
+        @form(f, controllers.businessdetails.routes.SummaryController.post()) {
             @submit(false, Some(Messages("button.checkyouranswers.acceptandcomplete")), returnLink = false)
         }
 }

@@ -39,7 +39,7 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
 
-      doc.title must startWith(Messages("aboutthebusiness.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -48,7 +48,7 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
 
-      heading.html must be(Messages("aboutthebusiness.registeredforcorporationtax.title"))
+      heading.html must be(Messages("businessdetails.registeredforcorporationtax.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

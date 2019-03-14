@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
@@ -69,7 +69,7 @@ class RegisteredOfficeControllerSpec extends AmlsSpec with  MockitoSugar{
 
       val result = controller.get()(request)
       status(result) must be(OK)
-      contentAsString(result) must include (Messages("aboutthebusiness.registeredoffice.title"))
+      contentAsString(result) must include (Messages("businessdetails.registeredoffice.title"))
 
       val document = Jsoup.parse(contentAsString(result))
       document.select("input[name=isUK]").`val` must be("true")

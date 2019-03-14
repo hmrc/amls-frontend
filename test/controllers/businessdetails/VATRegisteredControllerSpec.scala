@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
@@ -60,7 +60,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
         val result = controller.get()(request)
 
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.registeredforvat.title"))
+        contentAsString(result) must include(Messages("businessdetails.registeredforvat.title"))
       }
 
       "display the registered for VAT page with pre populated data" in new Fixture {
@@ -98,7 +98,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
           }
         }
 
@@ -118,7 +118,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
           }
 
           "customer is a Limited Company" in new Fixture {
@@ -136,7 +136,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post()(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorporationTaxRegisteredController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorporationTaxRegisteredController.get().url))
           }
         }
 
@@ -156,7 +156,7 @@ class VATRegisteredControllerSpec extends AmlsSpec with MockitoSugar with ScalaF
 
             val result = controller.post(true)(newRequest)
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
           }
         }
 

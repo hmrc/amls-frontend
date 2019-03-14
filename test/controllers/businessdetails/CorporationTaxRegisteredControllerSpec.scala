@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.{BusinessMatchingConnector, DataCacheConnector}
 import models.Country
@@ -103,7 +103,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
 
         val content = contentAsString(result)
 
-        content must include(Messages("aboutthebusiness.registeredforcorporationtax.title"))
+        content must include(Messages("businessdetails.registeredforcorporationtax.title"))
 
         val document = Jsoup.parse(content)
         document.getElementById("registeredForCorporationTax-true").hasAttr("checked") must be(false)
@@ -144,7 +144,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
             val result = controller.post()(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
           }
         }
 
@@ -159,7 +159,7 @@ class CorporationTaxRegisteredControllerSpec extends AmlsSpec with MockitoSugar 
             val result = controller.post(true)(newRequest)
 
             status(result) must be(SEE_OTHER)
-            redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
+            redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
           }
         }
 

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.Country
@@ -63,7 +63,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           .thenReturn(Future.successful(Some(aboutTheBusiness)))
         val result = controller.get()(request)
         status(result) must be(OK)
-        contentAsString(result) must include(Messages("aboutthebusiness.activity.start.date.title"))
+        contentAsString(result) must include(Messages("businessdetails.activity.start.date.title"))
       }
 
       "load ActivityStartDate with pre-populated data" in new Fixture {
@@ -103,7 +103,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.ConfirmRegisteredOfficeController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.ConfirmRegisteredOfficeController.get().url))
       }
 
       "successfully redirect to VATRegisteredController org or partnership" in new Fixture {
@@ -131,7 +131,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.VATRegisteredController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.VATRegisteredController.get().url))
       }
 
       "show error with invalid" in new Fixture {

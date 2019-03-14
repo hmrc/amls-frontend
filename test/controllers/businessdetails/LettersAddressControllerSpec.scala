@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package controllers.aboutthebusiness
+package controllers.businessdetails
 
 import connectors.DataCacheConnector
 import models.aboutthebusiness._
@@ -67,7 +67,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorrespondenceAddressController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressController.get().url))
 
       }
     }
@@ -91,7 +91,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.SummaryController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.SummaryController.get().url))
       }
 
       "successfully redirect to the page on selection of Option 'No' [this is not letters address]" in new Fixture {
@@ -110,7 +110,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorrespondenceAddressController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressController.get().url))
       }
 
       "on post invalid data" in new Fixture {
@@ -153,7 +153,7 @@ class LettersAddressControllerSpec extends AmlsSpec with MockitoSugar {
 
         val result = controller.post()(newRequest)
         status(result) must be(SEE_OTHER)
-        redirectLocation(result) must be(Some(controllers.aboutthebusiness.routes.CorrespondenceAddressController.get().url))
+        redirectLocation(result) must be(Some(controllers.businessdetails.routes.CorrespondenceAddressController.get().url))
 
       }
     }

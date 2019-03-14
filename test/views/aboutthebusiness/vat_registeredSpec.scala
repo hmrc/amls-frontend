@@ -39,7 +39,7 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
-      doc.title must startWith(Messages("aboutthebusiness.registeredforvat.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -48,7 +48,7 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers  {
 
       def view = views.html.aboutthebusiness.vat_registered(form2, true)
 
-      heading.html must be(Messages("aboutthebusiness.registeredforvat.title"))
+      heading.html must be(Messages("businessdetails.registeredforvat.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

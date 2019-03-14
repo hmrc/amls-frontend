@@ -37,7 +37,7 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.aboutthebusiness.activity_start_date(form2, true)
 
-      doc.title must startWith(Messages("aboutthebusiness.activity.start.date.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.activity.start.date.title") + " - " + Messages("summary.aboutbusiness"))
     }
 
     "have correct headings" in new ViewFixture {
@@ -46,7 +46,7 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
 
       def view = views.html.aboutthebusiness.activity_start_date(form2, true)
 
-      heading.html must be(Messages("aboutthebusiness.activity.start.date.title"))
+      heading.html must be(Messages("businessdetails.activity.start.date.title"))
       subHeading.html must include(Messages("summary.aboutbusiness"))
 
     }

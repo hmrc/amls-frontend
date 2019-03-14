@@ -55,18 +55,18 @@ class summarySpec extends AmlsSpec
     "does not show registered for mlr question when approved" in new ViewFixture {
       def view = views.html.aboutthebusiness.summary(EmptyForm, AboutTheBusiness(), false)
 
-      html must not include Messages("aboutthebusiness.registeredformlr.title")
+      html must not include Messages("businessdetails.registeredformlr.title")
     }
 
     val sectionChecks = Table[String, Element => Boolean](
       ("title key", "check"),
-      ("aboutthebusiness.registeredformlr.title",checkElementTextIncludes(_, "aboutthebusiness.registeredformlr.mlrregno.lbl", "1234")),
-      ("aboutthebusiness.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
-      ("aboutthebusiness.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
-      ("aboutthebusiness.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
-      ("aboutthebusiness.contactingyou.email.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.email.lbl", "test@test.com")),
-      ("aboutthebusiness.contactingyou.phone.title",checkElementTextIncludes(_, "aboutthebusiness.contactingyou.phone.lbl", "01234567890")),
-      ("aboutthebusiness.correspondenceaddress.postal.address",
+      ("businessdetails.registeredformlr.title",checkElementTextIncludes(_, "businessdetails.registeredformlr.mlrregno.lbl", "1234")),
+      ("businessdetails.activity.start.date.title",checkElementTextIncludes(_, "lbl.start.date", "2 January 2016")),
+      ("businessdetails.registeredforvat.title",checkElementTextIncludes(_, "lbl.vat.reg.number", "2345")),
+      ("businessdetails.registeredoffice.title",checkElementTextIncludes(_, "line1","line2","line3","line4","AB12CD")),
+      ("businessdetails.contactingyou.email.title",checkElementTextIncludes(_, "businessdetails.contactingyou.email.lbl", "test@test.com")),
+      ("businessdetails.contactingyou.phone.title",checkElementTextIncludes(_, "businessdetails.contactingyou.phone.lbl", "01234567890")),
+      ("businessdetails.correspondenceaddress.postal.address",
         checkElementTextIncludes(_, "your name", "business name","line1","line2","line3","line4","AB12CD"))
     )
 
