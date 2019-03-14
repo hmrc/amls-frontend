@@ -1568,3 +1568,17 @@ li.autocomplete__option {
     width: 100%;
   }
 }
+/*  new progress page css */
+.task-list-item {
+  border-bottom: 1px solid #bfc1c3;
+  padding-top: 10px;
+  padding-bottom: 10px;
+}
+
+.task-list-item:first-child {
+  border-top: 1px solid #bfc1c3;
+}
+
+.task-status {
+  float: right;
+}

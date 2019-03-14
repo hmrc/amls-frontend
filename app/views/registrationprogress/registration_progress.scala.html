@@ -46,7 +46,7 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
 
     <div class="grid-layout grid-layout--stacked">
 
-        @* Main section *@
+        @* Main sections *@
         <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
             @sections.map { case Section(name, status, _, call) =>
             @section(name, status, call)
@@ -55,19 +55,25 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
 
     </div>
 
+    &nbsp
+
+    @* the page bottom section *@
     <div class="grid-layout grid-layout--stacked">
-        <h3 class="heading-small">@Messages("progress.submit.title")</h3>
+        <h2 class = "heading-medium">@Messages("progress.submit.title")</h2>
         <p>@if(declarationAvailable) {
                 @Messages("progress.declarationavailable")
             } else {
                 @Messages("progress.declarationunavailable")
             }
         </p>
-        <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+
+        @if(declarationAvailable) {
+            <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
             @CSRF.formField
             <button id="progress-continue" type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
-                @Messages("progress.submit")
+            @Messages("progress.submit")
             </button>
-        </form>
+            </form>
+        }
     </div>
 }
