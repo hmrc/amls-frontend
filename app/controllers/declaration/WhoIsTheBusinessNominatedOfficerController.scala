@@ -96,7 +96,6 @@ class WhoIsTheBusinessNominatedOfficerController @Inject ()(
               rp <- updateNominatedOfficer(responsiblePeople, data)
               _ <- dataCacheConnector.save(ResponsiblePerson.key, rp)
             } yield serviceStatus match {
-              case SubmissionReady | NotCompleted if config.showFeesToggle => Redirect(controllers.routes.FeeGuidanceController.get())
               case _ => Redirect(routes.WhoIsRegisteringController.get())
             }
           }

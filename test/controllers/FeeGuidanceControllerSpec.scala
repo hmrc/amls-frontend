@@ -48,7 +48,6 @@ class FeeGuidanceControllerSpec extends AmlsSpec
     val request = addToken(authRequest)
 
     lazy val defaultBuilder = new GuiceApplicationBuilder()
-      .configure("microservice.services.feature-toggle.show-fees" -> false)
       .configure("microservice.services.feature-toggle.phase-2-changes" -> false)
       .disable[com.kenshoo.play.metrics.PlayModule]
       .overrides(bind[AuthConnector].to(self.authConnector))
@@ -78,32 +77,6 @@ class FeeGuidanceControllerSpec extends AmlsSpec
   }
 
   "FeeGuidanceController" when {
-
-    "get is called" must {
-
-      "show fee guidance page" in new Fixture {
-
-        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> true)
-
-        mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
-        mockCacheGetEntry[Seq[ResponsiblePerson]](None, ResponsiblePerson.key)
-
-        val result = controller.get()(request)
-        status(result) must be(OK)
-      }
-
-      "return notFound if show-fees toggle is off" in new Fixture {
-        mockCacheGetEntry[Seq[TradingPremises]](None, TradingPremises.key)
-        mockCacheGetEntry[Seq[ResponsiblePerson]](None, ResponsiblePerson.key)
-
-        override val builder = defaultBuilder.configure("microservice.services.feature-toggle.show-fees" -> false)
-
-        val result = controller.get()(request)
-
-        status(result) must be(NOT_FOUND)
-
-      }
-    }
 
     "getBreakdownRows is called" must {
 

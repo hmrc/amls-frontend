@@ -16,10 +16,9 @@
 
 package controllers
 
-import javax.inject.{Inject, Singleton}
-
 import config.{AppConfig, ApplicationConfig}
 import connectors.DataCacheConnector
+import javax.inject.{Inject, Singleton}
 import models.aboutthebusiness.{AboutTheBusiness, PreviouslyRegisteredNo, PreviouslyRegisteredYes}
 import models.businessmatching.{BusinessMatching, MoneyServiceBusiness, TrustAndCompanyServices}
 import models.confirmation.{BreakdownRow, Currency}
@@ -31,7 +30,6 @@ import play.api.i18n.Messages
 import uk.gov.hmrc.http.HeaderCarrier
 import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import utils.FeatureToggle
 
 import scala.concurrent.Future
 
@@ -40,14 +38,13 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
                                       val dataCacheConnector: DataCacheConnector,
                                       appConfig: AppConfig) extends BaseController {
 
-  def get = FeatureToggle(appConfig.showFeesToggle) {
+  def get =
     Authorised.async {
       implicit authContext =>
         implicit request =>
           getBreakdownRows() map { rows =>
             val total = getTotal(rows)
             Ok(views.html.fee_guidance(total, rows))
-          }
     }
   }
 

@@ -102,8 +102,6 @@ class AppConfig @Inject()(environment: Environment, val runModeConfiguration: Co
 
   def subscriptionUrl = s"$amlsUrl/amls/subscription"
 
-  def showFeesToggle = getConfBool("feature-toggle.show-fees", defBool = false)
-
   def enrolmentStoreToggle = getConfBool("feature-toggle.enrolment-store", defBool = false)
 
   def fxEnabledToggle = getConfBool("feature-toggle.fx-enabled", defBool = false)
