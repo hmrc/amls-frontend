@@ -44,6 +44,12 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
     @* registration progress *@
     @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
 
+    @if(!declarationAvailable) {
+        <div class="grid-layout grid-layout--stacked">
+            <h2 class = "heading-medium">Sections to complete</h2>
+        </div>
+    }
+
     <div class="grid-layout grid-layout--stacked">
 
         @* Main sections *@
