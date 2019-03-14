@@ -40,8 +40,8 @@ class ActivityStartDateController @Inject () (
       dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[ActivityStartDate] = (for {
-            aboutTheBusiness <- response
-            activityStartDate <- aboutTheBusiness.activityStartDate
+            businessDetails <- response
+            activityStartDate <- businessDetails.activityStartDate
           } yield Form2[ActivityStartDate](activityStartDate)).getOrElse(EmptyForm)
           Ok(activity_start_date(form, edit))
       }
@@ -63,13 +63,13 @@ class ActivityStartDateController @Inject () (
                 bt <- ControllerHelper.getBusinessType(businessMatching)
               } yield bt
 
-              val aboutTheBusiness = for {
+              val businessDetails = for {
                 cacheMap <- maybeCache
                 atb <- cacheMap.getEntry[BusinessDetails](BusinessDetails.key)
               } yield atb
 
               for {
-                _ <- dataCache.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.activityStartDate(data))
+                _ <- dataCache.save[BusinessDetails](BusinessDetails.key, businessDetails.activityStartDate(data))
               } yield  getRouting(businessType, edit)
 
             }

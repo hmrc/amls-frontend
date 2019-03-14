@@ -75,9 +75,9 @@ class HvdDateOfChangeController @Inject() ( val dataCacheConnector: DataCacheCon
       optionalCache =>
         (for {
           cache <- optionalCache
-          aboutTheBusiness <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           hvd <- cache.getEntry[Hvd](Hvd.key)
-        } yield (hvd, aboutTheBusiness.activityStartDate)) match {
+        } yield (hvd, businessDetails.activityStartDate)) match {
           case Some((hvd, Some(activityStartDate))) => (hvd, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
           case Some((hvd, _)) => (hvd, Map())
           case _ =>(Hvd(), Map())

@@ -96,7 +96,7 @@ class ConfirmationController @Inject()(
           renewalData <- OptionT.liftF(dataCacheConnector.fetch[Renewal](Renewal.key))
           paymentStatus <- OptionT.liftF(amlsConnector.refreshPaymentStatus(reference))
           payment <- OptionT(amlsConnector.getPaymentByPaymentReference(reference))
-          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
+          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
           _ <- doAudit(paymentStatus.currentStatus)
         } yield (status, paymentStatus.currentStatus, isPaymentSuccessful) match {
           case (_, currentPaymentStatus, false) =>
@@ -113,7 +113,7 @@ class ConfirmationController @Inject()(
             Ok(payment_confirmation_amendvariation(businessName, reference))
           }
 
-          case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
+          case _ if businessDetails.previouslyRegistered.fold(false) {
             case PreviouslyRegisteredYes(_) => true
             case _ => false
           } => Ok(payment_confirmation_transitional_renewal(businessName, reference))
@@ -132,9 +132,9 @@ class ConfirmationController @Inject()(
           refNo <- OptionT(authEnrolmentsService.amlsRegistrationNumber)
           status <- OptionT.liftF(statusService.getReadStatus(refNo))
           name <- BusinessName.getName(status.safeId)
-          aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
+          businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
         } yield () match {
-          case _ if aboutTheBusiness.previouslyRegistered.fold(false) {
+          case _ if businessDetails.previouslyRegistered.fold(false) {
             case PreviouslyRegisteredYes(_) => true
             case _ => false
           } => Ok(views.html.confirmation.confirmation_bacs_transitional_renewal(name))

@@ -36,9 +36,9 @@ class SummaryController @Inject () (
   def get = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
+        businessDetails <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
         status <- statusService.getStatus
-      } yield aboutTheBusiness match {
+      } yield businessDetails match {
         case Some(data) => {
           val showRegisteredForMLR = status match {
             case NotCompleted | SubmissionReady | SubmissionReadyForReview => true
@@ -53,9 +53,9 @@ class SummaryController @Inject () (
   def post = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
+        businessDetails <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
         _ <- dataCache.save[BusinessDetails](BusinessDetails.key,
-          aboutTheBusiness.copy(hasAccepted = true)
+          businessDetails.copy(hasAccepted = true)
         )
       } yield {
         Redirect(controllers.routes.RegistrationProgressController.get())

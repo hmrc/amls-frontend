@@ -55,8 +55,8 @@ class LettersAddressController @Inject () (
           dataCache.fetch[BusinessDetails](BusinessDetails.key) map {
             response =>
               val regOffice: Option[RegisteredOffice] = (for {
-                aboutTheBusiness <- response
-                registeredOffice <- aboutTheBusiness.registeredOffice
+                businessDetails <- response
+                registeredOffice <- businessDetails.registeredOffice
               } yield Option[RegisteredOffice](registeredOffice)).getOrElse(None)
               regOffice match {
                 case Some(data) => BadRequest(letters_address(f, data))
@@ -68,13 +68,13 @@ class LettersAddressController @Inject () (
             optionalCache =>
               (for {
                 cache <- optionalCache
-                aboutTheBusiness <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+                businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
               } yield {
                 dataCache.save[BusinessDetails](BusinessDetails.key, data.lettersAddress match {
                   case true =>
-                    aboutTheBusiness.altCorrespondenceAddress(false).copy(correspondenceAddress = None)
+                    businessDetails.altCorrespondenceAddress(false).copy(correspondenceAddress = None)
                   case false =>
-                    aboutTheBusiness.altCorrespondenceAddress(true)
+                    businessDetails.altCorrespondenceAddress(true)
                 })
 
                 getRouting(data.lettersAddress, edit)

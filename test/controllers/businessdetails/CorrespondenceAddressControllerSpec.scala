@@ -71,10 +71,10 @@ class CorrespondenceAddressControllerSpec extends AmlsSpec with MockitoSugar wit
       "data exists in the keystore" in new Fixture {
 
         val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-        val aboutTheBusiness = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
+        val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
         when(controller.dataConnector.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get(false)(request)
         status(result) must be(OK)

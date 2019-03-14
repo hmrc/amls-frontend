@@ -39,7 +39,7 @@ case class UpdateMongoCacheResponse(dataImport: Option[DataImport],
                                     businessMatching: Option[BusinessMatching],
                                     estateAgencyBusiness: Option[EstateAgentBusiness],
                                     tradingPremises: Option[Seq[TradingPremises]],
-                                    aboutTheBusiness: Option[BusinessDetails],
+                                    businessDetails: Option[BusinessDetails],
                                     bankDetails: Option[Seq[BankDetails]],
                                     addPerson: Option[AddPerson],
                                     businessActivities: Option[BusinessActivities],
@@ -70,7 +70,7 @@ object UpdateMongoCacheResponse {
         readLegacyField[BusinessMatching](BusinessMatching.key, "businessMatching") ~
         readLegacyField[EstateAgentBusiness](EstateAgentBusiness.key, "estateAgencyBusiness") ~
         readLegacyField[Seq[TradingPremises]](TradingPremises.key, "tradingPremises") ~
-        readLegacyField[BusinessDetails](BusinessDetails.key, "aboutTheBusiness") ~
+        readLegacyField[BusinessDetails](BusinessDetails.key, "businessDetails") ~
         readLegacyField[Seq[BankDetails]](BankDetails.key, "bankDetails") ~
         readLegacyField[AddPerson](AddPerson.key, "addPerson") ~
         readLegacyField[BusinessActivities](BusinessActivities.key, "businessActivities") ~

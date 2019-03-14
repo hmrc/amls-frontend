@@ -114,8 +114,8 @@ object BusinessDetails {
 
   }
 
-  implicit def default(aboutTheBusiness: Option[BusinessDetails]): BusinessDetails =
-    aboutTheBusiness.getOrElse(BusinessDetails())
+  implicit def default(businessDetails: Option[BusinessDetails]): BusinessDetails =
+    businessDetails.getOrElse(BusinessDetails())
 }
 
 

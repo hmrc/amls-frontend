@@ -51,8 +51,8 @@ class CorrespondenceAddressController @Inject () (
       dataConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[CorrespondenceAddress] = (for {
-            aboutTheBusiness <- response
-            correspondenceAddress <- aboutTheBusiness.correspondenceAddress
+            businessDetails <- response
+            correspondenceAddress <- businessDetails.correspondenceAddress
           } yield Form2[CorrespondenceAddress](correspondenceAddress)).getOrElse(Form2[CorrespondenceAddress](initialiseWithUK))
           Ok(correspondence_address(form, edit, autoCompleteService.getCountries))
       }
@@ -65,9 +65,9 @@ class CorrespondenceAddressController @Inject () (
           Future.successful(BadRequest(correspondence_address(f, edit, autoCompleteService.getCountries)))
         case ValidForm(_, data) =>
           val doUpdate = for {
-            aboutTheBusiness <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
-            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.correspondenceAddress(data)))
-            _ <- OptionT.liftF(auditAddressChange(data, aboutTheBusiness.correspondenceAddress, edit)) orElse OptionT.some(Success)
+            businessDetails <- OptionT(dataConnector.fetch[BusinessDetails](BusinessDetails.key))
+            _ <- OptionT.liftF(dataConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.correspondenceAddress(data)))
+            _ <- OptionT.liftF(auditAddressChange(data, businessDetails.correspondenceAddress, edit)) orElse OptionT.some(Success)
           } yield edit match {
             case true => Redirect(routes.SummaryController.get())
             case _ => Redirect(routes.SummaryController.get())

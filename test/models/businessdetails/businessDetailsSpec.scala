@@ -24,7 +24,7 @@ import play.api.libs.json.{JsNull, Json}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import utils.AmlsSpec
 
-class AboutTheBusinessSpec extends AmlsSpec {
+class businessDetailsSpec extends AmlsSpec {
 
   val previouslyRegistered = PreviouslyRegisteredYes("12345678")
 

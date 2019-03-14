@@ -60,7 +60,7 @@ class UpdateMongoCacheService @Inject()(http: HttpGet, val cacheConnector: DataC
       _ <- fn(MoneyServiceBusiness.key, response.msb)
       _ <- fn(Hvd.key, response.hvd)
       _ <- fn(Supervision.key, response.supervision)
-      _ <- fn(BusinessDetails.key, response.aboutTheBusiness)
+      _ <- fn(BusinessDetails.key, response.businessDetails)
       _ <- fn(EstateAgentBusiness.key, response.estateAgencyBusiness)
       _ <- fn(SubscriptionResponse.key, response.Subscription)
       _ <- fn(AmendVariationRenewalResponse.key, response.amendVariationResponse)

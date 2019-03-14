@@ -53,8 +53,8 @@ class ConfirmRegisteredOfficeController @Inject () (
     }
   }
 
-  def hasRegisteredAddress(aboutTheBusiness: Future[Option[BusinessDetails]]) : Future[Option[Boolean]] = {
-    aboutTheBusiness.map {
+  def hasRegisteredAddress(businessDetails: Future[Option[BusinessDetails]]) : Future[Option[Boolean]] = {
+    businessDetails.map {
       case Some(atb) => Some(atb.registeredOffice.isDefined)
       case _ => Some(false)
     }
@@ -86,7 +86,7 @@ class ConfirmRegisteredOfficeController @Inject () (
           case ValidForm(_, data) =>
 
             def updateRegisteredOfficeAndRedirect(bm: BusinessMatching,
-                                                  aboutTheBusiness: BusinessDetails) = {
+                                                  businessDetails: BusinessDetails) = {
 
               val address = if (data.isRegOfficeOrMainPlaceOfBusiness) {
                 updateBMAddress(bm)
@@ -94,7 +94,7 @@ class ConfirmRegisteredOfficeController @Inject () (
                 None
               }
 
-              dataCache.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.copy(registeredOffice = address)) map { _ =>
+              dataCache.save[BusinessDetails](BusinessDetails.key, businessDetails.copy(registeredOffice = address)) map { _ =>
                 if (data.isRegOfficeOrMainPlaceOfBusiness) {
                   Redirect(routes.ContactingYouController.get(edit))
                 } else {
@@ -106,8 +106,8 @@ class ConfirmRegisteredOfficeController @Inject () (
             (for {
               cache <- OptionT(dataCache.fetchAll)
               bm <- OptionT.fromOption[Future](cache.getEntry[BusinessMatching](BusinessMatching.key))
-              aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
-              result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, aboutTheBusiness))
+              businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
+              result <- OptionT.liftF(updateRegisteredOfficeAndRedirect(bm, businessDetails))
             } yield {
               result
             }).getOrElse(Redirect(routes.RegisteredOfficeController.get(edit)))

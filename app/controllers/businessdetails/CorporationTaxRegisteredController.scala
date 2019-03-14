@@ -86,8 +86,8 @@ class CorporationTaxRegisteredController @Inject () (
   }
 
   private def updateCache(cache: CacheMap, data: CorporationTaxRegistered)(implicit auth: AuthContext, hc: HeaderCarrier) = for {
-    aboutTheBusiness <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
-    cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.corporationTaxRegistered(data)))
+    businessDetails <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
+    cacheMap <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.corporationTaxRegistered(data)))
   } yield cacheMap
 
   private def getRedirectLocation(edit: Boolean) = if (edit) {

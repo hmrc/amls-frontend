@@ -63,20 +63,20 @@ class LandingService @Inject() (
       entry <- OptionT.fromOption[Future](cache.getEntry[BusinessDetails](BusinessDetails.key))
     } yield entry
 
-    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.aboutTheBusinessSection })
+    lazy val etmpModel = OptionT.liftF(desConnector.view(amlsRefNumber) map { v => v.businessDetailsSection })
 
     (for {
-      aboutTheBusiness <- cachedModel orElse etmpModel
-      cacheMap <- OptionT.liftF(cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(aboutTheBusiness)))
+      businessDetails <- cachedModel orElse etmpModel
+      cacheMap <- OptionT.liftF(cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails)))
     } yield cacheMap) getOrElse (throw new Exception("Unable to update alt correspondence address"))
   }
 
-  def setAltCorrespondenceAddress(aboutTheBusiness: BusinessDetails)(implicit
+  def setAltCorrespondenceAddress(businessDetails: BusinessDetails)(implicit
                                                                      authContext: AuthContext,
                                                                      hc: HeaderCarrier,
                                                                      ec: ExecutionContext
   ): Future[CacheMap] = {
-    cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(aboutTheBusiness))
+    cacheConnector.save[BusinessDetails](BusinessDetails.key, fixAddress(businessDetails))
   }
 
   def refreshCache(amlsRefNumber: String)
@@ -183,7 +183,7 @@ class LandingService @Inject() (
   }
 
   private def aboutSection(viewResponse: ViewResponse) = {
-    viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)
+    viewResponse.businessDetailsSection.copy(hasAccepted = true)
   }
 
   private def activitySection(viewResponse: ViewResponse) = {

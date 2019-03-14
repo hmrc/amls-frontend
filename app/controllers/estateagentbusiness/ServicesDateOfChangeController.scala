@@ -70,9 +70,9 @@ class ServicesDateOfChangeController  @Inject()(
       optionalCache =>
         (for {
           cache <- optionalCache
-          aboutTheBusiness <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           eab <- cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key)
-        } yield (eab, aboutTheBusiness.activityStartDate)) match {
+        } yield (eab, businessDetails.activityStartDate)) match {
           case Some((eab, Some(activityStartDate))) => (eab, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
           case Some((eab, _)) => (eab, Map())
           case _ => (EstateAgentBusiness(), Map())

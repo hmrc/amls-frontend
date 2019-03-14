@@ -63,7 +63,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      aboutTheBusinessSection = None,
+      businessDetailsSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))),
       businessActivitiesSection = None,
@@ -86,7 +86,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
 
     val tradingPremises = Seq(tradingPremisesGen.sample.get, tradingPremisesGen.sample.get)
 
-    val aboutTheBusiness = BusinessDetails(
+    val businessDetails = BusinessDetails(
       previouslyRegistered = Some(PreviouslyRegisteredYes("12345678")),
       activityStartDate = Some(ActivityStartDate(new LocalDate(1990, 2, 24))),
       vatRegistered = Some(VATRegisteredYes("123456789")),
@@ -211,7 +211,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       Some(businessMatching),
       Some(estateAgentBusiness),
       Some(tradingPremises),
-      Some(aboutTheBusiness),
+      Some(businessDetails),
       Some(Seq(bankDetails)),
       Some(addPerson),
       Some(businessActivitiesCompleteModel),

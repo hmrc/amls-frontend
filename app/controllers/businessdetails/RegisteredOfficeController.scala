@@ -52,8 +52,8 @@ class RegisteredOfficeController @Inject () (
         dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
           response =>
             val form: Form2[RegisteredOffice] = (for {
-              aboutTheBusiness <- response
-              registeredOffice <- aboutTheBusiness.registeredOffice
+              businessDetails <- response
+              registeredOffice <- businessDetails.registeredOffice
             } yield Form2[RegisteredOffice](registeredOffice)).getOrElse(Form2[RegisteredOffice](preSelectUK))
             Ok(registered_office(form, edit, autoCompleteService.getCountries))
 
@@ -68,12 +68,12 @@ class RegisteredOfficeController @Inject () (
           case ValidForm(_, data) =>
 
             val doUpdate = for {
-              aboutTheBusiness <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
-              _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, aboutTheBusiness.registeredOffice(data)))
+              businessDetails <- OptionT(dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key))
+              _ <- OptionT.liftF(dataCacheConnector.save[BusinessDetails](BusinessDetails.key, businessDetails.registeredOffice(data)))
               status <- OptionT.liftF(statusService.getStatus)
-              _ <- OptionT.liftF(auditAddressChange(data, aboutTheBusiness.registeredOffice, edit)) orElse OptionT.some(Success)
+              _ <- OptionT.liftF(auditAddressChange(data, businessDetails.registeredOffice, edit)) orElse OptionT.some(Success)
             } yield {
-              if (redirectToDateOfChange[RegisteredOffice](status, aboutTheBusiness.registeredOffice, data)) {
+              if (redirectToDateOfChange[RegisteredOffice](status, businessDetails.registeredOffice, data)) {
                 Redirect(routes.RegisteredOfficeDateOfChangeController.get())
               } else {
                 edit match {

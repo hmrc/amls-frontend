@@ -47,7 +47,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
   }
 
   private val ukAddress = RegisteredOfficeUK("line1", "line2", Some("line3"), Some("line4"), "AA1 1AA")
-  private val aboutTheBusiness = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
+  private val businessDetails = BusinessDetails(None, None, None, None, None, Some(ukAddress), None)
   val reviewDtls = ReviewDetails("BusinessName", Some(BusinessType.LimitedCompany),
     Address("line1", "line2", Some("line3"), Some("line4"), Some("AA1 1AA"), Country("United Kingdom", "GB")), "ghghg")
   val bm = BusinessMatching(Some(reviewDtls))
@@ -90,7 +90,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
           (any(), any(), any())).thenReturn(Future.successful(Some(bm)))
 
         when(controller.dataCache.fetch[BusinessDetails](meq(BusinessDetails.key))
-          (any(), any(), any())).thenReturn(Future.successful(Some(aboutTheBusiness)))
+          (any(), any(), any())).thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.get()(request)
         status(result) must be(SEE_OTHER)
@@ -112,7 +112,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(aboutTheBusiness))
+          .thenReturn(Some(businessDetails))
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -121,7 +121,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.ContactingYouController.get().url))
         verify(
           controller.dataCache).save[BusinessDetails](any(),
-          meq(aboutTheBusiness.copy(registeredOffice = Some(ukAddress))))(any(), any(), any()
+          meq(businessDetails.copy(registeredOffice = Some(ukAddress))))(any(), any(), any()
         )
       }
 
@@ -137,7 +137,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         when(controller.dataCache.save[BusinessMatching](any(), any())(any(), any(), any()))
           .thenReturn(Future.successful(emptyCache))
         when(mockCacheMap.getEntry[BusinessDetails](BusinessDetails.key))
-          .thenReturn(Some(aboutTheBusiness))
+          .thenReturn(Some(businessDetails))
         when(controller.dataCache.fetchAll(any[HeaderCarrier], any[AuthContext]))
           .thenReturn(Future.successful(Some(mockCacheMap)))
 
@@ -146,7 +146,7 @@ class ConfirmRegisteredOfficeControllerSpec extends AmlsSpec with MockitoSugar {
         redirectLocation(result) must be(Some(controllers.businessdetails.routes.RegisteredOfficeController.get().url))
         verify(
           controller.dataCache).save[BusinessDetails](any(),
-          meq(aboutTheBusiness.copy(registeredOffice = None)))(any(), any(), any()
+          meq(businessDetails.copy(registeredOffice = None)))(any(), any(), any()
         )
 
       }

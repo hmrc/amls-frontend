@@ -72,9 +72,9 @@ class ServicesOfBusinessDateOfChangeController @Inject()(val dataCacheConnector:
       optionalCache =>
         (for {
           cache <- optionalCache
-          aboutTheBusiness <- cache.getEntry[BusinessDetails](BusinessDetails.key)
+          businessDetails <- cache.getEntry[BusinessDetails](BusinessDetails.key)
           asp <- cache.getEntry[Asp](Asp.key)
-        } yield (asp, aboutTheBusiness.activityStartDate)) match {
+        } yield (asp, businessDetails.activityStartDate)) match {
           case Some((asp, Some(activityStartDate))) => (asp, Map("activityStartDate" -> Seq(activityStartDate.startDate.toString("yyyy-MM-dd"))))
           case Some((asp, _)) => (asp, Map())
           case _ => (Asp(), Map())

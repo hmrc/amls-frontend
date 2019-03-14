@@ -42,8 +42,8 @@ class VATRegisteredController @Inject () (
       dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[VATRegistered] = (for {
-            aboutTheBusiness <- response
-            vatRegistered <- aboutTheBusiness.vatRegistered
+            businessDetails <- response
+            vatRegistered <- businessDetails.vatRegistered
           } yield Form2[VATRegistered](vatRegistered)).getOrElse(EmptyForm)
           Ok(vat_registered(form, edit))
       }

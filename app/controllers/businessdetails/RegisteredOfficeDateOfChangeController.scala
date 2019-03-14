@@ -51,8 +51,8 @@ class RegisteredOfficeDateOfChangeController @Inject () (
   def post = Authorised.async {
     implicit authContext =>
       implicit request =>
-        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) flatMap { aboutTheBusiness =>
-          val extraFields: Map[String, Seq[String]] = aboutTheBusiness.get.activityStartDate match {
+        dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) flatMap { businessDetails =>
+          val extraFields: Map[String, Seq[String]] = businessDetails.get.activityStartDate match {
             case Some(date) => Map("activityStartDate" -> Seq(date.startDate.toString("yyyy-MM-dd")))
             case None => Map()
           }
@@ -65,7 +65,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
             case ValidForm(_, dateOfChange) =>
               for {
                 _ <- dataCacheConnector.save[BusinessDetails](BusinessDetails.key,
-                  aboutTheBusiness.registeredOffice(aboutTheBusiness.registeredOffice match {
+                  businessDetails.registeredOffice(businessDetails.registeredOffice match {
                     case Some(office: RegisteredOfficeUK) => office.copy(dateOfChange = Some(dateOfChange))
                     case Some(office: RegisteredOfficeNonUK) => office.copy(dateOfChange = Some(dateOfChange))
                   }))

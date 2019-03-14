@@ -40,8 +40,8 @@ class PreviouslyRegisteredController @Inject () (
       dataCacheConnector.fetch[BusinessDetails](BusinessDetails.key) map {
         response =>
           val form: Form2[PreviouslyRegistered] = (for {
-            aboutTheBusiness <- response
-            prevRegistered <- aboutTheBusiness.previouslyRegistered
+            businessDetails <- response
+            prevRegistered <- businessDetails.previouslyRegistered
           } yield Form2[PreviouslyRegistered](prevRegistered)).getOrElse(EmptyForm)
           Ok(previously_registered(form, edit))
       }
@@ -68,11 +68,11 @@ class PreviouslyRegisteredController @Inject () (
     }
   }
 
-  private def getUpdatedModel(businessType: BusinessType, aboutTheBusiness: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
+  private def getUpdatedModel(businessType: BusinessType, businessDetails: BusinessDetails, data: PreviouslyRegistered): BusinessDetails = {
     data match {
-      case PreviouslyRegisteredYes(_) => aboutTheBusiness.copy(previouslyRegistered = Some(data), activityStartDate = None,
+      case PreviouslyRegisteredYes(_) => businessDetails.copy(previouslyRegistered = Some(data), activityStartDate = None,
                                                                 hasChanged = true)
-      case PreviouslyRegisteredNo => aboutTheBusiness.copy(previouslyRegistered = Some(data),
+      case PreviouslyRegisteredNo => businessDetails.copy(previouslyRegistered = Some(data),
                                                                 hasChanged = true)
     }
   }

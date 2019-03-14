@@ -64,7 +64,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
 
     "return a cachmap with the saved alternative correspondence address - true" in {
       val correspondenceAddress = NonUKCorrespondenceAddress("Name Test", "Test", "Test", "Test", Some("test"), None, Country("Albania", "AL"))
-      val aboutTheBusiness = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
+      val businessDetails = BusinessDetails(None, None, None, None, None,None, None, Some(correspondenceAddress))
 
       implicit val r = FakeRequest()
 
@@ -77,17 +77,17 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         } thenReturn Future.successful(result)
       }
 
-      setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(true)))
 
 
-      await(service.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
 
     }
 
     "return a cachmap with the saved alternative correspondence address - false" in {
       implicit val r = FakeRequest()
 
-      val aboutTheBusiness = BusinessDetails(None, None, None, None, None,None, None, None)
+      val businessDetails = BusinessDetails(None, None, None, None, None,None, None, None)
 
       when(service.cacheConnector.save[BusinessDetails](any(), any())
         (any(), any(), any())).thenReturn(Future.successful(cacheMap))
@@ -98,10 +98,10 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         } thenReturn Future.successful(result)
       }
 
-      setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, aboutTheBusiness.copy(altCorrespondenceAddress = Some(false)))
+      setUpMockView(service.cacheConnector, cacheMap, BusinessDetails.key, businessDetails.copy(altCorrespondenceAddress = Some(false)))
 
 
-      await(service.setAltCorrespondenceAddress(aboutTheBusiness)) mustEqual cacheMap
+      await(service.setAltCorrespondenceAddress(businessDetails)) mustEqual cacheMap
 
     }
   }
@@ -115,7 +115,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      aboutTheBusinessSection = None,
+      businessDetailsSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = None,
@@ -148,7 +148,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
-      setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
       await(service.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
 
@@ -171,7 +171,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         when(service.cacheConnector.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
-        setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
+        setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
 
         await(service.setAltCorrespondenceAddress("regNo", Some(cache)))
 
@@ -189,7 +189,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      aboutTheBusinessSection = None,
+      businessDetailsSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = None,
@@ -246,7 +246,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
+        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
@@ -319,7 +319,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(hasAccepted = true),
       eabSection = None,
       tradingPremisesSection = None,
-      aboutTheBusinessSection = None,
+      businessDetailsSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = businessActivitiesSection,
@@ -373,7 +373,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
+        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),

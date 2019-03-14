@@ -143,10 +143,10 @@ class ConfirmationControllerSpec extends AmlsSpec
       controller.confirmationService.getBreakdownRows(any(), any())(any(), any(), any())
     } thenReturn Future.successful(Some(breakdownRows))
 
-    val aboutTheBusiness = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
+    val businessDetails = BusinessDetails(previouslyRegistered = Some(PreviouslyRegisteredNo))
     when {
       controller.dataCacheConnector.fetch[BusinessDetails](eqTo(BusinessDetails.key))(any(), any(), any())
-    } thenReturn Future.successful(Some(aboutTheBusiness))
+    } thenReturn Future.successful(Some(businessDetails))
 
     def paymentsReturnLocation(ref: String) = ReturnLocation(controllers.routes.ConfirmationController.paymentConfirmation(ref))
 

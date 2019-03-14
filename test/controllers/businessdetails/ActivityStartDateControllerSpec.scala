@@ -49,7 +49,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
 
   // scalastyle:off
   private val startDate = ActivityStartDate(new LocalDate(2010, 2, 22))
-  private val aboutTheBusiness = BusinessDetails(None, Some(startDate), None, None)
+  private val businessDetails = BusinessDetails(None, Some(startDate), None, None)
 
   val emptyCache = CacheMap("", Map.empty)
 
@@ -60,7 +60,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       "load ActivityStartDate page" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         status(result) must be(OK)
         contentAsString(result) must include(Messages("businessdetails.activity.start.date.title"))
@@ -69,7 +69,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
       "load ActivityStartDate with pre-populated data" in new Fixture {
 
         when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
         val result = controller.get()(request)
         val document = Jsoup.parse(contentAsString(result))
         document.select("input[name=startDate.day]").`val` must include("22")
@@ -141,7 +141,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.year" -> ""
         )
         when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -156,7 +156,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.year" -> "16"
         )
         when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)
@@ -170,7 +170,7 @@ class ActivityStartDateControllerSpec extends AmlsSpec with MockitoSugar {
           "startDate.year" -> "19782"
         )
         when(controller.dataCache.fetch[BusinessDetails](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(aboutTheBusiness)))
+          .thenReturn(Future.successful(Some(businessDetails)))
 
         val result = controller.post()(newRequest)
         status(result) must be(BAD_REQUEST)

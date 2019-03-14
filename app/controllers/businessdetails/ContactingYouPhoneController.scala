@@ -38,9 +38,9 @@ class ContactingYouPhoneController @Inject () (
   def get(edit: Boolean = false) = Authorised.async {
     implicit authContext => implicit request =>
       for {
-        aboutTheBusiness <-
+        businessDetails <-
         dataCache.fetch[BusinessDetails](BusinessDetails.key)
-      } yield aboutTheBusiness match {
+      } yield businessDetails match {
         case Some(BusinessDetails(_,_, _, _, Some(details), _, _, _, _, _)) if details.phoneNumber.isDefined =>
           Ok(contacting_you_phone(Form2[ContactingYouPhone](ContactingYouPhone (details.phoneNumber.getOrElse(""))), edit))
         case _ => Ok(contacting_you_phone(EmptyForm, edit))
@@ -54,9 +54,9 @@ class ContactingYouPhoneController @Inject () (
           Future.successful(BadRequest(contacting_you_phone(f, edit)))
         case ValidForm(_, data) =>
           for {
-            aboutTheBusiness <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
+            businessDetails <- dataCache.fetch[BusinessDetails](BusinessDetails.key)
             _ <- dataCache.save[BusinessDetails](BusinessDetails.key,
-                aboutTheBusiness.contactingYou(updateData(aboutTheBusiness.contactingYou, data))
+                businessDetails.contactingYou(updateData(businessDetails.contactingYou, data))
             )
           } yield {
             edit match {

@@ -87,7 +87,7 @@ class SubmissionService @Inject()
       request <- Future.successful(createSubscriptionRequest(cache))
       subscription <- amlsConnector.subscribe(request, safeId)
       _ <- saveResponse(subscription, SubscriptionResponse.key)
-      _ <- enrol(safeId, subscription.amlsRefNo, request.aboutTheBusinessSection.fold("")(_.registeredOffice match {
+      _ <- enrol(safeId, subscription.amlsRefNo, request.businessDetailsSection.fold("")(_.registeredOffice match {
         case Some(o: RegisteredOfficeUK) => o.postCode
         case _ => ""
       }))
@@ -113,7 +113,7 @@ class SubmissionService @Inject()
       businessMatchingSection = cache.getEntry[BusinessMatching](BusinessMatching.key),
       eabSection = cache.getEntry[EstateAgentBusiness](EstateAgentBusiness.key),
       tradingPremisesSection = filteredTradingPremises,
-      aboutTheBusinessSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
+      businessDetailsSection = cache.getEntry[BusinessDetails](BusinessDetails.key),
       bankDetailsSection = bankDetailsExceptDeleted(cache.getEntry[Seq[BankDetails]](BankDetails.key)),
       aboutYouSection = cache.getEntry[AddPerson](AddPerson.key),
       businessActivitiesSection = cache.getEntry[BusinessActivities](BusinessActivities.key),
