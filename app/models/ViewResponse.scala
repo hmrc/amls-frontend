@@ -37,7 +37,7 @@ case class ViewResponse(
                          businessMatchingSection: BusinessMatching,
                          eabSection: Option[EstateAgentBusiness],
                          tradingPremisesSection: Option[Seq[TradingPremises]],
-                         businessDetailsSection: BusinessDetails,
+                         aboutTheBusinessSection: BusinessDetails,
                          bankDetailsSection: Seq[BankDetails],
                          aboutYouSection: AddPerson,
                          businessActivitiesSection: BusinessActivities,
@@ -62,7 +62,7 @@ object ViewResponse {
       (__ \ "businessMatchingSection").read[BusinessMatching] and
       (__ \ "eabSection").readNullable[EstateAgentBusiness] and
       (__ \ "tradingPremisesSection").readNullable[Seq[TradingPremises]] and
-      (__ \ "businessDetailsSection").read[BusinessDetails] and
+      (__ \ "aboutTheBusinessSection").read[BusinessDetails] and
       (__ \ "bankDetailsSection").read[Seq[BankDetails]] and
       (__ \ "aboutYouSection").read[AddPerson] and
       (__ \ "businessActivitiesSection").read[BusinessActivities] and

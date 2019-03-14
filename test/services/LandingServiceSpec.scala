@@ -115,7 +115,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      businessDetailsSection = None,
+      aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = None,
@@ -148,7 +148,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         service.desConnector.view(any[String])(any[HeaderCarrier], any[ExecutionContext], any[Writes[ViewResponse]], any[AuthContext])
       } thenReturn Future.successful(viewResponse)
 
-      setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
+      setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
       await(service.setAltCorrespondenceAddress("regNo", None)) mustEqual cache
 
@@ -171,7 +171,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
         when(service.cacheConnector.save[BusinessDetails](any(), any())
           (any(), any(), any())).thenReturn(Future.successful(cacheMap))
 
-        setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.businessDetailsSection.copy(altCorrespondenceAddress = Some(true)))
+        setUpMockView(service.cacheConnector, cache, BusinessDetails.key, viewResponse.aboutTheBusinessSection.copy(altCorrespondenceAddress = Some(true)))
 
         await(service.setAltCorrespondenceAddress("regNo", Some(cache)))
 
@@ -189,7 +189,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      businessDetailsSection = None,
+      aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = None,
@@ -246,7 +246,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
+        eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),
@@ -319,7 +319,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       businessMatchingSection = BusinessMatching(hasAccepted = true),
       eabSection = None,
       tradingPremisesSection = None,
-      businessDetailsSection = None,
+      aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder)) ),
       businessActivitiesSection = businessActivitiesSection,
@@ -373,7 +373,7 @@ class LandingServiceSpec extends AmlsSpec with ScalaFutures with FutureAwaits wi
       verify(service.cacheConnector).upsert(any(), eqTo(TradingPremises.key),
         eqTo(Some(viewResponse.tradingPremisesSection.fold(Seq.empty[TradingPremises])(_.map(tp => tp.copy(hasAccepted = true))))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BusinessDetails.key),
-        eqTo(viewResponse.businessDetailsSection.copy(hasAccepted = true)))(any(), any(), any())
+        eqTo(viewResponse.aboutTheBusinessSection.copy(hasAccepted = true)))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(BankDetails.key),
         eqTo(viewResponse.bankDetailsSection.map(b => b.copy(hasAccepted = true))))(any(), any(), any())
       verify(service.cacheConnector).upsert(any(), eqTo(AddPerson.key),

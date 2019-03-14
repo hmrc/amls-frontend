@@ -63,7 +63,7 @@ class UpdateMongoCacheServiceSpec extends AmlsSpec with MockitoSugar
       businessMatchingSection = BusinessMatching(),
       eabSection = None,
       tradingPremisesSection = None,
-      businessDetailsSection = None,
+      aboutTheBusinessSection = None,
       bankDetailsSection = Seq(None),
       aboutYouSection = AddPerson("FirstName", None, "LastName", RoleWithinBusinessRelease7(Set(models.declaration.release7.BeneficialShareholder))),
       businessActivitiesSection = None,
