@@ -33,8 +33,7 @@ class SummaryController  @Inject() (val dataCacheConnector: DataCacheConnector,
   def get() = Authorised.async {
     implicit authContext => implicit request =>
       dataCacheConnector.fetch[Supervision](Supervision.key) map {
-        case Some(data) =>
-          Ok(summary(EmptyForm, data))
+        case Some(data) => Ok(summary(EmptyForm, data))
         case _ =>
           Redirect(controllers.routes.RegistrationProgressController.get())
       }

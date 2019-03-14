@@ -1,1 +1,0 @@
- + [AMLS-4740](https://jira.tools.tax.service.gov.uk/browse/AMLS-4740) - 'Replaced remaining  static methods with dependency injection, in readiness for upgrade to Play 2.6'

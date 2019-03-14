@@ -1,1 +1,0 @@
- + [AMLS-4392](https://jira.tools.tax.service.gov.uk/browse/AMLS-4392) - 'Remove Partner from list of Position in Business Options for LLP as not valid in DES schema'

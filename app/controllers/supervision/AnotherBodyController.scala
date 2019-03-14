@@ -20,7 +20,10 @@ import connectors.DataCacheConnector
 import controllers.BaseController
 import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import javax.inject.Inject
-import models.supervision.{AnotherBody, Supervision}
+import models.supervision.{AnotherBody, AnotherBodyNo, AnotherBodyYes, Supervision}
+import uk.gov.hmrc.http.HeaderCarrier
+import uk.gov.hmrc.http.cache.client.CacheMap
+import uk.gov.hmrc.play.frontend.auth.AuthContext
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import views.html.supervision.another_body
 
@@ -47,16 +50,38 @@ class AnotherBodyController @Inject() (val dataCacheConnector: DataCacheConnecto
       Form2[AnotherBody](request.body) match {
         case f: InvalidForm =>
           Future.successful(BadRequest(another_body(f, edit)))
-        case ValidForm(_, data) =>
+        case ValidForm(_, data: AnotherBody) =>
           for {
             supervision <- dataCacheConnector.fetch[Supervision](Supervision.key)
-            _ <- dataCacheConnector.save[Supervision](Supervision.key,
-              supervision.anotherBody(data)
-            )
-          } yield edit match {
-            case true => Redirect(routes.SummaryController.get())
-            case false => Redirect(routes.ProfessionalBodyMemberController.get())
+            cache <- dataCacheConnector.save[Supervision](Supervision.key,
+              updateData(supervision, data))
+          } yield {
+            redirectTo(edit, cache)
           }
       }
+  }
+
+  private def updateData(supervision: Supervision, data: AnotherBody): Supervision = {
+    def updatedAnotherBody = (supervision.anotherBody, data) match {
+      case (_, d) if d.equals(AnotherBodyNo) => AnotherBodyNo
+      case (Some(ab), d:AnotherBodyYes) if ab.equals(AnotherBodyNo) => AnotherBodyYes(d.supervisorName, None, None, None)
+      case (Some(ab), d:AnotherBodyYes) => ab.asInstanceOf[AnotherBodyYes].supervisorName(d.supervisorName)
+      case (None, d:AnotherBodyYes) => AnotherBodyYes(d.supervisorName, None, None, None)
+
+    }
+    supervision.anotherBody(updatedAnotherBody).copy(hasAccepted = true)
+  }
+
+  private def redirectTo(edit: Boolean, cache: CacheMap)(implicit authContext: AuthContext, headerCarrier: HeaderCarrier) = {
+
+    import utils.ControllerHelper.{anotherBodyComplete, isAnotherBodyYes, supervisionComplete}
+
+    val anotherBody = anotherBodyComplete(cache)
+
+    supervisionComplete(cache) match {
+      case false if isAnotherBodyYes(anotherBody) => Redirect(routes.SupervisionStartController.get())
+      case false => Redirect(routes.ProfessionalBodyMemberController.get())
+      case true => Redirect(routes.SummaryController.get())
+    }
   }
 }
