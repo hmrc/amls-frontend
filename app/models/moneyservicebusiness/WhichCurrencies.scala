@@ -16,16 +16,13 @@
 
 package models.moneyservicebusiness
 
-import cats.data.Validated.{Invalid, Valid}
 import jto.validation.GenericRules._
 import jto.validation._
 import jto.validation.forms.UrlFormEncoded
 import models.FormTypes._
-import models._
 import models.renewal.{WhichCurrencies => RWhichCurrencies}
 import play.api.libs.json._
 import utils.MappingUtils.Implicits._
-import utils.{GenericValidators, TraversableValidators}
 
 case class WhichCurrencies(currencies: Seq[String],
                            usesForeignCurrencies: Option[Boolean] = None,
@@ -42,12 +39,6 @@ object WhichCurrencies {
   type MoneySourceValidation = (Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
   type WhichCurrenciesValidation = (Option[Boolean], Option[BankMoneySource], Option[WholesalerMoneySource], Option[Boolean])
 
-  val emptyToNone: String => Option[String] = { x =>
-    x.trim() match {
-      case "" => None
-      case s => Some(s)
-    }
-  }
 
   private def nameType(fieldName: String) = {
     notEmptyStrip andThen
@@ -59,13 +50,11 @@ object WhichCurrencies {
   implicit def formR: Rule[UrlFormEncoded, WhichCurrencies] = From[UrlFormEncoded] { __ =>
     import jto.validation.forms.Rules._
 
-    val currencies = (__ \ "currencies").read[Seq[String]].withMessage("error.invalid.msb.wc.currencies")
-    val usesForeignCurrencies = (__ \ "usesForeignCurrencies").read[Option[Boolean]].withMessage("error.required.msb.wc.foreignCurrencies")
-    val bankMoneySource = (__ \ "bankMoneySource").read[Option[BankMoneySource]]
-    val wholesalerMoneySource = (__ \ "wholesalerMoneySource").read[Option[WholesalerMoneySource]]
-    val customerMoneySource = (__ \ "customerMoneySource").read[Option[Boolean]]
-
-    (currencies ~ usesForeignCurrencies ~ bankMoneySource ~ wholesalerMoneySource ~ customerMoneySource).tupled map {
+    ((__ \ "currencies").read[Seq[String]].withMessage("error.invalid.msb.wc.currencies") ~
+    (__ \ "usesForeignCurrencies").read[Option[Boolean]].withMessage("error.required.msb.wc.foreignCurrencies") ~
+    (__ \ "bankMoneySource").read[Option[BankMoneySource]] ~
+    (__ \ "wholesalerMoneySource").read[Option[WholesalerMoneySource]] ~
+    (__ \ "customerMoneySource").read[Option[Boolean]]).tupled map {
       r => WhichCurrencies(r._1, r._2,r._3,r._4,r._5)
     }
   }
