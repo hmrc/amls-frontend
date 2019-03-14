@@ -45,7 +45,8 @@ class registration_progressSpec extends AmlsSpec with MockitoSugar with AddressG
         Messages("title.amls") + " - " + Messages("title.gov"))
       heading.html must be(Messages("progress.title"))
 
-      doc.select("h2.heading-small").first().ownText() must be("progress.section1.name")
+      // the first h2.heading-small should be info about progress section
+      doc.select("h2.heading-small").first().ownText() must be("Your business")
     }
 
     "display the correct visual content for incomplete sections" when {

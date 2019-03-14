@@ -41,6 +41,9 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         </div>
     </div>
 
+    @* registration progress *@
+    @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
+
     <div class="grid-layout grid-layout--stacked">
 
         @* Main section *@
@@ -50,9 +53,6 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
             }
         </ul>
 
-        @* Sidebar *@
-        @registration_progress_sidebar(canEditPreApplication, address, serviceNames)
-        
     </div>
 
     <div class="grid-layout grid-layout--stacked">
