@@ -59,25 +59,29 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
 
     </div>
 
-    &nbsp
-
     @* the page bottom section *@
-    <div class="grid-layout grid-layout--stacked">
-        <h2 class = "heading-medium">@Messages("progress.submit.title")</h2>
-        <p>@if(declarationAvailable) {
+    <div class="grid-layout display-block">
+        <div class="grid-layout__column grid-layout__column--2-3 display-block">
+            <h2 class = "heading-medium" style="margin-top: 1.25em !important;">@Messages("progress.submit.title")</h2>
+            <p>@if(declarationAvailable) {
                 @Messages("progress.declarationavailable")
             } else {
                 @Messages("progress.declarationunavailable")
             }
-        </p>
+            </p>
 
-        @if(declarationAvailable) {
-            <form method="post" action="@controllers.routes.RegistrationProgressController.post.url">
-            @CSRF.formField
-            <button id="progress-continue" type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
-            @Messages("progress.submit")
-            </button>
-            </form>
-        }
+            @if(declarationAvailable) {
+                <form class="grid-layout__column grid-layout__column--3-3 display-block" method="post" action="@controllers.routes.RegistrationProgressController.post.url">
+                    @CSRF.formField
+                    <button id="progress-continue" type="submit" name="submit" class="button" @if(!declarationAvailable) {disabled}>
+                        @Messages("progress.submit")
+                    </button>
+                </form>
+            }
+        </div>
+
+        <div class="grid-layout__column grid-layout__column--1-3">
+                &nbsp;
+        </div>
     </div>
 }
