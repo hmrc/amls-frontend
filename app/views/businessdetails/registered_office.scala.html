@@ -24,11 +24,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.registeredoffice.title", "summary.aboutbusiness")
+    @heading("businessdetails.registeredoffice.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.registeredoffice.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
@@ -37,7 +37,7 @@
 
         @fieldset(
             f = f("isUK"),
-            legend = "aboutthebusiness.registeredoffice.lbl",
+            legend = "businessdetails.registeredoffice.lbl",
             legendHidden = false,
             panel = false,
             classes = Seq("form-group", "inline")
@@ -61,7 +61,7 @@
         @fieldset(
             f = f("postCode-fieldset"),
             legendHidden = true,
-            legend = "aboutthebusiness.correspondenceaddress.address",
+            legend = "businessdetails.correspondenceaddress.address",
             jsHidden = false,
             panel = false,
             id = s"""${f("postCode").id}-fieldset"""
@@ -88,7 +88,7 @@
             )
             @input(
                 field = f("postCode"),
-                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                labelText = "businessdetails.correspondenceaddress.postCode",
                 classes = Seq("postcode")
             )
         }
@@ -96,7 +96,7 @@
         @fieldset(
             f = f("country-fieldset"),
             legendHidden = true,
-            legend = "aboutthebusiness.correspondenceaddress.address",
+            legend = "businessdetails.correspondenceaddress.address",
             jsHidden = true,
             panel = false,
             id = s"""${f("country").id}-fieldset"""
@@ -123,7 +123,7 @@
             )
             @country_autocomplete(
                 field = f("country"),
-                labelText = "aboutthebusiness.correspondenceaddress.country",
+                labelText = "businessdetails.correspondenceaddress.country",
                 data = countryData.getOrElse(Seq.empty)
             )
         }

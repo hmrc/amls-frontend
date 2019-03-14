@@ -26,7 +26,7 @@ import models.businessmatching.BusinessMatching
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 
 import scala.concurrent.Future
 

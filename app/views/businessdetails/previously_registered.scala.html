@@ -26,18 +26,18 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.registeredformlr.title", "summary.aboutbusiness")
+    @heading("businessdetails.registeredformlr.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.registeredformlr.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
     @form(f, controllers.businessdetails.routes.PreviouslyRegisteredController.post(edit)) {
 
         @fieldset(
-            legend = "aboutthebusiness.registeredformlr.title",
+            legend = "businessdetails.registeredformlr.title",
             legendHidden = true,
             panel = false,
             f = f("previouslyRegistered-fieldset"),
@@ -70,8 +70,8 @@
         ) {
             @input(
                 field = f("prevMLRRegNo"),
-                labelText = "aboutthebusiness.registeredformlr.mlrregno.lbl",
-                hintText = "aboutthebusiness.registeredformlr.taxReferenceHint",
+                labelText = "businessdetails.registeredformlr.mlrregno.lbl",
+                hintText = "businessdetails.registeredformlr.taxReferenceHint",
                 bold = false,
                 attrType = "number",
                 attrMaxlength = "8",

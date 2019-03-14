@@ -26,7 +26,7 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany, Partnership
 import play.api.mvc.Result
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.ControllerHelper
-import views.html.aboutthebusiness.activity_start_date
+import views.html.businessdetails.activity_start_date
 
 import scala.concurrent.Future
 

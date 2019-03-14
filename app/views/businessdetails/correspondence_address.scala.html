@@ -32,21 +32,21 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.correspondenceaddress.title", "summary.aboutbusiness")
+    @heading("businessdetails.correspondenceaddress.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.correspondenceaddress.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.correspondenceaddress.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
-    <p>@Messages("aboutthebusiness.correspondenceaddress.p")</p>
+    <p>@Messages("businessdetails.correspondenceaddress.p")</p>
 
 
     @form(f, controllers.businessdetails.routes.CorrespondenceAddressController.post(edit)) {
 
         @fieldset(
-            legend = "aboutthebusiness.correspondenceaddress.contact.info",
+            legend = "businessdetails.correspondenceaddress.contact.info",
             legendHidden = true,
             panel = false,
             classes = Seq("form-group"),
@@ -54,31 +54,31 @@
         ) {
             @input(
                 field = f("yourName"),
-                labelText = "aboutthebusiness.correspondenceaddress.yourName"
+                labelText = "businessdetails.correspondenceaddress.yourName"
             )
             @input(
                 field = f("businessName"),
-                labelText = "aboutthebusiness.correspondenceaddress.businessName"
+                labelText = "businessdetails.correspondenceaddress.businessName"
             )
         }
 
         @fieldset(
             f = f("isUK"),
-            legend = "aboutthebusiness.correspondenceaddress.lbl",
+            legend = "businessdetails.correspondenceaddress.lbl",
             legendHidden = false,
             panel = false,
             classes = Seq("inline form-group")
         ) {
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.ukAddress",
+                labelText = "businessdetails.correspondenceaddress.ukAddress",
                 value = "true",
                 target = s"#$target",
                 inline = true
             )
             @radio(
                 f = f("isUK"),
-                labelText = "aboutthebusiness.correspondenceaddress.nonUkAddress",
+                labelText = "businessdetails.correspondenceaddress.nonUkAddress",
                 value = "false",
                 target = s"#$target1",
                 inline = true
@@ -87,7 +87,7 @@
 
         @fieldset(
             f = f(s"$target"),
-            legend = "aboutthebusiness.correspondenceaddress.address",
+            legend = "businessdetails.correspondenceaddress.address",
             legendHidden = false,
             panel = false
         ) {
@@ -109,14 +109,14 @@
             )
             @input(
                 field = f("postCode"),
-                labelText = "aboutthebusiness.correspondenceaddress.postCode",
+                labelText = "businessdetails.correspondenceaddress.postCode",
                 classes = Seq("form-control-1-4")
             )
         }
 
         @fieldset(
             f = f(s"$target1"),
-            legend = "aboutthebusiness.correspondenceaddress.address",
+            legend = "businessdetails.correspondenceaddress.address",
             legendHidden = true,
             panel = false,
             jsHidden = false
@@ -139,7 +139,7 @@
             )
             @country_autocomplete(
                 field = f("country"),
-                labelText = "aboutthebusiness.correspondenceaddress.country",
+                labelText = "businessdetails.correspondenceaddress.country",
                 data = countryData.getOrElse(Seq.empty)
             )
         }

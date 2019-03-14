@@ -38,15 +38,15 @@ class letters_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
+        views.html.businessdetails.letters_address(form2, address, true)
       }
 
       doc.title must be(Messages("businessdetails.lettersaddress.title") +
-        " - " + Messages("summary.aboutbusiness") +
+        " - " + Messages("summary.businessdetails") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
       heading.html must be(Messages("businessdetails.lettersaddress.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
       doc.getElementsMatchingOwnText("line1").text mustBe "line1 line2 AB12CD"
       doc.select("input[type=radio]").size mustBe 2
@@ -61,7 +61,7 @@ class letters_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
+        views.html.businessdetails.letters_address(form2, address, true)
       }
 
       errorSummary.html() must include("not a message Key")
@@ -73,7 +73,7 @@ class letters_addressSpec extends AmlsSpec with MustMatchers {
 
       def view = {
         val address = RegisteredOfficeUK("line1","line2",None,None,"AB12CD")
-        views.html.aboutthebusiness.letters_address(form2, address, true)
+        views.html.businessdetails.letters_address(form2, address, true)
       }
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty

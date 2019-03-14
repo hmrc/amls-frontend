@@ -19,7 +19,7 @@ package controllers.businessdetails
 import com.google.inject.Inject
 import controllers.BaseController
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 
 import scala.concurrent.Future
 

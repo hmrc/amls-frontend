@@ -24,15 +24,15 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.contactingyou.email.title", "summary.aboutbusiness")
+    @heading("businessdetails.contactingyou.email.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.contactingyou.email.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.contactingyou.email.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
-    <p>@Messages("aboutthebusiness.contactingyou.lbl")</p>
+    <p>@Messages("businessdetails.contactingyou.lbl")</p>
 
 
 
@@ -40,19 +40,19 @@
 
         @fieldset(
             f = f("contactingyou-fieldset"),
-            legend = "aboutthebusiness.contactingyou.email.title",
+            legend = "businessdetails.contactingyou.email.title",
             legendHidden = true,
             panel = false
         ) {
             @input(
                 field = f("email"),
-                labelText = "aboutthebusiness.contactingyou.email.lbl",
+                labelText = "businessdetails.contactingyou.email.lbl",
                 attrType = "email"
             )
 
             @input(
                 field = f("confirmEmail"),
-                labelText = "aboutthebusiness.contactingyou.confirm.email.lbl",
+                labelText = "businessdetails.contactingyou.confirm.email.lbl",
                 attrType = "email"
             )
         }

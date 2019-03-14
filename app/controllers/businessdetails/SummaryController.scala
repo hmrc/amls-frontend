@@ -24,7 +24,7 @@ import models.businessdetails.AboutTheBusiness
 import models.status.{NotCompleted, SubmissionReady, SubmissionReadyForReview}
 import services.StatusService
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 
 
 class SummaryController @Inject () (

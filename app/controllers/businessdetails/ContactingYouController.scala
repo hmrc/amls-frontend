@@ -22,7 +22,7 @@ import controllers.BaseController
 import forms._
 import models.businessdetails._
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 
 import scala.concurrent.Future
 

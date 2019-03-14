@@ -31,20 +31,20 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
 
   "What you need View" must {
     "Have the correct title" in new ViewFixture {
-      def view = views.html.aboutthebusiness.what_you_need()
+      def view = views.html.businessdetails.what_you_need()
 
       doc.title must startWith(Messages("title.wyn"))
     }
 
     "Have the correct Headings" in new ViewFixture{
-      def view = views.html.aboutthebusiness.what_you_need()
+      def view = views.html.businessdetails.what_you_need()
 
       heading.html must be (Messages("title.wyn"))
-      subHeading.html must include (Messages("summary.aboutbusiness"))
+      subHeading.html must include (Messages("summary.businessdetails"))
     }
 
     "contain the expected content elements" in new ViewFixture{
-      def view = views.html.aboutthebusiness.what_you_need()
+      def view = views.html.businessdetails.what_you_need()
 
       html must include(Messages("businessdetails.whatyouneed.line_1"))
       html must include(Messages("businessdetails.whatyouneed.line_2"))
@@ -54,7 +54,7 @@ class what_you_needSpec extends AmlsSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.what_you_need()
+      def view = views.html.businessdetails.what_you_need()
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

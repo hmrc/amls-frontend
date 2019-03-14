@@ -37,19 +37,19 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
 
-      doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredoffice.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[RegisteredOffice] = Form2(RegisteredOfficeUK("line1","line2",None,None,"AB12CD"))
 
-      def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
 
       heading.html must be(Messages("businessdetails.registeredoffice.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
     }
 
@@ -62,7 +62,7 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
           (Path \ "country-fieldset") -> Seq(ValidationError("third not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -82,7 +82,7 @@ class registered_officeSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.registered_office(form2, true, mockAutoComplete.getCountries)
+      def view = views.html.businessdetails.registered_office(form2, true, mockAutoComplete.getCountries)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

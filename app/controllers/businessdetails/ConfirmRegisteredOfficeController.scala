@@ -23,7 +23,7 @@ import forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import models.businessdetails.{AboutTheBusiness, ConfirmRegisteredOffice, RegisteredOffice, RegisteredOfficeUK}
 import models.businesscustomer.Address
 import models.businessmatching.BusinessMatching
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 import scala.concurrent.ExecutionContext.Implicits.global
 import scala.concurrent.Future
 import cats.implicits._

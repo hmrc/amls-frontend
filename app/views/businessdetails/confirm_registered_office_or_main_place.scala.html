@@ -25,11 +25,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.confirmingyouraddress.title", "summary.aboutbusiness")
+    @heading("businessdetails.confirmingyouraddress.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.confirmingyouraddress.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.confirmingyouraddress.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
@@ -39,7 +39,7 @@
 
         @fieldset(
             f = f("confirmingyouraddress-fieldset"),
-            legend = "aboutthebusiness.confirmingyouraddress.title",
+            legend = "businessdetails.confirmingyouraddress.title",
             legendHidden = true,
             panel = false,
             classes = Seq("inline")

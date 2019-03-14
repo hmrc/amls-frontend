@@ -37,15 +37,15 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
       val form2: ValidForm[ContactingYouPhone] = Form2(ContactingYouPhone("123456789789"))
 
       def view = {
-        views.html.aboutthebusiness.contacting_you_phone(form2, true)
+        views.html.businessdetails.contacting_you_phone(form2, true)
       }
 
       doc.title must be(Messages("businessdetails.contactingyou.phone.title") +
-        " - " + Messages("summary.aboutbusiness") +
+        " - " + Messages("summary.businessdetails") +
         " - " + Messages("title.amls") +
         " - " + Messages("title.gov"))
       heading.html must be(Messages("businessdetails.contactingyou.phone.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
       doc.getElementsByAttributeValue("name", "phoneNumber") must not be empty
 
@@ -59,7 +59,7 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
         ))
 
       def view = {
-        views.html.aboutthebusiness.contacting_you_phone(form2, true)
+        views.html.businessdetails.contacting_you_phone(form2, true)
       }
 
       errorSummary.html() must include("not a message Key")
@@ -69,7 +69,7 @@ class contacting_you_phoneSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.contacting_you_phone(form2, true)
+      def view = views.html.businessdetails.contacting_you_phone(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

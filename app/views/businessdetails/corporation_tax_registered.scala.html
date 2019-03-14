@@ -26,11 +26,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.registeredforcorporationtax.title", "summary.aboutbusiness")
+    @heading("businessdetails.registeredforcorporationtax.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
@@ -38,7 +38,7 @@
 
         @fieldset(
             f = f("registeredforcorporationtax-fieldset"),
-            legend = "aboutthebusiness.registeredforcorporationtax.title",
+            legend = "businessdetails.registeredforcorporationtax.title",
             legendHidden = true,
             panel = false,
             classes = Seq("inline")
@@ -71,8 +71,8 @@
         ) {
             @input(
                 field = f("corporationTaxReference"),
-                labelText = "aboutthebusiness.registeredforcorporationtax.taxReference",
-                hintText = "aboutthebusiness.registeredforcorporationtax.taxReferenceHint",
+                labelText = "businessdetails.registeredforcorporationtax.taxReference",
+                hintText = "businessdetails.registeredforcorporationtax.taxReferenceHint",
                 bold = false,
                 attrType = "number",
                 attrMaxlength = "10",

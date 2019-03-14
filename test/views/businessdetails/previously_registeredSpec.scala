@@ -36,19 +36,19 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
 
-      def view = views.html.aboutthebusiness.previously_registered(form2, true)
+      def view = views.html.businessdetails.previously_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredformlr.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[PreviouslyRegistered] = Form2(PreviouslyRegisteredYes("prevMLRRegNo"))
 
-      def view = views.html.aboutthebusiness.previously_registered(form2, true)
+      def view = views.html.businessdetails.previously_registered(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredformlr.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
     }
 
@@ -60,7 +60,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
           (Path \ "prevMLRRegNo-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.previously_registered(form2, true)
+      def view = views.html.businessdetails.previously_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -76,7 +76,7 @@ class previously_registeredSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.previously_registered(form2, true)
+      def view = views.html.businessdetails.previously_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

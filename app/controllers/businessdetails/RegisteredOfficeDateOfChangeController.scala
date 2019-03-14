@@ -42,7 +42,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
       implicit authContext => implicit request =>
         Ok(views.html.date_of_change(
           Form2[DateOfChange](DateOfChange(LocalDate.now)),
-          "summary.aboutbusiness",
+          "summary.businessdetails",
           controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post()
         ))
     }
@@ -59,7 +59,7 @@ class RegisteredOfficeDateOfChangeController @Inject () (
           Form2[DateOfChange](request.body.asFormUrlEncoded.get ++ extraFields) match {
             case form: InvalidForm =>
               Future.successful(BadRequest(views.html.date_of_change(
-                form, "summary.aboutbusiness",
+                form, "summary.businessdetails",
                 controllers.businessdetails.routes.RegisteredOfficeDateOfChangeController.post())
               ))
             case ValidForm(_, dateOfChange) =>

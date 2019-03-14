@@ -26,11 +26,11 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.registeredforvat.title", "summary.aboutbusiness")
+    @heading("businessdetails.registeredforvat.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.registeredforvat.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
@@ -38,7 +38,7 @@
 
         @fieldset(
             f = f("registeredforvat-fieldset"),
-            legend = "aboutthebusiness.registeredforvat.title",
+            legend = "businessdetails.registeredforvat.title",
             legendHidden = true,
             panel = false,
             classes = Seq("inline")
@@ -70,8 +70,8 @@
         ) {
             @input(
                 field = f("vrnNumber"),
-                labelText = "aboutthebusiness.registeredforvat.lbl.vatNumber",
-                hintText = "aboutthebusiness.registeredforvat.lbl.vatNumber.hint",
+                labelText = "businessdetails.registeredforvat.lbl.vatNumber",
+                hintText = "businessdetails.registeredforvat.lbl.vatNumber.hint",
                 bold = false,
                 attrType = "number",
                 attrMaxlength = "9",

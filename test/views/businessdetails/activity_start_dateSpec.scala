@@ -35,19 +35,19 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
 
       val form2: ValidForm[ActivityStartDate] = Form2(ActivityStartDate(LocalDate.now))
 
-      def view = views.html.aboutthebusiness.activity_start_date(form2, true)
+      def view = views.html.businessdetails.activity_start_date(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.activity.start.date.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.activity.start.date.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[ActivityStartDate] = Form2(ActivityStartDate(LocalDate.now))
 
-      def view = views.html.aboutthebusiness.activity_start_date(form2, true)
+      def view = views.html.businessdetails.activity_start_date(form2, true)
 
       heading.html must be(Messages("businessdetails.activity.start.date.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
     }
 
@@ -58,7 +58,7 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
           (Path \ "startDate") -> Seq(ValidationError("not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.activity_start_date(form2, true)
+      def view = views.html.businessdetails.activity_start_date(form2, true)
 
       errorSummary.html() must include("not a message Key")
 
@@ -70,7 +70,7 @@ class activity_start_dateSpec extends AmlsSpec with MustMatchers {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.activity_start_date(form2, true)
+      def view = views.html.businessdetails.activity_start_date(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

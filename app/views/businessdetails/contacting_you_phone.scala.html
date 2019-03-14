@@ -24,28 +24,28 @@
 @header = {
     @components.back_link()
     @errorSummary(f)
-    @heading("aboutthebusiness.contactingyou.phone.title", "summary.aboutbusiness")
+    @heading("businessdetails.contactingyou.phone.title", "summary.businessdetails")
 }
 
 @main(
-    title = Messages("aboutthebusiness.contactingyou.phone.title") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("businessdetails.contactingyou.phone.title") + " - " + Messages("summary.businessdetails"),
     heading = header
 ) {
 
-    <p>@Messages("aboutthebusiness.contactingyou.phone.lbl2")</p>
+    <p>@Messages("businessdetails.contactingyou.phone.lbl2")</p>
 
     @form(f, controllers.businessdetails.routes.ContactingYouPhoneController.post(edit)) {
 
         @fieldset(
             f = f("contactingyou-fieldset"),
-            legend = "aboutthebusiness.contactingyou.phone.title",
+            legend = "businessdetails.contactingyou.phone.title",
             legendHidden = true,
             panel = false
         ) {
             @input(
                 field = f("phoneNumber"),
-                labelText = "aboutthebusiness.contactingyou.phone.lbl",
-                hintText = "aboutthebusiness.contactingyou.phone.hint",
+                labelText = "businessdetails.contactingyou.phone.lbl",
+                hintText = "businessdetails.contactingyou.phone.hint",
                 attrMaxlength = "24",
                 attrPattern = "[0-9()+\\- ]{1,24}",
                 labelHidden = true

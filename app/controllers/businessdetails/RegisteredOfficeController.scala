@@ -32,7 +32,7 @@ import uk.gov.hmrc.play.audit.http.connector.AuditResult.Success
 import uk.gov.hmrc.play.audit.http.connector.{AuditConnector, AuditResult}
 import uk.gov.hmrc.play.frontend.auth.connectors.AuthConnector
 import utils.DateOfChangeHelper
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 
 import scala.concurrent.Future
 

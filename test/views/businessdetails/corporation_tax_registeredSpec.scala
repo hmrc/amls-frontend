@@ -37,19 +37,19 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.businessdetails.corporation_tax_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforcorporationtax.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[CorporationTaxRegistered] = Form2(CorporationTaxRegisteredYes("1234567890"))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.businessdetails.corporation_tax_registered(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredforcorporationtax.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
     }
 
@@ -61,7 +61,7 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
           (Path \ "corporationTaxReference-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.businessdetails.corporation_tax_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -77,7 +77,7 @@ class corporation_tax_registeredSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.corporation_tax_registered(form2, true)
+      def view = views.html.businessdetails.corporation_tax_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }

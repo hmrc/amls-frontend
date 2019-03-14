@@ -28,7 +28,7 @@ import models.businessmatching.BusinessType.{LPrLLP, LimitedCompany}
 import play.api.mvc.{Request, Result}
 import uk.gov.hmrc.http.cache.client.CacheMap
 import uk.gov.hmrc.play.frontend.auth.AuthContext
-import views.html.aboutthebusiness.corporation_tax_registered
+import views.html.businessdetails.corporation_tax_registered
 import utils.ControllerHelper
 
 import scala.concurrent.ExecutionContext.Implicits.global

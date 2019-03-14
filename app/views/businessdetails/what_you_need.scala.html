@@ -20,22 +20,22 @@
 
 @header = {
     @components.back_link()
-    @heading("title.wyn", "summary.aboutbusiness")
+    @heading("title.wyn", "summary.businessdetails")
 }
 
 @whatyouneed(
-    title = Messages("title.wyn") + " - " + Messages("summary.aboutbusiness"),
+    title = Messages("title.wyn") + " - " + Messages("summary.businessdetails"),
     heading = header,
     sidebar = sidebar
 ) {
 
-    <p>@Messages("aboutthebusiness.whatyouneed.subheading")</p>
+    <p>@Messages("businessdetails.whatyouneed.subheading")</p>
 
     <ul class="list list-bullet">
-        <li>@Messages("aboutthebusiness.whatyouneed.line_1")</li>
-        <li>@Messages("aboutthebusiness.whatyouneed.line_2")</li>
-        <li>@Messages("aboutthebusiness.whatyouneed.line_3")</li>
-        <li>@Messages("aboutthebusiness.whatyouneed.line_4")</li>
+        <li>@Messages("businessdetails.whatyouneed.line_1")</li>
+        <li>@Messages("businessdetails.whatyouneed.line_2")</li>
+        <li>@Messages("businessdetails.whatyouneed.line_3")</li>
+        <li>@Messages("businessdetails.whatyouneed.line_4")</li>
     </ul>
 
 
@@ -43,9 +43,9 @@
         attrHref = controllers.businessdetails.routes.PreviouslyRegisteredController.get().toString,
         attrRole = true,
         linkText = Messages("button.continue"),
-        visuallyhidden = Messages("summary.aboutbusiness"),
+        visuallyhidden = Messages("summary.businessdetails"),
         returnLink = true,
-        id=Some("aboutthebusinesswhatyouneed-button")
+        id=Some("businessdetailswhatyouneed-button")
     )
 
 }

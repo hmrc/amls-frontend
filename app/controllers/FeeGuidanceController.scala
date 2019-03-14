@@ -62,9 +62,9 @@ class FeeGuidanceController @Inject()(val authConnector: AuthConnector,
         cacheMap <- optCacheMap
         responsiblepeople <- cacheMap.getEntry[Seq[ResponsiblePerson]](ResponsiblePerson.key).map(_.filterEmpty)
         tradingpremises <- cacheMap.getEntry[Seq[TradingPremises]](TradingPremises.key).map(_.filterEmpty)
-        aboutthebusiness <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
+        businessdetails <- cacheMap.getEntry[AboutTheBusiness](AboutTheBusiness.key)
         businessmatching <- cacheMap.getEntry[BusinessMatching](BusinessMatching.key)
-        previouslyRegistered <- aboutthebusiness.previouslyRegistered
+        previouslyRegistered <- businessdetails.previouslyRegistered
         activities <- businessmatching.activities
       } yield {
 

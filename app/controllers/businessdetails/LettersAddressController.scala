@@ -19,7 +19,7 @@ package controllers.businessdetails
 import connectors.DataCacheConnector
 import controllers.BaseController
 import models.businessdetails.{AboutTheBusiness, LettersAddress, RegisteredOffice}
-import views.html.aboutthebusiness._
+import views.html.businessdetails._
 import play.api.mvc.Result
 import _root_.forms.{EmptyForm, Form2, InvalidForm, ValidForm}
 import com.google.inject.Inject

@@ -37,19 +37,19 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers  {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.aboutthebusiness.vat_registered(form2, true)
+      def view = views.html.businessdetails.vat_registered(form2, true)
 
-      doc.title must startWith(Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.aboutbusiness"))
+      doc.title must startWith(Messages("businessdetails.registeredforvat.title") + " - " + Messages("summary.businessdetails"))
     }
 
     "have correct headings" in new ViewFixture {
 
       val form2: ValidForm[VATRegistered] = Form2(VATRegisteredYes("1234"))
 
-      def view = views.html.aboutthebusiness.vat_registered(form2, true)
+      def view = views.html.businessdetails.vat_registered(form2, true)
 
       heading.html must be(Messages("businessdetails.registeredforvat.title"))
-      subHeading.html must include(Messages("summary.aboutbusiness"))
+      subHeading.html must include(Messages("summary.businessdetails"))
 
     }
 
@@ -61,7 +61,7 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers  {
           (Path \ "vrnNumber-panel") -> Seq(ValidationError("second not a message Key"))
         ))
 
-      def view = views.html.aboutthebusiness.vat_registered(form2, true)
+      def view = views.html.businessdetails.vat_registered(form2, true)
 
       errorSummary.html() must include("not a message Key")
       errorSummary.html() must include("second not a message Key")
@@ -77,7 +77,7 @@ class vat_registeredSpec extends AmlsSpec with MustMatchers  {
     "have a back link" in new ViewFixture {
       val form2: Form2[_] = EmptyForm
 
-      def view = views.html.aboutthebusiness.vat_registered(form2, true)
+      def view = views.html.businessdetails.vat_registered(form2, true)
 
       doc.getElementsByAttributeValue("class", "link-back") must not be empty
     }
