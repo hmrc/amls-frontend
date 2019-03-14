@@ -17,14 +17,14 @@
 package controllers.businessactivities
 
 import connectors.DataCacheConnector
-import models.businessactivities.{BusinessActivities, TaxMatters}
+import models.businessactivities._
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.mockito.Matchers._
 import org.mockito.Mockito._
 import org.scalatest.concurrent.ScalaFutures
 import org.scalatest.mock.MockitoSugar
-import  utils.AmlsSpec
+import utils.AmlsSpec
 import play.api.i18n.Messages
 import play.api.libs.json.Json
 import play.api.test.Helpers._
@@ -50,7 +50,10 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       "display the 'Manage Your Tax Affairs?' page with an empty form" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(None))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
+              accountantsTradingName = None,
+              address = UkAccountantsAddress("", "", None, None, "")))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -64,7 +67,9 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       "display the 'Manage Your Tax Affairs?' page with pre populated data if found in cache" in new Fixture {
 
         when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
-          .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true))))))
+          .thenReturn(Future.successful(Some(BusinessActivities(taxMatters = Some(TaxMatters(true)),
+            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
+              accountantsTradingName = None, address = UkAccountantsAddress("", "", None, None, "")))))))
 
         val result = controller.get()(request)
         status(result) must be(OK)
@@ -97,6 +102,12 @@ class TaxMattersControllerSpec extends AmlsSpec with MockitoSugar with ScalaFutu
       }
 
       "respond with Bad Request on post with invalid data" in new Fixture {
+        when(controller.dataCacheConnector.fetch[BusinessActivities](any())(any(), any(), any()))
+          .thenReturn(Future.successful(Some(BusinessActivities(
+            whoIsYourAccountant = Some(WhoIsYourAccountant(accountantsName = "Accountant name",
+              accountantsTradingName = None,
+              address = UkAccountantsAddress("", "", None, None, "")))))))
+
         val newRequest = request.withFormUrlEncodedBody(
           "manageYourTaxAffairs" -> "grrrrr"
         )

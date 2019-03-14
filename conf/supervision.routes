@@ -3,6 +3,15 @@ GET         /what-you-need                                                @contr
 GET         /supervised                                                   @controllers.supervision.AnotherBodyController.get(edit: Boolean ?= false)
 POST        /supervised                                                   @controllers.supervision.AnotherBodyController.post(edit: Boolean ?= false)
 
+GET         /supervised-start-date                                        @controllers.supervision.SupervisionStartController.get(edit: Boolean ?= false)
+POST        /supervised-start-date                                        @controllers.supervision.SupervisionStartController.post(edit: Boolean ?= false)
+
+GET         /supervised-end-date                                          @controllers.supervision.SupervisionEndController.get(edit: Boolean ?= false)
+POST        /supervised-end-date                                          @controllers.supervision.SupervisionEndController.post(edit: Boolean ?= false)
+
+GET         /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.get(edit: Boolean ?= false)
+POST        /supervised-end-reasons                                       @controllers.supervision.SupervisionEndReasonsController.post(edit: Boolean ?= false)
+
 GET         /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.get(edit: Boolean ?= false)
 POST        /professional-body                                            @controllers.supervision.ProfessionalBodyMemberController.post(edit: Boolean ?= false)
 

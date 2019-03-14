@@ -17,30 +17,33 @@
 @import include._
 @import forms2._
 
-@(f: forms.Form2[_], edit: Boolean, index: Int, flow: Option[String], personName: String)(implicit request: Request[_],m:Messages)
+@(f: forms.Form2[_], edit: Boolean)(implicit request: Request[_],m:Messages)
+
+@target = @{
+    s"""${f("anotherBody").id}-panel"""
+}
 
 @header = {
     @components.back_link()
-    @errorSummaryWithPlaceholder(f, personName)
-    @headingWithPlaceholder(("responsiblepeople.date.of.birth.heading", personName), "summary.responsiblepeople")
+    @errorSummary(f)
+    @heading("supervision.supervision_start.title", "summary.supervision")
 }
 
 @main(
-    title = Messages("responsiblepeople.date.of.birth.title") + " - " + Messages("summary.responsiblepeople"),
+    title = Messages("supervision.supervision_start.title") + " - " + Messages("summary.supervision"),
     heading = header
-) {
+)  {
 
-    @form(f, controllers.responsiblepeople.routes.DateOfBirthController.post(index, edit, flow)) {
+    @form(f, controllers.supervision.routes.SupervisionStartController.post(edit)) {
 
         @date(
-            f = f,
-            p = "dateOfBirth",
-            labelText = "responsiblepeople.date.of.birth.title",
-            hintText = "",
-            example = true
-        )
+                f = f,
+                p = "startDate",
+                labelText = "supervision.supervision_start.title",
+                legendHidden = true,
+                example = true
+            )
 
-        @submit()
-
-        }
+        @submit(edit)
+    }
 }

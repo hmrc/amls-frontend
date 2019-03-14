@@ -16,7 +16,6 @@
 
 package controllers.businessmatching.updateservice
 
-import cats.data.OptionT
 import cats.implicits._
 import config.AppConfig
 import generators.ResponsiblePersonGenerator
@@ -31,7 +30,6 @@ import org.joda.time.LocalDate
 import org.mockito.Matchers.{any, eq => eqTo}
 import org.mockito.Mockito.{never, verify, when}
 import org.scalacheck.Gen
-import org.scalatest.MustMatchers
 import play.api.test.Helpers._
 import services.{ResponsiblePeopleService, TradingPremisesService}
 import utils.{AmlsSpec, AuthorisedFixture, DependencyMocks, FutureAssertions}
@@ -121,7 +119,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
 
     "leave the supervision section alone" when {
       "the business has ASP" in new Fixture {
-        val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", LocalDate.now, LocalDate.now, "no reason")),
+        val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", Some(SupervisionStart(LocalDate.now)), Some(SupervisionEnd(LocalDate.now)), Some(SupervisionEndReasons("no reason")))),
           Some(ProfessionalBodyMemberNo),
           None,
           Some(ProfessionalBodyNo))
@@ -139,7 +137,7 @@ class AddBusinessTypeHelperSpec extends AmlsSpec
     }
 
     "the business has TCSP" in new Fixture {
-      val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", LocalDate.now, LocalDate.now, "no reason")),
+      val supervisionModel = Supervision(Some(AnotherBodyYes("Some supervisor", Some(SupervisionStart(LocalDate.now)), Some(SupervisionEnd(LocalDate.now)), Some(SupervisionEndReasons("no reason")))),
         Some(ProfessionalBodyMemberNo),
         None,
         Some(ProfessionalBodyNo))
