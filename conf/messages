@@ -689,7 +689,7 @@ progress.visuallyhidden.edit = You can edit this section.
 progress.visuallyhidden.continue = You can continue this section.
 progress.visuallyhidden.view.amend = View and amend your information
 progress.visuallyhidden.view.started = Section incomplete
-progress.preapplication.canedit = change
+progress.preapplication.canedit = Add or remove services
 progress.preapplication.readonly = view details
 
 progress.submit.updates = Submit Updates
