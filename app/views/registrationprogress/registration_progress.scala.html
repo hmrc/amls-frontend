@@ -31,8 +31,6 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
     <div class="grid-layout">
         <div class="grid-layout__column grid-layout__column--2-3">
             @heading("progress.title")
-
-
             <p>@Messages("progress.lede")</p>
             <p>@Messages("progress.saved.automatically")</p>
         </div>
@@ -50,12 +48,12 @@ title = Messages("progress.title") + " - " + Messages("title.yapp")
         </div>
     }
 
-    <div class="grid-layout grid-layout--stacked">
+    <div class="grid-layout">
 
         @* Main sections *@
-        <ul class="grid-layout__column grid-layout__column--2-3 progress-steps">
+        <ul class="grid-layout__column grid-layout__column--2-3 display-block">
             @sections.map { case Section(name, status, _, call) =>
-            @section(name, status, call)
+                @section(name, status, call)
             }
         </ul>
 
